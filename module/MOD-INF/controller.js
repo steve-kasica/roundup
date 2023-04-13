@@ -35,12 +35,32 @@ var html = "text/html";
 var encoding = "UTF-8";
 var ClientSideResourceManager = Packages.com.google.refine.ClientSideResourceManager;
 
+/**
+ * Register extension commands.
+ *
+ * Each Roundup command is accessible via /commands/roundup/<endpoint>
+ */
+function registerCommands() {
+  var refineServlet = Packages.com.google.refine.RefineServlet;
+  var commands = Packages.com.google.refine.roundup.commands;
+
+  var cmds = [{
+    endpoint: 'set-metadata', className: new commands.SetMetadata()
+  }];
+
+  cmds.forEach(function(cmd) {
+    refineServlet.registerCommand(module, cmd.endpoint, cmd.className);
+  });
+}
+
 /*
  * Function invoked to initialize the extension.
  */
 function init() {
   // Packages.java.lang.System.err.println("Initializing sample extension");
   // Packages.java.lang.System.err.println(module.getMountPoint());
+
+  registerCommands();
 
   // Script files to inject into /project page
   ClientSideResourceManager.addPaths(
