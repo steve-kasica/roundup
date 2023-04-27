@@ -5,7 +5,7 @@
 <html>
   <head>
     <title>Roundup</title>
-    <link rel="stylesheet" href="styles/roundup.less">
+    <link rel="stylesheet" href="styles/roundup.css">
   </head>
   <body>
     <h1>Roundup</h1>

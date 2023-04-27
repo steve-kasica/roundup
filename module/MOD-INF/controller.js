@@ -62,22 +62,20 @@ function init() {
 
   registerCommands();
 
-  // Script files to inject into /project page
   ClientSideResourceManager.addPaths(
-    "project/scripts",
+    "index/scripts", // Find this script @ 127.0.0.1:3333/index-bundle.js
     module,
     [
       "scripts/roundup.js"
     ]
   );
 
-  // Style files to inject into /project page
   ClientSideResourceManager.addPaths(
-    "project/styles",
-    module,
-    [
-      "styles/roundup.less"
-    ]
+      "index/styles", // Find these stylesheets @ 127.0.0.1:3333/extension/roundup/styles
+      module,
+      [
+        "styles/roundup.less"
+      ]
   );
 }
 
@@ -92,8 +90,8 @@ function process(path, request, response) {
     // here's how to pass things into the .vt templates
     context.someList = ["Superior","Michigan","Huron","Erie","Ontario"];
     context.someString = "foo";
-    context.someInt = Packages.com.google.refine.roundup.SampleUtil.stringArrayLength(context.someList);
-    context.projects = Packages.com.google.refine.ProjectManager;
+    // context.someInt = Packages.com.google.refine.roundup.SampleUtil.stringArrayLength(context.someList);
+    // context.projects = Packages.com.google.refine.ProjectManager;
 
     send(request, response, "index.vt", context);
   }
