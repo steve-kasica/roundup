@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../OpenRefine/main/src/com/google/refine">
+      <sourceFolder url="file://$MODULE_DIR$/../OpenRefine/main/src/com/google/refine" isTestSource="false" packagePrefix="com.google.refine" />
+    </content>
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+  </component>
+</module>

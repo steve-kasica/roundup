@@ -20,7 +20,7 @@ public class GetProjectSetNames extends Command {
         @JsonProperty("project-sets")
         protected Set<String> projectSets;
 
-        protected AllProjectSetNames(Set<String> projectSets) {
+        protected void AllProjectSetNames(Set<String> projectSets) {
             this.projectSets = projectSets;
         }
     }
@@ -31,7 +31,7 @@ public class GetProjectSetNames extends Command {
 
         Map<String, Integer> tagMap = ProjectManager.singleton.getAllProjectTags();
         Set<String> tags = tagMap == null ? Collections.emptySet() : tagMap.keySet();
-        respondJSON(response, new GetAllProjectTagsCommand.AllProjectsTags(tags));
+//        respondJSON(response, new GetAllProjectTagsCommand.AllProjectsTags(tags));
     }
 
 }
