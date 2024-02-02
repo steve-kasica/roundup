@@ -1,34 +1,7 @@
-/*
-
-Copyright 2010, Google Inc.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
- * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
- * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,           
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY           
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+/**
+ * controller.js
+ *
+ * Restart OpenRefine after making changes to this file, no need to recompile the extension or OpenRefine.
  */
 
 var html = "text/html";
@@ -38,45 +11,49 @@ var ClientSideResourceManager = Packages.com.google.refine.ClientSideResourceMan
 /**
  * Register extension commands.
  *
- * Each Roundup command is accessible via /commands/roundup/<endpoint>
+ * Each Roundup command is accessible via /command/roundup/<endpoint>.
  */
 function registerCommands() {
-  var refineServlet = Packages.com.google.refine.RefineServlet;
-  var commands = Packages.com.google.refine.roundup.commands;
+    Packages.java.lang.System.out.println("Registering Roundup commands");
 
-  var cmds = [{
-    endpoint: 'set-metadata', className: new commands.SetMetadata()
-  }];
+    var refineServlet = Packages.com.google.refine.RefineServlet;
+    var commands = Packages.com.google.refine.roundup.commands;
 
-  cmds.forEach(function(cmd) {
-    refineServlet.registerCommand(module, cmd.endpoint, cmd.className);
-  });
+    // Register commands
+    [
+        {endpoint: 'insert-rows', className: new commands.row.InsertRowsCommand()},
+        {endpoint: 'scratch', className: new commands.Scratch()},
+        // {endpoint: 'set-metadata', className: new commands.SetMetadata()},
+    ].forEach(function(cmd) {
+        Packages.java.lang.System.out.println("\t/commands/roundup/" + cmd.endpoint);
+        refineServlet.registerCommand(module, cmd.endpoint, cmd.className);
+    });
 }
 
 /*
  * Function invoked to initialize the extension.
  */
 function init() {
-  // Packages.java.lang.System.err.println("Initializing sample extension");
-  // Packages.java.lang.System.err.println(module.getMountPoint());
+    Packages.java.lang.System.err.println("Initializing Roundup extension");
+    Packages.java.lang.System.err.println(module.getMountPoint());
 
-  registerCommands();
+    registerCommands();
 
-  ClientSideResourceManager.addPaths(
-    "index/scripts", // Find this script @ 127.0.0.1:3333/index-bundle.js
-    module,
-    [
-      "scripts/roundup.js"
-    ]
-  );
-
-  ClientSideResourceManager.addPaths(
-      "index/styles", // Find these stylesheets @ 127.0.0.1:3333/extension/roundup/styles
-      module,
-      [
-        "styles/roundup.less"
-      ]
-  );
+    // ClientSideResourceManager.addPaths(
+    //     "index/scripts", // Find this script at /index-bundle.js
+    //     module,
+    //     [
+    //         "scripts/roundup.js"
+    //     ]
+    // );
+    //
+    // ClientSideResourceManager.addPaths(
+    //     "index/styles", // Find these stylesheets at /extension/roundup/*
+    //     module,
+    //     [
+    //         "styles/roundup.less"
+    //     ]
+    // );
 }
 
 /*

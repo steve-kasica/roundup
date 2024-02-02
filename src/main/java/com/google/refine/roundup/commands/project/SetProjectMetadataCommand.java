@@ -1,4 +1,4 @@
-package com.google.refine.roundup.commands;
+package com.google.refine.roundup.commands.project;
 
 import com.google.refine.ProjectManager;
 import com.google.refine.ProjectMetadata;
@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  *
  */
-public class SetMetadata extends Command {
+public class SetProjectMetadataCommand extends Command {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)

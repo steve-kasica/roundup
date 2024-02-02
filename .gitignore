@@ -3,3 +3,10 @@ module/MOD-INF/classes/
 module/MOD-INF/lib/
 
 .idea
+.DS_Store
+
+/src/main/resources/
+/src/test/resources/
+
+# soft link to OpenRefine's workspace directory
+workspace
