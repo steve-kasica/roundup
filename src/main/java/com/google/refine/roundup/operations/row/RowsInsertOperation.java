@@ -62,7 +62,7 @@ public class RowsInsertOperation extends EngineDependentOperation {
 
     @Override
     public String getOperationId() {
-        return "roundup/RowInsertionOperation";
+        return "roundup/RowsInsertOperation";
     }
 
     // TODO: Do I need to include column model to know what types each cell in the row is?
