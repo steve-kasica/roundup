@@ -22,6 +22,7 @@ function registerCommands() {
     // Register commands
     [
         {endpoint: 'insert-rows', className: new commands.row.InsertRowsCommand()},
+        {endpoint: 'aggregate-rows', className: new commands.row.AggregateRowsCommand()},
         {endpoint: 'scratch', className: new commands.Scratch()},
         // {endpoint: 'set-metadata', className: new commands.SetMetadata()},
     ].forEach(function(cmd) {
