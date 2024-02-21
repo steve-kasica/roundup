@@ -23,6 +23,7 @@ function registerCommands() {
     [
         {endpoint: 'insert-rows', className: new commands.row.InsertRowsCommand()},
         {endpoint: 'aggregate-rows', className: new commands.row.AggregateRowsCommand()},
+        {endpoint: 'copy-project', className: new commands.project.CopyProjectCommand()},
         {endpoint: 'scratch', className: new commands.Scratch()},
         // {endpoint: 'set-metadata', className: new commands.SetMetadata()},
     ].forEach(function(cmd) {

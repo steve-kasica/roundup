@@ -24,6 +24,7 @@
         <!-- Dependency properties -->
         <openrefine.version>3.7.2</openrefine.version>
         <junit.jupiter.version>5.10.1</junit.jupiter.version>
+        <jackson.datatype.jsr310.version>2.16.1</jackson.datatype.jsr310.version>
     </properties>
 
     <build>
@@ -124,6 +125,13 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- support for "Java 8 Dates" -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.datatype.jsr310.version}</version>
         </dependency>
 
     </dependencies>
