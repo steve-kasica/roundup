@@ -6,26 +6,16 @@ import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Project;
 import com.google.refine.roundup.operations.row.RowsInsertOperation;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class InsertRowsCommand extends EngineDependentCommand {
 
-    // TODO: delete when done developing
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        respondJSON(response, "hey");
-    }
-
-    // Used for debugging post request
-//    @Override
-//    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        respondJSON(response, 'hey');
-//    }
+    private String indicesParam = "indices";
+    private String rowDataParam = "rows";
 
     /**
      *
@@ -38,58 +28,64 @@ public class InsertRowsCommand extends EngineDependentCommand {
      * @return AbstractOperation
      * @throws Exception: TK
      */
-    // TODO: write test for request that does not have a rows parameter, how does the server respond?
     @Override
     protected AbstractOperation createOperation(Project project,
                                                 HttpServletRequest request,
-                                                EngineConfig engineConfig) throws Exception {
+                                                EngineConfig engineConfig) throws ServletException {
 
-        // Set rows parameter
-        List<List<String>> newRows = parseRows(request);
+        // Get rows parameter
+        assertParamExists(request, rowDataParam);
+        List<List<String>> rowData = getRowData(request);
 
-        // Get index parameter
-        int index = parseIndex(request);
+        // Get indices parameter
+        assertParamExists(request, indicesParam);
+        List<Integer> indices = getIndices(request);
 
-        return new RowsInsertOperation(
-                engineConfig,
-                newRows,
-                index
-        );
+        if (indices.size() != rowData.size()) {
+            String msg = String.format("Parameter sizes are unequal %s = %d and %s = %d",
+                    indicesParam, indices.size(), rowDataParam, rowData.size());
+            throw new ServletException(msg);
+        }
+
+        return new RowsInsertOperation(rowData, indices);
 
     }
 
-    private List<List<String>> parseRows(HttpServletRequest request) {
-        if (!request.getParameterMap().containsKey("rows") || request.getParameter("rows") == null) {
-            // If 'rows' parameter is missing or null, throw error
-            throw new IllegalArgumentException("parameter 'rows' should not be null");
-        }
-
+    /**
+     *
+     * @param request
+     * @return
+     */
+    private List<List<String>> getRowData(HttpServletRequest request) {
         String [] rows = request.getParameterValues("rows");
-
-        // TODO: If the length of rows is not equal to the number of columns, throw an error
-
         return Arrays.stream(rows)
                 .map(r -> Arrays.asList(r.split(",")))
                 .collect(Collectors.toList());
 
     }
 
-    private int parseIndex(HttpServletRequest request) {
-        String[] indexParam = {"0"};
-        int index;
-        if (request.getParameterMap().containsKey("index") || request.getParameter("index") != null) {
-            indexParam = request.getParameterValues("index");
-
-            // TODO: If indexParameter has more than one value, throw an error
-
-        }
-
+    /**
+     *
+     * @param request
+     * @return
+     * @throws ServletException
+     */
+    private List<Integer> getIndices(HttpServletRequest request) {
         // TODO: If indexParameter is not an integer, throw an error
-        index = Integer.parseInt(indexParam[0]);
+        return Arrays.stream(request.getParameterValues(indicesParam))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+    }
 
-        // TODO: If index > the number of rows in the project, throw an error
-
-        // Return valid row index
-        return index;
+    /**
+     *
+     * @param request
+     * @param param
+     * @throws ServletException
+     */
+    private void assertParamExists(HttpServletRequest request, String param) throws ServletException {
+        if (!request.getParameterMap().containsKey(param) || request.getParameter(param) == null) {
+            throw new ServletException(String.format("Parameter \"%s\" is required", param));
+        }
     }
 }

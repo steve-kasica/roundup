@@ -4,7 +4,7 @@
 
     <!--  TODO: should groupId be unique, e.g. "<groupId>org.kasica</groupId>"?-->
     <groupId>org.openrefine.extensions</groupId>
-    <artifactId>refine-openroundup-extension</artifactId>
+    <artifactId>roundup</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <packaging>pom</packaging>

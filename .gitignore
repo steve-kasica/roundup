@@ -1,12 +1,10 @@
 target
 module/MOD-INF/classes/
 module/MOD-INF/lib/
+module/production
 
 .idea
 .DS_Store
 
-/src/main/resources/
-/src/test/resources/
-
-# soft link to OpenRefine's workspace directory
-workspace
+src/main/resources/
+src/test/resources/

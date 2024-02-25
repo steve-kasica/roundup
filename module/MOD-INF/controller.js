@@ -24,6 +24,7 @@ function registerCommands() {
         {endpoint: 'insert-rows', className: new commands.row.InsertRowsCommand()},
         {endpoint: 'aggregate-rows', className: new commands.row.AggregateRowsCommand()},
         {endpoint: 'copy-project', className: new commands.project.CopyProjectCommand()},
+        {endpoint: 'interpolate-rows', className: new commands.row.InterpolateRowsCommand()},
         {endpoint: 'scratch', className: new commands.Scratch()},
         // {endpoint: 'set-metadata', className: new commands.SetMetadata()},
     ].forEach(function(cmd) {
@@ -32,14 +33,36 @@ function registerCommands() {
     });
 }
 
-/*
+/**
  * Function invoked to initialize the extension.
  */
 function init() {
-    Packages.java.lang.System.err.println("Initializing Roundup extension");
-    Packages.java.lang.System.err.println(module.getMountPoint());
+    print("Initializing Roundup extension");
+    print(module.getMountPoint());
+
+    var RefineServlet = Packages.com.google.refine.RefineServlet;
+    var roundup = Packages.com.google.refine.roundup;
+
+    // Register model changes
+    RefineServlet.registerClassMapping(
+        "com.google.refine.roundup.model.changes.RowAdditionChange",
+        "com.google.refine.roundup.model.changes.RowAdditionChange"
+    );
+
+    RefineServlet.cacheClass(roundup.model.changes.RowAdditionChange);
+
+    // Register operations
+    Packages.com.google.refine.operations.OperationRegistry.registerOperation(
+        module,
+        "insert-rows",
+        roundup.operations.row.RowsInsertOperation
+    )
 
     registerCommands();
+
+    function print(message) {
+        Packages.java.lang.System.err.println(message);
+    }
 
     // ClientSideResourceManager.addPaths(
     //     "index/scripts", // Find this script at /index-bundle.js

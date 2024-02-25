@@ -38,16 +38,13 @@ public class RowsInsertOperationTest {
         r3.add("5647392740");
         _m.add(r3);
 
-        _op = new RowsInsertOperation(null, _m, 0);
+        List<Integer> i = new ArrayList<>();
+        i.add(0);
+        i.add(1);
+        i.add(2);
 
-    }
+        _op = new RowsInsertOperation(_m, i);
 
-    @Test
-    @DisplayName("Row counts are equal")
-    public void testRowCount() {
-        int expected = _m.size();
-        int actual = _op.getRows().size();
-        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -57,7 +54,7 @@ public class RowsInsertOperationTest {
                 .map(r -> r.size())
                 .collect(Collectors.toList());
 
-        List<Integer> actual = _op.getRows().stream()
+        List<Integer> actual = RowsInsertOperation.parseRows(_m).stream()
                 .map(r -> r.cells.size())
                 .collect(Collectors.toList());
 
@@ -67,36 +64,19 @@ public class RowsInsertOperationTest {
     @Test
     @DisplayName("All list items are Row instances")
     public void testListItemClass() {
-        for (Object obj : _op.getRows()) {
+        List<Row> rows = RowsInsertOperation.parseRows(_m);
+        for (Object obj : rows) {
             Assertions.assertTrue(obj instanceof Row);
         }
     }
 
     @Test
-    @DisplayName("Test class stuff")
-    public void testOperationID() {
-        System.out.println(_op.getClass());
-    }
-
-//    @Test
-//    @DisplayName("All cell types match input value types")
-//    // TODO, not sure how to implement this test. Do I need to do Java Types and the column types specified in OpenRefine? I probably need to do both.
-//    public void testCellValueTypes() {
-//        List<Row> rows = _op.getRows();
-//        for (int i = 0; i < rows.size(); i++) {
-//            for (int j = 0; j < _m.size(); j++) {
-////                String expected = _m.get(i).get(j);
-////                Object actual = rows.get(i).getCellValue(j);
-//                Assertions.assertTrue(false);
-////                Assertions.assertEquals(expected, actual);
-//            }
-//        }
-//    }
-
-    @Test
-    @DisplayName("All cell values match input values")
-    public void testRowValues() {
-        List<Row> rows = _op.getRows();
+    @DisplayName("All cell types match input value types")
+    // TODO, not sure how to implement this test.
+    //  Do I need to do Java Types and the column types specified in OpenRefine?
+    //  I probably need to do both.
+    public void testCellValueTypes() {
+        List<Row> rows = RowsInsertOperation.parseRows(_m);
         for (int i = 0; i < rows.size(); i++) {
             for (int j = 0; j < _m.size(); j++) {
                 String expected = _m.get(i).get(j);
@@ -106,4 +86,29 @@ public class RowsInsertOperationTest {
         }
     }
 
+    @Test
+    @DisplayName("OperationID is correct")
+    public void testOperationID() {
+        String [] className = _op.getClass().toString().split("\\.");
+        String expected = String.format("roundup/%s", className[className.length - 1]);
+
+        String actual = _op.getOperationId();
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("`parseRows` input and output values are equal")
+    public void testRowValues() {
+        List<Row> rows = RowsInsertOperation.parseRows(_m);
+        String expected;
+        Object actual;
+
+        for (int i = 0; i < rows.size(); i++) {
+            for (int j = 0; j < _m.size(); j++) {
+                expected = _m.get(i).get(j);
+                actual = rows.get(i).getCellValue(j);
+                Assertions.assertEquals(expected, actual);
+            }
+        }
+    }
 }
