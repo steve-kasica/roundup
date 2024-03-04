@@ -1,14 +1,15 @@
 package com.google.refine.roundup.operations.row;
 
-import com.google.refine.model.Row;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.google.refine.model.Row;
 
 
 public class RowsInsertOperationTest {
@@ -38,12 +39,18 @@ public class RowsInsertOperationTest {
         r3.add("5647392740");
         _m.add(r3);
 
-        List<Integer> i = new ArrayList<>();
-        i.add(0);
-        i.add(1);
-        i.add(2);
+        int i = 0;
 
         _op = new RowsInsertOperation(_m, i);
+
+    }
+
+    @Test
+    @DisplayName("Row count is correct")
+    public void testRowCount() {
+        int actual = _op.getRowCount();
+        int expected = _m.size();
+        Assertions.assertEquals(expected,actual);
 
     }
 

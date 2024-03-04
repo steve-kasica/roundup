@@ -1,20 +1,21 @@
 package com.google.refine.roundup.commands.row;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
 import com.google.refine.browsing.EngineConfig;
 import com.google.refine.commands.EngineDependentCommand;
 import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Project;
 import com.google.refine.roundup.operations.row.RowsInsertOperation;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class InsertRowsCommand extends EngineDependentCommand {
 
-    private String indicesParam = "indices";
+    private String indexParam = "index";
     private String rowDataParam = "rows";
 
     /**
@@ -34,20 +35,16 @@ public class InsertRowsCommand extends EngineDependentCommand {
                                                 EngineConfig engineConfig) throws ServletException {
 
         // Get rows parameter
-        assertParamExists(request, rowDataParam);
         List<List<String>> rowData = getRowData(request);
 
+        // TODO: verify that row size (# of columns) is not out of bounds
+
         // Get indices parameter
-        assertParamExists(request, indicesParam);
-        List<Integer> indices = getIndices(request);
+        int index = getIndex(request);
 
-        if (indices.size() != rowData.size()) {
-            String msg = String.format("Parameter sizes are unequal %s = %d and %s = %d",
-                    indicesParam, indices.size(), rowDataParam, rowData.size());
-            throw new ServletException(msg);
-        }
+        // TODO: verify that index is not out of bounds
 
-        return new RowsInsertOperation(rowData, indices);
+        return new RowsInsertOperation(rowData, index);
 
     }
 
@@ -56,10 +53,13 @@ public class InsertRowsCommand extends EngineDependentCommand {
      * @param request
      * @return
      */
-    private List<List<String>> getRowData(HttpServletRequest request) {
-        String [] rows = request.getParameterValues("rows");
+    private List<List<String>> getRowData(HttpServletRequest request) throws ServletException {
+        assertParamExists(request, rowDataParam);
+        String [] rows = request.getParameterValues(rowDataParam);
+
+        String delim = ",";
         return Arrays.stream(rows)
-                .map(r -> Arrays.asList(r.split(",")))
+                .map(r -> Arrays.asList(r.split(delim)))
                 .collect(Collectors.toList());
 
     }
@@ -70,11 +70,9 @@ public class InsertRowsCommand extends EngineDependentCommand {
      * @return
      * @throws ServletException
      */
-    private List<Integer> getIndices(HttpServletRequest request) {
-        // TODO: If indexParameter is not an integer, throw an error
-        return Arrays.stream(request.getParameterValues(indicesParam))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+    private Integer getIndex(HttpServletRequest request) throws ServletException {
+        assertParamExists(request, indexParam);
+        return Integer.parseInt(request.getParameter(indexParam));
     }
 
     /**
