@@ -1,9 +1,10 @@
 package com.google.refine.roundup.util;
 
-import com.google.refine.model.Cell;
+import java.io.Serializable;
+
 import org.apache.commons.lang.SerializationUtils;
 
-import java.io.Serializable;
+import com.google.refine.model.Cell;
 
 public class CellUtil {
 

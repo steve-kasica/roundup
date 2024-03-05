@@ -25,14 +25,14 @@ import com.google.refine.model.Row;
 import com.google.refine.operations.EngineDependentOperation;
 import com.google.refine.roundup.model.changes.RowAdditionChange;
 
-public class RowInterpolateOperation extends EngineDependentOperation {
+public class RowsInterpolateOperation extends EngineDependentOperation {
 
     final private Integer _groupCellIndex;
     final private Integer _valueCellIndex;
     final private ChronoUnit _step;
     private int _count = 0;
     @JsonCreator
-    public RowInterpolateOperation(
+    public RowsInterpolateOperation(
             @JsonProperty("engineConfig") EngineConfig engineConfig,
             @JsonProperty("groupCellIndex") int groupCellIndex,
             @JsonProperty("valueColumn") int valueCellIndex,

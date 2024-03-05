@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.google.refine.roundup.RoundupTest;
 
-public class TestRowInterpolateOperation extends RoundupTest {
+public class TestRowsInterpolateOperation extends RoundupTest {
 
     @Test
     @DisplayName("Interpolated days is correct size")
@@ -20,7 +20,7 @@ public class TestRowInterpolateOperation extends RoundupTest {
         OffsetDateTime end = OffsetDateTime.of(2024, 1, 31,0,0,0,0,ZoneOffset.UTC);
         long expected = 29;
 
-        List<OffsetDateTime> dts = RowInterpolateOperation.interpolate(start, end, ChronoUnit.DAYS);
+        List<OffsetDateTime> dts = RowsInterpolateOperation.interpolate(start, end, ChronoUnit.DAYS);
         long actual = dts.size();
 
         Assertions.assertEquals(expected, actual);
@@ -32,7 +32,7 @@ public class TestRowInterpolateOperation extends RoundupTest {
         OffsetDateTime start = OffsetDateTime.of(2024, 1, 01,0,0,0,0,ZoneOffset.UTC);
         OffsetDateTime end = OffsetDateTime.of(2024, 1, 10,0,0,0,0,ZoneOffset.UTC);
 
-        List<OffsetDateTime> dts = RowInterpolateOperation.interpolate(start, end, ChronoUnit.DAYS);
+        List<OffsetDateTime> dts = RowsInterpolateOperation.interpolate(start, end, ChronoUnit.DAYS);
         testExclusivity(start, end, dts);
     }
 
@@ -43,7 +43,7 @@ public class TestRowInterpolateOperation extends RoundupTest {
         OffsetDateTime end = OffsetDateTime.of(2024, 12, 1,0,0,0,0,ZoneOffset.UTC);
         long expected = 10;
 
-        List<OffsetDateTime> dts = RowInterpolateOperation.interpolate(start, end, ChronoUnit.MONTHS);
+        List<OffsetDateTime> dts = RowsInterpolateOperation.interpolate(start, end, ChronoUnit.MONTHS);
         long actual = dts.size();
 
         Assertions.assertEquals(expected, actual);
@@ -54,7 +54,7 @@ public class TestRowInterpolateOperation extends RoundupTest {
     public void testInterpolateMonthsExclusive() {
         OffsetDateTime start = OffsetDateTime.of(2024, 1, 1,0,0,0,0, ZoneOffset.UTC);
         OffsetDateTime end = OffsetDateTime.of(2024, 11, 1,0,0,0,0, ZoneOffset.UTC);
-        List<OffsetDateTime> dts = RowInterpolateOperation.interpolate(start, end, ChronoUnit.MONTHS);
+        List<OffsetDateTime> dts = RowsInterpolateOperation.interpolate(start, end, ChronoUnit.MONTHS);
         testExclusivity(start, end, dts);
     }
 
@@ -63,7 +63,7 @@ public class TestRowInterpolateOperation extends RoundupTest {
     public void testDuplicateDates() {
         OffsetDateTime start = OffsetDateTime.of(2024, 1, 1,0,0,0,0, ZoneOffset.UTC);
         OffsetDateTime end = OffsetDateTime.of(2024, 11, 1,0,0,0,0, ZoneOffset.UTC);
-        List<OffsetDateTime> dts = RowInterpolateOperation.interpolate(start, end, ChronoUnit.MONTHS);
+        List<OffsetDateTime> dts = RowsInterpolateOperation.interpolate(start, end, ChronoUnit.MONTHS);
 
         List<OffsetDateTime> sub;
         for (int i = 0; i < dts.size(); i++) {
@@ -77,7 +77,7 @@ public class TestRowInterpolateOperation extends RoundupTest {
     public void testInterpolateYearsExclusive() {
         OffsetDateTime start = OffsetDateTime.of(2020, 1, 1,0,0,0,0, ZoneOffset.UTC);
         OffsetDateTime end = OffsetDateTime.of(2024, 1, 1,0,0,0,0, ZoneOffset.UTC);
-        List<OffsetDateTime> dts = RowInterpolateOperation.interpolate(start, end, ChronoUnit.YEARS);
+        List<OffsetDateTime> dts = RowsInterpolateOperation.interpolate(start, end, ChronoUnit.YEARS);
         testExclusivity(start, end, dts);
     }
 

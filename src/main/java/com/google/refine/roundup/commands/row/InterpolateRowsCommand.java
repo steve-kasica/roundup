@@ -12,11 +12,11 @@ import com.google.refine.commands.EngineDependentCommand;
 import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Column;
 import com.google.refine.model.Project;
-import com.google.refine.roundup.operations.row.RowInterpolateOperation;
+import com.google.refine.roundup.operations.row.RowsInterpolateOperation;
 
 public class InterpolateRowsCommand extends EngineDependentCommand {
 
-    // Must match switch statement in RowInterpolateOperation.interpolate
+    // Must match switch statement in RowsInterpolateOperation.interpolate
     private final ImmutableMap<String, ChronoUnit> validChronoStepUnits = ImmutableMap.of(
             "years", ChronoUnit.YEARS,
             "month", ChronoUnit.MONTHS,
@@ -39,7 +39,7 @@ public class InterpolateRowsCommand extends EngineDependentCommand {
         if (validChronoStepUnits.keySet().contains(stepParam)) {
             // TODO: throw error if value column type is not datetime
             ChronoUnit step = validChronoStepUnits.get(stepParam);
-            return new RowInterpolateOperation(
+            return new RowsInterpolateOperation(
                     engineConfig,
                     groupColumn.getCellIndex(),
                     valueColumn.getCellIndex(),
