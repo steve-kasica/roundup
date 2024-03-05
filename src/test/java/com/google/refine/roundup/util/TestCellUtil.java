@@ -1,7 +1,11 @@
 package com.google.refine.roundup.util;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import com.google.refine.model.Cell;
-import org.junit.jupiter.api.*;
 
 public class TestCellUtil {
 
