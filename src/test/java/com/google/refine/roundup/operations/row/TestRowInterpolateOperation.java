@@ -9,7 +9,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class TestRowInterpolateOperation {
+import com.google.refine.roundup.RoundupTest;
+
+public class TestRowInterpolateOperation extends RoundupTest {
 
     @Test
     @DisplayName("Interpolated days is correct size")

@@ -39,7 +39,11 @@ public class InterpolateRowsCommand extends EngineDependentCommand {
         if (validChronoStepUnits.keySet().contains(stepParam)) {
             // TODO: throw error if value column type is not datetime
             ChronoUnit step = validChronoStepUnits.get(stepParam);
-            return new RowInterpolateOperation(engineConfig, groupColumn, valueColumn, step);
+            return new RowInterpolateOperation(
+                    engineConfig,
+                    groupColumn.getCellIndex(),
+                    valueColumn.getCellIndex(),
+                    step);
         }
 
         // TODO: handle exceptions and other step increments

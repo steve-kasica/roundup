@@ -1,7 +1,12 @@
 package com.google.refine.roundup.operations.row;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.google.refine.history.HistoryEntry;
 import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Column;
@@ -10,10 +15,6 @@ import com.google.refine.model.Row;
 import com.google.refine.model.changes.MassRowColumnChange;
 import com.google.refine.roundup.util.RowGroup;
 import com.google.refine.roundup.util.RowGroupAggregators;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class RowsAggregateOperation extends AbstractOperation {
@@ -71,11 +72,6 @@ public class RowsAggregateOperation extends AbstractOperation {
                 _accumulatorName,
                 _valueColumnName,
                 _keyColumnName);
-    }
-
-    @Override
-    public String getOperationId() {
-        return "roundup/RowsAggregateOperation";
     }
 
 }

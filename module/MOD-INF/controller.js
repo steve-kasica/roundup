@@ -52,11 +52,11 @@ function init() {
     RefineServlet.cacheClass(roundup.model.changes.RowAdditionChange);
 
     // Register operations
-    Packages.com.google.refine.operations.OperationRegistry.registerOperation(
-        module,
-        "insert-rows",
-        roundup.operations.row.RowsInsertOperation
-    )
+    [
+        { "name": "insert-rows", "klass": roundup.operations.row.RowsInsertOperation },
+        { "name": "interpolate-rows", "klass": roundup.operations.row.RowInterpolateOperation },
+        { "name": "aggregate-rows", "klass": roundup.operations.row.RowsAggregateOperation }
+    ].forEach(registerOperation);
 
     registerCommands();
 
@@ -79,6 +79,10 @@ function init() {
     //         "styles/roundup.less"
     //     ]
     // );
+
+    function registerOperation(op) {
+        Packages.com.google.refine.operations.OperationRegistry.registerOperation(module, op["name"], op["klass"]);
+    }
 }
 
 /*

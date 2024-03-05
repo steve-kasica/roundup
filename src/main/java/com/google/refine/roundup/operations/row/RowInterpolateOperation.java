@@ -20,7 +20,6 @@ import com.google.refine.browsing.FilteredRows;
 import com.google.refine.browsing.RowVisitor;
 import com.google.refine.history.HistoryEntry;
 import com.google.refine.model.Cell;
-import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 import com.google.refine.model.Row;
 import com.google.refine.operations.EngineDependentOperation;
@@ -31,22 +30,22 @@ public class RowInterpolateOperation extends EngineDependentOperation {
     final private Integer _groupCellIndex;
     final private Integer _valueCellIndex;
     final private ChronoUnit _step;
+    private int _count = 0;
     @JsonCreator
     public RowInterpolateOperation(
             @JsonProperty("engineConfig") EngineConfig engineConfig,
-            @JsonProperty("groupColumn") Column groupColumn,
-            @JsonProperty("valueColumn") Column valueColumn,
+            @JsonProperty("groupCellIndex") int groupCellIndex,
+            @JsonProperty("valueColumn") int valueCellIndex,
             @JsonProperty("step") ChronoUnit step) {
                 super(engineConfig);
-                _groupCellIndex = groupColumn.getCellIndex();
-                _valueCellIndex = valueColumn.getCellIndex();
+                _groupCellIndex = groupCellIndex;
+                _valueCellIndex = valueCellIndex;
                 _step = step;
     }
 
-    // TODO: Can I get the count of new rows by the time this method is called?
     @Override
     protected String getBriefDescription(Project project) {
-        return "Interpolate rows";
+        return "Interpolate " + _count + " new row" + ((_count > 1) ? "s" : "");
     }
 
     @Override
@@ -54,21 +53,18 @@ public class RowInterpolateOperation extends EngineDependentOperation {
         Engine engine = createEngine(project);
 
         List<Row> additionalRows = new ArrayList();
-        List<Integer> indices = new ArrayList<>();
-        indices.add(0);
+        int index = 0;  // Prepend new rows
 
         FilteredRows filteredRows = engine.getFilteredRows(null);
         filteredRows.accept(project, createRowVisitor(additionalRows));
-
-        List<List<Row>> rowBlocks = new ArrayList<>();
-        rowBlocks.add(additionalRows);
+        _count = additionalRows.size();
 
         return new HistoryEntry(
                 historyEntryID,
                 project,
-                "Interpolate a few rows",
+                getBriefDescription(null),
                 this,
-                new RowAdditionChange(rowBlocks, indices));
+                new RowAdditionChange(additionalRows, index));
     }
 
     private RowVisitor createRowVisitor(List<Row> additionalRows) {
