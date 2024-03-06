@@ -54,7 +54,7 @@ function init() {
     // Register operations
     [
         { "name": "insert-rows", "klass": roundup.operations.row.RowsInsertOperation },
-        { "name": "interpolate-rows", "klass": roundup.operations.row.RowInterpolateOperation },
+        { "name": "interpolate-rows", "klass": roundup.operations.row.RowsInterpolateOperation },
         { "name": "aggregate-rows", "klass": roundup.operations.row.RowsAggregateOperation }
     ].forEach(registerOperation);
 
