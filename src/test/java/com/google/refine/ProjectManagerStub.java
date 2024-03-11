@@ -4,6 +4,7 @@ Copied directly from: https://github.com/OpenRefine/OpenRefine/blob/master/main/
 
 package com.google.refine;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -72,5 +73,17 @@ public class ProjectManagerStub extends ProjectManager {
     protected void saveWorkspace() {
         // empty
     }
+
+    static public File getProjectDir(long projectID) {
+        File workspace = new File("src/test/resources");
+        String PROJECT_DIR_SUFFIX = ".project";
+        File dir = new File(workspace, projectID + PROJECT_DIR_SUFFIX);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return dir;
+    }
+
+
 
 }

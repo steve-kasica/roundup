@@ -1,21 +1,20 @@
 package com.google.refine.roundup.commands.project;
 
-import com.google.refine.ProjectManager;
-import com.google.refine.ProjectMetadata;
-import com.google.refine.commands.Command;
-import com.google.refine.model.Column;
-import com.google.refine.model.Project;
-import com.google.refine.model.Row;
-import com.google.refine.roundup.util.ColumnUtil;
-import com.google.refine.roundup.util.ProjectMetadataUtil;
-import com.google.refine.roundup.util.RowUtil;
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import com.google.refine.ProjectManager;
+import com.google.refine.ProjectMetadata;
+import com.google.refine.commands.Command;
+import com.google.refine.history.HistoryEntryManager;
+import com.google.refine.model.Project;
+import com.google.refine.roundup.util.CopyUtilities;
 
 public class CopyProjectCommand extends Command {
+    // TODO: Should the user be able to copy only rows that match the selection, as an engine dependent operation?
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -26,30 +25,27 @@ public class CopyProjectCommand extends Command {
         }
 
         try {
-            Project origProject = getProject(request);
-            Project copyProject = new Project();
-
-            // TODO copy only rows that match the selection
-            // TODO: workout shallow copy functionality
-            for (Row row : origProject.rows) {
-                copyProject.rows.add(RowUtil.copy(row));
-            }
-
-            ProjectMetadata copyProjectMetadata = ProjectMetadataUtil.copy(origProject.getMetadata());
-
-            Column column;
-            boolean avoidNameCollision = false;
-            for (int i=0; i < origProject.columnModel.getMaxCellIndex(); i++) {
-                column = origProject.columnModel.getColumnByCellIndex(i);
-                copyProject.columnModel.addColumn(i, ColumnUtil.copy(column), avoidNameCollision);
-            }
+            Project originalProject = getProject(request);
+            Project copyProject = CopyUtilities.copyProject(originalProject);
+            ProjectMetadata copyProjectMetadata = CopyUtilities.copyProjectMetadata(originalProject);
+            copyProjectMetadata.setName(copyProjectMetadata.getName() + " (Copy)");
 
             ProjectManager.singleton.registerProject(copyProject, copyProjectMetadata);
 
-//            ProjectUtilities.save(copyProject);
-//            FileProjectManager.singleton.saveMetadata(copyProjectMetadata, copyProject.id);
+            // Save project data and metadata
+            ProjectManager.singleton.ensureProjectSaved(copyProject.id);
 
-            respond(response, "{\"code\":\"ok\"}");
+            // Save history entrys in copy Project
+            HistoryEntryManager manager = ProjectManager.singleton.getHistoryEntryManager();
+            copyProject.history.getLastPastEntries(-1).forEach(historyEntry -> {
+                try {
+                    manager.saveChange(historyEntry);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            respond(response, String.format("{\"code\":\"ok\", \"projectId\": %d}", copyProject.id));
         } catch (Exception e) {
             respondException(response, e);
         }

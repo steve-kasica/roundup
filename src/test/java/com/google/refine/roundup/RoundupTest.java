@@ -1,24 +1,28 @@
 package com.google.refine.roundup;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.refine.ProjectManager;
-import com.google.refine.ProjectManagerStub;
 import com.google.refine.RefineServlet;
 import com.google.refine.RefineServletStub;
 import com.google.refine.importing.ImportingManager;
+import com.google.refine.io.FileProjectManager;
+import com.google.refine.io.ProjectUtilities;
 import com.google.refine.model.Cell;
+import com.google.refine.model.Project;
 import com.google.refine.model.Row;
 
 public abstract class RoundupTest {
 
     private static boolean _setUpIsDone = false;
-    private String _employeesA = "src/test/resources/data/employees-a.csv";
-    private String _employeesB = "src/test/resources/data/employees-b.csv";
+    private String _testResourcesDir = "src/test/resources";
+    private String _employeesA = _testResourcesDir + "/data/employees-a.csv";
+    private String _employeesB = _testResourcesDir + "/data/employees-b.csv";
+    protected long wranglerCrimeProject = 2453872733112L;
 
     protected List<Row> getEmployeesA() {
         return fetchRows(_employeesA);
@@ -34,10 +38,20 @@ public abstract class RoundupTest {
         if (!_setUpIsDone) {
             // Initialize Project Manager
             servlet = new RefineServletStub();
-            ProjectManager.singleton = new ProjectManagerStub();
+//            ProjectManager.singleton = new ProjectManagerStub();
+            File dataDir = new File("src/test/resources");
+            FileProjectManager.initialize(dataDir);
+//            ProjectManager.singleton = new FileProjectManager.initialize(new File("src/test/resources"));
+//            ProjectManager.singleton = new ProjectMana
             ImportingManager.initialize(servlet);
             _setUpIsDone = true;
         }
+    }
+
+    protected Project getProject(long projectId) {
+        String path = String.format("%s/%d.project", _testResourcesDir, projectId);
+        File file = new File(path);
+        return ProjectUtilities.load(file, projectId);
     }
 
     /**
