@@ -2,7 +2,13 @@ package com.google.refine.roundup.util;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.InjectableValues;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.google.refine.ProjectManager;
 import com.google.refine.ProjectMetadata;
@@ -11,6 +17,7 @@ import com.google.refine.io.FileProjectManager;
 import com.google.refine.io.ProjectMetadataUtilities;
 import com.google.refine.io.ProjectUtilities;
 import com.google.refine.model.Project;
+import com.google.refine.model.Row;
 import com.google.refine.util.Pool;
 
 public class CopyUtilities {
@@ -51,4 +58,20 @@ public class CopyUtilities {
         return ProjectMetadataUtilities.load(projectDir);
     }
 
+    public static Row copyRow(Row row) {
+        Pool pool = new Pool();
+        ObjectMapper mapper = new ObjectMapper();
+        InjectableValues injections = new InjectableValues.Std().addValue("pool", pool);
+        mapper.setInjectableValues(injections);
+        
+        try {
+            return mapper.readValue(mapper.writeValueAsString(row), Row.class);
+        } catch(JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public static List<Row> copyRows(List<Row> rows) {
+        return rows.stream().map(CopyUtilities::copyRow).collect(Collectors.toList());
+    }
 }

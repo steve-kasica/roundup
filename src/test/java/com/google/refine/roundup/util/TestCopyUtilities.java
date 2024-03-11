@@ -33,6 +33,61 @@ public class TestCopyUtilities extends RoundupTest {
     }
 
     @Nested
+    @DisplayName("Copy Row")
+    public class CopyRowTests {
+
+        private Row originalRow;
+        private Row copyRow;
+
+        @BeforeEach
+        public void setup() {
+            originalRow = originalProject.rows.get(0);
+            copyRow = CopyUtilities.copyRow(originalRow);
+        }
+
+        @Test
+        @DisplayName("Copy length is equal to original")
+        public void testCopyRowLength() {
+            Assertions.assertEquals(originalRow.cells.size(), copyRow.cells.size());
+        }
+
+        @Test
+        @DisplayName("Copy is not identical to original")
+        public void testCopyRowIdentity() {
+            Assertions.assertNotSame(originalRow, copyRow);
+        }
+
+        @Test
+        @DisplayName("Copy's cells are not identical to original")
+        public void testCopyRowCellIdentity() {
+            for (int i = 0; i < originalRow.cells.size(); i++) {
+                Cell originalCell = originalRow.getCell(i);
+                Cell copyCell = copyRow.getCell(i);
+                if (originalCell != null && copyCell != null) {
+                    Assertions.assertNotSame(originalCell, copyCell);
+                }
+            }
+        }
+
+        @Test
+        @DisplayName("Copy's cells are equal to original")
+        public void testCopyRowCellEquality() {
+            for (int i = 0; i < originalRow.cells.size(); i++) {
+                Cell originalCell = originalRow.getCell(i);
+                Cell copyCell = copyRow.getCell(i);
+                if (originalCell == null) {
+                    Assertions.assertNull(copyCell);
+                } else if (copyCell == null) {
+                    Assertions.assertNull(originalCell);
+                } else {
+                    Assertions.assertEquals(originalCell.getValue(), copyCell.getValue());
+                }
+            }
+        }
+
+    }
+
+    @Nested
     @DisplayName("Copy Project")
     public class CopyProjectTests {
         private Project cloneProject;
