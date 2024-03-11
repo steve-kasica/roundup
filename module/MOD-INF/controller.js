@@ -25,6 +25,7 @@ function registerCommands() {
         {endpoint: 'aggregate-rows', className: new commands.row.AggregateRowsCommand()},
         {endpoint: 'copy-project', className: new commands.project.CopyProjectCommand()},
         {endpoint: 'interpolate-rows', className: new commands.row.InterpolateRowsCommand()},
+        {endpoint: 'get-rows-partitioned', className: new commands.row.GetRowsPartitionedCommand()},
         {endpoint: 'scratch', className: new commands.Scratch()},
         // {endpoint: 'set-metadata', className: new commands.SetMetadata()},
     ].forEach(function(cmd) {
