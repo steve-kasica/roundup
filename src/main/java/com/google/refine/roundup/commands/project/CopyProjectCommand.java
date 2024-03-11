@@ -35,7 +35,7 @@ public class CopyProjectCommand extends Command {
             // Save project data and metadata
             ProjectManager.singleton.ensureProjectSaved(copyProject.id);
 
-            // Save history entrys in copy Project
+            // Save history entries in copy Project
             HistoryEntryManager manager = ProjectManager.singleton.getHistoryEntryManager();
             copyProject.history.getLastPastEntries(-1).forEach(historyEntry -> {
                 try {
