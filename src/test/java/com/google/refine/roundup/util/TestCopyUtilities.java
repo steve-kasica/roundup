@@ -33,6 +33,50 @@ public class TestCopyUtilities extends RoundupTest {
     }
 
     @Nested
+    @DisplayName("Copying Column")
+    public class CopyColumnTests {
+        private Column originalColumn;
+        private Column copyColumn;
+
+        @BeforeEach
+        public void setup() {
+            originalColumn = originalProject.columnModel.getColumnByCellIndex(0);
+            copyColumn = CopyUtilities.copyColumn(originalColumn);
+        }
+
+        @Test
+        @DisplayName("Copy is not identical to original")
+        public void testColumnIdentity() {
+            Assertions.assertNotSame(originalColumn, copyColumn);
+
+            // Just a sanity check
+            copyColumn.setName("foo");
+            Assertions.assertNotEquals(originalColumn.getName(), copyColumn.getName());
+        }
+
+        @Test
+        @DisplayName("Cell index is equal to original")
+        public void testCellIndex() {
+            Assertions.assertEquals(originalColumn.getCellIndex(), copyColumn.getCellIndex());
+        }
+
+        @Test
+        @DisplayName("Original name is equal to original")
+        public void testOriginalName() {
+            // `getOriginalHeaderLabel` is a getter method for `_originalName` in Column class
+            Assertions.assertEquals(originalColumn.getOriginalHeaderLabel(), copyColumn.getOriginalHeaderLabel());
+        }
+
+        @Test
+        @DisplayName("Name is equal to original")
+        public void testName() {
+            Assertions.assertEquals(originalColumn.getName(), copyColumn.getName());
+        }
+
+
+    }
+
+    @Nested
     @DisplayName("Copy Row")
     public class CopyRowTests {
 

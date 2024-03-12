@@ -16,6 +16,7 @@ import com.google.refine.history.History;
 import com.google.refine.io.FileProjectManager;
 import com.google.refine.io.ProjectMetadataUtilities;
 import com.google.refine.io.ProjectUtilities;
+import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 import com.google.refine.model.Row;
 import com.google.refine.util.Pool;
@@ -73,5 +74,14 @@ public class CopyUtilities {
 
     public static List<Row> copyRows(List<Row> rows) {
         return rows.stream().map(CopyUtilities::copyRow).collect(Collectors.toList());
+    }
+
+    public static Column copyColumn(Column column) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(mapper.writeValueAsString(column), Column.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }
