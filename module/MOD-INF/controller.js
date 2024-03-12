@@ -24,6 +24,7 @@ function registerCommands() {
         {endpoint: 'insert-rows', className: new commands.row.InsertRowsCommand()},
         {endpoint: 'aggregate-rows', className: new commands.row.AggregateRowsCommand()},
         {endpoint: 'copy-project', className: new commands.project.CopyProjectCommand()},
+        {endpoint: 'slice-project', className: new commands.project.SliceProjectCommand()},
         {endpoint: 'interpolate-rows', className: new commands.row.InterpolateRowsCommand()},
         {endpoint: 'get-rows-partitioned', className: new commands.row.GetRowsPartitionedCommand()},
         {endpoint: 'scratch', className: new commands.Scratch()},
