@@ -23,6 +23,8 @@ public abstract class RoundupTest {
     private String _employeesA = _testResourcesDir + "/data/employees-a.csv";
     private String _employeesB = _testResourcesDir + "/data/employees-b.csv";
     protected long wranglerCrimeProject = 2453872733112L;
+    protected long interviewsProject = 2000804677262L;
+    protected long employeesAProject = 1763065689295L;
 
     protected List<Row> getEmployeesA() {
         return fetchRows(_employeesA);

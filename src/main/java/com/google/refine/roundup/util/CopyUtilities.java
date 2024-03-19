@@ -84,4 +84,8 @@ public class CopyUtilities {
             throw new IllegalArgumentException(e);
         }
     }
+
+    public static List<Column> copy(List<Column> columns) {
+        return columns.stream().map(CopyUtilities::copyColumn).collect(Collectors.toList());
+    }
 }

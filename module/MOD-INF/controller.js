@@ -12,6 +12,7 @@ var ClientSideResourceManager = Packages.com.google.refine.ClientSideResourceMan
  * Register extension commands.
  *
  * Each Roundup command is accessible via /command/roundup/<endpoint>.
+ * Restart OpenRefine after adding a new command.
  */
 function registerCommands() {
     Packages.java.lang.System.out.println("Registering Roundup commands");
@@ -25,6 +26,7 @@ function registerCommands() {
         {endpoint: 'aggregate-rows', className: new commands.row.AggregateRowsCommand()},
         {endpoint: 'copy-project', className: new commands.project.CopyProjectCommand()},
         {endpoint: 'slice-project', className: new commands.project.SliceProjectCommand()},
+        {endpoint: 'join-project', className: new commands.project.JoinProjectsCommand()},
         {endpoint: 'interpolate-rows', className: new commands.row.InterpolateRowsCommand()},
         {endpoint: 'get-rows-partitioned', className: new commands.row.GetRowsPartitionedCommand()},
         {endpoint: 'scratch', className: new commands.Scratch()},
@@ -57,7 +59,8 @@ function init() {
     [
         { "name": "insert-rows", "klass": roundup.operations.row.RowsInsertOperation },
         { "name": "interpolate-rows", "klass": roundup.operations.row.RowsInterpolateOperation },
-        { "name": "aggregate-rows", "klass": roundup.operations.row.RowsAggregateOperation }
+        { "name": "aggregate-rows", "klass": roundup.operations.row.RowsAggregateOperation },
+        { "name": "join-projects", "klass": roundup.operations.ProjectJoinOperation }
     ].forEach(registerOperation);
 
     registerCommands();
