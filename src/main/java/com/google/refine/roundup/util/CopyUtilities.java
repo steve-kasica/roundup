@@ -16,6 +16,7 @@ import com.google.refine.history.History;
 import com.google.refine.io.FileProjectManager;
 import com.google.refine.io.ProjectMetadataUtilities;
 import com.google.refine.io.ProjectUtilities;
+import com.google.refine.model.Cell;
 import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 import com.google.refine.model.Row;
@@ -60,7 +61,7 @@ public class CopyUtilities {
     }
 
     public static Row copyRow(Row row) {
-        Pool pool = new Pool();
+        Pool pool = new Pool();  // TODO: handle an existing pool
         ObjectMapper mapper = new ObjectMapper();
         InjectableValues injections = new InjectableValues.Std().addValue("pool", pool);
         mapper.setInjectableValues(injections);
@@ -87,5 +88,17 @@ public class CopyUtilities {
 
     public static List<Column> copy(List<Column> columns) {
         return columns.stream().map(CopyUtilities::copyColumn).collect(Collectors.toList());
+    }
+
+    public static Cell copy(Cell cell) {
+        Pool pool = new Pool();  // TODO: handle an existing pool
+        ObjectMapper mapper = new ObjectMapper();
+        InjectableValues injections = new InjectableValues.Std().addValue("pool", pool);
+        mapper.setInjectableValues(injections);
+        try {
+            return mapper.readValue(mapper.writeValueAsString(cell), Cell.class);
+        } catch(JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

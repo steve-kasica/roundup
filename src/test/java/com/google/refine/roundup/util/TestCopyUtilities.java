@@ -1,9 +1,17 @@
 package com.google.refine.roundup.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,30 +55,30 @@ public class TestCopyUtilities extends RoundupTest {
         @Test
         @DisplayName("Copy is not identical to original")
         public void testColumnIdentity() {
-            Assertions.assertNotSame(originalColumn, copyColumn);
+            assertNotSame(originalColumn, copyColumn);
 
             // Just a sanity check
             copyColumn.setName("foo");
-            Assertions.assertNotEquals(originalColumn.getName(), copyColumn.getName());
+            assertNotEquals(originalColumn.getName(), copyColumn.getName());
         }
 
         @Test
         @DisplayName("Cell index is equal to original")
         public void testCellIndex() {
-            Assertions.assertEquals(originalColumn.getCellIndex(), copyColumn.getCellIndex());
+            assertEquals(originalColumn.getCellIndex(), copyColumn.getCellIndex());
         }
 
         @Test
         @DisplayName("Original name is equal to original")
         public void testOriginalName() {
             // `getOriginalHeaderLabel` is a getter method for `_originalName` in Column class
-            Assertions.assertEquals(originalColumn.getOriginalHeaderLabel(), copyColumn.getOriginalHeaderLabel());
+            assertEquals(originalColumn.getOriginalHeaderLabel(), copyColumn.getOriginalHeaderLabel());
         }
 
         @Test
         @DisplayName("Name is equal to original")
         public void testName() {
-            Assertions.assertEquals(originalColumn.getName(), copyColumn.getName());
+            assertEquals(originalColumn.getName(), copyColumn.getName());
         }
 
 
@@ -92,13 +100,13 @@ public class TestCopyUtilities extends RoundupTest {
         @Test
         @DisplayName("Copy length is equal to original")
         public void testCopyRowLength() {
-            Assertions.assertEquals(originalRow.cells.size(), copyRow.cells.size());
+            assertEquals(originalRow.cells.size(), copyRow.cells.size());
         }
 
         @Test
         @DisplayName("Copy is not identical to original")
         public void testCopyRowIdentity() {
-            Assertions.assertNotSame(originalRow, copyRow);
+            assertNotSame(originalRow, copyRow);
         }
 
         @Test
@@ -108,7 +116,7 @@ public class TestCopyUtilities extends RoundupTest {
                 Cell originalCell = originalRow.getCell(i);
                 Cell copyCell = copyRow.getCell(i);
                 if (originalCell != null && copyCell != null) {
-                    Assertions.assertNotSame(originalCell, copyCell);
+                    assertNotSame(originalCell, copyCell);
                 }
             }
         }
@@ -120,11 +128,11 @@ public class TestCopyUtilities extends RoundupTest {
                 Cell originalCell = originalRow.getCell(i);
                 Cell copyCell = copyRow.getCell(i);
                 if (originalCell == null) {
-                    Assertions.assertNull(copyCell);
+                    assertNull(copyCell);
                 } else if (copyCell == null) {
-                    Assertions.assertNull(originalCell);
+                    assertNull(originalCell);
                 } else {
-                    Assertions.assertEquals(originalCell.getValue(), copyCell.getValue());
+                    assertEquals(originalCell.getValue(), copyCell.getValue());
                 }
             }
         }
@@ -144,13 +152,13 @@ public class TestCopyUtilities extends RoundupTest {
         @Test
         @DisplayName("Copy is not identical to original")
         public void testProjectIdentity() {
-            Assertions.assertNotSame(originalProject,cloneProject);
+            assertNotSame(originalProject,cloneProject);
         }
 
         @Test
         @DisplayName("Project in copy does not equal original")
         public void testProjectIDs() {
-            Assertions.assertNotEquals(originalProject.id, cloneProject.id);
+            assertNotEquals(originalProject.id, cloneProject.id);
         }
 
         @Nested
@@ -159,21 +167,21 @@ public class TestCopyUtilities extends RoundupTest {
             @Test
             @DisplayName("Rows list size in copy is equal to original")
             public void testRowSize() {
-                Assertions.assertEquals(originalProject.rows.size(), cloneProject.rows.size());
+                assertEquals(originalProject.rows.size(), cloneProject.rows.size());
             }
 
             @Test
             @DisplayName("Row list in copy is not identical to original")
             public void testRowsListIdentity() {
                 // List of Rows are not the same object in memory
-                Assertions.assertNotSame(originalProject.rows, cloneProject.rows);
+                assertNotSame(originalProject.rows, cloneProject.rows);
 
                 // (Sanity check) Each row in these lists is a different object
                 // Probably redundant with assertion above
                 for (int i = 0; i < originalProject.rows.size(); i++) {
                     Row originalRow = originalProject.rows.get(i);
                     Row cloneRow = cloneProject.rows.get(i);
-                    Assertions.assertNotSame(originalRow, cloneRow);
+                    assertNotSame(originalRow, cloneRow);
                 }
             }
 
@@ -183,7 +191,7 @@ public class TestCopyUtilities extends RoundupTest {
                 for (int i = 0; i < originalProject.rows.size(); i++) {
                     Row originalRow = originalProject.rows.get(i);
                     Row cloneRow = cloneProject.rows.get(i);
-                    Assertions.assertEquals(originalRow.cells.size(), cloneRow.cells.size());
+                    assertEquals(originalRow.cells.size(), cloneRow.cells.size());
                 }
             }
 
@@ -204,9 +212,9 @@ public class TestCopyUtilities extends RoundupTest {
                         if (originalCell == null || copiedCell == null) {
                             // if one Cell is null, then the other one is too
                             // nulls are valid, and common, in these cells lists in the Row class
-                            Assertions.assertEquals(originalCell, copiedCell);
+                            assertEquals(originalCell, copiedCell);
                         } else {
-                            Assertions.assertEquals(originalCell.getValue(), copiedCell.getValue());
+                            assertEquals(originalCell.getValue(), copiedCell.getValue());
                         }
                     }
                 }
@@ -227,11 +235,11 @@ public class TestCopyUtilities extends RoundupTest {
                         Cell originalCell = originalProject.rows.get(i).getCell(j);
                         Cell copiedCell = cloneProject.rows.get(i).getCell(j);
                         if (originalCell == null) {
-                            Assertions.assertNull(copiedCell);
+                            assertNull(copiedCell);
                         } else if (copiedCell == null) {
-                            Assertions.assertNull(originalCell);
+                            assertNull(originalCell);
                         } else {
-                            Assertions.assertNotSame(originalCell, copiedCell);
+                            assertNotSame(originalCell, copiedCell);
                         }
 
                     }
@@ -277,20 +285,20 @@ public class TestCopyUtilities extends RoundupTest {
             @Test
             @DisplayName("Not identical to original")
             public void testHistoryIdentity() {
-                Assertions.assertNotSame(originalProject.history, cloneProject.history);
+                assertNotSame(originalProject.history, cloneProject.history);
             }
 
             @Test
             @DisplayName("Is same length as original")
             public void testHistorySize() {
-                Assertions.assertEquals(originalHistory.size(), copyHistory.size());
+                assertEquals(originalHistory.size(), copyHistory.size());
             }
 
             @Test
             @DisplayName("HistoryEntry instances are not identical to original")
             public void testHistoryEntryIdentity() {
                 historyEntries.stream()
-                        .forEach(map -> Assertions.assertNotSame(map.get(origKey), map.get(copyKey)));
+                        .forEach(map -> assertNotSame(map.get(origKey), map.get(copyKey)));
             }
 
             @Test
@@ -299,9 +307,9 @@ public class TestCopyUtilities extends RoundupTest {
                 // Since there's no equals method for HistoryEntry, based equality on fields: id, description, time
                 historyEntries.stream()
                         .forEach(map -> {
-                            Assertions.assertEquals(map.get(origKey).id, map.get(copyKey).id);
-                            Assertions.assertEquals(map.get(origKey).description, map.get(copyKey).description);
-                            Assertions.assertEquals(map.get(origKey).time, map.get(copyKey).time);
+                            assertEquals(map.get(origKey).id, map.get(copyKey).id);
+                            assertEquals(map.get(origKey).description, map.get(copyKey).description);
+                            assertEquals(map.get(origKey).time, map.get(copyKey).time);
                         });
             }
 
@@ -309,7 +317,7 @@ public class TestCopyUtilities extends RoundupTest {
             @DisplayName("HistoryEntry instances share project ID with copy project")
             public void testHistoryEntryProject() {
                 copyHistory.stream()
-                        .forEach(historyEntry -> Assertions.assertEquals(historyEntry.projectID, cloneProject.id));
+                        .forEach(historyEntry -> assertEquals(historyEntry.projectID, cloneProject.id));
             }
         }
 
@@ -319,8 +327,7 @@ public class TestCopyUtilities extends RoundupTest {
 
             @Test
             @DisplayName("Column models are not identical")
-            public void testColumnModelIdentity() {
-                Assertions.assertNotSame(originalProject.columnModel, cloneProject.columnModel);
+            public void testColumnModelIdentity() { assertNotSame(originalProject.columnModel, cloneProject.columnModel);
             }
 
             @Test
@@ -357,4 +364,74 @@ public class TestCopyUtilities extends RoundupTest {
 
     }
 
+
+    @Nested
+    @DisplayName("Copy Cell")
+    public class CopyCellTests {
+
+        private List<Cell> originals;
+        private List<Cell> copies;
+        
+        private final int ORIGINAL = 1;
+        private final int COPY = 2;
+
+        @BeforeEach
+        public void setup() {
+            originals = new ArrayList<>();
+            originals.add(new Cell(-12345678987654321L, null));  // Test cells with negative long value
+            originals.add(new Cell(12345678987654321L, null));  // Test cells with positive long value
+            originals.add(new Cell(-1, null));                  // Test cells with negative integers value
+            originals.add(new Cell(0, null));                   // Test cells with zero value
+            originals.add(new Cell(1, null));                   // Test cells with positive integers value
+            originals.add(new Cell("Alice", null));             // Test cell with String value
+            originals.add(new Cell(null, null));                // Test cell with null value
+
+            copies = originals.stream().map(CopyUtilities::copy).collect(Collectors.toList());
+        }
+
+        private Stream<Map<Integer, Cell>> getCombined() {
+            return IntStream.range(0, originals.size()).mapToObj(i -> {
+                Map<Integer, Cell> map = new HashMap<>();
+                map.put(ORIGINAL, originals.get(i));
+                map.put(COPY, copies.get(i));
+                return map;
+            });
+        }
+
+        @Test
+        public void testCellEquality() {
+            getCombined().forEach(cellMap ->assertEquals(cellMap.get(ORIGINAL).getValue(), cellMap.get(COPY).getValue()));
+        }
+
+        @Test
+        public void testIdentity() {
+            getCombined().forEach(cellMap -> assertNotSame(cellMap.get(ORIGINAL), cellMap.get(COPY)));
+        }
+
+        @Test
+        public void testRecondIdString() {
+            getCombined().forEach(cellMap -> assertEquals(cellMap.get(ORIGINAL).getReconIdString(), cellMap.get(COPY).getReconIdString()));
+        }
+
+        @Test
+        public void testGetTypeString() {
+            getCombined().forEach(cellMap -> assertEquals(cellMap.get(ORIGINAL).getTypeString(), cellMap.get(COPY).getTypeString()));
+        }
+
+        @Test
+        public void testGetErrorMessage() {
+            getCombined().forEach(cellMap -> assertEquals(cellMap.get(ORIGINAL).getErrorMessage(), cellMap.get(COPY).getErrorMessage()));
+        }
+
+        @Test
+        public void testHashCode() {
+            getCombined().forEach(cellMap -> assertNotEquals(cellMap.get(ORIGINAL).hashCode(), cellMap.get(COPY).hashCode()));
+        }
+
+        @Test
+        public void testToString() {
+            getCombined().forEach(cellMap -> assertEquals(cellMap.get(ORIGINAL).toString(), cellMap.get(COPY).toString()));
+        }
+
+    }
 }
