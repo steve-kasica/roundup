@@ -39,10 +39,6 @@ public class ProjectCrossOperation extends AbstractOperation {
 
         List<Row> rows = crossProductRows(project.rows, auxProject.rows);
         List<Column> columns = joinColumns(project.columnModel.columns, auxProject.columnModel.columns);
-        for (Row row : rows) {
-            System.out.println(row.toString());
-        }
-
 
         String description = String.format("Cross product with project %d", auxProject.id);
 
@@ -75,6 +71,8 @@ public class ProjectCrossOperation extends AbstractOperation {
         return row;
     }
 
+    // This operation does not automatically remove the redundant join colum; however,
+    // users can remove that column in a later step.
     public static List<Column> joinColumns(List<Column> cols1, List<Column> cols2) {
         List<Column> columns = new ArrayList<>(cols1.size() + cols2.size());
 

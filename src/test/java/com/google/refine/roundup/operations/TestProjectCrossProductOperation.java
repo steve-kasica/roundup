@@ -1,9 +1,12 @@
 package com.google.refine.roundup.operations;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +22,7 @@ public class TestProjectCrossProductOperation extends RoundupTest {
     Project courses;
     int originalStudentsRowCount;
     int originalCoursesRowCount;
+    int originalCoursesColumnCount;
 
     @BeforeEach
     public void setup() {
@@ -26,6 +30,8 @@ public class TestProjectCrossProductOperation extends RoundupTest {
         long coursesProjectId = 1734453768523L;
         students = getProject(studentsProjectId);
         courses = getProject(coursesProjectId);
+
+        originalCoursesColumnCount = courses.columnModel.columns.size();
 
         originalStudentsRowCount = students.rows.size();
         originalCoursesRowCount = courses.rows.size();
@@ -140,13 +146,36 @@ public class TestProjectCrossProductOperation extends RoundupTest {
         }
 
         @Test
+        @DisplayName("Column count of auxiliary input project is unchanged")
+        public void testInputsColumnCount() {
+            int expected = originalCoursesColumnCount;
+            int actual = courses.columnModel.columns.size();
+            Assertions.assertEquals(expected, actual);
+        }
+
+        @Test
         public void testColumnIdentity() {
             assert results.size() > 0;
-//            for (int i = 0; i < results.size(); i++) {
-////                Column unexpected = (i < students.columnModel.columns.size()) ? students.columnModel.columns.get(i) : courses.columnModel.columns.get(i);
-//                Column actual = results.get(i);
-//                Assertions.assertNotSame(unexpected, actual);
-//            }
+            List<Column> combined = Stream.concat(students.columnModel.columns.stream(), courses.columnModel.columns.stream())
+                    .collect(Collectors.toList());
+
+            for (Column actual : results) {
+                for (Column unexpected : combined) {
+                    Assertions.assertNotSame(unexpected, actual);
+                }
+            }
+        }
+
+        @Test
+        public void testColumnDuplicateNames() {
+            assert results.size() > 0;
+            for (int i = 0; i < results.size(); i++) {
+                Column a = results.get(i);
+                for (int j = i + 1; j < results.size(); j++) {
+                    Column b = results.get(j);
+                    Assertions.assertNotEquals(a.getName(), b.getName());
+                }
+            }
         }
 
         @Test
