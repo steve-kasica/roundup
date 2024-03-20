@@ -69,6 +69,14 @@ public class TestCopyUtilities extends RoundupTest {
         }
 
         @Test
+        @DisplayName("Cell index is equal to assigned index")
+        public void testAssignedCellIndex() {
+            int index = 0;
+            copyColumn = CopyUtilities.copy(originalColumn,index);
+            Assertions.assertEquals(originalColumn.getCellIndex(), index);
+        }
+
+        @Test
         @DisplayName("Original name is equal to original")
         public void testOriginalName() {
             // `getOriginalHeaderLabel` is a getter method for `_originalName` in Column class

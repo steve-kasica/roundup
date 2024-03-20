@@ -86,6 +86,11 @@ public class CopyUtilities {
         }
     }
 
+    public static Column copy(Column column, int cellIndex) {
+        Column out = new Column(cellIndex, column.getOriginalHeaderLabel());
+        return out;
+    }
+
     public static List<Column> copy(List<Column> columns) {
         return columns.stream().map(CopyUtilities::copyColumn).collect(Collectors.toList());
     }

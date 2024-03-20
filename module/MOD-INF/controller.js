@@ -28,6 +28,7 @@ function registerCommands() {
         {endpoint: 'slice-project', className: new commands.project.SliceProjectCommand()},
         {endpoint: 'join-project', className: new commands.project.JoinProjectsCommand()},
         {endpoint: 'bind-project', className: new commands.project.BindProjectsCommand()},
+        {endpoint: 'cross-project', className: new commands.project.CrossProjectsCommand()},
         {endpoint: 'interpolate-rows', className: new commands.row.InterpolateRowsCommand()},
         {endpoint: 'get-rows-partitioned', className: new commands.row.GetRowsPartitionedCommand()},
         {endpoint: 'scratch', className: new commands.Scratch()},
@@ -62,7 +63,8 @@ function init() {
         { "name": "interpolate-rows", "klass": roundup.operations.row.RowsInterpolateOperation },
         { "name": "aggregate-rows", "klass": roundup.operations.row.RowsAggregateOperation },
         { "name": "join-projects", "klass": roundup.operations.ProjectJoinOperation },
-        { "name": "bind-projects", "klass": roundup.operations.ProjectBindOperation }
+        { "name": "bind-projects", "klass": roundup.operations.ProjectBindOperation },
+        { "name": "cross-projects", "klass": roundup.operations.ProjectCrossOperation }
     ].forEach(registerOperation);
 
     registerCommands();
