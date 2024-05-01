@@ -74,3 +74,70 @@ public class TestProjectJoinOperation extends RoundupTest {
         }
     }
 }
+
+//    @Nested public class JoinColumnsTests{
+//
+//        List<Column> results;
+//
+//        @BeforeEach
+//        public void setup() {
+//            results = ProjectCartesianProductOperation.joinColumns(students.columnModel.columns, courses.columnModel.columns);
+//        }
+//
+//        @Test
+//        public void testColumnCount() {
+//            assert results.size() > 0;
+//            int expected = students.columnModel.columns.size() + courses.columnModel.columns.size();
+//            int actual = results.size();
+//            Assertions.assertEquals(expected, actual);
+//        }
+//
+//        @Test
+//        @DisplayName("Column count of auxiliary input project is unchanged")
+//        public void testInputsColumnCount() {
+//            int expected = originalCoursesColumnCount;
+//            int actual = courses.columnModel.columns.size();
+//            Assertions.assertEquals(expected, actual);
+//        }
+//
+//        @Test
+//        public void testColumnIdentity() {
+//            assert results.size() > 0;
+//            List<Column> combined = Stream.concat(students.columnModel.columns.stream(), courses.columnModel.columns.stream())
+//                    .collect(Collectors.toList());
+//
+//            for (Column actual : results) {
+//                for (Column unexpected : combined) {
+//                    Assertions.assertNotSame(unexpected, actual);
+//                }
+//            }
+//        }
+//
+//        @Test
+//        public void testColumnDuplicateNames() {
+//            assert results.size() > 0;
+//            for (int i = 0; i < results.size(); i++) {
+//                Column a = results.get(i);
+//                for (int j = i + 1; j < results.size(); j++) {
+//                    Column b = results.get(j);
+//                    Assertions.assertNotEquals(a.getName(), b.getName());
+//                }
+//            }
+//        }
+//
+//        @Test
+//        public void testCellIndex() {
+//            for (int i = 0; i < results.size(); i++) {
+//                int expected = i;
+//                int actual = results.get(i).getCellIndex();
+//                Assertions.assertEquals(expected, actual);
+//            }
+//        }
+//
+//        @Test
+//        public void testOriginalNameEquality() {
+//            for (Column column : results) {
+//                Assertions.assertEquals(column.getName(), column.getOriginalHeaderLabel());
+//            }
+//        }
+//    }

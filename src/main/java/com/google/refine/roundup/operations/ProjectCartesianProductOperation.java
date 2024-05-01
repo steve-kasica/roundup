@@ -2,9 +2,7 @@ package com.google.refine.roundup.operations;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,28 +14,30 @@ import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 import com.google.refine.model.Row;
 import com.google.refine.model.changes.MassRowColumnChange;
-import com.google.refine.roundup.util.CopyUtilities;
 
-public class ProjectCrossOperation extends AbstractOperation {
+import com.google.refine.roundup.util.CopyUtilities;
+import static com.google.refine.roundup.util.RowUtil.concatRows;
+
+public class ProjectCartesianProductOperation extends AbstractOperation {
 
     final protected long _auxProjectId;
 
     @JsonCreator
-    public ProjectCrossOperation(
+    public ProjectCartesianProductOperation(
             @JsonProperty("auxProjectId") long auxProjectId) {
         _auxProjectId = auxProjectId;
     }
 
     @Override
     protected String getBriefDescription(Project project) {
-        return "Cross product";
+        return "Cartesian product";
     }
 
     @Override
     protected HistoryEntry createHistoryEntry(Project project, long historyEntryId) throws Exception {
         Project auxProject = ProjectManager.singleton.getProject(_auxProjectId);
 
-        List<Row> rows = crossProductRows(project.rows, auxProject.rows);
+        List<Row> rows = run(project.rows, auxProject.rows);
         List<Column> columns = joinColumns(project.columnModel.columns, auxProject.columnModel.columns);
 
         String description = String.format("Cross product with project %d", auxProject.id);
@@ -50,25 +50,10 @@ public class ProjectCrossOperation extends AbstractOperation {
                 new MassRowColumnChange(columns, rows));
     }
 
-    public static List<Row> crossProductRows(List<Row> rows1, List<Row> rows2) {
+    public static List<Row> run(List<Row> rows1, List<Row> rows2) {
         return rows1.stream()
-                .flatMap(r1 -> rows2.stream().map(r2 -> mergeRows(r1, r2)))
+                .flatMap(r1 -> rows2.stream().map(r2 -> concatRows(r1, r2)))
                 .collect(Collectors.toList());
-    }
-
-    public static Row mergeRows(Row r1, Row r2) {
-        int count = r1.cells.size() + r2.cells.size();
-        System.out.println(r1.cells.toString());
-        System.out.println(r2.cells.toString());
-        Row row = new Row(count);
-
-        // TODO: would really love an addCell method to Row that auto-increments the cell
-        AtomicInteger index = new AtomicInteger(0);
-        Stream.concat(r1.cells.stream(), r2.cells.stream())
-                .map(CopyUtilities::copy)
-                .forEach(cellCopy -> row.setCell(index.getAndIncrement(), cellCopy));
-
-        return row;
     }
 
     // This operation does not automatically remove the redundant join colum; however,

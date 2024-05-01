@@ -11,7 +11,7 @@ import com.google.refine.commands.Command;
 import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Project;
 import com.google.refine.process.Process;
-import com.google.refine.roundup.operations.ProjectCrossOperation;
+import com.google.refine.roundup.operations.ProjectCartesianProductOperation;
 
 public class CrossProjectsCommand extends Command {
 
@@ -29,7 +29,7 @@ public class CrossProjectsCommand extends Command {
 
             long auxProjectId = Long.parseLong(request.getParameter("auxProject"));
 
-            AbstractOperation op = new ProjectCrossOperation(auxProjectId);
+            AbstractOperation op = new ProjectCartesianProductOperation(auxProjectId);
             Process process = op.createProcess(project, new Properties());
 
             performProcessAndRespond(request, response, project, process);

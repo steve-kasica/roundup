@@ -1,5 +1,7 @@
 package com.google.refine.roundup.operations;
 
+import static com.google.refine.roundup.util.RowUtil.concatRows;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +45,7 @@ public class ProjectJoinOperation extends AbstractOperation {
         int auxJoinCellIndex = auxProject.columnModel.getColumnIndexByName(_auxJoinColumnName);
 
         List<Row> rows = innerJoinRows(project.rows, auxProject.rows, primaryJoinCellIndex, auxJoinCellIndex);
-        List<Column> columns = ProjectCrossOperation.joinColumns(project.columnModel.columns, auxProject.columnModel.columns);
+        List<Column> columns = ProjectCartesianProductOperation.joinColumns(project.columnModel.columns, auxProject.columnModel.columns);
 
         String description = String.format("Inner join with project %d on %s == %s",
                 auxProject.id,
@@ -62,7 +64,7 @@ public class ProjectJoinOperation extends AbstractOperation {
         return rows1.stream()
                 .flatMap(r1 -> rows2.stream()
                         .filter(r2 -> rowsMatch(r1, r2, cellIndex1, cellIndex2))
-                        .map(r2 -> ProjectCrossOperation.mergeRows(r1, r2))
+                        .map(r2 -> concatRows(r1, r2))
                 )
                 .collect(Collectors.toList());
     }
