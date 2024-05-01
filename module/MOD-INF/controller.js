@@ -61,7 +61,7 @@ function init() {
     [
         { "name": "insert-rows", "klass": roundup.operations.row.RowsInsertOperation },
         { "name": "interpolate-rows", "klass": roundup.operations.row.RowsInterpolateOperation },
-        { "name": "aggregate-rows", "klass": roundup.operations.row.RowsAggregateOperation },
+        { "name": "aggregate-rows", "klass": roundup.operations.row.RowAggregateOperation },
         { "name": "join-projects", "klass": roundup.operations.ProjectJoinOperation },
         { "name": "bind-projects", "klass": roundup.operations.ProjectBindOperation },
         { "name": "cross-projects", "klass": roundup.operations.ProjectCrossOperation }

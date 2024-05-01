@@ -5,18 +5,19 @@ import com.google.refine.commands.Command;
 import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Project;
 import com.google.refine.process.Process;
-import com.google.refine.roundup.operations.row.RowsAggregateOperation;
-import com.google.refine.roundup.util.RowGroupAggregators;
+import com.google.refine.roundup.operations.row.RowAggregateOperation;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.Set;
 
 public class AggregateRowsCommand extends Command {
-    // This command follows the basic pattern of the TransposeRowsIntoColumnCommand
+
+    public static String GROUP_INDEX_PARAMETER = "groupIndex";
+    public static String VALUE_INDEX_PARAMETER = "valueIndex";
+    public static String ACCUMULATOR_NAME_PARAMETER = "accumulatorName";
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -29,26 +30,15 @@ public class AggregateRowsCommand extends Command {
 
         try {
             Project project = getProject(request);
+            int maxIndex = project.columnModel.getMaxCellIndex();
 
-            // TODO throw an error if we're in records mode, Maybe this should be in doPost?
+            RowAggregateOperation.AccumulatorName accumulatorName = getAccumulatorParameter(request);
+            int groupIndex = getIndexParameter(request, GROUP_INDEX_PARAMETER, maxIndex);
+            int valueIndex = getIndexParameter(request, VALUE_INDEX_PARAMETER, maxIndex);
 
-            String groupParam = getColumnParam(request, "group");
 
-            String valueParam = getColumnParam(request,"value");
-
-            // TODO Handle missing parameter
-            String functionParam = request.getParameter("function");
-
-            // If the passed function name is not defined, throw an error
-            Set<String> functionList = RowGroupAggregators.getAggregationMethods();
-            if (!functionList.contains(functionParam)) {
-                throw new ServletException(functionParam + " is not a valid aggregator function. Choices are: " + functionList);
-            }
-
-            AbstractOperation op = new RowsAggregateOperation(groupParam, valueParam, functionParam);
-
+            AbstractOperation op = new RowAggregateOperation(groupIndex, valueIndex, accumulatorName);
             Process process = op.createProcess(project, new Properties());
-
             performProcessAndRespond(request, response, project, process);
 
         } catch(Exception e) {
@@ -56,16 +46,17 @@ public class AggregateRowsCommand extends Command {
         }
     }
 
-    private String getColumnParam(HttpServletRequest request, String name) throws ServletException {
-        // TODO Handle missing parameter
-        String param = request.getParameter(name);
+    public RowAggregateOperation.AccumulatorName getAccumulatorParameter(HttpServletRequest request) {
+        return RowAggregateOperation.AccumulatorName
+                .valueOf(request.getParameter(ACCUMULATOR_NAME_PARAMETER));
+    }
 
-        Project project = getProject(request);
-        long id = project.id;
-
-        if (!project.columnModel.getColumnNames().contains(param)) {
-            throw new ServletException(param + " is not a valid column name in project #" + id);
+    public int getIndexParameter(HttpServletRequest request, String name, int maxIndex) {
+        String paramStr = request.getParameter(name);
+        int paramValue = Integer.parseInt(paramStr);
+        if (paramValue < 0 || paramValue > maxIndex) {
+            throw new IndexOutOfBoundsException("Cell index " + paramValue + " is out of bounds");
         }
-        return param;
+        return paramValue;
     }
 }
