@@ -1,7 +1,10 @@
 package com.google.refine.roundup.commands.project;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +14,7 @@ import com.google.refine.commands.Command;
 import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Project;
 import com.google.refine.process.Process;
-import com.google.refine.roundup.operations.ProjectBindOperation;
+import com.google.refine.roundup.operations.row.RowBindOperation;
 
 public class BindProjectsCommand extends Command {
 
@@ -27,9 +30,12 @@ public class BindProjectsCommand extends Command {
         try {
             Project project = getProject(request);
 
-            long auxProjectId = Long.parseLong(request.getParameter("auxProject"));
+            String [] auxIdValues = request.getParameterValues("auxProject");
+            List<Long> auxProjectIds = Arrays.stream(auxIdValues)
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
 
-            AbstractOperation op = new ProjectBindOperation(auxProjectId);
+            AbstractOperation op = new RowBindOperation(auxProjectIds);
             Process process = op.createProcess(project, new Properties());
 
             performProcessAndRespond(request, response, project, process);
