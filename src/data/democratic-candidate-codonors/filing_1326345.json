@@ -1,0 +1,43 @@
+{
+    "path": "data/2019-04-democratic-candidate-codonors/raw/filing_1326345.csv",
+    "name": "filing_1326345.csv",
+    "columns": [
+        {
+            "name": "col_a_individuals_itemized",
+            "index": 0,
+            "columnType": "categorical",
+            "values": {
+                "31960": 1,
+                "NA": 0
+            }
+        },
+        {
+            "name": "col_a_individuals_unitemized",
+            "index": 1,
+            "columnType": "categorical",
+            "values": {
+                "11571.62": 1,
+                "NA": 0
+            }
+        },
+        {
+            "name": "col_a_individual_contribution_total",
+            "index": 2,
+            "columnType": "categorical",
+            "values": {
+                "43531.62": 1,
+                "NA": 0
+            }
+        },
+        {
+            "name": "filing_id",
+            "index": 3,
+            "columnType": "categorical",
+            "values": {
+                "1326345": 1,
+                "NA": 0
+            }
+        }
+    ]
+}
+
