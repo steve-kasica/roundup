@@ -84,7 +84,10 @@ function tablesReducer(state, action) {
       action.columns.forEach(column => column.setSelected(false));
       break;
     case "SWAP":
-      action.a.table.swapColumns(action.a, action.b);
+      const temp = action.a.index;
+      action.a.index = action.b.index;
+      action.b.index = temp;
+      // action.a.table.swapColumns(action.a, action.b);
       break;
     default:
       throw Error("Unknown action: " + action.type);

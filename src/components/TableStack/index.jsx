@@ -3,41 +3,26 @@
 import {useRef, useEffect} from 'react';
 import Vis from "./TableStack.js";
 import "./TableStack.css"
-import * as d3 from "d3";
 
 export default function TableStack({tables, onColumnSwap, focusIndex}) {
     const svgRef = useRef(null);
     const visRef = useRef(null);
 
-    function onChangeHandler(a, b) {
-        onColumnSwap(a.column, b.column);
-        // setTables(state => {
-        //     state
-        //         .filter(t => t.name === source.y)
-        //         [0].columns
-        //         .forEach(c => { 
-        //             if (c.key === source.key) {
-        //                 c.index = source.x;
-        //             } else if (c.key === target.key) {
-        //                 c.index = target.x;
-        //             }
-        //         });
-        //     return [...state];
-        // });
-    }
+    console.log("Component rendered");
     
     useEffect(() => {
         if (visRef.current === null) {
             // Initialize
             visRef.current = new Vis({
-                width: 400,
-                height: 400,
-                marginLeft: 50,
-                marginTop: 20,
+                width: undefined,
+                height: undefined,
+                marginLeft: 0,
+                marginTop: 0,
                 marginRight: 0,
                 marginBottom: 0,
                 rectRoundness: 2,
-                onDataChange: onChangeHandler
+                cellSize: 100
+                // onDataChange: (a,b) => onColumnSwap(a.column, b.column)
             },
             svgRef.current);
         } else if (tables.length > 0) {
@@ -69,11 +54,11 @@ export default function TableStack({tables, onColumnSwap, focusIndex}) {
     }, [tables, focusIndex]);
 
     return (
-        <>
+        <div className="overflow-x-scroll">
             <svg 
                 className="table-stack"
                 ref={svgRef}
             />
-        </>
+        </div>
     )
 }

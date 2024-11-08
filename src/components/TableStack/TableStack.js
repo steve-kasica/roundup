@@ -3,21 +3,22 @@ import ColumnSchema from "../utilities/data/Column";
 
 export default class TableStack {
   constructor(config, svg) {
-    this.width = config.width || 400;
-    this.height = config.height || 200;
+    this.width = config.width;
+    this.height = config.height;
     this.fontSize = config.fontSize || 10;  // TODO, separate style
-    this.marginTop = config.marginTop || 20;
-    this.marginRight = config.marginRight || 10;
-    this.marginBottom = config.marginBottom || 10;
-    this.marginLeft = config.marginLeft || 10;
-    this.yInnerPadding = config.yInnerPadding || 0.01;
-    this.xInnerPadding = config.xInnerPadding || 0.01;
+    this.marginTop = config.marginTop >= 0 ? config.marginTop : 10;
+    this.marginRight = config.marginRight >= 0 ? config.marginRight : 10;
+    this.marginBottom = config.marginBottom >= 0 ? config.marginBottom : 10;
+    this.marginLeft = config.marginLeft >= 0 ? config.marginLeft : 10;
+    this.yInnerPadding = config.yInnerPadding || 0;
+    this.xInnerPadding = config.xInnerPadding || 0;
     this.rectRoundness = config.rectRoundness || 0;
     this.deselectedOpacity = config.deselectedOpacity || 0.4;  // TODO: separate style
     this.dropShadowStyle = config.dropShadowStyle || "drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7))";
     this.maxRectHeight = 100;
     this.maxRectWidth = 100;
     this.minRectWidth = 0;
+    this.cellSize = config.cellSize;
     this.minRectHeight = this.minRectWidth;
 
     // Test if svg object is already a D3 selection
@@ -31,26 +32,28 @@ export default class TableStack {
   
   init() {
     this.svg
-      .attr("viewBox", [0, 0, this.width, this.height])
+      // .attr("viewBox", [0, 0, this.width, this.height])
       .attr("width", this.width)
       .attr("height", this.height)
       // Clean SVG of all child element
       .selectAll("*")
       .remove();
     
-      this.xAxis = this.svg
-        .append("g")
-        .attr("transform", `translate(0, ${this.marginTop})`);
+      // this.xAxis = this.svg
+      //   .append("g")
+      //   .attr("transform", `translate(0, ${this.marginTop})`);
       
-      this.yAxis = this.svg
-        .append("g")
-        .attr("transform", `translate(${this.marginLeft}, 0)`);        
+      // this.yAxis = this.svg
+      //   .append("g")
+      //   .attr("transform", `translate(${this.marginLeft}, 0)`);        
 
   }
 
-  setXScale(data) {
-    const domain = [...new Set(data.map(d => d.x))].sort(d3.ascending);
-    const range = [this.marginLeft, this.width - this.marginRight];
+  setXScale() {
+    const domain = [...new Set(this.data.map(d => d.x))].sort(d3.ascending);
+    const range = (this.cellSize)
+      ? [this.marginLeft, domain.length * this.cellSize]
+      : [this.marginLeft, this.width - this.marginRight];
 
     this.xScale = d3
       .scaleBand(domain, range)
@@ -59,9 +62,9 @@ export default class TableStack {
     return this;
   }
 
-  setYScale(data) {
-    const domain = [...new Set(data.map(d => d.y))].sort(d3.ascending);
-    const range = [this.marginTop, this.height - this.marginBottom];
+  setYScale() {
+    const domain = [...new Set(this.data.map(d => d.y))].sort(d3.ascending);
+    const range = [this.marginTop, domain.length * this.cellSize];
 
     this.yScale = d3
       .scaleBand(domain, range)
@@ -104,11 +107,13 @@ export default class TableStack {
     return this;
   }
 
-  updateRects(data) {
+  updateRects() {
     const vis = this;
 
     const drag = d3.drag()
-      .on("start", function (ev, d) { d3.select(this).classed("dragging", true).raise(); })
+      .on("start", function (ev, d) { 
+        d3.select(this).classed("dragging", true).raise(); 
+      })
       .on("drag", function ({ x, dx }, d) {
         const cell = d3.select(this);
         const [min, max] = d3.extent(vis.xScale.domain()).map(vis.xScale);
@@ -127,11 +132,11 @@ export default class TableStack {
         d3.select(this.parentNode)
           .selectAll(".cell:not(.dragging)")
           .classed("dragged-over", function() {
-            const a1 = parseInt(cell.attr("x"));
-            const a2 = a1 + cellWidth;
-            const b1 = parseInt(d3.select(this).attr("x"));
-            const b2 = b1 + cellWidth;
-            const delta = Math.max(0, Math.min(a2, b2) - Math.max(a1, b1)) / cellWidth;
+            const a1 = parseInt(cell.attr("x")),
+                  a2 = a1 + cellWidth,
+                  b1 = parseInt(d3.select(this).attr("x")),
+                  b2 = b1 + cellWidth,
+                  delta = Math.max(0, Math.min(a2, b2) - Math.max(a1, b1)) / cellWidth;
             return (threshold <= delta && delta <= 1);
           });
       })
@@ -140,36 +145,34 @@ export default class TableStack {
         const sourceCell = d3.select(this);
 
         if (!targetCell.empty()) {
-          // A cell swap has occured
-          const temp = targetCell.data()[0].x;
-          targetCell.datum(d => {
-            d.x = sourceCell.data()[0].x;
+          // Swap datum x attributes between cells (in-place operation on this.data)
+          const temp = targetCell.datum().x;
+          targetCell.datum(d => { 
+            d.x = sourceCell.datum().x;
             return d;
           });
-
-          sourceCell.datum(d => {
+          
+          sourceCell.datum(d => { 
             d.x = temp;
             return d;
           });
 
-          vis.onDataChange(sourceCell.data()[0], targetCell.data()[0]);
+          // vis.onDataChange(sourceCell.data()[0], targetCell.data()[0]);
+        } // else no-op, return dragging cell to original position
 
-        }
-        // else no-op, return dragging cell to original position
-
-        vis.updateRects(vis.data);
+        // Update <rect> elements only
+        vis.updateRects();
 
         sourceCell.classed("dragging", false);
         targetCell.classed("dragged-over", false);
       });
     
     const cells = this.svg.selectAll("svg.cell")
-      .data(data, d => d.key)
+      .data(this.data, d => d.key)
       .join(
         enter => {
           const svg = enter.append("svg")
             .classed("cell", true)
-            .classed("null", d => d.isEmpty)
             .call(drag);
           
           svg.append("rect")
@@ -190,35 +193,43 @@ export default class TableStack {
         .style("fill", "black")
         .transition()
           .attr("x", d => vis.xScale(d.x))
-          .attr("width", () => d3.max([this.xScale.bandwidth(), this.minRectWidth]))
+          .attr("width", this.cellSize)
     );
 
     // Cells contains both enter + update selection <svg> elements
     cells
       .classed("focused", d => d.isFocused)
+      .classed("null", d => d.isEmpty)
       .attr("x", d => this.xScale(d.x))
       .attr("y", d => this.yScale(d.y))
-      .attr("width", () => d3.max([this.xScale.bandwidth(), this.minRectWidth]))      
-      .attr("height", vis.yScale.bandwidth());
+      .attr("width", () => this.cellSize)      
+      .attr("height", this.cellSize);
     
-    cells.select("text")
-      .text(d => (this.xScale.bandwidth() > this.minRectWidth) ? d.text : "");
+    // cells.select("text")
+    //   .text(d => (this.xScale.bandwidth() > this.minRectWidth) ? d.text : "");
 
     return this;
   }
 
+  updateSVG() {
+    if (this.cellSize) {
+      const {x, y, width, height} = this.svg.node().getBBox();
+      this.svg
+          .attr("width", x + width + x)
+          .attr("height", y + height + y);
+    }
+  }
+
   update(data) {
-    this.setXScale(data)
-      .setYScale(data)
-      .updateXAxis()
-      .updateYAxis()
-      .setData(data)
-      .updateRects(this.data);
+
+    this.data = data;
+    this.setXScale()
+        .setYScale()
+        // .setData(data)
+        .updateRects()
+        .updateSVG();
       // .updateMargins();
     
-    // if (this.onDataChange) {
-    //   this.onDataChange(this.data);
-    // }
   }
 
   // updateMargins() {
@@ -258,9 +269,9 @@ export default class TableStack {
     const bIndex = parseInt(b.attr("data-index"));
     [t[aIndex], t[bIndex]] = [t[bIndex], t[aIndex]];
 
-    if (this.onDataChange) {
-      this.onDataChange(this.data);
-    }
+    // if (this.onDataChange) {
+    //   this.onDataChange(this.data);
+    // }
 
     return this;  // for chaining
 
