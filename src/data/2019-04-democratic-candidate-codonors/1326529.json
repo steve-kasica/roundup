@@ -1,0 +1,44 @@
+{
+    "name": "1326529.csv",
+    "id": 3,
+    "row_count": 1,
+    "columns": [
+        {
+            "name": "col_a_individuals_itemized",
+            "index": 0,
+            "columnType": "categorical",
+            "values": {
+                "3421762.07": 1,
+                "NA": 0
+            }
+        },
+        {
+            "name": "col_a_individuals_unitemized",
+            "index": 1,
+            "columnType": "categorical",
+            "values": {
+                "1810613.8": 1,
+                "NA": 0
+            }
+        },
+        {
+            "name": "col_a_individual_contribution_total",
+            "index": 2,
+            "columnType": "categorical",
+            "values": {
+                "5232375.87": 1,
+                "NA": 0
+            }
+        },
+        {
+            "name": "filing_id",
+            "index": 3,
+            "columnType": "categorical",
+            "values": {
+                "1326529": 1,
+                "NA": 0
+            }
+        }
+    ]
+}
+

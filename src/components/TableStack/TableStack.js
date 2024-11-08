@@ -94,7 +94,7 @@ export default class TableStack {
         y,
         key: `${x}-${y}`,
         isFocused: focusColumns.length > 0 && parseInt(x) === focusColumns[0].x,
-        isNull: true,
+        isEmpty: true,
         text: null
       }));
     })(this.xScale.domain(), this.yScale.domain());
@@ -169,14 +169,16 @@ export default class TableStack {
         enter => {
           const svg = enter.append("svg")
             .classed("cell", true)
-            .classed("null", d => d.isNull)
+            .classed("null", d => d.isEmpty)
             .call(drag);
           
           svg.append("rect")
             .attr("width", "100%")
             .attr("height", "100%")
             .attr("rx", this.rectRoundness)
-            .attr("ry", this.rectRoundness);
+            .attr("ry", this.rectRoundness)
+            .append("title")
+              .text(d => d.title);
 
           svg.append("text")
             .attr("x", "50%")

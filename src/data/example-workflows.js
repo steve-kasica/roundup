@@ -4,14 +4,14 @@
 
 const workflows = new Map();
 
-workflows.set("crime-and-heat", {
+workflows.set("2018-05-31-crime-and-heat-analysis", {
     label: "Crime & Heat",
-    data: import.meta.glob("./crime-and-heat/*.json")
+    data: import.meta.glob("./2018-05-31-crime-and-heat-analysis/*.json")
 });
 
-workflows.set("democratic-candidate-codonors", {
+workflows.set("2019-04-democratic-candidate-codonors", {
     label: "Democratic Candidate Codonors", 
-    data: import.meta.glob("./democratic-candidate-codonors/*.json") 
+    data: import.meta.glob("./2019-04-democratic-candidate-codonors/*.json") 
 });
 
 export default workflows;

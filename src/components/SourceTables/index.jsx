@@ -1,62 +1,51 @@
+/**
+ * SourceTables/index.js
+ * -------------------------------------------------------------------------
+ */
+import TableCard from "./TableCard";
 
-import { useEffect, useState } from "react";
-import Workflow from "./Workflow";
-import TableList from "./TableList";
-import { 
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from "@/components/ui/select";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-  } from "@/components/ui/card"
-  
-import workflows from "../../data/example-workflows.js";
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
-export default () => {
-    const options = [...workflows.entries()].map(([value, {label}]) => ({value, label}));
-    const [workflow, setWorkflow] = useState(options[0].value);
-    const [data, setData] = useState([]);
+export default ({tables, onAddColumns, onRemoveColumns}) => {
+    const [searchString, setSearchString] = useState("");
 
-    useEffect(() => {
-        const promises = Object.entries(workflows.get(workflow).data)
-            .map(([path, f]) => f()
-                .then(schema => ({...schema})));
-
-        Promise.all(promises).then(setData);
-    }, [workflow]);
-
+    const results = tables
+        // Sort results so matches appear first
+        .sort((t1, t2) => {
+            const a = t1.name.includes(searchString);
+            const b = t2.name.includes(searchString);
+            if (a && b || !a && !b) {
+                return 0;
+            } else if (a && !b) {
+                return -1;
+            } else if (!a && b) {
+                return 1;
+            }
+        });
 
     return (
         <>
-            <Select onValueChange={setWorkflow}>
-                <SelectTrigger className="w-auto">
-                    <SelectValue placeholder="Select a workflow" />
-                </SelectTrigger>
-                <SelectContent>
-                    {options.map(({value, label}) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
-                </SelectContent>
-            </Select>
-
-            <div>
-                {data.map(d => <Card>
-                    <CardHeader>
-                        <CardTitle>{d.name}</CardTitle>
-                        <CardDescription>{d.columns.length} x ?</CardDescription>
-                        {/* <CardContent>
-                        </CardContent> */}
-                    </CardHeader>
-                </Card>)}
+            <div className="flex w-full max-w-sm items-center space-x-2">
+                <Input 
+                    type="text" 
+                    placeholder="Search table names" 
+                    onChange={(event) => setSearchString(event.target.value)}
+                />        
             </div>
-            {/* <Workflow setWorkflow={setWorkflow} /> */}
-            {/* <TableList workflow={workflow} /> */}
+
+            <div className="flex-1 h-screen overflow-y-auto">
+                {results.map(table => (
+                        <TableCard
+                            key={table.id}
+                            table={table}
+                            searchString={searchString}
+                            onAddColumns={onAddColumns}
+                            onRemoveColumns={onRemoveColumns}
+                        />
+                ))}
+            </div>
         </>
     );
 }
