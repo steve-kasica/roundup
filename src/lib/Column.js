@@ -15,7 +15,11 @@ export default class {
 
       // A unique ID based on it's original position
       // in the table when the app was loaded
-      this.key = `${table.id}-${index}`;
+      this.key = `${table.id}-${this.index}`;
+
+      this.init = {
+        index: this.index
+      };
 
       return this;
   

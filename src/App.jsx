@@ -14,6 +14,7 @@ import {
 
 import TableStack from "@/components/TableStack";
 import ColumnInspector from './components/ColumnInspector';
+
 import Table from './lib/Table';
 
 function App() {
@@ -23,7 +24,17 @@ function App() {
   const [tables, dispatch] = useReducer(tablesReducer, []);
   const handleSelectColumns = (columns) => dispatch({ type: "SELECT", columns });
   const handleDeselectColumns = (columns) => dispatch(({ type: "DESELECT", columns }));
-  const handleSwapColumns = (a, b) => dispatch({type: "SWAP", a, b });
+  const handleSwapTableColumns = (columnA, columnB) => dispatch({
+    type: "SET_COLUMN_INDEX",
+    payload: [
+      { column: columnA, value: new Number(columnB.index) },
+      { column: columnB, value: new Number(columnA.index) }
+    ]
+  });
+
+  // const [transforms, transformsDispatch] = useReducer(transformsReducer, []);
+  // const [positionMap, updatePositionMap] = useState(new Map());
+  
   const focusIndex = 0;
 
   useEffect(() => {
@@ -59,7 +70,7 @@ function App() {
         <div>
           <TableStack
             tables={tables}
-            onColumnSwap={handleSwapColumns}
+            onCellSwap={handleSwapTableColumns}
             focusIndex={focusIndex}
           />
         </div>
@@ -68,10 +79,37 @@ function App() {
             tables={tables}
             focusIndex={focusIndex}
           />
+          <hr />
+          {/* <TransformsList 
+            transforms={transforms}
+          /> */}
         </div>
       </main>
   );
 }
+
+// function transformsReducer(state, {type, payload}) {
+
+//   let currTransform;
+//   switch(type) {
+//     case "SWAP_TABLE_COLUMNS":
+//       currTransform = transforms.swapTableColumns(payload);
+//       break;
+//   }
+
+//   if (state.size > 0) {
+//     let prevId = [...state.entries()].pop()[0];
+//     if (currTransform.id !== prevId) {
+//       state.set(currTransform.id, currTransform);
+//       return new Map(state);
+//     } else {
+//       return state;
+//     }
+//   } else {
+//     state.set(currTransform.id, currTransform);
+//     return new Map(state);
+//   }
+// }
 
 function tablesReducer(state, action) {
   switch(action.type) {
@@ -83,11 +121,8 @@ function tablesReducer(state, action) {
     case "DESELECT":
       action.columns.forEach(column => column.setSelected(false));
       break;
-    case "SWAP":
-      const temp = action.a.index;
-      action.a.index = action.b.index;
-      action.b.index = temp;
-      // action.a.table.swapColumns(action.a, action.b);
+    case "SET_COLUMN_INDEX":
+      action.payload.forEach(({column, value}) => column.index = value);
       break;
     default:
       throw Error("Unknown action: " + action.type);

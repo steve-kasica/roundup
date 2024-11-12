@@ -7,6 +7,7 @@ import TableCard from "./TableCard";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import * as d3 from "d3";
 
 export default ({tables, onAddColumns, onRemoveColumns}) => {
     const [searchString, setSearchString] = useState("");

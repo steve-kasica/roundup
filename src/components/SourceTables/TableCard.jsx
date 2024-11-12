@@ -22,6 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import TableIcon from "./TableIcon.jsx";
 
 import { ChevronDown } from "lucide-react"  
+import * as d3 from "d3";
 
 function ColumnItem({ column, isChecked, onAddColumns, onRemoveColumns }) {
     const id = `column-input-${column.key}`;
@@ -41,7 +42,7 @@ function ColumnItem({ column, isChecked, onAddColumns, onRemoveColumns }) {
                     htmlFor={id}
                     className="text-sm font-light leading-none truncate select-none cursor-pointer hover:font-medium"
                 >
-                    {column.index1}. {column.name} ({column.uniqValues})
+                    {column.init.index + 1}. {column.name} ({column.uniqValues})
                 </Label>
             </div>
             <Checkbox 
@@ -119,6 +120,7 @@ function TableCard({table, searchString, onAddColumns, onRemoveColumns}) {
                     {
                     table.columns
                         .filter(column => !column.isNull)
+                        .sort((a,b) => d3.ascending(a.init.index, b.init.index))
                         .map(column => (
                             <ColumnItem 
                                 key={column.key}
