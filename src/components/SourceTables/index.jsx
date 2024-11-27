@@ -2,14 +2,21 @@
  * SourceTables/index.js
  * -------------------------------------------------------------------------
  */
-import TableCard from "./TableCard";
 
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import * as d3 from "d3";
 
-export default ({tables, onAddColumns, onRemoveColumns}) => {
+import TableCard from "./TableCard";
+
+import { useDispatch } from "react-redux";
+import { selectTable, deselectTable, selectColumn, deselectColumn } from "../../data/schemaSlice";
+
+export default ({ tables }) => {
+    if (tables.length === 0) {
+        return <></>;
+    }
+
+    const dispatch = useDispatch();
     const [searchString, setSearchString] = useState("");
 
     const results = tables
@@ -37,16 +44,33 @@ export default ({tables, onAddColumns, onRemoveColumns}) => {
             </div>
 
             <div className="flex-1 h-screen overflow-y-auto">
-                {results.map(table => (
+                {results.map((table, tableIndex) => (
                         <TableCard
                             key={table.id}
                             table={table}
                             searchString={searchString}
-                            onAddColumns={onAddColumns}
-                            onRemoveColumns={onRemoveColumns}
+                            onTableCheck={onTableCheck}
+                            onColumnCheck={onColumnCheck}
                         />
                 ))}
             </div>
         </>
     );
+
+    function onColumnCheck(isChecked, tableId, column) {
+        if (isChecked) {
+            dispatch(selectColumn({ column, tableId }));
+        } else {
+            dispatch(deselectColumn({ column, tableId }));
+        }
+    }
+
+    function onTableCheck(isChecked, tableId, columns) {
+        if (isChecked) {
+            dispatch(selectTable({columns, tableId}));
+        } else {
+            dispatch(deselectTable({tableId}));
+        }
+    }
+
 }

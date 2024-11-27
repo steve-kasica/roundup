@@ -1,48 +1,125 @@
+/**
+ * schemaSlice.js
+ * 
+ */
 import { createSlice } from "@reduxjs/toolkit";
-import { insert, remove, clear } from "@/lib/matrix-operations";
+import * as ops from "@/lib/matrix-operations";
 
 export const initialState = {
     // The data property is a matrix with m vertical columns and n horizontal rows.
     // By convention: 
     //  `i` is used to index into rows, 0 <= j < n
     //  `j` represent the column index, 0 <= j < m
-    data: [[]],
+    data: [],
 
     error: undefined,
 
     size: { n : 0, m: 0 },
+
+    columnMap: [],
+    tableMap: []
 };
-
-const outOfBoundsError = (index, value) => new Error(`insertion index out-of-bounds: ${index} = ${value}`);
-
-const testBounds = (matrix, [i,j]) => {
-    if (i >= matrix.length) {
-        return outOfBoundsError("i", i);
-    } else if (j >= matrix.at(0).length) {
-        return outOfBoundsError("j", j);        
-    } else {
-        return undefined;
-    }
-}
-
-// Test if schema matrix is empty
-const isEmpty = (matrix) => matrix.length === 1 && matrix.at(0).length === 0;
-
-const isNull = (arr) => arr.filter(v => v).length === 0;
 
 export const getMatrixSize = (matrix) => ({ 
     n: matrix.length, 
-    m: matrix.at(0).length
+    m: matrix.length > 0 ? matrix.at(0).length : 0
 });
 
-const schemaSlice = createSlice({
+function mapKey(arr, key) {
+    let idx = arr.indexOf(key);
+    if (idx < 0) {
+        arr.push(key);
+        idx = arr.length - 1;
+    }
+    return idx;
+}
+
+export const schemaSlice = createSlice({
     name: "schema",
-    initialState: initialState,
+    initialState,
     reducers: {
+
+        selectTable: ( state, action ) => {
+            const { columns, tableId } = action.payload;
+            const i = mapKey(state.tableMap, tableId);
+            try {
+                ops.addRow(
+                    state.data,
+                    columns.reduce((arr, column) => {
+                        const j = mapKey(state.columnMap, column.index);
+                        arr.splice(j, 1, column);
+                        return arr;
+                    }, new Array(columns.length)),
+                    i
+                );
+                state.error = undefined;
+                state.size = getMatrixSize(state.data);
+            } catch (error) {
+                state.error = error.message;
+            }
+        },
+
+        deselectTable: (state, action) => {
+            const {tableId} = action.payload;
+            const i = state.tableMap.indexOf(tableId);
+            if (i < 0) {
+                throw new RangeError(`tableId not present`);
+            }            
+            try {
+                ops.removeRow(state.data, i);
+                state.error = undefined;
+                state.size = getMatrixSize(state.data);
+                state.tableMap.splice(i, 1);  // update map
+            } catch (error) {
+                state.error = error.message;
+            }
+        },
+
+        selectColumn: ( state, action ) => {
+            const { column, tableId } = action.payload;
+            const [i, j] = [mapKey(state.tableMap, tableId), mapKey(state.columnMap, column.index)];
+            const {n,m} = state.size;
+
+            if (i >= n) {
+                ops.addRow(
+                    state.data,
+                    Array.from(
+                        { length: j + 1}, 
+                        (_, jj) => (jj === j) ? column : null
+                    ),
+                    i
+                );
+            } else if (j >= m) {
+                ops.addColumn(
+                    state.data,
+                    Array.from(
+                        {length: i + 1},
+                        (_, ii) => (ii === i) ? column : null
+                    ),
+                    j
+                )
+            } else {
+                ops.updateCell(state.data, column, i, j);
+            }
+            state.error = undefined;
+            state.size = getMatrixSize(state.data);
+        },
+
+        deselectColumn: (state, action) => {
+            const { column, tableId } = action.payload;
+            const [i, j] = [mapKey(state.tableMap, tableId), mapKey(state.columnMap, column.index)];
+            const {n,m} = state.size;
+            ops.updateCell(state.data, null, i, j);
+            state.error = undefined;
+            state.size = getMatrixSize(state.data);
+        },
+
+
         clear: ( state ) => state = initialState,
 
         addColumn: ( state, action ) => {
             const { j, vector } = action.payload;
+
             const { n, m } = state.size;
             if ( j > m ) {
                 state.error = new Error("index j must be less than or equal to matrix width");
@@ -72,6 +149,7 @@ const schemaSlice = createSlice({
                 state.error = new Error(`i ${i} is out-of-bounds`);
                 return;
             }
+
             if (isEmpty(state.data)) {
                 // TODOD should initial state just be an array (1-D)?
                 state.data.splice(0, 1);
@@ -202,31 +280,6 @@ const schemaSlice = createSlice({
             state.size = getMatrixSize(state.data);
         },
 
-        updateCell: ( state, action ) => {
-            const {i, j, data} = action.payload;
-            const {n, m} = state.size;
-            if (j >= m) {
-                state.error = new Error(`j ${j} is out-of-bounds`);
-                return;
-            } else if (i >= n) {
-                state.error = new Error(`i ${i} is out-of-bounds`);
-                return;
-            } else if (isEmpty(state.data)) {
-                state.error = new Error(`State is empty`);
-                return;
-            }
-            state.error = undefined;
-            state.data.at(i).splice(j, 1, data);
-
-            // resize
-            if (isNull(state.data.at(i))) {
-                state.data.splice(i, 1);
-            } else if (isNull(state.data.map(row => row.at(j)))) {
-                state.data.forEach(row => row.splice(j, 1));
-            }
-            state.size = getMatrixSize(state.data);
-        },
-
         insertToPosition: (state, action) => {
             const { position, column } = action.payload;
             state.error = testBounds(state.data, position);
@@ -238,8 +291,16 @@ const schemaSlice = createSlice({
     }
 });
 
-export const { 
+// Action creators are generated for each case reducer function
+export const {
     clear,
+
+
+    selectColumn,
+    deselectColumn,
+
+    selectTable,
+    deselectTable,
 
     addColumn,
     addRow,
@@ -251,7 +312,6 @@ export const {
 
     updateRow,
     updateColumn,
-    updateCell,
 
 } = schemaSlice.actions;
 

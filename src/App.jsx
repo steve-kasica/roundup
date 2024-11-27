@@ -1,8 +1,5 @@
 import { useEffect, useState, useReducer } from 'react'
-import SourceTables from './components/SourceTables';
 import './App.css'
-
-import workflows from "@/data/example-workflows.js";
 
 import { 
   Select,
@@ -12,30 +9,21 @@ import {
   SelectValue
 } from "@/components/ui/select";
 
-import TableStack from "@/components/TableStack";
-import ColumnInspector from './components/ColumnInspector';
+// import Table from './lib/Table';
+import workflows from "@/data/example-workflows.js";
 
-import Table from './lib/Table';
+// import top-level app components
+import SourceTables from './components/SourceTables';
+import TableStack from "./components/TableStack";
+// import ColumnInspector from './components/ColumnInspector';
+// import TablePreview from "./components/TablePreview";
 
 function App() {
   const options = [...workflows.entries()].map(([value, {label}]) => ({value, label}));
   const [workflow, setWorkflow] = useState(options[0].value);
-
-  const [tables, dispatch] = useReducer(tablesReducer, []);
-  const handleSelectColumns = (columns) => dispatch({ type: "SELECT", columns });
-  const handleDeselectColumns = (columns) => dispatch(({ type: "DESELECT", columns }));
-  const handleSwapTableColumns = (columnA, columnB) => dispatch({
-    type: "SET_COLUMN_INDEX",
-    payload: [
-      { column: columnA, value: new Number(columnB.index) },
-      { column: columnB, value: new Number(columnA.index) }
-    ]
-  });
-
-  // const [transforms, transformsDispatch] = useReducer(transformsReducer, []);
-  // const [positionMap, updatePositionMap] = useState(new Map());
-  
-  const focusIndex = 0;
+  const [tables, setTables] = useState([]);
+  const [focusIndex, setFocusIndex] = useState(undefined);
+  const [operations, dispatch] = useReducer(operationsReducer, new Map());
 
   useEffect(() => {
     const promises = Object.entries(workflows.get(workflow).data)
@@ -43,11 +31,13 @@ function App() {
             .then(module => ({...module.default})));
 
     Promise.all(promises)
-      .then(data => {
-        const maxColumns = Math.max(...data.map(({columns}) => columns.length));
-        return data.map((d,i) => new Table(d, i, maxColumns));
+      .then(tables => { 
+        return tables.map((table, i) => ({
+          ...table, 
+          columns: table.columns.map((column, j) => ({...column, id: `${i}-${j}`}))
+        }))
       })
-      .then(data => dispatch({type: "SET_INITIAL_DATA", data: data}));
+      .then(tables => setTables(tables));
   }, [workflow]);
 
   return (
@@ -63,71 +53,110 @@ function App() {
             </Select>
           <SourceTables 
             tables={tables}
-            onAddColumns={handleSelectColumns}
-            onRemoveColumns={handleDeselectColumns}
+            onCheckColumns={handleSelectColumns}
+            onUncheckColumns={handleDeselectColumns}
           />
         </div>
         <div>
-          <TableStack
-            tables={tables}
-            onCellSwap={handleSwapTableColumns}
+          {<TableStack
             focusIndex={focusIndex}
-          />
+          />/*
+        
+          <hr></hr>
+          <TablePreview 
+            tables={tables}
+            focusIndex={focusIndex}
+          /> */}
         </div>
-        <div>
+        {/* <div>
           <ColumnInspector 
             tables={tables}
             focusIndex={focusIndex}
           />
-          <hr />
-          {/* <TransformsList 
-            transforms={transforms}
-          /> */}
-        </div>
+        </div> */}
       </main>
   );
-}
 
-// function transformsReducer(state, {type, payload}) {
+  function handleExampleDataLoad(tables) {
+    const action = {
+      type: "SET_TABLES",
+      payload: tables
+    };
+    return dispatch(action);
+  }
 
-//   let currTransform;
+  function handleSelectColumns(columnArray) {
+    const action = { 
+      type: "ADD_OPERATIONS",
+      payload: columnArray.map(column => ops.addColumnBySourcePosition(column)),
+    };
+    return dispatch(action);
+  }
+
+  function handleDeselectColumns(columnArray) {
+    const action = { 
+      type: "ADD_OPERATIONS",
+      payload: columnArray.map(column => ops.removeColumn(column)),
+    };
+    return dispatch(action);
+  }
+
+  // Note: React will call this function once in development mode
+  function handleSwapTableColumns([columnA, columnB]) {
+    const action = {
+      type: "SET_COLUMN_INDEX",
+      payload: [
+        { column: columnA, value: columnB.index },
+        { column: columnB, value: columnA.index }
+      ]
+    };
+    return dispatch(action);
+  }
+
+}  // App()
+
+// function positionReducer(state, {type, payload}) {
+
 //   switch(type) {
-//     case "SWAP_TABLE_COLUMNS":
-//       currTransform = transforms.swapTableColumns(payload);
-//       break;
+//     case "SELECT_COLUMNS":
+//       state.set([payload.x, payload.y], [])
+//       state.has(payload.x)
 //   }
 
-//   if (state.size > 0) {
-//     let prevId = [...state.entries()].pop()[0];
-//     if (currTransform.id !== prevId) {
-//       state.set(currTransform.id, currTransform);
-//       return new Map(state);
-//     } else {
-//       return state;
-//     }
-//   } else {
-//     state.set(currTransform.id, currTransform);
-//     return new Map(state);
-//   }
+//   return new Map(state);
 // }
 
-function tablesReducer(state, action) {
-  switch(action.type) {
-    case "SET_INITIAL_DATA":
-      return action.data;
-    case "SELECT":
-      action.columns.forEach(column => column.setSelected(true));
+function operationsReducer(state, {type, payload}) {
+  switch(type) {
+    case "ADD_OPERATIONS":
+    case "UPDATE_OPERATIONS":
+      payload.forEach(func => state.set(func.id, func));
       break;
-    case "DESELECT":
-      action.columns.forEach(column => column.setSelected(false));
+    case "REMOVE_OPERATIONS":
+      payload.forEach(func => state.delete(func.id));
+      break;
+  }
+  return new Map(state);
+}
+
+// Note: React will call tableReducer twice in development mode
+function tablesReducer(state, {type, payload}) {
+  switch(type) {
+    case "SET_TABLES":
+      return payload;
+    case "SELECT_COLUMNS":
+      payload.table.selectColumns(payload.columnIds);
+      break;
+    case "DESELECT_COLUMNS":
+      payload.table.deselectColumns(payload.columnIds);
       break;
     case "SET_COLUMN_INDEX":
-      action.payload.forEach(({column, value}) => column.index = value);
+      payload.forEach(({column, value}) => column.index = value);
       break;
     default:
-      throw Error("Unknown action: " + action.type);
+      throw Error("Unknown action: " + type);
   }
-  return [...state];
+  return [...state];  // Return a new array object so React knows state has updated
 }
 
 export default App
