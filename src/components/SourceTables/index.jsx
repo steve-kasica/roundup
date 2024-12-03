@@ -9,7 +9,12 @@ import { useState } from "react";
 import TableCard from "./TableCard";
 
 import { useDispatch } from "react-redux";
-import { selectTable, deselectTable, selectColumn, deselectColumn } from "../../data/schemaSlice";
+import { 
+    selectTable, 
+    deselectTable, 
+    selectColumn, 
+    deselectColumn 
+} from "../../data/schemaSlice";
 
 export default ({ tables }) => {
     if (tables.length === 0) {
@@ -61,15 +66,15 @@ export default ({ tables }) => {
         if (isChecked) {
             dispatch(selectColumn({ column, tableId }));
         } else {
-            dispatch(deselectColumn({ column, tableId }));
+            dispatch(deselectColumn({ column }));
         }
     }
 
-    function onTableCheck(isChecked, tableId, columns) {
+    function onTableCheck(isChecked, columns) {
         if (isChecked) {
-            dispatch(selectTable({columns, tableId}));
+            dispatch(selectTable({ columns }));
         } else {
-            dispatch(deselectTable({tableId}));
+            dispatch(deselectTable({ columns }));
         }
     }
 

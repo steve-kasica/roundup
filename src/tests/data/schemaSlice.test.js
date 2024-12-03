@@ -1,622 +1,657 @@
 import { expect, describe, it, beforeEach } from "vitest";
 import reducer, 
     { 
-        getMatrixSize,
         initialState,
+        selectTable,
+        deselectTable,
+        deselectColumn,
+        swapColumnPositions,
+        getColumnKey,
+        selectColumn,
+    } from "../../data/schemaSlice";
 
-        addRow,
-        addColumn,
-        addCell,
+import * as lambert_1 from "../../data/2018-05-31-crime-and-heat-analysis/lambert_1.json";
+import * as lambert_2 from "../../data/2018-05-31-crime-and-heat-analysis/lambert_2.json";
 
-        removeRow,
-        removeColumn,
-        removeCell,
+// const [a,b,c,d,e,f] = ["a", "b", "c", "d", "e", "f"]; // TODO make to string method for this data
+const [a,b,c,d] = lambert_1.columns.slice(0, 4).map((column, index) => ({...column, id: `1-${index}`, tableId: lambert_1.id}));
+const [x,y,z] = lambert_2.columns.slice(0, 3).map((column, index) => ({...column, id: `2-${index}`, tableId: lambert_2.id }));
 
-        updateRow,
-        updateColumn,
-        updateCell,
-
-        clear,
-    } from "@/data/schemaSlice";
-
-import { columns } from "../../data/2018-05-31-crime-and-heat-analysis/lambert_1.json";
-
-const [a,b,c,d] = ["a", "b", "c", "d"]; // TODO make to string method for this data
-// const [a,b,c,d] = columns.slice(0,4);
-
-describe("Initial state", () => {
-    const {data, error} = reducer(undefined, {type: "unknown"});
-
-    it("should be an array", () => expect(data).to.be.an("Array"));
-    it("should have a length of 1", () => expect(data).to.have.lengthOf(1));
-    it("should contain an array", () => expect(data.at(0)).to.be.an("Array"));
-    it("Inner array should be empty", () => expect(data.at(0)).to.have.lengthOf(0));
-
+describe("selectTable action", () => {
+    describe("selecting a new table", () => {
+        beforeEach(context => {
+            context.tableId = a.tableId;
+            context.columns = [a,b,c,d];
+            context.state = reducer(initialState, selectTable({ columns: context.columns }));
+        });
+        it("increments tableMap with new key", ({state}) => expect(state.tableMap).to.have.lengthOf(1));
+        it("adds new key to tableMap", ({state, tableId}) => expect(state.tableMap).to.eql([tableId]));
+        it("adds new keys to columnMap", ({columns, state}) => 
+            columns.forEach(column => expect(state.columnMap).to.contain(getColumnKey(column)))
+        );
+        it("increases columnMap length", ({columns, state}) => expect(state.columnMap).to.have.lengthOf(columns.length));
+        it("sets error property to undefined", ({state}) => expect(state.error).to.be.undefined);
+    });
 });
 
-describe("Clear action", () => {
-    beforeEach(context => {
-        context.previousState = [
-            [a,     b,      d],
-            [c,     null,   null]
-        ];
-        context.currentState = reducer(context.previousState, clear(null));
+describe("deselectTable action", () => {
+    describe("Remove to undo previous selectTable action", () => {
+        beforeEach(context => {
+            context.tableId = a.tableId;
+            context.columns = [a,b,c];
+            context.state = reducer(initialState, selectTable({
+                columns: context.columns
+            }));
+            context.state = reducer(context.state, deselectTable({ columns: context.columns }));
+        });
+        it("removes key from tableMap", ({state, tableId}) => expect(state.tableMap.includes(tableId)).to.equal(false));
+        it("sets error property to undefined", ({state}) => expect(state.error).to.be.undefined);
+        it("reverts back to initial data state", ({state}) => expect(state.data).to.eql(initialState.data));
+        it("remove key form tableMap", ({state, tableId}) => expect(state.tableMap).to.not.contain(tableId));
+        it("decrements the length of tableMap", ({state}) => expect(state.tableMap).to.have.lengthOf(0));
     });
-    it("Resets state data", ({currentState}) => expect(currentState).to.eql(initialState))
+});
+
+describe("selectColumn action", () => {
+    describe("value present at position", () => {
+        beforeEach(context => {
+            const previousState = {
+                data: [
+                    [b],
+                ],
+                columnMap: [a.index],
+                tableMap: [a.tableId],
+                size: {n: 1, m: 1}
+            };
+            context.state = reducer(previousState, selectColumn({column: a}))
+        });
+        it("throws error", ({state}) => expect(state.error).to.not.be.undefined);
+    });
 })
 
-describe("addColumn action", () => {
-    const schema = [
-        [a,     b],
-        [null,  d]
-    ];
+describe("deselectColumn action", () => {
+    describe("resizes null row", () => {
+        beforeEach(context => {
+            const previousState = {
+                data: [
+                    [a, b],
+                    [x, null]
+                ],
+                columnMap: [a.index, b.index],
+                tableMap: [a.tableId, x.tableId],
+                error: undefined,
+                size: {n: 2, m: 2},
+            }
+            context.state = reducer(previousState, deselectColumn({ column: x }));
+        });
 
-    function setContext(context, j, vector, before) {
-        context.previousState = { 
-            data: before, 
-            error: undefined, 
-            size: {n: before.length, m: before[0].length } 
-        };
-        const payload = { j: j, vector: vector };
-        context.currentState = reducer(context.previousState, addColumn(payload))
-    }
-
-    describe("initial state", () => {
-        beforeEach(context => setContext(context, 0, [c], initialState.data));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [c]
-        ]);
-    });
-
-    describe("append", () => {
-        beforeEach(context => setContext(context, schema.length, [c, null], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b,  c],
-            [null,  d,  null],
-        ]);
-    });
-
-    describe("insert", () => {
-        beforeEach(context => setContext(context, 1, [c, null], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a, c, b],
-            [null, null, d]
-        ])
-    });
-
-    describe("prepend", () => {
-        beforeEach(context => setContext(context, 0, [c,null], schema));        
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [c, a, b],
-            [null, null, d]
-        ]);
-    });
-
-    describe("vector length greater than n", () => {
-        beforeEach(context => setContext(context, schema.length, [c, null, null], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b,      c],
-            [null,  d,      null],
-            [null,  null,   null]
-        ]);
-    });
-
-    describe("vector length is less than n", () => {
-        beforeEach(context => setContext(context, schema.length, [c], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b,      c],
-            [null,  d,      null]
-        ]);
-    });
-
-});
-
-describe("addRow action", () => {
-    const schema = [
-        [a,     b],
-        [null,  d]
-    ];
-
-    function setContext(context, i, vector, before) {
-        context.previousState = { 
-            data: before, 
-            error: undefined, 
-            size: getMatrixSize(before)
-        };
-        context.currentState = reducer(context.previousState, addRow({i, vector }))
-    }
-
-    describe("initial state", () => {
-        beforeEach(context => setContext(context, 0, [c], initialState.data));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [c]
-        ]);
-    });
-
-    describe("append", () => {
-        beforeEach(context => setContext(context, schema.length, [c,null], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b],
-            [null,  d],
-            [c,     null]
-        ]);
-    });
-
-    describe("insert", () => {
-        beforeEach(context => setContext(context, schema.length - 1, [c, null], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b],
-            [c,     null],
-            [null,  d]
-        ]);
-    });
-
-    describe("prepend", () => {
-        beforeEach(context => setContext(context, 0, [c, null], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-                [c,     null],
-                [a,     b],
-                [null,  d]
-            ]);
-    });
-
-    describe("i out-of-bounds", () => {
-        beforeEach(context => setContext(context, schema.length + 1, [ c, null ], schema));
-        assertRaisedOutofBoundsError();
-        assertSchemaUnchanged();
-    });
-
-    describe("vector length greater than m", () => {
-        beforeEach(context => setContext(context, schema.length, [c, null, null], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b,      null],
-            [null,  d,      null],
-            [c,     null,   null]
-        ]);
-    });
-
-    describe("vector length is less than m", () => {
-        beforeEach(context => setContext(context, schema.length, [c], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b],
-            [null,  d],
-            [c,     null]
-        ]);
-    });
-
-});
-
-describe("addCell action", () => {
-    const schema = [
-        [a,     b],
-        [null,  d]
-    ];
-    function setContext(context, i, j, data, before) {
-        context.previousState = { 
-            data: before, 
-            error: undefined, 
-            size: getMatrixSize(before)
-        };
-        context.currentState = reducer(context.previousState, addCell({i, j, data }))
-    }
-
-    describe("initial state", () => {
-        beforeEach(context => setContext(context, 0, 0, c, initialState.data));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [c]
-        ]);  
-    });
-
-    describe("i out-of-bounds", () => {
-        beforeEach(context => setContext(context, schema.length + 1, 0, c, schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);  // schema unchanged
-    });
-
-    describe("j out-of-bounds", () => {
-        beforeEach(context => setContext(context, 0, schema[0].length + 1, c, schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);  // schema unchanged
-    });
-
-    describe("prepend", () => {
-        beforeEach(context => setContext(context, 0, 0, c, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [c,     a,      b],
-            [null,  null,   d]
-        ]);
-    });
-
-    describe("insert", () => {
-        beforeEach(context => setContext(context, 0, schema[0].length - 1, c, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     c,      b],
-            [null,  null,   d]
-        ]); 
-    });
-
-    describe("append", () => {
-        beforeEach(context => setContext(context, 0, schema[0].length, c, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b,  c],
-            [null,  d,  null]
-        ]);
-    });
-
-});
-
-describe("removeRow action", () => {
-    const schema = [
-        [a,     b],
-        [null,  d]
-    ];
-
-    function setContext(context, i, before) {
-        context.previousState = { 
-            data: before, 
-            error: undefined, 
-            size: getMatrixSize(before)
-        };
-        context.currentState = reducer(context.previousState, removeRow({i}))
-    }
-
-    describe("initial state", () => {
-        beforeEach(context => setContext(context, 0, initialState.data));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(initialState.data);  // schema unchanged        
-    });
-
-    describe("i out-of-bounds", () => {
-        beforeEach(context => setContext(context, schema.length, schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);  // schema unchanged
-    });
-
-    describe("last row", () => {
-        beforeEach(context => setContext(context, schema.length - 1, schema));        
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a, b]
-        ]);
-    });
-
-    describe("first row", () => {
-        beforeEach(context => setContext(context, 0, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [null, d]
-        ]);
-    });
-});
-
-describe("removeColumn action", () => {
-    const schema = [
-        [a,     b],
-        [null,  d]
-    ];
-
-    function setContext(context, j, before) {
-        context.previousState = { 
-            data: before, 
-            error: undefined, 
-            size: getMatrixSize(before)
-        };
-        context.currentState = reducer(context.previousState, removeColumn({j}))
-    }
-
-    describe("initial state", () => {
-        beforeEach(context => setContext(context, 0, initialState.data));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(initialState.data);  // schema unchanged        
-    });
-
-    describe("j out-of-bounds", () => {
-        beforeEach(context => setContext(context, schema[0].length, schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);  // schema unchanged
-    });
-
-    describe("last column", () => {
-        beforeEach(context => setContext(context, schema[0].length - 1, schema));        
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a],
-            [null]
-        ]);
-    });
-
-    describe("first column", () => {
-        beforeEach(context => setContext(context, 0, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [b],
-            [d]
-        ]);
-    });
-});
-
-describe("removeCell action", () => {
-    const schema = [
-        [a,     b],
-        [null,  d]
-    ];
-
-    function setContext(context, i, j, before) {
-        context.previousState = { 
-            data: before, 
-            error: undefined, 
-            size: getMatrixSize(before)
-        };
-        context.currentState = reducer(context.previousState, removeCell({i, j}))
-    }
-
-    describe("initial state", () => {
-        beforeEach(context => setContext(context, 0, 0, initialState.data));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(initialState.data);  
-    });
-
-    describe("i out-of-bounds", () => {
-        beforeEach(context => setContext(context, schema.length + 1, 0, schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);  // schema unchanged
-    });
-
-    describe("j out-of-bounds", () => {
-        beforeEach(context => setContext(context, 0, schema[0].length + 1, schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);  // schema unchanged
-    });
-
-    describe("no resize", () => {
-        beforeEach(context => setContext(context, 0, 1, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     null],
-            [null,  d]
-        ]);
-    });
-
-    describe("Resizes when null row in result", () => {
-        beforeEach(context => setContext(context, 1, 1, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b]
-        ]); 
-    });
-
-    describe("Resizes when null column in result", () => {
-        beforeEach(context => setContext(context, 0, 1, [
-            [a,     b,      null],
-            [null,  null,   d]
+        it("does not change size.m", ({state}) => expect(state.size.m).to.equal(2));
+        it("changes size.n", ({state}) => expect(state.size.n).to.equal(1));
+        it("removes row with deselected cell", ({state}) => expect(state.data).to.eql([ 
+            [a,b]
         ]));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     null],
-            [null,  d]
-        ]);
-    });
-    // TODO, does this do the right kind of shifting? of cell greater than
-    // j in the row i?
-
-});
-
-describe("updateRow action", () => {
-    const schema = [
-        [a,     b],
-        [null,  d]
-    ];
-
-    function setContext(context, i, vector, before) {
-        context.previousState = { 
-            data: before, 
-            error: undefined, 
-            size: getMatrixSize(before)
-        };
-        context.currentState = reducer(context.previousState, updateRow({i, vector}));
-    }
-
-    describe("initial state", () => {
-        beforeEach(context => setContext(context, 0, [c], initialState.data));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(initialState.data);
     });
 
-    describe("i out-of-bounds", () => {
-        beforeEach(context => setContext(context, schema.length, [c, null], schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);
-    });
+    describe("resizes null column", () => {
+        beforeEach(context => {
+            console.log(a.key);
+            const previousState = {
+                data: [
+                    [a,     b],
+                    [null,  y]
+                ],
+                columnMap: [a.index, b.index],
+                tableMap: [a.tableId, y.tableId],
+                error: undefined,
+                size: {n: 2, m: 2}
+            };
+            context.state = reducer(previousState, deselectColumn({ column: a }));
+        });
 
-    describe("vector length does not equal m", () => {
-        beforeEach(context => setContext(context, schema[0].length, [c, null, null], schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);
-    });
-
-    describe("update single cell", () => {
-        beforeEach(context => setContext(context, schema.length - 1, [c, d], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     b],
-            [c,     d]
-        ]);
-    });
-
-    describe("null single cell", () => {
-        beforeEach(context => setContext(context, 0, [null, b], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [null,  b],
-            [null,  d]
-        ]);
-    });
-
-    describe("swap cell", () => {
-        beforeEach(context => setContext(context, 0, [b, a], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [b,     a],
-            [null,  d]
-        ]);
-    });
-});
-
-describe("updateColumn action", () => {
-    const schema = [
-        [a,     b],
-        [null,  d]
-    ];
-
-    function setContext(context, j, vector, before) {
-        context.previousState = { 
-            data: before, 
-            error: undefined, 
-            size: getMatrixSize(before)
-        };
-        context.currentState = reducer(context.previousState, updateColumn({j, vector}));
-    }
-
-    describe("initial state", () => {
-        beforeEach(context => setContext(context, 0, [c], initialState.data));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(initialState.data);
-    });
-
-    describe("j out-of-bounds", () => {
-        beforeEach(context => setContext(context, schema[0].length, [c, null], schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);
-    });
-
-    describe("vector length does not equal n", () => {
-        beforeEach(context => setContext(context, schema[0].length, [c, null, null], schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);
-    });
-
-    describe("update single cell", () => {
-        beforeEach(context => setContext(context, schema[0].length - 1, [c, d], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     c],
-            [null,     d]
-        ]);
-    });
-
-    describe("null single cell", () => {
-        beforeEach(context => setContext(context, schema[0].length - 1, [null, d], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,  null],
-            [null,  d]
-        ]);
-    });
-
-    describe("swap cell", () => {
-        beforeEach(context => setContext(context, schema[0].length - 1, [d, b], schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     d],
-            [null,  b]
-        ]);
-    });
-});
-
-describe("updateCell action", () => {
-    const schema = [
-        [a,     b],
-        [null,  d]
-    ];
-
-    function setContext(context, i, j, data, before) {
-        context.previousState = { 
-            data: before, 
-            error: undefined, 
-            size: getMatrixSize(before)
-        };
-        context.currentState = reducer(context.previousState, updateCell({i, j, data}));
-    }
-
-    describe("initial state", () => {
-        beforeEach(context => setContext(context, 0, 0, c, initialState.data));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(initialState.data);
-    });
-
-    describe("i out-of-bounds", () => {
-        beforeEach(context => setContext(context, schema.length, 0, c, schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);
-    });
-
-    describe("j out-of-bounds", () => {
-        beforeEach(context => setContext(context, 0, schema[0].length, c, schema));
-        assertRaisedOutofBoundsError();
-        assertMatrixEqualsExpected(schema);
-    });
-
-    describe("update null cell", () => {
-        beforeEach(context => setContext(context, 1, 0, c, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a, b],
-            [c, d]
-        ]);
-    });
-
-    describe("update existing cell", () => {
-        beforeEach(context => setContext(context, 0, 0, c, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [c, b],
-            [null, d]
-        ]);
-    });
-
-    describe("null an existing cell", () => {
-        beforeEach(context => setContext(context, 0, 1, null, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a,     null],
-            [null,  d]
-        ]);
-    });
-
-    describe("resize if creates a null column", () => {
-        beforeEach(context => setContext(context, 0, 0, null, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
+        it("changes size.m", ({state}) => expect(state.size.m).to.equal(1));
+        it("does not change size.n", ({state}) => expect(state.size.n).to.equal(2));
+        it("removes column with deselected cell", ({state}) => expect(state.data).to.eql([ 
             [b],
-            [d]
-        ]);
+            [y]
+        ]));
     });
 
-    describe("resize if creates a null row", () => {
-        beforeEach(context => setContext(context, 1, 1, null, schema));
-        assertNoError();
-        assertMatrixEqualsExpected([
-            [a, b],
-        ]);
+    describe("deselect after swap", () => {
+        beforeEach(context => {
+            context.state = reducer(initialState, selectTable({ columns: [a,b]}));
+            context.state = reducer(context.state, swapColumnPositions([{i: 0, j:0 }, {i: 0, j: 1}]));
+            context.state = reducer(context.state, deselectColumn({column: a }));
+        });
+        it("changes size.m", ({state}) => expect(state.size.m).to.equal(1));
+        it("does not change size.n", ({state}) => expect(state.size.n).to.equal(1));
+        // it("removes column index from columnMap", ({state}) => expect(state.columnMap).to.not.contain(a.index));
+        it("removes column", ({state}) => expect(state.data.at(0)).to.not.include(a));
     });
 
+    // describe("results in empty matrix", () => {
+    //     beforeEach(context => {
+    //         const previousState = {
+    //             data: [[a]],
+    //             columnMap: [a.index],
+    //             tableMap: [a.tableId]
+    //         }
+    //     })
+    // });
 });
+
+describe("swapColumnPositions action", () => {
+
+    describe("Swap position with non-null neighbor", () => {
+        beforeEach(context => {
+            context.state = reducer(initialState, selectTable({columns: [a, b]}));
+            context.state = reducer(context.state, swapColumnPositions([ {i: 0, j: 0}, {i: 0, j: 1} ]));
+        });
+        it("does not change size.n", ({state}) => expect(state.size.n).to.equal(state.data.length));
+        it("does not change size.m", ({state}) => expect(state.size.m).to.equal(state.data[0].length));
+        it("places a in b's old position", ({state}) => expect(state.data.at(0).at(0)).to.equal(b));
+        it("places b in a's old position", ({state}) => expect(state.data.at(0).at(1)).to.equal(a));
+        it("sets error property to undefined", ({state}) => expect(state.error).to.be.undefined);
+    });
+
+    describe("Swap position with null neighbor", () => {
+        beforeEach(context => {
+            const previousState = {
+                data: [
+                    [a, b],
+                    [x, null]
+                ],
+                error: undefined,
+                columnMap: [a.index, b.index],
+                tableMap: [a.tableid, x.tableId],
+                size: {m: 2, n: 2}
+            };
+            context.state = reducer(previousState, swapColumnPositions([{i: 1, j: 0}, {i: 1, j: 1} ]));
+        });
+        it("does not change size.n", ({state}) => expect(state.size.n).to.equal(2));
+        it("does not change size.m", ({state}) => expect(state.size.m).to.equal(2));
+        it("places a in b's old position", ({state}) => expect(state.data.at(1).at(0)).to.equal(null));
+        it("places b in a's old position", ({state}) => expect(state.data.at(1).at(1)).to.equal(x));
+        it("sets error property to undefined", ({state}) => expect(state.error).to.be.undefined);
+    });
+
+    describe("Swap creates a null column", () => {
+        beforeEach(context => {
+            const previousState = {
+                data: [
+                    [null, b],
+                    [x, null]
+                ],
+                error: undefined,
+                tableMap: [b.tableId, x.tableid],
+                columnMap: [x.index, b.index],
+                size: {n: 2, m: 2}
+            };
+            context.state = reducer(previousState, swapColumnPositions([{i: 1, j: 0}, {i: 1, j: 1}]));
+        });
+        it("does not change size.n", ({state}) => expect(state.size.n).to.equal(2));
+        it("changes size.m", ({state}) => expect(state.size.m).to.equal(1));
+        it("sets error property to undefined", ({state}) => expect(state.error).to.be.undefined);
+        it("remove null column", ({state}) => expect(state.data).to.eql([
+            [b],
+            [x]
+        ]));
+    });
+
+    // TODO
+    // describe("Swap position with non-neighbor", () => {
+    // });
+});
+
+// describe("Clear action", () => {
+//     beforeEach(context => {
+//         context.previousState = [
+//             [a,     b,      d],
+//             [c,     null,   null]
+//         ];
+//         context.currentState = reducer(context.previousState, clear(null));
+//     });
+//     it("Resets state data", ({currentState}) => expect(currentState).to.eql(initialState))
+// })
+
+// describe("addRow action", () => {
+//     const schema = [
+//         [a,     b],
+//         [null,  d]
+//     ];
+
+//     function setContext(context, i, vector, before) {
+//         context.previousState = { 
+//             data: before, 
+//             error: undefined, 
+//             size: getMatrixSize(before)
+//         };
+//         context.currentState = reducer(context.previousState, addRow({i, vector }))
+//     }
+
+//     describe("initial state", () => {
+//         beforeEach(context => setContext(context, 0, [c], initialState.data));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [c]
+//         ]);
+//     });
+
+//     describe("append", () => {
+//         beforeEach(context => setContext(context, schema.length, [c,null], schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     b],
+//             [null,  d],
+//             [c,     null]
+//         ]);
+//     });
+
+//     describe("insert", () => {
+//         beforeEach(context => setContext(context, schema.length - 1, [c, null], schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     b],
+//             [c,     null],
+//             [null,  d]
+//         ]);
+//     });
+
+//     describe("prepend", () => {
+//         beforeEach(context => setContext(context, 0, [c, null], schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//                 [c,     null],
+//                 [a,     b],
+//                 [null,  d]
+//             ]);
+//     });
+
+//     describe("i out-of-bounds", () => {
+//         beforeEach(context => setContext(context, schema.length + 1, [ c, null ], schema));
+//         assertRaisedOutofBoundsError();
+//         assertSchemaUnchanged();
+//     });
+
+//     describe("vector length greater than m", () => {
+//         beforeEach(context => setContext(context, schema.length, [c, null, null], schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     b,      null],
+//             [null,  d,      null],
+//             [c,     null,   null]
+//         ]);
+//     });
+
+//     describe("vector length is less than m", () => {
+//         beforeEach(context => setContext(context, schema.length, [c], schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     b],
+//             [null,  d],
+//             [c,     null]
+//         ]);
+//     });
+
+// });
+
+// describe("addCell action", () => {
+//     const schema = [
+//         [a,     b],
+//         [null,  d]
+//     ];
+//     function setContext(context, i, j, data, before) {
+//         context.previousState = { 
+//             data: before, 
+//             error: undefined, 
+//             size: getMatrixSize(before)
+//         };
+//         context.currentState = reducer(context.previousState, addCell({i, j, data }))
+//     }
+
+//     describe("initial state", () => {
+//         beforeEach(context => setContext(context, 0, 0, c, initialState.data));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [c]
+//         ]);  
+//     });
+
+//     describe("i out-of-bounds", () => {
+//         beforeEach(context => setContext(context, schema.length + 1, 0, c, schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);  // schema unchanged
+//     });
+
+//     describe("j out-of-bounds", () => {
+//         beforeEach(context => setContext(context, 0, schema[0].length + 1, c, schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);  // schema unchanged
+//     });
+
+//     describe("prepend", () => {
+//         beforeEach(context => setContext(context, 0, 0, c, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [c,     a,      b],
+//             [null,  null,   d]
+//         ]);
+//     });
+
+//     describe("insert", () => {
+//         beforeEach(context => setContext(context, 0, schema[0].length - 1, c, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     c,      b],
+//             [null,  null,   d]
+//         ]); 
+//     });
+
+//     describe("append", () => {
+//         beforeEach(context => setContext(context, 0, schema[0].length, c, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     b,  c],
+//             [null,  d,  null]
+//         ]);
+//     });
+
+// });
+
+// describe("removeRow action", () => {
+//     const schema = [
+//         [a,     b],
+//         [null,  d]
+//     ];
+
+//     function setContext(context, i, before) {
+//         context.previousState = { 
+//             data: before, 
+//             error: undefined, 
+//             size: getMatrixSize(before)
+//         };
+//         context.currentState = reducer(context.previousState, removeRow({i}))
+//     }
+
+//     describe("initial state", () => {
+//         beforeEach(context => setContext(context, 0, initialState.data));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(initialState.data);  // schema unchanged        
+//     });
+
+//     describe("i out-of-bounds", () => {
+//         beforeEach(context => setContext(context, schema.length, schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);  // schema unchanged
+//     });
+
+//     describe("last row", () => {
+//         beforeEach(context => setContext(context, schema.length - 1, schema));        
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a, b]
+//         ]);
+//     });
+
+//     describe("first row", () => {
+//         beforeEach(context => setContext(context, 0, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [null, d]
+//         ]);
+//     });
+// });
+
+// describe("removeColumn action", () => {
+//     const schema = [
+//         [a,     b],
+//         [null,  d]
+//     ];
+
+//     function setContext(context, j, before) {
+//         context.previousState = { 
+//             data: before, 
+//             error: undefined, 
+//             size: getMatrixSize(before)
+//         };
+//         context.currentState = reducer(context.previousState, removeColumn({j}))
+//     }
+
+//     describe("initial state", () => {
+//         beforeEach(context => setContext(context, 0, initialState.data));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(initialState.data);  // schema unchanged        
+//     });
+
+//     describe("j out-of-bounds", () => {
+//         beforeEach(context => setContext(context, schema[0].length, schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);  // schema unchanged
+//     });
+
+//     describe("last column", () => {
+//         beforeEach(context => setContext(context, schema[0].length - 1, schema));        
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a],
+//             [null]
+//         ]);
+//     });
+
+//     describe("first column", () => {
+//         beforeEach(context => setContext(context, 0, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [b],
+//             [d]
+//         ]);
+//     });
+// });
+
+// describe("removeCell action", () => {
+//     const schema = [
+//         [a,     b],
+//         [null,  d]
+//     ];
+
+//     function setContext(context, i, j, before) {
+//         context.previousState = { 
+//             data: before, 
+//             error: undefined, 
+//             size: getMatrixSize(before)
+//         };
+//         context.currentState = reducer(context.previousState, removeCell({i, j}))
+//     }
+
+//     describe("initial state", () => {
+//         beforeEach(context => setContext(context, 0, 0, initialState.data));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(initialState.data);  
+//     });
+
+//     describe("i out-of-bounds", () => {
+//         beforeEach(context => setContext(context, schema.length + 1, 0, schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);  // schema unchanged
+//     });
+
+//     describe("j out-of-bounds", () => {
+//         beforeEach(context => setContext(context, 0, schema[0].length + 1, schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);  // schema unchanged
+//     });
+
+//     describe("no resize", () => {
+//         beforeEach(context => setContext(context, 0, 1, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     null],
+//             [null,  d]
+//         ]);
+//     });
+
+//     describe("Resizes when null row in result", () => {
+//         beforeEach(context => setContext(context, 1, 1, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     b]
+//         ]); 
+//     });
+
+//     describe("Resizes when null column in result", () => {
+//         beforeEach(context => setContext(context, 0, 1, [
+//             [a,     b,      null],
+//             [null,  null,   d]
+//         ]));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     null],
+//             [null,  d]
+//         ]);
+//     });
+//     // TODO, does this do the right kind of shifting? of cell greater than
+//     // j in the row i?
+
+// });
+
+// describe("updateColumn action", () => {
+//     const schema = [
+//         [a,     b],
+//         [null,  d]
+//     ];
+
+//     function setContext(context, j, vector, before) {
+//         context.previousState = { 
+//             data: before, 
+//             error: undefined, 
+//             size: getMatrixSize(before)
+//         };
+//         context.currentState = reducer(context.previousState, updateColumn({j, vector}));
+//     }
+
+//     describe("initial state", () => {
+//         beforeEach(context => setContext(context, 0, [c], initialState.data));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(initialState.data);
+//     });
+
+//     describe("j out-of-bounds", () => {
+//         beforeEach(context => setContext(context, schema[0].length, [c, null], schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);
+//     });
+
+//     describe("vector length does not equal n", () => {
+//         beforeEach(context => setContext(context, schema[0].length, [c, null, null], schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);
+//     });
+
+//     describe("update single cell", () => {
+//         beforeEach(context => setContext(context, schema[0].length - 1, [c, d], schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     c],
+//             [null,     d]
+//         ]);
+//     });
+
+//     describe("null single cell", () => {
+//         beforeEach(context => setContext(context, schema[0].length - 1, [null, d], schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,  null],
+//             [null,  d]
+//         ]);
+//     });
+
+//     describe("swap cell", () => {
+//         beforeEach(context => setContext(context, schema[0].length - 1, [d, b], schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     d],
+//             [null,  b]
+//         ]);
+//     });
+// });
+
+// describe("updateCell action", () => {
+//     const schema = [
+//         [a,     b],
+//         [null,  d]
+//     ];
+
+//     function setContext(context, i, j, data, before) {
+//         context.previousState = { 
+//             data: before, 
+//             error: undefined, 
+//             size: getMatrixSize(before)
+//         };
+//         context.currentState = reducer(context.previousState, updateCell({i, j, data}));
+//     }
+
+//     describe("initial state", () => {
+//         beforeEach(context => setContext(context, 0, 0, c, initialState.data));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(initialState.data);
+//     });
+
+//     describe("i out-of-bounds", () => {
+//         beforeEach(context => setContext(context, schema.length, 0, c, schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);
+//     });
+
+//     describe("j out-of-bounds", () => {
+//         beforeEach(context => setContext(context, 0, schema[0].length, c, schema));
+//         assertRaisedOutofBoundsError();
+//         assertMatrixEqualsExpected(schema);
+//     });
+
+//     describe("update null cell", () => {
+//         beforeEach(context => setContext(context, 1, 0, c, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a, b],
+//             [c, d]
+//         ]);
+//     });
+
+//     describe("update existing cell", () => {
+//         beforeEach(context => setContext(context, 0, 0, c, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [c, b],
+//             [null, d]
+//         ]);
+//     });
+
+//     describe("null an existing cell", () => {
+//         beforeEach(context => setContext(context, 0, 1, null, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a,     null],
+//             [null,  d]
+//         ]);
+//     });
+
+//     describe("resize if creates a null column", () => {
+//         beforeEach(context => setContext(context, 0, 0, null, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [b],
+//             [d]
+//         ]);
+//     });
+
+//     describe("resize if creates a null row", () => {
+//         beforeEach(context => setContext(context, 1, 1, null, schema));
+//         assertNoError();
+//         assertMatrixEqualsExpected([
+//             [a, b],
+//         ]);
+//     });
+
+// });
 
 function assertRaisedOutofBoundsError() {
     it("should raise error", ({currentState}) => expect(currentState.error).to.be.an("Error"));

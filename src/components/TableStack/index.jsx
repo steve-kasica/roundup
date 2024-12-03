@@ -3,39 +3,40 @@
 import * as d3 from "d3";
 import StackBody from "./StackBody";
 import StackHeader from "./StackHeader";
+import { transpose } from "d3";
+import { useDispatch, useSelector } from "react-redux";
+import { swapColumnPositions } from "../../data/schemaSlice";
 
-export default function TableStack({tables, transforms, onCellSwap, focusIndex}) {
+const multipleValuesText = "...";
 
-    const selectedIndices = new Set(tables
-        .map(table => table.selectedColumns.map(column => column.index))
-        .flat()
-    );
+export default function TableStack({focusIndex}) {
 
-    const bodyData = tables
-            .filter(table => table.isSelected)
-            .map(table => table.columns
-                .filter(c => selectedIndices.has(c.index))
-                .sort((a,b) => d3.ascending(a.index, b.index))
-            );
+    const dispatch = useDispatch();
 
-    const headerData = Array.from(
-        d3.group(
-            bodyData.flat(), 
-            c => c.index,
-            c => c.name
-        ), 
-        ([i, names]) => [...names.keys()].filter(text => text.length > 0)
-    );
+    const {data} = useSelector(({ schema }) => {
+        return {
+            data: schema.data,
+            error: schema.error
+        };
+    });
 
     return (
         <table className="w-full table-fixed border-separate border-spacing-2 border border-slate-400">
             <thead>
-                <StackHeader data={headerData} />
+                <StackHeader
+                    data={data}
+                    focusIndex={focusIndex}
+                />
             </thead>
-            <StackBody 
-                data={bodyData}
+            {<StackBody 
+                data={data}
+                focusIndex={focusIndex}
                 onCellSwap={onCellSwap}
-            />
+            />}
         </table>
-    )
+    );
+
+    function onCellSwap(columnA, columnB, tableId) {
+        dispatch(swapColumnPositions(columnA, columnB, tableId))
+    }
 }

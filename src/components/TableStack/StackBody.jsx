@@ -1,17 +1,24 @@
+import { Fragment } from "react";
 import StackRow from "./StackRow";
+import * as d3 from "d3";
 
-// `data` == a matrix containing arrays of column instances
-export default function StackBody({data, onCellSwap}) {
-
+/**
+ * 
+ * @param {Array[Array]} data: An array of arrays containing Column instances
+ * @returns 
+ */
+export default function StackBody({data, focusIndex, onCellSwap}) {
     return (
         <tbody>
-            {data.map(columns => (
-                <StackRow
-                    key={columns[0].table.id}
-                    tableId={columns[0].table.id}
-                    columns={columns}
-                    onCellSwap={onCellSwap}
-                />
+            {data.map((columns, i) => (
+                // TODO: do I need this fragment can I move key to StackRow?
+                <Fragment key={i}>
+                    <StackRow
+                        columns={columns}
+                        focusIndex={focusIndex}
+                        onCellSwap={onCellSwap}
+                    />
+                </Fragment>
             ))}
         </tbody>
     )

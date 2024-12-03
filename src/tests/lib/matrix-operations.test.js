@@ -407,6 +407,10 @@ describe("addColumn function", () => {
     });
 });
 
+// TODO: removeColumn function tests
+
+// TODO: removeRow function tests
+
 describe("updateCell function", () => {
     const op = updateCell;
 
@@ -454,45 +458,6 @@ describe("updateCell function", () => {
         it("added data is strictly equal to vector", 
             ({matrix, value, i, j}) => expect(matrix.at(i).at(j)).to.equal(value)
         );
-    });
-
-    describe("creates null row", () => {
-        beforeEach(context => {
-            context.matrix = [
-                [a,     b],
-                [null,  d]
-            ];
-            context.value = null;
-            context.i = 1;
-            context.j = 1;
-            op(context.matrix, context.value, context.i, context.j);
-        });
-
-        it("does not change width", ({matrix, vector}) => matrix.forEach(row => expect(row).to.have.lengthOf(2)));
-        it("change length", ({matrix}) => expect(matrix).to.have.lengthOf(1));
-        it("resizes matrix", ({matrix}) => expect(matrix).to.eql([ 
-            [a,    b]
-        ]));
-    });
-
-    describe("creates null column", () => {
-        beforeEach(context => {
-            context.matrix = [
-                [a,     b],
-                [null,  d]
-            ];
-            context.value = null;
-            context.i = 0;
-            context.j = 0;
-            op(context.matrix, context.value, context.i, context.j);
-        });
-
-        it("changes width", ({matrix}) => matrix.forEach(row => expect(row).to.have.lengthOf(1)));
-        it("does not change length", ({matrix}) => expect(matrix).to.have.lengthOf(2));
-        it("resizes matrix", ({matrix}) => expect(matrix).to.eql([ 
-            [b],
-            [d]
-        ]));
     });
 
     describe("error handling", () => {

@@ -111,9 +111,9 @@ export default class TableStack {
     const vis = this;
 
     const drag = d3.drag()
-      .on("start", function (ev, d) { 
-        d3.select(this).classed("dragging", true).raise(); 
-      })
+      // .on("start", function (ev, d) { 
+      //   d3.select(this).classed("dragging", true).raise(); 
+      // })
       .on("drag", function ({ x, dx }, d) {
         const cell = d3.select(this);
         const [min, max] = d3.extent(vis.xScale.domain()).map(vis.xScale);
@@ -302,97 +302,6 @@ export default class TableStack {
     
   //   return this;  // for chaining
   // }
-  
-  // renderYAxis() {
-    
-  //   const vis = this;
-  //   const yScale = this.yScale; // alias for use within callback functions
-    
-  //   // draw axis
-  //   const yAxis = this.svg
-  //     .append("g")
-  //     .attr("transform", `translate(${(this.marginTop, this.marginLeft)})`)
-  //     .call(this.yAxis);
-    
-  //   yAxis
-  //     .select("path,line") // Remove axis line
-  //     .remove();
-
-  //   // Define row interactivity      
-  //   yAxis
-  //     .selectAll("g.tick")
-  //     .attr("data-index", (yIndex) => yIndex)
-  //     .style("cursor", "grab")
-  //     .style("user-select", "none")
-  //     .call(d3.drag()
-  //       .on("start", function() {
-  //         const tick = d3.select(this);
-  //         tick.style("cursor", "grabbing");
-            
-  //         vis.svg
-  //           .selectAll(`g.row[data-index="${tick.attr("data-index")}"] g.cell`)
-  //           .attr("fill", "red")
-  //       })
-  //       .on("drag", function ({ x, y }, d) {
-  //         const initialIndex = parseInt(d3.select(this).attr("data-index"));
-  
-  //         const currentIndex = (function (initIdx, maxIdx, minIdx, diff) {
-  //           // diff > 0 if moving right, < 0 if moving left
-  //           let idx = initIdx + Math.floor(diff / vis.yScale.step());
-  //           return idx > maxIdx ? maxIdx : idx < minIdx ? minIdx : idx;
-  //         })(initialIndex, 3, 1, y - vis.yScale(initialIndex));
-  
-  //         if (initialIndex !== currentIndex) {
-  //           // Move y-axis tick vertically
-  //           d3.select(this)
-  //             .attr("data-index", currentIndex)
-  //             .attr(
-  //               "transform",
-  //               `translate(0, ${vis.yScale(currentIndex) + vis.yScale.bandwidth() / 2})`
-  //             );
-  
-  //           // Move row of columns vertically
-  //           d3.select(`g.row[data-index="${initialIndex}"]`)
-  //             .attr("data-index", currentIndex)
-  //             .attr("transform", `translate(0, ${vis.yScale(currentIndex)})`);
-  
-  //           let nextIndex =
-  //             currentIndex - initialIndex > 0
-  //               ? currentIndex - 1
-  //               : currentIndex + 1;
-  
-  //           // Move tick under selected tick
-  //           d3.select(this.parentElement)
-  //             .select(`g.tick[data-index="${currentIndex}"]`)
-  //             .attr("data-index", nextIndex)
-  //             .attr(
-  //               "transform",
-  //               `translate(0, ${vis.yScale(nextIndex) + vis.yScale.bandwidth() / 2})`
-  //             );
-  
-  //           // Move row of column under dragging row of columns
-  //           d3.select(`g.row[data-index="${currentIndex}"]`)
-  //             .attr("data-index", nextIndex)
-  //             .attr("transform", `translate(0, ${vis.yScale(nextIndex)})`);
-  //           }
-  //         })
-  //         .on("end", function() {
-  //           const tick = d3.select(this);
-            
-  //           tick.style("cursor", "grab");
-              
-  //           vis.svg
-  //             .selectAll(`g.row[data-index="${tick.attr("data-index")}"] g.cell`)
-  //             .attr("fill", null);
-            
-  //           // Update margins with new data
-  //           vis.serialize.call(vis)
-  //              .renderMargins();
-  //         })
-  //     );
-  //     return yAxis;
-      
-  // }  // renderYAxis
   
   // update(updatedData) {
   //   const data = updatedData || this.data;

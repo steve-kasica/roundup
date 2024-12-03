@@ -73,6 +73,18 @@ export function addColumn(matrix, vector, j) {
     vector.forEach((value, i) => matrix.at(i).splice(j, 0, value));
 }
 
+export function removeColumn(matrix, j) {
+    const {n, m} = getSize(matrix);
+    if (n === 0 && m === 0) {
+        throw new Error(`matrix is empty`);   
+    } else if (j === undefined) {
+        throw new Error("j is undefined");
+    } else if (j >= m || j < 0) {
+        throw new RangeError(`j = ${j} is out-of-bounds`);
+    }
+    matrix.forEach(row => row.splice(j, 1));
+}
+
 export function updateCell(matrix, value, i, j) {
     const { n, m } = getSize(matrix);
     if (n === 0 && m === 0) {
@@ -82,23 +94,13 @@ export function updateCell(matrix, value, i, j) {
     } else if (i === undefined) {
         throw new Error("i is undefined");
     } else if (j >= m || j < 0) {
-        throw new RangeError(`j ${j} is out-of-bounds`);
+        throw new RangeError(`j = ${j} is out-of-bounds`);
     } else if (i >= n || i < 0) {
-        throw new RangeError(`i ${i} is out-of-bounds`);
+        throw new RangeError(`i = ${i} is out-of-bounds: n = ${n}`);
     } else if (value === undefined) {
         throw new Error("value is undefined");
     }
 
     matrix.at(i).splice(j, 1, value);
 
-    // Resize if null value results in empty rows are columns
-    if (value === null) {
-        if (matrix.at(i).filter(cell => cell !== null).length === 0) {
-            // row is empty
-            matrix.splice(i, 1);
-        } else if (matrix.filter(row => row.at(j) !== null).length === 0) {
-            // column is empty
-            matrix.forEach(row => row.splice(j,1));
-        }
-    }
 }

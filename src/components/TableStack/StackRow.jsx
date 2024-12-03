@@ -2,11 +2,12 @@
 import { useEffect, useRef, Fragment } from "react";
 import * as d3 from "d3";
 
-export default function StackRow({columns, onCellSwap}) {
+export default function StackRow({columns, focusIndex, onCellSwap}) {
     const trRef = useRef();
 
     useEffect(() => {
         const tr = d3.select(trRef.current);
+        // TODO: can this scope be at the module level?
         const drag = d3.drag()
             .on("start", onStartHandler)
             .on("drag", onDragHandler)
@@ -18,23 +19,27 @@ export default function StackRow({columns, onCellSwap}) {
 
     }, [columns]);
 
+    const setTdClassName = (isNull, isFocused) => {
+        let className = "border rounded p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 cursor-ew-resize";
+        className += (isNull) ? "border-solid " : "border-dotted ";
+        className += (isFocused) ? "bg-sky-500/50 " : "";
+        return className;
+    };
+
     return (
-        <Fragment key={columns[0].table.id}>
-        <tr 
-            ref={trRef} 
-            key={columns[0].table.id}>
+        <tr ref={trRef}>
             {columns.map((column, i) => (
-                <td key={column.id}
+                <td key={column !== null ? column.id : `null-${i}`}
                     data-index={i}
-                    className={`border rounded p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 cursor-ew-resize ${(column.isSelected) ? "border-solid " : "border-dotted"}`}
+                    data-id={column !== null ? column.id : ""}
+                    className={setTdClassName(column === null, i === focusIndex)}
                 >
                     <p className="truncate text-center text-sm select-none">
-                        {column.isSelected ? column.name : ""}
+                        {column !== null ? column.name : ""}
                     </p>
                 </td>
             ))}
         </tr>
-    </Fragment>
     )
 
     function onStartHandler() {
@@ -70,13 +75,19 @@ export default function StackRow({columns, onCellSwap}) {
     function onEndHandler(event, d) {
         const td = d3.select(this);
         const tr = d3.select(this.parentElement);
+        const getIndexOfChild = (parent, child) => Array.prototype.indexOf.call(parent.children, child);
 
-        const overlap = tr.select("td.bg-slate-700");
+        const overlapSelector = "td.bg-slate-700"; // TODO: change to be more semantic
+        const overlap = tr.select(overlapSelector);
         if (!overlap.empty()) {
-            onCellSwap(
-                columns[d.index], 
-                columns[overlap.datum().index]
-            );
+            onCellSwap([this, overlap.node()].map(child => ({
+                i: getIndexOfChild(tr.node().parentNode, tr.node()),
+                j: getIndexOfChild(tr.node(), child)
+            })));
+            // onCellSwap({ 
+            //     columns: [d.id, overlap.datum().id].map(id => columns.filter(column => id === column.id)[0]),
+            //     positions: [this, overlap.node()].map(child => getIndexOfChild(tr.node(), child))
+            // });
         }
 
         // Reset temporary styles

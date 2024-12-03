@@ -34,14 +34,26 @@ function mapKey(arr, key) {
     return idx;
 }
 
+export const getTableKey = (column) => column.tableId;
+export const getColumnKey = (column) => column.index;
+
+const isRowNull = (data, i) => data.at(i).filter(cell => cell !== null).length === 0;
+const isColumnNull = (data, j) => data.map(row => row.at(j)).filter(cell => cell !== null).length === 0;
+
+const logState = (state, action) => console.log("state:", {
+    action,
+    tableMap: state.tableMap.map((val, i) => `${val} -> ${i}`),
+    columnMap: state.columnMap.map((val, i) => `${val} -> ${i}`)
+});
+
 export const schemaSlice = createSlice({
     name: "schema",
     initialState,
     reducers: {
 
         selectTable: ( state, action ) => {
-            const { columns, tableId } = action.payload;
-            const i = mapKey(state.tableMap, tableId);
+            const { columns } = action.payload;
+            const i = mapKey(state.tableMap, getTableKey(columns.at(0)));
             try {
                 ops.addRow(
                     state.data,
@@ -54,68 +66,134 @@ export const schemaSlice = createSlice({
                 );
                 state.error = undefined;
                 state.size = getMatrixSize(state.data);
+                logState(state, "selectTable");
             } catch (error) {
                 state.error = error.message;
             }
         },
 
         deselectTable: (state, action) => {
-            const {tableId} = action.payload;
-            const i = state.tableMap.indexOf(tableId);
+            const {columns} = action.payload;
+            const i = state.tableMap.indexOf(getTableKey(columns.at(0)));
             if (i < 0) {
-                throw new RangeError(`tableId not present`);
-            }            
+                throw new RangeError(`tableId (${tableId}) not present: [${state.tableMap}]`);
+            }
             try {
                 ops.removeRow(state.data, i);
                 state.error = undefined;
                 state.size = getMatrixSize(state.data);
                 state.tableMap.splice(i, 1);  // update map
+                logState(state, "deselectTable");
             } catch (error) {
                 state.error = error.message;
             }
         },
 
         selectColumn: ( state, action ) => {
-            const { column, tableId } = action.payload;
-            const [i, j] = [mapKey(state.tableMap, tableId), mapKey(state.columnMap, column.index)];
+            const { column } = action.payload;
+            const [i, j] = [
+                mapKey(state.tableMap, getTableKey(column)), 
+                mapKey(state.columnMap, getColumnKey(column))
+            ];
             const {n,m} = state.size;
 
-            if (i >= n) {
-                ops.addRow(
-                    state.data,
-                    Array.from(
-                        { length: j + 1}, 
-                        (_, jj) => (jj === j) ? column : null
-                    ),
-                    i
-                );
-            } else if (j >= m) {
-                ops.addColumn(
-                    state.data,
-                    Array.from(
-                        {length: i + 1},
-                        (_, ii) => (ii === i) ? column : null
-                    ),
-                    j
-                )
-            } else {
-                ops.updateCell(state.data, column, i, j);
+            try {
+                if (i >= n) {
+                    ops.addRow(
+                        state.data,
+                        Array.from(
+                            { length: j + 1}, 
+                            (_, jj) => (jj === j) ? column : null
+                        ),
+                        i
+                    );
+                } else if (j >= m) {
+                    ops.addColumn(
+                        state.data,
+                        Array.from(
+                            {length: i + 1},
+                            (_, ii) => (ii === i) ? column : null
+                        ),
+                        j
+                    )
+                } else {
+                    if (state.data.at(i).at(j) !== null) {
+                        throw new Error(`Value present at [${i}, ${j}]`);
+                    }
+                    ops.updateCell(state.data, column, i, j);
+                }
+                state.error = undefined;
+                state.size = getMatrixSize(state.data);
+            } catch (error) {
+                state.error = error.message;
             }
-            state.error = undefined;
-            state.size = getMatrixSize(state.data);
+
+            logState(state, "selectColumn");
         },
 
+        /**
+         * deselectColumn
+         * -----------------------------------------
+         * Need to use Array.prototype.reduce vs Array.prototyp.indexOf b/c state.data is a proxy object
+         * Object comparison does not work
+         * @param {*} state 
+         * @param {*} action 
+         */
         deselectColumn: (state, action) => {
-            const { column, tableId } = action.payload;
-            const [i, j] = [mapKey(state.tableMap, tableId), mapKey(state.columnMap, column.index)];
-            const {n,m} = state.size;
+            const { column } = action.payload;
+            const i = mapKey(state.tableMap, getTableKey(column));
+            const j = state.data.at(i).reduce((accumulator, currentValue, currentIndex) =>
+                (currentValue !== null && currentValue.id === column.id) 
+                    ? currentIndex 
+                    : accumulator, 
+                    -1
+            );
+
             ops.updateCell(state.data, null, i, j);
+
+            if (isRowNull(state.data, i)) {
+                // Resize newly created null row
+                ops.removeRow(state.data, i);
+                state.tableMap.splice(i, 1);
+            } else if (isColumnNull(state.data, j)) {
+                // Reize newly created null column
+                ops.removeColumn(state.data, j);
+                state.columnMap.splice(j, 1);
+            }
+
             state.error = undefined;
             state.size = getMatrixSize(state.data);
+            logState(state, "deselectColumn");
         },
 
+        swapColumnPositions: (state, action) => {
+            const [a, b] = action.payload;
+            if (a.i !== b.i) {
+                throw new Error("swapping columns must occur within a table");
+            }
 
-        clear: ( state ) => state = initialState,
+            const columnA = state.data.at(a.i).at(a.j);
+            const columnB = state.data.at(b.i).at(b.j);
+            ops.updateCell(state.data, columnB, a.i, a.j);
+            ops.updateCell(state.data, columnA, b.i, b.j);
+
+            if (isColumnNull(state.data, a.j)) {
+                state.columnMap.splice(a.j, 1);
+                ops.removeColumn(state.data, a.j);
+            } else if (isColumnNull(state.data, b.j)) {
+                state.columnMap.splice(b.j, 1);
+                ops.removeColumn(state.data, b.j);
+            }
+
+            state.error = undefined;
+            state.size = getMatrixSize(state.data);
+            logState(state, "swapColumnPositions");
+        },
+
+        clear: ( state ) => { 
+            state = initialState
+            logState(state, "clear");
+        },
 
         addColumn: ( state, action ) => {
             const { j, vector } = action.payload;
@@ -301,6 +379,8 @@ export const {
 
     selectTable,
     deselectTable,
+
+    swapColumnPositions,
 
     addColumn,
     addRow,

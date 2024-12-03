@@ -49,8 +49,6 @@ export default function TableCard({
             .map(column => column.id);
     });
 
-    console.log(selectedColumns);
-
     return (
         <Card className="my-4 snap-start">
             <Collapsible>
@@ -78,7 +76,7 @@ export default function TableCard({
                         </Button>
                     </CollapsibleTrigger>
                     <Switch 
-                        onCheckedChange={(isChecked) => onTableCheck(isChecked, id, columns)} 
+                        onCheckedChange={(isChecked) => onTableCheck(isChecked, columns)} 
                     />
                 </div>                    
                 </CardHeader>

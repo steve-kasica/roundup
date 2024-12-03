@@ -1,20 +1,57 @@
 
 import { Input } from "@/components/ui/input";
+import { transpose } from "d3";
 
-export default function StackHeader({data}) {
-    // const [values, setValues] = useState();
-    const genId = (i) => `stack-header-index-${i}`;
+/**
+ * 
+ * @param {Array} data: An array of set where each index corresponds
+ *  to a column index in the composite table and each member of 
+ *  the set is a different column name at that index in a separate table.
+ * @returns Table header
+ */
+
+const multipleValuesPlaceholder = "...";
+const focusClass = "bg-sky-500/50";
+
+export default function StackHeader({ data, focusIndex }) {
+
+    const headers = transpose(data).reduce((acc, columns, i) => {
+        if (columns !== null) {
+            const names = columns.reduce((acc, column) => {
+                if (column !== null && !acc.includes(column.name)) {
+                    acc.push(column.name)
+                }
+                return acc;
+            }, []);
+
+            acc.push(({
+                id: `stack-header-index-${i}`,
+                placeholder: names.length > 1 ? multipleValuesPlaceholder : names.pop(),
+                required: names.length !== 1,
+                options: names.length > 1 ? names : [],
+                className: `text-center ${(focusIndex === i) ? focusClass : ""}`                
+            }));
+        }
+        return acc;
+    }, []);
+
     return (
         <tr>
-            {data.map((values, i) => (
-                <th key={genId(i)} id={genId(i)}>
+            {headers.map(({id, placeholder, required, options, className}) => (
+                <th key={id}>
                     <Input 
-                        type="text" 
-                        placeholder={values.length > 1 ? "..." : values[0]} 
-                        className="text-center"/>
-                    <datalist id={genId(i)}>
-                        {values.map((text, i) => (
-                            <option key={i} value={text}></option>
+                        id={id}
+                        type="text"
+                        required={required}
+                        placeholder={placeholder}
+                        className={className}
+                    />
+                    <datalist id={id}>
+                        {options.map(name => (
+                            <option 
+                                key={name}
+                                value={name}
+                            />
                         ))}
                     </datalist>
                 </th>
