@@ -4,6 +4,7 @@
  */
 import { createSlice } from "@reduxjs/toolkit";
 import * as ops from "@/lib/matrix-operations";
+import * as mapper from "../lib/column-mappers/by-source-index";
 
 export const initialState = {
     // The data property is a matrix with m vertical columns and n horizontal rows.
@@ -16,8 +17,10 @@ export const initialState = {
 
     size: { n : 0, m: 0 },
 
-    columnMap: [],
-    tableMap: []
+    mapperData: [],
+
+    // columnMap: [],
+    // tableMap: []
 };
 
 export const getMatrixSize = (matrix) => ({ 
@@ -42,8 +45,8 @@ const isColumnNull = (data, j) => data.map(row => row.at(j)).filter(cell => cell
 
 const logState = (state, action) => console.log("state:", {
     action,
-    tableMap: state.tableMap.map((val, i) => `${val} -> ${i}`),
-    columnMap: state.columnMap.map((val, i) => `${val} -> ${i}`)
+    // tableMap: state.tableMap.map((val, i) => `${val} -> ${i}`),
+    // columnMap: state.columnMap.map((val, i) => `${val} -> ${i}`)
 });
 
 export const schemaSlice = createSlice({
@@ -53,12 +56,15 @@ export const schemaSlice = createSlice({
 
         selectTable: ( state, action ) => {
             const { columns } = action.payload;
-            const i = mapKey(state.tableMap, getTableKey(columns.at(0)));
+            // TODO: delete?
+            // const i = mapKey(state.tableMap, getTableKey(columns.at(0)));
+            const {i} = mapper.getIndices(columns.at(0));
             try {
                 ops.addRow(
                     state.data,
                     columns.reduce((arr, column) => {
-                        const j = mapKey(state.columnMap, column.index);
+                        const { j } = mapper.getIndices(column);
+                        // const j = mapKey(state.columnMap, column.index);
                         arr.splice(j, 1, column);
                         return arr;
                     }, new Array(columns.length)),
@@ -74,27 +80,35 @@ export const schemaSlice = createSlice({
 
         deselectTable: (state, action) => {
             const {columns} = action.payload;
-            const i = state.tableMap.indexOf(getTableKey(columns.at(0)));
+            const column = columns.at(0);
+            const {i} = mapper.getIndices(column);
+            // TODO: delete??
+            // const i = state.tableMap.indexOf(getTableKey(columns.at(0)));
             if (i < 0) {
                 throw new RangeError(`tableId (${tableId}) not present: [${state.tableMap}]`);
             }
             try {
                 ops.removeRow(state.data, i);
-                state.error = undefined;
+                mapper.removeIndex(column, "i");
                 state.size = getMatrixSize(state.data);
-                state.tableMap.splice(i, 1);  // update map
-                logState(state, "deselectTable");
+                state.error = undefined;
+                // TODO: delete
+                // state.tableMap.splice(i, 1);  // update map
+                // logState(state, "deselectTable");
             } catch (error) {
                 state.error = error.message;
             }
         },
 
+        // TODO: what is i >= n && j >== n (new column index from new position)
         selectColumn: ( state, action ) => {
             const { column } = action.payload;
-            const [i, j] = [
-                mapKey(state.tableMap, getTableKey(column)), 
-                mapKey(state.columnMap, getColumnKey(column))
-            ];
+            const {i, j} = mapper.getIndices(column);
+            // TODO: delete??
+            // const [i, j] = [
+            //     mapKey(state.tableMap, getTableKey(column)), 
+            //     mapKey(state.columnMap, getColumnKey(column))
+            // ];
             const {n,m} = state.size;
 
             try {
@@ -128,37 +142,43 @@ export const schemaSlice = createSlice({
                 state.error = error.message;
             }
 
-            logState(state, "selectColumn");
+//            logState(state, "selectColumn");
         },
 
         /**
          * deselectColumn
-         * -----------------------------------------
-         * Need to use Array.prototype.reduce vs Array.prototyp.indexOf b/c state.data is a proxy object
-         * Object comparison does not work
-         * @param {*} state 
+         * -----------------------------------------------------------
+         * Need to use Array.prototype.reduce vs Array.prototyp.indexOf 
+         * because state.data is a proxy object, object comparison does not work
+         * @param {*} state
          * @param {*} action 
          */
         deselectColumn: (state, action) => {
             const { column } = action.payload;
-            const i = mapKey(state.tableMap, getTableKey(column));
-            const j = state.data.at(i).reduce((accumulator, currentValue, currentIndex) =>
-                (currentValue !== null && currentValue.id === column.id) 
-                    ? currentIndex 
-                    : accumulator, 
-                    -1
-            );
+            const {i,j} = mapper.getIndices(column);
+            // TODO: delete??
+            // const i = mapKey(state.tableMap, getTableKey(column));
+            // const j = state.data.at(i).reduce((accumulator, currentValue, currentIndex) =>
+            //     (currentValue !== null && currentValue.id === column.id) 
+            //         ? currentIndex 
+            //         : accumulator, 
+            //         -1
+            // );
 
             ops.updateCell(state.data, null, i, j);
 
             if (isRowNull(state.data, i)) {
                 // Resize newly created null row
                 ops.removeRow(state.data, i);
-                state.tableMap.splice(i, 1);
+                mapper.removeIndex(column, "i");
+                // TODO: delete
+                // state.tableMap.splice(i, 1);
             } else if (isColumnNull(state.data, j)) {
                 // Reize newly created null column
                 ops.removeColumn(state.data, j);
-                state.columnMap.splice(j, 1);
+                // TODO: delete
+                // state.columnMap.splice(j, 1);
+                mapper.removeIndex(column, "j");
             }
 
             state.error = undefined;
@@ -178,21 +198,26 @@ export const schemaSlice = createSlice({
             ops.updateCell(state.data, columnA, b.i, b.j);
 
             if (isColumnNull(state.data, a.j)) {
-                state.columnMap.splice(a.j, 1);
+                // TODO: delete
+                // state.columnMap.splice(a.j, 1);
                 ops.removeColumn(state.data, a.j);
+                mapper.removeIndex(columnA, "j");
             } else if (isColumnNull(state.data, b.j)) {
-                state.columnMap.splice(b.j, 1);
+                // TODO: delete
+                // state.columnMap.splice(b.j, 1);
                 ops.removeColumn(state.data, b.j);
+                mapper.removeIndex(columnb, "j");                
             }
 
             state.error = undefined;
             state.size = getMatrixSize(state.data);
-            logState(state, "swapColumnPositions");
+//            logState(state, "swapColumnPositions");
         },
 
         clear: ( state ) => { 
-            state = initialState
-            logState(state, "clear");
+            state = initialState;
+            mapper.clear();
+       //     logState(state, "clear");
         },
 
         addColumn: ( state, action ) => {

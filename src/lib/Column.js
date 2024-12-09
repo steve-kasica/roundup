@@ -12,10 +12,11 @@ export default class {
       this.table = table;
       
       this.isSelected = false;
+      this.position = [table.index, index]; // Default values
 
       // A unique ID based on it's original position
       // in the table when the app was loaded
-      this.key = `${table.id}-${this.index}`;
+      this.id = `${table.id}-${this.index}`;
 
       this.init = {
         index: this.index
@@ -31,8 +32,6 @@ export default class {
     }
   
     get isNull() { return this.columnType === "null" }
-
-    get index1() { return this.index + 1; }
 
     contains(term) { return this.name.toLowerCase().includes(term.toLowerCase()); }
   
