@@ -10,24 +10,26 @@ const pad = (v, l, value=null) => v.splice(v.length, 0, ...new Array(l).fill(val
 /**
  * AddRow: adds a new row array to the matrix, inplace
  * @param {Array} matrix 
- * @param {Array} vector 
+ * @param {Array} vector: vector can be empty to create a null row of size m 
  * @param {number} i
  */
 export function addRow(matrix, vector, i) {
     const { n, m } = getSize(matrix);
-    if (i < 0 || i > n) {
+    const l = vector.length;
+
+    // Throw error if any parameter is undefined
+    if (i === undefined || vector === undefined || matrix === undefined) {
+        throw new Error("At least one parameter is undefined");
+    } else if (i < 0 || i > n) {
         throw new RangeError(`i out-of-bounds: 0 ≤ i ≤ ${n}`);
-    } else if (vector === undefined || vector.length === 0) {
-        throw new Error("vector is empty or undefined");
-    } else if (i === undefined) {
-        throw new Error("i is undefined");
     }
 
-    if (vector.length < m) {
-        pad(vector, m - vector.length);
-    } else if (vector.length > m) {
+    // Pad data objects is l !== m
+    if (l < m) {
+        pad(vector, m - l);
+    } else if (l > m) {
         // Resize matrix width-wise
-        matrix.forEach(row => pad(row, vector.length - m))
+        matrix.forEach(row => pad(row, l - m))
     }
 
     matrix.splice(i, 0, vector);

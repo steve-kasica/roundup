@@ -1,4 +1,5 @@
 {
+    "endpoint": "2019-04-democratic-candidate-codonors/candidates.csv",
     "name": "candidates.csv",
     "id": 1,
     "row_count": 15,

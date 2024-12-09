@@ -15,8 +15,8 @@ import workflows from "@/data/example-workflows.js";
 // import top-level app components
 import SourceTables from './components/SourceTables';
 import TableStack from "./components/TableStack";
+import TablePreview from "./components/TablePreview";
 // import ColumnInspector from './components/ColumnInspector';
-// import TablePreview from "./components/TablePreview";
 
 function App() {
   const options = [...workflows.entries()].map(([value, {label}]) => ({value, label}));
@@ -34,7 +34,11 @@ function App() {
       .then(tables => { 
         return tables.map((table, i) => ({
           ...table, 
-          columns: table.columns.map((column, j) => ({...column, id: `${i}-${j}`}))
+          columns: table.columns.map((column, j) => ({
+            ...column, 
+            endpoint: table.endpoint,
+            tableId: i, 
+            id: `${i}-${j}`}))
         }))
       })
       .then(tables => setTables(tables));
@@ -58,15 +62,12 @@ function App() {
           />
         </div>
         <div>
-          {<TableStack
+          <TableStack
             focusIndex={focusIndex}
-          />/*
-        
+          />        
           <hr></hr>
           <TablePreview 
-            tables={tables}
-            focusIndex={focusIndex}
-          /> */}
+          />
         </div>
         {/* <div>
           <ColumnInspector 

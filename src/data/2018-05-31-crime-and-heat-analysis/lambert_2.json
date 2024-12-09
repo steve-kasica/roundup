@@ -1,4 +1,5 @@
 {
+    "endpoint": "2018-05-31-crime-and-heat-analysis/lambert_2.csv",
     "name": "lambert_2.csv",
     "id": 2,
     "row_count": 120,

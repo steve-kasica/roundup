@@ -158,6 +158,25 @@ describe("addRow function", () => {
         ]));
     });
 
+    describe("vector is empty", ({matrix}) => {
+        beforeEach(context => {
+            context.matrix = [
+                [a,b]
+            ];
+            context.vector = [];
+            context.i = context.matrix.length; // append
+            op(context.matrix, context.vector, context.i);
+        });
+
+        it("has expected length", ({matrix}) => expect(matrix).to.have.lengthOf(2));
+        it("has expected width", ({matrix, vector}) => matrix.forEach(row => expect(row).to.have.lengthOf(2)));
+        it("is deeply equal", ({matrix}) => expect(matrix).to.eql([ 
+            [a,     b],
+            [null,  null]
+        ]));
+
+    })
+
     describe("error handling", () => {
         beforeEach(context => {
             context.matrix = [
@@ -179,12 +198,8 @@ describe("addRow function", () => {
             ({matrix, vector}) => expect(() => op(matrix, vector, -1)).to.throw(RangeError, "i")
         );
 
-        it("throws an error if vector is empty",
-            ({matrix}) => expect(() => op(matrix, [], 0)).to.throw(Error, "vector")
-        );
-
-        it("throws an error if vector is undefined",
-            ({matrix}) => expect(() => op(matrix, undefined, 0)).to.throw(Error, "vector")
+        it("Throws an error if vector is undefined",
+            ({matrix}) => expect(() => op(matrix, undefined, 0)).to.throw(Error, "undefined")
         );
 
         it("does not throw error if i equals 0", 

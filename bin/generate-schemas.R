@@ -20,23 +20,25 @@ summarize <- function(df) {
   return(l)
 }
 
-process_files <- function(files, out_dir) {
+process_files <- function(files, directory) {
   id <- 0;
+  out_dir <- paste0("src/data/", directory)
   sapply(files, function(path) {
     id <<- id + 1
     df <- read_csv(path)
     fn <- basename(path)
-    outPath <- paste0(out_dir, "/", gsub(".csv", ".json", fn))
     data <- list(
-      # path=paste0(out_dir, "/", path),
-      name=basename(path),
+      endpoint=paste0(directory, "/", fn),
+      name=fn,
       id=id,
       row_count=nrow(df),
       columns=summarize(df)
     ) %>%
       rjson::toJSON() %>%
       prettify()
+      
     dir.create(out_dir, showWarnings = FALSE)
+    outPath <- paste0(out_dir, "/", gsub(".csv", ".json", fn))
     write(data, outPath)
   })
 }
@@ -47,7 +49,7 @@ crime_and_heat <- c(
   "example-workflows/2018-05-31-crime-and-heat-analysis/lambert_2.csv",
   "example-workflows/2018-05-31-crime-and-heat-analysis/violent_crimes.csv"
 )
-process_files(crime_and_heat, "src/data/2018-05-31-crime-and-heat-analysis")
+process_files(crime_and_heat, "2018-05-31-crime-and-heat-analysis")
 
 #### Process data from 2019-04-democratic-candidate-codonors #####
 process_democratic_codonors <- function(src_dir, out_dir) {
@@ -64,5 +66,5 @@ process_democratic_codonors <- function(src_dir, out_dir) {
 
 process_democratic_codonors(
   "example-workflows/2019-04-democratic-candidate-codonors/inputs",
-  "src/data/2019-04-democratic-candidate-codonors"
+  "2019-04-democratic-candidate-codonors"
 )
