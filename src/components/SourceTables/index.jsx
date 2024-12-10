@@ -26,7 +26,7 @@ export default ({ workflow }) => {
     return <>
         {
             error ? (
-                <ErrorState />
+                <ErrorState error={error} />
             ) : isLoading ? (
                 <LoadingState />
             ) : data ? (
@@ -82,7 +82,8 @@ export default ({ workflow }) => {
         }
     }
 
-    function ErrorState() {
+    function ErrorState({error}) {
+        console.error(error);
         return <>Error</>
     }
     

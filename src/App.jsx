@@ -1,9 +1,6 @@
 import { useEffect, useState, useReducer } from 'react'
 import './App.css'
 
-// import Table from './lib/Table';
-import workflows from "@/data/example-workflows.js";
-
 // import top-level app components
 import SourceTables from './components/SourceTables';
 import TableStack from "./components/TableStack";
@@ -12,32 +9,9 @@ import WorkflowSelector from './components/WorkflowSelector';
 // import ColumnInspector from './components/ColumnInspector';
 
 function App() {
-  // const options = [...workflows.entries()].map(([value, {label}]) => ({value, label}));
-//  const [workflow, setWorkflow] = useState(workflows.data.workflows.at(0).name);
   const [workflow, setWorkflow] = useState(null);
-  const [tables, setTables] = useState([]);
-
-  const [focusIndex, setFocusIndex] = useState(undefined);
+  const [focusIndex, setFocusIndex] = useState(-1);
   const [operations, dispatch] = useReducer(operationsReducer, new Map());
-
-  // useEffect(() => {
-  //   // const promises = Object.entries(workflows.get(workflow).data)
-  //   //     .map(([path, f]) => f()
-  //   //         .then(module => ({...module.default})));
-
-  //   // Promise.all(promises)
-  //   //   .then(tables => { 
-  //   //     return tables.map((table, i) => ({
-  //   //       ...table, 
-  //   //       columns: table.columns.map((column, j) => ({
-  //   //         ...column, 
-  //   //         endpoint: table.endpoint,
-  //   //         tableId: i, 
-  //   //         id: `${i}-${j}`}))
-  //   //     }))
-  //   //   })
-  //   //   .then(tables => setTables(tables));
-  // }, [workflow]);
 
   return (
       <main className="grid grid-cols-3 gap-2">
@@ -96,17 +70,6 @@ function App() {
   }
 
 }  // App()
-
-// function positionReducer(state, {type, payload}) {
-
-//   switch(type) {
-//     case "SELECT_COLUMNS":
-//       state.set([payload.x, payload.y], [])
-//       state.has(payload.x)
-//   }
-
-//   return new Map(state);
-// }
 
 function operationsReducer(state, {type, payload}) {
   switch(type) {
