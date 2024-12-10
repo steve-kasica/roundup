@@ -1,0 +1,12 @@
+{
+    "workflows": [
+        {
+            "value": "2018-05-31-crime-and-heat-analysis",
+            "label": "Crime & Heat"
+        },
+        {
+            "value": "2019-04-democratic-candidate-codonors",
+            "label": "Democratic Candidate Codonors"
+        }
+    ]
+}
