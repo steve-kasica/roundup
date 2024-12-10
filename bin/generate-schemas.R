@@ -20,15 +20,15 @@ summarize <- function(df) {
   return(l)
 }
 
-process_files <- function(files, directory) {
-  id <- 0;
-  out_dir <- paste0("src/data/", directory)
+process_files <- function(files, workflow) {
+  id <- 0
   sapply(files, function(path) {
     id <<- id + 1
     df <- read_csv(path)
     fn <- basename(path)
-    data <- list(
-      endpoint=paste0(directory, "/", fn),
+    table_name <- gsub(".csv", "", fn)
+    table_data <- list(
+      endpoint=paste0(workflow, "/", fn),
       name=fn,
       id=id,
       row_count=nrow(df),
@@ -36,11 +36,21 @@ process_files <- function(files, directory) {
     ) %>%
       rjson::toJSON() %>%
       prettify()
-      
-    dir.create(out_dir, showWarnings = FALSE)
-    outPath <- paste0(out_dir, "/", gsub(".csv", ".json", fn))
-    write(data, outPath)
+    out_dir <- paste0("public/workflows/", workflow, "/", table_name)
+    dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+    out_path <- paste0(out_dir, "/schema.json")
+
+    write(table_data, out_path)
   })
+
+  workflow_data <- list(
+    tables = lapply(files, function(path) {
+      gsub(".csv", "", basename(path))
+    })
+  ) %>%
+    rjson::toJSON() %>%
+    prettify()
+  write(workflow_data, paste0("public/workflows/", workflow, "/index.json"))
 }
 
 #### Process data from 2018-05-31-crime-and-heat-analysis #####
@@ -67,4 +77,20 @@ process_democratic_codonors <- function(src_dir, out_dir) {
 process_democratic_codonors(
   "example-workflows/2019-04-democratic-candidate-codonors/inputs",
   "2019-04-democratic-candidate-codonors"
+)
+
+### Generate workflows index ####
+write(list(
+  workflows=list(
+    list(
+      value = "2018-05-31-crime-and-heat-analysis",
+      label = "Crime & Heat"),
+    list(
+      value = "2019-04-democratic-candidate-codonors",
+      label = "Democratic Candidate Codonors"
+    )
+  )) %>%
+  rjson::toJSON() %>%
+  prettify(),
+  "public/workflows/index.json"
 )
