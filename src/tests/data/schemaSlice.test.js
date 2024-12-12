@@ -11,8 +11,8 @@ import reducer,
         clear,
     } from "../../data/schemaSlice";
 
-import * as lambert_1 from "../../data/2018-05-31-crime-and-heat-analysis/lambert_1.json";
-import * as lambert_2 from "../../data/2018-05-31-crime-and-heat-analysis/lambert_2.json";
+import * as lambert_1 from "../../../public/workflows/2018-05-31-crime-and-heat-analysis/lambert_1/schema.json"
+import * as lambert_2 from "../../../public/workflows/2018-05-31-crime-and-heat-analysis/lambert_2/schema.json"
 
 // const [a,b,c,d,e,f] = ["a", "b", "c", "d", "e", "f"]; // TODO make to string method for this data
 const [a,b,c,d] = lambert_1.columns.slice(0, 4).map((column, index) => ({...column, id: `${lambert_1.id}-${index}`, tableId: lambert_1.id}));
