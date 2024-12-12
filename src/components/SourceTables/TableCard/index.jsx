@@ -45,7 +45,7 @@ export default function TableCard({
         if (!schema) return [];
         return schema.data
             .flat()
-            .filter(column => column !== null)
+            .filter(column => (column !== null && column.tableId === id))
             .map(column => column.id);
     });
 

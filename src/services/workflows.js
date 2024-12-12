@@ -35,7 +35,7 @@ export const workflowAPI = createApi({
                                 columns: result.data.columns.map((column, j) => ({
                                     ...column,
                                     endpoint: result.data.endpoint,
-                                    tableId: i,
+                                    tableId: result.data.id,
                                     id: `${i}-${j}`
                                 }))
                             })
