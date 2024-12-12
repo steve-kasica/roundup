@@ -9,6 +9,7 @@ import reducer,
         getColumnKey,
         selectColumn,
         clear,
+        isColumnNull,
     } from "../../data/schemaSlice";
 
 import * as lambert_1 from "../../../public/workflows/2018-05-31-crime-and-heat-analysis/lambert_1/schema.json"
@@ -118,6 +119,18 @@ describe("deselectColumn action", () => {
         ]));
     });
 
+    describe("Deselect last column", () => {
+        beforeEach(context => {
+            context.state = reducer(initialState, clear());
+            context.state = reducer(context.state, selectTable({columns: [a]}));
+            context.state = reducer(context.state, deselectColumn({column: a}));
+        });
+
+        it("changes size.m", ({state}) => expect(state.size.m).to.equal(0));
+        it("changes size.n", ({state}) => expect(state.size.n).to.equal(0));
+        it("removes all data", ({state}) => expect(state.data).to.eql([]));
+    });
+
     // TODO: fix
     // describe("deselect after swap", () => {
     //     beforeEach(context => {
@@ -147,6 +160,15 @@ describe("deselectColumn action", () => {
     //     })
     // });
 });
+
+describe("Helper functions", () => {
+    describe("isColumnNull", () => {
+        beforeEach(context => {
+            context.matrix = [];
+        });
+        it("returns true if matrix is empty", ({matrix}) => expect(isColumnNull(matrix, 0)).to.equal(true));
+    });
+})
 
 // describe("swapColumnPositions action", () => {
 

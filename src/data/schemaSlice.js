@@ -17,10 +17,7 @@ export const initialState = {
 
     size: { n : 0, m: 0 },
 
-    mapperData: [],
-
-    // columnMap: [],
-    // tableMap: []
+    mapperData: []
 };
 
 export const getMatrixSize = (matrix) => ({ 
@@ -40,13 +37,13 @@ function mapKey(arr, key) {
 export const getTableKey = (column) => column.tableId;
 export const getColumnKey = (column) => column.index;
 
+const isEmptyMatrix = (matrix) => matrix.length === 0;
 const isRowNull = (data, i) => data.at(i).filter(cell => cell !== null).length === 0;
-const isColumnNull = (data, j) => data.map(row => row.at(j)).filter(cell => cell !== null).length === 0;
+export const isColumnNull = (data, j) => data.map(row => row.at(j)).filter(cell => cell !== null).length === 0;
+
 
 const logState = (state, action) => console.log("state:", {
     action,
-    // tableMap: state.tableMap.map((val, i) => `${val} -> ${i}`),
-    // columnMap: state.columnMap.map((val, i) => `${val} -> ${i}`)
 });
 
 export const schemaSlice = createSlice({
@@ -56,15 +53,12 @@ export const schemaSlice = createSlice({
 
         selectTable: ( state, action ) => {
             const { columns } = action.payload;
-            // TODO: delete?
-            // const i = mapKey(state.tableMap, getTableKey(columns.at(0)));
             const {i} = mapper.getIndices(columns.at(0));
             try {
                 ops.addRow(
                     state.data,
                     columns.reduce((arr, column) => {
                         const { j } = mapper.getIndices(column);
-                        // const j = mapKey(state.columnMap, column.index);
                         arr.splice(j, 1, column);
                         return arr;
                     }, new Array(columns.length)),
@@ -82,8 +76,6 @@ export const schemaSlice = createSlice({
             const {columns} = action.payload;
             const column = columns.at(0);
             const {i} = mapper.getIndices(column);
-            // TODO: delete??
-            // const i = state.tableMap.indexOf(getTableKey(columns.at(0)));
             if (i < 0) {
                 throw new RangeError(`tableId (${tableId}) not present: [${state.tableMap}]`);
             }
@@ -92,9 +84,6 @@ export const schemaSlice = createSlice({
                 mapper.removeIndex(column, "i");
                 state.size = getMatrixSize(state.data);
                 state.error = undefined;
-                // TODO: delete
-                // state.tableMap.splice(i, 1);  // update map
-                // logState(state, "deselectTable");
             } catch (error) {
                 state.error = error.message;
             }
@@ -104,11 +93,6 @@ export const schemaSlice = createSlice({
         selectColumn: ( state, action ) => {
             const { column } = action.payload;
             const {i, j} = mapper.getIndices(column);
-            // TODO: delete??
-            // const [i, j] = [
-            //     mapKey(state.tableMap, getTableKey(column)), 
-            //     mapKey(state.columnMap, getColumnKey(column))
-            // ];
             const {n,m} = state.size;
 
             try {
@@ -141,8 +125,6 @@ export const schemaSlice = createSlice({
             } catch (error) {
                 state.error = error.message;
             }
-
-//            logState(state, "selectColumn");
         },
 
         /**
@@ -156,14 +138,6 @@ export const schemaSlice = createSlice({
         deselectColumn: (state, action) => {
             const { column } = action.payload;
             const {i,j} = mapper.getIndices(column);
-            // TODO: delete??
-            // const i = mapKey(state.tableMap, getTableKey(column));
-            // const j = state.data.at(i).reduce((accumulator, currentValue, currentIndex) =>
-            //     (currentValue !== null && currentValue.id === column.id) 
-            //         ? currentIndex 
-            //         : accumulator, 
-            //         -1
-            // );
 
             ops.updateCell(state.data, null, i, j);
 
@@ -171,14 +145,15 @@ export const schemaSlice = createSlice({
                 // Resize newly created null row
                 ops.removeRow(state.data, i);
                 mapper.removeIndex(column, "i");
-                // TODO: delete
-                // state.tableMap.splice(i, 1);
             } else if (isColumnNull(state.data, j)) {
                 // Reize newly created null column
                 ops.removeColumn(state.data, j);
-                // TODO: delete
-                // state.columnMap.splice(j, 1);
                 mapper.removeIndex(column, "j");
+            }
+
+            // If resize created an empty matrix
+            if (isEmptyMatrix(state.data)) {
+                mapper.clear();
             }
 
             state.error = undefined;
@@ -198,26 +173,20 @@ export const schemaSlice = createSlice({
             ops.updateCell(state.data, columnA, b.i, b.j);
 
             if (isColumnNull(state.data, a.j)) {
-                // TODO: delete
-                // state.columnMap.splice(a.j, 1);
                 ops.removeColumn(state.data, a.j);
                 mapper.removeIndex(columnA, "j");
             } else if (isColumnNull(state.data, b.j)) {
-                // TODO: delete
-                // state.columnMap.splice(b.j, 1);
                 ops.removeColumn(state.data, b.j);
-                mapper.removeIndex(columnb, "j");                
+                mapper.removeIndex(columnB, "j");                
             }
 
             state.error = undefined;
             state.size = getMatrixSize(state.data);
-//            logState(state, "swapColumnPositions");
         },
 
         clear: ( state ) => { 
             state = initialState;
             mapper.clear();
-       //     logState(state, "clear");
         },
 
         addColumn: ( state, action ) => {
