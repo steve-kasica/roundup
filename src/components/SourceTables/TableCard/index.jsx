@@ -76,6 +76,7 @@ export default function TableCard({
                         </Button>
                     </CollapsibleTrigger>
                     <Switch 
+                        checked={selectedColumns.length > 0}
                         onCheckedChange={(isChecked) => onTableCheck(isChecked, columns)} 
                     />
                 </div>                    
