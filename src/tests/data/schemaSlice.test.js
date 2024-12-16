@@ -16,27 +16,37 @@ import * as lambert_1 from "../../../public/workflows/2018-05-31-crime-and-heat-
 import * as lambert_2 from "../../../public/workflows/2018-05-31-crime-and-heat-analysis/lambert_2/schema.json"
 
 // const [a,b,c,d,e,f] = ["a", "b", "c", "d", "e", "f"]; // TODO make to string method for this data
-const [a,b,c,d] = lambert_1.columns.slice(0, 4).map((column, index) => ({...column, id: `${lambert_1.id}-${index}`, tableId: lambert_1.id}));
-const [x,y,z] = lambert_2.columns.slice(0, 3).map((column, index) => ({...column, id: `${lambert_2.id}-${index}`, tableId: lambert_2.id }));
+// const [x,y,z] = ["x", "y", "z"];
+const [a,b,c,d] = lambert_1.columns
+    .slice(0, 4)
+    .map((column, index) => ({
+        name: column.name, 
+        index: column.index, 
+        id: `${lambert_1.id}-${index}`, 
+        tableId: lambert_1.id
+    }));
+
+const [x,y,z] = lambert_2.columns
+    .slice(0, 3)
+    .map((column, index) => ({
+        name: column.name, 
+        index: column.index, 
+        id: `${lambert_2.id}-${index}`, 
+        tableId: lambert_2.id 
+    }));
 
 describe("selectTable action", () => {
     describe("selecting a new table", () => {
-        const columns = [a,b,c,d];
         beforeEach(context => {
             /*
                 Previous matrix state = []
             */
+            context.columns = [a,b,c,d];
             context.state = reducer(initialState, clear());
-            context.state = reducer(initialState, selectTable({ columns }));
+            context.state = reducer(context.state, selectTable({ columns: context.columns }));
         });
-        // it("increments tableMap with new key", ({state}) => expect(state.tableMap).to.have.lengthOf(1));
-        // it("adds new key to tableMap", ({state, tableId}) => expect(state.tableMap).to.eql([tableId]));
-        // it("adds new keys to columnMap", ({columns, state}) => 
-        //     columns.forEach(column => expect(state.columnMap).to.contain(getColumnKey(column)))
-        // );
-        // it("increases columnMap length", ({columns, state}) => expect(state.columnMap).to.have.lengthOf(columns.length));
         it("sets error property to undefined", ({state}) => expect(state.error).to.be.undefined);
-        it("adds row of column to matrix", ({state}) => expect(state.data).to.eql([
+        it("adds row of column to matrix", ({state, columns}) => expect(state.data).to.eql([
             columns
         ]));
     });
@@ -46,16 +56,12 @@ describe("deselectTable action", () => {
     describe("Remove to undo previous selectTable action", () => {
         const columns = [a,b,c];
         beforeEach(context => {
-            // context.tableId = a.tableId;
             context.state = reducer(initialState, clear());
-            context.state = reducer(initialState, selectTable({ columns }));
+            context.state = reducer(context.state, selectTable({ columns }));
             context.state = reducer(context.state, deselectTable({ columns }));
         });
-        // it("removes key from tableMap", ({state, tableId}) => expect(state.tableMap.includes(tableId)).to.equal(false));
         it("sets error property to undefined", ({state}) => expect(state.error).to.be.undefined);
         it("reverts back to initial data state", ({state}) => expect(state.data).to.eql(initialState.data));
-        // it("remove key form tableMap", ({state, tableId}) => expect(state.tableMap).to.not.contain(tableId));
-        // it("decrements the length of tableMap", ({state}) => expect(state.tableMap).to.have.lengthOf(0));
     });
 });
 
@@ -87,6 +93,7 @@ describe("deselectColumn action", () => {
             context.state = reducer(initialState, clear());
             context.state = reducer(context.state, selectTable({columns: [a,b]}));
             context.state = reducer(context.state, selectColumn({ column: x }));
+
             context.state = reducer(context.state, deselectColumn({ column: x }));
         });
 

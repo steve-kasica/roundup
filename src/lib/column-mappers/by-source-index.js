@@ -5,44 +5,44 @@
  * composite schema based on index in the source table.
  */
 
-const iMap = new Array();
-const jMap = new Array();
+import { transpose } from "d3";
 
 const iKey = (column) => column.tableId;
 const jKey = (column) => column.index;
 
-function getIndexFromMap(map, key) {
-    let idx = map.indexOf(key);
-    if (idx < 0) {
-        map.push(key);
-        idx = map.length - 1;
+function suggestIndex(arr) {
+    if (arr.length === 0) {
+        return 0; // empty matrix
     }
-    return idx;
+    var max = 0;
+    var maxIndex = arr.length;
+    for (var i = 0; i < arr.length; i++) {
+        if (arr.at(i) > max) {
+            maxIndex = i;
+            max = arr.at(i)
+        }
+    }
+    return maxIndex;
 }
 
-export function getIndices(column) {
-    const i = getIndexFromMap(iMap, iKey(column));
-    const j = getIndexFromMap(jMap, jKey(column));
-    return {i, j};
-}
+export function getIndices(matrix, column) {
+    const scores = {};
+    scores.i = matrix
+        .map(row => row.reduce((acc, curr) => 
+            (!curr || iKey(column) !== iKey(curr)) ? acc : acc + 1, 0)
+        )
+        .map((val, _, arr) => val / arr.length  // normalize
+    );  
 
-export function removeIndex(column, map) {
-    let [i,j] = [iMap.indexOf(iKey(column)), jMap.indexOf(jKey(column))];
-    if (i < 0) {
-        throw new Error("column not included in i index");
-    } else if (j < 0) {
-        throw new Error("column not included for j index");
-    }
-    
-    if (map === "both" || map === "i") {
-        iMap.splice(i, 1);
-    }
-    if (map === "both" || map === "j") {
-        jMap.splice(j, 1);
-    }
-}
+    scores.j = transpose(matrix)
+        .map(col => col.reduce((acc, curr) => 
+            (!curr || jKey(column) !== jKey(curr)) ? acc : acc + 1, 0)
+        )
+        .map((val, _, arr) => val / arr.length  // normalize
+    );
 
-export function clear() {
-    iMap.splice(0, iMap.length);
-    jMap.splice(0, jMap.length);
+    return {
+        i: suggestIndex(scores.i),
+        j: suggestIndex(scores.j)
+    };
 }
