@@ -189,7 +189,8 @@ export const schemaSlice = createSlice({
         },
 
         clear: ( state ) => { 
-            state = initialState;
+            state.data.splice(0, state.data.length);
+            state.size = {n: 0, m:0 };
         },
 
         addColumn: ( state, action ) => {
