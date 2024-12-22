@@ -1,22 +1,28 @@
 /**
  * TableCard/ColumnItem.jsx
  * ----------------------------------
+ * API for [Tooltip](https://www.radix-ui.com/primitives/docs/components/tooltip)
  */
-
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 
 import { useDispatch, useSelector } from "react-redux";
 import { selectColumn, deselectColumn } from "@/data/schemaSlice";
-import { Toggle } from "@/components/ui/toggle";
-import {Card, CardContent, CardHeader} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+    TooltipArrow,
+  } from "@/components/ui/tooltip"
+import ValuesDetail from "./ValuesDetail";
+  
 import { COLUMN_NAME_KEY, COLUMN_INDEX_KEY, TABLE_NAME_KEY } from "../../lib/sourceColumnGroups";
 
 export default function ColumnItem({ column, isSelected }) {
     const dispatch = useDispatch();
     const { sourceColumnGroup, sourceColumnGroupSearchString } = useSelector(({ui}) => ui);
 
-    const { id, tableName, name, index } = column;
+    const { id, tableName, name, index, values } = column;
     const typeGlpyh = "C";
     const uniqueCount = Object.keys(column.values)
         .filter(value => value !== "NA")
@@ -26,26 +32,33 @@ export default function ColumnItem({ column, isSelected }) {
 
     return (
             <Card 
-                className={`mt-1 mb-1 py-1 px-2 cursor-pointer 
-                    bg-zinc-600
+                className={`mt-1 mb-1 py-1 px-2 cursor-pointer text-slate-200 bg-zinc-600
                     hover:bg-zinc-400 
                     ${isSelected ? "bg-zinc-400" : ""}`}
                 onClick={onClickHandler}
             >
-                <div className="flex text-slate-200">
-                    <div className="w-6/12 truncate">
-                        <Highlight field={COLUMN_INDEX_KEY}>{index + 1}</Highlight>.&nbsp;
-                        <Highlight field={COLUMN_NAME_KEY}>{name}</Highlight>
-                    </div>
-                    <div className="w-5/12 truncate">
-                        <small className="">
-                            <Highlight field={TABLE_NAME_KEY}>{tableName}</Highlight>
-                        </small>
-                    </div>
-                    <div className="w-1/12">
-                        <span className="float-right">{typeGlpyh}</span>
-                    </div>
-                </div>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger className="flex text-left w-full">
+                            <div className="w-6/12 truncate">
+                                <Highlight field={COLUMN_INDEX_KEY}>{index + 1}</Highlight>.&nbsp;
+                                <Highlight field={COLUMN_NAME_KEY}>{name}</Highlight>
+                            </div>
+                            <div className="w-5/12 truncate">
+                                <small className="">
+                                    <Highlight field={TABLE_NAME_KEY}>{tableName}</Highlight>
+                                </small>
+                            </div>
+                            <div className="w-1/12">
+                                <span className="float-right">{typeGlpyh}</span>
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={10}>
+                            <ValuesDetail values={values}></ValuesDetail>
+                            <TooltipArrow></TooltipArrow>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </Card>
     );
 
