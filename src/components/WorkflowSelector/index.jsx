@@ -8,12 +8,14 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue
-  } from "./select";
+} from "./select";
 
-  import { useGetWorkflowsQuery } from '../../services/workflows';
+import { useGetWorkflowsQuery } from '../../services/workflows';
+import { useDispatch } from "react-redux";
+import { setWorkflow } from "../../data/uiSlice";
 
-export default ({setWorkflow}) => {
-
+export default () => {
+    const dispatch = useDispatch();
     const {data, error, isLoading} = useGetWorkflowsQuery();
     
     return <>
@@ -23,7 +25,7 @@ export default ({setWorkflow}) => {
                 ) : isLoading ? (
                     <>Loading...</>
                 ) : data ? (
-                    <Select onValueChange={setWorkflow}>
+                    <Select onValueChange={(value) => dispatch(setWorkflow(value))}>
                         <SelectTrigger className="w-auto">
                             <SelectValue placeholder="Select a workflow" />
                         </SelectTrigger>

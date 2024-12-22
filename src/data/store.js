@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import schemaReducer from "./schemaSlice";
+import uiReducer from "./uiSlice";
 import { tableAPI } from "../services/table";
 import { workflowAPI } from "../services/workflows";
 
@@ -7,6 +8,7 @@ const store = configureStore({
     reducer: {
         
         schema: schemaReducer,
+        ui: uiReducer,
 
         // Add the generated reducer as a specific top-level slices
         [tableAPI.reducerPath]: tableAPI.reducer,
