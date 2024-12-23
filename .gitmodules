@@ -4,3 +4,6 @@
 [submodule "example-workflows/2019-04-democratic-candidate-codonors"]
 	path = example-workflows/2019-04-democratic-candidate-codonors
 	url = git@github.com:steve-kasica/2019-04-democratic-candidate-codonors.git
+[submodule "example-workflows/babyname_politics"]
+	path = example-workflows/babyname_politics
+	url = git@github.com:steve-kasica/babyname_politics.git
