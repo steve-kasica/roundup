@@ -1,9 +1,10 @@
 
-import { useEffect, useRef, Fragment } from "react";
+import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
 export default function StackRow({columns, focusIndex, onCellSwap}) {
     const trRef = useRef();
+    const sourceTable = columns.filter(column => column).at(0).tableName;
 
     useEffect(() => {
         const tr = d3.select(trRef.current);
@@ -28,6 +29,7 @@ export default function StackRow({columns, focusIndex, onCellSwap}) {
 
     return (
         <tr ref={trRef}>
+            <td className="text-right">{sourceTable}</td>
             {columns.map((column, i) => (
                 <td key={column !== null ? column.id : `null-${i}`}
                     data-index={i}
@@ -84,10 +86,6 @@ export default function StackRow({columns, focusIndex, onCellSwap}) {
                 i: getIndexOfChild(tr.node().parentNode, tr.node()),
                 j: getIndexOfChild(tr.node(), child)
             })));
-            // onCellSwap({ 
-            //     columns: [d.id, overlap.datum().id].map(id => columns.filter(column => id === column.id)[0]),
-            //     positions: [this, overlap.node()].map(child => getIndexOfChild(tr.node(), child))
-            // });
         }
 
         // Reset temporary styles

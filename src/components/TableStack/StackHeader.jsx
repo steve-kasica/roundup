@@ -36,26 +36,35 @@ export default function StackHeader({ data, focusIndex }) {
     }, []);
 
     return (
-        <tr>
-            {headers.map(({id, placeholder, required, options, className}) => (
-                <th key={id}>
-                    <Input 
-                        id={id}
-                        type="text"
-                        required={required}
-                        placeholder={placeholder}
-                        className={className}
-                    />
-                    <datalist id={id}>
-                        {options.map(name => (
-                            <option 
-                                key={name}
-                                value={name}
-                            />
-                        ))}
-                    </datalist>
-                </th>
-            ))}
-        </tr>
+        <>
+            <tr>
+                <th></th>
+                {headers.map((header, i) => (
+                    <th key={header.id}>{i + 1}</th>
+                ))}
+            </tr>
+            <tr>
+                <td></td>
+                {headers.map(({id, placeholder, required, options, className}) => (
+                    <th key={id}>
+                        <Input 
+                            id={id}
+                            type="text"
+                            required={required}
+                            placeholder={placeholder}
+                            className={className}
+                        />
+                        <datalist id={id}>
+                            {options.map(name => (
+                                <option 
+                                    key={name}
+                                    value={name}
+                                />
+                            ))}
+                        </datalist>
+                    </th>
+                ))}
+            </tr>
+        </>
     )
 }
