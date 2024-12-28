@@ -5,13 +5,14 @@ import './App.css'
 import SourceTables from './components/SourceTables';
 import TableStack from "./components/TableStack";
 import TablePreview from "./components/TablePreview";
-import WorkflowSelector from './components/WorkflowSelector';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
+    <>
+      <Navbar></Navbar>
       <main className="grid grid-cols-3 gap-2">
         <div>
-          <WorkflowSelector />
           <SourceTables />
         </div>
         <div>
@@ -20,6 +21,7 @@ function App() {
           <TablePreview />
         </div>
       </main>
+    </>
   );
 
 }  // App()
