@@ -47,6 +47,18 @@ export function removeRow(matrix, i) {
     matrix.splice(i, 1);
 }
 
+export function updateRow(matrix, vector, i) {
+    const {n, m} = getSize(matrix);
+    if (n === 0 && m === 0) {
+        throw new Error("matrix is empty");   
+    } else if (i >= n || i < 0) {
+        throw new Error("insertion index is out-of-bounds");
+    } else if(vector.length !== m) {
+        throw new Error("Vector length does not equal matrix width")
+    }
+    vector.forEach((cell,j) => updateCell(matrix, cell, i, j))
+}
+
 export function addColumn(matrix, vector, j) {
     const { n, m } = getSize(matrix);
     if (j < 0 || j > m) {
