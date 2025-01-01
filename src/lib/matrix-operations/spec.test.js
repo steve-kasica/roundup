@@ -6,8 +6,15 @@
  * 
  */
 import { expect, describe, it, beforeEach, afterEach } from "vitest";
-import { addColumn, addRow, updateCell, updateRow, updateColumn } from ".";
 import { transpose } from "d3";
+import { 
+    addColumn,
+    addRow,
+    addCell,
+    updateCell, 
+    updateRow, 
+    updateColumn 
+} from ".";
 
 const [a,b,c,d,e,f,x,y,z] = ["a", "b", "c", "d", "e", "f", "x", "y", "z"];
 
@@ -420,6 +427,92 @@ describe("addColumn function", () => {
         it("does not throw error if j equals m", 
             ({matrix, vector}) => expect(() => op(matrix, vector, matrix[0].length)).to.not.throw()
         );
+    });
+});
+
+describe("addCell function", () => {
+    const op = addCell;
+
+    describe("non-null value", () => {
+        beforeEach(context => {
+            context.matrix = [
+                [a,     b],
+                [null,  d]
+            ];
+            context.value = c;
+            context.i = 1;
+            context.j = 0;
+            op(context.matrix, context.value, context.i, context.j);
+        });
+
+        it("Change width", ({matrix}) => matrix.forEach(row => expect(row).to.have.lengthOf(3)));
+        it("does not change length", ({matrix}) => expect(matrix).to.have.lengthOf(2));
+        it("updates specific cell with value", ({matrix}) => expect(matrix).to.eql([ 
+            [a,     b,      null],
+            [c,     null,   d],            
+        ]));
+        it("added data is strictly equal to vector", 
+            ({matrix, value, i, j}) => expect(matrix[i][j]).to.equal(value)
+        );
+    });
+
+    describe("error handling", () => {
+        beforeEach(context => {
+            context.matrix = [
+                [a,     b],
+                [null,  d]
+            ];
+            context.value = c;
+        });
+
+        it("throws error if i is undefined",
+            ({matrix, value}) => expect(() => op(matrix, value, undefined, 0)).to.throw(Error, "i")
+        );
+
+        it("throws range error if i === n", 
+            ({matrix, value}) => expect(() => op(matrix, value, matrix.length, 0)).to.throw(RangeError, "i")
+        );
+
+        it("throws range error if i > n", 
+            ({matrix, value}) => expect(() => op(matrix, value, matrix.length + 1, 0)).to.throw(RangeError, "i")
+        );
+
+        it("throws range error if i < 0", 
+            ({matrix, value}) => expect(() => op(matrix, value, -1, 0)).to.throw(RangeError, "i")
+        );
+
+        it("does not throw error if j equals m - 1", 
+            ({matrix, value}) => expect(() => op(matrix, value, 0, matrix[0].length - 1)).to.not.throw()
+        );
+
+        it("throws error if j is undefined",
+            ({matrix, value}) => expect(() => op(matrix, value, 0, undefined)).to.throw(Error, "j")
+        );
+
+        it("throws range error if j === m", 
+            ({matrix, value}) => expect(() => op(matrix, value, 0, matrix[0].length)).to.throw(RangeError, "j")
+        );
+
+        it("throws range error if j > m", 
+            ({matrix, value}) => expect(() => op(matrix, value, 0, matrix[0].length + 1)).to.throw(RangeError, "j")
+        );
+
+        it("throws range error if j < 0", 
+            ({matrix, value}) => expect(() => op(matrix, value, 0, -1)).to.throw(RangeError, "j")
+        );
+
+        it("does not throw error if j equals 0", 
+            ({matrix, value}) => expect(() => op(matrix, value, 0, 0)).to.not.throw()
+        );
+
+        it("throws an error if value is undefined",
+            ({matrix}) => expect(() => op(matrix, undefined, 0, 0)).to.throw(Error, "value")
+        );
+
+        it("throws an error if matrix is empty",
+            ({value}) => expect(() => op([], value, 0, 0)).to.throw(Error, "matrix")
+        )
+
     });
 });
 

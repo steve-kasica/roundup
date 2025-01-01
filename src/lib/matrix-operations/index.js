@@ -130,3 +130,28 @@ export function updateCell(matrix, value, i, j) {
     matrix.at(i).splice(j, 1, value);
 
 }
+
+export function addCell(matrix, value, i, j) {
+    const { n, m } = getSize(matrix);
+    if (n === 0 && m === 0) {
+        throw new Error(`matrix is empty`);   
+    } else if (j === undefined) {
+        throw new Error("j is undefined");
+    } else if (i === undefined) {
+        throw new Error("i is undefined");
+    } else if (j >= m || j < 0) {
+        throw new RangeError(`j = ${j} is out-of-bounds`);
+    } else if (i >= n || i < 0) {
+        throw new RangeError(`i = ${i} is out-of-bounds: n = ${n}`);
+    } else if (value === undefined) {
+        throw new Error("value is undefined");
+    }
+    matrix.forEach((row, ii) => {
+        if (ii === i) {
+            row.splice(j, 0, value);
+        } else {
+            // Resize other rows
+            row.splice(row.length, 0, null);
+        }
+    });
+}
