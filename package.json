@@ -12,7 +12,6 @@
     "create-example-data": "Rscript bin/generate-schemas.R"
   },
   "dependencies": {
-    "0836f492cde0a101": "https://api.observablehq.com/d/0836f492cde0a101@715.tgz?v=3&api_key=9d2d5933514f5c10274fe847b9b8f2f6c1a731a7",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@observablehq/runtime": "5",
