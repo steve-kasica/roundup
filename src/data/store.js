@@ -1,13 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
 import schemaReducer from "./schemaSlice";
 import uiReducer from "./uiSlice";
+import issuesReducer from "./issuesSlice";
 import { tableAPI } from "../services/table";
 import { workflowAPI } from "../services/workflows";
+import { listenerMiddleware } from "../listenerMiddleware";
 
 const store = configureStore({
     reducer: {
         
         schema: schemaReducer,
+        issues: issuesReducer,
         ui: uiReducer,
 
         // Add the generated reducer as a specific top-level slices
@@ -18,8 +21,9 @@ const store = configureStore({
     // Adding the api middleware enables caching, invalidation, polling,
     // and other useful features of `rtk-query`.
     middleware: (getDefaultMiddleware) => getDefaultMiddleware()
-    .concat(tableAPI.middleware)
-    .concat(workflowAPI.middleware),
+        .concat(tableAPI.middleware)
+        .concat(workflowAPI.middleware)
+        .prepend(listenerMiddleware.middleware),
 });
 
 

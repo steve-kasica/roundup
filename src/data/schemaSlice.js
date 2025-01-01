@@ -2,9 +2,11 @@
  * schemaSlice.js
  * 
  */
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 import * as ops from "@/lib/matrix-operations";
 import * as mapper from "../lib/column-mappers/by-source-index";
+import { startListening } from "../listenerMiddleware";
+import { runRules } from "./issuesSlice";
 
 export const initialState = {
     // The data property is a matrix with m vertical columns and n horizontal rows.
@@ -46,11 +48,6 @@ export const getColumnKey = (column) => column.index;
 const isRowNull = (data, i) => data.at(i).filter(cell => cell !== null).length === 0;
 export const isColumnNull = (data, j) => data.map(row => row.at(j)).filter(cell => cell !== null).length === 0;
 
-
-const logState = (state, action) => console.log("state:", {
-    action,
-});
-
 export const schemaSlice = createSlice({
     name: "schema",
     initialState,
@@ -84,7 +81,6 @@ export const schemaSlice = createSlice({
                 );
                 state.error = undefined;
                 state.size = getMatrixSize(state.data);
-                logState(state, "selectTable");
             } catch (error) {
                 state.error = error.message;
             }
@@ -394,3 +390,11 @@ export const {
 } = schemaSlice.actions;
 
 export default schemaSlice.reducer;
+
+startListening({
+    matcher: isAnyOf(selectColumn, deselectColumn, selectTable, deselectTable, swapColumnPositions),
+    effect: async (action, listenerApi) => {
+        const {schema} = listenerApi.getState();
+        listenerApi.dispatch(runRules(schema));
+    }
+})

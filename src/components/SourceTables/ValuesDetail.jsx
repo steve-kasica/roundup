@@ -19,9 +19,7 @@ export default function({
         .rangeRound([0, 100]);
 
     return <div className="w-52">
-        {[...Object.entries(values)].map(([value, count]) => {
-            console.log(`linear-gradient(to right, blue ${xScale(count)}%, #fff ${xScale(count)}%)`);
-            return (
+        {[...Object.entries(values)].map(([value, count]) => (
             <div 
                 key={value} 
                 className="flex my-1" 
@@ -36,8 +34,6 @@ export default function({
                 <div className="w-5/6 truncate">{value}</div>
                 <div className="w-1/6 text-right">{count}</div>
             </div>
-        );
-    })
-    }
+        ))}
     </div>;
 }
