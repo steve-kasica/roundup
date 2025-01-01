@@ -99,6 +99,18 @@ export function removeColumn(matrix, j) {
     matrix.forEach(row => row.splice(j, 1));
 }
 
+export function updateColumn(matrix, vector, j) {
+    const {n, m} = getSize(matrix);
+    if (n === 0 && m === 0) {
+        throw new Error("matrix is empty");   
+    } else if (j >= m || j < 0) {
+        throw new Error("index is out-of-bounds");
+    } else if(vector.length !== n) {
+        throw new Error("Vector length does not equal matrix height")
+    }
+    vector.forEach((cell, i) => updateCell(matrix, cell, i, j));
+}
+
 export function updateCell(matrix, value, i, j) {
     const { n, m } = getSize(matrix);
     if (n === 0 && m === 0) {

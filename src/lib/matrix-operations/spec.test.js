@@ -6,7 +6,8 @@
  * 
  */
 import { expect, describe, it, beforeEach, afterEach } from "vitest";
-import { addColumn, addRow, updateCell, updateRow } from ".";
+import { addColumn, addRow, updateCell, updateRow, updateColumn } from ".";
+import { transpose } from "d3";
 
 const [a,b,c,d,e,f,x,y,z] = ["a", "b", "c", "d", "e", "f", "x", "y", "z"];
 
@@ -580,6 +581,55 @@ describe("updateRow function", () => {
         const i = matrix.length - 1;
         const vector = [x];
         expect(() => op(matrix, vector, i)).to.throw(Error);
+    });
+  })  
+})
+
+describe("updateColumn function", () => {
+    const op = updateColumn;
+
+    describe("valid operation", () => {
+        beforeEach(context => {
+            context.matrix = [
+                [a,b,c],
+                [d,e,f]
+            ];
+            context.vector = [x,y];
+            context.j = 0;
+            op(context.matrix, context.vector, context.j);
+        });
+
+        it("Does not increase n", ({matrix}) => expect(matrix.length).to.equal(2));
+        it("Does not increase m", ({matrix}) => expect(matrix.map(r => r.length)).to.eql([3,3]));
+        it("Changes values in column j", ({matrix, j}) => expect(transpose(matrix).at(j)).to.eql([x,y]));
+    });
+
+  describe("error handling", () => {
+    beforeEach(context => {
+        context.matrix = [
+            [a,b],
+            [d,e]
+        ];
+    });
+    it("Throws error if j is greater than n", ({matrix}) => {
+        const j = matrix.at(0).length + 1;
+        const vector = [x,y];
+        expect(() => op(matrix, vector, j)).to.throw(Error)
+    });
+    it("Throws error if j is equal to n", ({matrix}) => {
+        const j = matrix.at(0).length;
+        const vector = [x,y];        
+        expect(() => op(matrix, vector, j)).to.throw(Error)
+    });
+    it("Throws error if updating column is longer than n", ({matrix}) => {
+        const j = 0;
+        const vector = [x,y,z];
+        expect(() => op(matrix, vector, j)).to.throw(Error);
+    });
+    it("Throws error if updating column is shorter than n", ({matrix}) => {
+        const j = 0;
+        const vector = [x];
+        expect(() => op(matrix, vector, j)).to.throw(Error);
     });
   })  
 })

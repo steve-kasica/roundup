@@ -13,12 +13,13 @@ This module is lightweight, easy to integrate, and follows modern JavaScript pra
 2. Row Operations:
    1. `addRow`: Adds a new row at a specified index, resizing the matrix as needed.
    2. `removeRow`: Removes a row at the specified index.
-   3. updateRow(matrix, vector, i): Updates a row with a new vector, ensuring size consistency.
+   3. `updateRow`: Updates a row with a new vector, ensuring size consistency.
 3. Column Operations:
-   1. addColumn(matrix, vector, j): Inserts a column at a specified index, resizing the matrix as necessary.
-   2. removeColumn(matrix, j): Removes a column at the specified index.
+   1. `addColumn`: Inserts a column at a specified index, resizing the matrix as necessary.
+   2. `removeColumn`: Removes a column at the specified index.
+   3. `updateColumn`: Updates a column with a new vector, ensuring size consistency.
 4. Cell Operations:
-   1. updateCell(matrix, value, i, j): Updates the value of a specific cell in the matrix.
+   1. `updateCell`: Updates the value of a specific cell in the matrix.
 5. Error Handling:
    1. Validates input parameters to prevent out-of-bounds operations or undefined values.
    2. Provides descriptive error messages for debugging and safe usage.
