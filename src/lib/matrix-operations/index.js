@@ -155,3 +155,33 @@ export function addCell(matrix, value, i, j) {
         }
     });
 }
+
+export function removeCell(matrix, i, j) {
+    const { n, m } = getSize(matrix);
+    if (n === 0 && m === 0) {
+        throw new Error(`matrix is empty`);   
+    } else if (j === undefined) {
+        throw new Error("j is undefined");
+    } else if (i === undefined) {
+        throw new Error("i is undefined");
+    } else if (j >= m || j < 0) {
+        throw new RangeError(`j = ${j} is out-of-bounds`);
+    } else if (i >= n || i < 0) {
+        throw new RangeError(`i = ${i} is out-of-bounds: n = ${n}`);
+    }
+    
+    matrix.at(i).splice(j, 1, null);
+    
+    if (isNullArray(matrix.at(i))) {
+        // Row i is null, resize
+        matrix.splice(i, 1);
+    }
+    if (isNullArray(matrix.map(row => row.at(j)))) {
+        // Column j is null, resize
+        matrix.forEach(row => row.splice(j, 1));
+    }
+}
+
+function isNullArray(array) {
+    return (array.filter(cell => cell !== null).length === 0)
+}

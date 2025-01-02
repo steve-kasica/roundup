@@ -19,7 +19,9 @@ This module is lightweight, easy to integrate, and follows modern JavaScript pra
    2. `removeColumn`: Removes a column at the specified index.
    3. `updateColumn`: Updates a column with a new vector, ensuring size consistency.
 4. Cell Operations:
-   1. `updateCell`: Updates the value of a specific cell in the matrix.
+   1. `addCell`: Adds a new cell
+   2. `removeCell`: Remove cell (nulls position)
+   3. `updateCell`: Updates the value of a specific cell in the matrix.
 5. Error Handling:
    1. Validates input parameters to prevent out-of-bounds operations or undefined values.
    2. Provides descriptive error messages for debugging and safe usage.

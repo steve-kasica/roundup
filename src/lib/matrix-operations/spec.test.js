@@ -11,7 +11,8 @@ import {
     addColumn,
     addRow,
     addCell,
-    updateCell, 
+    updateCell,
+    removeCell,
     updateRow, 
     updateColumn 
 } from ".";
@@ -511,6 +512,163 @@ describe("addCell function", () => {
 
         it("throws an error if matrix is empty",
             ({value}) => expect(() => op([], value, 0, 0)).to.throw(Error, "matrix")
+        )
+
+    });
+});
+
+describe("removeCell function", () => {
+    const op = removeCell;
+
+    describe("Operating on an n x 1 matrix", () => {
+        beforeEach(context => {
+            context.matrix = [
+                [ a ],
+                [ c ]
+            ];
+            context.i = 1;
+            context.j = 0;
+            op(context.matrix, context.i, context.j);
+        });
+
+        it("should not change matrix width", 
+            ({matrix}) => matrix.forEach(row => expect(row).to.have.lengthOf(1))
+        );
+        it("should change matrix length", ({matrix}) => expect(matrix.length).to.equal(1));
+        it("should equal", ({matrix}) => expect(matrix).to.eql([
+            [a]
+        ]));
+    });
+
+    describe("Operating on an n x m matrix", () => {
+        beforeEach(context => {
+            context.matrix = [
+                [ a, b ],
+                [ c, d ]
+            ];
+            context.i = 1;
+            context.j = 0;
+            op(context.matrix, context.i, context.j);
+        });
+
+        it("should not change matrix width", 
+            ({matrix}) => matrix.forEach(row => expect(row).to.have.lengthOf(2))
+        );
+        it("should not change matrix length", ({matrix}) => expect(matrix.length).to.equal(2));
+        it("should replace c with null", ({matrix, i, j}) => expect(matrix.at(i).at(j)).to.be.null);
+    });
+
+    describe("creates a null column", () => {
+        beforeEach(context => {
+            context.matrix = [
+                [ a, null ],
+                [ c, d ]
+            ];
+            context.i = 1;
+            context.j = 1;
+            op(context.matrix, context.i, context.j);
+        });
+
+        it("should change matrix width", 
+            ({matrix}) => matrix.forEach(row => expect(row).to.have.lengthOf(1))
+        );
+        it("should not change matrix length", ({matrix}) => expect(matrix.length).to.equal(2));
+        it("should remove null values at column index", ({matrix}) => expect(matrix).to.eql([
+            [a],
+            [c]
+        ]));
+    });
+
+    describe("creating a null row", () => {
+        beforeEach(context => {
+            context.matrix = [
+                [ a, null ],
+                [ c, d ]
+            ];
+            context.i = 0;
+            context.j = 0;
+            op(context.matrix, context.i, context.j);
+        });
+
+        it("should not change matrix width", 
+            ({matrix}) => matrix.forEach(row => expect(row).to.have.lengthOf(2))
+        );
+        it("should change matrix length", ({matrix}) => expect(matrix.length).to.equal(1));
+        it("should remove null values at column index", ({matrix}) => expect(matrix).to.eql([
+            [c, d]
+        ]));
+    });
+
+    describe("creates a null row and column", () => {
+        beforeEach(context => {
+            context.matrix = [
+                [ null, b ],
+                [ c,    null ]
+            ];
+            context.i = 0;
+            context.j = 1;
+            op(context.matrix, context.i, context.j);
+        });
+
+        it("should change matrix width", 
+            ({matrix}) => matrix.forEach(row => expect(row).to.have.lengthOf(1))
+        );
+        it("should change matrix length", ({matrix}) => expect(matrix.length).to.equal(1));
+        it("should remove null values at column index", ({matrix}) => expect(matrix).to.eql([
+            [c]
+        ]));
+    });
+
+    describe("error handling", () => {
+        beforeEach(context => {
+            context.matrix = [
+                [a,     b],
+                [null,  d]
+            ];
+        });
+
+        it("throws error if i is undefined",
+            ({matrix}) => expect(() => op(matrix, undefined, 0)).to.throw(Error, "i")
+        );
+
+        it("throws range error if i === n", 
+            ({matrix}) => expect(() => op(matrix, matrix.length, 0)).to.throw(RangeError, "i")
+        );
+
+        it("throws range error if i > n", 
+            ({matrix}) => expect(() => op(matrix, matrix.length + 1, 0)).to.throw(RangeError, "i")
+        );
+
+        it("throws range error if i < 0", 
+            ({matrix}) => expect(() => op(matrix, -1, 0)).to.throw(RangeError, "i")
+        );
+
+        it("does not throw error if j equals m - 1", 
+            ({matrix}) => expect(() => op(matrix, 0, matrix[0].length - 1)).to.not.throw()
+        );
+
+        it("throws error if j is undefined",
+            ({matrix}) => expect(() => op(matrix, 0, undefined)).to.throw(Error, "j")
+        );
+
+        it("throws range error if j === m", 
+            ({matrix}) => expect(() => op(matrix, 0, matrix[0].length)).to.throw(RangeError, "j")
+        );
+
+        it("throws range error if j > m", 
+            ({matrix}) => expect(() => op(matrix, 0, matrix[0].length + 1)).to.throw(RangeError, "j")
+        );
+
+        it("throws range error if j < 0", 
+            ({matrix}) => expect(() => op(matrix, 0, -1)).to.throw(RangeError, "j")
+        );
+
+        it("does not throw error if j equals 0", 
+            ({matrix}) => expect(() => op(matrix, 0, 0)).to.not.throw()
+        );
+
+        it("throws an error if matrix is empty",
+            () => expect(() => op([], 0, 0)).to.throw(Error, "matrix")
         )
 
     });
