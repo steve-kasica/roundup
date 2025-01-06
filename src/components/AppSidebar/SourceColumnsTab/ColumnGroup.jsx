@@ -17,15 +17,13 @@ export default function ColumnGroup({ label, columns }) {
                 <div className="w-1/6">
                 </div>
             </div>
-            <div>
-                {columns.map(column => (
-                    <ColumnItem 
-                        key={column.id}
-                        column={column} 
-                        isSelected={selectedColumns.includes(column.id)} 
-                    />)
-                )}
-            </div>
+            {columns.map(column => (
+                <ColumnItem 
+                    key={column.id}
+                    column={column} 
+                    isSelected={selectedColumns.includes(column.id)} 
+                />)
+            )}
         </div>
     ) 
 }

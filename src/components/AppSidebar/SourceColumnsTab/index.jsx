@@ -6,13 +6,13 @@
 
 import { group } from "d3";
 import { useSelector } from "react-redux";
-import { NO_GROUP_KEY, sourceColumnGroups } from "../../lib/sourceColumnGroups";
-import { useGetWorkflowSchemasQuery } from "../../services/workflows";
+import { sourceColumnGroups } from "@/lib/sourceColumnGroups";
+import { useGetWorkflowSchemasQuery } from "@/services/workflows";
 import ColumnGroup from "./ColumnGroup";
 import Controls from "./Controls/index.jsx";
 
-export default () => {
-    const {sourceColumnGroup, sourceColumnGroupSearchString, workflow} = useSelector(({ui, schema}) => {
+export default ({children}) => {
+    const {sourceColumnGroup, sourceColumnGroupSearchString, workflow} = useSelector(({ui}) => {
         return {
             ...ui,
             sourceColumnGroup: sourceColumnGroups.get(ui.sourceColumnGroup)
@@ -32,23 +32,22 @@ export default () => {
     }
 
     return <>
+        {children}
         <Controls isDisabled={isDisabled}></Controls>
-        <div className="flex-1 h-screen overflow-y-auto divide-y-2">
-            {
-                error ? (
-                    null
-                ) : isLoading ? (
-                    null
-                ) : tables ? (
-                    columnGroups.map(([groupKey, columns]) => (
-                        <ColumnGroup 
-                            key={groupKey} 
-                            label={groupKey}
-                            columns={columns} />
-                    ))
-                ) : null
-            }
-        </div>
+        {
+            error ? (
+                null
+            ) : isLoading ? (
+                null
+            ) : tables ? (
+                columnGroups.map(([groupKey, columns]) => (
+                    <ColumnGroup 
+                        key={groupKey} 
+                        label={groupKey}
+                        columns={columns} />
+                ))
+            ) : null
+        }
     </>;
 
     /**

@@ -5,11 +5,11 @@ import { Input } from "./input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "./select";
 
 import { useSelector, useDispatch } from "react-redux";
-import { sourceColumnGroups } from "../../../lib/sourceColumnGroups";
+import { sourceColumnGroups } from "@/lib/sourceColumnGroups";
 import {  
     setSourceColumnGroup, 
     setSourceColumnSearchString 
-} from "../../../data/uiSlice";
+} from "@/data/uiSlice";
 
 export default ({isDisabled}) => {
     const dispatch = useDispatch();

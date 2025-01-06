@@ -16,7 +16,7 @@ import {
   } from "@/components/ui/tooltip"
 import ValuesDetail from "./ValuesDetail";
   
-import { COLUMN_NAME_KEY, COLUMN_INDEX_KEY, TABLE_NAME_KEY } from "../../lib/sourceColumnGroups";
+import { COLUMN_NAME_KEY, COLUMN_INDEX_KEY, TABLE_NAME_KEY } from "@/lib/sourceColumnGroups";
 
 export default function ColumnItem({ column, isSelected }) {
     const dispatch = useDispatch();
