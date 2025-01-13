@@ -14,6 +14,7 @@ import SourceColumnsIcon from "@mui/icons-material/ViewColumn";
 import IssuesIcon from "@mui/icons-material/Flag";
 import SourceTablesIcon from "@mui/icons-material/Source";
 import ExportIcon from "@mui/icons-material/Share";
+import SettingsIcon from "@mui/icons-material/Settings"
 
 import { useDispatch, useSelector } from "react-redux";
 import { 
@@ -22,7 +23,8 @@ import {
     SIDEBAR_SOURCE_COLUMNS, 
     SIDEBAR_ISSUES, 
     SIDEBAR_SOURCE_TABLES, 
-    SIDEBAR_EXPORT 
+    SIDEBAR_EXPORT, 
+    SIDEBAR_CONFIG
 } from "../data/uiSlice";
 
 import { styled } from '@mui/material/styles';
@@ -46,6 +48,10 @@ const navigationItems = [
         id: SIDEBAR_EXPORT,
         label: "Export",
         icon: ExportIcon,
+    },{
+        id: SIDEBAR_CONFIG,
+        label: "Settings",
+        icon: SettingsIcon,
     }
 ];
 
