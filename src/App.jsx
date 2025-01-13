@@ -3,39 +3,55 @@ import './App.css'
 // import top-level app components
 import TableStack from "./components/TableStack";
 import TablePreview from "./components/TablePreview";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "./components/AppSidebar/sidebar";
-import { AppSidebar } from "./components/AppSidebar";
 
 import { useSelector, useDispatch } from 'react-redux';
-import { setSidebarStatus, SIDEBAR_CLOSED } from './data/uiSlice';
+import { setSidebarStatus, SIDEBAR_CLOSED, SIDEBAR_SOURCE_COLUMNS, SIDEBAR_SOURCE_TABLES } from './data/uiSlice';
 import WorkflowSelector from './components/AppSidebar/WorkflowSelector';
 
+import NavigationRail from './components/NavigationRail';
+
+import Grid from '@mui/material/Grid2';
+import ColumnSelector from './components/ColumnSelector';
+
+import { ThemeProvider } from '@mui/material/styles';
+
+import theme from "./themes/theme-default";
+
+function DynamicComponent({sidebarStatus}) {
+  switch(sidebarStatus) {
+    case SIDEBAR_SOURCE_TABLES: return <WorkflowSelector />;
+    case SIDEBAR_SOURCE_COLUMNS: return <ColumnSelector />;
+  }
+}
+
 function App() {
-  const dispatch = useDispatch();
-  const isSidebarOpen = useSelector(({ui}) => ui.sidebarStatus !== SIDEBAR_CLOSED);
+  const sidebarStatus = useSelector(({ui}) => ui.sidebarStatus);
 
   return (
-    <SidebarProvider open={isSidebarOpen}>
-      <AppSidebar/>
-      <SidebarInset>
-      <header className="flex w-full h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <SidebarTrigger onClick={onSidebarTriggerClickHandler} />
-          <div className="ml-auto mr-1">
-            <WorkflowSelector></WorkflowSelector>            
-          </div>
-      </header>
-      <main>
-        <TableStack />        
-            <hr></hr>
-        <TablePreview />
-      </main>
-      </SidebarInset>
-    </SidebarProvider>
+    <ThemeProvider theme={theme}>
+      <Grid container spacing={0.5}>
+        <Grid size={12} sx={{borderBottom: "1px solid #ddd"}}>
+          Open Roundup
+        </Grid>
+        <Grid size={1} sx={{
+          height: "100vh",
+          borderRight: "1px solid #ddd"
+        }}>
+          <NavigationRail></NavigationRail>
+        </Grid>
+        <Grid size={3} sx={{
+          height: "100vh",
+          overflowY: "scroll",
+          borderRight: "1px solid #ddd"
+        }}>
+          <DynamicComponent sidebarStatus={sidebarStatus}></DynamicComponent>
+        </Grid>
+        <Grid size={6}>
+          <TableStack />
+        </Grid>
+      </Grid>
+    </ThemeProvider>
   );
-
-  function onSidebarTriggerClickHandler() {
-    dispatch(setSidebarStatus(SIDEBAR_CLOSED));
-  }
 }
 
 export default App

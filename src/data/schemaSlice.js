@@ -48,6 +48,70 @@ export const getColumnKey = (column) => column.index;
 const isRowNull = (data, i) => data.at(i).filter(cell => cell !== null).length === 0;
 export const isColumnNull = (data, j) => data.map(row => row.at(j)).filter(cell => cell !== null).length === 0;
 
+/**
+ * deselectColumn
+ * -----------------------------------------------------------
+ * Need to use Array.prototype.reduce vs Array.prototyp.indexOf 
+ * because state.data is a proxy object, object comparison does not work
+ * @param {*} state
+ * @param {*} action 
+ */
+function deselectColumnAction(state, action) {
+    const { column } = action.payload;
+    const {i,j} = getColumnPosition(state.data, column);
+
+    ops.updateCell(state.data, null, i, j);
+
+    if (isRowNull(state.data, i)) {
+        // Resize newly created null row
+        ops.removeRow(state.data, i);
+    } else if (isColumnNull(state.data, j)) {
+        // Reize newly created null column
+        ops.removeColumn(state.data, j);
+    }
+
+    state.error = undefined;
+    state.size = getMatrixSize(state.data);
+}
+
+// TODO: what is i >= n && j >== n (new column index from new position)
+function selectColumnAction( state, action ) {
+    const { column } = action.payload;
+    const {i,j} = mapper.getIndices(state.data, column);
+    const {n,m} = state.size;
+
+    try {
+        if (i >= n) {
+            ops.addRow(
+                state.data,
+                Array.from(
+                    { length: j + 1}, 
+                    (_, jj) => (jj === j) ? column : null
+                ),
+                i
+            );
+        } else if (j >= m) {
+            ops.addColumn(
+                state.data,
+                Array.from(
+                    {length: i + 1},
+                    (_, ii) => (ii === i) ? column : null
+                ),
+                j
+            )
+        } else {
+            if (state.data.at(i).at(j) !== null) {
+                throw new Error(`Value present at [${i}, ${j}]`);
+            }
+            ops.updateCell(state.data, column, i, j);
+        }
+        state.error = undefined;
+        state.size = getMatrixSize(state.data);
+    } catch (error) {
+        state.error = error.message;
+    }
+}
+
 export const schemaSlice = createSlice({
     name: "schema",
     initialState,
@@ -98,69 +162,26 @@ export const schemaSlice = createSlice({
                 state.error = error.message;
             }
         },
-
-        // TODO: what is i >= n && j >== n (new column index from new position)
-        selectColumn: ( state, action ) => {
-            const { column } = action.payload;
-            const {i,j} = mapper.getIndices(state.data, column);
-            const {n,m} = state.size;
-
-            try {
-                if (i >= n) {
-                    ops.addRow(
-                        state.data,
-                        Array.from(
-                            { length: j + 1}, 
-                            (_, jj) => (jj === j) ? column : null
-                        ),
-                        i
-                    );
-                } else if (j >= m) {
-                    ops.addColumn(
-                        state.data,
-                        Array.from(
-                            {length: i + 1},
-                            (_, ii) => (ii === i) ? column : null
-                        ),
-                        j
-                    )
-                } else {
-                    if (state.data.at(i).at(j) !== null) {
-                        throw new Error(`Value present at [${i}, ${j}]`);
-                    }
-                    ops.updateCell(state.data, column, i, j);
-                }
-                state.error = undefined;
-                state.size = getMatrixSize(state.data);
-            } catch (error) {
-                state.error = error.message;
+        selectColumn: selectColumnAction,
+        deselectColumn: deselectColumnAction,
+        toggleColumnSelection: (state, action) => {
+            const {column} = action.payload;
+            const {i, j} = getColumnPosition(state.data, column);
+            console.log(i,j);
+            if (i < 0 && j < 0) {
+                // Column is not selected
+                selectColumnAction(state, action);
+            } else {
+                deselectColumnAction(state, action);
             }
         },
-
-        /**
-         * deselectColumn
-         * -----------------------------------------------------------
-         * Need to use Array.prototype.reduce vs Array.prototyp.indexOf 
-         * because state.data is a proxy object, object comparison does not work
-         * @param {*} state
-         * @param {*} action 
-         */
-        deselectColumn: (state, action) => {
-            const { column } = action.payload;
-            const {i,j} = getColumnPosition(state.data, column);
-
-            ops.updateCell(state.data, null, i, j);
-
-            if (isRowNull(state.data, i)) {
-                // Resize newly created null row
-                ops.removeRow(state.data, i);
-            } else if (isColumnNull(state.data, j)) {
-                // Reize newly created null column
-                ops.removeColumn(state.data, j);
-            }
-
-            state.error = undefined;
-            state.size = getMatrixSize(state.data);
+        selectColumns: (state, action) => {
+            const columns = action.payload;
+            columns.forEach((column) => selectColumnAction(state, {payload: {column}}));
+        },
+        deselectColumns: (state, action) => {
+            const columns = action.payload;
+            columns.forEach((column) => deselectColumnAction(state, {payload: {column}}));
         },
 
         swapColumnPositions: (state, action) => {
@@ -370,6 +391,9 @@ export const {
 
     selectColumn,
     deselectColumn,
+    toggleColumnSelection,
+    selectColumns,
+    deselectColumns,
 
     selectTable,
     deselectTable,

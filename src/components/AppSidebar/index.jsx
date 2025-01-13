@@ -73,7 +73,7 @@ export function AppSidebar() {
                         <CogIcon className={defaultIconFill} />
                     </MenuItem>
                 </TabsList>
-                <div className="flex-1 shrink-0 p-2 w-[--sidebar-content-width]">
+                <div className="flex-1 shrink-0 p-2 w-[--sidebar-content-width] bg-white">
                     <TabsContent value={SIDEBAR_SOURCE_COLUMNS}>
                         <SourceColumnsTab />
                     </TabsContent>
