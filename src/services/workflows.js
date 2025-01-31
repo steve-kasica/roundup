@@ -6,6 +6,7 @@
 
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { Table } from '../lib/types';
 
 export const workflowAPI = createApi({
     reducerPath: "workflowApi",
@@ -29,16 +30,17 @@ export const workflowAPI = createApi({
                     await _queryAPI
                         .dispatch(workflowAPI.endpoints.getTableSchema.initiate(`${workflowEndpoint}/${schemaEndpoint}`))
                         .then(result => ({
-                            ...result, 
-                            data: ({
-                                ...result.data, 
-                                columns: result.data.columns.map((column, j) => ({
-                                    ...column,
-                                    endpoint: result.data.endpoint,
-                                    tableId: result.data.id,
-                                    id: `${i}-${j}`
-                                }))
-                            })
+                            ...result, // error, isLoading, etc...
+                            data: new Table(...Object.values(result.data)),
+                            // data: ({
+                            //     ...result.data, 
+                            //     columns: result.data.columns.map((column, j) => ({
+                            //         ...column,
+                            //         endpoint: result.data.endpoint,
+                            //         tableId: result.data.id,
+                            //         id: `${i}-${j}`
+                            //     }))
+                            // })
                         }))
                 );
 

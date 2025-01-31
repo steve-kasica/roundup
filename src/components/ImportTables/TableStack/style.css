@@ -1,0 +1,15 @@
+
+.block {
+    width: 100%;
+}
+
+.operation.block {
+    background-color: burlywood;
+    padding: 5px;
+}
+
+.table.block {
+    background-color: aquamarine;
+    margin: 5px 0;
+    padding: 5px;
+}

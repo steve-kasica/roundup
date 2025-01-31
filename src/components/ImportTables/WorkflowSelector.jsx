@@ -1,5 +1,5 @@
 /**
- * src/components/Navbar/WorkflowSelector.jsx
+ * WorkflowSelector.jsx
  * -----------------------------------------------------------------------------
  */
 
@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"  
+import { reset } from '../../data/tableTreeSlice';
 
 export default () => {
     const dispatch = useDispatch();
@@ -20,7 +21,7 @@ export default () => {
     const currentWorkflow = useSelector(({ui}) => ui.workflow);
     
     return (
-        <Select onValueChange={(workflow) => dispatch(setWorkflow(workflow))}>
+        <Select onValueChange={onValueChangeHandler}>
             <SelectTrigger>
                 <SelectValue placeholder="Select example workflow" />
             </SelectTrigger>
@@ -42,8 +43,9 @@ export default () => {
         </Select>
     );
 
-    function onClickHandler(value) {
-        dispatch(setWorkflow(value));
+    function onValueChangeHandler(workflow) {
+        dispatch(setWorkflow(workflow));
+        dispatch(reset());
     }
 }
 

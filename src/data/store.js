@@ -1,7 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
+
 import schemaReducer from "./schemaSlice";
 import uiReducer from "./uiSlice";
 import issuesReducer from "./issuesSlice";
+import tableTreeReducer from "./tableTreeSlice";
+
 import { tableAPI } from "../services/table";
 import { workflowAPI } from "../services/workflows";
 import { listenerMiddleware } from "../listenerMiddleware";
@@ -12,6 +15,7 @@ const store = configureStore({
         schema: schemaReducer,
         issues: issuesReducer,
         ui: uiReducer,
+        tableTree: tableTreeReducer,
 
         // Add the generated reducer as a specific top-level slices
         [tableAPI.reducerPath]: tableAPI.reducer,

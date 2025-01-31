@@ -31,12 +31,12 @@ import ColumnGroupMenuIcon from "@mui/icons-material/MoreHoriz";
 import { Check } from "@mui/icons-material"
 
 // in-house components
-import HighlightText from "./HighlightText.jsx";
+import HighlightText from "../ui/HighlightText.jsx";
 
 import { useGetWorkflowSchemasQuery } from "@/services/workflows";
 import { useDispatch, useSelector } from "react-redux"
 
-import { toggleColumnSelection, selectColumns, selectColumn, deselectColumns } from "../data/schemaSlice.js"
+import { toggleColumnSelection, selectColumns, selectColumn, deselectColumns } from "../../data/schemaSlice.js"
 import ColumnDetail from "./ColumnDetail.jsx"
 import { ImportContacts } from "@mui/icons-material"
 

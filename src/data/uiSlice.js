@@ -16,29 +16,48 @@ export const SIDEBAR_CONFIG = "config";
 export const DRAWER_CLOSED = "closed";
 export const DRAWER_SOURCE_COLUMNS = "source columns"
 
+// export const MODE_SELECT_TABLE = 0;
+// export const MODE_STACK_TABLE = 1;
+// export const MODE_PACK_TABLE = 2;
+// export const MODE_ADD_TABLE_TO_GROUP = 3;
+// export const MODE_GUIDED_PLACEMENT = 4;
+
+// Enumerate valid options for `insertionMode` property
+export const ADD_TO_GROUP = "add";
+export const SYSTEM_DECIDES = "system";
+
 export const initialState = {
     workflow: null,
     sidebarStatus: SIDEBAR_SOURCE_TABLES,
-}
+    insertionMode: SYSTEM_DECIDES,
+    focusedNode: null,
+};
 
 export const uiSlice = createSlice({
     name: "ui",
     initialState,
     reducers: {
         setWorkflow: ( state, action ) => {
-            const workflow = action.payload;
-            state.workflow = workflow;
+            state.workflow = action.payload
         },
         setSidebarStatus: (state, action) => {
-            const status = action.payload;
-            state.sidebarStatus = status;
-        }
-}});
+            state.sidebarStatus = action.payload
+        },
+        setInsertionMode: (state, action) => {
+            state.insertionMode = action.payload
+        },
+        setFocusedNode: (state, action)  => {
+            state.focusedNode = action.payload
+        },
+    }
+});
 
 // Action creators are generated for each case reducer function
 export const {
     setWorkflow,
-    setSidebarStatus
+    setSidebarStatus,
+    setInsertionMode,
+    setFocusedNode
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

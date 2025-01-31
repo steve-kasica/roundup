@@ -25,3 +25,11 @@
     --sidebar-ring: 217.2 91.2% 59.8%
   }
 }
+
+body {
+  background-color: whitesmoke;
+}
+
+.panel-resize-handle {
+  width: 10px;
+}

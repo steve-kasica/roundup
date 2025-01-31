@@ -7,3 +7,6 @@
 [submodule "example-workflows/babyname_politics"]
 	path = example-workflows/babyname_politics
 	url = git@github.com:steve-kasica/babyname_politics.git
+[submodule "src/lib/hierarchy"]
+	path = src/lib/hierarchy
+	url = git@github.com:steve-kasica/d3-hierarchy.git
