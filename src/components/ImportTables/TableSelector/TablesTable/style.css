@@ -1,0 +1,29 @@
+.table-container {
+    overflow: auto;
+    max-height: 100vh;
+    background: whitesmoke;
+}
+
+table {
+    background: inherit;
+}
+
+table thead {
+    background: inherit;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+table td {
+    padding: 0 10px;
+}
+
+table tbody > tr {
+    cursor: pointer;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    border-bottom: 1px solid #d0d0d0;
+    border-top: 1px solid #d0d0d0;
+}

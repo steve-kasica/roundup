@@ -4,12 +4,12 @@
 }
 
 .operation.block {
-    background-color: burlywood;
+    background-color: #ddd;
     padding: 5px;
 }
 
 .table.block {
-    background-color: aquamarine;
+    background-color: #aaa;
     margin: 5px 0;
     padding: 5px;
 }

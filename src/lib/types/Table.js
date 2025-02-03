@@ -32,13 +32,19 @@ export default function Table(
     name,
     id,
     row_count,
-    columns
+    columns,
+    type=undefined,
+    date_created=new Date(),
+    last_modified=new Date()
 ) {
     return {
         endpoint,
-        name,
+        name: removeFileExtension(name),
         id: (id === null) ? `t-${++id}` : id,
+        type: (type === undefined) ? getFileExtension(name) : type,
         row_count,
+        date_created: date_created.toDateString(),
+        last_modified: last_modified.toDateString(),
         column_count: columns.length,
         columns: columns.map(columnData => new Column(...Object.values({
             ...columnData, 
@@ -49,6 +55,24 @@ export default function Table(
         operation_group: null  // Group contains a valid operation ID
     }
 }
+
+function getFileExtension(filename) {
+    return filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
+}
+
+function removeFileExtension(filename) {
+    return filename.replace(/\.[^/.]+$/, "");
+}
+
+// User-facing table properties
+export const properties = [
+    "name",
+    "type",
+    "row_count",
+    "column_count",
+    "date_created",
+    "last_modified"
+]
 
 export function isTable(obj) {
     return (

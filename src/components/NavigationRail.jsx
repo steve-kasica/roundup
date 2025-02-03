@@ -27,31 +27,34 @@ import {
     SIDEBAR_CONFIG
 } from "../data/uiSlice";
 
-import { styled } from '@mui/material/styles';
-
 const navigationItems = [
     {
         id: SIDEBAR_SOURCE_TABLES,
         label: "Source tables",
         icon: SourceTablesIcon,
+        isDisabled: false,
     },
     {
         id: SIDEBAR_SOURCE_COLUMNS,
         label: "Select columns",
         icon: SourceColumnsIcon,
+        isDisabled: true,        
     },
     {
         id: SIDEBAR_ISSUES,
         label: "Issues",
         icon: IssuesIcon,
+        isDisabled: true,                
     },{
         id: SIDEBAR_EXPORT,
         label: "Export",
         icon: ExportIcon,
+        isDisabled: true,                
     },{
         id: SIDEBAR_CONFIG,
         label: "Settings",
         icon: SettingsIcon,
+        isDisabled: true,                
     }
 ];
 
@@ -89,7 +92,7 @@ export default function() {
                     <ListItemButton
                         onClick={() => dispatch(setSidebarStatus(item.id))}
                         selected={(activeItem === item.id)}
-                        disabled={false}
+                        disabled={item.isDisabled}
                         sx={{
                             justifyContent: "center",
                             paddingBottom: "5px"

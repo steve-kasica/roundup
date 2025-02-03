@@ -33,3 +33,7 @@ body {
 .panel-resize-handle {
   width: 10px;
 }
+
+.table-row-item:hover {
+  background-color: aquamarine;
+}
