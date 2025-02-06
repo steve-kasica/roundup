@@ -18,9 +18,9 @@ export const TABLE_LAYOUT = "table";
 export const LIST_LAYOUT = "list";
 
 const SIDEBAR_MIN = 20;         // size before hidden 
-const SIDEBAR_DEFAULT = 50;     // size on page load
-const SIDEBAR_THRESHOLD = SIDEBAR_DEFAULT - 1;   // when sidebar goes from list to table layout
+const SIDEBAR_THRESHOLD = 30;   // when sidebar goes from list to table layout
 const SIDEBAR_MAX = 75;         // maximum size of sidebar
+const SIDEBAR_DEFAULT = 50;     // size on page load
 
 export default function ImportTables() {
     const [layout, setLayout] = useState(TABLE_LAYOUT);

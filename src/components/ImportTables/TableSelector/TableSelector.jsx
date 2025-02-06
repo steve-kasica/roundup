@@ -7,7 +7,7 @@ import TablesList from "./TablesList";
 import TablesTable from "./TablesTable";
 import { useSelector } from "react-redux";
 import { LIST_LAYOUT, TABLE_LAYOUT } from "../ImportTables";
-import { addTableToTree, removeTableFromTree } from "../../../data/tableTreeSlice";
+import { addTableToTree, insertTableInGroup, removeTableFromTree } from "../../../data/tableTreeSlice";
 import { useDispatch } from "react-redux";
 import { isTable } from "../../../lib/types/Table";
 import { ADD_TO_GROUP, SYSTEM_DECIDES } from "../../../data/uiSlice";
@@ -21,8 +21,9 @@ export default function TableSelector({
 }) {
 
     const dispatch = useDispatch();
-    const {insertionMode, selectedTables} = useSelector(({ ui, tableTree }) => ({
+    const {insertionMode, selectedTables, focusedNode} = useSelector(({ ui, tableTree }) => ({
         insertionMode: ui.insertionMode,
+        focusedNode: ui.focusedNode,
         // TODO: does the whole component re-render everytime a table is selected?        
         selectedTables: new Set(tableTree.tree
             .filter(node => isTable(node))

@@ -8,6 +8,8 @@ import Column from "./Column";
 
 let id = 0;
 
+export const type = "table";
+
 /**
  * Table
  * ----------------------------------
@@ -68,8 +70,8 @@ function removeFileExtension(filename) {
 export const properties = [
     "name",
     "type",
-    "row_count",
     "column_count",
+    "row_count",
     "date_created",
     "last_modified"
 ]

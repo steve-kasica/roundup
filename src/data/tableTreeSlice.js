@@ -1,8 +1,9 @@
 /**
  * tableTreeSlice.js
+ * -------------------------------------------------------------------
  * 
- * This Redux slice stores a relational query tree in a linked representation
- * [Redux strongly suggests storing nested data in a *normalized form*](https://redux.js.org/usage/structuring-reducers/normalizing-state-shape)
+ * This Redux slice stores a relational query tree in a linked 
+ * representation [Redux strongly suggests storing nested data in a *normalized form*](https://redux.js.org/usage/structuring-reducers/normalizing-state-shape)
  * 
  */
 import { createSlice } from "@reduxjs/toolkit";

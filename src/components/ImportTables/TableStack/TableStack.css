@@ -1,4 +1,14 @@
 
+
+.TableStack-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #ddd;
+    color: #999;
+    min-height: 500px;
+}
+
 .block {
     width: 100%;
 }

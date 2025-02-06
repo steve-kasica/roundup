@@ -7,6 +7,7 @@ import TableDetailsIcon from "@mui/icons-material/Info";
 import HighlightText from "../../ui/HighlightText";
 import { useSelector } from "react-redux";
 import { ADD_TO_GROUP } from "../../../data/uiSlice";
+import { useDrag } from "react-dnd";
 
 export default function TablesList({
     searchString, 
@@ -39,16 +40,28 @@ export default function TablesList({
     );
 
     function TableDetail({
+        isDragging,
         table,
         searchString,
         isSelected
     }) {
+        const [{opacity}, dragRef] = useDrag(
+            () => ({
+                type: "table",
+                item: {table, searchString, isSelected},
+                collect: (monitor) => ({
+                    opacity: monitor.isDragging() ? 0.5 : 1
+                })
+            }),
+            []
+        );
+
         const { name, row_count, column_count } = table;
         const isDisabled = useSelector(({ui}) => 
             (ui.insertionMode === ADD_TO_GROUP && isSelected) || name.indexOf(searchString) < 0
         );
         return (
-            <>
+            <div ref={dragRef}>
                 <ListItem
                     secondaryAction={
                         <IconButton
@@ -94,7 +107,7 @@ export default function TablesList({
                         />
                     </ListItemButton>
                 </ListItem>
-            </>
+            </div>
         );
     } // end TableDetail()
 

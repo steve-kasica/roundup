@@ -99,7 +99,7 @@ export default function TablesTable({
   function Row({ table }) {
     const {id, name, type, row_count, column_count, date_created, last_modified} = table;
 
-    const items = [name, type, row_count, column_count, date_created, last_modified ];
+    const items = [name, type, column_count,  row_count, date_created, last_modified ];
 
     const isSelected = selectedTables.has(id);
     const isDisabled = useSelector(({ui}) => 
