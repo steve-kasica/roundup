@@ -8,7 +8,7 @@
  */
 import { createSlice } from "@reduxjs/toolkit";
 import { stratify as d3stratify } from "d3";
-import Operation, { isOperation, NO_OP, STACK } from "../lib/types/Operation";
+import Operation, { isOperation, isStackOperation, NO_OP, STACK } from "../lib/types/Operation";
 import { isTable } from "../lib/types/Table";
 
 const initialState = {
@@ -56,7 +56,7 @@ export const tableTreeSlice = createSlice({
 
             if (operations.length === 0) {
                 // initialize
-                parent = new Operation(NO_OP);
+                parent = new Operation(STACK);
                 state.tree.push(parent);
             } else {
                 parent = operations.pop();
@@ -97,6 +97,10 @@ export const tableTreeSlice = createSlice({
             // Update state array
             state.tree.splice(0, 0, operation, table);
 
+            if (operationType === STACK) {
+                state.tree = simplifyTree(state.tree);
+            }
+
         },
         reset() {
             return initialState;
@@ -117,6 +121,27 @@ function getIndex(state, node) {
 
 function isNodePresent(tree, id) {
     tree.map(node => node.id).includes(id)
+}
+
+function simplifyTree(tree) {
+    const root = stratify(tree);
+    const nodesToRemove = [];
+
+    // Group stack operations together
+    root.each((node) => {
+        if (node.children) {
+            node.children.forEach(child => {
+                if (isStackOperation(node.data) && isStackOperation(child.data)) {
+                    child.children.forEach(({data}) => data.operation_group = node.data.id);
+                    nodesToRemove.push(child.data.id);
+                }
+            });
+        }
+    });
+
+    return root.descendants()
+        .map(n => n.data)
+        .filter(d => !(isOperation(d) && nodesToRemove.includes(d.id)));
 }
 
 /**

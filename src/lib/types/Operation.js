@@ -28,3 +28,15 @@ export function isOperation(obj) {
         Object.hasOwn(obj, "children")
     );
 }
+
+export function isStackOperation(obj) {
+    return (
+        isOperation(obj) && obj.type === STACK
+    );
+}
+
+export function isPackOperation(obj) {
+    return (
+        isOperation(obj) && obj.type === PACK
+    );
+}

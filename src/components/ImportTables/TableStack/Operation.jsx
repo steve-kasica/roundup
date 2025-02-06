@@ -26,7 +26,7 @@ export default function Operation({node}) {
                         (isOperation(childNode.data))
                         ? (<Operation node={childNode} />)
                         : (<Table node={childNode} />)
-                    }                
+                    }
                 </Fragment>
             ))}  
         </div>
