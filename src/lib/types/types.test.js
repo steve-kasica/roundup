@@ -8,7 +8,7 @@ describe("Operation", () => {
 
     describe("factory function", (context) => {
         checkPropertiesExists(
-            ["id", "operation_type", "children"],
+            ["id", "type", "children"],
             operation
         );
         it("return objects with unique ids", () => {

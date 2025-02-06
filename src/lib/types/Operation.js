@@ -9,22 +9,22 @@
 
 let id = 0;
 
-const VALID_OPERATIONS = [0,1,2];
-export const [NO_OP, UNION, LEFT_JOIN] = VALID_OPERATIONS;
+const VALID_OPERATIONS = ['n','stack','pack'];
+export const [NO_OP, STACK, PACK] = VALID_OPERATIONS;
 
-export default function Operation(operation_type, children) {
-    if (!VALID_OPERATIONS.includes(operation_type))
+export default function Operation(type, children) {
+    if (!VALID_OPERATIONS.includes(type))
         throw Error("Not a valid operation type");
     return {
         id: `o-${++id}`,
-        operation_type,
+        type,
         children: (children) ? children : []
     };
 }
 
 export function isOperation(obj) {
     return (
-        Object.hasOwn(obj, "operation_type") &&
+        Object.hasOwn(obj, "type") &&
         Object.hasOwn(obj, "children")
     );
 }
