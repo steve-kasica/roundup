@@ -21,7 +21,7 @@
 
 .block.operation.stack {
     background-color: aquamarine;
-    flex-direction: column;
+    flex-direction: column-reverse;
 }
 
 .block.operation.pack {
