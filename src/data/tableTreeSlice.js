@@ -7,9 +7,8 @@
  * 
  */
 import { createSlice } from "@reduxjs/toolkit";
-import { Operation } from "../lib/types";
 import { stratify as d3stratify } from "d3";
-import { isOperation, NO_OP } from "../lib/types/Operation";
+import Operation, { isOperation, NO_OP, STACK } from "../lib/types/Operation";
 import { isTable } from "../lib/types/Table";
 
 const initialState = {
@@ -85,6 +84,20 @@ export const tableTreeSlice = createSlice({
                 state.isEmpty = true;
             }
         },
+        addTable(state, action) {
+            const table = structuredClone(action.payload.table);
+            const operationType = action.payload.operationType;
+            const operation = new Operation(operationType);
+
+            // Assign new table and root of previous tree as
+            // children of the new operation
+            table.operation_group = operation.id;
+            state.tree.at(0).operation_group = operation.id;
+
+            // Update state array
+            state.tree.splice(0, 0, operation, table);
+
+        },
         reset() {
             return initialState;
         }
@@ -132,6 +145,7 @@ export const {
     removeTableFromTree,
     addTableToTree,
     removeOperation,
+    addTable,
     reset
 } = tableTreeSlice.actions;
 

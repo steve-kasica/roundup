@@ -11,15 +11,26 @@
 
 .block {
     width: 100%;
+    border: 1px solid #ddd;
 }
 
-.operation.block {
-    background-color: #ddd;
+.block.operation {
+    display: flex;
     padding: 5px;
+}
+
+.block.operation.stack {
+    background-color: aquamarine;
+    flex-direction: column;
+}
+
+.block.operation.pack {
+    background-color: beige;
+    flex-direction: row-reverse;
 }
 
 .table.block {
     background-color: #aaa;
-    margin: 5px 0;
+    /* margin: 5px 0; */
     padding: 5px;
 }

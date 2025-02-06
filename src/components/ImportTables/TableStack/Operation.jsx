@@ -10,12 +10,16 @@
 
 import { Fragment } from "react";
 import Table from "./Table";
-import { isOperation } from "../../../lib/types/Operation";
+import { isOperation, PACK, STACK } from "../../../lib/types/Operation";
 
 export default function Operation({node}) {
     const {data, children} = node;
     return (
-        <div data-id={data.id} className="block operation">
+        <div 
+            data-id={data.id} 
+            data-type={data.type}
+            className={`block operation ${data.type}`}
+        >
             {children.map(childNode => (
                 <Fragment key={childNode.data.id}>
                     {
