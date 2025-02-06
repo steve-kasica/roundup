@@ -4,9 +4,9 @@
  */
 import { Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import TableDetailsIcon from "@mui/icons-material/Info";    
-import HighlightText from "../../ui/HighlightText";
+import HighlightText from "../../../ui/HighlightText";
 import { useSelector } from "react-redux";
-import { ADD_TO_GROUP } from "../../../data/uiSlice";
+import { ADD_TO_GROUP } from "../../../../data/uiSlice";
 import { useDrag } from "react-dnd";
 
 export default function TablesList({

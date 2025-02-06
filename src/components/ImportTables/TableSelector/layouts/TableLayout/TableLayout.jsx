@@ -2,16 +2,17 @@
  * TablesTable.jsx
  * -------------------------------
  */
-import { isTable, properties as tableProperties } from "../../../../lib/types/Table";
+import { isTable, properties as tableProperties } from "../../../../../lib/types/Table";
 import { Button, Checkbox, Typography } from "@mui/material";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
 import { useSelector } from "react-redux";
 import "./style.css"
-import { ADD_TO_GROUP } from "../../../../data/uiSlice";
-import HighlightText from "../../../ui/HighlightText";
+import { ADD_TO_GROUP } from "../../../../../data/uiSlice";
+import HighlightText from "../../../../ui/HighlightText";
 import { CheckBox } from "@mui/icons-material";
+import { useDrag } from "react-dnd";
 
 const columns = tableProperties
   .map((prop) => ({
@@ -19,7 +20,7 @@ const columns = tableProperties
     label: prop.replace("_", " ")
   }));
 
-export default function TablesTable({ 
+export default function TableLayout({ 
   searchString, 
   handleTablePrimaryClick,
   handleSelectAllClick,
@@ -106,10 +107,20 @@ export default function TablesTable({
       (ui.insertionMode === ADD_TO_GROUP && isSelected) || 
       items.join("^").indexOf(searchString) < 0
     );
+    const [{opacity}, dragRef] = useDrag(
+      () => ({
+        type: "table",
+        item: {table, searchString, isSelected},
+        collect: (monitor) => ({
+          opacity: monitor.isDragging() ? 0.5 : 1
+        })
+      })
+    )
 
     return (
           <tr 
             key={id}
+            ref={dragRef}
             className={`table-row ${isDisabled ? "disabled" : ""}`}
             onClick={() => handleTablePrimaryClick(table, isSelected)}
           >

@@ -3,8 +3,7 @@
  * ------------------------------------
  */
 
-import TablesList from "./TablesList";
-import TablesTable from "./TablesTable";
+import {TableLayout, ListLayout} from "./layouts";
 import { useSelector } from "react-redux";
 import { LIST_LAYOUT, TABLE_LAYOUT } from "../ImportTables";
 import { addTableToTree, insertTableInGroup, removeTableFromTree } from "../../../data/tableTreeSlice";
@@ -34,14 +33,14 @@ export default function TableSelector({
         (error || isLoading) ? (
             <p>TODO...</p>
         ) : (sourceTables && layout === LIST_LAYOUT) ? (
-            <TablesList 
+            <ListLayout 
                 searchString={searchString} 
                 handleTablePrimaryClick={handleTablePrimaryClick}
                 sourceTables={sourceTables} 
                 selectedTables={selectedTables}
             />
         ) : (sourceTables && layout === TABLE_LAYOUT) ? (
-            <TablesTable 
+            <TableLayout 
                 searchString={searchString} 
                 handleTablePrimaryClick={handleTablePrimaryClick}
                 handleSelectAllClick={handleSelectAllClick}
