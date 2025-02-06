@@ -7,7 +7,9 @@ import TableDetailsIcon from "@mui/icons-material/Info";
 import HighlightText from "../../../ui/HighlightText";
 import { useSelector } from "react-redux";
 import { ADD_TO_GROUP } from "../../../../data/uiSlice";
-import { useDrag } from "react-dnd";
+import { DragPreviewImage, useDrag } from "react-dnd";
+import {type as tableInstance} from "../../../../lib/types/Table";
+import tableIconImage from "../../../../../public/images/table-icon.png";
 
 export default function TablesList({
     searchString, 
@@ -40,15 +42,13 @@ export default function TablesList({
     );
 
     function TableDetail({
-        isDragging,
         table,
         searchString,
         isSelected
     }) {
-        const [{opacity}, dragRef] = useDrag(
-            () => ({
-                type: "table",
-                item: {table, searchString, isSelected},
+        const [{opacity}, dragRef, previewRef] = useDrag(() => ({
+                type: tableInstance,
+                item: table,
                 collect: (monitor) => ({
                     opacity: monitor.isDragging() ? 0.5 : 1
                 })
@@ -61,53 +61,56 @@ export default function TablesList({
             (ui.insertionMode === ADD_TO_GROUP && isSelected) || name.indexOf(searchString) < 0
         );
         return (
-            <div ref={dragRef}>
-                <ListItem
-                    secondaryAction={
-                        <IconButton
-                            disabled={isDisabled}
-                        >
-                            <TableDetailsIcon />
-                        </IconButton>
-                    }
-                    disablePadding
-                >
-                    <ListItemButton
-                        color=""
-                        disabled={isDisabled}
-                        onClick={() => handleTablePrimaryClick(table, isSelected)}                    
-                    >
-                        <ListItemIcon>
-                            <Checkbox 
-                                edge="start"
-                                checked={isSelected}
+            <>
+                <DragPreviewImage connect={previewRef} src={tableIconImage} />
+                <div ref={dragRef}>
+                    <ListItem
+                        secondaryAction={
+                            <IconButton
                                 disabled={isDisabled}
-                                tabIndex={-1}
-                                disableRipple
+                            >
+                                <TableDetailsIcon />
+                            </IconButton>
+                        }
+                        disablePadding
+                    >
+                        <ListItemButton
+                            color=""
+                            disabled={isDisabled}
+                            onClick={() => handleTablePrimaryClick(table, isSelected)}                    
+                        >
+                            <ListItemIcon>
+                                <Checkbox 
+                                    edge="start"
+                                    checked={isSelected}
+                                    disabled={isDisabled}
+                                    tabIndex={-1}
+                                    disableRipple
+                                />
+                            </ListItemIcon>
+                            <ListItemText 
+                                primary={
+                                    <Typography 
+                                        color={isDisabled ? "textDisabled" : "normal"}
+                                    >
+                                        <HighlightText 
+                                            pattern={searchString} 
+                                            text={name} 
+                                        />
+                                    </Typography> 
+                                }
+                                secondary={
+                                    <Typography 
+                                        color={isDisabled ? "textDisabled" : "normal"}
+                                    >
+                                        {row_count} x {column_count}
+                                    </Typography>
+                                }
                             />
-                        </ListItemIcon>
-                        <ListItemText 
-                            primary={
-                                <Typography 
-                                    color={isDisabled ? "textDisabled" : "normal"}
-                                >
-                                    <HighlightText 
-                                        pattern={searchString} 
-                                        text={name} 
-                                    />
-                                </Typography> 
-                            }
-                            secondary={
-                                <Typography 
-                                    color={isDisabled ? "textDisabled" : "normal"}
-                                >
-                                    {row_count} x {column_count}
-                                </Typography>
-                            }
-                        />
-                    </ListItemButton>
-                </ListItem>
-            </div>
+                        </ListItemButton>
+                    </ListItem>
+                </div>
+            </>
         );
     } // end TableDetail()
 

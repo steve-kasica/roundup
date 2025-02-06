@@ -25,7 +25,7 @@ export default function() {
                 <Root node={root} />
             ) : ( 
                 <TableDropTarget
-                    drop={({table}) => dispatch(addTableToTree(table))}
+                    drop={(table) => dispatch(addTableToTree(table))}
                 >
                     <Typography>
                         Add a source table

@@ -5,14 +5,15 @@
 import { isTable, properties as tableProperties } from "../../../../../lib/types/Table";
 import { Button, Checkbox, Typography } from "@mui/material";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { ascending, descending } from "d3";
 import { useSelector } from "react-redux";
 import "./style.css"
 import { ADD_TO_GROUP } from "../../../../../data/uiSlice";
 import HighlightText from "../../../../ui/HighlightText";
 import { CheckBox } from "@mui/icons-material";
-import { useDrag } from "react-dnd";
+import { DragPreviewImage, useDrag } from "react-dnd";
+import tableIconImage from "../../../../../../public/images/table-icon.png";
 
 const columns = tableProperties
   .map((prop) => ({
@@ -107,7 +108,7 @@ export default function TableLayout({
       (ui.insertionMode === ADD_TO_GROUP && isSelected) || 
       items.join("^").indexOf(searchString) < 0
     );
-    const [{opacity}, dragRef] = useDrag(
+    const [{opacity}, dragRef, previewRef] = useDrag(
       () => ({
         type: "table",
         item: {table, searchString, isSelected},
@@ -118,8 +119,9 @@ export default function TableLayout({
     )
 
     return (
-          <tr 
-            key={id}
+      <Fragment key={id}>
+        <DragPreviewImage connect={previewRef} src={tableIconImage} />
+        <tr 
             ref={dragRef}
             className={`table-row ${isDisabled ? "disabled" : ""}`}
             onClick={() => handleTablePrimaryClick(table, isSelected)}
@@ -144,6 +146,7 @@ export default function TableLayout({
                 </td>
             ))}
           </tr>
+      </Fragment>
     )
 } // Row
 

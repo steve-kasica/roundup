@@ -25,14 +25,14 @@ export default function Root({node}) {
                 </Grid>
                 <Grid size={12 - schemaSize}>
                     <TableDropTarget 
-                        drop={({table}) => dispatch(addTable({table, operationType: PACK}))}                                          
+                        drop={(table) => dispatch(addTable({table, operationType: PACK}))}                                          
                     >
                         <PlusIcon />
                     </TableDropTarget>
                 </Grid>
                 <Grid size={schemaSize}>
                     <TableDropTarget
-                        drop={({table}) => dispatch(addTable({table, operationType: STACK}))}                  
+                        drop={(table) => dispatch(addTable({table, operationType: STACK}))}                  
                     >
                         <PlusIcon />
                     </TableDropTarget>
