@@ -6,16 +6,16 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import "./TableStack.css";
-import { addTableToTree, stratify } from "../../../data/tableTreeSlice";
+import { addTable, stratify } from "../../../data/tableTreeSlice";
 import Root from "./Root";
 import TableDropTarget from "./TableDropTarget";
 import { Typography } from "@mui/material";
+import { STACK } from "../../../lib/types/Operation";
 
 export default function() {
-    const dispatch = useDispatch();
-    const root = useSelector(({tableTree}) => (tableTree.isEmpty)
-        ? null
-        : stratify(tableTree.tree)
+    const root = useSelector(({tableTree}) => (tableTree.tree.length > 0)
+        ? stratify(tableTree.tree)
+        : null
     );
 
     return (<>
@@ -24,9 +24,7 @@ export default function() {
             (root !== null) ? (
                 <Root node={root} />
             ) : ( 
-                <TableDropTarget
-                    drop={(table) => dispatch(addTableToTree(table))}
-                >
+                <TableDropTarget operationType={STACK}>
                     <Typography>
                         Add a source table
                     </Typography>

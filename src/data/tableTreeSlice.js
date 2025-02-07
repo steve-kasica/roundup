@@ -49,24 +49,6 @@ export const tableTreeSlice = createSlice({
             }
 
         },
-        addTableToTree(state, action) {
-            const table = structuredClone(action.payload);
-            const operations = getOperations(state);
-            let parent;
-
-            if (operations.length === 0) {
-                // initialize
-                parent = new Operation(STACK);
-                state.tree.push(parent);
-            } else {
-                parent = operations.pop();
-            }
-
-            table.operation_group = parent.id;            
-            state.tree.push(table);
-            state.isEmpty = false;
-
-        },
         /**
          * Recursively 
          * @param {object} state 
@@ -84,23 +66,23 @@ export const tableTreeSlice = createSlice({
                 state.isEmpty = true;
             }
         },
-        addTable(state, action) {
-            const table = structuredClone(action.payload.table);
-            const operationType = action.payload.operationType;
-            const operation = new Operation(operationType);
+        addTable(state, {payload}) {
+            const operation = new Operation(payload.operationType);
 
-            // Assign new table and root of previous tree as
-            // children of the new operation
+            const table = structuredClone(payload.table);
             table.operation_group = operation.id;
-            state.tree.at(0).operation_group = operation.id;
 
-            // Update state array
-            state.tree.splice(0, 0, operation, table);
-
-            if (operationType === STACK) {
-                state.tree = simplifyTree(state.tree);
+            if (state.tree.length > 0) {
+                // Assign new table and root of previous tree as
+                // children of the new operation
+                state.tree.at(0).operation_group = operation.id;
             }
 
+            state.tree.splice(0, 0, operation, table);
+
+            if (payload.operationType === STACK && state.tree.length > 2) {
+                state.tree = simplifyTree(state.tree);
+            }
         },
         reset() {
             return initialState;
@@ -168,7 +150,6 @@ export function isTreeEmpty(state) {
 export const {
     insertTableInGroup,
     removeTableFromTree,
-    addTableToTree,
     removeOperation,
     addTable,
     reset
