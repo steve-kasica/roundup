@@ -48,6 +48,7 @@ export default function TablesList({
     }) {
         const [{opacity}, dragRef, previewRef] = useDrag(() => ({
                 type: tableInstance,
+                canDrag: !isSelected,
                 item: table,
                 collect: (monitor) => ({
                     opacity: monitor.isDragging() ? 0.5 : 1

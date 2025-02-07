@@ -111,6 +111,7 @@ export default function TableLayout({
     const [{opacity}, dragRef, previewRef] = useDrag(
       () => ({
         type: "table",
+        canDrag: !isSelected,
         item: {table, searchString, isSelected},
         collect: (monitor) => ({
           opacity: monitor.isDragging() ? 0.5 : 1
