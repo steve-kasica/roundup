@@ -1,19 +1,20 @@
 /**
- * TableSelector.jsx
- * ------------------------------------
+ * SourceTables.jsx
+ * 
+ * A component for displaying and interacting with the set of source tables.
  */
 
 import {TableLayout, ListLayout} from "./layouts";
 import { useSelector } from "react-redux";
-import { LIST_LAYOUT, TABLE_LAYOUT } from "../ImportTables";
-import { addTable, insertTableInGroup, removeTableFromTree } from "../../../data/tableTreeSlice";
+import { LIST_LAYOUT, TABLE_LAYOUT } from "../ImportTables/ImportTables";
+import { addTable, insertTableInGroup, removeTableFromTree } from "../../data/tableTreeSlice";
 import { useDispatch } from "react-redux";
-import { isTable } from "../../../lib/types/Table";
-import { ADD_TO_GROUP, SYSTEM_DECIDES } from "../../../data/uiSlice";
-import { STACK } from "../../../lib/types/Operation";
+import { isTable } from "../../lib/types/Table";
+import { ADD_TO_GROUP, SYSTEM_DECIDES } from "../../data/uiSlice";
+import { STACK } from "../../lib/types/Operation";
 import "./style.css"
 
-export default function TableSelector({
+export default function SourceTables({
     searchString,
     layout,
     sourceTables,

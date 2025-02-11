@@ -10,7 +10,7 @@ import SearchBar from "../ui/SearchBar";
 import { useState } from "react";
 import TableStack from "./TableStack/TableStack";
 import { useSelector } from "react-redux";
-import TableSelector from './TableSelector/TableSelector';
+import SourceTables from '../SourceTables';
 import {useGetWorkflowSchemasQuery} from "../../services/workflows";
 import { DragIndicator } from '@mui/icons-material';
 
@@ -51,7 +51,7 @@ export default function ImportTables() {
                     placeholder="Search tables"
                     onChange={({currentTarget}) => setSearchString(currentTarget.value)}                                
                 />
-                <TableSelector 
+                <SourceTables 
                     searchString={searchString} 
                     layout={layout}
                     sourceTables={sourceTables}

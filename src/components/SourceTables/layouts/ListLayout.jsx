@@ -6,7 +6,7 @@
  */
 import { IconButton, List, ListItem, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import TableDetailsIcon from "@mui/icons-material/Info";    
-import HighlightText from "../../../ui/HighlightText";
+import HighlightText from "../../ui/HighlightText";
 import SourceTableItem from "../SourceTableItem";
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 

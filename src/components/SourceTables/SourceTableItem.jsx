@@ -10,10 +10,10 @@
      *  - [`useDrag`](https://react-dnd.github.io/react-dnd/docs/api/use-drag)
  */
 import { useDispatch } from "react-redux";
-import {type as tableInstance} from "../../../lib/types/Table";
-import tableIconImage from "../../../../public/images/table-icon.png";
+import {type as tableInstance} from "../../lib/types/Table";
+import tableIconImage from "../../../public/images/table-icon.png";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import { addTable } from "../../../data/tableTreeSlice";
+import { addTable } from "../../data/tableTreeSlice";
 import { useState } from "react";
 
 export default function SourceTableItem({

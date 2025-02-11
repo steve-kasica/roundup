@@ -2,13 +2,13 @@
  * TablesTable.jsx
  * -------------------------------
  */
-import { properties as tableProperties } from "../../../../../lib/types/Table";
+import { properties as tableProperties } from "../../../../lib/types/Table";
 import { Button, Checkbox, Typography } from "@mui/material";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
 import "./style.css"
-import HighlightText from "../../../../ui/HighlightText";
+import HighlightText from "../../../ui/HighlightText";
 import SourceTableItem from "../../SourceTableItem";
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 
