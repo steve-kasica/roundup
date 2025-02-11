@@ -2,7 +2,7 @@
  * TableDropTarget.jsx
  */
 import { useDrop } from "react-dnd";
-import {type as tableInstances} from "../../../lib/types/Table";
+import {type as tableInstances} from "../../lib/types/Table";
 
 export default function TableDropTarget({operationType, children}) {
     const [{ isOver, canDrop }, dropRef] = useDrop({

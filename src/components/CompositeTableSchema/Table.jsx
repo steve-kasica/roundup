@@ -7,7 +7,7 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { setFocusedNode } from "../../../data/uiSlice";
+import { setFocusedNode } from "../../data/uiSlice";
 
 export default function Table({node}) {
     const [contextMenu, setContextMenu] = useState(null);

@@ -8,7 +8,7 @@ import { Paper } from '@mui/material';
 import WorkflowSelector from "./WorkflowSelector";
 import SearchBar from "../ui/SearchBar";
 import { useState } from "react";
-import TableStack from "./TableStack/TableStack";
+import CompositeTableSchema from "../CompositeTableSchema";
 import { useSelector } from "react-redux";
 import SourceTables from '../SourceTables';
 import {useGetWorkflowSchemasQuery} from "../../services/workflows";
@@ -73,7 +73,7 @@ export default function ImportTables() {
                     padding: "10px",
                     height: "100vh"
                 }}>
-                    <TableStack />
+                    <CompositeTableSchema />
                 </Paper>
             </Panel>
       </PanelGroup>

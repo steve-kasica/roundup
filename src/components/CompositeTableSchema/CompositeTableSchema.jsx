@@ -1,18 +1,19 @@
 /** 
- * TableStack.js 
+ * CompositeTableSchema.js 
  * ------------------------------------------------------------------------------------------------
  * An interactive hierarchical visualization of the table tree
  */
-import { useDispatch, useSelector } from "react-redux";
 
-import "./TableStack.css";
-import { addTable, stratify } from "../../../data/tableTreeSlice";
+import "./style.css";
+
+import { useSelector } from "react-redux";
+import { stratify } from "../../data/tableTreeSlice";
 import Root from "./Root";
 import TableDropTarget from "./TableDropTarget";
 import { Typography } from "@mui/material";
-import { STACK } from "../../../lib/types/Operation";
+import { STACK } from "../../lib/types/Operation";
 
-export default function() {
+export default function CompositeTableSchema() {
     const root = useSelector(({tableTree}) => (tableTree.tree.length > 0)
         ? stratify(tableTree.tree)
         : null

@@ -6,7 +6,7 @@
 import Grid from "@mui/material/Grid2"
 import { Add as PlusIcon } from "@mui/icons-material"
 
-import { isOperation, PACK, STACK } from "../../../lib/types/Operation"
+import { isOperation, PACK, STACK } from "../../lib/types/Operation"
 import Operation from "./Operation"
 import Table from "./Table"
 import TableDropTarget from "./TableDropTarget"
