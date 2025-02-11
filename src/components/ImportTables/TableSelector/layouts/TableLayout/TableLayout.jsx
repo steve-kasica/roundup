@@ -2,18 +2,15 @@
  * TablesTable.jsx
  * -------------------------------
  */
-import { isTable, properties as tableProperties } from "../../../../../lib/types/Table";
+import { properties as tableProperties } from "../../../../../lib/types/Table";
 import { Button, Checkbox, Typography } from "@mui/material";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { ascending, descending } from "d3";
-import { useSelector } from "react-redux";
 import "./style.css"
-import { ADD_TO_GROUP } from "../../../../../data/uiSlice";
 import HighlightText from "../../../../ui/HighlightText";
-import { CheckBox } from "@mui/icons-material";
-import { DragPreviewImage, useDrag } from "react-dnd";
-import tableIconImage from "../../../../../../public/images/table-icon.png";
+import SourceTableItem from "../../SourceTableItem";
+import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 
 const columns = tableProperties
   .map((prop) => ({
@@ -23,7 +20,6 @@ const columns = tableProperties
 
 export default function TableLayout({ 
   searchString, 
-  handleTablePrimaryClick,
   handleSelectAllClick,
   sourceTables,
   selectedTables,
@@ -87,10 +83,16 @@ export default function TableLayout({
         <tbody className="table-body">
           {
             rows.map(table => (
-              <Row 
+              <SourceTableItem 
                 key={table.id} 
                 table={table}
-              />
+                ContainerElement="tr"
+              >
+                <TableDetail 
+                  {...table} 
+                  isSelected={selectedTables.has(table.id)}
+                />
+              </SourceTableItem>
             ))
           }
         </tbody>
@@ -98,58 +100,39 @@ export default function TableLayout({
     </div>
   ); // end return statement
 
-  function Row({ table }) {
-    const {id, name, type, row_count, column_count, date_created, last_modified} = table;
+  function TableDetail({
+    id, 
+    name, 
+    type, 
+    row_count, 
+    column_count, 
+    date_created, 
+    last_modified,
+    isSelected
+  }) {
 
     const items = [name, type, column_count,  row_count, date_created, last_modified ];
-
-    const isSelected = selectedTables.has(id);
-    const isDisabled = useSelector(({ui}) => 
-      (ui.insertionMode === ADD_TO_GROUP && isSelected) || 
-      items.join("^").indexOf(searchString) < 0
-    );
-    const [{opacity}, dragRef, previewRef] = useDrag(
-      () => ({
-        type: "table",
-        canDrag: !isSelected,
-        item: {table, searchString, isSelected},
-        collect: (monitor) => ({
-          opacity: monitor.isDragging() ? 0.5 : 1
-        })
-      })
-    )
+    const isDisabled = items.join("^").indexOf(searchString) < 0;
 
     return (
-      <Fragment key={id}>
-        <DragPreviewImage connect={previewRef} src={tableIconImage} />
-        <tr 
-            ref={dragRef}
-            className={`table-row ${isDisabled ? "disabled" : ""}`}
-            onClick={() => handleTablePrimaryClick(table, isSelected)}
-          >
+      <>
             <td className="table-data">
-              <Checkbox 
-                  edge="start"
-                  checked={isSelected}
-                  disabled={isDisabled}
-                  tabIndex={-1}
-                  disableRipple
-              />
+                {(isSelected) ? (
+                    <CheckBox />
+                ) : (
+                    <CheckBoxOutlineBlank />
+                )}
             </td>
             {items.map((text, i) => (
-                <td 
-                    key={i}
-                    className="table-data"
-                >
+                <td key={i} className="table-data">
                     <Typography color={isDisabled ? "textDisabled" : "normal"}>
                         <HighlightText pattern={searchString} text={String(text)} />
                     </Typography> 
                 </td>
             ))}
-          </tr>
-      </Fragment>
+          </>
     )
-} // Row
+} // TableDetail
 
   function SortIcon({column}) {
     if (sortColumn === column.prop) {

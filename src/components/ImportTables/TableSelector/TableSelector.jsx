@@ -6,10 +6,12 @@
 import {TableLayout, ListLayout} from "./layouts";
 import { useSelector } from "react-redux";
 import { LIST_LAYOUT, TABLE_LAYOUT } from "../ImportTables";
-import { addTableToTree, insertTableInGroup, removeTableFromTree } from "../../../data/tableTreeSlice";
+import { addTable, insertTableInGroup, removeTableFromTree } from "../../../data/tableTreeSlice";
 import { useDispatch } from "react-redux";
 import { isTable } from "../../../lib/types/Table";
 import { ADD_TO_GROUP, SYSTEM_DECIDES } from "../../../data/uiSlice";
+import { STACK } from "../../../lib/types/Operation";
+import "./style.css"
 
 export default function TableSelector({
     searchString,
@@ -62,7 +64,7 @@ export default function TableSelector({
             }
         } else if (insertionMode === SYSTEM_DECIDES) {
             if (!isSelected) {
-                dispatch(addTableToTree(table));
+                dispatch(addTable({table, operationType: STACK}));
             } else {
                 dispatch(removeTableFromTree(table));
             }
@@ -77,7 +79,7 @@ export default function TableSelector({
             // Select all unseleted source tables
             sourceTables
                 .filter(({id}) => !selectedTables.has(id))
-                .forEach(table => dispatch(addTableToTree(table)));
+                .forEach(table => dispatch(addTable({table, operationType: STACK })));
         } else if (!checked) {
             // Unselect all selected soruce tables
             sourceTables

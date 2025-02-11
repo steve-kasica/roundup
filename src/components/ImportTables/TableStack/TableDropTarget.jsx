@@ -4,10 +4,13 @@
 import { useDrop } from "react-dnd";
 import {type as tableInstances} from "../../../lib/types/Table";
 
-export default function TableDropTarget({drop, children}) {
+export default function TableDropTarget({operationType, children}) {
     const [{ isOver, canDrop }, dropRef] = useDrop({
         accept: tableInstances,
-        drop,
+        drop: (item, monitor) => ({
+            ...item,
+            operationType,
+        }),
         collect: (monitor) => ({
             isOver: monitor.isOver(),
             canDrop: monitor.canDrop(),

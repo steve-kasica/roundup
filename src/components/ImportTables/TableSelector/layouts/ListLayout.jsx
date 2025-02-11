@@ -1,19 +1,17 @@
 /**
- * TablesList.jsx
- * ----------------------------------
+ * ListLayout.jsx
+ * 
+ * An unordered list layout for tables when the sidebar is collasped to
+ * a specific width.
  */
-import { Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { IconButton, List, ListItem, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import TableDetailsIcon from "@mui/icons-material/Info";    
 import HighlightText from "../../../ui/HighlightText";
-import { useSelector } from "react-redux";
-import { ADD_TO_GROUP } from "../../../../data/uiSlice";
-import { DragPreviewImage, useDrag } from "react-dnd";
-import {type as tableInstance} from "../../../../lib/types/Table";
-import tableIconImage from "../../../../../public/images/table-icon.png";
+import SourceTableItem from "../SourceTableItem";
+import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 
 export default function TablesList({
     searchString, 
-    handleTablePrimaryClick,
     sourceTables,
     selectedTables
 }) {
@@ -28,13 +26,13 @@ export default function TablesList({
                         return (a === b) ? 0 : (a < b) ? 1 : -1;
                     })
                     .map(table => (
-                        <TableDetail 
-                            key={table.id}
-                            table={table}
-                            searchString={searchString}
-                            isSelected={selectedTables.has(table.id)}
-                            isDisabled={false}
-                        />
+                        <SourceTableItem key={table.id} table={table}>
+                            <TableDetail 
+                                {...table}
+                                searchString={searchString}
+                                isSelected={selectedTables.has(table.id)}
+                            />
+                        </SourceTableItem>
                     ))
                 }
             </List>
@@ -42,77 +40,45 @@ export default function TablesList({
     );
 
     function TableDetail({
-        table,
+        name,
+        row_count,
+        column_count,
         searchString,
-        isSelected
+        isSelected,
     }) {
-        const [{opacity}, dragRef, previewRef] = useDrag(() => ({
-                type: tableInstance,
-                canDrag: !isSelected,
-                item: table,
-                collect: (monitor) => ({
-                    opacity: monitor.isDragging() ? 0.5 : 1
-                })
-            }),
-            []
-        );
-
-        const { name, row_count, column_count } = table;
-        const isDisabled = useSelector(({ui}) => 
-            (ui.insertionMode === ADD_TO_GROUP && isSelected) || name.indexOf(searchString) < 0
-        );
+        const isDisabled = name.indexOf(searchString) < 0;
         return (
-            <>
-                <DragPreviewImage connect={previewRef} src={tableIconImage} />
-                <div ref={dragRef}>
-                    <ListItem
-                        secondaryAction={
-                            <IconButton
-                                disabled={isDisabled}
-                            >
-                                <TableDetailsIcon />
-                            </IconButton>
-                        }
-                        disablePadding
-                    >
-                        <ListItemButton
-                            color=""
-                            disabled={isDisabled}
-                            onClick={() => handleTablePrimaryClick(table, isSelected)}                    
+            <ListItem
+                secondaryAction={ <TableDetailsIcon /> }
+                disablePadding
+            >
+                <ListItemIcon>
+                    {(isSelected) ? (
+                        <CheckBox />
+                    ) : (
+                        <CheckBoxOutlineBlank />
+                    )}
+                </ListItemIcon>
+                <ListItemText 
+                    primary={
+                        <Typography 
+                            color={isDisabled ? "textDisabled" : "normal"}
                         >
-                            <ListItemIcon>
-                                <Checkbox 
-                                    edge="start"
-                                    checked={isSelected}
-                                    disabled={isDisabled}
-                                    tabIndex={-1}
-                                    disableRipple
-                                />
-                            </ListItemIcon>
-                            <ListItemText 
-                                primary={
-                                    <Typography 
-                                        color={isDisabled ? "textDisabled" : "normal"}
-                                    >
-                                        <HighlightText 
-                                            pattern={searchString} 
-                                            text={name} 
-                                        />
-                                    </Typography> 
-                                }
-                                secondary={
-                                    <Typography 
-                                        color={isDisabled ? "textDisabled" : "normal"}
-                                    >
-                                        {row_count} x {column_count}
-                                    </Typography>
-                                }
+                            <HighlightText 
+                                pattern={searchString} 
+                                text={name} 
                             />
-                        </ListItemButton>
-                    </ListItem>
-                </div>
-            </>
+                        </Typography> 
+                    }
+                    secondary={
+                        <Typography 
+                            color={isDisabled ? "textDisabled" : "normal"}
+                        >
+                            {column_count} x {row_count}
+                        </Typography>
+                    }
+                />
+            </ListItem>
         );
     } // end TableDetail()
-
-}  // end TablesList()
+}  // end ListLayout()
