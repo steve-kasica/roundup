@@ -13,7 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"  
-import { reset } from '../../data/tableTreeSlice';
+import { reset } from '../data/tableTreeSlice';
 
 export default () => {
     const dispatch = useDispatch();

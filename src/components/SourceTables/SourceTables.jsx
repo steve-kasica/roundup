@@ -6,51 +6,60 @@
 
 import {TableLayout, ListLayout} from "./layouts";
 import { useSelector } from "react-redux";
-import { LIST_LAYOUT, TABLE_LAYOUT } from "../ImportTables/ImportTables";
 import { addTable, insertTableInGroup, removeTableFromTree } from "../../data/tableTreeSlice";
 import { useDispatch } from "react-redux";
 import { isTable } from "../../lib/types/Table";
-import { ADD_TO_GROUP, SYSTEM_DECIDES } from "../../data/uiSlice";
+import { ADD_TO_GROUP, setSearchString, SYSTEM_DECIDES } from "../../data/uiSlice";
 import { STACK } from "../../lib/types/Operation";
 import "./style.css"
+import SearchBar from "./SearchBar";
 
-export default function SourceTables({
-    searchString,
-    layout,
-    sourceTables,
-    error,
-    isLoading
-}) {
+import {useGetWorkflowSchemasQuery} from "../../services/workflows";
 
+const TABLE_LAYOUT = "table";
+const LIST_LAYOUT = "list";
+const FIRST_PANE_THRESHOLD = 30;
+
+export default function SourceTables() {
     const dispatch = useDispatch();
-    const {insertionMode, selectedTables, focusedNode} = useSelector(({ ui, tableTree }) => ({
-        insertionMode: ui.insertionMode,
-        focusedNode: ui.focusedNode,
+
+    const {ui, selectedTables} = useSelector(({ ui, tableTree }) => ({
+        ui,
         // TODO: does the whole component re-render everytime a table is selected?        
         selectedTables: new Set(tableTree.tree
             .filter(node => isTable(node))
             .map(table => table.id))
     }));
 
+    const layout = (ui.firstPaneWidth < FIRST_PANE_THRESHOLD) ? LIST_LAYOUT : TABLE_LAYOUT;
+    const { data: sourceTables, error, isLoading } = useGetWorkflowSchemasQuery(ui.workflow);
+
     return (
-        (error || isLoading) ? (
-            <p>TODO...</p>
-        ) : (sourceTables && layout === LIST_LAYOUT) ? (
-            <ListLayout 
-                searchString={searchString} 
-                handleTablePrimaryClick={handleTablePrimaryClick}
-                sourceTables={sourceTables} 
-                selectedTables={selectedTables}
+        <>
+            <h3>Source tables</h3>
+            <SearchBar
+                placeholder="Search tables"
+                onChange={({currentTarget}) => dispatch(setSearchString(currentTarget.value))}
             />
-        ) : (sourceTables && layout === TABLE_LAYOUT) ? (
-            <TableLayout 
-                searchString={searchString} 
-                handleTablePrimaryClick={handleTablePrimaryClick}
-                handleSelectAllClick={handleSelectAllClick}
-                sourceTables={sourceTables}
-                selectedTables={selectedTables}
-            />
-        ) : null
+            {(error || isLoading) ? (
+                <p>TODO...</p>
+            ) : (sourceTables && layout === LIST_LAYOUT) ? (
+                <ListLayout 
+                    searchString={ui.searchString} 
+                    handleTablePrimaryClick={handleTablePrimaryClick}
+                    sourceTables={sourceTables} 
+                    selectedTables={selectedTables}
+                />
+            ) : (sourceTables && layout === TABLE_LAYOUT) ? (
+                <TableLayout 
+                    searchString={ui.searchString} 
+                    handleTablePrimaryClick={handleTablePrimaryClick}
+                    handleSelectAllClick={handleSelectAllClick}
+                    sourceTables={sourceTables}
+                    selectedTables={selectedTables}
+                />
+            ) : null}        
+        </>
     );
 
     function handleTablePrimaryClick(table, isSelected) {

@@ -1,37 +1,64 @@
 /**
  * App.jsx
- * ---------------------------------------------------------
- * Follows a supproting pane layout (https://m3.material.io/foundations/layout/canonical-layouts/supporting-pane)
+ * 
+ * This file handles theming, and layout logic depending on user's state in 
+ * the overall roundup workflow.
+ * 
  */
-import './App.css'
-import ImportTables from "./components/ImportTables"
-import NavigationRail from './components/NavigationRail';
-import Grid from '@mui/material/Grid2';
+import './App.css';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from "./themes/theme-default";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-
-const APP_TITLE = "Open Roundup (demo)"
+import { useSelector } from 'react-redux';
+import { STAGE_ARRANGE_TABLES, STAGE_CONFIG_SOURCES, STAGE_REFINE_OPS } from './data/uiSlice';
+import {ListDetail, SupportingPane} from './layouts';
+import NavigationRail from './components/NavigationRail';
+import SourceTables from './components/SourceTables';
+import WorkflowSelector from './components/WorkflowSelector';
+import CompositeTableSchema from './components/CompositeTableSchema';
 
 function App() {
+  const {stage} = useSelector(({ui}) => ui);
 
   return (
     <ThemeProvider theme={theme}>
       <DndProvider backend={HTML5Backend}>
-        <Grid container spacing={1}>
-          <Grid size={12} sx={{borderBottom: "1px solid #ddd"}}>
-            {APP_TITLE}
-          </Grid>
-          <Grid size={1} sx={{
-            height: "100vh"
-          }}>
-            <NavigationRail />
-          </Grid>
-          <Grid size={11} sx={{padding: "10px"}}>
-            <ImportTables />
-          </Grid>
-        </Grid>
+        {
+          (stage === STAGE_CONFIG_SOURCES) ? (
+            <ListDetail 
+              navigation={
+                <NavigationRail currentStage={stage} />
+              }
+              firstPane={
+                <WorkflowSelector />
+              }
+              secondPane={
+                <p>Workflow detail</p>
+              }
+            />
+          ) : (
+            <SupportingPane 
+              navigation={
+                <NavigationRail currentStage={stage} />
+              }
+              primaryContent={
+                (stage === STAGE_ARRANGE_TABLES) ? (
+                  <SourceTables />
+                ) : (stage == STAGE_REFINE_OPS) ? (
+                  <CompositeTableSchema />
+                ) : null
+              }
+              secondaryContent={
+                (stage === STAGE_ARRANGE_TABLES) ? (
+                  <CompositeTableSchema />
+                ) : (stage === STAGE_REFINE_OPS) ? (
+                  <p>Secondary content</p>
+                ) : null
+              }
+            />
+          )
+        }
       </DndProvider>
     </ThemeProvider>
   );

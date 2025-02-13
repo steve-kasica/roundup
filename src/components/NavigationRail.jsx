@@ -1,98 +1,83 @@
 /**
+ * NavigationRail.jsx
  * 
+ * A component for rendering the navigation bar on the left-hand side of the application
+ * The order of menu items in the navigation bar corresponds to the intended
+ * workflow stages the user iterates through when rounding up tables.
  */
 
-import MuiDrawer from "@mui/material/Drawer";
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Typography from "@mui/material/Typography";
+import { List, ListItem, ListItemButton, ListItemIcon, Typography } from "@mui/material";
 
 // All icon imports are aliases of default export
 import SourceColumnsIcon from "@mui/icons-material/ViewColumn";
-import IssuesIcon from "@mui/icons-material/Flag";
-import SourceTablesIcon from "@mui/icons-material/Source";
+import SourceTablesIcon from "@mui/icons-material/TableChart";
 import ExportIcon from "@mui/icons-material/Share";
-import SettingsIcon from "@mui/icons-material/Settings"
+import SourcesIcon from "@mui/icons-material/Source";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useDispatch, useSelector } from "react-redux";
 import { 
-    setSidebarStatus, 
-    initialState,
-    SIDEBAR_SOURCE_COLUMNS, 
-    SIDEBAR_ISSUES, 
-    SIDEBAR_SOURCE_TABLES, 
-    SIDEBAR_EXPORT, 
-    SIDEBAR_CONFIG
+    setStage, 
+    STAGE_ARRANGE_TABLES,
+    STAGE_REFINE_OPS,
+    STAGE_CONFIG_SOURCES,
+    STAGE_EXPORT,
+    initialState
 } from "../data/uiSlice";
 
-const navigationItems = [
-    {
-        id: SIDEBAR_SOURCE_TABLES,
-        label: "Source tables",
-        icon: SourceTablesIcon,
-        isDisabled: false,
-    },
-    {
-        id: SIDEBAR_SOURCE_COLUMNS,
-        label: "Select columns",
-        icon: SourceColumnsIcon,
-        isDisabled: true,        
-    },
-    {
-        id: SIDEBAR_ISSUES,
-        label: "Issues",
-        icon: IssuesIcon,
-        isDisabled: true,                
-    },{
-        id: SIDEBAR_EXPORT,
-        label: "Export",
-        icon: ExportIcon,
-        isDisabled: true,                
-    },{
-        id: SIDEBAR_CONFIG,
-        label: "Settings",
-        icon: SettingsIcon,
-        isDisabled: true,                
-    }
-];
-
-const getStage = (ui, issues) => {
-    const isWorkflow = (ui.workflow !== initialState.workflow);
-    const areIssues = issues.areIssues;
-    if (!isWorkflow && !areIssues) {
-        return SIDEBAR_SOURCE_TABLES;
-    } else if (isWorkflow && !areIssues) {
-        return SIDEBAR_SOURCE_COLUMNS;
-    } else if (isWorkflow && areIssues) {
-        return SIDEBAR_ISSUES;
-    } else {
-        console.error("Strange app state");
-        return -1;
-    }
-}
-
-export default function() {
+export default function({currentStage}) {
     const dispatch = useDispatch();
-    const [activeItem, currentStage] = useSelector(({ui, issues}) => [
-        ui.sidebarStatus,
-        getStage(ui, issues)
-    ]);
+    const {workflow, isTreeEmpty} = useSelector(({ui, tableTree}) => ({
+        workflow: ui.workflow,
+        isTreeEmpty: tableTree.tree.length === 0
+    }));
+
+    const navigationItems = [
+        {
+            stage: STAGE_CONFIG_SOURCES,
+            label: "Configure data sources",
+            Icon: SourcesIcon,
+            isDisabled: false,
+        },
+        {
+            stage: STAGE_ARRANGE_TABLES,
+            label: "Select and arrange tables",
+            Icon: SourceTablesIcon,
+            isDisabled: (workflow === initialState.workflow),
+        },
+        {
+            stage: STAGE_REFINE_OPS,        
+            label: "Refine operations",
+            Icon: SourceColumnsIcon,
+            isDisabled: (isTreeEmpty),
+        },
+        {
+            stage: STAGE_EXPORT,
+            label: "Export table",
+            Icon: ExportIcon,
+            isDisabled: true,                
+        },
+        // {
+        //     id: "config",
+        //     label: "Settings",
+        //     Icon: SettingsIcon,
+        //     isDisabled: true,                
+        // }
+    ];
 
     return (
         <List sx={{
             height: "inherit"
         }}>
-            {navigationItems.map((item, i) => (
+            {navigationItems.map(({stage, isDisabled, label, Icon}) => (
                 <ListItem 
-                    key={`nav-item-${i}`} 
+                    key={stage} 
                     disablePadding
                 >
                     <ListItemButton
-                        onClick={() => dispatch(setSidebarStatus(item.id))}
-                        selected={(activeItem === item.id)}
-                        disabled={item.isDisabled}
+                        onClick={() => dispatch(setStage(stage))}
+                        selected={(stage === currentStage)}
+                        disabled={isDisabled}
                         sx={{
                             justifyContent: "center",
                             paddingBottom: "5px"
@@ -102,7 +87,7 @@ export default function() {
                             flexDirection: "column",
                             width: "100%"
                         }}>
-                            <item.icon sx={{ 
+                            <Icon sx={{ 
                                 marginLeft: "auto", 
                                 marginRight: "auto"}}
                             />
@@ -113,7 +98,7 @@ export default function() {
                                     textAlign: "center"
                                 }}
                             >
-                                {item.label}
+                                {label}
                             </Typography>
                         </ListItemIcon>
                     </ListItemButton>
