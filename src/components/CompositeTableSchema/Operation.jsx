@@ -10,7 +10,7 @@
 
 import { Fragment } from "react";
 import Table from "./Table";
-import { isOperation, PACK, STACK } from "../../lib/types/Operation";
+import { isOperation } from "../../lib/types/Operation";
 
 export default function Operation({node}) {
     const {data, children} = node;
