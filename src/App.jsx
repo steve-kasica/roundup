@@ -17,6 +17,7 @@ import NavigationRail from './components/NavigationRail';
 import SourceTables from './components/SourceTables';
 import WorkflowSelector from './components/WorkflowSelector';
 import CompositeTableSchema from './components/CompositeTableSchema';
+import StackDetail from "./components/StackDetail/StackDetail";
 
 function App() {
   const {stage} = useSelector(({ui}) => ui);
@@ -53,7 +54,7 @@ function App() {
                 (stage === STAGE_ARRANGE_TABLES) ? (
                   <CompositeTableSchema />
                 ) : (stage === STAGE_REFINE_OPS) ? (
-                  <p>Secondary content</p>
+                  <StackDetail />
                 ) : null
               }
             />

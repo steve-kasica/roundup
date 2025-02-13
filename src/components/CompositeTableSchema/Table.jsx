@@ -6,8 +6,8 @@
  */
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { setFocusedNode } from "../../data/uiSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setFocusedNode, setFocusedOperation } from "../../data/uiSlice";
 
 export default function Table({node}) {
     const [contextMenu, setContextMenu] = useState(null);
@@ -15,6 +15,7 @@ export default function Table({node}) {
     
     const { data:table } = node;
     const operation = node.parent.data;
+    const isUnfocused = useSelector(({ui}) => (ui.focusedOperation !== null && ui.focusedOperation.id !== operation.id));
 
     const menuItems = [
         {
@@ -26,6 +27,9 @@ export default function Table({node}) {
         },{
             label: "Add table to group",
             onClick: () => dispatch(setInsertionMode(ADD_TO_GROUP))
+        },{
+            label: "Select operation",
+            onClick: () => dispatch(setFocusedOperation(operation))
         }
     ];
     
@@ -33,7 +37,7 @@ export default function Table({node}) {
         <>
             <div 
                 data-id={table.id} 
-                className="block table"
+                className={`block table ${isUnfocused ? "unfocused" : ""}`}
                 onContextMenu={handleContextMenu}
             >
                 {table.name}

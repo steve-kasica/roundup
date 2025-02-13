@@ -36,7 +36,7 @@ export default function StackHeader({ data, focusIndex }) {
     }, []);
 
     return (
-        <>
+        <thead>
             <tr>
                 <th></th>
                 {headers.map((header, i) => (
@@ -65,6 +65,6 @@ export default function StackHeader({ data, focusIndex }) {
                     </th>
                 ))}
             </tr>
-        </>
+        </thead>
     )
 }

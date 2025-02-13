@@ -1,24 +1,31 @@
-
+/**
+ * StackRow.jsx
+ * 
+ * 
+ */
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-export default function StackRow({columns, focusIndex, onCellSwap}) {
+export default function StackRow({
+    table,
+    focusIndex, 
+    onCellSwap
+}) {
     const trRef = useRef();
-    const sourceTable = columns.filter(column => column).at(0).tableName;
 
-    useEffect(() => {
-        const tr = d3.select(trRef.current);
-        // TODO: can this scope be at the module level?
-        const drag = d3.drag()
-            .on("start", onStartHandler)
-            .on("drag", onDragHandler)
-            .on("end", onEndHandler);
+    // useEffect(() => {
+    //     const tr = d3.select(trRef.current);
+    //     // TODO: can this scope be at the module level?
+    //     const drag = d3.drag()
+    //         .on("start", onStartHandler)
+    //         .on("drag", onDragHandler)
+    //         .on("end", onEndHandler);
         
-        tr.selectAll("td")
-            .datum(function() { return this.dataset; })
-            .call(drag);
+    //     tr.selectAll("td")
+    //         .datum(function() { return this.dataset; })
+    //         .call(drag);
 
-    }, [columns]);
+    // }, [table.columns]);
 
     const setTdClassName = (isNull, isFocused) => {
         let className = "border rounded p-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 cursor-ew-resize";
@@ -29,16 +36,15 @@ export default function StackRow({columns, focusIndex, onCellSwap}) {
 
     return (
         <tr ref={trRef}>
-            <td className="text-right">{sourceTable}</td>
-            {columns.map((column, i) => (
+            <td className="label">{table.name}</td>
+            {table.columns.map((column, i) => (
                 <td key={column !== null ? column.id : `null-${i}`}
                     data-index={i}
                     data-id={column !== null ? column.id : ""}
-                    className={setTdClassName(column === null, i === focusIndex)}
+                    className={`column`}
+                    // className={setTdClassName(column === null, i === focusIndex)}
                 >
-                    <p className="truncate text-center text-sm select-none">
-                        {column !== null ? column.name : ""}
-                    </p>
+                    {column !== null ? column.name : ""}
                 </td>
             ))}
         </tr>

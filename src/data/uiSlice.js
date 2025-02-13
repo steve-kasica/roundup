@@ -36,6 +36,7 @@ export const initialState = {
     stage: STAGE_CONFIG_SOURCES,
     searchString: "",
     firstPaneWidth: 20,
+    focusedOperation: null,
 };
 
 export const uiSlice = createSlice({
@@ -63,6 +64,9 @@ export const uiSlice = createSlice({
         },
         setFirstPaneWidth: (state, action) => {
             state.firstPaneWidth = action.payload;
+        },
+        setFocusedOperation: (state, action) => {
+            state.focusedOperation = action.payload;
         }
     }
 });
@@ -81,7 +85,8 @@ export const {
     setFocusedNode,
     setStage,
     setSearchString,
-    setFirstPaneWidth
+    setFirstPaneWidth,
+    setFocusedOperation,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

@@ -29,8 +29,12 @@
     flex-direction: row-reverse;
 }
 
-.table.block {
+.block.table {
     background-color: #aaa;
     /* margin: 5px 0; */
     padding: 5px;
+}
+
+.block.table.unfocused {
+    opacity: 0.5;
 }
