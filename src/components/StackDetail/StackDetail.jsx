@@ -13,6 +13,11 @@ import "./style.css"
 const multipleValuesText = "...";
 const HEADER_HEIGHT = "20px";
 
+const headerStyle = {
+    height: HEADER_HEIGHT,
+    lineHeight: HEADER_HEIGHT
+};
+
 export default function StackDetail() {
     const dispatch = useDispatch();
 
@@ -33,10 +38,7 @@ export default function StackDetail() {
                 >
                     <div 
                         className="row-label"
-                        style={{
-                            height: HEADER_HEIGHT,
-                            lineHeight: HEADER_HEIGHT
-                        }}
+                        style={headerStyle}
                     >
                         &nbsp;
                     </div>
@@ -55,10 +57,7 @@ export default function StackDetail() {
                 <div className="body">
                     <div 
                         className="header"
-                        style={{
-                            height: HEADER_HEIGHT,
-                            lineHeight: HEADER_HEIGHT,
-                        }}
+                        style={headerStyle}
                     >
                     {Array.from({length: columnCount}, (_, i) => (
                     <div 

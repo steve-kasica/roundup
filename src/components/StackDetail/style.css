@@ -7,58 +7,39 @@
     flex-grow: 0;
 }
 
+.sidebar > .row-label {
+    padding-right: 5px;
+    font-size: 0.75rem;
+    text-align: right;
+}
+
 .body {
     flex-grow: 1;
     overflow-x: auto;
 }
 
-.header {
+.body > .header {
     text-align: center;
 }
 
-/* .container > .header {
-    position:relative;
-    width: 100%;
-} */
-
-.head {
+.body > .header > .head {
     position: absolute;
     top: 0;
 }
 
-.container > .sidebar > .row-label {
-    padding-right: 5px;
-    font-size: 0.75rem;
-    text-align: right;
-    /* line-height: calc(1 / 0.75); */
-}
-
-.row {
+.body > .row {
     position: relative;
 }
 
-.row > div {
+.body > .row > div {
     position: absolute;
     top: 0px;
     height: inherit;
     text-align: center;
 }
 
-.row > .label {
-    text-align: right;
-    width: auto;
-    font-size: 0.75rem;
-    line-height: calc(1 / 0.75);
-}
-
-.row > .data {
-    border: 1px solid #ddd;
-    /* border-width: 1px; */
-    /* border-radius: 10%; */
-
-    /* position: relative;
-    top: 0;
-    width: 50px; */
+.body > .row > .data {
+    border: 1px solid #fff;
 
     background: #ccc;
     cursor: ew-resize;
@@ -80,10 +61,6 @@
     user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
-.data.label {
-    background: none;;
-}
-
 .row:active > .data:hover {
     background: #bbb;
 }
@@ -91,40 +68,3 @@
 .row > .data:active {
     background: #aaa;
 }
-
-/* .stack-detail {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: separate;
-    border-spacing: 2;
-    border-width: 1px;
-    border-color: #ddd;
-}
-
-thead.x.axis {
-    text-align: center;
-}
-
-td.label {
-    text-align: right;
-    color: blue;
-}
-
-.row {
-    width: 100%;
-}
-.table-head {
-    position: relative;
-    top: 0;
-}
-
-td.column.dragging {
-    position: relative;
-    background-color: coral;
-}
-
-td.column.hovered {
-    background-color: violet;
-}
-
-*/
