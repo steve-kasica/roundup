@@ -4,7 +4,7 @@
  */
 
 import { useGetWorkflowsQuery } from '@/services/workflows';
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setWorkflow } from "@/data/uiSlice";
 import {
     Select,
@@ -14,6 +14,7 @@ import {
     SelectValue,
   } from "@/components/ui/select"  
 import { reset } from '../data/tableTreeSlice';
+import { setStage, STAGE_ARRANGE_TABLES } from '../data/uiSlice';
 
 export default () => {
     const dispatch = useDispatch();
@@ -45,5 +46,6 @@ export default () => {
     function onValueChangeHandler(workflow) {
         dispatch(setWorkflow(workflow));
         dispatch(reset());
+        // dispatch(setStage(STAGE_ARRANGE_TABLES));
     }
 }

@@ -4,53 +4,86 @@
  * 
  */
 
-import StackHeader from "./StackHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { swapColumnPositions } from "../../data/schemaSlice";
 import { isTable } from "../../lib/types/Table";
-import StackRow from "./StackRow";
+import StackRow, {CELL_WIDTH} from "./StackRow";
 import "./style.css"
 
 const multipleValuesText = "...";
+const HEADER_HEIGHT = "20px";
 
 export default function StackDetail() {
     const dispatch = useDispatch();
 
-    // const {data} = useSelector(({ schema }) => {
-    //     return {
-    //         data: schema.data,
-    //         error: schema.error
-    //     };
-    // });
-
     const data = useSelector(({tableTree, ui}) => tableTree.tree
-        .filter(node => isTable(node) && node.operation_group === ui.focusedOperation.id)
+        .filter(node => (
+            isTable(node) && 
+            ui.focusedOperation && 
+            node.operation_group === ui.focusedOperation.id))
     );
 
-    const columnCount = Math.max(...data.map(table => table.column_count))
+    const columnCount = Math.max(...data.map(table => table.column_count));
 
     return (
-        <table className="stack-detail">
-            <thead className="x axis">
-                {Array.from({length: columnCount}, (_, i) => (
-                    <td key={i}>{(i > 0) ? i : null}</td>
-                ))}
-            </thead>
-            {/* <StackHeader
-                data={data}
-                focusIndex={null}
-            /> */}
-            <tbody>
-                {data.map(table => (
+        (data.length > 0) ? (
+            <div className="container">
+                <div 
+                    className="sidebar"
+                >
+                    <div 
+                        className="row-label"
+                        style={{
+                            height: HEADER_HEIGHT,
+                            lineHeight: HEADER_HEIGHT
+                        }}
+                    >
+                        &nbsp;
+                    </div>
+                    {data.map(table => (
+                        <div 
+                            className="row-label"
+                            style={{
+                                height: `${CELL_WIDTH}px`,
+                                lineHeight: `${CELL_WIDTH}px`
+                            }}
+                        >
+                            {table.name}
+                        </div>
+                    ))}
+                </div>
+                <div className="body">
+                    <div 
+                        className="header"
+                        style={{
+                            height: HEADER_HEIGHT,
+                            lineHeight: HEADER_HEIGHT,
+                        }}
+                    >
+                    {Array.from({length: columnCount}, (_, i) => (
+                    <div 
+                        key={i}
+                        className="head"
+                        style={{
+                            width: `${CELL_WIDTH}px`,
+                            left: `${CELL_WIDTH * i}px`
+                        }}
+                    >
+                        {i + 1}
+                    </div>
+                    ))}
+                    </div> {/* end div.header */}            
+                    {data.map(table => (
                     <StackRow 
                         key={table.id}
                         table={table}
                         focusIndex={null}
                         onCellSwap={onCellSwap}
                     />
-                ))}
-            </tbody>
-        </table>
+                    ))}
+                </div> {/* end div.body */}
+        </div>
+        ) : null
     );
 
     function onCellSwap(columnA, columnB, tableId) {
