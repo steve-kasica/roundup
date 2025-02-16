@@ -31,7 +31,7 @@ export default function StackRow({
             .on("drag", onDragHandler)
             .on("end", onEndHandler);
         
-        tr.selectAll("td")
+        tr.selectAll(".column")
             .datum(function() { return this.dataset; })
             .call(drag);
 
@@ -65,40 +65,35 @@ export default function StackRow({
     function onStartHandler() {
         const parent = this.parentElement.getBoundingClientRect();
         const child = this.getBoundingClientRect();
-        const td = d3.select(this);
-        td
+        d3.select(this)
             .classed(DRAGGING_CLASS, true)
-            .attr("data-original-position", "x")
-            .attr("data-min", (child.left - parent.left) * -1)
-            .attr("data-max", parent.right - child.right)
-            .style("left", 0);
+            .attr("data-max", parent.right - child.right);
     }
 
     function onDragHandler({dx}) {
         const that = this;
-        const td = d3.select(that);
-        const tr = d3.select(that.parentElement);
+        const dragging = d3.select(this);
+        const row = d3.select(that.parentElement);
     
-        // Update dragging <td> position
-        td.style("left", updatePosition(
-            parseInt(td.style("left").replace("px", "")),
+        // Update dragging position
+        dragging.style("left", updatePosition(
+            parseInt(dragging.style("left").replace("px", "")),
             dx,
-            parseInt(td.attr("data-min")),
-            parseInt(td.attr("data-max")),
+            0,
+            parseInt(dragging.attr("data-max")),
         ));
     
         // Update other cell styles, if overlapping
-        tr.selectAll("td")
+        row.selectAll("div.column")
             .classed(HOVERED_CLASS, function() { 
-                const {a: thisOverlap, b: thatOverlap} = getPercentOverlap(this, that);
-                // console.log(thisOverlap);
-                return thisOverlap === 1 || thatOverlap === 1;
-                return (boundsOverlap(this, that) && that !== this)
+                const overlap = getPercentOverlap(this, that);
+                console.log(overlap);
+                return overlap > 0.5;
             });
     }
 
     function onEndHandler(event, d) {
-        const td = d3.select(this);
+        const dragging = d3.select(this);
         const tr = d3.select(this.parentElement);
         const getIndexOfChild = (parent, child) => Array.prototype.indexOf.call(parent.children, child);
 
@@ -113,11 +108,13 @@ export default function StackRow({
         // }
 
         // Reset temporary styles
-        tr.selectAll("td")
-            .classed(HOVERED_CLASS + " " + DRAGGING_CLASS, false)
-            .style("left", null)
-            .attr("data-min", null)
-            .attr("data-max", null)
+        dragging
+            .classed(DRAGGING_CLASS, false);
+        // tr.selectAll(``)
+        //     .classed(HOVERED_CLASS + " " + DRAGGING_CLASS, false)
+        //     .style("left", null)
+        //     .attr("data-min", null)
+        //     .attr("data-max", null)
     }
 
 }
@@ -149,8 +146,8 @@ function boundsOverlap(a, b) {
  * Note that `right` and `left` are relative from the viewport, see [`getBoundingClientRect`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect)
  */
 function getPercentOverlap(a, b) {
-    const { right: aRight, left: aLeft, width: aWidth } = a.getBoundingClientRect();
-    const { right: bRight, left: bLeft, width: bWidth } = b.getBoundingClientRect();
-    const overlap = (aRight < bLeft || aLeft > bRight) ? 0 : aRight - bLeft;
-    return ({ a: overlap / aWidth, b: overlap / bWidth });
+    const { right: aRight,  left: aLeft, width } = a.getBoundingClientRect();
+    const { right: bRight, left: bLeft } = b.getBoundingClientRect();
+    const overlap = 1 - (Math.abs(aRight - bRight) / width);
+    return Math.max(0, overlap);
 }

@@ -6,13 +6,17 @@
     font-size: 0.75rem;
 }
 
-.container > .y.axis {
+.y.axis {
     flex-grow: 0;
 }
 
 .y.axis > .label {
     display: inline-block;
     transform: rotate(-90deg);
+}
+
+.x.axis {
+    text-align: center;
 }
 
 .sidebar {
@@ -26,10 +30,6 @@
 
 .main {
     flex-grow: 1;
-}
-
-.main > .axis-label {
-    text-align: center;
 }
 
 .body { 
@@ -51,18 +51,35 @@
     position: relative;
 }
 
-.body > .row > div {
+.row > .column {
+    cursor: grab;
+}
+
+.row > .column:active {
+    cursor: ew-resize;
+}
+
+.row > .column.dragging {
+    z-index: 1000;
+    box-shadow: 3px 3px 5px #555;
+}
+
+.row > .column.hovered {
+    background-color: hotpink;
+}
+
+.row > div {
     position: absolute;
     top: 0px;
     height: inherit;
     text-align: center;
 }
 
-.body > .row > .data {
+.row > .data {
     border: 1px solid #fff;
 
     background: #ccc;
-    cursor: ew-resize;
+    /* cursor: ew-resize; */
 
     text-align: center;
     font-size: 0.75rem;
@@ -81,7 +98,7 @@
     user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
-.row:active > .data:hover {
+.row:active > .column:hover {
     background: #bbb;
 }
 

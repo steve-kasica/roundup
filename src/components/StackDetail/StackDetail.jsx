@@ -64,7 +64,7 @@ export default function StackDetail() {
                 </div>
                 <div className="main">
                     <div 
-                        className="axis-label"
+                        className="x axis"
                         style={{
                             height: `${HEADER_HEIGHT}px`,
                             lineHeight: `${HEADER_HEIGHT}px`
