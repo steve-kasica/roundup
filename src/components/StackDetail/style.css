@@ -1,6 +1,18 @@
 
 .container {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+.container > .y.axis {
+    flex-grow: 0;
+}
+
+.y.axis > .label {
+    display: inline-block;
+    transform: rotate(-90deg);
 }
 
 .sidebar {
@@ -9,25 +21,33 @@
 
 .sidebar > .row-label {
     padding-right: 5px;
-    font-size: 0.75rem;
     text-align: right;
 }
 
-.body {
+.main {
     flex-grow: 1;
-    overflow-x: auto;
 }
 
-.body > .header {
+.main > .axis-label {
     text-align: center;
 }
 
-.body > .header > .head {
+.body { 
+    overflow-x: auto;
+}
+
+.header {
+    text-align: center;
+    position: relative;
+    font-size: 0.75rem;
+}
+
+.head {
     position: absolute;
     top: 0;
 }
 
-.body > .row {
+.row {
     position: relative;
 }
 

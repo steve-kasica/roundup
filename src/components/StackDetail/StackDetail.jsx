@@ -11,12 +11,10 @@ import StackRow, {CELL_WIDTH} from "./StackRow";
 import "./style.css"
 
 const multipleValuesText = "...";
-const HEADER_HEIGHT = "20px";
 
-const headerStyle = {
-    height: HEADER_HEIGHT,
-    lineHeight: HEADER_HEIGHT
-};
+const X_AXIS_LABEL = "column index"
+const Y_AXIS_LABEL = "table name";
+const HEADER_HEIGHT = 20;  // height of a header row in pixels
 
 export default function StackDetail() {
     const dispatch = useDispatch();
@@ -33,12 +31,22 @@ export default function StackDetail() {
     return (
         (data.length > 0) ? (
             <div className="container">
+                <div className="y axis">
+                    <span className="label" style={{
+                        marginTop: `${HEADER_HEIGHT  * 2}px`
+                    }}>
+                        {Y_AXIS_LABEL}                        
+                    </span> 
+                </div>
                 <div 
                     className="sidebar"
                 >
                     <div 
                         className="row-label"
-                        style={headerStyle}
+                        style={{
+                            height: `${HEADER_HEIGHT * 2}px`,
+                            lineHeight: `${HEADER_HEIGHT * 2}px`
+                        }}
                     >
                         &nbsp;
                     </div>
@@ -54,10 +62,23 @@ export default function StackDetail() {
                         </div>
                     ))}
                 </div>
-                <div className="body">
+                <div className="main">
+                    <div 
+                        className="axis-label"
+                        style={{
+                            height: `${HEADER_HEIGHT}px`,
+                            lineHeight: `${HEADER_HEIGHT}px`
+                        }}
+                    >
+                        {X_AXIS_LABEL}
+                    </div>
+                    <div className="body">
                     <div 
                         className="header"
-                        style={headerStyle}
+                        style={{
+                            height: `${HEADER_HEIGHT}px`,
+                            lineHeight: `${HEADER_HEIGHT}px`
+                        }}
                     >
                     {Array.from({length: columnCount}, (_, i) => (
                     <div 
@@ -81,6 +102,7 @@ export default function StackDetail() {
                     />
                     ))}
                 </div> {/* end div.body */}
+                </div>                
         </div>
         ) : null
     );
