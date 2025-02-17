@@ -52,6 +52,7 @@ export default function StackDetail() {
                     </div>
                     {data.map(table => (
                         <div 
+                            key={table.id}
                             className="row-label"
                             style={{
                                 height: `${CELL_WIDTH}px`,

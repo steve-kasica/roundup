@@ -51,39 +51,14 @@
     position: relative;
 }
 
-.row > .column {
-    cursor: grab;
-}
-
-.row > .column:active {
-    cursor: ew-resize;
-}
-
-.row > .column.dragging {
-    z-index: 1000;
-    box-shadow: 3px 3px 5px #555;
-}
-
-.row > .column.hovered {
-    background-color: hotpink;
-}
-
-.row > div {
-    position: absolute;
-    top: 0px;
-    height: inherit;
-    text-align: center;
-}
-
-.row > .data {
+.column {
     border: 1px solid #fff;
 
     background: #ccc;
-    /* cursor: ew-resize; */
+    cursor: context-menu;
 
     text-align: center;
     font-size: 0.75rem;
-    line-height: calc(1 / 0.75);
 
     /* truncate text */
     overflow: hidden;
@@ -98,10 +73,32 @@
     user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
-.row:active > .column:hover {
-    background: #bbb;
+/* .column:active {
+    cursor: ew-resize;
+} */
+
+/* .column.dragging {
+    z-index: 1000;
+    box-shadow: 3px 3px 5px #555;
+} */
+
+/* .column.hovered {
+    background-color: hotpink;
+} */
+
+.column.selected {
+    background-color: yellowgreen;
 }
 
-.row > .data:active {
-    background: #aaa;
+.column.null {
+    background-color: #FFF;
+    border: 1px dotted #ddd;
+    cursor: auto;
+}
+
+.row > div {
+    position: absolute;
+    top: 0px;
+    height: inherit;
+    text-align: center;
 }

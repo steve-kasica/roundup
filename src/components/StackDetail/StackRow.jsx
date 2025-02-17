@@ -3,10 +3,20 @@
  * 
  * 
  */
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-export const CELL_WIDTH = 50;  // in pixels (px)
+import {Menu, MenuItem} from "@mui/material"
+import { useDispatch } from "react-redux";
+import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
+import { updateColumnStatus } from "../../data/tableTreeSlice";
+
+export const CELL_WIDTH = 50;  // pixels (px)
+export const OVERLAP_THRESHOLD = 0.5; // percent
+
+// text string to represent null column indexes within a table
+const NULL_TEXT = "";
+
 const DRAGGING_CLASS = "dragging";
 const HOVERED_CLASS = "hovered";
 
@@ -21,21 +31,41 @@ export default function StackRow({
     focusIndex, 
     onCellSwap
 }) {
+    const [contextMenu, setContextMenu] = useState(null);
+    // const [selectedColumn, setSelectedColumn] = useState(null);
+    const dispatch = useDispatch();
     const trRef = useRef();
 
-    useEffect(() => {
-        const tr = d3.select(trRef.current);
-        // TODO: can this scope be at the module level?
-        const drag = d3.drag()
-            .on("start", onStartHandler)
-            .on("drag", onDragHandler)
-            .on("end", onEndHandler);
+    // useEffect(() => {
+    //     const tr = d3.select(trRef.current);
+    //     // TODO: can this scope be at the module level?
+    //     const drag = d3.drag()
+    //         .on("start", onStartHandler)
+    //         .on("drag", onDragHandler)
+    //         .on("end", onEndHandler);
         
-        tr.selectAll(".column")
-            .datum(function() { return this.dataset; })
-            .call(drag);
+    //     tr.selectAll(".column:not(.null)")
+    //         .datum(function() { return this.dataset; })
+    //         .call(drag);
 
-    }, [table]);
+    // }, [table]);
+
+    const handleContextMenu = (event) => {
+        event.preventDefault();
+        const columnData = event.target.dataset;
+        setContextMenu(
+          contextMenu === null
+            ? {
+                ...columnData,
+                mouseX: event.clientX + 2,
+                mouseY: event.clientY - 6,
+              }
+            : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
+              // Other native context menus might behave different.
+              // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+              null,
+        );
+    };
 
     return (
         <div 
@@ -45,29 +75,87 @@ export default function StackRow({
                 height: `${CELL_WIDTH}px`
             }}
         >        
-            {table.columns.map((column, i) => (
-            <div 
-                key={column !== null ? column.id : `null-${i}`}
-                className={`data column`}                
-                data-index={i}
-                data-id={column !== null ? column.id : ""}
-                style={{
-                    ...dataStyle, 
-                    left: `${CELL_WIDTH * i}px`,
-                }}
-            >
-                {column !== null ? column.name : ""}
+            {table.columns
+                .filter(column => column.status !== COLUMN_STATUS_REMOVED)
+                .map((column, i) => (
+                    <Fragment key={column !== null ? column.id : `null-${i}`}>
+                        <div 
+                            className={`column ${column.status === COLUMN_STATUS_NULLED ? "null" : ""}`}                
+                            data-index={i}
+                            data-table-id={table.id}
+                            data-column-id={column !== null ? column.id : ""}
+                            style={{
+                                ...dataStyle, 
+                                left: `${CELL_WIDTH * i}px`,
+                            }}
+                            onContextMenu={handleContextMenu}
+                            // onClick={() => setSelectedColumn(column)}
+                        >
+                            {
+                            (column === null || column.status === COLUMN_STATUS_NULLED) 
+                                ? NULL_TEXT
+                                : column.name
+                            }
+                        </div>
+                    </Fragment>
+                ))}
+                <Menu
+                    open={contextMenu !== null}
+                    onClose={() => setContextMenu(null)}
+                    anchorReference="anchorPosition"
+                    anchorPosition={
+                        contextMenu !== null
+                            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                            : undefined
+                    }
+                >
+                    <MenuItem onClick={onRemoveClick}>Remove</MenuItem>
+                    <MenuItem onClick={onNullClick}>Null</MenuItem>
+                    {/* <MenuItem onClick={onMoveClick}>Move</MenuItem> */}
+                    {/* {
+                        (selectedColumn !== null) ? (
+                            <MenuItem onClick={onSwapClick}>Swap with selected column</MenuItem>
+                        ) : (
+                            null
+                        )
+                    } */}
+                </Menu>
             </div>
-            ))}
-        </div>
-    )
+    ); // end return
+
+    function onRemoveClick() {
+        dispatch(updateColumnStatus({
+            ...contextMenu, 
+            status: COLUMN_STATUS_REMOVED
+        }));
+        setContextMenu(null);
+    }
+
+    function onNullClick() {
+        dispatch(updateColumnStatus({
+            ...contextMenu, 
+            status: COLUMN_STATUS_NULLED
+        }));
+        setContextMenu(null);        
+    }
+
+    function onMoveClick() {
+        console.log(contextMenu);
+        setContextMenu(null);
+    }
+
+    // function onSwapClick() {
+    //     console.log(contextMenu);
+    //     setContextMenu(null);        
+    // }
 
     function onStartHandler() {
         const parent = this.parentElement.getBoundingClientRect();
         const child = this.getBoundingClientRect();
         d3.select(this)
             .classed(DRAGGING_CLASS, true)
-            .attr("data-max", parent.right - child.right);
+            .attr("data-max", parent.right - child.right)
+            .attr("data-prev-left", d3.select(this).style("left"));
     }
 
     function onDragHandler({dx}) {
@@ -76,20 +164,31 @@ export default function StackRow({
         const row = d3.select(that.parentElement);
     
         // Update dragging position
-        dragging.style("left", updatePosition(
-            parseInt(dragging.style("left").replace("px", "")),
-            dx,
-            0,
-            parseInt(dragging.attr("data-max")),
-        ));
+        // dragging.style("left", function() {
+        //     const position = updatePosition(
+        //         parseInt(dragging.style("left").replace("px", "")),
+        //         dx,
+        //         0,
+        //         parseInt(dragging.attr("data-max")),
+        //     );
+        //     return position;
+        // });
     
         // Update other cell styles, if overlapping
         row.selectAll("div.column")
+            .filter(function() {
+                return (this !== that)
+            })
             .classed(HOVERED_CLASS, function() { 
-                const overlap = getPercentOverlap(this, that);
-                console.log(overlap);
-                return overlap > 0.5;
-            });
+                return getPercentOverlap(this, that) > OVERLAP_THRESHOLD;
+            })
+            // .style("left", function() {
+            //     if (getPercentOverlap(this, that) > OVERLAP_THRESHOLD) {
+            //         return d3.select(that).attr("data-prev-left");
+            //     } else {
+            //         return d3.select(this).style("left");
+            //     }
+            // })
     }
 
     function onEndHandler(event, d) {

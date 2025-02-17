@@ -1,6 +1,11 @@
 /**
+ * Column.js
  * 
  */
+
+export const COLUMN_STATUS_VISABLE = 'visable';
+export const COLUMN_STATUS_REMOVED = 'removed';
+export const COLUMN_STATUS_NULLED = 'nulled';
 
 let id = 0;
 
@@ -19,7 +24,8 @@ export default function Column(
         name,
         index,
         columnType,
-        values
+        values,
+        status: COLUMN_STATUS_VISABLE
     }
 }
 
