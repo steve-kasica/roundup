@@ -42,7 +42,7 @@ export default function Table(
     return {
         endpoint,
         name: removeFileExtension(name),
-        id: (id === null) ? `t-${++id}` : id,
+        id: (id === null) ? `t-${++id}` : String(id),
         type: (type === undefined) ? getFileExtension(name) : type,
         row_count,
         date_created: date_created.toDateString(),
