@@ -19,6 +19,7 @@ export default function Column(
 ) {
     return {
         id: `c-${++id}`,
+        original: {name},
         tableId,
         endpoint,
         name,

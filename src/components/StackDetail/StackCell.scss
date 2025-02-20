@@ -1,0 +1,92 @@
+
+$cellWidth: 50px;
+$cellBorderWidth: 2px;
+
+.StackCell {
+    position: absolute;
+    // width: $cellWidth;
+    // height: $cellWidth;
+    // background-color: navajowhite;
+
+    border-width: 1px;
+    border-style: groove;
+    border-color: #ddd;
+    border-radius: 5px;
+
+    cursor: context-menu;
+
+    > div, > input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: inherit;
+        cursor: inherit;
+    }
+
+    .screen {
+        width: 100%;
+        height: 100%;
+        opacity: 0.25;
+        background-color: #fff !important;
+        z-index: 1000;
+    }
+
+    input {
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:disabled {
+            user-select: none;
+            pointer-events: none; // also disables text selection
+        }
+    }
+
+    &.null {
+        background-color: ghostwhite;
+        border-style: dotted;
+    }
+
+    &.focused {
+        background-color: olivedrab;
+
+        .screen {
+            display: none;
+        }
+    }
+
+    &.editable {
+        background-color: fuchsia;
+        .screen {
+            display: none;
+        }
+    }
+}
+// .cell {
+//     position: absolute;
+//     top: 0px;
+//     height: $cellWidth + $cellBorderWidth;
+
+//     background-color: #ddd;
+//     border-width: $cellBorderWidth;
+//     border-style: groove;
+//     border-color: #eee;
+
+//     font-size: 0.75rem;
+//     line-height: $cellWidth;
+
+//     > input {
+//         width: $cellWidth + $cellBorderWidth;
+//         background-color: inherit;
+//         text-align: center;
+//         text-overflow: ellipsis;
+//         cursor: context-menu;
+
+//         &:focus {
+//             cursor: text;
+//         }
+//     }
+// }

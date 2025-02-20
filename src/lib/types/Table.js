@@ -51,7 +51,7 @@ export default function Table(
         columns: columns.map(columnData => new Column(...Object.values({
             ...columnData, 
             endpoint, 
-            tableId: id
+            tableId: String(id)
         }))),
 
         operation_group: null  // Group contains a valid operation ID

@@ -6,10 +6,11 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-import {Menu, MenuItem} from "@mui/material"
+import {Input, Menu, MenuItem} from "@mui/material"
 import { useDispatch } from "react-redux";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
-import { updateColumnStatus } from "../../data/tableTreeSlice";
+import { setColumnProperty } from "../../data/tableTreeSlice";
+import StackCell from "./StackCell";
 
 export const CELL_WIDTH = 50;  // pixels (px)
 export const OVERLAP_THRESHOLD = 0.5; // percent
@@ -21,8 +22,8 @@ const DRAGGING_CLASS = "dragging";
 const HOVERED_CLASS = "hovered";
 
 const dataStyle = {
-    height: `${CELL_WIDTH}px`,
-    width: `${CELL_WIDTH}px`,
+    // height: `${CELL_WIDTH}px`,
+    // width: `${CELL_WIDTH}px`,
     lineHeight: `${CELL_WIDTH}px`
 }
 
@@ -31,7 +32,9 @@ export default function StackRow({
     focusIndex, 
     onCellSwap
 }) {
+    const [focusedCell, setFocusedCell] = useState(null);
     const [contextMenu, setContextMenu] = useState(null);
+    const [editableCell, setEditableCell] = useState(null);
     // const [selectedColumn, setSelectedColumn] = useState(null);
     const dispatch = useDispatch();
     const trRef = useRef();
@@ -50,9 +53,16 @@ export default function StackRow({
 
     // }, [table]);
 
+    // useEffect(() => {
+    //     if (!focusedCell) return;
+    //     const cell = d3.select(`.column[data-column-id=${focusedCell}]`);
+    //     cell.attr("contentEditable", "plaintext-only");
+    //     setTimeout(function() {cell.dispatch("focus")}, 0);
+    // }, [focusedCell]);
+
     const handleContextMenu = (event) => {
         event.preventDefault();
-        const columnData = event.target.dataset;
+        const columnData = event.target.parentElement.dataset;
         setContextMenu(
           contextMenu === null
             ? {
@@ -78,26 +88,11 @@ export default function StackRow({
             {table.columns
                 .filter(column => column.status !== COLUMN_STATUS_REMOVED)
                 .map((column, i) => (
-                    <Fragment key={column !== null ? column.id : `null-${i}`}>
-                        <div 
-                            className={`column ${column.status === COLUMN_STATUS_NULLED ? "null" : ""}`}                
-                            data-index={i}
-                            data-table-id={table.id}
-                            data-column-id={column !== null ? column.id : ""}
-                            style={{
-                                ...dataStyle, 
-                                left: `${CELL_WIDTH * i}px`,
-                            }}
-                            onContextMenu={handleContextMenu}
-                            // onClick={() => setSelectedColumn(column)}
-                        >
-                            {
-                            (column === null || column.status === COLUMN_STATUS_NULLED) 
-                                ? NULL_TEXT
-                                : column.name
-                            }
-                        </div>
-                    </Fragment>
+                    <StackCell
+                        key={column !== null ? column.id : `null-${i}`}
+                        column={column}
+                        index={i}
+                    ></StackCell>
                 ))}
                 <Menu
                     open={contextMenu !== null}
@@ -111,6 +106,7 @@ export default function StackRow({
                 >
                     <MenuItem onClick={onRemoveClick}>Remove</MenuItem>
                     <MenuItem onClick={onNullClick}>Null</MenuItem>
+                    <MenuItem onClick={onRenameClick}>Rename</MenuItem>
                     {/* <MenuItem onClick={onMoveClick}>Move</MenuItem> */}
                     {/* {
                         (selectedColumn !== null) ? (
@@ -124,25 +120,59 @@ export default function StackRow({
     ); // end return
 
     function onRemoveClick() {
-        dispatch(updateColumnStatus({
+        dispatch(setColumnProperty({
             ...contextMenu, 
-            status: COLUMN_STATUS_REMOVED
+            property: "status",
+            value: COLUMN_STATUS_REMOVED
         }));
         setContextMenu(null);
     }
 
     function onNullClick() {
-        dispatch(updateColumnStatus({
+        dispatch(setColumnProperty({
             ...contextMenu, 
-            status: COLUMN_STATUS_NULLED
+            property: "status",            
+            value: COLUMN_STATUS_NULLED
         }));
         setContextMenu(null);        
     }
 
-    function onMoveClick() {
-        console.log(contextMenu);
+
+    function onRenameClick(event) {
+        setFocusedCell(contextMenu.columnId);
+        // setEditableCell(contextMenu.columnId);
+        // const cell = d3.select(`#cell-${contextMenu.columnId}`);
+
+        // cell.on("focus", () => cell
+        //         .attr("contentEditable", "plaintext-only")
+        //         .classed("editable", true)
+        //     )
+        //     .on("blur", () => cell
+        //         .classed("editable", false)
+        //         .attr("contentEditable", false)
+        //         .on("focus", null)
+        //         // .on("blur", null);
+        //     );
+        // cell.addEventListener("focus", () => d3.select(cell).classed("editable", true));
+
+        // cell.focus();
+        // cell.addEventListener("input", function() { 
+        //     console.log(this, arguments);
+        // });
+        // const newName = "foo";
+        // dispatch(updateColumnProperty({
+        //     ...contextMenu,
+        //     property: "name",
+        //     value: newName
+        // }));
+        // cell.dispatch("focus");
         setContextMenu(null);
     }
+
+    // function onMoveClick() {
+    //     console.log(contextMenu);
+    //     setContextMenu(null);
+    // }
 
     // function onSwapClick() {
     //     console.log(contextMenu);

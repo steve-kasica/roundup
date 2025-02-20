@@ -84,11 +84,12 @@ export const tableTreeSlice = createSlice({
                 state.tree = simplifyTree(state.tree);
             }
         },
-        updateColumnStatus(state, {payload}) {
-            const {tableId, columnId, status} = payload;
-            const table = state.tree.filter(node => isTable(node) && node.id === tableId).at(0);
-            const column = table.columns.filter(column => column.id === columnId).at(0);
-            column.status = status;
+        setColumnProperty(state, {payload}) {
+            const {column, property, value} = payload;
+            const table = state.tree
+                .filter(node => isTable(node) && node.id === column.tableId).at(0);
+            const column2 = table.columns.filter(c => c.id === column.id).at(0);
+            column2[property] = value;
         },
         reset() {
             return initialState;
@@ -158,7 +159,7 @@ export const {
     removeTableFromTree,
     removeOperation,
     addTable,
-    updateColumnStatus,
+    setColumnProperty,
     reset
 } = tableTreeSlice.actions;
 

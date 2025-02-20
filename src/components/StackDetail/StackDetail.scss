@@ -1,0 +1,118 @@
+/**
+ * StackDetail.scss
+ * Styles for the Stack Detail panel
+ */
+
+$verticalGutterWidth: 10px;
+$horizontalGutterWidth: 10px;
+$cellPadding: 5px;
+$cellBorderRadius: 5px;
+$yAxisTickoffset: 14.55px * 2 + 10px;
+
+.StackDetail {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    line-height: normal;
+    font-size: 0.75rem;
+
+    text-align: center;
+
+    > div {
+        height: 100%;
+    }
+
+    .left-panel {
+        display: flex;
+        padding-top: $yAxisTickoffset;
+
+        > .label {        
+            // rotate text -90 degrees
+            height: auto;
+            color: #777;
+            writing-mode: sideways-lr;
+        }
+
+        > .ticks {
+            float: right;
+            text-align: right;
+            padding-left: 5px;
+
+            .tick {
+                padding-top: $cellPadding;
+                padding-bottom: $cellPadding;
+                margin-top: $horizontalGutterWidth;
+            }
+        }
+    }
+
+    .right-panel {
+        flex-basis: 0;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-x: auto;
+
+        .grid-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding-left: 5px;
+            height: 100%;
+
+            .grid-column {
+                // TODO add animated transition on width changes
+                margin-right: $verticalGutterWidth;
+                margin-bottom: 15px;  // Leave from for scrollbar
+                user-select: none;
+                cursor: context-menu;
+
+                > div {
+                    margin-top: $horizontalGutterWidth;
+                }
+
+                .StackCell {
+                    padding: $cellPadding;
+                    outline-color: #999;
+                    outline-style: solid;
+                    outline-width: 1px;
+                    border-radius: $cellBorderRadius;
+                    font-weight: 500;
+
+                    &:hover {
+                        background-color: #eee;
+                        filter: drop-shadow(1px 1px 1px #ddd)
+                    }
+
+                    input {
+                        field-sizing: content;  // https://developer.mozilla.org/en-US/docs/Web/CSS/field-sizing
+                        white-space: nowrap;
+                        overflow: hidden;
+                        min-width: 25px;
+                        background-color: inherit;
+    
+                        &:disabled {
+                            text-overflow: ellipsis;
+                            max-width: 100px;
+    
+                            user-select: inherit;
+                            // also disables text selection and
+                            // ensure non-scrolling on overflow text
+                            // with Chrome issue (https://stackoverflow.com/a/74845969)
+                            pointer-events: none;
+                        }
+                    }
+                }
+            
+                &.focused {
+                    input {
+                        text-overflow: unset;
+                        max-width: fit-content;
+                    }
+                }
+            }
+        }
+    }
+}

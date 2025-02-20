@@ -37,6 +37,7 @@ export const initialState = {
     searchString: "",
     firstPaneWidth: 20,
     focusedOperation: null,
+    focusedColumnIndex: null,
 };
 
 export const uiSlice = createSlice({
@@ -67,7 +68,10 @@ export const uiSlice = createSlice({
         },
         setFocusedOperation: (state, action) => {
             state.focusedOperation = action.payload;
-        }
+        },
+        setFocusedColumnIndex: (state, action) => {
+            state.focusedColumnIndex = action.payload;
+        },
     }
 });
 
@@ -87,6 +91,7 @@ export const {
     setSearchString,
     setFirstPaneWidth,
     setFocusedOperation,
+    setFocusedColumnIndex,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

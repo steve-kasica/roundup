@@ -49,7 +49,7 @@ export default function SuppotingPane({
                         <Paper sx={{
                             borderRadius: "5px",
                             padding: "10px",
-                            height: "100vh"
+                            // height: "100vh"
                         }}>
                             {primaryContent}
                         </Paper>
@@ -59,7 +59,7 @@ export default function SuppotingPane({
                         <Paper sx={{
                             borderRadius: "5px",
                             padding: "10px",
-                            height: "100vh"
+                            // height: "100vh"
                         }}>
                             {secondaryContent}
                         </Paper>
