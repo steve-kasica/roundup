@@ -8,12 +8,13 @@ import { useDispatch } from "react-redux";
 import { setColumnProperty } from "../../data/tableTreeSlice";
 import { List, ListItemButton, Popover } from "@mui/material";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
+import { setFocusedColumnIndex } from "../../data/uiSlice";
 
 function cn() {
     return Array.prototype.slice.call(arguments).filter(arg => arg).join(" ");
 }
 
-export default function StackCell({column, style}) {
+export default function StackCell({column, columnIndex, style}) {
     const {name, id, status} = column;
 
     const dispatch = useDispatch();
@@ -35,8 +36,8 @@ export default function StackCell({column, style}) {
         <div
             className={cn(
                 "StackCell", 
-                status === COLUMN_STATUS_NULLED ? "null" : null,
-                isEditable ? "editable" : null,
+                // status === COLUMN_STATUS_NULLED ? "null" : null,
+                // isEditable ? "editable" : null,
                 isFocused ? "focused" : null
             )}
             style={style}
@@ -82,6 +83,7 @@ export default function StackCell({column, style}) {
         event.preventDefault();
         setIsFocused(true);
         setAnchorEl(event.target);
+        dispatch(setFocusedColumnIndex(columnIndex));
     }
 
     function handleInputOnClick(event) {

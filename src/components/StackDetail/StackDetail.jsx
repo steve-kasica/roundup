@@ -16,7 +16,6 @@ import { setFocusedColumnIndex } from "../../data/uiSlice";
 
 const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";
-const HEADER_HEIGHT = 20;  // height of a header row in pixels
 const cellSize = 50;  // in height and width of cells (in pixels)
 
 export default function StackDetail() {
@@ -69,74 +68,42 @@ export default function StackDetail() {
                     </div>
                     <div className="grid-container">
                         {xScale.domain().map(j => (
-                            <div 
+                            <form 
                                 key={j}
-                                className={`grid-column ${j === focusedColumnIndex ? "focused" : ""}`}
-                                onClick={() => dispatch(setFocusedColumnIndex(j))}
+                                className={`grid-column ${(focusedColumnIndex !== null) ? (j === focusedColumnIndex ? "focused" : "unfocused") : ""}`}
+                                // onClick={(event1) => {
+                                //     dispatch(setFocusedColumnIndex(j));
+                                //     document.addEventListener("click", function(event2) {
+                                //         if (!event1.target.contains(event2.target)) {
+                                //             console.log("fired");
+                                //             // dispatch(setFocusedColumnIndex(null));
+                                //         }
+                                //     })
+                                // }}
+                                // autoFocus={focusedColumnIndex === j}
+                                // onBlur={() => dispatch(setFocusedColumnIndex(null))}
                                 onContextMenu={() => dispatch(setFocusedColumnIndex(j))}
                             >
-                                <div className="index-label">
+                                <label className="index-label">
                                     {j + 1}
-                                </div>
+                                </label>
                                 {tables.map(table => (
                                     j < table.columns.length
                                         ? (
                                             <StackCell 
                                                 key={`${table.id}-${j}`}
                                                 columnIndex={j}
-                                                column={(j < table.columns.length) ? table.columns.at(j) : null}
+                                                column={table.columns.at(j)}
                                             />
                                         )
                                         : null
 
                                 ))}
-                            </div>
+                            </form>
                         ))}
-                        {/* {tables.map(table => (
-                            <div className="StackRow">
-                                {table.columns.map((column, j) => (
-                                <StackCell 
-                                    key={`${column.tableId}-${column.id}`}                            
-                                    column={column} 
-                                    style={{
-                                        // height: `${yScale.bandwidth()}px`,
-                                        // width: `${xScale.bandwidth()}px`,
-                                        // top: `${yScale(i)}px`,
-                                        // left: `${xScale(j)}px`
-                                    }}
-                                />
-                                ))}
-                            </div>
-                        ))} */}
                     </div>
 
                 </div>
-                {/* <div className="main">
-
-                    
-                    <div className="gridgrid">
-                        <div className="stack-grid">
-                        
-                        {/* <div 
-                            className="header"
-                            style={{
-                                height: `${HEADER_HEIGHT}px`,
-                                lineHeight: `${HEADER_HEIGHT}px`
-                            }}
-                        >
-
-                        </div> {/* end div.header }            
-                        {tables.map(table => (
-                        <StackRow 
-                            key={table.id}
-                            table={table}
-                            focusIndex={null}
-                            onCellSwap={onCellSwap}
-                        />
-))} end}
-                    </div> 
-                </div>
-                </div>                 */}
         </div>
         ) : null
     );
