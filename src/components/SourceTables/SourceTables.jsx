@@ -32,7 +32,7 @@ export default function SourceTables() {
     }));
 
     const layout = (ui.firstPaneWidth < FIRST_PANE_THRESHOLD) ? LIST_LAYOUT : TABLE_LAYOUT;
-    const { data: sourceTables, error, isLoading } = useGetWorkflowSchemasQuery(ui.workflow);
+    const { data: sourceTables, error, isLoading } = useGetWorkflowSchemasQuery(ui.workflow.value);
 
     return (
         <>

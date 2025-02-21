@@ -2,14 +2,44 @@
     "workflows": [
         {
             "value": "2018-05-31-crime-and-heat-analysis",
+            "organization": "St. Louis Public Radio",
+            "date": "May 31, 2018",
+            "author": "Brent Jones",
+            "environment": "Jupyter Notebook",
+            "language": "Python",
+            "article": {
+                "title": "Warm weather worries in St. Louis: When temperatures rise, crime often follows",
+                "url": "http://news.stlpublicradio.org/post/warm-weather-worries-st-louis-when-temperatures-rise-crime-often-follows"
+            },
+            "sourceUrl": "https://github.com/stlpublicradio/2018-05-31-crime-and-heat-analysis",
             "label": "Crime & Heat"
         },
         {
             "value": "2019-04-democratic-candidate-codonors",
+            "organization": "BuzzFeed News",
+            "date": "April 16, 2019",
+            "author": "Jeremy Singer-Vine",
+            "environment": "Jupyter Notebook",
+            "language": "Python",
+            "article": {
+                "title": "Democrats Who Really Like More Than One Presidential Candidate Have Found A Temporary Solution: Give Them All Money",
+                "url": "https://www.buzzfeednews.com/article/tariniparti/democratic-donors-2020-candidates"
+            },
+            "sourceUrl": "https://github.com/BuzzFeedNews/2019-04-democratic-candidate-codonors",
             "label": "Democratic Candidate Codonors"
         },
         {
             "value": "babyname_politics",
+            "organization": "Time Magazine",
+            "date": "December 20, 2016",
+            "author": "Chris Wilson",
+            "environment": "RStudio IDE",
+            "language": "R",
+            "article": {
+                "title": "Is Your Name Democratic or Republican?",
+                "url": "https://time.com/4606813/democrat-republican-name/"
+            },
+            "sourceUrl": "https://web.archive.org/web/20180613010437/https://github.com/TimeMagazine/babyname_politics",
             "label": "Baby Name Politics"
         }
     ]
