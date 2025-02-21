@@ -18,6 +18,7 @@ import SourceTables from './components/SourceTables';
 import WorkflowSelector from './components/WorkflowSelector';
 import CompositeTableSchema from './components/CompositeTableSchema';
 import StackDetail from "./components/StackDetail/StackDetail";
+import WorkflowDetail from './components/WorkflowDetail';
 
 function App() {
   const {stage} = useSelector(({ui}) => ui);
@@ -35,7 +36,7 @@ function App() {
                 <WorkflowSelector />
               }
               secondPane={
-                <p>Workflow detail</p>
+                <WorkflowDetail />
               }
             />
           ) : (

@@ -32,15 +32,6 @@ export const workflowAPI = createApi({
                         .then(result => ({
                             ...result, // error, isLoading, etc...
                             data: new Table(...Object.values(result.data)),
-                            // data: ({
-                            //     ...result.data, 
-                            //     columns: result.data.columns.map((column, j) => ({
-                            //         ...column,
-                            //         endpoint: result.data.endpoint,
-                            //         tableId: result.data.id,
-                            //         id: `${i}-${j}`
-                            //     }))
-                            // })
                         }))
                 );
 
