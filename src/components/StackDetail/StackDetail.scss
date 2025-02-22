@@ -39,6 +39,7 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
     justify-content: center;
     line-height: normal;
     font-size: 0.75rem;
+    user-select: none;
 
     text-align: center;
 
@@ -93,7 +94,6 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
                 max-width: 100px;
                 text-overflow: ellipse;
                 // TODO add animated transition on width changes
-                user-select: none;
                 width: fit-content;
                 font-family: sans-serif;
 
