@@ -27,7 +27,10 @@ $verticalGutterWidth: 10px;
 $horizontalGutterWidth: 10px;
 $cellPadding: 5px;
 $cellBorderRadius: 5px;
-$yAxisTickoffset: 14.55px * 2 + 10px;
+
+$xAxisLabelHeight: 25px;
+$xAxisTickHeight: 10px;
+$yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
 
 .StackDetail {
     display: flex;
@@ -39,8 +42,8 @@ $yAxisTickoffset: 14.55px * 2 + 10px;
 
     text-align: center;
 
-    x-axis.label {
-        margin-bottom: 11px;
+    .x-axis.label {
+        height: $xAxisLabelHeight;
     }
 
     > div {
@@ -94,8 +97,9 @@ $yAxisTickoffset: 14.55px * 2 + 10px;
                 width: fit-content;
                 font-family: sans-serif;
 
-                .screen {
-                    pointer-events: none;
+                label {
+                    height: $xAxisTickHeight;
+                    line-height: $xAxisTickHeight;
                 }
 
                 .StackCell {
@@ -114,6 +118,10 @@ $yAxisTickoffset: 14.55px * 2 + 10px;
                         // TODO: bold text in a way that doesn't change bounding box dimensions
                         filter: drop-shadow(1px 1px 1px #ddd);
                         outline-color: darken($enabledCellOutlineColor, 25%);
+                    }
+
+                    .screen {
+                        pointer-events: none;
                     }
                 }
 
