@@ -1,30 +1,19 @@
 /**
  * StackDetail.scss
- 
- * Styles for the Stack Detail panel
+ *
+ * SASS styles for the Stack Detail component
+ *
+ * Uses the limited [`field-sizing` property](https://developer.mozilla.org/en-US/docs/Web/CSS/field-sizing) to
+ * control the width of input fields, which is unsupported in Firefox and Safari.
  */
 
 $enabledCellColor: #555;
-$enabledCellOutlineColor: #ddd;
+$enabledCellOutlineColor: #aaa;
 $enabledCellBackgroundColor: #f9f9f9;
 $enabledCellFontWeight: 500;
 
-$lightenPercent: 10%;
-$unhoveredCellColor: lighten($enabledCellColor, $lightenPercent);
-$unhoveredCellOutlineColor: lighten($enabledCellOutlineColor, $lightenPercent);
-$unhoveredCellBackgroundColor: lighten($enabledCellBackgroundColor, 1%);
-$unhoveredCellFontWeight: $enabledCellFontWeight;
-
-@mixin unhoveredColumn {
-    input,label {
-        color: $unhoveredCellColor;
-        font-weight: $unhoveredCellFontWeight;
-    }
-    input {
-        outline-color: $unhoveredCellOutlineColor;
-        background-color: $unhoveredCellBackgroundColor;
-    }
-}
+// lightens enabled variables to signify hover/unhover state
+$unhoverLightenFactor: 25%;
 
 $hoveredCellColor: $enabledCellColor;
 $hoveredCellOutlineColor: $enabledCellOutlineColor;
@@ -32,21 +21,8 @@ $hoveredCellBackgroundColor: $enabledCellBackgroundColor;
 $hoveredCellFontWeight: $enabledCellFontWeight;
 $hoveredCellDropShadowColor: #ddd;
 
-@mixin hoveredColumn {
-    input,label {
-        color: $hoveredCellColor;
-        font-weight: $hoveredCellFontWeight;                            
-    }
-    input {
-        outline-color: $hoveredCellOutlineColor;
-        background-color: $hoveredCellBackgroundColor;
-        &:hover {
-            filter: drop-shadow(1px 1px 1px $hoveredCellDropShadowColor)
-        }
-    }
-}
-
 $cellOutlineWidth: 1px;
+$cellMaxWidth: 100px;
 $verticalGutterWidth: 10px;
 $horizontalGutterWidth: 10px;
 $cellPadding: 5px;
@@ -76,7 +52,7 @@ $yAxisTickoffset: 14.55px * 2 + 10px;
         padding-top: $yAxisTickoffset;
 
         > .label {        
-            // rotate text -90 degrees
+            // rotates text -90 degrees
             height: auto;
             color: #777;
             writing-mode: sideways-lr;
@@ -111,19 +87,34 @@ $yAxisTickoffset: 14.55px * 2 + 10px;
             height: 100%;
 
             form {
-                // TODO add animated transition on width changes
-                padding-right: $verticalGutterWidth / 2;
-                padding-left: $verticalGutterWidth / 2;
-                padding-bottom: $cellOutlineWidth; // show bottom border
-                user-select: none;
                 max-width: 100px;
+                text-overflow: ellipse;
+                // TODO add animated transition on width changes
+                user-select: none;
                 width: fit-content;
                 font-family: sans-serif;
 
-                * {
-                    user-select: inherit;
-                    max-width: inherit;
-                    width: inherit;
+                .screen {
+                    pointer-events: none;
+                }
+
+                .StackCell {
+                    margin-top: $horizontalGutterWidth;
+                    margin-bottom: $horizontalGutterWidth;
+                    margin-right: $verticalGutterWidth / 2;
+                    margin-left: $verticalGutterWidth / 2;
+                    background-color: $enabledCellBackgroundColor;
+                    outline-color: $enabledCellOutlineColor;                    
+                    outline-style: solid;
+                    outline-width: $cellOutlineWidth;
+                    border-radius: $cellBorderRadius;
+                    cursor: context-menu;
+
+                    &:hover {
+                        // TODO: bold text in a way that doesn't change bounding box dimensions
+                        filter: drop-shadow(1px 1px 1px #ddd);
+                        outline-color: darken($enabledCellOutlineColor, 25%);
+                    }
                 }
 
                 input, label {
@@ -131,30 +122,28 @@ $yAxisTickoffset: 14.55px * 2 + 10px;
                     font-weight: $enabledCellFontWeight;
                 }
                 input {
-                    margin-top: $horizontalGutterWidth;
-                    background-color: $enabledCellBackgroundColor;
-                    outline-color: $enabledCellOutlineColor;                    
-                    outline-style: solid;
-                    outline-width: $cellOutlineWidth;
-                    border-radius: $cellBorderRadius;
                     padding: $cellPadding;        
-                    field-sizing: content;  // https://developer.mozilla.org/en-US/docs/Web/CSS/field-sizing
+                    field-sizing: content;
                     white-space: nowrap;
                     overflow: hidden;
+                    width: 100%;
+                    min-width: 25px;
+                    text-align: center;
                     text-overflow: ellipsis;
-                    cursor: context-menu;
                 }
 
-                // &.unhovered {
-                //     color: $unhoveredCellColor;
-                //     font-weight: $unhoveredCellFontWeight;                    
-                // }
-            }
-            &:hover {
-                form {
-                    @include unhoveredColumn();
-                    &:hover {
-                        @include hoveredColumn();
+                &:focus-within {
+                    max-width: unset;
+                    text-overflow: unset;
+                }
+    
+                &.unhovered {
+                    input,label {
+                        color: lighten($enabledCellColor, $unhoverLightenFactor);
+                    }
+                    .StackCell {
+                        outline-color: lighten($enabledCellOutlineColor, $unhoverLightenFactor);
+                        background-color: lighten($enabledCellBackgroundColor, $unhoverLightenFactor);
                     }
                 }
             }

@@ -14,18 +14,14 @@ function cn() {
     return Array.prototype.slice.call(arguments).filter(arg => arg).join(" ");
 }
 
-export default function StackCell({column, columnIndex, style}) {
+export default function StackCell({column, style}) {
     const {name, id, status} = column;
-
     const dispatch = useDispatch();
-
     const [anchorEl, setAnchorEl] = useState(null);
     const isPopoverOpen = Boolean(anchorEl);
     const closePopover = () => setAnchorEl(null);
 
-    const [isFocused, setIsFocused] = useState(false);
     const [isEditable, setIsEditable] = useState(false);
-
     const inputRef = useRef(null);
     useEffect(() => {
         if (!isEditable) return;
@@ -34,45 +30,42 @@ export default function StackCell({column, columnIndex, style}) {
 
     return (
         <div
-            className={cn(
-                "StackCell", 
-                // status === COLUMN_STATUS_NULLED ? "null" : null,
-                // isEditable ? "editable" : null,
-                isFocused ? "focused" : null
-            )}
+            className="StackCell"
             style={style}
             onContextMenu={handleOnContextMenu}
         >
-            {/* <div className="screen"/> */}
-            <input 
-                ref={inputRef}
-                type="text"
-                id={`cell-${id}`}
-                disabled={!isEditable}
-                value={status === COLUMN_STATUS_NULLED ? "null" : name}
-                onChange={handleOnChange}
-                onClick={handleInputOnClick}
-                onBlur={handleOnBlur}
-                onFocus={handleInputFocus}
-                // data-index={i}
-                // data-table-id={table.id}
-                // data-column-id={column !== null ? column.id : ""}
-            />
-            <Popover
-                open={isPopoverOpen}
-                anchorEl={anchorEl}
-                onClose={handlePopoverOnClose}
-                anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left"
-                }}
-            >
-                <List>
-                    <ListItemButton onClick={handleRemoveClick}>Remove</ListItemButton>
-                    <ListItemButton onClick={handleNullClick}>Null</ListItemButton>                    
-                    <ListItemButton onClick={handleRenameClick}>Rename</ListItemButton>                    
-                </List>
-            </Popover>
+            <div className="screen">
+                <input 
+                    ref={inputRef}
+                    type="text"
+                    id={`cell-${id}`}
+                    disabled={!isEditable}
+                    value={status === COLUMN_STATUS_NULLED ? "null" : name}
+                    onChange={handleOnChange}
+                    onClick={handleInputOnClick}
+                    onBlur={handleOnBlur}
+                    onFocus={handleInputFocus}
+                    minLength={1}
+                    // data-index={i}
+                    // data-table-id={table.id}
+                    // data-column-id={column !== null ? column.id : ""}
+                />
+                <Popover
+                    open={isPopoverOpen}
+                    anchorEl={anchorEl}
+                    onClose={handlePopoverOnClose}
+                    anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "left"
+                    }}
+                >
+                    <List>
+                        <ListItemButton onClick={handleRemoveClick}>Remove</ListItemButton>
+                        <ListItemButton onClick={handleNullClick}>Null</ListItemButton>                    
+                        <ListItemButton onClick={handleRenameClick}>Rename</ListItemButton>                    
+                    </List>
+                </Popover>
+            </div>
         </div>
     );
 
@@ -81,9 +74,7 @@ export default function StackCell({column, columnIndex, style}) {
 
     function handleOnContextMenu(event) {
         event.preventDefault();
-        setIsFocused(true);
         setAnchorEl(event.target);
-        dispatch(setFocusedColumnIndex(columnIndex));
     }
 
     function handleInputOnClick(event) {
@@ -97,9 +88,8 @@ export default function StackCell({column, columnIndex, style}) {
     }
 
     function handleOnBlur(event) {
-        // event.preventDefault();
-        setIsFocused(false);
         setIsEditable(false);
+        dispatch(setFocusedColumnIndex(null));
     }
 
     function handleRemoveClick(event) {
@@ -109,7 +99,6 @@ export default function StackCell({column, columnIndex, style}) {
             value: COLUMN_STATUS_REMOVED
         }));
         closePopover();
-        setIsFocused(false);
     }
 
     function handleNullClick(event) {
@@ -119,7 +108,6 @@ export default function StackCell({column, columnIndex, style}) {
             value: COLUMN_STATUS_NULLED
         }));
         closePopover();
-        setIsFocused(false);
     }
 
     function handleRenameClick(event) {
@@ -129,7 +117,7 @@ export default function StackCell({column, columnIndex, style}) {
 
     function handlePopoverOnClose(event) {
         closePopover();
-        setIsFocused(false);
+        dispatch(setFocusedColumnIndex(null));
     }
 
     function handleOnChange(event) {

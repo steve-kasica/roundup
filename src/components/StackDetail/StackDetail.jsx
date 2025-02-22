@@ -7,7 +7,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { swapColumnPositions } from "../../data/schemaSlice";
 import { isTable } from "../../lib/types/Table";
-import {CELL_WIDTH} from "./StackRow";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
 import StackCell from "./StackCell";
@@ -34,11 +33,9 @@ export default function StackDetail() {
         focusedColumnIndex: ui.focusedColumnIndex
     }));
 
-    const tableCount = tables.length;
     const maxColumnCount = Math.max(...tables.map(table => table.columns.length));
     const columnPositions = Array.from({length: maxColumnCount}, (_, i) => i);
 
-    const yScale = scaleBand(Array.from({length: tables.length}, (_,i) => i), [0, tableCount * cellSize]);
     const xScale = scaleBand(
         columnPositions,
         [0, maxColumnCount * cellSize]
@@ -70,19 +67,9 @@ export default function StackDetail() {
                         {xScale.domain().map(j => (
                             <form 
                                 key={j}
-                                className={`grid-column ${(focusedColumnIndex !== null) ? (j === focusedColumnIndex ? "focused" : "unfocused") : ""}`}
-                                // onClick={(event1) => {
-                                //     dispatch(setFocusedColumnIndex(j));
-                                //     document.addEventListener("click", function(event2) {
-                                //         if (!event1.target.contains(event2.target)) {
-                                //             console.log("fired");
-                                //             // dispatch(setFocusedColumnIndex(null));
-                                //         }
-                                //     })
-                                // }}
-                                // autoFocus={focusedColumnIndex === j}
-                                // onBlur={() => dispatch(setFocusedColumnIndex(null))}
-                                onContextMenu={() => dispatch(setFocusedColumnIndex(j))}
+                                className={`${(focusedColumnIndex !== null && focusedColumnIndex !== j) ? "unhovered" : ""}`}
+                                onMouseEnter={() => dispatch(setFocusedColumnIndex(j))}
+                                onMouseLeave={() => dispatch(setFocusedColumnIndex(null))}
                             >
                                 <label className="index-label">
                                     {j + 1}
@@ -102,13 +89,13 @@ export default function StackDetail() {
                             </form>
                         ))}
                     </div>
-
                 </div>
         </div>
         ) : null
     );
 
-    function onCellSwap(columnA, columnB, tableId) {
-        dispatch(swapColumnPositions(columnA, columnB, tableId))
-    }
+    // TODO: implement cell swaping action
+    // function onCellSwap(columnA, columnB, tableId) {
+    //     dispatch(swapColumnPositions(columnA, columnB, tableId))
+    // }
 }
