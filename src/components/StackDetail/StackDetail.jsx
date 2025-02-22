@@ -43,6 +43,7 @@ export default function StackDetail() {
 
     return (
         (tables.length > 0) ? (
+            <div>
             <div className="StackDetail">
                 <div className="left-panel">
                     <div className="label">
@@ -79,7 +80,6 @@ export default function StackDetail() {
                                         ? (
                                             <StackCell 
                                                 key={`${table.id}-${j}`}
-                                                columnIndex={j}
                                                 column={table.columns.at(j)}
                                             />
                                         )
@@ -90,6 +90,7 @@ export default function StackDetail() {
                         ))}
                     </div>
                 </div>
+            </div>
         </div>
         ) : null
     );

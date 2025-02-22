@@ -120,6 +120,16 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
                         outline-color: darken($enabledCellOutlineColor, 25%);
                     }
 
+                    &.null {
+                        outline-style: dotted;
+                        input {
+                            background-color: #fff;
+                            font-style: italic;
+                            text-transform: uppercase;
+                        }
+
+                    }
+
                     .screen {
                         pointer-events: none;
                     }

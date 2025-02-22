@@ -14,7 +14,7 @@ function cn() {
     return Array.prototype.slice.call(arguments).filter(arg => arg).join(" ");
 }
 
-export default function StackCell({column, style}) {
+export default function StackCell({column}) {
     const {name, id, status} = column;
     const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = useState(null);
@@ -30,8 +30,10 @@ export default function StackCell({column, style}) {
 
     return (
         <div
-            className="StackCell"
-            style={style}
+            className={cn(
+                "StackCell",
+                status === COLUMN_STATUS_NULLED ? "null" : undefined
+            )}
             onContextMenu={handleOnContextMenu}
         >
             <div className="screen">
