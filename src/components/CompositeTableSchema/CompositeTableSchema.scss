@@ -1,0 +1,40 @@
+
+
+.TableStack-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #ddd;
+    color: #999;
+    min-height: 500px;
+}
+
+.block {
+    width: 100%;
+    border: 1px solid #ddd;
+
+    &.operation {
+        display: flex;
+        padding: 5px;
+
+        &.stack {
+            background-color: aquamarine;
+            flex-direction: column-reverse;
+        }
+    
+        &.pack {
+            background-color: beige;
+            flex-direction: row-reverse;
+        }
+    }
+
+    &.table {
+        background-color: #aaa;
+        /* margin: 5px 0; */
+        padding: 5px;
+
+        &.unfocused {
+            opacity: 0.5;
+        }
+    }
+}
