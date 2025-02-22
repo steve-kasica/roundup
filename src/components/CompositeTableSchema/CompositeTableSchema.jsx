@@ -4,7 +4,7 @@
  * An interactive hierarchical visualization of the table tree
  */
 
-import "./style.css";
+import "./CompositeTableSchema.scss";
 
 import { useSelector } from "react-redux";
 import { stratify } from "../../data/tableTreeSlice";
@@ -19,7 +19,7 @@ export default function CompositeTableSchema() {
         : null
     );
 
-    return (<>
+    return (<div className="CompositeTableSchema">
         <h3>Output table</h3>
         {
             (root !== null) ? (
@@ -32,5 +32,5 @@ export default function CompositeTableSchema() {
                 </TableDropTarget>
             )
         }
-    </>);
+    </div>);
 }

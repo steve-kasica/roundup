@@ -7,7 +7,11 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusedNode, setFocusedOperation } from "../../data/uiSlice";
+import { setFocusedNode, setFocusedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
+import Column from "./Column";
+import { isTable } from "../../lib/types/Table";
+import { COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
+import { ascending, descending } from "d3";
 
 export default function Table({node}) {
     const [contextMenu, setContextMenu] = useState(null);
@@ -15,17 +19,26 @@ export default function Table({node}) {
     
     const { data:table } = node;
     const operation = node.parent.data;
-    const isUnfocused = useSelector(({ui}) => (ui.focusedOperation !== null && ui.focusedOperation.id !== operation.id));
+    const maxColumns = node.parent.children
+            .map(n => n.data)
+            .filter(d =>  isTable(d))
+            .reduce((acc, d) => Math.max(
+                acc, 
+                d.columns.filter(c => c.status !== COLUMN_STATUS_REMOVED).length
+            ), 0);
+
+    const {focusedOperation, stage} = useSelector(({ui}) => ui);
+    const isUnfocused = (focusedOperation !== null && focusedOperation.id !== operation.id);
 
     const menuItems = [
         {
             label: "Remove table",
             onClick: () => dispatch(removeTableFromTree(table))
         },{
-            label: "Remove group",
+            label: "Remove operation",
             onClick: () => dispatch(removeOperation(operation))
         },{
-            label: "Add table to group",
+            label: "Add table",
             onClick: () => dispatch(setInsertionMode(ADD_TO_GROUP))
         },{
             label: "Select operation",
@@ -40,7 +53,22 @@ export default function Table({node}) {
                 className={`block table ${isUnfocused ? "unfocused" : ""}`}
                 onContextMenu={handleContextMenu}
             >
-                {table.name}
+                <span className="label">{table.name}</span>
+                {
+                    (stage === STAGE_REFINE_OPS) ? (
+                        table.columns
+                            .filter(column => column.status !== COLUMN_STATUS_REMOVED)
+                            .map(column => (
+                                <Column 
+                                    key={column.id}
+                                    column={column}
+                                    style={{
+                                        width: `${(1 / maxColumns) * 100}%`
+                                    }}
+                                />
+                        ))
+                    ) : null
+                }
             </div>
             <Menu
                 open={contextMenu !== null}

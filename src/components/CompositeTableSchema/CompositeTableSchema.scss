@@ -1,40 +1,91 @@
+/**
+ * CompositeTableSchema.scss
+ * 
+ * Styles for the Composite Table Schema.
+ */
 
+.CompositeTableSchema {
 
-.TableStack-empty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px dashed #ddd;
-    color: #999;
-    min-height: 500px;
-}
+    font-family: sans-serif;
 
-.block {
-    width: 100%;
-    border: 1px solid #ddd;
-
-    &.operation {
+    .TableStack-empty {
         display: flex;
-        padding: 5px;
-
-        &.stack {
-            background-color: aquamarine;
-            flex-direction: column-reverse;
+        justify-content: center;
+        align-items: center;
+        border: 1px dashed #ddd;
+        color: #999;
+        min-height: 500px;
+    }
+    
+    .block {
+        width: 100%;
+        border: 1px solid #ddd;
+    
+        &.operation {
+            display: flex;
+            padding: 5px;
+    
+            &.stack {
+                background-color: aquamarine;
+                flex-direction: column-reverse;
+            }
+        
+            &.pack {
+                background-color: beige;
+                flex-direction: row-reverse;
+            }
         }
     
-        &.pack {
-            background-color: beige;
-            flex-direction: row-reverse;
-        }
-    }
+        &.table {
+            background-color: #aaa;
+            padding: 5px;
 
-    &.table {
-        background-color: #aaa;
-        /* margin: 5px 0; */
-        padding: 5px;
 
-        &.unfocused {
-            opacity: 0.5;
+            > div {
+                // padding: 20px 0;
+                text-align: center;
+            }
+
+            .label {
+                position: absolute;
+                display: none;
+                font-size: 0.75rem;
+            }
+
+            .cell {
+                user-select: none;
+                display: block;
+                float: left;
+
+                > div {
+                    // Matches cell style with Stack Operation
+                    // TODO: make mixin for these styles, for consistency
+                    min-width: 1px;
+                    height: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    outline-color: #aaa;
+                    outline-style: solid;
+                    outline-width: 1px;
+                    background-color: #f9f9f9;
+                    height: inherit;
+                    white-space: nowrap;
+                    overflow: hidden;
+
+                    outline: 1px solid #ddd;
+                }
+
+                &:hover, &.hover {
+                    > div {
+                        background-color: firebrick;
+                    }
+                }
+            }
+    
+            &.unfocused {
+                opacity: 0.5;
+            }
         }
     }
 }
