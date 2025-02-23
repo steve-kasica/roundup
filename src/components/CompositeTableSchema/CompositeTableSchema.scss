@@ -22,6 +22,7 @@
         border: 1px solid #ddd;
     
         &.operation {
+            // Operation block state is enabled
             display: flex;
             padding: 5px;
     
@@ -34,57 +35,70 @@
                 background-color: beige;
                 flex-direction: row-reverse;
             }
-        }
+
+            .table {
+                background-color: #aaa;
+                padding: 5px;
     
-        &.table {
-            background-color: #aaa;
-            padding: 5px;
-
-
-            > div {
-                // padding: 20px 0;
-                text-align: center;
-            }
-
-            .label {
-                position: absolute;
-                display: none;
-                font-size: 0.75rem;
-            }
-
-            .cell {
-                user-select: none;
-                display: block;
-                float: left;
-
+    
                 > div {
-                    // Matches cell style with Stack Operation
-                    // TODO: make mixin for these styles, for consistency
-                    min-width: 1px;
-                    height: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    outline-color: #aaa;
-                    outline-style: solid;
-                    outline-width: 1px;
-                    background-color: #f9f9f9;
-                    height: inherit;
-                    white-space: nowrap;
-                    overflow: hidden;
-
-                    outline: 1px solid #ddd;
+                    // padding: 20px 0;
+                    text-align: center;
                 }
-
-                &:hover, &.hover {
+    
+                .label {
+                    position: absolute;
+                    display: none;
+                    font-size: 0.75rem;
+                }
+    
+                .cell {
+                    user-select: none;
+                    display: block;
+                    float: left;
+    
                     > div {
+                        // Matches cell style with Stack Operation
+                        // TODO: make mixin for these styles, for consistency
+                        min-width: 1px;
+                        height: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        outline-color: #aaa;
+                        outline-style: solid;
+                        outline-width: 1px;
+                        background-color: #f9f9f9;
+                        height: inherit;
+                        white-space: nowrap;
+                        overflow: hidden;
+    
+                        outline: 1px solid #ddd;
+                    }
+    
+                    &.hover {
+                        > div {
+                            background-color: firebrick;                        
+                        }
+                    }
+                }
+        
+                &.unfocused {
+                    opacity: 0.5;
+                }
+            }
+
+            &:hover {
+                // Operation block state is hover                
+
+                .table .cell {
+                    &.hover > div {
+                        background-color: #f9f9f9;
+                    }
+                    &:hover > div {
                         background-color: firebrick;
                     }
                 }
-            }
-    
-            &.unfocused {
-                opacity: 0.5;
             }
         }
     }
