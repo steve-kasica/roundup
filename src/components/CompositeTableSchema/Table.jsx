@@ -53,7 +53,8 @@ export default function Table({node}) {
                 className={`block table ${isUnfocused ? "unfocused" : ""}`}
                 onContextMenu={handleContextMenu}
             >
-                <span className="label">{table.name}</span>
+                <div className="label">{table.name} ({table.columns.length})</div>
+                <div className="columns">
                 {
                     (stage === STAGE_REFINE_OPS) ? (
                         table.columns
@@ -69,6 +70,7 @@ export default function Table({node}) {
                         ))
                     ) : null
                 }
+                </div>
             </div>
             <Menu
                 open={contextMenu !== null}

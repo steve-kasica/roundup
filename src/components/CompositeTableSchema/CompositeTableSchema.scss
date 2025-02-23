@@ -7,6 +7,8 @@
 .CompositeTableSchema {
 
     font-family: sans-serif;
+    font-size: 10px;
+    text-align: left;
 
     .TableStack-empty {
         display: flex;
@@ -39,17 +41,15 @@
             .table {
                 background-color: #aaa;
                 padding: 5px;
-    
-    
-                > div {
-                    // padding: 20px 0;
-                    text-align: center;
-                }
+                padding-top: 0px;
     
                 .label {
-                    position: absolute;
-                    display: none;
-                    font-size: 0.75rem;
+                    padding: 1px;
+                }
+    
+                .columns {
+                    height: 20px;
+                    line-height: 20px;
                 }
     
                 .cell {
@@ -61,7 +61,6 @@
                         // Matches cell style with Stack Operation
                         // TODO: make mixin for these styles, for consistency
                         min-width: 1px;
-                        height: 10px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
