@@ -56,46 +56,18 @@
                     user-select: none;
                     display: block;
                     float: left;
+                    min-width: 1px;
     
                     > div {
-                        // Matches cell style with Stack Operation
-                        // TODO: make mixin for these styles, for consistency
-                        min-width: 1px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        outline-color: #aaa;
-                        outline-style: solid;
-                        outline-width: 1px;
-                        background-color: #f9f9f9;
-                        height: inherit;
-                        white-space: nowrap;
-                        overflow: hidden;
-    
-                        outline: 1px solid #ddd;
+                        border-style: solid;
+                        border-width: 1px;
+                        border-top: none;
+                        border-bottom: none;
+                        // note: border-color is set inline dynamically based data
                     }
-    
-                    &.hover {
-                        > div {
-                            background-color: firebrick;                        
-                        }
-                    }
-                }
-        
-                &.unfocused {
-                    opacity: 0.5;
-                }
-            }
 
-            &:hover {
-                // Operation block state is hover                
-
-                .table .cell {
-                    &.hover > div {
-                        background-color: #f9f9f9;
-                    }
-                    &:hover > div {
-                        background-color: firebrick;
+                    &.unhover {
+                        opacity: 0.25;
                     }
                 }
             }

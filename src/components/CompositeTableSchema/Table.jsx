@@ -11,9 +11,9 @@ import { setFocusedNode, setFocusedOperation, STAGE_REFINE_OPS } from "../../dat
 import Column from "./Column";
 import { isTable } from "../../lib/types/Table";
 import { COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
-import { ascending, descending } from "d3";
+import { BorderColor } from "@mui/icons-material";
 
-export default function Table({node}) {
+export default function Table({node, colorScale}) {
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
     
@@ -52,6 +52,7 @@ export default function Table({node}) {
                 data-id={table.id} 
                 className={`block table ${isUnfocused ? "unfocused" : ""}`}
                 onContextMenu={handleContextMenu}
+                style={{ backgroundColor: colorScale(node.height + 1) }}
             >
                 <div className="label">{table.name} ({table.columns.length})</div>
                 <div className="columns">
@@ -62,10 +63,12 @@ export default function Table({node}) {
                             .map(column => (
                                 <Column 
                                     key={column.id}
-                                    column={column}
+                                    colorScale={colorScale}
+                                    height={node.height}
                                     style={{
-                                        width: `${(1 / maxColumns) * 100}%`
+                                        width: `${(1 / maxColumns) * 100}%`,
                                     }}
+                                    column={column}
                                 />
                         ))
                     ) : null

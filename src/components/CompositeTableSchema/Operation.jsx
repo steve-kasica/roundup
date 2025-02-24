@@ -1,5 +1,5 @@
 /**
- * Operation.jsx
+ * CompositeTableSchema/Operation.jsx
  * -----------------------------------------------------------------
  * A visual representation of an operation in the **Output Schema**
  * It is a container for **Source Tables** and/or other **Operations**.
@@ -12,20 +12,21 @@ import { Fragment } from "react";
 import Table from "./Table";
 import { isOperation } from "../../lib/types/Operation";
 
-export default function Operation({node}) {
+export default function Operation({node, colorScale}) {
     const {data, children} = node;
     return (
         <div 
             data-id={data.id} 
             data-type={data.type}
             className={`block operation ${data.type}`}
+            style={{ backgroundColor: colorScale(node.height + 1) }}
         >
             {children.map(childNode => (
                 <Fragment key={childNode.data.id}>
                     {
                         (isOperation(childNode.data))
-                        ? (<Operation node={childNode} />)
-                        : (<Table node={childNode} />)
+                        ? (<Operation node={childNode} colorScale={colorScale} />)
+                        : (<Table node={childNode} colorScale={colorScale} />)
                     }
                 </Fragment>
             ))}  
