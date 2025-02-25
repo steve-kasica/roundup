@@ -1,0 +1,77 @@
+/**
+ * CellLayout.scss
+ *
+ */
+
+ $enabledCellColor: #555;
+ $enabledCellOutlineColor: #aaa;
+ $enabledCellBackgroundColor: #f9f9f9;
+ $enabledCellFontWeight: 500;
+ 
+ // lightens enabled variables to signify hover/unhover state
+ $unhoverLightenFactor: 25%;
+ 
+ $hoveredCellColor: $enabledCellColor;
+ $hoveredCellOutlineColor: $enabledCellOutlineColor;
+ $hoveredCellBackgroundColor: $enabledCellBackgroundColor;
+ $hoveredCellFontWeight: $enabledCellFontWeight;
+ $hoveredCellDropShadowColor: #ddd;
+ 
+ $cellOutlineWidth: 1px;
+ $cellMaxWidth: 100px;
+ $verticalGutterWidth: 10px;
+ $horizontalGutterWidth: 10px;
+ $cellPadding: 5px;
+ $cellBorderRadius: 5px;
+ 
+ $xAxisLabelHeight: 25px;
+ $xAxisTickHeight: 10px;
+ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
+
+.ColumnView.cell {
+    margin-top: $horizontalGutterWidth;
+    margin-bottom: $horizontalGutterWidth;
+    margin-right: $verticalGutterWidth / 2;
+    margin-left: $verticalGutterWidth / 2;
+    background-color: $enabledCellBackgroundColor;
+    outline-color: $enabledCellOutlineColor;                    
+    outline-style: solid;
+    outline-width: $cellOutlineWidth;
+    border-radius: $cellBorderRadius;
+    cursor: context-menu;
+
+    &:hover {
+        // TODO: bold text in a way that doesn't change bounding box dimensions
+        filter: drop-shadow(1px 1px 1px #ddd);
+        outline-color: darken($enabledCellOutlineColor, 25%);
+    }
+
+    &.null {
+        outline-style: dotted;
+        input {
+            background-color: #fff;
+            font-style: italic;
+            text-transform: uppercase;
+        }
+    }
+
+    .screen {
+        // pointer-events: none;
+    }
+                
+
+    input, label {
+        color: $enabledCellColor;                
+        font-weight: $enabledCellFontWeight;
+    }
+    input {
+        padding: $cellPadding;        
+        field-sizing: content;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 100%;
+        min-width: 25px;
+        text-align: center;
+        text-overflow: ellipsis;
+    }
+}

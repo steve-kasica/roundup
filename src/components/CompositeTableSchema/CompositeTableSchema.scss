@@ -51,25 +51,6 @@
                     height: 20px;
                     line-height: 20px;
                 }
-    
-                .cell {
-                    user-select: none;
-                    display: block;
-                    float: left;
-                    min-width: 1px;
-    
-                    > div {
-                        border-style: solid;
-                        border-width: 1px;
-                        border-top: none;
-                        border-bottom: none;
-                        // note: border-color is set inline dynamically based data
-                    }
-
-                    &.unhover {
-                        opacity: 0.25;
-                    }
-                }
             }
         }
     }

@@ -8,10 +8,9 @@ import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocusedNode, setFocusedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
-import Column from "./Column";
+import ColumnView, {COLUMN_LAYOUT_TICK} from "../ColumnView";
 import { isTable } from "../../lib/types/Table";
 import { COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
-import { BorderColor } from "@mui/icons-material";
 
 export default function Table({node, colorScale}) {
     const [contextMenu, setContextMenu] = useState(null);
@@ -61,14 +60,15 @@ export default function Table({node, colorScale}) {
                         table.columns
                             .filter(column => column.status !== COLUMN_STATUS_REMOVED)
                             .map(column => (
-                                <Column 
+                                <ColumnView 
                                     key={column.id}
+                                    column={column}     
+                                    layout={COLUMN_LAYOUT_TICK}                               
                                     colorScale={colorScale}
                                     height={node.height}
                                     style={{
                                         width: `${(1 / maxColumns) * 100}%`,
                                     }}
-                                    column={column}
                                 />
                         ))
                     ) : null

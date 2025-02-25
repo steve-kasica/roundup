@@ -20,7 +20,7 @@ export default function CompositeTableSchema() {
     );
 
     return (<div className="CompositeTableSchema">
-        <h3>Output table</h3>
+        <h3>Composite Table Schema</h3>
         {
             (root !== null) ? (
                 <Root node={root} />

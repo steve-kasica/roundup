@@ -1,0 +1,28 @@
+/*
+ * TickLayout.scss
+ *
+ * Notes:
+ * - The class name that defines tick styles is 
+ * declared in `src/components/ColumnView/index.jsx`. Changing that exported 
+ * constant value require redefining the class name in this file.
+ * - The `border-color` attribute is defined inline. It is dynamically set 
+ *   based on the data.
+ */
+
+ .ColumnView.tick {
+    user-select: none;
+    display: block;
+    float: left;
+    min-width: 1px;
+
+    > div {
+        border-style: solid;
+        border-width: 1px;
+        border-top: none;
+        border-bottom: none;
+    }
+
+    &.unhover {
+        opacity: 0.25;
+    }
+ }

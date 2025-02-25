@@ -3,8 +3,16 @@
  *
  * SASS styles for the Stack Detail component
  *
- * Uses the limited [`field-sizing` property](https://developer.mozilla.org/en-US/docs/Web/CSS/field-sizing) to
- * control the width of input fields, which is unsupported in Firefox and Safari.
+ * Notes:
+ * 
+ * - Uses the limited [`field-sizing` property](https://developer.mozilla.org/en-US/docs/Web/CSS/field-sizing) to
+ *   control the width of input fields, which is unsupported in Firefox and Safari.
+ *
+ * - The form inputs are instances of ColumnView's Stack layout with most styles defined in
+ *   src/components/ColumnView/Layouts/CellLayou.scss. It is necessary to define pointer-events
+ *   for those `input` elements at the form level using the `:focus-within` psuedo-element. I 
+ *   do it this way in lieu of disabled attributes, e.g. `<input disabled>`, in order to change
+ *   the focus between cells but within column index of a stack operation.
  */
 
 $enabledCellColor: #555;
@@ -102,57 +110,16 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
                     line-height: $xAxisTickHeight;
                 }
 
-                .StackCell {
-                    margin-top: $horizontalGutterWidth;
-                    margin-bottom: $horizontalGutterWidth;
-                    margin-right: $verticalGutterWidth / 2;
-                    margin-left: $verticalGutterWidth / 2;
-                    background-color: $enabledCellBackgroundColor;
-                    outline-color: $enabledCellOutlineColor;                    
-                    outline-style: solid;
-                    outline-width: $cellOutlineWidth;
-                    border-radius: $cellBorderRadius;
-                    cursor: context-menu;
-
-                    &:hover {
-                        // TODO: bold text in a way that doesn't change bounding box dimensions
-                        filter: drop-shadow(1px 1px 1px #ddd);
-                        outline-color: darken($enabledCellOutlineColor, 25%);
-                    }
-
-                    &.null {
-                        outline-style: dotted;
-                        input {
-                            background-color: #fff;
-                            font-style: italic;
-                            text-transform: uppercase;
-                        }
-
-                    }
-
-                    .screen {
-                        pointer-events: none;
-                    }
-                }
-
-                input, label {
-                    color: $enabledCellColor;                
-                    font-weight: $enabledCellFontWeight;
-                }
                 input {
-                    padding: $cellPadding;        
-                    field-sizing: content;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    width: 100%;
-                    min-width: 25px;
-                    text-align: center;
-                    text-overflow: ellipsis;
+                    pointer-events: none;
                 }
 
                 &:focus-within {
                     max-width: unset;
                     text-overflow: unset;
+                    input {
+                        pointer-events: all;
+                    }
                 }
     
                 &.unhovered {

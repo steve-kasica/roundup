@@ -9,9 +9,10 @@ import { swapColumnPositions } from "../../data/schemaSlice";
 import { isTable } from "../../lib/types/Table";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
-import StackCell from "./StackCell";
+import ColumnView from "../ColumnView";
 import { COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
-import { setFocusedColumnIndex } from "../../data/uiSlice";
+import { setFocusedColumn} from "../../data/uiSlice";
+import { COLUMN_LAYOUT_CELL } from "../ColumnView";
 
 const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";
@@ -20,7 +21,7 @@ const cellSize = 50;  // in height and width of cells (in pixels)
 export default function StackDetail() {
     const dispatch = useDispatch();
 
-    const {tables, focusedColumnIndex} = useSelector(({tableTree, ui}) => ({
+    const {tables, focusedColumn} = useSelector(({tableTree, ui}) => ({
         tables: tableTree.tree
             .filter(node => (
                 isTable(node) && 
@@ -30,7 +31,7 @@ export default function StackDetail() {
                 ...table,
                 columns: table.columns.filter(({status}) => status !== COLUMN_STATUS_REMOVED)
             })),
-        focusedColumnIndex: ui.focusedColumnIndex
+        focusedColumn: ui.focusedColumn
     }));
 
     const maxColumnCount = Math.max(...tables.map(table => table.columns.length));
@@ -44,6 +45,7 @@ export default function StackDetail() {
     return (
         (tables.length > 0) ? (
             <div>
+                <p>Stack operation detail view</p>
             <div className="StackDetail">
                 <div className="left-panel">
                     <div className="label">
@@ -68,9 +70,10 @@ export default function StackDetail() {
                         {xScale.domain().map(j => (
                             <form 
                                 key={j}
-                                className={`${(focusedColumnIndex !== null && focusedColumnIndex !== j) ? "unhovered" : ""}`}
-                                onMouseEnter={() => dispatch(setFocusedColumnIndex(j))}
-                                onMouseLeave={() => dispatch(setFocusedColumnIndex(null))}
+                                className={`${(focusedColumn !== null && focusedColumn.index !== j) ? "unhovered" : ""}`}
+                                // TODO: address
+                                // onMouseEnter={() => dispatch(setFocusedColumnIndex(j))}
+                                // onMouseLeave={() => dispatch(setFocusedColumnIndex(null))}
                             >
                                 <label className="index-label">
                                     {j + 1}
@@ -78,9 +81,10 @@ export default function StackDetail() {
                                 {tables.map(table => (
                                     j < table.columns.length
                                         ? (
-                                            <StackCell 
+                                            <ColumnView
                                                 key={`${table.id}-${j}`}
                                                 column={table.columns.at(j)}
+                                                layout={COLUMN_LAYOUT_CELL}
                                             />
                                         )
                                         : null
