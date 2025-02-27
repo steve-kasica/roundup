@@ -9,44 +9,42 @@
 
 
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusedColumn } from "../../data/uiSlice";
+import { setHoverColumn } from "../../data/uiSlice";
 import { setColumnProperty } from "../../data/tableTreeSlice";
 import { COLUMN_LAYOUT_TICK, COLUMN_LAYOUT_CELL } from ".";
 import {TickLayout, CellLayout} from "./Layouts";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import "./ColumnView.scss"
 
-export default function ColumnView({column, layout, style}) {
-    const {index, name, id, status} = column;
-
+export default function ColumnView({column, layout}) {
+    const {name, status, index} = column;
     const dispatch = useDispatch();
-    const {focusedColumn} = useSelector(({ui}) => ui);
+    const {hoverColumn} = useSelector(({ui}) => ui);
 
-    let state;
+    let state = [];
     if (status === COLUMN_STATUS_NULLED) {
-        state = "null";
-    } else if (focusedColumn === null) {
-        state = "enabled";
-    } else if (focusedColumn.index === index) {
-        state = "hovered";
+        state.push("null");
+    }
+    if (hoverColumn === null) {
+        state.push("enabled");
+    } else if (hoverColumn.index === index) {
+        state.push("hover");
     } else {
-        state = "unhovered";
+        state.push("unhover")
     }
 
     return (
         <div
-            className={`ColumnView ${layout} ${state}`}
-            onMouseEnter={focusColumn}
-            onMouseLeave={unfocusColumn}
+            className={`ColumnView ${layout} ${state.join(" ")}`}
+            onMouseEnter={() => dispatch(setHoverColumn(column))}
+            onMouseLeave={() => dispatch(setHoverColumn(null))}
         >
         {(layout === COLUMN_LAYOUT_TICK) ? (
-            <TickLayout 
-                style={style}
-            />
+            <TickLayout />
         ) : (layout === COLUMN_LAYOUT_CELL) ? (
             <CellLayout 
                 className={`ColumnView cell ${state}`}
-                initialValue={state === COLUMN_STATUS_NULLED ? "null" : name}
+                initialValue={name}
                 removeColumn={removeColumn}
                 nullColumn={nullColumn}
                 renameColumn={renameColumn}
@@ -54,14 +52,6 @@ export default function ColumnView({column, layout, style}) {
         ) : null}
         </div>
     );
-
-    function focusColumn() {
-        dispatch(setFocusedColumn(column));
-    }
-
-    function unfocusColumn() {
-        dispatch(setFocusedColumn(null));        
-    }
 
     function removeColumn() {
         dispatch(setColumnProperty({
@@ -85,8 +75,5 @@ export default function ColumnView({column, layout, style}) {
             value
         }))
 
-    }
-    function handlePopoverOnClose() {
-        setAnchorEl(null);  // closes popover
     }
 }

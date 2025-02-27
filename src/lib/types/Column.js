@@ -16,17 +16,18 @@ export default function Column(
     values,
     endpoint,
     tableId,
+    status=COLUMN_STATUS_VISABLE
 ) {
     return {
         id: `c-${++id}`,
-        original: {name},
-        tableId,
-        endpoint,
         name,
         index,
         columnType,
         values,
-        status: COLUMN_STATUS_VISABLE
+        endpoint,
+        tableId,
+        status,
+        original: {name},
     }
 }
 

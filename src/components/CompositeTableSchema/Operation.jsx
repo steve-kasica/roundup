@@ -11,15 +11,22 @@
 import { Fragment } from "react";
 import Table from "./Table";
 import { isOperation } from "../../lib/types/Operation";
+import { useSelector } from "react-redux";
 
 export default function Operation({node, colorScale}) {
     const {data, children} = node;
+    const {focusOperation} = useSelector(({ui}) => ui);
+    const isFocus = (focusOperation && focusOperation.id === data.id);
+    const backgroundColor = "green";
     return (
         <div 
-            data-id={data.id} 
+            data-id={data.id}
             data-type={data.type}
-            className={`block operation ${data.type}`}
-            style={{ backgroundColor: colorScale(node.height + 1) }}
+            className={`block operation ${data.type} ${isFocus ? "focus" : ""}`}
+            style={{ 
+                backgroundColor, 
+                borderColor: backgroundColor
+            }}
         >
             {children.map(childNode => (
                 <Fragment key={childNode.data.id}>

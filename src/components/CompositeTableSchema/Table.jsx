@@ -7,10 +7,10 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusedNode, setFocusedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
+import { setFocusedNode, setFocusOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
 import ColumnView, {COLUMN_LAYOUT_TICK} from "../ColumnView";
 import { isTable } from "../../lib/types/Table";
-import { COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
+import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 
 export default function Table({node, colorScale}) {
     const [contextMenu, setContextMenu] = useState(null);
@@ -25,9 +25,17 @@ export default function Table({node, colorScale}) {
                 acc, 
                 d.columns.filter(c => c.status !== COLUMN_STATUS_REMOVED).length
             ), 0);
+    const validColumns = table.columns
+        .filter(column => column.status !== COLUMN_STATUS_REMOVED);
+    const columns = Array.from(
+        {length: maxColumns}, 
+        (_,i) => (i < validColumns.length)
+            ? validColumns.at(i)
+            : new Column("null", i, undefined, useDispatch, useDispatch, table.id, COLUMN_STATUS_NULLED)
+    );
 
-    const {focusedOperation, stage} = useSelector(({ui}) => ui);
-    const isUnfocused = (focusedOperation !== null && focusedOperation.id !== operation.id);
+    const {hoverOperation, stage} = useSelector(({ui}) => ui);
+    const isUnfocused = (hoverOperation !== null && hoverOperation.id !== operation.id);
 
     const menuItems = [
         {
@@ -41,7 +49,7 @@ export default function Table({node, colorScale}) {
             onClick: () => dispatch(setInsertionMode(ADD_TO_GROUP))
         },{
             label: "Select operation",
-            onClick: () => dispatch(setFocusedOperation(operation))
+            onClick: () => dispatch(setFocusOperation(operation))
         }
     ];
     
@@ -51,29 +59,19 @@ export default function Table({node, colorScale}) {
                 data-id={table.id} 
                 className={`block table ${isUnfocused ? "unfocused" : ""}`}
                 onContextMenu={handleContextMenu}
-                style={{ backgroundColor: colorScale(node.height + 1) }}
+                // style={{ backgroundColor: colorScale(node.height + 1) }}
             >
                 <div className="label">{table.name} ({table.columns.length})</div>
-                <div className="columns">
                 {
-                    (stage === STAGE_REFINE_OPS) ? (
-                        table.columns
-                            .filter(column => column.status !== COLUMN_STATUS_REMOVED)
-                            .map(column => (
-                                <ColumnView 
-                                    key={column.id}
-                                    column={column}     
-                                    layout={COLUMN_LAYOUT_TICK}                               
-                                    colorScale={colorScale}
-                                    height={node.height}
-                                    style={{
-                                        width: `${(1 / maxColumns) * 100}%`,
-                                    }}
-                                />
-                        ))
-                    ) : null
+                    (stage === STAGE_REFINE_OPS) 
+                        ? columns.map((column) => (
+                            <ColumnView 
+                                key={column.id}
+                                column={column}     
+                                layout={COLUMN_LAYOUT_TICK}
+                            />))
+                        : null
                 }
-                </div>
             </div>
             <Menu
                 open={contextMenu !== null}

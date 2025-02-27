@@ -10,19 +10,24 @@
  */
 
  .ColumnView.tick {
+    display: table-cell;
     user-select: none;
-    display: block;
-    float: left;
-    min-width: 1px;
+    padding: 1px;
+    // padding-top: 15px;
 
     > div {
-        border-style: solid;
-        border-width: 1px;
-        border-top: none;
-        border-bottom: none;
+        background-color: aquamarine;
+        // border-style: solid;
+        // border-width: 1px;
+        // border-top: none;
+        // border-bottom: none;
     }
 
-    &.unhover {
+    &.hovered, :hover {
+        opacity: 1;
+    }
+
+    &.unhovered {
         opacity: 0.25;
     }
  }

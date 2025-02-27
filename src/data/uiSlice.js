@@ -36,8 +36,9 @@ export const initialState = {
     stage: STAGE_CONFIG_SOURCES,
     searchString: "",
     firstPaneWidth: 20,
-    focusedOperation: null,
-    focusedColumn: null,
+    hoverOperation: null,
+    focusOperation: null,
+    hoverColumn: null,
 };
 
 export const uiSlice = createSlice({
@@ -66,11 +67,14 @@ export const uiSlice = createSlice({
         setFirstPaneWidth: (state, action) => {
             state.firstPaneWidth = action.payload;
         },
-        setFocusedOperation: (state, action) => {
-            state.focusedOperation = action.payload;
+        setHoverOperation: (state, action) => {
+            state.hoverOperation = action.payload;
         },
-        setFocusedColumn: (state, action) => {
-            state.focusedColumn = action.payload;
+        setFocusOperation: (state, action) => {
+            state.focusOperation = action.payload;
+        },
+        setHoverColumn: (state, action) => {
+            state.hoverColumn = action.payload;
         },
     }
 });
@@ -90,8 +94,9 @@ export const {
     setStage,
     setSearchString,
     setFirstPaneWidth,
-    setFocusedOperation,
-    setFocusedColumn,
+    setHoverOperation,
+    setFocusOperation,
+    setHoverColumn,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

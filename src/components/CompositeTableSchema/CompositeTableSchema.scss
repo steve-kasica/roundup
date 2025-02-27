@@ -2,10 +2,19 @@
  * CompositeTableSchema.scss
  * 
  * Styles for the Composite Table Schema.
+ *
+ * Notes:
+ *  - The `border-color` attribute of `div.ColumnView` is defined inline. 
+ *    It is dynamically set based on the data.
  */
 
-.CompositeTableSchema {
+$tableHeight: 15px;
+$gutterWidth: 2px;
+$tableColor: #888;
+$nullColumnBackgroundColor: lighten($tableColor, 25%);
+$cellGutterColor: lighten($tableColor, 10%);
 
+.CompositeTableSchema {
     font-family: sans-serif;
     font-size: 10px;
     text-align: left;
@@ -21,36 +30,138 @@
     
     .block {
         width: 100%;
-        border: 1px solid #ddd;
     
         &.operation {
-            // Operation block state is enabled
-            display: flex;
-            padding: 5px;
+            display: table;
+            // background-color: (dynamically set inline)
+            // border-color: (dynamically set inline)
     
             &.stack {
-                background-color: aquamarine;
-                flex-direction: column-reverse;
+                .table {
+                    display: table-row;
+                    height: $tableHeight;
+                    border-color: inherit;
+
+                    &:first-child {
+                        border-top-color: inherit;
+                        .ColumnView > div {
+                            margin-top: $gutterWidth;
+                        }
+                    }
+
+                    &:last-child {
+                        border-bottom-color: inherit;
+                        .ColumnView > div {
+                            margin-bottom: $gutterWidth;
+                        }
+                    }
+        
+                    .label {
+                        position: absolute;
+                        line-height: $tableHeight + $gutterWidth;
+                        margin-left: $gutterWidth + 2px;
+                        pointer-events: none;
+                    }
+    
+                    .ColumnView {
+                        display: table-cell;
+                        line-height: $tableHeight;
+                        user-select: none;
+                        border-color: inherit;
+
+                        > div {
+                            margin-top: $gutterWidth / 2;
+                            margin-bottom: $gutterWidth / 2;
+                            background-color: $tableColor;
+                        }
+
+                        // Note: `div.label` is the first child
+                        &:nth-child(2) > div {
+                            border-left-width: 2px;
+                            border-left-style: solid;
+                            border-left-color: inherit;
+                        }
+                        &:last-child > div {
+                            border-right-width: 2px;
+                            border-right-style: solid;
+                            border-right-color: inherit;
+                        }
+
+                        &.null > div {
+                            background-color: $nullColumnBackgroundColor;
+                        }
+                    }
+                }
+
+                // When hovering over a `div.operation.stack`
+                &:hover, &.hover {
+                    .table { 
+                        .label {
+                            opacity: 0.5;
+                        }
+                        .ColumnView > div { 
+                            pointer-events: none;
+                            border-left-width: $gutterWidth / 2;
+                            border-left-style: solid;
+                            border-left-color: $cellGutterColor;
+                            border-right-width: $gutterWidth / 2;
+                            border-right-style: solid;
+                            border-right-color: $cellGutterColor;
+                        }
+
+                        // Note: `div.label` is the first child
+                        .ColumnView:nth-child(2) > div {
+                            border-left-color: inherit;
+                            border-left-width: $gutterWidth;
+                        }
+
+                        .ColumnView:last-child > div {
+                            border-right-color: inherit;
+                            border-right-width: $gutterWidth;
+                        }
+                    }
+                }
+
+                // When "focused" on `div.operation.stack`
+                &.focus {
+                    // outline: 2px solid pink;
+                    .table {
+                        .label {
+                            opacity: 0.5;
+                        }
+
+                        .ColumnView {
+                            pointer-events: all;
+                            > div { 
+                                border-left-width: $gutterWidth / 2;
+                                border-left-style: solid;
+                                border-left-color: $cellGutterColor;
+                                border-right-width: $gutterWidth / 2;
+                                border-right-style: solid;
+                                border-right-color: $cellGutterColor;
+                            }
+
+                            // Note: `div.label` is the first child
+                            &:nth-child(2) > div {
+                                border-left-color: inherit;
+                                border-left-width: $gutterWidth;
+                            }
+                            &:last-child > div {
+                                border-right-color: inherit;
+                                border-right-width: $gutterWidth;
+                            }
+
+                            &:hover > div, &.hover > div {
+                                background-color: pink;
+                            }
+                        }
+                    }
+                }
             }
         
             &.pack {
                 background-color: beige;
                 flex-direction: row-reverse;
-            }
-
-            .table {
-                background-color: #aaa;
-                padding: 5px;
-                padding-top: 0px;
-    
-                .label {
-                    padding: 1px;
-                }
-    
-                .columns {
-                    height: 20px;
-                    line-height: 20px;
-                }
             }
         }
     }
