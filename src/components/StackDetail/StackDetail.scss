@@ -100,7 +100,7 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
 
             form {
                 max-width: 100px;
-                text-overflow: ellipse;
+                text-overflow: ellipsis;
                 // TODO add animated transition on width changes
                 width: fit-content;
                 font-family: sans-serif;
@@ -110,26 +110,70 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
                     line-height: $xAxisTickHeight;
                 }
 
-                input {
-                    pointer-events: none;
+                input, label {
+                    color: $enabledCellColor;                
+                    font-weight: $enabledCellFontWeight;
                 }
+
+                .ColumnView.cell {
+
+                    .screen {
+                        margin-top: $horizontalGutterWidth;
+                        margin-bottom: $horizontalGutterWidth;
+                        margin-right: $verticalGutterWidth / 2;
+                        margin-left: $verticalGutterWidth / 2;
+                        background-color: $enabledCellBackgroundColor;
+                        outline-color: $enabledCellOutlineColor;                    
+                        outline-style: solid;
+                        outline-width: $cellOutlineWidth;
+                        border-radius: $cellBorderRadius;
+                        cursor: context-menu;
+                    }
+
+                    input {
+                        padding: $cellPadding;        
+                        border: none;
+                        field-sizing: content;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        width: calc(100% - $verticalGutterWidth);
+                        text-align: center;
+                        text-overflow: ellipsis;
+                        pointer-events: none;
+
+                    }
+                
+                    &.null {
+                        .screen {
+                            outline-style: dotted;
+                        }
+
+                        input {
+                            background-color: #fff;
+                            font-style: italic;
+                            text-transform: uppercase;
+                        }
+                    }
+
+                }  // end .ColumnView.cell
 
                 &:focus-within {
                     max-width: unset;
                     text-overflow: unset;
-                    input {
+                    .ColumnView.cell input {
                         pointer-events: all;
                     }
+
                 }
     
                 &.unhovered {
                     input,label {
                         color: lighten($enabledCellColor, $unhoverLightenFactor);
                     }
-                    .StackCell {
-                        outline-color: lighten($enabledCellOutlineColor, $unhoverLightenFactor);
-                        background-color: lighten($enabledCellBackgroundColor, $unhoverLightenFactor);
-                    }
+                    // .StackCell {
+                    //     outline-color: lighten($enabledCellOutlineColor, $unhoverLightenFactor);
+                    //     background-color: lighten($enabledCellBackgroundColor, $unhoverLightenFactor);
+                    // }
                 }
             }
         }

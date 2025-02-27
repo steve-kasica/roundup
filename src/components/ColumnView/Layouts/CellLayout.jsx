@@ -10,17 +10,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
 
-function debounce(func, delay) {
-    let timeoutId;
-    return function(...args) {
-        clearTimeout(timeoutId);
-        console.log(args);
-        timeoutId = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
-    }
-}
-
 const DEBOUNCE_DELAY = 500;
 
 export default function CellLayout({ 

@@ -4,14 +4,13 @@
  * 
  */
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { swapColumnPositions } from "../../data/schemaSlice";
 import { isTable } from "../../lib/types/Table";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
 import ColumnView from "../ColumnView";
-import { COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
-import { setFocusedColumn} from "../../data/uiSlice";
+import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import { COLUMN_LAYOUT_CELL } from "../ColumnView";
 
 const X_AXIS_LABEL = "column index"
@@ -19,19 +18,17 @@ const Y_AXIS_LABEL = "table name";
 const cellSize = 50;  // in height and width of cells (in pixels)
 
 export default function StackDetail() {
-    const dispatch = useDispatch();
-
-    const {tables, focusedColumn} = useSelector(({tableTree, ui}) => ({
+    const {tables, hoverColumn} = useSelector(({tableTree, ui}) => ({
         tables: tableTree.tree
             .filter(node => (
                 isTable(node) && 
-                ui.focusedOperation && 
-                node.operation_group === ui.focusedOperation.id))
+                ui.focusOperation && 
+                node.operation_group === ui.focusOperation.id))
             .map(table => ({
                 ...table,
                 columns: table.columns.filter(({status}) => status !== COLUMN_STATUS_REMOVED)
             })),
-        focusedColumn: ui.focusedColumn
+        hoverColumn: ui.hoverColumn
     }));
 
     const maxColumnCount = Math.max(...tables.map(table => table.columns.length));
@@ -70,25 +67,23 @@ export default function StackDetail() {
                         {xScale.domain().map(j => (
                             <form 
                                 key={j}
-                                className={`${(focusedColumn !== null && focusedColumn.index !== j) ? "unhovered" : ""}`}
+                                className={`${(hoverColumn !== null && hoverColumn.index !== j) ? "unhovered" : ""}`}
                                 // TODO: address
-                                // onMouseEnter={() => dispatch(setFocusedColumnIndex(j))}
-                                // onMouseLeave={() => dispatch(setFocusedColumnIndex(null))}
+                                // onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
+                                // onMouseLeave={() => dispatch(setHoverColumnIndex(null))}
                             >
                                 <label className="index-label">
                                     {j + 1}
                                 </label>
                                 {tables.map(table => (
-                                    j < table.columns.length
-                                        ? (
-                                            <ColumnView
-                                                key={`${table.id}-${j}`}
-                                                column={table.columns.at(j)}
-                                                layout={COLUMN_LAYOUT_CELL}
-                                            />
-                                        )
-                                        : null
-
+                                    <ColumnView 
+                                        key={`${table.id}-${j}`}
+                                        column={j < table.columns.length 
+                                            ? table.columns.at(j) 
+                                            : new Column("null", j, "", {}, "", table.id, COLUMN_STATUS_NULLED)
+                                        }
+                                        layout={COLUMN_LAYOUT_CELL}
+                                    />
                                 ))}
                             </form>
                         ))}
