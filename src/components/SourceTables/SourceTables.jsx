@@ -11,8 +11,8 @@ import { useDispatch } from "react-redux";
 import { isTable } from "../../lib/types/Table";
 import { ADD_TO_GROUP, setSearchString, SYSTEM_DECIDES } from "../../data/uiSlice";
 import { STACK } from "../../lib/types/Operation";
-import "./style.css"
 import SearchBar from "./SearchBar";
+import "./SourceTables.scss"
 
 import {useGetWorkflowSchemasQuery} from "../../services/workflows";
 
@@ -35,7 +35,7 @@ export default function SourceTables() {
     const { data: sourceTables, error, isLoading } = useGetWorkflowSchemasQuery(ui.workflow.value);
 
     return (
-        <>
+        <div className="SourceTables">
             <h3>Source tables</h3>
             <SearchBar
                 placeholder="Search tables"
@@ -52,14 +52,13 @@ export default function SourceTables() {
                 />
             ) : (sourceTables && layout === TABLE_LAYOUT) ? (
                 <TableLayout 
-                    searchString={ui.searchString} 
                     handleTablePrimaryClick={handleTablePrimaryClick}
                     handleSelectAllClick={handleSelectAllClick}
                     sourceTables={sourceTables}
                     selectedTables={selectedTables}
                 />
             ) : null}        
-        </>
+        </div>
     );
 
     function handleTablePrimaryClick(table, isSelected) {

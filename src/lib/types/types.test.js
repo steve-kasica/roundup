@@ -33,7 +33,7 @@ describe("Table", () => {
 
     describe("factory function", (context) => {
         checkPropertiesExists(
-            ["endpoint", "name", "id", "row_count", "column_count", "operation_group"],
+            ["endpoint", "name", "id", "rowCount", "columnCount", "operation_group"],
             table
         );
     });

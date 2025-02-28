@@ -11,18 +11,20 @@ import { Panel, PanelGroup } from "react-resizable-panels";
 import {name as APP_NAME} from "../../package.json"
 import { Paper } from "@mui/material";
 import PanelResizeHandle from "./PanelResizeHandle";
+import { useDispatch } from "react-redux";
+import { setFirstPaneWidth } from "../data/uiSlice";
 
 const PRIMARY_PANEL_MIN = 20;
 const PRIMARY_PANEL_DEFAULT = 30;
 const PRIMARY_PANEL_MAX = 50;
 
 const LAYOUT_ID = "roundup-suppoting-pane-layout";
-
 export default function SuppotingPane({
     navigation,
     primaryContent,
     secondaryContent
 }) {
+    const dispatch = useDispatch();
     return (
         <Grid container spacing={1}>
             <Grid size={12} sx={{borderBottom: "1px solid #ddd"}}>
@@ -45,6 +47,7 @@ export default function SuppotingPane({
                         maxSize={PRIMARY_PANEL_MAX}
                         order={1}
                         style={{height: "100vh"}}
+                        onResize={(size) => dispatch(setFirstPaneWidth(size))}
                     >
                         <Paper sx={{
                             borderRadius: "5px",

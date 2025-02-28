@@ -8,7 +8,7 @@ import { Add as PlusIcon } from "@mui/icons-material"
 
 import { isOperation, PACK, STACK } from "../../lib/types/Operation"
 import Operation from "./Operation"
-import Table from "./Table"
+import Table from "../TableView/layouts/BlockLayout"
 import TableDropTarget from "./TableDropTarget"
 import { useSelector } from "react-redux"
 import { STAGE_ARRANGE_TABLES } from "../../data/uiSlice"

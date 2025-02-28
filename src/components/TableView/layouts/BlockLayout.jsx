@@ -7,31 +7,47 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusedNode, setFocusOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
-import ColumnView, {COLUMN_LAYOUT_TICK} from "../ColumnView";
-import { isTable } from "../../lib/types/Table";
-import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
+import { setFocusedNode, setFocusOperation, STAGE_REFINE_OPS } from "../../../data/uiSlice";
+import ColumnView, {COLUMN_LAYOUT_TICK} from "../../ColumnView";
+import { isTable } from "../../../lib/types/Table";
+import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
 
-export default function Table({node, colorScale}) {
+export default function BlockLayout({
+    name,
+    columns,
+    id,
+    operation_group,
+    style
+}) {
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
+
+    const maxColumns = useSelector(({tableTree}) => Math.max(
+        ...tableTree.tree
+            .filter(node => isTable(node) && node.operation_group === operation_group)
+            .map(table => table.columns
+                .filter(column => column.status !== COLUMN_STATUS_REMOVED)
+                .length
+            )
+    ));
     
-    const { data:table } = node;
-    const operation = node.parent.data;
-    const maxColumns = node.parent.children
-            .map(n => n.data)
-            .filter(d =>  isTable(d))
-            .reduce((acc, d) => Math.max(
-                acc, 
-                d.columns.filter(c => c.status !== COLUMN_STATUS_REMOVED).length
-            ), 0);
-    const validColumns = table.columns
+    // const { data:table } = node;
+    // const operation = node.parent.data;
+    // const maxColumns = node.parent.children
+    //         .map(n => n.data)
+    //         .filter(d =>  isTable(d))
+    //         .reduce((acc, d) => Math.max(
+    //             acc, 
+    //             d.columns.filter(c => c.status !== COLUMN_STATUS_REMOVED).length
+    //         ), 0);
+    const validColumns = columns
         .filter(column => column.status !== COLUMN_STATUS_REMOVED);
-    const columns = Array.from(
+
+    const visableColumns = Array.from(
         {length: maxColumns}, 
         (_,i) => (i < validColumns.length)
             ? validColumns.at(i)
-            : new Column("null", i, undefined, useDispatch, useDispatch, table.id, COLUMN_STATUS_NULLED)
+            : new Column("null", i, undefined, useDispatch, useDispatch, id, COLUMN_STATUS_NULLED)
     );
 
     const {hoverOperation, stage} = useSelector(({ui}) => ui);
@@ -56,21 +72,20 @@ export default function Table({node, colorScale}) {
     return (
         <>
             <div 
-                data-id={table.id} 
+                data-id={id}
                 className={`block table ${isUnfocused ? "unfocused" : ""}`}
                 onContextMenu={handleContextMenu}
-                // style={{ backgroundColor: colorScale(node.height + 1) }}
+                style={style}
             >
-                <div className="label">{table.name} ({table.columns.length})</div>
+                <div className="label">{name} ({columns.length})</div>
                 {
-                    (stage === STAGE_REFINE_OPS) 
-                        ? columns.map((column) => (
-                            <ColumnView 
-                                key={column.id}
-                                column={column}     
-                                layout={COLUMN_LAYOUT_TICK}
-                            />))
-                        : null
+                visableColumns.map((column) => (
+                    <ColumnView 
+                        key={column.id}
+                        column={column}     
+                        layout={COLUMN_LAYOUT_TICK}
+                    />
+                ))
                 }
             </div>
             <Menu
@@ -104,7 +119,7 @@ export default function Table({node, colorScale}) {
 
     function handleContextMenu(event) {
         event.preventDefault();
-        dispatch(setFocusedNode(node.parent.data));
+        // dispatch(setFocusedNode(node.parent.data));
         setContextMenu(
             (contextMenu === null)
             ? {

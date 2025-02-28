@@ -23,17 +23,17 @@ export const type = "table";
  * @param {string} endpoint 
  * @param {string} name 
  * @param {number} id 
- * @param {number} row_count 
+ * @param {number} rowCount 
  * @param {Array} columns 
  * @returns {Object}: 
  *  - operationGroup {}: An operation id
- *  - column_count
+ *  - columnCount
  */
 export default function Table(
     endpoint,
     name,
     id,
-    row_count,
+    rowCount,
     columns,
     type=undefined,
     date_created=new Date(),
@@ -44,10 +44,10 @@ export default function Table(
         name: removeFileExtension(name),
         id: (id === null) ? `t-${++id}` : String(id),
         type: (type === undefined) ? getFileExtension(name) : type,
-        row_count,
+        rowCount,
+        columnCount: columns.length,
         date_created: date_created.toDateString(),
         last_modified: last_modified.toDateString(),
-        column_count: columns.length,
         columns: columns.map(columnData => new Column(...Object.values({
             ...columnData, 
             endpoint, 
@@ -70,16 +70,16 @@ function removeFileExtension(filename) {
 export const properties = [
     "name",
     "type",
-    "column_count",
-    "row_count",
+    "columnCount",
+    "rowCount",
     "date_created",
     "last_modified"
 ]
 
 export function isTable(obj) {
     return (
-        Object.hasOwn(obj, "row_count") &&
-        Object.hasOwn(obj, "column_count") &&
+        Object.hasOwn(obj, "rowCount") &&
+        Object.hasOwn(obj, "columnCount") &&
         Object.hasOwn(obj, "columns") &&
         Object.hasOwn(obj, "operation_group")
     );

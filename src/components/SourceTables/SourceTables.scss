@@ -1,0 +1,46 @@
+
+.SourceTables {
+
+    .TableView {
+        cursor: grab;
+        user-select: none;
+
+        &.dragging, &.pressed {
+            cursor: grabbing;
+        }
+
+        &:hover, &.hover {
+            background-color: pink;
+        }
+
+        &.selected {
+            background-color: #ddd;
+        }
+    }
+
+    .table-layout {
+        overflow: auto;
+        max-height: 100vh;
+        background-color: whitesmoke;
+
+        table {
+            background: inherit;
+
+            thead {
+                background: inherit;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            td {
+                padding: 0 10px;
+            }
+
+            tbody > tr.TableView {
+                border-bottom: 1px solid #d0d0d0;
+                border-top: 1px solid #d0d0d0;
+            }
+        }
+    }
+}

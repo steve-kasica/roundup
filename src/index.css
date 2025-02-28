@@ -1,7 +1,7 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
-@layer base {
+@tailwind utilities; */
+/* @layer base {
   :root {
     --radius: 0.5rem;
     --sidebar-background: 0 0% 98%;
@@ -24,7 +24,7 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%
   }
-}
+} */
 
 body {
   background-color: whitesmoke;
@@ -32,8 +32,4 @@ body {
 
 .panel-resize-handle {
   width: 10px;
-}
-
-.table-row-item:hover {
-  background-color: aquamarine;
 }

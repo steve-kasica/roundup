@@ -9,7 +9,7 @@
  */
 
 import { Fragment } from "react";
-import Table from "./Table";
+import TableView, { TABLE_LAYOUT_BLOCK } from "../TableView";
 import { isOperation } from "../../lib/types/Operation";
 import { useSelector } from "react-redux";
 
@@ -33,7 +33,12 @@ export default function Operation({node, colorScale}) {
                     {
                         (isOperation(childNode.data))
                         ? (<Operation node={childNode} colorScale={colorScale} />)
-                        : (<Table node={childNode} colorScale={colorScale} />)
+                        : (<TableView 
+                                table={childNode.data}
+                                layout={TABLE_LAYOUT_BLOCK}
+                                // node={childNode} 
+                                colorScale={colorScale} 
+                            />)
                     }
                 </Fragment>
             ))}  

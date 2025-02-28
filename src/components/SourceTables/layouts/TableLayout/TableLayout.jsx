@@ -7,10 +7,7 @@ import { Button, Checkbox, Typography } from "@mui/material";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
-import "./style.css"
-import HighlightText from "../../../ui/HighlightText";
-import SourceTableItem from "../../SourceTableItem";
-import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
+import TableView, { TABLE_LAYOUT_ROW } from "../../../TableView";
 
 const columns = tableProperties
   .map((prop) => ({
@@ -19,7 +16,6 @@ const columns = tableProperties
   }));
 
 export default function TableLayout({ 
-  searchString, 
   handleSelectAllClick,
   sourceTables,
   selectedTables,
@@ -40,9 +36,9 @@ export default function TableLayout({
   const areSomeTablesChecked = selectedTables.size > 0;
 
   return (
-    <div className="table-container">
-      <table className="table">
-        <thead className="table-header">
+    <div className="table-layout">
+      <table>
+        <thead>
           <tr>
             <th>
               <Checkbox 
@@ -80,59 +76,20 @@ export default function TableLayout({
             ))}
           </tr>
         </thead>
-        <tbody className="table-body">
+        <tbody>
           {
             rows.map(table => (
-              <SourceTableItem 
-                key={table.id} 
+              <TableView 
+                key={table.id}
                 table={table}
-                ContainerElement="tr"
-              >
-                <TableDetail 
-                  {...table} 
-                  isSelected={selectedTables.has(table.id)}
-                />
-              </SourceTableItem>
+                layout={TABLE_LAYOUT_ROW}
+              />
             ))
           }
         </tbody>
       </table>
     </div>
   ); // end return statement
-
-  function TableDetail({
-    id, 
-    name, 
-    type, 
-    row_count, 
-    column_count, 
-    date_created, 
-    last_modified,
-    isSelected
-  }) {
-
-    const items = [name, type, column_count,  row_count, date_created, last_modified ];
-    const isDisabled = items.join("^").indexOf(searchString) < 0;
-
-    return (
-      <>
-            <td className="table-data">
-                {(isSelected) ? (
-                    <CheckBox />
-                ) : (
-                    <CheckBoxOutlineBlank />
-                )}
-            </td>
-            {items.map((text, i) => (
-                <td key={i} className="table-data">
-                    <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                        <HighlightText pattern={searchString} text={String(text)} />
-                    </Typography> 
-                </td>
-            ))}
-          </>
-    )
-} // TableDetail
 
   function SortIcon({column}) {
     if (sortColumn === column.prop) {
