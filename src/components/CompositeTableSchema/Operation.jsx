@@ -13,31 +13,46 @@ import TableView, { TABLE_LAYOUT_BLOCK } from "../TableView";
 import { isOperation } from "../../lib/types/Operation";
 import { useSelector } from "react-redux";
 
-export default function Operation({node, colorScale}) {
+const STACK_OPERATION = "stack";
+const PACK_OPERATION = "pack";
+
+export default function Operation({node, style, colorScale}) {
     const {data, children} = node;
     const {focusOperation} = useSelector(({ui}) => ui);
     const isFocus = (focusOperation && focusOperation.id === data.id);
-    const backgroundColor = "green";
+    const className=[
+        "operation",
+        data.type,
+        (isFocus) ? "focus" : undefined,
+        `depth-${node.depth}`
+    ].filter(name => name).join(" ");
+    const columnCount = 6;
     return (
         <div 
             data-id={data.id}
             data-type={data.type}
-            className={`block operation ${data.type} ${isFocus ? "focus" : ""}`}
-            style={{ 
-                backgroundColor, 
-                borderColor: backgroundColor
-            }}
+            className={className}
+            style={style}
         >
             {children.map(childNode => (
                 <Fragment key={childNode.data.id}>
                     {
                         (isOperation(childNode.data))
-                        ? (<Operation node={childNode} colorScale={colorScale} />)
+                        ? (<Operation 
+                            node={childNode} 
+                            colorScale={colorScale}
+                            style={{
+                                width: `${(1 / children.length) * 100}%`                                
+                            }}
+                        />)
                         : (<TableView 
                                 table={childNode.data}
                                 layout={TABLE_LAYOUT_BLOCK}
                                 // node={childNode} 
-                                colorScale={colorScale} 
+                                colorScale={colorScale}
+                                style={{
+                                    width: (data.type === STACK_OPERATION) ? "100%" : `${(1 / children.length) * 100}%`
+                                }}
                             />)
                     }
                 </Fragment>

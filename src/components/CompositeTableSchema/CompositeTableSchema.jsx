@@ -18,8 +18,9 @@ export default function CompositeTableSchema() {
         ? stratify(tableTree.tree)
         : null
     );
+    const {stage} = useSelector(({ui}) => ui)
 
-    return (<div className="CompositeTableSchema">
+    return (<div className={`CompositeTableSchema ${stage}`}>
         <h3>Composite Table Schema</h3>
         {
             (root !== null) ? (

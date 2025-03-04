@@ -11,28 +11,28 @@ import { setFocusedNode, setFocusOperation, STAGE_REFINE_OPS } from "../../../da
 import ColumnView, {COLUMN_LAYOUT_TICK} from "../../ColumnView";
 import { isTable } from "../../../lib/types/Table";
 import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
+import { isOperation } from "../../../lib/types/Operation";
 
 export default function BlockLayout({
     name,
     columns,
     id,
     operation_group,
-    style
+    style,
+    removeTableEvent
 }) {
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
 
-    const maxColumns = useSelector(({tableTree}) => Math.max(
-        ...tableTree.tree
+    const {maxColumns, parentOperation} = useSelector(({tableTree}) => ({
+        maxColumns: Math.max(...tableTree.tree
             .filter(node => isTable(node) && node.operation_group === operation_group)
             .map(table => table.columns
                 .filter(column => column.status !== COLUMN_STATUS_REMOVED)
                 .length
-            )
-    ));
-    
-    // const { data:table } = node;
-    // const operation = node.parent.data;
+            )),
+        parentOperation: tableTree.tree.filter(node => isOperation(node) && node.id === operation_group).at(0)
+    }));
     // const maxColumns = node.parent.children
     //         .map(n => n.data)
     //         .filter(d =>  isTable(d))
@@ -56,16 +56,16 @@ export default function BlockLayout({
     const menuItems = [
         {
             label: "Remove table",
-            onClick: () => dispatch(removeTableFromTree(table))
+            onClick: removeTableEvent
         },{
             label: "Remove operation",
-            onClick: () => dispatch(removeOperation(operation))
+            onClick: () => dispatch(removeOperation(parentOperation))
         },{
             label: "Add table",
             onClick: () => dispatch(setInsertionMode(ADD_TO_GROUP))
         },{
             label: "Select operation",
-            onClick: () => dispatch(setFocusOperation(operation))
+            onClick: () => dispatch(setFocusOperation(parentOperation))
         }
     ];
     
@@ -73,11 +73,11 @@ export default function BlockLayout({
         <>
             <div 
                 data-id={id}
-                className={`block table ${isUnfocused ? "unfocused" : ""}`}
+                className={`block table`}
                 onContextMenu={handleContextMenu}
                 style={style}
             >
-                <div className="label">{name} ({columns.length})</div>
+                <div className="label">{name} <span className="column-count">({columns.length})</span></div>
                 {
                 visableColumns.map((column) => (
                     <ColumnView 

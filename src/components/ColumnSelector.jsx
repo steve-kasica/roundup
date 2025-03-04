@@ -138,8 +138,8 @@ export default () => {
     const [searchMenuEl, setSearchMenuEl] = useState(null);
     const [isSearchMenuOpen, setIsSearchMenuOpen] = useState(false);
 
-    const [focusedColumn, setFocusedColumn] = useState({anchorEl: null});
-    const isPopoverOpen = Boolean(focusedColumn.anchorEl);
+    const [hoverColumn, setHoverColumn] = useState({anchorEl: null});
+    const isPopoverOpen = Boolean(hoverColumn.anchorEl);
 
     const [subheaderMenu, setSubheaderMenu] = useState({anchorEl: null, columnInstances: []});
     const isSubheaderMenuOpen = Boolean(subheaderMenu.anchorEl);
@@ -341,7 +341,7 @@ export default () => {
                                 <ListItemButton 
                                     role={undefined} 
                                     onClick={({currentTarget}) => {
-                                        setFocusedColumn({
+                                        setHoverColumn({
                                             ...column,
                                             anchorEl: currentTarget
                                         })
@@ -406,7 +406,7 @@ export default () => {
                     id="column-detail-popover"
                     open={isPopoverOpen}
                     onClose={closePopover}
-                    anchorEl={focusedColumn.anchorEl}
+                    anchorEl={hoverColumn.anchorEl}
                     anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
                     transformOrigin={{ vertical: 'center', horizontal: 'left' }}   
                     sx={{padding: "5px"}}    
@@ -414,13 +414,13 @@ export default () => {
                     {
                     isPopoverOpen ? (<>
                         <ColumnDetail 
-                            {...focusedColumn}
+                            {...hoverColumn}
                             onIconClick={closePopover} 
                         />
                         <Button 
                             variant="contained"
                             onClick={() => { 
-                                dispatch(selectColumn({column: focusedColumn}));
+                                dispatch(selectColumn({column: hoverColumn}));
                                 closePopover();
                             }}
                             sx={{float: "right"}}
@@ -434,6 +434,6 @@ export default () => {
         );
 
     function closePopover() {
-        setFocusedColumn({anchorEl: null});
+        setHoverColumn({anchorEl: null});
     }
 }

@@ -74,14 +74,16 @@ export default function TableView({table, layout, style}) {
     function addTableEvent(operationType) {
         dispatch(addTable({table, operationType}))
     }
+    
+    function removeTableEvent() {
+        dispatch(removeTableFromTree(table));
+    }
+
     function hoverTableEvent() {
         dispatch(setHoverTable(table));
     }
+
     function unhoverTableEvent() {
         dispatch(setHoverTable(null));
-    }
-
-    function removeTableEvent() {
-        return null;
     }
 }

@@ -8,16 +8,57 @@
  *    It is dynamically set based on the data.
  */
 
-$tableHeight: 15px;
-$gutterWidth: 2px;
-$tableColor: #888;
-$nullColumnBackgroundColor: lighten($tableColor, 25%);
-$cellGutterColor: lighten($tableColor, 10%);
+$table-height: 20px;
+$operation-border-radius: 10px;
+$gutter-width: 3px;
+
+// Stack background colors, max depth = 3
+$stack-0-color: #deebf7;
+$stack-1-color: #9ecae1;
+$stack-2-color: #3182bd;
+
+// Pack background color, max depth = 3
+$pack-0-color: #e5f5e0;
+$pack-1-color: #a1d99b;
+$pack-2-color: #31a354;
+
+// Table hover color
+$table-hover-color: goldenrod;
+
+@mixin operation-color($color, $parent-color) {
+    background-color: $color;
+    > .table {
+        border-color: $color;
+        border-top-color: $parent-color;
+    }
+}
 
 .CompositeTableSchema {
     font-family: sans-serif;
     font-size: 10px;
     text-align: left;
+
+    .root {
+        outline: 1px solid #000;
+    }
+
+    &.ro {
+        .operation {
+            &.stack {
+                .table {
+                    .ColumnView {
+                        &.null {
+                            background-color: #ddd;
+                        }
+
+                        &:hover, &.hover {
+                            background-color: $table-hover-color;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     .TableStack-empty {
         display: flex;
@@ -28,141 +69,57 @@ $cellGutterColor: lighten($tableColor, 10%);
         min-height: 500px;
     }
     
-    .block {
+    .operation {
         width: 100%;
+        border-radius: $operation-border-radius;
+        overflow: hidden;
+        display: flex;
+
+        &.stack {
+            flex-direction: column;
+
+            &.depth-0 { @include operation-color($stack-0-color, #fff); }
+            &.depth-1 { @include operation-color($stack-1-color, $pack-0-color); }
+            &.depth-2 { @include operation-color($stack-2-color, $pack-1-color); }
+
+            > .table {
+                display: flex;
+                flex-grow: 1;
+                flex-basis: inherit;
+                height: $table-height;
+                border: none;
+                border-top-style: solid;
+                border-top-width: $gutter-width;
+                // width: (set dynamically inline)
+
+                &:first-child { 
+                    border-top: none; border-bottom: none; 
+                }
     
-        &.operation {
-            display: table;
-            // background-color: (dynamically set inline)
-            // border-color: (dynamically set inline)
-    
-            &.stack {
-                .table {
-                    display: table-row;
-                    height: $tableHeight;
-                    border-color: inherit;
-
-                    &:first-child {
-                        border-top-color: inherit;
-                        .ColumnView > div {
-                            margin-top: $gutterWidth;
-                        }
-                    }
-
-                    &:last-child {
-                        border-bottom-color: inherit;
-                        .ColumnView > div {
-                            margin-bottom: $gutterWidth;
-                        }
-                    }
-        
-                    .label {
-                        position: absolute;
-                        line-height: $tableHeight + $gutterWidth;
-                        margin-left: $gutterWidth + 2px;
-                        pointer-events: none;
-                    }
-    
-                    .ColumnView {
-                        display: table-cell;
-                        line-height: $tableHeight;
-                        user-select: none;
-                        border-color: inherit;
-
-                        > div {
-                            margin-top: $gutterWidth / 2;
-                            margin-bottom: $gutterWidth / 2;
-                            background-color: $tableColor;
-                        }
-
-                        // Note: `div.label` is the first child
-                        &:nth-child(2) > div {
-                            border-left-width: 2px;
-                            border-left-style: solid;
-                            border-left-color: inherit;
-                        }
-                        &:last-child > div {
-                            border-right-width: 2px;
-                            border-right-style: solid;
-                            border-right-color: inherit;
-                        }
-
-                        &.null > div {
-                            background-color: $nullColumnBackgroundColor;
-                        }
-                    }
+                .label {
+                    position: absolute;
+                    line-height: $table-height + $gutter-width;
+                    margin-left: $operation-border-radius;
+                    pointer-events: none;
                 }
 
-                // When hovering over a `div.operation.stack`
-                &:hover, &.hover {
-                    .table { 
-                        .label {
-                            opacity: 0.5;
-                        }
-                        .ColumnView > div { 
-                            pointer-events: none;
-                            border-left-width: $gutterWidth / 2;
-                            border-left-style: solid;
-                            border-left-color: $cellGutterColor;
-                            border-right-width: $gutterWidth / 2;
-                            border-right-style: solid;
-                            border-right-color: $cellGutterColor;
-                        }
-
-                        // Note: `div.label` is the first child
-                        .ColumnView:nth-child(2) > div {
-                            border-left-color: inherit;
-                            border-left-width: $gutterWidth;
-                        }
-
-                        .ColumnView:last-child > div {
-                            border-right-color: inherit;
-                            border-right-width: $gutterWidth;
-                        }
-                    }
-                }
-
-                // When "focused" on `div.operation.stack`
-                &.focus {
-                    // outline: 2px solid pink;
-                    .table {
-                        .label {
-                            opacity: 0.5;
-                        }
-
-                        .ColumnView {
-                            pointer-events: all;
-                            > div { 
-                                border-left-width: $gutterWidth / 2;
-                                border-left-style: solid;
-                                border-left-color: $cellGutterColor;
-                                border-right-width: $gutterWidth / 2;
-                                border-right-style: solid;
-                                border-right-color: $cellGutterColor;
-                            }
-
-                            // Note: `div.label` is the first child
-                            &:nth-child(2) > div {
-                                border-left-color: inherit;
-                                border-left-width: $gutterWidth;
-                            }
-                            &:last-child > div {
-                                border-right-color: inherit;
-                                border-right-width: $gutterWidth;
-                            }
-
-                            &:hover > div, &.hover > div {
-                                background-color: pink;
-                            }
-                        }
-                    }
+                .ColumnView {
+                    flex-grow: 1;  // set individual item width to fill available space
+                    line-height: $table-height;
+                    user-select: none;
+                    background-color: inherit;
                 }
             }
-        
-            &.pack {
-                background-color: beige;
-                flex-direction: row-reverse;
-            }
+        }
+
+        &.pack {
+            display: flex;
+            flex-direction: row-reverse;
+            padding: $gutter-width;
+
+            &.depth-0 { @include operation-color($pack-0-color, #fff); }
+            &.depth-1 { @include operation-color($pack-1-color, $stack-0-color); }
+            &.depth-2 { @include operation-color($pack-2-color, $stack-1-color); }
         }
     }
 }
