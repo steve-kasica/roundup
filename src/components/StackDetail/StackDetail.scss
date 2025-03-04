@@ -34,11 +34,20 @@ $cellMaxWidth: 100px;
 $verticalGutterWidth: 10px;
 $horizontalGutterWidth: 10px;
 $cellPadding: 5px;
-$cellBorderRadius: 5px;
 
 $xAxisLabelHeight: 25px;
 $xAxisTickHeight: 10px;
 $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
+
+$hover-color: goldenrod;
+
+$table-border-width: 1px;
+$table-border-style: solid;
+$table-border-color: #aaa;
+
+$cell-border-width: $table-border-width;
+$cell-border-style: dotted;
+$cell-border-color: $table-border-color;
 
 .StackDetail {
     display: flex;
@@ -105,6 +114,16 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
                 width: fit-content;
                 font-family: sans-serif;
 
+                &:first-child .ColumnView.cell > .screen {
+                    border-left-style: $table-border-style;
+                    border-left-width: $cell-border-width;
+                    border-left-color: $cell-border-color;
+                }
+
+                &:last-child .ColumnView.cell > .screen {
+                    border-right-style: $table-border-style;
+                }
+
                 label {
                     height: $xAxisTickHeight;
                     line-height: $xAxisTickHeight;
@@ -120,13 +139,13 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
                     .screen {
                         margin-top: $horizontalGutterWidth;
                         margin-bottom: $horizontalGutterWidth;
-                        margin-right: $verticalGutterWidth / 2;
-                        margin-left: $verticalGutterWidth / 2;
-                        background-color: $enabledCellBackgroundColor;
-                        outline-color: $enabledCellOutlineColor;                    
-                        outline-style: solid;
-                        outline-width: $cellOutlineWidth;
-                        border-radius: $cellBorderRadius;
+                        margin-right: 0;
+                        margin-left: 0;
+                        border-color: $enabledCellOutlineColor;
+                        border-style: $table-border-style;
+                        border-width: $cell-border-width;                   
+                        border-right-style: $cell-border-style;
+                        border-left: none;
                         cursor: context-menu;
                     }
 
@@ -144,12 +163,8 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
                     }
                 
                     &.null {
-                        .screen {
-                            outline-style: dotted;
-                        }
-
                         input {
-                            background-color: #fff;
+                            background-color: #ddd;
                             font-style: italic;
                             text-transform: uppercase;
                         }
@@ -165,15 +180,11 @@ $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
                     }
 
                 }
-    
-                &.unhovered {
-                    input,label {
-                        color: lighten($enabledCellColor, $unhoverLightenFactor);
+
+                &:hover, &.hover {
+                    .screen input {
+                        background-color: $hover-color;
                     }
-                    // .StackCell {
-                    //     outline-color: lighten($enabledCellOutlineColor, $unhoverLightenFactor);
-                    //     background-color: lighten($enabledCellBackgroundColor, $unhoverLightenFactor);
-                    // }
                 }
             }
         }

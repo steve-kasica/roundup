@@ -29,8 +29,6 @@ export default function ColumnView({column, layout}) {
         state.push("enabled");
     } else if (hoverColumn.index === index) {
         state.push("hover");
-    } else {
-        state.push("unhover")
     }
 
     return (
