@@ -18,12 +18,12 @@ const PACK_OPERATION = "pack";
 
 export default function Operation({node, style, colorScale}) {
     const {data, children} = node;
-    const {focusOperation} = useSelector(({ui}) => ui);
-    const isFocus = (focusOperation && focusOperation.id === data.id);
+    const {selectedOperation} = useSelector(({ui}) => ui);
+    const isSelected = (selectedOperation && selectedOperation.id === data.id);
     const className=[
         "operation",
         data.type,
-        (isFocus) ? "focus" : undefined,
+        (isSelected) ? "selected" : undefined,
         `depth-${node.depth}`
     ].filter(name => name).join(" ");
     const columnCount = 6;

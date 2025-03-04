@@ -7,7 +7,7 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusedNode, setFocusOperation, STAGE_REFINE_OPS } from "../../../data/uiSlice";
+import { setFocusedNode, setSelectedOperation, STAGE_REFINE_OPS } from "../../../data/uiSlice";
 import ColumnView, {COLUMN_LAYOUT_TICK} from "../../ColumnView";
 import { isTable } from "../../../lib/types/Table";
 import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
@@ -65,7 +65,7 @@ export default function BlockLayout({
             onClick: () => dispatch(setInsertionMode(ADD_TO_GROUP))
         },{
             label: "Select operation",
-            onClick: () => dispatch(setFocusOperation(parentOperation))
+            onClick: () => dispatch(setSelectedOperation(parentOperation))
         }
     ];
     

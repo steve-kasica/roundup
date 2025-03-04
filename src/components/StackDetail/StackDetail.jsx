@@ -22,8 +22,8 @@ export default function StackDetail() {
         tables: tableTree.tree
             .filter(node => (
                 isTable(node) && 
-                ui.focusOperation && 
-                node.operation_group === ui.focusOperation.id))
+                ui.selectedOperation && 
+                node.operation_group === ui.selectedOperation.id))
             .map(table => ({
                 ...table,
                 columns: table.columns.filter(({status}) => status !== COLUMN_STATUS_REMOVED)

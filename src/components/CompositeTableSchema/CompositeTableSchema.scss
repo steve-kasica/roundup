@@ -22,8 +22,10 @@ $pack-0-color: #e5f5e0;
 $pack-1-color: #a1d99b;
 $pack-2-color: #31a354;
 
-// Table hover color
-$table-hover-color: goldenrod;
+// Interaction state color
+$selected-color: goldenrod;
+$hover-color: lighten(goldenrod, 10%);
+
 
 @mixin operation-color($color, $parent-color) {
     background-color: $color;
@@ -52,7 +54,7 @@ $table-hover-color: goldenrod;
                         }
 
                         &:hover, &.hover {
-                            background-color: $table-hover-color;
+                            background-color: $hover-color;
                         }
                     }
                 }
@@ -74,6 +76,12 @@ $table-hover-color: goldenrod;
         border-radius: $operation-border-radius;
         overflow: hidden;
         display: flex;
+
+        &.selected {
+            > .table {
+                background-color: $selected-color;
+            }
+        }
 
         &.stack {
             flex-direction: column;

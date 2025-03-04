@@ -26,7 +26,7 @@ export class Table {
     // Set the focus status of all columns given if index matches `focusIndex` argument
     setFocus = (focusIndex) => this.columns.forEach(c => c.setFocus(c.index === focusIndex));
 
-    getFocusedColumn = () => this.columns.filter(c => c.isFocused);
+    gethoverColumn = () => this.columns.filter(c => c.isFocused);
 
     // A table is selected if at least one column is selected
     get isSelected() { return this.columns.filter(c => c.isSelected).length > 0 };

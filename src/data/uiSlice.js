@@ -37,7 +37,7 @@ export const initialState = {
     searchString: "",
     firstPaneWidth: 20,
     hoverOperation: null,
-    focusOperation: null,
+    selectedOperation: null,
     hoverColumn: null,
     hoverTable: null,
 };
@@ -71,8 +71,8 @@ export const uiSlice = createSlice({
         setHoverOperation: (state, action) => {
             state.hoverOperation = action.payload;
         },
-        setFocusOperation: (state, action) => {
-            state.focusOperation = action.payload;
+        setSelectedOperation: (state, action) => {
+            state.selectedOperation = action.payload;
         },
         setHoverColumn: (state, action) => {
             state.hoverColumn = action.payload;
@@ -99,7 +99,7 @@ export const {
     setSearchString,
     setFirstPaneWidth,
     setHoverOperation,
-    setFocusOperation,
+    setSelectedOperation,
     setHoverColumn,
     setHoverTable,
 } = uiSlice.actions;
