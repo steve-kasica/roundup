@@ -83,6 +83,13 @@ $hover-color: lighten(goldenrod, 10%);
             }
         }
 
+        .label {
+            position: absolute;
+            line-height: $table-height;
+            margin-left: 5px;
+            pointer-events: none;
+        }
+
         &.stack {
             flex-direction: column;
 
@@ -102,13 +109,6 @@ $hover-color: lighten(goldenrod, 10%);
 
                 &:first-child { 
                     border-top: none; border-bottom: none; 
-                }
-    
-                .label {
-                    position: absolute;
-                    line-height: $table-height + $gutter-width;
-                    margin-left: $operation-border-radius;
-                    pointer-events: none;
                 }
 
                 .ColumnView {
