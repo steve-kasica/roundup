@@ -46,7 +46,9 @@ $hover-color: lighten(goldenrod, 10%);
 
     &.ro {
         .operation {
-            &.stack {
+            pointer-events: none;
+            &.selected.stack {
+                pointer-events: all;
                 .table {
                     .ColumnView {
                         &.null {
