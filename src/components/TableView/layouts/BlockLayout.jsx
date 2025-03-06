@@ -47,7 +47,7 @@ export default function BlockLayout({
         {length: maxColumns}, 
         (_,i) => (i < validColumns.length)
             ? validColumns.at(i)
-            : new Column("null", i, undefined, useDispatch, useDispatch, id, COLUMN_STATUS_NULLED)
+            : new Column("null", i, undefined, undefined, undefined, id, COLUMN_STATUS_NULLED)
     );
 
     const {hoverOperation, stage} = useSelector(({ui}) => ui);
