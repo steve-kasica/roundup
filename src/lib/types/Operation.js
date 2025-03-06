@@ -19,6 +19,8 @@ export default function Operation(type, children) {
         id: `o-${++id}`,
         type,
         children: (children) ? children : []
+        // TODO: doesn't this Object need a operation_group value
+        // to render nested operations?
     };
 }
 

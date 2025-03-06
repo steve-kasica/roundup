@@ -5,11 +5,11 @@ import Column from "./Column";
 import * as d3 from "d3";
 
 export default class {
-    constructor({name, id, row_count, path, columns}, index, maxColumns) {
+    constructor({name, id, rowCount, path, columns}, index, maxColumns) {
         this.name = name;
         this.id = id;
-        this.row_count = row_count;
-        this.column_count = columns.length;
+        this.rowCount = rowCount;
+        this.columnCount = columns.length;
         this.path = path || null;
         this.index = index;
 
@@ -84,6 +84,6 @@ export default class {
     // Set the focus status of all columns given if index matches `focusIndex` argument
     setFocus = (focusIndex) => this.columns.forEach(c => c.setFocus(c.index === focusIndex));
 
-    getFocusedColumn = () => this.columns.filter(c => c.isFocused);
+    gethoverColumn = () => this.columns.filter(c => c.isFocused);
 
 }

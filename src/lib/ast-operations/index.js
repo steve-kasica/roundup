@@ -15,17 +15,17 @@
 //  * @param {string} endpoint 
 //  * @param {string} name 
 //  * @param {string} id 
-//  * @param {number} row_count 
+//  * @param {number} rowCount 
 //  * @param {Array} columns 
 //  * @returns 
 //  */
-// function Table(endpoint, name, id, row_count, columns) {
+// function Table(endpoint, name, id, rowCount, columns) {
 //     return {
 //         endpoint,
 //         name,
 //         id,
-//         row_count,
-//         column_count: columns.length,
+//         rowCount,
+//         columnCount: columns.length,
 //         columns
 //     };
 // }

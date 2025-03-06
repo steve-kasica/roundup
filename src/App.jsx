@@ -19,6 +19,7 @@ import WorkflowSelector from './components/WorkflowSelector';
 import CompositeTableSchema from './components/CompositeTableSchema';
 import StackDetail from "./components/StackDetail/StackDetail";
 import WorkflowDetail from './components/WorkflowDetail';
+import OperationsList from './components/OperationsList';
 
 function App() {
   const {stage} = useSelector(({ui}) => ui);
@@ -48,7 +49,10 @@ function App() {
                 (stage === STAGE_ARRANGE_TABLES) ? (
                   <SourceTables />
                 ) : (stage == STAGE_REFINE_OPS) ? (
-                  <CompositeTableSchema />
+                  <>
+                    <CompositeTableSchema />
+                    <OperationsList />                  
+                  </>
                 ) : null
               }
               secondaryContent={
