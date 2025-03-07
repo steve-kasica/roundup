@@ -9,7 +9,7 @@ import { TABLE_LAYOUT_BLOCK, TABLE_LAYOUT_ROW, TABLE_LAYOUT_LIST_ITEM, TABLE_STA
 import BlockLayout from "./layouts/BlockLayout";
 import RowLayout from "./layouts/RowLayout";
 import ListItemLayout from "./layouts/ListItemLayout";
-import { addTable } from "../../data/tableTreeSlice";
+import { addTable, removeTable } from "../../data/tableTreeSlice";
 import { setHoverTable } from "../../data/uiSlice";
 import { isTable } from "../../lib/types/Table";
 
@@ -76,7 +76,7 @@ export default function TableView({table, layout, style}) {
     }
     
     function removeTableEvent() {
-        dispatch(removeTableFromTree(table));
+        dispatch(removeTable(table));
     }
 
     function hoverTableEvent() {

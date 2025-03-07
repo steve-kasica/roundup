@@ -55,16 +55,20 @@ export default function BlockLayout({
 
     const menuItems = [
         {
-            label: "Remove table",
+            label: `Remove ${name}`,
+            isVisable: true,
             onClick: removeTableEvent
         },{
             label: "Remove operation",
+            isVisable: true,
             onClick: () => dispatch(removeOperation(parentOperation))
         },{
-            label: "Add table",
-            onClick: () => dispatch(setInsertionMode(ADD_TO_GROUP))
+            // label: "Add table",
+            // isVisable: true,
+            // onClick: () => dispatch(setInsertionMode(ADD_TO_GROUP))
         },{
             label: "Select operation",
+            isVisable: stage === STAGE_REFINE_OPS,
             onClick: () => dispatch(setSelectedOperation(parentOperation))
         }
     ];
@@ -98,17 +102,20 @@ export default function BlockLayout({
                     : undefined
                 }
             >
-                {menuItems.map((item, i) => (
-                    <MenuItem 
-                        key={i}
-                        onClick={(event) => {
-                            item.onClick(event);
-                            closeMenu();
-                        }}
-                    >
-                        {item.label}
-                    </MenuItem>
-                ))}
+                {menuItems
+                    .filter(item => item.isVisable)
+                    .map((item, i) => (
+                        <MenuItem 
+                            key={i}
+                            onClick={(event) => {
+                                item.onClick(event);
+                                closeMenu();
+                            }}
+                        >
+                            {item.label}
+                        </MenuItem>
+                    ))
+                }
             </Menu>        
         </>
     );

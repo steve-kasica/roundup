@@ -10,7 +10,7 @@
 
 $table-height: 20px;
 $operation-border-radius: 10px;
-$gutter-width: 3px;
+$gutter-width: 2px;
 
 // Stack background colors, max depth = 3
 $stack-0-color: #deebf7;
@@ -28,10 +28,11 @@ $hover-color: lighten(goldenrod, 10%);
 
 
 @mixin operation-color($color, $parent-color) {
-    background-color: $color;
+    background-color: $parent-color;
+    border-color: $color;
     > .table {
+        background-color: $color;
         border-color: $color;
-        border-top-color: $parent-color;
     }
 }
 
@@ -40,15 +41,13 @@ $hover-color: lighten(goldenrod, 10%);
     font-size: 10px;
     text-align: left;
 
-    .root {
-        outline: 1px solid #000;
-    }
-
     &.ro {
         .operation {
             pointer-events: none;
+
             &.selected.stack {
                 pointer-events: all;
+                > div { border-bottom-color: #fff !important; }
                 .table {
                     .ColumnView {
                         &.null {
@@ -74,14 +73,28 @@ $hover-color: lighten(goldenrod, 10%);
     }
     
     .operation {
-        width: 100%;
-        border-radius: $operation-border-radius;
         overflow: hidden;
         display: flex;
+        width: 100%;
+        border-radius: $operation-border-radius;
+        border-width: $gutter-width;
+        border-style: solid;
 
         &.selected {
-            > .table {
-                background-color: $selected-color;
+            border-color: $selected-color !important;
+        }
+
+        > .table {
+            display: flex;
+            flex-grow: 1;
+            flex-basis: inherit;
+            height: $table-height;
+
+            .ColumnView {
+                flex-grow: 1;  // set individual item width to fill available space
+                line-height: $table-height;
+                user-select: none;
+                background-color: inherit;
             }
         }
 
@@ -99,37 +112,33 @@ $hover-color: lighten(goldenrod, 10%);
             &.depth-1 { @include operation-color($stack-1-color, $pack-0-color); }
             &.depth-2 { @include operation-color($stack-2-color, $pack-1-color); }
 
-            > .table {
-                display: flex;
-                flex-grow: 1;
-                flex-basis: inherit;
-                height: $table-height;
-                border: none;
-                border-top-style: solid;
-                border-top-width: $gutter-width;
-                // width: (set dynamically inline)
-
-                &:first-child { 
-                    border-top: none; border-bottom: none; 
-                }
-
-                .ColumnView {
-                    flex-grow: 1;  // set individual item width to fill available space
-                    line-height: $table-height;
-                    user-select: none;
-                    background-color: inherit;
-                }
+            > div {
+                border-bottom-width: $gutter-width / 2;
+                border-bottom-style: solid;
+                border-bottom-color: #fff !important;
+                &:last-child { border-bottom: none; }
             }
         }
 
         &.pack {
             display: flex;
             flex-direction: row-reverse;
-            padding: $gutter-width;
 
-            &.depth-0 { @include operation-color($pack-0-color, #fff); }
+            &.depth-0 { @include operation-color($pack-0-color, $pack-0-color); }
             &.depth-1 { @include operation-color($pack-1-color, $stack-0-color); }
             &.depth-2 { @include operation-color($pack-2-color, $stack-1-color); }
+
+            > div {
+                border-right-width: $gutter-width;
+                border-right-style: solid;
+                &:first-child { border: none; }
+            }
+
+            &.selected {
+                > div {
+                    border-radius: 0px;
+                }
+            }
         }
     }
 }

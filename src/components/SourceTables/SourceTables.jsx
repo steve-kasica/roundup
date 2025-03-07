@@ -6,7 +6,7 @@
 
 import {TableLayout, ListLayout} from "./layouts";
 import { useSelector } from "react-redux";
-import { addTable, insertTableInGroup, removeTableFromTree } from "../../data/tableTreeSlice";
+import { addTable, insertTableInGroup, removeTable } from "../../data/tableTreeSlice";
 import { useDispatch } from "react-redux";
 import { isTable } from "../../lib/types/Table";
 import { ADD_TO_GROUP, setSearchString, SYSTEM_DECIDES } from "../../data/uiSlice";
@@ -75,7 +75,7 @@ export default function SourceTables() {
             if (!isSelected) {
                 dispatch(addTable({table, operationType: STACK}));
             } else {
-                dispatch(removeTableFromTree(table));
+                dispatch(removeTable(table));
             }
         } else {
             throw Error("Unknown app state!");
@@ -93,7 +93,7 @@ export default function SourceTables() {
             // Unselect all selected soruce tables
             sourceTables
                 .filter(({id}) => selectedTables.has(id))
-                .forEach(table => dispatch(removeTableFromTree(table)));            
+                .forEach(table => dispatch(removeTable(table)));            
         }
     }
 }

@@ -36,14 +36,22 @@ export const tableTreeSlice = createSlice({
             clonedTable.operation_group = focusedNode.id;
             state.tree.push(clonedTable);
         },
-        removeTableFromTree(state, action) {
+
+        /**
+         * removeTable
+         * 
+         * @param {*} state 
+         * @param {*} action 
+         */
+        removeTable(state, action) {
             const table = action.payload;
             const tableIndex = getIndex(state, table);
             state.tree.splice(tableIndex, 1);
 
+            // TODO, what if removing tree creates an empty operation?
+
             // If all tables have been removed, reset state
-            const tableCount = state.tree.filter(node => isTable(node)).length;
-            if (tableCount === 0) {
+            if (state.tree.filter(isTable).length === 0) {
                 state.tree.splice(0, 1);
                 state.isEmpty = true;
             }
@@ -156,7 +164,7 @@ export function isTreeEmpty(state) {
 
 export const {
     insertTableInGroup,
-    removeTableFromTree,
+    removeTable,
     removeOperation,
     addTable,
     setColumnProperty,
