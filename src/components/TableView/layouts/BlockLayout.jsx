@@ -26,20 +26,14 @@ export default function BlockLayout({
 
     const {maxColumns, parentOperation} = useSelector(({tableTree}) => ({
         maxColumns: Math.max(...tableTree.tree
-            .filter(node => isTable(node) && node.operation_group === operation_group)
+            .filter(d => isTable(d) && d.operation_group === operation_group)
             .map(table => table.columns
                 .filter(column => column.status !== COLUMN_STATUS_REMOVED)
                 .length
             )),
-        parentOperation: tableTree.tree.filter(node => isOperation(node) && node.id === operation_group).at(0)
+        parentOperation: tableTree.tree.filter(d => isOperation(d) && d.id === operation_group).at(0)
     }));
-    // const maxColumns = node.parent.children
-    //         .map(n => n.data)
-    //         .filter(d =>  isTable(d))
-    //         .reduce((acc, d) => Math.max(
-    //             acc, 
-    //             d.columns.filter(c => c.status !== COLUMN_STATUS_REMOVED).length
-    //         ), 0);
+
     const validColumns = columns
         .filter(column => column.status !== COLUMN_STATUS_REMOVED);
 
@@ -50,8 +44,7 @@ export default function BlockLayout({
             : new Column("null", i, undefined, undefined, undefined, id, COLUMN_STATUS_NULLED)
     );
 
-    const {hoverOperation, stage} = useSelector(({ui}) => ui);
-    const isUnfocused = (hoverOperation !== null && hoverOperation.id !== operation.id);
+    const {stage} = useSelector(({ui}) => ui);
 
     const menuItems = [
         {
