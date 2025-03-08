@@ -13,7 +13,7 @@ import { addTable, removeTable } from "../../data/tableTreeSlice";
 import { setHoverTable } from "../../data/uiSlice";
 import { isTable } from "../../lib/types/Table";
 
-export default function TableView({table, layout, style}) {
+export default function TableView({table, layout, style, setIsHover}) {
     const dispatch = useDispatch();
     const {hoverTable} = useSelector(({ui}) => ui);
     const selectedTables = useSelector(({ tableTree }) => 
@@ -47,6 +47,7 @@ export default function TableView({table, layout, style}) {
                     className={className}
                     {...table}
                     style={style}
+                    setIsHover={setIsHover} // TODO: This is why these views need to be within the component
                     {...interactionEventHandlers}
                     {...state}
                 />

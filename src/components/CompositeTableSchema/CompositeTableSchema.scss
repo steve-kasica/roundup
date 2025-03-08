@@ -3,14 +3,12 @@
  * 
  * Styles for the Composite Table Schema.
  *
- * Notes:
- *  - The `border-color` attribute of `div.ColumnView` is defined inline. 
- *    It is dynamically set based on the data.
  */
 
-$table-height: 20px;
+
+
 $operation-border-radius: 10px;
-$gutter-width: 2px;
+$operation-padding: 5px;
 
 // Stack background colors, max depth = 3
 $stack-0-color: #deebf7;
@@ -22,23 +20,28 @@ $pack-0-color: #e5f5e0;
 $pack-1-color: #a1d99b;
 $pack-2-color: #31a354;
 
-// Interaction state color
-$selected-color: goldenrod;
-$hover-color: lighten(goldenrod, 10%);
+$table-height: 20px;
+$table-border-color: #000;
+$table-border-style: solid;
+$table-border-width: 1px;
 
+$label-text-color: $table-border-color;
+$label-font-size: 10px;
+$label-font-family: sans-serif;
+
+// Interaction state color
+$selected-color: #edc948;
+$hover-color: lighten($selected-color, 10%);
 
 @mixin operation-color($color, $parent-color) {
-    background-color: $parent-color;
+    background-color: $color;
     border-color: $color;
     > .table {
         background-color: $color;
-        border-color: $color;
     }
 }
 
 .CompositeTableSchema {
-    font-family: sans-serif;
-    font-size: 10px;
     text-align: left;
 
     &.ro {
@@ -47,7 +50,6 @@ $hover-color: lighten(goldenrod, 10%);
 
             &.selected.stack {
                 pointer-events: all;
-                > div { border-bottom-color: #fff !important; }
                 .table {
                     .ColumnView {
                         &.null {
@@ -73,22 +75,39 @@ $hover-color: lighten(goldenrod, 10%);
     }
     
     .operation {
+        padding: $operation-padding;
         overflow: hidden;
         display: flex;
-        width: 100%;
+
+        // Define a "secret" border to prevent jitter when selected.
+        // The attribute `border-color` is defined elsewhere
+        // border-radius: $operation-border-radius;
         border-radius: $operation-border-radius;
-        border-width: $gutter-width;
+        border-width: 1px;
         border-style: solid;
 
         &.selected {
+            background-color: $selected-color !important;
             border-color: $selected-color !important;
+        }
+
+        &.hover {
+            background-color: $hover-color !important;
+            border-color: $hover-color !important;
+        }
+
+        .table {
+            border-width: $table-border-width;
+            border-style: $table-border-style;
+            border-color: $table-border-color !important;
+            overflow: hidden; // prevent column divs from poking out of rounded corners
         }
 
         > .table {
             display: flex;
             flex-grow: 1;
             flex-basis: inherit;
-            height: $table-height;
+            min-height: $table-height;
 
             .ColumnView {
                 flex-grow: 1;  // set individual item width to fill available space
@@ -103,6 +122,9 @@ $hover-color: lighten(goldenrod, 10%);
             line-height: $table-height;
             margin-left: 5px;
             pointer-events: none;
+            font-family: $label-font-family;
+            font-size: $label-font-size;
+            color: $label-text-color;
         }
 
         &.stack {
@@ -113,10 +135,22 @@ $hover-color: lighten(goldenrod, 10%);
             &.depth-2 { @include operation-color($stack-2-color, $pack-1-color); }
 
             > div {
-                border-bottom-width: $gutter-width / 2;
-                border-bottom-style: solid;
-                border-bottom-color: #fff !important;
-                &:first-child { border-bottom: none; }
+                border-top: none;
+
+                // Last child is the stack bottom
+                // due to flex-direction
+                &:last-child { 
+                    border-top-width: $table-border-width;
+                    border-top-style: $table-border-style;
+                    border-top-left-radius: inherit;
+                    border-top-right-radius: inherit;
+                }
+                // First child is the stack top,
+                // due to flex-direction
+                &:first-child {
+                    border-bottom-left-radius: inherit;
+                    border-bottom-right-radius: inherit;
+                }
             }
         }
 
@@ -129,14 +163,22 @@ $hover-color: lighten(goldenrod, 10%);
             &.depth-2 { @include operation-color($pack-2-color, $stack-1-color); }
 
             > div {
-                border-right-width: $gutter-width;
-                border-right-style: solid;
-                &:first-child { border: none; }
+                &:first-child { 
+                    border-top-right-radius: inherit;
+                    border-bottom-right-radius: inherit;
+                }
+                &:last-child {
+                    border-top-right-radius: 0px;
+                    border-bottom-right-radius: 0px;
+                }
+                &.table {
+                    height: inherit;
+                }
             }
 
             &.selected {
                 > div {
-                    border-radius: 0px;
+                    // border-radius: 0px;
                 }
             }
         }

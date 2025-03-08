@@ -19,7 +19,8 @@ export default function BlockLayout({
     id,
     operation_group,
     style,
-    removeTableEvent
+    removeTableEvent,
+    setIsHover,
 }) {
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
@@ -73,6 +74,8 @@ export default function BlockLayout({
                 className={`block table`}
                 onContextMenu={handleContextMenu}
                 style={style}
+                onMouseEnter={() => setIsHover(true)}
+                onMouseLeave={() => setIsHover(false)}
             >
                 <div className="label">{name} <span className="column-count">({columns.length})</span></div>
                 {
