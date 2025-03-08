@@ -38,29 +38,43 @@ export const tableTreeSlice = createSlice({
         },
 
         /**
-         * removeTable
-         * 
+         * @name removeTable
+         * @description Remove a Table instance from the tree
          * @param {*} state 
          * @param {*} action 
          */
         removeTable(state, action) {
             const table = action.payload;
-            const tableIndex = getIndex(state, table);
-            state.tree.splice(tableIndex, 1);
+            const idsToRemove = [table.id]; 
 
-            // TODO, what if removing tree creates an empty operation?
+            const siblings = state.tree
+                .map((d,i) => [d,i])
+                .filter(([d,i]) => 
+                    d.id !== table.id && 
+                    d.operation_group === table.operation_group
+            );
 
-            // If all tables have been removed, reset state
-            if (state.tree.filter(isTable).length === 0) {
-                state.tree.splice(0, 1);
-                state.isEmpty = true;
+            // Check if parent operation will not include any table direct descendents
+            if (siblings.filter(([d,i]) => isTable(d)).length === 0) {
+                const parentOperation = state.tree.find(d => d.id === table.operation_group);
+
+                // Slate operation for removal from tree
+                idsToRemove.push(parentOperation.id);
+
+                // Assign operation direct descendants, if any, to the grandparent operation
+                siblings.forEach(([d,i]) => {
+                    state.tree[i] = {...d, operation_group: parentOperation.operation_group};
+                });
             }
 
+            // Remove data from tree
+            state.tree = state.tree.filter(d => !idsToRemove.includes(d.id));
         },
         /**
-         * Recursively 
+         * @name removeOperation
+         * @description Remove an operation and all its descendants
          * @param {object} state 
-         * @param {object} action 
+         * @param {object} action containing an Object instance in its payload
          */
         removeOperation(state, action) {
             const operationId = action.payload.id;
