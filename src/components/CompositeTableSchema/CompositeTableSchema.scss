@@ -106,7 +106,7 @@ $hover-color: lighten(goldenrod, 10%);
         }
 
         &.stack {
-            flex-direction: column;
+            flex-direction: column-reverse;
 
             &.depth-0 { @include operation-color($stack-0-color, #fff); }
             &.depth-1 { @include operation-color($stack-1-color, $pack-0-color); }
@@ -116,7 +116,7 @@ $hover-color: lighten(goldenrod, 10%);
                 border-bottom-width: $gutter-width / 2;
                 border-bottom-style: solid;
                 border-bottom-color: #fff !important;
-                &:last-child { border-bottom: none; }
+                &:first-child { border-bottom: none; }
             }
         }
 
