@@ -110,16 +110,14 @@ $hover-color: lighten($selected-color, 10%);
             &.depth-1 { @include operation-color($stack-1-color, $pack-0-color); }
             &.depth-2 { @include operation-color($stack-2-color, $pack-1-color); }
 
-            > .children {
-                > div {
-                    border: none;
-                    border-bottom-style: $table-border-style;
-                    border-bottom-width: $table-border-width;
-                    border-bottom-color: $table-border-color;
-                    &:first-child {
-                        // Top child of the stack
-                        border-bottom: none;
-                    }
+            > .children > div {
+                border: none;
+                border-bottom-style: $table-border-style;
+                border-bottom-width: $table-border-width;
+                border-bottom-color: $table-border-color;
+                &:first-child {
+                    // Top child of the stack
+                    border-bottom: none;
                 }
             }
 
@@ -132,12 +130,10 @@ $hover-color: lighten($selected-color, 10%);
             &.depth-1 { @include operation-color($pack-1-color, $stack-0-color); }
             &.depth-2 { @include operation-color($pack-2-color, $stack-1-color); }
 
-            > .children {
-                > div {
-                    border-style: $table-border-style;
-                    border-width: $table-border-width;                    
-                    border-color: $table-border-color;
-                }
+            > .children > div {
+                border-style: $table-border-style;
+                border-width: $table-border-width;                    
+                border-color: $table-border-color;
             }
         }
     }
@@ -148,13 +144,7 @@ $hover-color: lighten($selected-color, 10%);
     // Arrange tables stage
     &.at {
         .operation {
-    
-            // Define a "secret" border to prevent jitter when selected.
-            // The attribute `border-color` is defined elsewhere
-            // border-radius: $operation-border-radius;
             border-radius: $operation-border-radius;
-            // border-width: $operation-border-width;
-            // border-style: $operation-border-style;
 
             > .children {
                 > .table {
@@ -169,7 +159,8 @@ $hover-color: lighten($selected-color, 10%);
                         display: none;
                     }
     
-                    &:hover {
+                    &:hover, &.hover {
+                        background-color: $selected-color;
                         .label {
                             font-weight: bold;
                         }
@@ -186,16 +177,11 @@ $hover-color: lighten($selected-color, 10%);
     // Refine Operations
     &.ro {
         .operation {
-            border: none;
             pointer-events: none;
 
             &.selected {
                 pointer-events: all;
                 cursor: default;
-            }
-            &.hover {
-                // background-color: $hover-color !important;
-                // border-color: $hover-color !important;
             }
             > .label {
                 display: none;
@@ -206,12 +192,6 @@ $hover-color: lighten($selected-color, 10%);
             }
 
             &.pack {
-                > div:first-child {
-                    // Left-most child due to flex direction
-                    // border-top: none;
-                    // border-bottom: none;
-                    // border-left: none;
-                }
                 
                 &.selected {
                     > div {
@@ -229,8 +209,6 @@ $hover-color: lighten($selected-color, 10%);
             }
 
             &.selected {
-                // border: $table-border-width $table-border-style $selected-color;
-                // border-color: $selected-color !important;                    
                 .table {
                     background-color: inherit !important;  // Toggles table color from gray
                 }
@@ -242,7 +220,6 @@ $hover-color: lighten($selected-color, 10%);
                     }
 
                     > .table {
-                        // border: none;
                         > .label {
                             display: none;
                         }

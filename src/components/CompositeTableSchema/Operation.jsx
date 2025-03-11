@@ -58,9 +58,6 @@ export default function Operation({node, style, colorScale}) {
                                     table={childNode.data}
                                     layout={TABLE_LAYOUT_BLOCK}
                                     colorScale={colorScale}
-                                    // style={{
-                                    //     width: (data.type === STACK_OPERATION) ? "100%" : `${(1 / children.length) * 100}%`
-                                    // }}
                                     setIsHover={setIsHover}
                                 />)
                         }
