@@ -162,12 +162,14 @@ $cell-border-color: $table-border-color;
 
                     }
                 
-                    &.null {
-                        input {
-                            background-color: #ddd;
-                            font-style: italic;
-                            text-transform: uppercase;
-                        }
+                    &.null input {
+                        background-color: #ddd;
+                        font-style: italic;
+                        text-transform: uppercase;
+                    }
+
+                    &.hover input {
+                        background-color: $hover-color;
                     }
 
                 }  // end .ColumnView.cell
@@ -181,7 +183,8 @@ $cell-border-color: $table-border-color;
 
                 }
 
-                &:hover, &.hover {
+                &.hover {
+                // &:hover, &.hover {
                     .screen input {
                         background-color: $hover-color;
                     }

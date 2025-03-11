@@ -39,6 +39,7 @@ export const initialState = {
     hoverOperation: null,
     selectedOperation: null,
     hoverColumn: null,
+    hoverColumnIndex: null,
     hoverTable: null,
 };
 
@@ -77,6 +78,9 @@ export const uiSlice = createSlice({
         setHoverColumn: (state, action) => {
             state.hoverColumn = action.payload;
         },
+        setHoverColumnIndex: (state, action) => {
+            state.hoverColumnIndex = action.payload;
+        },
         setHoverTable: (state, action) => {
             state.hoverTable = action.payload;
         }
@@ -101,6 +105,7 @@ export const {
     setHoverOperation,
     setSelectedOperation,
     setHoverColumn,
+    setHoverColumnIndex,
     setHoverTable,
 } = uiSlice.actions;
 

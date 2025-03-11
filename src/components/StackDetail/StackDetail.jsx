@@ -4,7 +4,7 @@
  * 
  */
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { swapColumnPositions } from "../../data/schemaSlice";
 import { isTable } from "../../lib/types/Table";
 import "./StackDetail.scss"
@@ -12,12 +12,14 @@ import { scaleBand } from "d3";
 import ColumnView from "../ColumnView";
 import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import { COLUMN_LAYOUT_CELL } from "../ColumnView";
+import { setHoverColumnIndex } from "../../data/uiSlice";
 
 const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";
 const cellSize = 50;  // in height and width of cells (in pixels)
 
 export default function StackDetail() {
+    const dispatch = useDispatch();
     const {tables, hoverColumn} = useSelector(({tableTree, ui}) => ({
         tables: tableTree.tree
             .filter(node => (
@@ -65,16 +67,16 @@ export default function StackDetail() {
                     </div>
                     <div className="grid-container">
                         {xScale.domain().map(j => (
-                            <form 
-                                key={j}
-                                className={`${(hoverColumn !== null && hoverColumn.index !== j) ? "unhovered" : ""}`}
-                                // TODO: address
-                                // onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
-                                // onMouseLeave={() => dispatch(setHoverColumnIndex(null))}
-                            >
-                                <label className="index-label">
-                                    {j + 1}
-                                </label>
+                            <form key={j}>
+                                <div 
+                                    className="index-label"
+                                    onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
+                                    onMouseLeave={() => dispatch(setHoverColumnIndex(null))}
+                                >
+                                    <label>
+                                        {j + 1}
+                                    </label>
+                                </div>
                                 {tables.map(table => (
                                     <ColumnView 
                                         key={`${table.id}-${j}`}

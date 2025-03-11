@@ -19,23 +19,21 @@ import "./ColumnView.scss"
 export default function ColumnView({column, layout}) {
     const {name, status, index} = column;
     const dispatch = useDispatch();
-    const {hoverColumn} = useSelector(({ui}) => ui);
+    const {hoverColumn, hoverColumnIndex} = useSelector(({ui}) => ui);
 
     let state = [];
     if (status === COLUMN_STATUS_NULLED) {
         state.push("null");
     }
-    if (hoverColumn === null) {
-        state.push("enabled");
-    } else if (hoverColumn.index === index) {
+    if (hoverColumnIndex === index) {
         state.push("hover");
     }
 
     return (
         <div
             className={`ColumnView ${layout} ${state.join(" ")}`}
-            onMouseEnter={() => dispatch(setHoverColumn(column))}
-            onMouseLeave={() => dispatch(setHoverColumn(null))}
+            // onMouseEnter={() => dispatch(setHoverColumn(column))}
+            // onMouseLeave={() => dispatch(setHoverColumn(null))}
         >
         {(layout === COLUMN_LAYOUT_TICK) ? (
             <TickLayout />

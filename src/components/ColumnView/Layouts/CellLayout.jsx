@@ -14,6 +14,7 @@ const DEBOUNCE_DELAY = 500;
 
 export default function CellLayout({ 
     initialValue,
+    column,
     removeColumn,
     nullColumn,
     renameColumn
