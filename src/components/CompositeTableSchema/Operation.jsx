@@ -12,6 +12,7 @@ import { Fragment, useState } from "react";
 import TableView, { TABLE_LAYOUT_BLOCK } from "../TableView";
 import { isOperation } from "../../lib/types/Operation";
 import { useSelector } from "react-redux";
+import { isTable } from "../../lib/types/Table";
 
 const STACK_OPERATION = "stack";
 const PACK_OPERATION = "pack";
@@ -29,37 +30,43 @@ export default function Operation({node, style, colorScale}) {
         `depth-${node.depth}`
     ].filter(name => name).join(" ");
 
-    const columnCount = 6;
+    const columnCount = Math.max(
+        ...children.map(node => node.data)
+            .filter(isTable)
+            .map(({columns}) => columns.length)
+    );
+
     return (
         <div 
             data-id={data.id}
-            data-type={data.type}
             className={className}
             style={style}
         >
-            {children.map(childNode => (
-                <Fragment key={childNode.data.id}>
-                    {
-                        (isOperation(childNode.data))
-                        ? (<Operation 
-                            node={childNode} 
-                            colorScale={colorScale}
-                            style={{
-                                width: `${(1 / children.length) * 100}%`                                
-                            }}
-                        />)
-                        : (<TableView 
-                                table={childNode.data}
-                                layout={TABLE_LAYOUT_BLOCK}
+            <div className="label">
+                {data.type} {data.id} <span className="column-count">({columnCount})</span>
+            </div>
+            <div className="children">
+                {children.map(childNode => (
+                    <Fragment key={childNode.data.id}>
+                        {
+                            (isOperation(childNode.data))
+                            ? (<Operation 
+                                node={childNode} 
                                 colorScale={colorScale}
-                                style={{
-                                    width: (data.type === STACK_OPERATION) ? "100%" : `${(1 / children.length) * 100}%`
-                                }}
-                                setIsHover={setIsHover}
                             />)
-                    }
-                </Fragment>
-            ))}  
+                            : (<TableView 
+                                    table={childNode.data}
+                                    layout={TABLE_LAYOUT_BLOCK}
+                                    colorScale={colorScale}
+                                    // style={{
+                                    //     width: (data.type === STACK_OPERATION) ? "100%" : `${(1 / children.length) * 100}%`
+                                    // }}
+                                    setIsHover={setIsHover}
+                                />)
+                        }
+                    </Fragment>
+                ))}  
+            </div>
         </div>
     );    
 }
