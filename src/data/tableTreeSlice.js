@@ -8,7 +8,7 @@
  */
 import { createSlice } from "@reduxjs/toolkit";
 import { stratify as d3stratify } from "d3";
-import Operation, { isOperation, isStackOperation, NO_OP, STACK } from "../lib/types/Operation";
+import Operation, { isOperation, isPackOperation, isStackOperation, NO_OP, STACK } from "../lib/types/Operation";
 import { isTable } from "../lib/types/Table";
 
 const initialState = {
@@ -102,7 +102,7 @@ export const tableTreeSlice = createSlice({
 
             state.tree.splice(0, 0, operation, table);
 
-            if (payload.operationType === STACK && state.tree.length > 2) {
+            if (state.tree.length > 2) {
                 state.tree = simplifyTree(state.tree);
             }
         },
@@ -142,7 +142,11 @@ function simplifyTree(tree) {
     root.each((node) => {
         if (node.children) {
             node.children.forEach(child => {
-                if (isStackOperation(node.data) && isStackOperation(child.data)) {
+                const isNestedOperation = (
+                    (isStackOperation(node.data) && isStackOperation(child.data)) ||
+                    (isPackOperation(node.data) && isPackOperation(child.data))
+                );
+                if (isNestedOperation) {
                     child.children.forEach(({data}) => data.operation_group = node.data.id);
                     nodesToRemove.push(child.data.id);
                 }
