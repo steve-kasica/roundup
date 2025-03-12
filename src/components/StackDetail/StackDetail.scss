@@ -114,13 +114,13 @@ $cell-border-color: $table-border-color;
                 width: fit-content;
                 font-family: sans-serif;
 
-                &:first-child .ColumnView.cell > .screen {
+                &:first-child .ColumnView > .screen {
                     border-left-style: $table-border-style;
                     border-left-width: $cell-border-width;
                     border-left-color: $cell-border-color;
                 }
 
-                &:last-child .ColumnView.cell > .screen {
+                &:last-child .ColumnView > .screen {
                     border-right-style: $table-border-style;
                 }
 
@@ -134,50 +134,51 @@ $cell-border-color: $table-border-color;
                     font-weight: $enabledCellFontWeight;
                 }
 
-                .ColumnView.cell {
+                .ColumnView {
 
                     .screen {
-                        margin-top: $horizontalGutterWidth;
-                        margin-bottom: $horizontalGutterWidth;
-                        margin-right: 0;
-                        margin-left: 0;
+                        padding-top: $horizontalGutterWidth / 2;
+                        padding-bottom: $horizontalGutterWidth / 2;
                         border-color: $enabledCellOutlineColor;
                         border-style: $table-border-style;
                         border-width: $cell-border-width;                   
                         border-right-style: $cell-border-style;
                         border-left: none;
+                        background-color: inherit;
                         cursor: context-menu;
                     }
 
                     input {
+                        width: calc(100% - $verticalGutterWidth);                        
+                        overflow: hidden;                        
                         padding: $cellPadding;        
+                        background: inherit;                        
                         border: none;
                         field-sizing: content;
                         white-space: nowrap;
-                        overflow: hidden;
-                        width: calc(100% - $verticalGutterWidth);
                         text-align: center;
                         text-overflow: ellipsis;
                         pointer-events: none;
-
                     }
                 
-                    &.null input {
+                    &.null {
                         background-color: #ddd;
-                        font-style: italic;
-                        text-transform: uppercase;
+                        input {
+                            font-style: italic;
+                            text-transform: uppercase;
+                        }
                     }
 
-                    &.hover input {
+                    &.hover {
                         background-color: $hover-color;
                     }
 
-                }  // end .ColumnView.cell
+                }  // end .ColumnView
 
                 &:focus-within {
                     max-width: unset;
                     text-overflow: unset;
-                    .ColumnView.cell input {
+                    .ColumnView input {
                         pointer-events: all;
                     }
 

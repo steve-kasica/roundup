@@ -9,7 +9,7 @@ import { swapColumnPositions } from "../../data/schemaSlice";
 import { isTable } from "../../lib/types/Table";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
-import ColumnView from "../ColumnView";
+import ColumnView from "./ColumnView";
 import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import { COLUMN_LAYOUT_CELL } from "../ColumnView";
 import { setHoverColumnIndex } from "../../data/uiSlice";
@@ -32,6 +32,8 @@ export default function StackDetail() {
             })),
         hoverColumn: ui.hoverColumn
     }));
+
+    tables.reverse()
 
     const maxColumnCount = Math.max(...tables.map(table => table.columns.length));
     const columnPositions = Array.from({length: maxColumnCount}, (_, i) => i);
@@ -67,11 +69,13 @@ export default function StackDetail() {
                     </div>
                     <div className="grid-container">
                         {xScale.domain().map(j => (
-                            <form key={j}>
+                            <form 
+                                key={j}
+                                onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
+                                onMouseLeave={() => dispatch(setHoverColumnIndex(null))}
+                            >
                                 <div 
                                     className="index-label"
-                                    onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
-                                    onMouseLeave={() => dispatch(setHoverColumnIndex(null))}
                                 >
                                     <label>
                                         {j + 1}
@@ -84,7 +88,6 @@ export default function StackDetail() {
                                             ? table.columns.at(j) 
                                             : new Column("null", j, "", {}, "", table.id, COLUMN_STATUS_NULLED)
                                         }
-                                        layout={COLUMN_LAYOUT_CELL}
                                     />
                                 ))}
                             </form>

@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setHoverColumn } from "../../data/uiSlice";
 import { setColumnProperty } from "../../data/tableTreeSlice";
 import { COLUMN_LAYOUT_TICK, COLUMN_LAYOUT_CELL } from ".";
-import {TickLayout, CellLayout} from "./Layouts";
+import {TickLayout} from "./Layouts";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import "./ColumnView.scss"
 
@@ -37,14 +37,6 @@ export default function ColumnView({column, layout}) {
         >
         {(layout === COLUMN_LAYOUT_TICK) ? (
             <TickLayout />
-        ) : (layout === COLUMN_LAYOUT_CELL) ? (
-            <CellLayout 
-                className={`ColumnView cell ${state}`}
-                initialValue={name}
-                removeColumn={removeColumn}
-                nullColumn={nullColumn}
-                renameColumn={renameColumn}
-            />
         ) : null}
         </div>
     );
