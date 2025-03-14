@@ -1,5 +1,5 @@
 /**
- * Table.jsx
+ * CompositeTableSchema/TableView.jsx
  * -----------------------------------------------------------------
  * A visual representation of **source table** data in the 
  * **Table Tree**.
