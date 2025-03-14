@@ -10,6 +10,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { stratify as d3stratify } from "d3";
 import Operation, { isOperation, isPackOperation, isStackOperation, NO_OP, STACK } from "../lib/types/Operation";
 import { isTable } from "../lib/types/Table";
+import { COLUMN_STATUS_REMOVED } from "../lib/types/Column";
 
 const initialState = {
     tree: [],
@@ -113,6 +114,21 @@ export const tableTreeSlice = createSlice({
             const column2 = table.columns.filter(c => c.id === column.id).at(0);
             column2[property] = value;
         },
+        /**
+         * @name removeColumnsAfter
+         * @description Sets column status to removed for all columns with
+         * an index greater than the provided column, within the same table
+         * @param {*} state 
+         * @param {*} action 
+         */
+        removeColumnsAfter(state, action) {
+            const column = action.payload;
+            state.tree
+                .find(node => isTable(node) && node.id === column.tableId)
+                .columns
+                .slice(column.index + 1)
+                .forEach(c => c.status = COLUMN_STATUS_REMOVED);
+        },
         reset() {
             return initialState;
         }
@@ -186,7 +202,8 @@ export const {
     removeOperation,
     addTable,
     setColumnProperty,
-    reset
+    reset,
+    removeColumnsAfter
 } = tableTreeSlice.actions;
 
 export default tableTreeSlice.reducer;

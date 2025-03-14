@@ -84,15 +84,18 @@ export default function StackDetail() {
                                         {j + 1}
                                     </label>
                                 </div>
-                                {tables.map(table => (
-                                    <ColumnView 
-                                        key={`${table.id}-${j}`}
-                                        column={j < table.columns.length 
-                                            ? table.columns.at(j) 
-                                            : new Column("null", j, "", {}, "", table.id, COLUMN_STATUS_NULLED)
-                                        }
-                                    />
-                                ))}
+                                {tables.map(table => {
+                                    const column = (j < table.columns.length)
+                                        ? table.columns.at(j)
+                                        :  new Column("null", j, "", {}, "", table.id, COLUMN_STATUS_NULLED);
+                                    return <ColumnView 
+                                        key={column.id} 
+                                        column={column} 
+                                        position={j + 1}
+                                        columnCount={table.columns.length}
+                                        tableName={table.name}
+                                        />;
+                                })}
                             </form>
                         ))}
                     </div>

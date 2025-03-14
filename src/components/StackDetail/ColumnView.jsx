@@ -12,13 +12,14 @@ import { useEffect, useState, useRef } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
-import { setColumnProperty } from "../../data/tableTreeSlice";
+import { removeColumnsAfter, setColumnProperty } from "../../data/tableTreeSlice";
 import { setHoverColumn, setHoverTable } from "../../data/uiSlice";
 
 const DEBOUNCE_DELAY = 500;
 
-export default function ColumnView({ column }) {
+export default function({ column, position, tableName, columnCount }) {
     const {id, name, status, index, tableId} = column;
+    const isLastInTable = (position === columnCount);
 
     const dispatch = useDispatch();
     const {hoverColumn, hoverColumnIndex} = useSelector(({ui}) => ui);
@@ -53,7 +54,7 @@ export default function ColumnView({ column }) {
     }, [isFocused]);
 
     // Debounce input when modifying column attributes in the DOM
-    const [value, setValue] = useState(name);
+    const [value, setValue] = useState(status !== COLUMN_STATUS_NULLED ? name : "null");
     useEffect(() => {
         const timeoutId = setTimeout(
             () => dispatch(setColumnProperty({
@@ -86,7 +87,6 @@ export default function ColumnView({ column }) {
                     setAnchorEl(event.target);
                 }}
                 onMouseEnter={() => {
-                    // setIsHovering(true);
                     dispatch(setHoverColumn(id));
                     if (hoverTimeoutRef.current) {
                         clearTimeout(hoverTimeoutRef.current);
@@ -94,16 +94,9 @@ export default function ColumnView({ column }) {
                     }
                 }}
                 onMouseLeave={() => {
-                    // Only set the timeout if we're not opening a context menu
                     if (!isPopoverOpen) {
                         dispatch(setHoverColumn(null));
-                        // hoverTimeoutRef.current = setTimeout(
-                        //     () => dispatch(setHoverColumn(null)),
-                        //     // () => setIsHovering(false), 
-                        //     0  // Small delay to avoid flickering
-                        // );
                     }
-                    // dispatch(setHoverTable(null))
                 }}
                 onDoubleClick={() => setIsFocused(true)}
             >
@@ -132,24 +125,39 @@ export default function ColumnView({ column }) {
                             property: "status",
                             value: COLUMN_STATUS_REMOVED
                         }));
+                        dispatch(setHoverColumn(null));
                         closePopover();
                     }}>
-                        Remove
+                        Remove {column.name}
                     </ListItemButton>
-                    <ListItemButton onClick={() => {
-                        dispatch(setColumnProperty({
-                            column,
-                            property: "status",            
-                            value: COLUMN_STATUS_NULLED
-                        }));
-                        closePopover();
-                    }}>
-                        Null
+                    <ListItemButton 
+                        disabled={isLastInTable}
+                        onClick={() => {
+                            dispatch(removeColumnsAfter(column));
+                            closePopover();
+                        }}>
+                        Remove all to the right
+                    </ListItemButton>
+                    <hr></hr>
+                    <ListItemButton 
+                        disabled={status === COLUMN_STATUS_NULLED}
+                        onClick={() => {
+                            dispatch(setColumnProperty({
+                                column,
+                                property: "status",            
+                                value: COLUMN_STATUS_NULLED
+                            }));
+                            setValue("null");
+                            closePopover();
+                        }}>
+                        Null column {position} in {tableName}
                     </ListItemButton>                    
-                    <ListItemButton onClick={() => {
-                        setIsFocused(true);
-                        closePopover();
-                    }}>
+                    <ListItemButton 
+                        disabled={status === COLUMN_STATUS_NULLED}
+                        onClick={() => {
+                            setIsFocused(true);
+                            closePopover();
+                        }}>
                         Rename
                     </ListItemButton>                    
                 </List>

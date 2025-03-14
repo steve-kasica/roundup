@@ -16,6 +16,7 @@ export default function TableView({table, layout, style, setIsHover}) {
     const dispatch = useDispatch();
     const {hoverTable} = useSelector(({ui}) => ui);
     const selectedTables = useSelector(({ tableTree }) => null);
+    const isSelected = false;
 
 
     const isHovered = (hoverTable !== null && hoverTable.id === table.id);
