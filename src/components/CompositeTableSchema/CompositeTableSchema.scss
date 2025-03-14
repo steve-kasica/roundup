@@ -211,6 +211,12 @@ $hover-color: lighten($selected-color, 10%);
             &.selected {
                 .table {
                     background-color: inherit !important;  // Toggles table color from gray
+                    .ColumnView {
+                        border-right: 1px solid #bbb;
+                        &:last-child {
+                            border-right: none;
+                        }
+                    }
                 }
 
                 > .operation {
