@@ -75,12 +75,24 @@ export const uiSlice = createSlice({
         setSelectedOperation: (state, action) => {
             state.selectedOperation = action.payload;
         },
+
+        /**
+         * 
+         * @param {*} state 
+         * @param {*} action: action payload contains unique column id 
+         */
         setHoverColumn: (state, action) => {
             state.hoverColumn = action.payload;
         },
         setHoverColumnIndex: (state, action) => {
             state.hoverColumnIndex = action.payload;
         },
+
+        /**
+         * 
+         * @param {*} state 
+         * @param {*} action: action payload contains unique table id 
+         */
         setHoverTable: (state, action) => {
             state.hoverTable = action.payload;
         }

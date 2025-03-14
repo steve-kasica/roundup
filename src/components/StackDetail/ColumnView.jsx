@@ -13,20 +13,36 @@ import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import { setColumnProperty } from "../../data/tableTreeSlice";
-import { setHoverTable } from "../../data/uiSlice";
+import { setHoverColumn, setHoverTable } from "../../data/uiSlice";
 
 const DEBOUNCE_DELAY = 500;
 
 export default function ColumnView({ column }) {
-    const {name, status, index, tableId} = column;
+    const {id, name, status, index, tableId} = column;
 
     const dispatch = useDispatch();
-    const {hoverTable, hoverColumnIndex} = useSelector(({ui}) => ui);
+    const {hoverColumn, hoverColumnIndex} = useSelector(({ui}) => ui);
+
+    // Keep hover persistent when context menu opens
+    const [isHovering, setIsHovering] = useState(false);
+    const hoverTimeoutRef = useRef(null);
 
     // Local state variables and functions for displaying context menu
     const [anchorEl, setAnchorEl] = useState(null);
     const isPopoverOpen = Boolean(anchorEl);
-    const closePopover = () => setAnchorEl(null);
+    const closePopover = () => {
+        setAnchorEl(null);
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+        }
+        // Determine if we should still be hovering based on mouse position
+        // This could be improved with a check if mouse is still over element
+        hoverTimeoutRef.current = setTimeout(
+            () => dispatch(setHoverColumn(null)),
+            // () => setIsHovering(false),
+            265
+        );
+    };
 
     // Weird workaround to trigger focus on column from context menu clicks
     const inputRef = useRef(null);    
@@ -52,22 +68,43 @@ export default function ColumnView({ column }) {
 
     // Set class-based state styles
     const state = [
-        (status === COLUMN_STATUS_NULLED) ? "null" : "",
-        (hoverColumnIndex === index && hoverTable === null) || 
-        (hoverColumnIndex === index && hoverTable === tableId) ? "hover" : ""
-    ].filter(className => className.length > 0).join(" ");
+        (status === COLUMN_STATUS_NULLED) ? "null" : undefined,
+        (hoverColumnIndex === index || hoverColumn === id )
+            ? "hover" 
+            : undefined
+    ].filter(className => className).join(" ");
 
     // Render ColumnView
     return (
-        <div className={`ColumnView ${state}`}>
+        <div 
+            className={`ColumnView ${state}`}
+        >
             <div 
                 className="screen"
                 onContextMenu={(event) => {
                     event.preventDefault();
                     setAnchorEl(event.target);
                 }}
-                onMouseEnter={() => dispatch(setHoverTable(tableId))}
-                onMouseLeave={() => dispatch(setHoverTable(null))}
+                onMouseEnter={() => {
+                    // setIsHovering(true);
+                    dispatch(setHoverColumn(id));
+                    if (hoverTimeoutRef.current) {
+                        clearTimeout(hoverTimeoutRef.current);
+                        hoverTimeoutRef.current = null;
+                    }
+                }}
+                onMouseLeave={() => {
+                    // Only set the timeout if we're not opening a context menu
+                    if (!isPopoverOpen) {
+                        dispatch(setHoverColumn(null));
+                        // hoverTimeoutRef.current = setTimeout(
+                        //     () => dispatch(setHoverColumn(null)),
+                        //     // () => setIsHovering(false), 
+                        //     0  // Small delay to avoid flickering
+                        // );
+                    }
+                    // dispatch(setHoverTable(null))
+                }}
                 onDoubleClick={() => setIsFocused(true)}
             >
                 <input 

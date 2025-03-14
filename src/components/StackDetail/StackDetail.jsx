@@ -12,7 +12,7 @@ import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
 import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import { COLUMN_LAYOUT_CELL } from "../ColumnView";
-import { setHoverColumnIndex } from "../../data/uiSlice";
+import { setHoverColumnIndex, setHoverTable } from "../../data/uiSlice";
 
 const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";
@@ -58,6 +58,8 @@ export default function StackDetail() {
                         <div 
                             key={table.id}
                             className="tick"
+                            onMouseEnter={() => dispatch(setHoverTable(table.id))}
+                            onMouseLeave={() => dispatch(setHoverTable(null))}                            
                         >
                             {table.name}
                         </div>
@@ -72,11 +74,11 @@ export default function StackDetail() {
                         {xScale.domain().map(j => (
                             <form 
                                 key={j}
-                                onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
-                                onMouseLeave={() => dispatch(setHoverColumnIndex(null))}
                             >
                                 <div 
                                     className="index-label"
+                                    onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
+                                    onMouseLeave={() => dispatch(setHoverColumnIndex(null))}
                                 >
                                     <label>
                                         {j + 1}
