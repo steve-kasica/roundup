@@ -9,7 +9,8 @@
  */
 
 import { Fragment, useState } from "react";
-import TableView, { TABLE_LAYOUT_BLOCK } from "../TableView";
+import TableView from "./TableView";
+// import TableView, { TABLE_LAYOUT_BLOCK } from "../TableView";
 import { isOperation } from "../../lib/types/Operation";
 import { useSelector } from "react-redux";
 import { isTable } from "../../lib/types/Table";
@@ -56,9 +57,8 @@ export default function Operation({node, style, colorScale}) {
                             />)
                             : (<TableView 
                                     table={childNode.data}
-                                    layout={TABLE_LAYOUT_BLOCK}
-                                    colorScale={colorScale}
-                                    setIsHover={setIsHover}
+                                    // colorScale={colorScale}
+                                    // setIsHover={setIsHover}
                                 />)
                         }
                     </Fragment>

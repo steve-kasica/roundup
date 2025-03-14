@@ -8,11 +8,12 @@ import { Add as PlusIcon } from "@mui/icons-material"
 
 import { isOperation, PACK, STACK } from "../../lib/types/Operation"
 import Operation from "./Operation"
-import Table from "../TableView/layouts/BlockLayout"
+// import Table from "../TableView/layouts/BlockLayout"
 import TableDropTarget from "./TableDropTarget"
 import { useSelector } from "react-redux"
 import { STAGE_ARRANGE_TABLES } from "../../data/uiSlice"
 import { interpolateCividis, interpolateCool, interpolateGreys, interpolatePlasma, scaleSequential } from "d3";
+import TableView from "./TableView"
 
 const GRID_COLUMNS = 12;
 
@@ -45,6 +46,6 @@ export default function Root({node}) {
             </Grid>
         )
     else
-        return <Table node={node} />
+        return <TableView node={node.data} />
 }
 

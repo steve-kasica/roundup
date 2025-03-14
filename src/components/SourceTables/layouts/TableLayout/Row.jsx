@@ -11,27 +11,28 @@
  */
 import { useState } from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import {type as tableInstance} from "../../../lib/types/Table";
+import {isTable, type as tableInstance} from "../../../../lib/types/Table";
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
-import HighlightText from "../../ui/HighlightText";
+import HighlightText from "../../../ui/HighlightText";
 import { Typography } from "@mui/material";
-import tableIconImage from "../../../../public/images/table-icon.png";
-import { useSelector } from "react-redux";
+import tableIconImage from "../../../../../public/images/table-icon.png";
+import { useDispatch, useSelector } from "react-redux";
+import { setHoverTable } from "../../../../data/uiSlice";
+import { addTable } from "../../../../data/tableTreeSlice";
 
-export default function RowLayout({
-    className,
-    name,
-    id,
-    type,
-    rowCount,
-    columnCount,
-    date_created,
-    last_modified,
-    addTableEvent,
-    hoverTableEvent,
-    unhoverTableEvent,
-    isSelected
-}) {
+export default function Row({table}) {
+    const {name, id, rowCount, type, columnCount, date_created, last_modified } = table;
+
+    const dispatch = useDispatch();
+    const {hoverTable, selectedTables} = useSelector(({ui, tableTree}) => ({
+        hoverTable: ui.hoverTable,
+        selectedTables: new Set(tableTree.tree
+            .filter(node => isTable(node))
+            .map(table => table.id))
+    }));
+
+    const isSelected = selectedTables.has(table.id);
+
     const {searchString} = useSelector(({ui}) => ui);
     const [isPressed, setIsPressed] = useState(false);
     const [{isDragging}, dragRef, previewRef] = useDrag(() => ({
@@ -41,7 +42,10 @@ export default function RowLayout({
                 const result = monitor.getDropResult();
                 if (monitor.didDrop() && item.id === result.id) {
                     // Table has dropped
-                    addTableEvent(result.operationType);
+                    dispatch(addTable(({
+                        table,
+                        operationType: result.operationType
+                    })));
                 }
                 setIsPressed(false);
             },
@@ -54,20 +58,22 @@ export default function RowLayout({
 
     const items = [name, type, columnCount, rowCount, date_created, last_modified ];
     const isDisabled = items.join("^").indexOf(searchString) < 0;
-    className += " " + [
-        isDragging ? "dragging" : undefined,
-        isPressed ? "pressed" : undefined,
+
+    const state = [
+        hoverTable === id ? "hover" : undefined,
+        isSelected ? "selected" : undefined,
         isDisabled ? "disabled" : undefined,
-    ].filter(state => state).join(" ");
+        isPressed ? "pressed" : undefined,        
+        isDragging ? "dragging" : undefined,        
+    ].filter(name => name).join(" ");
 
     return (
         <>
             <DragPreviewImage connect={previewRef} src={tableIconImage} />
-            <tr
-                className={className}
+            <tr className={`TableView ${state}`}
                 ref={dragRef}
-                onMouseEnter={hoverTableEvent}
-                onMouseLeave={unhoverTableEvent}
+                onMouseEnter={() => dispatch(setHoverTable(id))}
+                onMouseLeave={() => dispatch(setHoverTable(null))}
             >
                 <td>
                     {(isSelected) ? (

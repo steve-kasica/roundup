@@ -6,8 +6,7 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import { TABLE_LAYOUT_BLOCK, TABLE_LAYOUT_ROW, TABLE_LAYOUT_LIST_ITEM, TABLE_STATE_HOVER } from ".";
-import BlockLayout from "./layouts/BlockLayout";
-import RowLayout from "./layouts/RowLayout";
+// import RowLayout from "../SourceTables/layouts/TableLayout/Row";
 import ListItemLayout from "./layouts/ListItemLayout";
 import { addTable, removeTable } from "../../data/tableTreeSlice";
 import { setHoverTable } from "../../data/uiSlice";
@@ -16,13 +15,9 @@ import { isTable } from "../../lib/types/Table";
 export default function TableView({table, layout, style, setIsHover}) {
     const dispatch = useDispatch();
     const {hoverTable} = useSelector(({ui}) => ui);
-    const selectedTables = useSelector(({ tableTree }) => 
-        new Set(tableTree.tree
-            .filter(node => isTable(node))
-            .map(table => table.id))
-    );
+    const selectedTables = useSelector(({ tableTree }) => null);
 
-    const isSelected = selectedTables.has(table.id);
+
     const isHovered = (hoverTable !== null && hoverTable.id === table.id);
 
     const className = [
@@ -43,22 +38,24 @@ export default function TableView({table, layout, style, setIsHover}) {
         <>
             {
             (layout === TABLE_LAYOUT_BLOCK) ? (
-                <BlockLayout
-                    className={className}
-                    {...table}
-                    style={style}
-                    setIsHover={setIsHover} // TODO: This is why these views need to be within the component
-                    {...interactionEventHandlers}
-                    {...state}
-                />
+                <p></p>
+                // <BlockLayout
+                //     className={className}
+                //     {...table}
+                //     style={style}
+                //     setIsHover={setIsHover} // TODO: This is why these views need to be within the component
+                //     {...interactionEventHandlers}
+                //     {...state}
+                // />
             ) : (layout === TABLE_LAYOUT_ROW) ? (
-                <RowLayout
-                    className={className}
-                    {...table}
-                    style={style}
-                    {...interactionEventHandlers}
-                    {...state}
-                />
+                <p></p>
+                // <RowLayout
+                //     className={className}
+                //     {...table}
+                //     style={style}
+                //     {...interactionEventHandlers}
+                //     {...state}
+                // />
             ) : (layout === TABLE_LAYOUT_LIST_ITEM) ? (
                 <ListItemLayout 
                     className={className}

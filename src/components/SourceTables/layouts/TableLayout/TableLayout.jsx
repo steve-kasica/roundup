@@ -1,16 +1,15 @@
 /**
- * TablesTable.jsx
+ * TableLayout.jsx
  * -------------------------------
  */
 import { properties as tableProperties } from "../../../../lib/types/Table";
-import { Button, Checkbox, Typography } from "@mui/material";
+import { Button, Checkbox } from "@mui/material";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
-import TableView, { TABLE_LAYOUT_ROW } from "../../../TableView";
+import Row from "./Row";
 
-const columns = tableProperties
-  .map((prop) => ({
+const COLUMNS = tableProperties.map((prop) => ({
     prop,
     label: prop.replace("_", " ")
   }));
@@ -21,7 +20,7 @@ export default function TableLayout({
   selectedTables,
 }) {
 
-  const [sortColumn, setSortColumn] = useState(columns.at(0).prop);
+  const [sortColumn, setSortColumn] = useState(COLUMNS.at(0).prop);
   const [isAscending, setIsAscending] = useState(true);
 
   const rows = sourceTables.toSorted((a, b) => {
@@ -50,7 +49,7 @@ export default function TableLayout({
                 disableRipple
               />
             </th>
-            {columns.map((column) => (
+            {COLUMNS.map((column) => (
               <th 
                 key={column.prop}
                 className="table-head"
@@ -77,15 +76,7 @@ export default function TableLayout({
           </tr>
         </thead>
         <tbody>
-          {
-            rows.map(table => (
-              <TableView 
-                key={table.id}
-                table={table}
-                layout={TABLE_LAYOUT_ROW}
-              />
-            ))
-          }
+          {rows.map(table => <Row key={table.id} table={table} />)}
         </tbody>
       </table>
     </div>
@@ -102,5 +93,4 @@ export default function TableLayout({
       return null;
     }
   }
-
-} // TablesTable()
+}

@@ -33,6 +33,7 @@ export default function StackDetail() {
         hoverColumn: ui.hoverColumn
     }));
 
+    // Reverses table order to match flex-direction (in-place)
     tables.reverse()
 
     const maxColumnCount = Math.max(...tables.map(table => table.columns.length));

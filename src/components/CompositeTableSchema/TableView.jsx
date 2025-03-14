@@ -7,32 +7,28 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusedNode, setSelectedOperation, STAGE_REFINE_OPS } from "../../../data/uiSlice";
-import ColumnView, {COLUMN_LAYOUT_TICK} from "../../ColumnView";
-import { isTable } from "../../../lib/types/Table";
-import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
-import { isOperation } from "../../../lib/types/Operation";
+import { setHoverTable, setSelectedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
+import { isTable } from "../../lib/types/Table";
+import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
+import { isOperation } from "../../lib/types/Operation";
+import ColumnView from "./ColumnView";
 
-export default function BlockLayout({
-    name,
-    columns,
-    id,
-    operation_group,
-    style,
-    removeTableEvent,
-    setIsHover,
-}) {
+export default function({table}) {
+    const {name, id, columns, operation_group} = table;
+
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
 
-    const {maxColumns, parentOperation} = useSelector(({tableTree}) => ({
+    const {maxColumns, parentOperation, stage, hoverTable} = useSelector(({tableTree, ui}) => ({
         maxColumns: Math.max(...tableTree.tree
             .filter(d => isTable(d) && d.operation_group === operation_group)
             .map(table => table.columns
                 .filter(column => column.status !== COLUMN_STATUS_REMOVED)
                 .length
             )),
-        parentOperation: tableTree.tree.filter(d => isOperation(d) && d.id === operation_group).at(0)
+        parentOperation: tableTree.tree.filter(d => isOperation(d) && d.id === operation_group).at(0),
+        stage: ui.stage,
+        hoverTable: ui.hoverTable
     }));
 
     const validColumns = columns
@@ -45,13 +41,11 @@ export default function BlockLayout({
             : new Column("null", i, undefined, undefined, undefined, id, COLUMN_STATUS_NULLED)
     );
 
-    const {stage} = useSelector(({ui}) => ui);
-
     const menuItems = [
         {
             label: `Remove ${name}`,
             isVisable: true,
-            onClick: removeTableEvent
+            onClick: () => dispatch(removeTable(table))
         },{
             label: "Remove operation",
             isVisable: true,
@@ -66,27 +60,22 @@ export default function BlockLayout({
             onClick: () => dispatch(setSelectedOperation(parentOperation))
         }
     ];
+
+    const state = [
+        hoverTable === id ? "hover" : undefined,
+    ].filter(className => className).join(" ");
     
     return (
         <>
             <div 
                 data-id={id}
-                className={`block table`}
+                className={`block table ${state}`}
                 onContextMenu={handleContextMenu}
-                style={style}
-                onMouseEnter={() => setIsHover(true)}
-                onMouseLeave={() => setIsHover(false)}
+                onMouseEnter={() => dispatch(setHoverTable(id))}
+                onMouseLeave={() => dispatch(setHoverTable(null))}
             >
                 <div className="label">{name} <span className="column-count">({columns.length})</span></div>
-                {
-                visableColumns.map((column) => (
-                    <ColumnView 
-                        key={column.id}
-                        column={column}     
-                        layout={COLUMN_LAYOUT_TICK}
-                    />
-                ))
-                }
+                {visableColumns.map((column) => <ColumnView key={column.id} column={column} />)}
             </div>
             <Menu
                 open={contextMenu !== null}
@@ -122,7 +111,6 @@ export default function BlockLayout({
 
     function handleContextMenu(event) {
         event.preventDefault();
-        // dispatch(setFocusedNode(node.parent.data));
         setContextMenu(
             (contextMenu === null)
             ? {
