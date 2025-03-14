@@ -17,7 +17,7 @@ import NavigationRail from './components/NavigationRail';
 import SourceTables from './components/SourceTables';
 import WorkflowSelector from './components/WorkflowSelector';
 import CompositeTableSchema from './components/CompositeTableSchema';
-import StackDetail from "./components/StackDetail/StackDetail";
+import OperationDetail from "./components/OperationDetail";
 import WorkflowDetail from './components/WorkflowDetail';
 import OperationsList from './components/OperationsList';
 
@@ -59,7 +59,7 @@ function App() {
                 (stage === STAGE_ARRANGE_TABLES) ? (
                   <CompositeTableSchema />
                 ) : (stage === STAGE_REFINE_OPS) ? (
-                  <StackDetail />
+                  <OperationDetail />
                 ) : null
               }
             />
