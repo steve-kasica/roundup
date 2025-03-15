@@ -15,6 +15,8 @@
  *   the focus between cells but within column index of a stack operation.
  */
 
+@import "../../../styles/variables.scss";
+
 $enabledCellColor: #555;
 $enabledCellOutlineColor: #aaa;
 $enabledCellBackgroundColor: #f9f9f9;
@@ -38,8 +40,6 @@ $cellPadding: 5px;
 $xAxisLabelHeight: 25px;
 $xAxisTickHeight: 10px;
 $yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 2px;
-
-$hover-color: goldenrod;
 
 $table-border-width: 1px;
 $table-border-style: solid;
@@ -171,6 +171,26 @@ $cell-border-color: $table-border-color;
 
                     &.hover {
                         background-color: $hover-color;
+                    }
+                    
+                    &.drag {
+                        position: fixed;
+                        // left: set inline dynamically
+                        // top: set inline dynamically
+                        filter: drop-shadow(2px 2px 2px black);
+                        // input {
+                        //     opacity: 0.1;
+                        // }
+                        // display: none;
+                    }
+
+                    &.ghost {
+                        opacity: 0.75;
+                        // border: 1px solid red;
+                    }
+
+                    &.hovered {
+                        background-color: teal !important;
                     }
 
                 }  // end .ColumnView

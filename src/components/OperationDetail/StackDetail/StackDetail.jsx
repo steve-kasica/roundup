@@ -5,14 +5,13 @@
  */
 
 import { useDispatch, useSelector } from "react-redux";
-import { swapColumnPositions } from "../../data/schemaSlice";
-import { isTable } from "../../lib/types/Table";
+import { swapColumnPositions } from "../../../data/schemaSlice";
+import { isTable } from "../../../lib/types/Table";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
-import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
-import { COLUMN_LAYOUT_CELL } from "../ColumnView";
-import { setHoverColumnIndex, setHoverTable } from "../../data/uiSlice";
+import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
+import { setHoverColumnIndex, setHoverTable } from "../../../data/uiSlice";
 
 const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";
@@ -94,7 +93,7 @@ export default function StackDetail() {
                                         position={j + 1}
                                         columnCount={table.columns.length}
                                         tableName={table.name}
-                                        />;
+                                    />;
                                 })}
                             </form>
                         ))}

@@ -5,7 +5,7 @@
  *
  */
 
-
+@import "../../styles/variables.scss";
 
 $operation-border-radius: 0px;
 $operation-padding: 0px;
@@ -33,10 +33,6 @@ $table-border-width: 1px;
 $label-text-color: $table-border-color;
 $label-font-size: 10px;
 $label-font-family: sans-serif;
-
-// Interaction state color
-$selected-color: #edc948;
-$hover-color: lighten($selected-color, 10%);
 
 @mixin operation-color($color, $parent-color) {
     background-color: $color;
@@ -180,7 +176,7 @@ $hover-color: lighten($selected-color, 10%);
             pointer-events: none;
 
             &.selected {
-                pointer-events: all;
+                pointer-events: auto;
                 cursor: default;
             }
             > .label {
@@ -234,7 +230,6 @@ $hover-color: lighten($selected-color, 10%);
             }
 
             &.selected.stack {
-                pointer-events: all;
                 .table {
                     .ColumnView {
                         &.null {

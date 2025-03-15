@@ -129,6 +129,21 @@ export const tableTreeSlice = createSlice({
                 .slice(column.index + 1)
                 .forEach(c => c.status = COLUMN_STATUS_REMOVED);
         },
+
+        /**
+         * @name swapColumnPositions
+         * @param {*} state 
+         * @param {*} action 
+         */
+        swapColumnPositions(state, action) {
+            const {tableId, sourceIndex, targetIndex} = action.payload;
+            const columns = state.tree
+                .find(node => isTable(node) && node.id === tableId)
+                .columns;
+            const temp = columns[sourceIndex];
+            columns[sourceIndex] = columns[targetIndex];
+            columns[targetIndex] = temp;
+        },
         reset() {
             return initialState;
         }
@@ -203,7 +218,8 @@ export const {
     addTable,
     setColumnProperty,
     reset,
-    removeColumnsAfter
+    removeColumnsAfter,
+    swapColumnPositions,
 } = tableTreeSlice.actions;
 
 export default tableTreeSlice.reducer;

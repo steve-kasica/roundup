@@ -8,8 +8,8 @@ import * as d3 from "d3";
 
 import {Input, Menu, MenuItem} from "@mui/material"
 import { useDispatch } from "react-redux";
-import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
-import { setColumnProperty } from "../../data/tableTreeSlice";
+import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
+import { setColumnProperty } from "../../../data/tableTreeSlice";
 import StackCell from "./StackCell";
 
 export const CELL_WIDTH = 50;  // pixels (px)

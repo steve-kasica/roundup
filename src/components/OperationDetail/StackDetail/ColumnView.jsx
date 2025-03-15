@@ -11,21 +11,80 @@
 import { useEffect, useState, useRef } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
-import { removeColumnsAfter, setColumnProperty } from "../../data/tableTreeSlice";
-import { setHoverColumn, setHoverTable } from "../../data/uiSlice";
+import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
+import { removeColumnsAfter, setColumnProperty } from "../../../data/tableTreeSlice";
+import { setHoverColumn } from "../../../data/uiSlice";
+import { drag, select, selectAll } from "d3";
+import { swapColumnPositions } from "../../../data/tableTreeSlice";
 
 const DEBOUNCE_DELAY = 500;
+const OVERLAP_THRESHOLD = 0.5; // percent
+const TABLE_ID_ATTR = "data-table-id";
 
 export default function({ column, position, tableName, columnCount }) {
     const {id, name, status, index, tableId} = column;
     const isLastInTable = (position === columnCount);
 
     const dispatch = useDispatch();
-    const {hoverColumn, hoverColumnIndex} = useSelector(({ui}) => ui);
+    const {hoverColumn, hoverColumnIndex, hoverTable} = useSelector(({ui}) => ui);
+
+    const columnDataRef = useRef();
+    useEffect(() => {
+        select(columnDataRef.current)
+            .call(drag()
+            .on("start", function() {
+                const {top, left} = this.getBoundingClientRect();
+                const originalElement = select(this);
+                const clone = originalElement.clone(true);
+                clone.classed("ghost", true);
+
+                originalElement
+                    .classed("drag", true)
+                    .style("position", "fixed")
+                    .style("top", `${top}px`)
+                    .style("left", `${left}px`);
+            })
+            .on("drag", function({dx}) {
+                const that = this;
+                const dragging = select(that);
+                const left = parseInt(dragging.style("left").replace("px"));
+                dragging.style("left", `${left + dx}px`);
+
+                selectAll(`.ColumnView[data-table-id="${tableId}"]`)
+                    .filter(function() { return (this !== that); })
+                    .classed("hovered", function() {
+                        return getPercentOverlap(this, dragging.node()) > OVERLAP_THRESHOLD;
+                    })
+            })
+            .on("end", function() {
+                const source = select(this);
+                const target = select(".ColumnView.hovered");
+
+                // reset all dragging styles
+                source
+                    .classed("drag", false)
+                    .style("position", null)
+                    .style("top", null)
+                    .style("left", null);             
+                selectAll(".ColumnView.ghost")
+                    .remove();
+                selectAll(".ColumnView.hovered")
+                    .classed("hovered", false);
+
+                // Update data state
+                if (target) {
+                    dispatch(swapColumnPositions({
+                        tableId: source.attr("data-table-id"),
+                        sourceIndex: parseInt(source.attr("data-column-index")),
+                        targetIndex: parseInt(target.attr("data-column-index")),
+                    }));
+                }
+
+            })
+        );
+    }, []);
 
     // Keep hover persistent when context menu opens
-    const [isHovering, setIsHovering] = useState(false);
     const hoverTimeoutRef = useRef(null);
 
     // Local state variables and functions for displaying context menu
@@ -40,7 +99,6 @@ export default function({ column, position, tableName, columnCount }) {
         // This could be improved with a check if mouse is still over element
         hoverTimeoutRef.current = setTimeout(
             () => dispatch(setHoverColumn(null)),
-            // () => setIsHovering(false),
             265
         );
     };
@@ -55,29 +113,32 @@ export default function({ column, position, tableName, columnCount }) {
 
     // Debounce input when modifying column attributes in the DOM
     const [value, setValue] = useState(status !== COLUMN_STATUS_NULLED ? name : "null");
-    useEffect(() => {
-        const timeoutId = setTimeout(
-            () => dispatch(setColumnProperty({
-                column,
-                property: "name",
-                value
-            })),
-            DEBOUNCE_DELAY
-        );
-        return () => clearTimeout(timeoutId);
-    }, [value, DEBOUNCE_DELAY])
+    // useEffect(() => {
+    //     const timeoutId = setTimeout(
+    //         () => dispatch(setColumnProperty({
+    //             column,
+    //             property: "name",
+    //             value
+    //         })),
+    //         DEBOUNCE_DELAY
+    //     );
+    //     return () => clearTimeout(timeoutId);
+    // }, [value, DEBOUNCE_DELAY])
 
     // Set class-based state styles
     const state = [
         (status === COLUMN_STATUS_NULLED) ? "null" : undefined,
-        (hoverColumnIndex === index || hoverColumn === id )
+        (hoverColumnIndex === index || hoverColumn === id || (hoverTable === tableId && hoverColumn === null) )
             ? "hover" 
             : undefined
     ].filter(className => className).join(" ");
 
     // Render ColumnView
     return (
-        <div 
+        <div
+            ref={columnDataRef} 
+            data-table-id={tableId}
+            data-column-index={position - 1}
             className={`ColumnView ${state}`}
         >
             <div 
@@ -164,4 +225,22 @@ export default function({ column, position, tableName, columnCount }) {
             </Popover>
     </div>
     );
+}
+
+/**
+ * getPercentOverlap
+ * 
+ * Get the percentage of overlap between two element along the x-axis, left to right.
+ * 
+ * @param {DOM} a 
+ * @param {DOM} b 
+ * 
+ * Note that `right` and `left` are relative from the viewport, see [`getBoundingClientRect`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect)
+ */
+function getPercentOverlap(a, b) {
+    const { right: aRight,  left: aLeft, width } = a.getBoundingClientRect();
+    const { right: bRight, left: bLeft } = b.getBoundingClientRect();
+    const overlap = 1 - (Math.abs(aRight - bRight) / width);
+    console.log(this);
+    return Math.max(0, overlap);
 }
