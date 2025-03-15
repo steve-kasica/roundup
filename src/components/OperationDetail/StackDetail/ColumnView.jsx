@@ -194,6 +194,7 @@ export default function({ column, position, tableName, columnCount }) {
                     <ListItemButton 
                         disabled={isLastInTable}
                         onClick={() => {
+                            console.log(this, arguments);
                             dispatch(removeColumnsAfter(column));
                             closePopover();
                         }}>

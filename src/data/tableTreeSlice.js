@@ -122,12 +122,17 @@ export const tableTreeSlice = createSlice({
          * @param {*} action 
          */
         removeColumnsAfter(state, action) {
-            const column = action.payload;
-            state.tree
-                .find(node => isTable(node) && node.id === column.tableId)
-                .columns
-                .slice(column.index + 1)
-                .forEach(c => c.status = COLUMN_STATUS_REMOVED);
+            const lastColumn = action.payload;
+            const table = state.tree
+                .find(node => isTable(node) && node.id === lastColumn.tableId);
+            
+            table.columns
+                .slice(
+                    table.columns
+                        .map(({id}) => id)
+                        .indexOf(lastColumn.id) + 1
+                )
+                .forEach(column => column.status = COLUMN_STATUS_REMOVED); 
         },
 
         /**
