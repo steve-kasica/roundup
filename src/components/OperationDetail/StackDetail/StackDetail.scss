@@ -193,6 +193,10 @@ $cell-border-color: $table-border-color;
                         background-color: teal !important;
                     }
 
+                    &.selected {
+                        background-color: $selected-color;
+                    }
+
                 }  // end .ColumnView
 
                 &:focus-within {

@@ -232,8 +232,14 @@ $label-font-family: sans-serif;
             &.selected.stack {
                 .table {
                     .ColumnView {
+                        cursor: pointer;
                         &.null {
+                            cursor: default;
                             background-color: #ddd;
+                        }
+
+                        &.selected {
+                            background-color: $selected-color;
                         }
 
                         &:hover, &.hover {

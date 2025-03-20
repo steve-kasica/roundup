@@ -19,10 +19,9 @@ import { swapColumnPositions } from "../../../data/tableTreeSlice";
 
 const DEBOUNCE_DELAY = 500;
 const OVERLAP_THRESHOLD = 0.5; // percent
-const TABLE_ID_ATTR = "data-table-id";
 
 export default function({ column, position, tableName, columnCount }) {
-    const {id, name, status, index, tableId} = column;
+    const {id, name, status, index, tableId, isSelected} = column;
     const isLastInTable = (position === columnCount);
 
     const dispatch = useDispatch();
@@ -72,14 +71,20 @@ export default function({ column, position, tableName, columnCount }) {
                     .classed("hovered", false);
 
                 // Update data state
-                if (target) {
+                if (target.node()) {
                     dispatch(swapColumnPositions({
                         tableId: source.attr("data-table-id"),
                         sourceIndex: parseInt(source.attr("data-column-index")),
                         targetIndex: parseInt(target.attr("data-column-index")),
                     }));
+                } else {
+                    // Treat as if a regular click, equivalent to callback for onMouseUp
+                    dispatch(setColumnProperty({
+                        column,
+                        property: "isSelected",
+                        value: !isSelected
+                    }));
                 }
-
             })
         );
     }, []);
@@ -130,7 +135,8 @@ export default function({ column, position, tableName, columnCount }) {
         (status === COLUMN_STATUS_NULLED) ? "null" : undefined,
         (hoverColumnIndex === index || hoverColumn === id || (hoverTable === tableId && hoverColumn === null) )
             ? "hover" 
-            : undefined
+            : undefined,
+        (isSelected) ? "selected" : undefined
     ].filter(className => className).join(" ");
 
     // Render ColumnView
@@ -194,7 +200,6 @@ export default function({ column, position, tableName, columnCount }) {
                     <ListItemButton 
                         disabled={isLastInTable}
                         onClick={() => {
-                            console.log(this, arguments);
                             dispatch(removeColumnsAfter(column));
                             closePopover();
                         }}>
@@ -242,6 +247,5 @@ function getPercentOverlap(a, b) {
     const { right: aRight,  left: aLeft, width } = a.getBoundingClientRect();
     const { right: bRight, left: bLeft } = b.getBoundingClientRect();
     const overlap = 1 - (Math.abs(aRight - bRight) / width);
-    console.log(this);
     return Math.max(0, overlap);
 }

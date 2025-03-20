@@ -28,6 +28,7 @@ export default function Column(
         tableId,
         status,
         original: {name},
+        isSelected: false,
     }
 }
 

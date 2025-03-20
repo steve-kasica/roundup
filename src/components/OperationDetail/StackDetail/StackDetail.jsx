@@ -12,6 +12,7 @@ import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
 import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
 import { setHoverColumnIndex, setHoverTable } from "../../../data/uiSlice";
+import { setColumnProperty } from "../../../data/tableTreeSlice";
 
 const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";
@@ -76,6 +77,29 @@ export default function StackDetail() {
                             >
                                 <div 
                                     className="index-label"
+                                    onClick={() => {
+                                        const columns = tables
+                                            .map(table => (j < table.columns.length) ? table.columns.at(j) : null)
+                                            .filter(column => column);
+                                        const isIndexSelected = columns.filter(column => column.isSelected).length === columns.length;
+                                        if (isIndexSelected) {
+                                            // If every column in the index is selected, unselect all columns in the index
+                                            columns.forEach(column => dispatch(setColumnProperty({
+                                                column,
+                                                property: "isSelected",
+                                                value: false
+                                            })))
+                                        } else {
+                                            // Select all unselected columns in the index
+                                            columns
+                                                .filter(column => !column.isSelected)
+                                                .forEach(column => dispatch(setColumnProperty({
+                                                    column,
+                                                    property: "isSelected",
+                                                    value: true
+                                                })))
+                                        }
+                                    }}
                                     onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
                                     onMouseLeave={() => dispatch(setHoverColumnIndex(null))}
                                 >
