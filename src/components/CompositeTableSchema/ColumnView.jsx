@@ -1,12 +1,12 @@
 /**
  * CompositeTableSchema/ColumnView.jsx
  * 
- * Notes:
+ * A view for Column instances within the Composite Table Schema component
  */
 
 import { useDispatch } from "react-redux";
 import { COLUMN_STATUS_NULLED } from "../../lib/types/Column";
-import { setColumnProperty } from "../../data/tableTreeSlice";
+import { setColumnHover, setColumnProperty } from "../../data/tableTreeSlice";
 
 export default function({column}) {
     const {status, isSelected, isHovered} = column;
@@ -27,15 +27,15 @@ export default function({column}) {
                 property: "isSelected",
                 value: !isSelected
             }))}
-            onMouseEnter={() => dispatch(setColumnProperty({
-                column,
-                property: "isHovered",
-                value: true
+            onMouseEnter={() => dispatch(setColumnHover({
+                tableId: column.tableId,
+                columnId: column.id,
+                isHovered: true
             }))}
-            onMouseLeave={() => dispatch(setColumnProperty({
-                column,
-                property: "isHovered",
-                value: false
+            onMouseLeave={() => dispatch(setColumnHover({
+                tableId: column.tableId,
+                columnId: column.id,
+                isHovered: false
             }))}
         >
         </div>

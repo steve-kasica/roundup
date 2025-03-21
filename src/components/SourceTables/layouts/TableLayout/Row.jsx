@@ -17,7 +17,7 @@ import HighlightText from "../../../ui/HighlightText";
 import { Typography } from "@mui/material";
 import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useDispatch, useSelector } from "react-redux";
-import { addTable, setColumnProperty } from "../../../../data/tableTreeSlice";
+import { addTable, setTableHover } from "../../../../data/tableTreeSlice";
 
 export default function Row({table}) {
     const {name, id, rowCount, type, columnCount, date_created, last_modified, columns } = table;
@@ -70,19 +70,17 @@ export default function Row({table}) {
             <tr className={`TableView ${state}`}
                 ref={dragRef}
                 onMouseEnter={() => (isSelected) 
-                    ? columns.forEach(column => dispatch(setColumnProperty({
-                        column,
-                        property: "isHovered",
-                        value: true
-                    })))
+                    ? dispatch(setTableHover({
+                        tableId: table.id, 
+                        isHovered: true
+                    }))
                     : null
                 }
                 onMouseLeave={() => (isSelected) 
-                    ? columns.forEach(column => dispatch(setColumnProperty({
-                        column,
-                        property: "isHovered",
-                        value: false
-                    })))
+                    ? dispatch(setTableHover({
+                        tableId: table.id, 
+                        isHovered: false
+                    }))
                     : null
                 }
             >

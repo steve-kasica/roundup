@@ -1,7 +1,8 @@
 /**
  * StackDetail.jsx
  * 
- * 
+ * The main entrypoint for the Stack Detail Component. This component provides details about the
+ * stack operation
  */
 
 import { useDispatch, useSelector } from "react-redux";
@@ -9,8 +10,8 @@ import { isTable } from "../../../lib/types/Table";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
-import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
-import { setColumnProperty } from "../../../data/tableTreeSlice";
+import { COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
+import { setColumnProperty, setTableHover, setColumnIndexHover } from "../../../data/tableTreeSlice";
 
 const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";
@@ -56,20 +57,14 @@ export default function StackDetail() {
                         <div 
                             key={table.id}
                             className="tick"
-                            onMouseEnter={() => table.columns
-                                .forEach(column => dispatch(setColumnProperty({
-                                    column,
-                                    property: "isHovered",
-                                    value: true
-                                })))
-                            }
-                            onMouseLeave={() => table.columns
-                                .forEach(column => dispatch(setColumnProperty({
-                                    column,
-                                    property: "isHovered",
-                                    value: false
-                                })))
-                            }
+                            onMouseEnter={() => dispatch(setTableHover({
+                                tableId: table.id, 
+                                isHovered: true
+                            }))}
+                            onMouseLeave={() => dispatch(setTableHover({
+                                tableId: table.id, 
+                                isHovered: false
+                            }))}
                         >
                             {table.name}
                         </div>
@@ -110,21 +105,16 @@ export default function StackDetail() {
                                                 })))
                                         }
                                     }}
-                                    onMouseEnter={() => tables
-                                            .map(table => (j < table.columns.length) ? table.columns.at(j) : null)
-                                            .filter(column => column)
-                                            .forEach(column => dispatch(setColumnProperty({
-                                                column,
-                                                property: "isHovered",
-                                                value: true })))
-                                    }
-                                    onMouseLeave={() => tables
-                                        .map(table => (j < table.columns.length) ? table.columns.at(j) : null)
-                                        .filter(column => column)
-                                        .forEach(column => dispatch(setColumnProperty({
-                                            column,
-                                            property: "isHovered",
-                                            value: false })))}
+                                    onMouseEnter={() => dispatch(setColumnIndexHover({
+                                        tableIds: tables.map(table => table.id),
+                                        index: j,
+                                        isHovered: true
+                                    }))}
+                                    onMouseLeave={() => dispatch(setColumnIndexHover({
+                                        tableIds: tables.map(table => table.id),
+                                        index: j,
+                                        isHovered: false
+                                    }))}
                                 >
                                     <label>
                                         {j + 1}

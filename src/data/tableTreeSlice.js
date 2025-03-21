@@ -112,11 +112,19 @@ export const tableTreeSlice = createSlice({
             }
         },
         setColumnProperty(state, {payload}) {
-            const {column, property, value} = payload;
+            let {columns, property, value} = payload;
+
+            if (!Array.isArray(columns)) {
+                columns = [columns];
+            }
+
             const table = state.tree
-                .filter(node => isTable(node) && node.id === column.tableId).at(0);
-            const column2 = table.columns.filter(c => c.id === column.id).at(0);
-            column2[property] = value;
+                .find(node => isTable(node) && node.id === columns[0].tableId);
+            columns.forEach(column => {
+                table.columns.find(c => c.id === column.id)[property] = value;
+            });
+            // const column2 = table.columns.filter(c => c.id === column.id).at(0);
+            // column2[property] = value;
         },
         /**
          * @name removeColumnsAfter
@@ -152,6 +160,38 @@ export const tableTreeSlice = createSlice({
             const temp = columns[sourceIndex];
             columns[sourceIndex] = columns[targetIndex];
             columns[targetIndex] = temp;
+        },
+        setTableHover(state, action) {
+            const {tableId, isHovered} = action.payload;
+            state.tree
+                .find(node => isTable(node) && node.id === tableId)
+                .columns
+                .forEach(column => column.isHovered = isHovered);
+        },
+        /**
+         * @name setColumnHover
+         * @description Set the hover attribute for a specific column given
+         * a table and column id
+         * 
+         * @param {*} state 
+         * @param {*} action: payload must contain {tableId, columnId, isHovered} 
+         */
+        setColumnHover(state, action) {
+            const {tableId, columnId, isHovered} = action.payload;
+            state.tree
+                .find(node => isTable(node) && node.id == tableId)
+                .columns
+                .find(column => column.id === columnId)
+                .isHovered = isHovered;
+        },
+        setColumnIndexHover(state, action) {
+            const {tableIds, index, isHovered} = action.payload;
+            tableIds.forEach(tableId => state.tree
+                .find(node => isTable(node) && node.id === tableId)
+                .columns
+                .at(index)
+                .isHovered = isHovered
+            )
         },
         reset() {
             return initialState;
@@ -261,6 +301,9 @@ export const {
     reset,
     removeColumnsAfter,
     swapColumnPositions,
+    setTableHover,
+    setColumnHover,
+    setColumnIndexHover,
 } = tableTreeSlice.actions;
 
 export default tableTreeSlice.reducer;

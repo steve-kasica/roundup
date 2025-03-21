@@ -2,6 +2,8 @@
 /** 
  * ColumnView.jsx 
  * 
+ * A view for Column instance data within the StackDetail component
+ * 
  * Notes:
  *  - *autofocus*: I had technical trouble trigger focus on input elements from the rename option in
  *    the context menu. Follow the useEffect-approach listed on [Stack Overflow](https://stackoverflow.com/a/79315636/3734991)
@@ -13,7 +15,7 @@ import { useEffect, useState, useRef } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
-import { removeColumnsAfter, setColumnProperty } from "../../../data/tableTreeSlice";
+import { removeColumnsAfter, setColumnHover, setColumnProperty } from "../../../data/tableTreeSlice";
 import { drag, select, selectAll } from "d3";
 import { swapColumnPositions } from "../../../data/tableTreeSlice";
 
@@ -103,10 +105,10 @@ export default function({ column, position, tableName, columnCount }) {
         // Determine if we should still be hovering based on mouse position
         // This could be improved with a check if mouse is still over element
         hoverTimeoutRef.current = setTimeout(
-            () => dispatch(setColumnProperty({
-                column,
-                property: "isHovered",
-                value: true
+            () => dispatch(setColumnHover({
+                tableId: column.tableId,
+                columnId: column.id,
+                isHovered: true
             })),
             265
         );
@@ -156,10 +158,10 @@ export default function({ column, position, tableName, columnCount }) {
                     setAnchorEl(event.target);
                 }}
                 onMouseEnter={() => {
-                    dispatch(setColumnProperty({
-                        column,
-                        property: "isHovered",
-                        value: true
+                    dispatch(setColumnHover({
+                        tableId: column.tableId,
+                        columnId: column.id,
+                        isHovered: true
                     }));
                     if (hoverTimeoutRef.current) {
                         clearTimeout(hoverTimeoutRef.current);
@@ -168,10 +170,10 @@ export default function({ column, position, tableName, columnCount }) {
                 }}
                 onMouseLeave={() => {
                     if (!isPopoverOpen) {
-                        dispatch(setColumnProperty({
-                            column,
-                            property: "isHovered",
-                            value: false
+                        dispatch(setColumnHover({
+                            tableId: column.tableId,                            
+                            columnId: column.id,
+                            isHovered: false
                         }));
                     }
                 }}
@@ -202,10 +204,10 @@ export default function({ column, position, tableName, columnCount }) {
                             property: "status",
                             value: COLUMN_STATUS_REMOVED
                         }));
-                        dispatch(setColumnProperty({
-                            column,
-                            property: "isHovered",
-                            value: false
+                        dispatch(setColumnHover({
+                            tableId: column.tableId,
+                            columnId: column.id,
+                            isHovered: true
                         }));
                         closePopover();
                     }}>
