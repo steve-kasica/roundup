@@ -5,13 +5,11 @@
  */
 
 import { useDispatch, useSelector } from "react-redux";
-import { swapColumnPositions } from "../../../data/schemaSlice";
 import { isTable } from "../../../lib/types/Table";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
 import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
-import { setHoverColumnIndex, setHoverTable } from "../../../data/uiSlice";
 import { setColumnProperty } from "../../../data/tableTreeSlice";
 
 const X_AXIS_LABEL = "column index"
@@ -58,8 +56,20 @@ export default function StackDetail() {
                         <div 
                             key={table.id}
                             className="tick"
-                            onMouseEnter={() => dispatch(setHoverTable(table.id))}
-                            onMouseLeave={() => dispatch(setHoverTable(null))}                            
+                            onMouseEnter={() => table.columns
+                                .forEach(column => dispatch(setColumnProperty({
+                                    column,
+                                    property: "isHovered",
+                                    value: true
+                                })))
+                            }
+                            onMouseLeave={() => table.columns
+                                .forEach(column => dispatch(setColumnProperty({
+                                    column,
+                                    property: "isHovered",
+                                    value: false
+                                })))
+                            }
                         >
                             {table.name}
                         </div>
@@ -100,8 +110,21 @@ export default function StackDetail() {
                                                 })))
                                         }
                                     }}
-                                    onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
-                                    onMouseLeave={() => dispatch(setHoverColumnIndex(null))}
+                                    onMouseEnter={() => tables
+                                            .map(table => (j < table.columns.length) ? table.columns.at(j) : null)
+                                            .filter(column => column)
+                                            .forEach(column => dispatch(setColumnProperty({
+                                                column,
+                                                property: "isHovered",
+                                                value: true })))
+                                    }
+                                    onMouseLeave={() => tables
+                                        .map(table => (j < table.columns.length) ? table.columns.at(j) : null)
+                                        .filter(column => column)
+                                        .forEach(column => dispatch(setColumnProperty({
+                                            column,
+                                            property: "isHovered",
+                                            value: false })))}
                                 >
                                     <label>
                                         {j + 1}
@@ -127,9 +150,4 @@ export default function StackDetail() {
         </div>
         ) : null
     );
-
-    // TODO: implement cell swaping action
-    // function onCellSwap(columnA, columnB, tableId) {
-    //     dispatch(swapColumnPositions(columnA, columnB, tableId))
-    // }
 }

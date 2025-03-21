@@ -29,6 +29,7 @@ export default function Column(
         status,
         original: {name},
         isSelected: false,
+        isHovered: false,
     }
 }
 

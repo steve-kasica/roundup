@@ -7,11 +7,12 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setHoverTable, setSelectedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
+import { setSelectedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
 import { isTable } from "../../lib/types/Table";
 import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import { isOperation } from "../../lib/types/Operation";
 import ColumnView from "./ColumnView";
+import { setColumnProperty } from "../../data/tableTreeSlice";
 
 export default function({table}) {
     const {name, id, columns, operation_group} = table;
@@ -19,7 +20,7 @@ export default function({table}) {
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
 
-    const {maxColumns, parentOperation, stage, hoverTable} = useSelector(({tableTree, ui}) => ({
+    const {maxColumns, parentOperation, stage} = useSelector(({tableTree, ui}) => ({
         maxColumns: Math.max(...tableTree.tree
             .filter(d => isTable(d) && d.operation_group === operation_group)
             .map(table => table.columns
@@ -28,7 +29,6 @@ export default function({table}) {
             )),
         parentOperation: tableTree.tree.filter(d => isOperation(d) && d.id === operation_group).at(0),
         stage: ui.stage,
-        hoverTable: ui.hoverTable
     }));
 
     const validColumns = columns
@@ -61,8 +61,9 @@ export default function({table}) {
         }
     ];
 
+    const isHovered = columns.filter(column => column.isHovered).length === columns.length;
     const state = [
-        hoverTable === id ? "hover" : undefined,
+        isHovered ? "hover" : undefined,
     ].filter(className => className).join(" ");
     
     return (
@@ -71,8 +72,16 @@ export default function({table}) {
                 data-id={id}
                 className={`block table ${state}`}
                 onContextMenu={handleContextMenu}
-                onMouseEnter={() => dispatch(setHoverTable(id))}
-                onMouseLeave={() => dispatch(setHoverTable(null))}
+                onMouseEnter={() => columns.forEach(column => dispatch(setColumnProperty({
+                    column,
+                    property: "isHovered",
+                    value: true
+                })))}
+                onMouseLeave={() => columns.forEach(column => dispatch(setColumnProperty({
+                    column,
+                    property: "isHovered",
+                    value: false
+                })))}
             >
                 <div className="label">{name} <span className="column-count">({columns.length})</span></div>
                 {visableColumns.map((column) => <ColumnView key={column.id} column={column} />)}

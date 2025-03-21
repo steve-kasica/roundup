@@ -17,21 +17,18 @@ import HighlightText from "../../../ui/HighlightText";
 import { Typography } from "@mui/material";
 import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useDispatch, useSelector } from "react-redux";
-import { setHoverTable } from "../../../../data/uiSlice";
-import { addTable } from "../../../../data/tableTreeSlice";
+import { addTable, setColumnProperty } from "../../../../data/tableTreeSlice";
 
 export default function Row({table}) {
-    const {name, id, rowCount, type, columnCount, date_created, last_modified } = table;
+    const {name, id, rowCount, type, columnCount, date_created, last_modified, columns } = table;
 
     const dispatch = useDispatch();
-    const {hoverTable, selectedTables} = useSelector(({ui, tableTree}) => ({
-        hoverTable: ui.hoverTable,
-        selectedTables: new Set(tableTree.tree
-            .filter(node => isTable(node))
-            .map(table => table.id))
-    }));
+    const selectedTables = useSelector(({tableTree}) => tableTree.tree.filter(node => isTable(node)));
 
-    const isSelected = selectedTables.has(table.id);
+    const isSelected = selectedTables.map(({id}) => id).includes(id);
+    const isHovered = (isSelected) 
+        ? selectedTables.find(t => t.id === id).columns.filter(column => !column.isHovered).length === 0
+        : false;
 
     const {searchString} = useSelector(({ui}) => ui);
     const [isPressed, setIsPressed] = useState(false);
@@ -60,11 +57,11 @@ export default function Row({table}) {
     const isDisabled = items.join("^").indexOf(searchString) < 0;
 
     const state = [
-        hoverTable === id ? "hover" : undefined,
-        isSelected ? "selected" : undefined,
-        isDisabled ? "disabled" : undefined,
-        isPressed ? "pressed" : undefined,        
-        isDragging ? "dragging" : undefined,        
+        isHovered   ? "hover"       : undefined,
+        isSelected  ? "selected"    : undefined,
+        isDisabled  ? "disabled"    : undefined,
+        isPressed   ? "pressed"     : undefined,        
+        isDragging  ? "dragging"    : undefined,        
     ].filter(name => name).join(" ");
 
     return (
@@ -72,8 +69,22 @@ export default function Row({table}) {
             <DragPreviewImage connect={previewRef} src={tableIconImage} />
             <tr className={`TableView ${state}`}
                 ref={dragRef}
-                onMouseEnter={() => dispatch(setHoverTable(id))}
-                onMouseLeave={() => dispatch(setHoverTable(null))}
+                onMouseEnter={() => (isSelected) 
+                    ? columns.forEach(column => dispatch(setColumnProperty({
+                        column,
+                        property: "isHovered",
+                        value: true
+                    })))
+                    : null
+                }
+                onMouseLeave={() => (isSelected) 
+                    ? columns.forEach(column => dispatch(setColumnProperty({
+                        column,
+                        property: "isHovered",
+                        value: false
+                    })))
+                    : null
+                }
             >
                 <td>
                     {(isSelected) ? (

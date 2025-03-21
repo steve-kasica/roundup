@@ -38,9 +38,6 @@ export const initialState = {
     firstPaneWidth: 20,
     hoverOperation: null,
     selectedOperation: null,
-    hoverColumn: null,
-    hoverColumnIndex: null,
-    hoverTable: null,
 };
 
 export const uiSlice = createSlice({
@@ -74,27 +71,6 @@ export const uiSlice = createSlice({
         },
         setSelectedOperation: (state, action) => {
             state.selectedOperation = action.payload;
-        },
-
-        /**
-         * 
-         * @param {*} state 
-         * @param {*} action: action payload contains unique column id 
-         */
-        setHoverColumn: (state, action) => {
-            state.hoverColumn = action.payload;
-        },
-        setHoverColumnIndex: (state, action) => {
-            state.hoverColumnIndex = action.payload;
-        },
-
-        /**
-         * 
-         * @param {*} state 
-         * @param {*} action: action payload contains unique table id 
-         */
-        setHoverTable: (state, action) => {
-            state.hoverTable = action.payload;
         }
     }
 });
@@ -115,10 +91,7 @@ export const {
     setSearchString,
     setFirstPaneWidth,
     setHoverOperation,
-    setSelectedOperation,
-    setHoverColumn,
-    setHoverColumnIndex,
-    setHoverTable,
+    setSelectedOperation
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

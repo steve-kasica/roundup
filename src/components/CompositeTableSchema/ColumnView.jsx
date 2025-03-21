@@ -1,25 +1,25 @@
 /**
  * CompositeTableSchema/ColumnView.jsx
  * 
- * 
+ * Notes:
+ *  - *Null columns*: Sometimes a null column instance is passed to this view via the 
+ *    `column` prop. Since this column does not exist in the dataset,
+ *    I've disabled pointer events on elements that match `div.ColumnView.null`
+ *    so the onClick event defined here does not fire for those cases.
  */
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { COLUMN_STATUS_NULLED } from "../../lib/types/Column";
-import { setHoverColumn } from "../../data/uiSlice";
 import { setColumnProperty } from "../../data/tableTreeSlice";
 
 export default function({column}) {
-    const {id, status, index, tableId, isSelected} = column;
-
+    const {status, isSelected, isHovered} = column;
+    const isNull = (status === COLUMN_STATUS_NULLED);
     const dispatch = useDispatch();
-    const {hoverColumnIndex, hoverColumn, hoverTable} = useSelector(({ui}) => ui);
 
     const state = [
-        (status === COLUMN_STATUS_NULLED) ? "null" : undefined,
-        (hoverColumnIndex === index || hoverColumn === id || (!hoverColumn && hoverTable === tableId))
-            ? "hover" 
-            : undefined,
+        (isNull) ? "null" : undefined,
+        (isHovered) ? "hover" : undefined,
         (isSelected) ? "selected" : undefined
     ].filter(className => className).join(" ");
 
@@ -31,10 +31,17 @@ export default function({column}) {
                 property: "isSelected",
                 value: !isSelected
             }))}
-            onMouseEnter={() => dispatch(setHoverColumn(id))}
-            onMouseLeave={() => dispatch(setHoverColumn(null))}
+            onMouseEnter={() => dispatch(setColumnProperty({
+                column,
+                property: "isHovered",
+                value: true
+            }))}
+            onMouseLeave={() => dispatch(setColumnProperty({
+                column,
+                property: "isHovered",
+                value: false
+            }))}
         >
-            &nbsp;
         </div>
     );
 }

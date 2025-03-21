@@ -6,20 +6,18 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import { TABLE_LAYOUT_BLOCK, TABLE_LAYOUT_ROW, TABLE_LAYOUT_LIST_ITEM, TABLE_STATE_HOVER } from ".";
-// import RowLayout from "../SourceTables/layouts/TableLayout/Row";
 import ListItemLayout from "./layouts/ListItemLayout";
-import { addTable, removeTable } from "../../data/tableTreeSlice";
-import { setHoverTable } from "../../data/uiSlice";
-import { isTable } from "../../lib/types/Table";
+import { addTable, removeTable, setColumnProperty } from "../../data/tableTreeSlice";
 
-export default function TableView({table, layout, style, setIsHover}) {
+export default function TableView({table, layout, style}) {
+    const {columns} = table;
     const dispatch = useDispatch();
-    const {hoverTable} = useSelector(({ui}) => ui);
     const selectedTables = useSelector(({ tableTree }) => null);
     const isSelected = false;
 
 
-    const isHovered = (hoverTable !== null && hoverTable.id === table.id);
+    // const isHovered = (hoverTable !== null && hoverTable.id === table.id);
+    const isHovered = (columns.filter(column => column.isHovered).length === columns.length);
 
     const className = [
         "TableView",
@@ -79,10 +77,18 @@ export default function TableView({table, layout, style, setIsHover}) {
     }
 
     function hoverTableEvent() {
-        dispatch(setHoverTable(table));
+        columns.forEach(column => dispatch(setColumnProperty({
+            column,
+            property: "isHovered",
+            value: true
+        })));
     }
 
     function unhoverTableEvent() {
-        dispatch(setHoverTable(null));
+        columns.forEach(column => dispatch(setColumnProperty({
+            column,
+            property: "isHovered",
+            value: false
+        })));
     }
 }

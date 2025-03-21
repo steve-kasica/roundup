@@ -3,9 +3,14 @@
  * ColumnView.jsx 
  * 
  * Notes:
- *  - I had technical trouble trigger focus on input elements from the rename option in
+ *  - *autofocus*: I had technical trouble trigger focus on input elements from the rename option in
  *    the context menu. Follow the useEffect-approach listed on [Stack Overflow](https://stackoverflow.com/a/79315636/3734991)
  *    was able to make the UI perform the desired behavior.
+ * 
+ *  - *Null columns*: Sometimes a null column instance is passed to this view via the 
+ *    `column` prop. Since this column does not exist in the dataset,
+ *    I've disabled pointer events on elements that match `div.ColumnView.null`
+ *    so interaction events, e.g. `onMouseLeave`, `onClick`, etc..., defined here does not fire for those cases.
  */
 
 import { useEffect, useState, useRef } from "react";
@@ -13,19 +18,18 @@ import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
 import { removeColumnsAfter, setColumnProperty } from "../../../data/tableTreeSlice";
-import { setHoverColumn } from "../../../data/uiSlice";
 import { drag, select, selectAll } from "d3";
 import { swapColumnPositions } from "../../../data/tableTreeSlice";
 
-const DEBOUNCE_DELAY = 500;
+// const DEBOUNCE_DELAY = 500;
 const OVERLAP_THRESHOLD = 0.5; // percent
 
 export default function({ column, position, tableName, columnCount }) {
-    const {id, name, status, index, tableId, isSelected} = column;
+    const { name, status, tableId, isSelected, isHovered} = column;
     const isLastInTable = (position === columnCount);
 
     const dispatch = useDispatch();
-    const {hoverColumn, hoverColumnIndex, hoverTable} = useSelector(({ui}) => ui);
+    const {hoverColumnIndex, hoverTable} = useSelector(({ui}) => ui);
 
     const columnDataRef = useRef();
     useEffect(() => {
@@ -103,7 +107,11 @@ export default function({ column, position, tableName, columnCount }) {
         // Determine if we should still be hovering based on mouse position
         // This could be improved with a check if mouse is still over element
         hoverTimeoutRef.current = setTimeout(
-            () => dispatch(setHoverColumn(null)),
+            () => dispatch(setColumnProperty({
+                column,
+                property: "isHovered",
+                value: true
+            })),
             265
         );
     };
@@ -133,9 +141,7 @@ export default function({ column, position, tableName, columnCount }) {
     // Set class-based state styles
     const state = [
         (status === COLUMN_STATUS_NULLED) ? "null" : undefined,
-        (hoverColumnIndex === index || hoverColumn === id || (hoverTable === tableId && hoverColumn === null) )
-            ? "hover" 
-            : undefined,
+        (isHovered) ? "hovered" : undefined,
         (isSelected) ? "selected" : undefined
     ].filter(className => className).join(" ");
 
@@ -154,7 +160,11 @@ export default function({ column, position, tableName, columnCount }) {
                     setAnchorEl(event.target);
                 }}
                 onMouseEnter={() => {
-                    dispatch(setHoverColumn(id));
+                    dispatch(setColumnProperty({
+                        column,
+                        property: "isHovered",
+                        value: true
+                    }));
                     if (hoverTimeoutRef.current) {
                         clearTimeout(hoverTimeoutRef.current);
                         hoverTimeoutRef.current = null;
@@ -162,7 +172,11 @@ export default function({ column, position, tableName, columnCount }) {
                 }}
                 onMouseLeave={() => {
                     if (!isPopoverOpen) {
-                        dispatch(setHoverColumn(null));
+                        dispatch(setColumnProperty({
+                            column,
+                            property: "isHovered",
+                            value: false
+                        }));
                     }
                 }}
                 onDoubleClick={() => setIsFocused(true)}
@@ -192,7 +206,11 @@ export default function({ column, position, tableName, columnCount }) {
                             property: "status",
                             value: COLUMN_STATUS_REMOVED
                         }));
-                        dispatch(setHoverColumn(null));
+                        dispatch(setColumnProperty({
+                            column,
+                            property: "isHovered",
+                            value: false
+                        }));
                         closePopover();
                     }}>
                         Remove {column.name}
