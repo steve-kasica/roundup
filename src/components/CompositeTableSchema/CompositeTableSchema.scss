@@ -234,7 +234,6 @@ $label-font-family: sans-serif;
                     .ColumnView {
                         cursor: pointer;
                         &.null {
-                            pointer-events: none;
                             cursor: default;
                             background-color: #ddd;
                         }

@@ -163,7 +163,6 @@ $cell-border-color: $table-border-color;
                 
                     &.null {
                         background-color: #ddd;
-                        pointer-events: none;
                         input {
                             font-style: italic;
                             text-transform: uppercase;

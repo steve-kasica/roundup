@@ -131,9 +131,7 @@ export default function StackDetail() {
                                     </label>
                                 </div>
                                 {tables.map(table => {
-                                    const column = (j < table.columns.length)
-                                        ? table.columns.at(j)
-                                        :  new Column("null", j, "", {}, "", table.id, COLUMN_STATUS_NULLED);
+                                    const column = table.columns.at(j);
                                     return <ColumnView 
                                         key={column.id} 
                                         column={column} 

@@ -8,11 +8,9 @@ import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
-import { isTable } from "../../lib/types/Table";
-import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
+import { COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import { isOperation } from "../../lib/types/Operation";
 import ColumnView from "./ColumnView";
-import { setColumnProperty } from "../../data/tableTreeSlice";
 
 export default function({table}) {
     const {name, id, columns, operation_group} = table;
@@ -20,26 +18,10 @@ export default function({table}) {
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
 
-    const {maxColumns, parentOperation, stage} = useSelector(({tableTree, ui}) => ({
-        maxColumns: Math.max(...tableTree.tree
-            .filter(d => isTable(d) && d.operation_group === operation_group)
-            .map(table => table.columns
-                .filter(column => column.status !== COLUMN_STATUS_REMOVED)
-                .length
-            )),
+    const {parentOperation, stage} = useSelector(({tableTree, ui}) => ({
         parentOperation: tableTree.tree.filter(d => isOperation(d) && d.id === operation_group).at(0),
         stage: ui.stage,
     }));
-
-    const validColumns = columns
-        .filter(column => column.status !== COLUMN_STATUS_REMOVED);
-
-    const visableColumns = Array.from(
-        {length: maxColumns}, 
-        (_,i) => (i < validColumns.length)
-            ? validColumns.at(i)
-            : new Column("null", i, undefined, undefined, undefined, id, COLUMN_STATUS_NULLED)
-    );
 
     const menuItems = [
         {
@@ -61,7 +43,7 @@ export default function({table}) {
         }
     ];
 
-    const isHovered = columns.filter(column => column.isHovered).length === columns.length;
+    const isHovered = columns.filter(column => column.isHovered).length > 0;
     const state = [
         isHovered ? "hover" : undefined,
     ].filter(className => className).join(" ");
@@ -72,19 +54,11 @@ export default function({table}) {
                 data-id={id}
                 className={`block table ${state}`}
                 onContextMenu={handleContextMenu}
-                onMouseEnter={() => columns.forEach(column => dispatch(setColumnProperty({
-                    column,
-                    property: "isHovered",
-                    value: true
-                })))}
-                onMouseLeave={() => columns.forEach(column => dispatch(setColumnProperty({
-                    column,
-                    property: "isHovered",
-                    value: false
-                })))}
             >
                 <div className="label">{name} <span className="column-count">({columns.length})</span></div>
-                {visableColumns.map((column) => <ColumnView key={column.id} column={column} />)}
+                {columns
+                    .filter(column => column.status !== COLUMN_STATUS_REMOVED)
+                    .map((column) => <ColumnView key={column.id} column={column} />)}
             </div>
             <Menu
                 open={contextMenu !== null}

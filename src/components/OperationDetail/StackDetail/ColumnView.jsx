@@ -7,10 +7,6 @@
  *    the context menu. Follow the useEffect-approach listed on [Stack Overflow](https://stackoverflow.com/a/79315636/3734991)
  *    was able to make the UI perform the desired behavior.
  * 
- *  - *Null columns*: Sometimes a null column instance is passed to this view via the 
- *    `column` prop. Since this column does not exist in the dataset,
- *    I've disabled pointer events on elements that match `div.ColumnView.null`
- *    so interaction events, e.g. `onMouseLeave`, `onClick`, etc..., defined here does not fire for those cases.
  */
 
 import { useEffect, useState, useRef } from "react";

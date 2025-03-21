@@ -2,10 +2,6 @@
  * CompositeTableSchema/ColumnView.jsx
  * 
  * Notes:
- *  - *Null columns*: Sometimes a null column instance is passed to this view via the 
- *    `column` prop. Since this column does not exist in the dataset,
- *    I've disabled pointer events on elements that match `div.ColumnView.null`
- *    so the onClick event defined here does not fire for those cases.
  */
 
 import { useDispatch } from "react-redux";

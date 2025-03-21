@@ -27,7 +27,7 @@ export default function Row({table}) {
 
     const isSelected = selectedTables.map(({id}) => id).includes(id);
     const isHovered = (isSelected) 
-        ? selectedTables.find(t => t.id === id).columns.filter(column => !column.isHovered).length === 0
+        ? selectedTables.find(t => t.id === id).columns.filter(column => column.isHovered).length > 0
         : false;
 
     const {searchString} = useSelector(({ui}) => ui);

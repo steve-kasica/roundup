@@ -10,7 +10,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { stratify as d3stratify } from "d3";
 import Operation, { isOperation, isPackOperation, isStackOperation, NO_OP, STACK } from "../lib/types/Operation";
 import { isTable } from "../lib/types/Table";
-import { COLUMN_STATUS_REMOVED } from "../lib/types/Column";
+import Column, { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../lib/types/Column";
 
 const initialState = {
     tree: [],
@@ -105,6 +105,10 @@ export const tableTreeSlice = createSlice({
 
             if (state.tree.length > 2) {
                 state.tree = simplifyTree(state.tree);
+
+                if (payload.operationType === STACK) {
+                    balanceStackColumns(state.tree, table.operation_group);
+                }
             }
         },
         setColumnProperty(state, {payload}) {
@@ -174,9 +178,9 @@ function simplifyTree(tree) {
     const root = stratify(tree);
     const nodesToRemove = [];
 
-    // Group stack operations together
+    // Group nested operations together
     root.each((node) => {
-        if (node.children) {
+        if (node.children) {            
             node.children.forEach(child => {
                 const isNestedOperation = (
                     (isStackOperation(node.data) && isStackOperation(child.data)) ||
@@ -190,9 +194,41 @@ function simplifyTree(tree) {
         }
     });
 
+    // Remove any consolidated operations
     return root.descendants()
         .map(n => n.data)
         .filter(d => !(isOperation(d) && nodesToRemove.includes(d.id)));
+
+}
+
+/**
+ * balanceStackColumns
+ * 
+ * Given an the current state and an operation ID, identifies the table with the most columns
+ * in the stack and backfills other columns with null columns, so all tables within the 
+ * stack operation have the same width.
+ * 
+ * TODO: This current implement will break if a child of a stack operation is another operation
+ * 
+ * @param {*} tree 
+ * @param {*} operationId 
+ */
+function balanceStackColumns(tree, operationId) {
+    const tables = tree
+        .map((node, i) => [node, i])
+        .filter(([node, index]) => isTable(node) && node.operation_group === operationId);
+
+    const maxColumns = Math.max(...tables.map(([table, index]) => table.columns.length));
+
+    tables.forEach(([table, index]) => {
+        if (table.columns.length < maxColumns) {
+            const nullColumns = Array.from(
+                {length: maxColumns - table.columns.length}, 
+                () => new Column("null", undefined, undefined, null, null, table.id, COLUMN_STATUS_NULLED)
+            );
+            tree[index].columns = [...table.columns, ...nullColumns];
+        }
+    })
 }
 
 /**
