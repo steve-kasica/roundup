@@ -24,13 +24,16 @@ import {
     STAGE_EXPORT,
     initialState
 } from "../data/uiSlice";
+import { createSelector } from "@reduxjs/toolkit";
+
+// TODO: is this necessary
+const selectTree = (state) => state.tableTree.tree;
+const selectIsTreeEmpty = createSelector([selectTree], (tree) => tree.length === 0);
 
 export default function({currentStage}) {
     const dispatch = useDispatch();
-    const {workflow, isTreeEmpty} = useSelector(({ui, tableTree}) => ({
-        workflow: ui.workflow,
-        isTreeEmpty: tableTree.tree.length === 0
-    }));
+    const {workflow} = useSelector(({ui}) => ui)
+    const isTreeEmpty = useSelector(selectIsTreeEmpty);
 
     const navigationItems = [
         {

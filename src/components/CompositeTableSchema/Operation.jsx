@@ -10,23 +10,17 @@
 
 import { Fragment, useState } from "react";
 import TableView from "./TableView";
-// import TableView, { TABLE_LAYOUT_BLOCK } from "../TableView";
 import { isOperation } from "../../lib/types/Operation";
 import { useSelector } from "react-redux";
 import { isTable } from "../../lib/types/Table";
-
-const STACK_OPERATION = "stack";
-const PACK_OPERATION = "pack";
 
 export default function Operation({node, style, colorScale}) {
     const {data, children} = node;
     const {selectedOperation} = useSelector(({ui}) => ui);
     const isSelected = (selectedOperation && selectedOperation.id === data.id);
-    const [isHover, setIsHover] = useState(false);
     const className=[
         "operation",
         data.type,
-        (isHover) ? "hover" : undefined,
         (isSelected) ? "selected" : undefined,
         `depth-${node.depth}`
     ].filter(name => name).join(" ");
@@ -56,10 +50,9 @@ export default function Operation({node, style, colorScale}) {
                                 colorScale={colorScale}
                             />)
                             : (<TableView 
-                                    table={childNode.data}
-                                    // colorScale={colorScale}
-                                    // setIsHover={setIsHover}
-                                />)
+                                table={childNode.data} 
+                                parentOperation={data}
+                            />)
                         }
                     </Fragment>
                 ))}  

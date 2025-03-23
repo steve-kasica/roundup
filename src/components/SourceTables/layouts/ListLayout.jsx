@@ -10,7 +10,8 @@ import { isTable } from "../../../lib/types/Table";
 
 export default function TablesList({
     searchString, 
-    sourceTables
+    sourceTables,
+    selectedTableIds
 }) {
 
     return (
@@ -34,6 +35,7 @@ export default function TablesList({
                             key={table.id}
                             table={table}
                             layout={TABLE_LAYOUT_LIST_ITEM}
+                            isSelected={selectedTableIds.has(table.id)}
                         />
                     ))
                 }

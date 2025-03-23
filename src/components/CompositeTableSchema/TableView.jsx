@@ -11,17 +11,34 @@ import { setSelectedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
 import { COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
 import { isOperation } from "../../lib/types/Operation";
 import ColumnView from "./ColumnView";
+import { createSelector } from "@reduxjs/toolkit";
 
-export default function({table}) {
-    const {name, id, columns, operation_group} = table;
+// const selectTableTree = (state) => state.tableTree.tree;
+// const selectStage = (state) => state.stage;
+
+// const selectOperationAndStage = createSelector(
+//     [selectTableTree, selectStage, (_, operation_group) => operation_group],
+//     (tree, stage, operation_group) => ({
+//         parentOperation: tree.find(d => isOperation(d) && d.id === operation_group),
+//         stage
+//     })
+// );
+
+export default function({table, parentOperation}) {
+    const {name, id, columns} = table;
 
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
 
-    const {parentOperation, stage} = useSelector(({tableTree, ui}) => ({
-        parentOperation: tableTree.tree.filter(d => isOperation(d) && d.id === operation_group).at(0),
-        stage: ui.stage,
-    }));
+    const {stage} = useSelector(({ui}) => ui);
+    // const {parentOperation, stage} = useSelector(
+    //     state => selectOperationAndStage(state, operation_group)
+    // );
+    
+    const isHovered = columns.filter(column => column.isHovered).length > 0;
+    const state = [
+        isHovered ? "hover" : undefined,
+    ].filter(className => className).join(" ");
 
     const menuItems = [
         {
@@ -42,11 +59,6 @@ export default function({table}) {
             onClick: () => dispatch(setSelectedOperation(parentOperation))
         }
     ];
-
-    const isHovered = columns.filter(column => column.isHovered).length > 0;
-    const state = [
-        isHovered ? "hover" : undefined,
-    ].filter(className => className).join(" ");
     
     return (
         <>

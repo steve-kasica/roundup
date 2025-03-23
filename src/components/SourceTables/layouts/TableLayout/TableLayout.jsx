@@ -14,10 +14,16 @@ const COLUMNS = tableProperties.map((prop) => ({
     label: prop.replace("_", " ")
   }));
 
+  /**
+   * 
+   * @param {*} props
+   *  - selectedTableIds is a Set
+   * @returns 
+   */
 export default function TableLayout({ 
   handleSelectAllClick,
   sourceTables,
-  selectedTables,
+  selectedTableIds,
 }) {
 
   const [sortColumn, setSortColumn] = useState(COLUMNS.at(0).prop);
@@ -31,8 +37,8 @@ export default function TableLayout({
     }
   });
 
-  const areAllTablesSelected = (sourceTables.length === selectedTables.size);
-  const areSomeTablesChecked = selectedTables.size > 0;
+  const areAllTablesSelected = (sourceTables.length === selectedTableIds.size);
+  const areSomeTablesChecked = selectedTableIds.size > 0;
 
   return (
     <div className="table-layout">
@@ -76,7 +82,17 @@ export default function TableLayout({
           </tr>
         </thead>
         <tbody>
-          {rows.map(table => <Row key={table.id} table={table} />)}
+          {rows.map(table => {
+            const isSelected = selectedTableIds.has(table.id);
+            return (<Row 
+              key={table.id}
+              table={table} 
+              isSelected={isSelected}
+              isHovered={(isSelected && false)} 
+              // ? selectedTables.find(t => t.id === id).columns.filter(column => column.isHovered).length > 0
+              // : false;}
+            />);
+          })}
         </tbody>
       </table>
     </div>

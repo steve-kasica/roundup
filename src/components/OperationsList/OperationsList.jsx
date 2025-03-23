@@ -2,9 +2,17 @@ import { List, ListItemText, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { stratify } from "../../data/tableTreeSlice";
 import { setSelectedOperation } from "../../data/uiSlice";
+import { createSelector } from "@reduxjs/toolkit";
+
+const selectTreeArray = state => state.tableTree.tree;
+
+const selectTreeRoot = createSelector(
+    [selectTreeArray],
+    (tree) => stratify(tree)
+);
 
 export default function OperationsList() {
-    const root = useSelector(({tableTree}) => stratify(tableTree.tree));
+    const root = useSelector(selectTreeRoot);
     const {selectedOperation} = useSelector(({ui}) => ui)
     const dispatch = useDispatch();
     

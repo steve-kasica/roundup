@@ -15,24 +15,28 @@ import SearchBar from "./SearchBar";
 import "./SourceTables.scss"
 
 import {useGetWorkflowSchemasQuery} from "../../services/workflows";
+import { createSelector } from "@reduxjs/toolkit";
 
 const TABLE_LAYOUT = "table";
 const LIST_LAYOUT = "list";
 const FIRST_PANE_THRESHOLD = 30;
 
+const selectTree = (state) => state.tableTree.tree;
+const selectSelectedTableIds = createSelector(
+    [selectTree], 
+    (tree) => new Set(tree
+        .filter(isTable)
+        .map(table => table.id))
+);
+
 export default function SourceTables() {
     const dispatch = useDispatch();
+    
+    const selectedTableIds = useSelector(selectSelectedTableIds);
+    const {firstPaneWidth, workflow, searchString} = useSelector(({ui}) => ui);
 
-    const {ui, selectedTables} = useSelector(({ ui, tableTree }) => ({
-        ui,
-        // TODO: does the whole component re-render everytime a table is selected?        
-        selectedTables: new Set(tableTree.tree
-            .filter(node => isTable(node))
-            .map(table => table.id))
-    }));
-
-    const layout = (ui.firstPaneWidth < FIRST_PANE_THRESHOLD) ? LIST_LAYOUT : TABLE_LAYOUT;
-    const { data: sourceTables, error, isLoading } = useGetWorkflowSchemasQuery(ui.workflow.value);
+    const layout = (firstPaneWidth < FIRST_PANE_THRESHOLD) ? LIST_LAYOUT : TABLE_LAYOUT;
+    const { data: sourceTables, error, isLoading } = useGetWorkflowSchemasQuery(workflow.value);
 
     return (
         <div className="SourceTables">
@@ -45,17 +49,17 @@ export default function SourceTables() {
                 <p>TODO...</p>
             ) : (sourceTables && layout === LIST_LAYOUT) ? (
                 <ListLayout 
-                    searchString={ui.searchString} 
+                    searchString={searchString} 
                     handleTablePrimaryClick={handleTablePrimaryClick}
                     sourceTables={sourceTables} 
-                    selectedTables={selectedTables}
+                    selectedTableIds={selectedTableIds}
                 />
             ) : (sourceTables && layout === TABLE_LAYOUT) ? (
                 <TableLayout 
                     handleTablePrimaryClick={handleTablePrimaryClick}
                     handleSelectAllClick={handleSelectAllClick}
                     sourceTables={sourceTables}
-                    selectedTables={selectedTables}
+                    selectedTableIds={selectedTableIds}
                 />
             ) : null}        
         </div>
@@ -87,12 +91,12 @@ export default function SourceTables() {
         if (checked) {
             // Select all unseleted source tables
             sourceTables
-                .filter(({id}) => !selectedTables.has(id))
+                .filter(({id}) => !selectedTableIds.has(id))
                 .forEach(table => dispatch(addTable({table, operationType: STACK })));
         } else if (!checked) {
             // Unselect all selected soruce tables
             sourceTables
-                .filter(({id}) => selectedTables.has(id))
+                .filter(({id}) => selectedTableIds.has(id))
                 .forEach(table => dispatch(removeTable(table)));            
         }
     }

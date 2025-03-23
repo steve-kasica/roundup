@@ -19,16 +19,10 @@ import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useDispatch, useSelector } from "react-redux";
 import { addTable, setTableHover } from "../../../../data/tableTreeSlice";
 
-export default function Row({table}) {
+export default function Row({table, isSelected, isHovered}) {
     const {name, id, rowCount, type, columnCount, date_created, last_modified, columns } = table;
 
     const dispatch = useDispatch();
-    const selectedTables = useSelector(({tableTree}) => tableTree.tree.filter(node => isTable(node)));
-
-    const isSelected = selectedTables.map(({id}) => id).includes(id);
-    const isHovered = (isSelected) 
-        ? selectedTables.find(t => t.id === id).columns.filter(column => column.isHovered).length > 0
-        : false;
 
     const {searchString} = useSelector(({ui}) => ui);
     const [isPressed, setIsPressed] = useState(false);

@@ -12,28 +12,42 @@ import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
 import { COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
 import { setColumnProperty, setTableHover, setColumnIndexHover } from "../../../data/tableTreeSlice";
+import { createSelector } from "@reduxjs/toolkit";
 
 const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";
 const cellSize = 50;  // in height and width of cells (in pixels)
 
-export default function StackDetail() {
-    const dispatch = useDispatch();
-    const {tables, hoverColumn} = useSelector(({tableTree, ui}) => ({
-        tables: tableTree.tree
+const selectTree = state => state.tableTree.tree;
+const selectSelectedOperation = state => state.ui.selectedOperation;
+
+const selectedTablesByOperation = createSelector(
+    [selectTree, selectSelectedOperation],
+    (tree, selectedOperation) => {
+        // Only process if we have a selected operation
+        if (!selectSelectedOperation) return new Array();
+
+        const tables = tree
             .filter(node => (
-                isTable(node) && 
-                ui.selectedOperation && 
-                node.operation_group === ui.selectedOperation.id))
+                isTable(node) && node.operation_group === selectedOperation.id)
+            )
             .map(table => ({
                 ...table,
                 columns: table.columns.filter(({status}) => status !== COLUMN_STATUS_REMOVED)
-            })),
-        hoverColumn: ui.hoverColumn
-    }));
+            }));
+        // Reverses table order to match flex-direction (in-place)            
+        tables.reverse();
 
-    // Reverses table order to match flex-direction (in-place)
-    tables.reverse()
+        return tables;
+    }
+);
+
+export default function StackDetail() {
+    const dispatch = useDispatch();
+    const tables = useSelector(selectedTablesByOperation);
+
+
+
 
     const maxColumnCount = Math.max(...tables.map(table => table.columns.length));
     const columnPositions = Array.from({length: maxColumnCount}, (_, i) => i);
