@@ -38,6 +38,7 @@ export default function({column}) {
                 isHovered: false
             }))}
         >
+            &nbsp;
         </div>
     );
 }
