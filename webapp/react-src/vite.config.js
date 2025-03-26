@@ -13,6 +13,16 @@ import react from '@vitejs/plugin-react-swc'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    outDir: path.resolve(__dirname, '../resouces/module'),
+    rollupOptions: {
+      output: {
+        entryFileNames: 'open-roundup.js',
+        assetFileNames: 'open-roundup.[ext]'
+      }
+    }
+  },
+  base: './',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src")
