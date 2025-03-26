@@ -8,6 +8,10 @@ import tableTreeReducer from "./tableTreeSlice";
 import { tableAPI } from "../services/table";
 import { workflowAPI } from "../services/workflows";
 import { listenerMiddleware } from "../listenerMiddleware";
+import createSagaMiddleware from "redux-saga";
+import rootSaga from "./sagas";
+
+const sagaMidddleware = createSagaMiddleware();
 
 const store = configureStore({
     reducer: {
@@ -27,8 +31,11 @@ const store = configureStore({
     middleware: (getDefaultMiddleware) => getDefaultMiddleware()
         .concat(tableAPI.middleware)
         .concat(workflowAPI.middleware)
+        .concat(sagaMidddleware)
         .prepend(listenerMiddleware.middleware),
 });
+
+sagaMidddleware.run(rootSaga);
 
 
 // optional, but required for refetchOnFocus/refetchOnReconnect behaviors

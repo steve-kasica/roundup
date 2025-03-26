@@ -16,6 +16,8 @@ import "./SourceTables.scss"
 
 import {useGetWorkflowSchemasQuery} from "../../services/workflows";
 import { createSelector } from "@reduxjs/toolkit";
+import { useEffect } from "react";
+import { fetchTablesRequest } from "../../data/slices/sourceTablesSlice";
 
 const TABLE_LAYOUT = "table";
 const LIST_LAYOUT = "list";
@@ -31,12 +33,16 @@ const selectSelectedTableIds = createSelector(
 
 export default function SourceTables() {
     const dispatch = useDispatch();
-    
+
     const selectedTableIds = useSelector(selectSelectedTableIds);
     const {firstPaneWidth, workflow, searchString} = useSelector(({ui}) => ui);
 
     const layout = (firstPaneWidth < FIRST_PANE_THRESHOLD) ? LIST_LAYOUT : TABLE_LAYOUT;
     const { data: sourceTables, error, isLoading } = useGetWorkflowSchemasQuery(workflow.value);
+
+    useEffect(() => {
+        dispatch(fetchTablesRequest());
+    }, []);
 
     return (
         <div className="SourceTables">
