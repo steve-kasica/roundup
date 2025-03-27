@@ -3,7 +3,7 @@
  * 
  * This component handles interaction events that modify global state,
  * independent of table item layout, in order to support different
- * layouts for source table items. It also handles some basic styles
+ * layouts for source table attributes. It also handles some basic styles
  * linked with interaction that's consistent across layout modes.
  * 
  * See:
@@ -11,7 +11,7 @@
  */
 import { useState } from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import {isTable, type as tableInstance} from "../../../../lib/types/Table";
+import {attributeMap, ID_ATTR, isTable, type as tableInstance} from "../../../../lib/types/Table";
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 import HighlightText from "../../../ui/HighlightText";
 import { Typography } from "@mui/material";
@@ -20,12 +20,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { addTable, setTableHover } from "../../../../data/tableTreeSlice";
 
 export default function Row({table, isSelected, isHovered}) {
-    const {name, id, rowCount, type, columnCount, date_created, last_modified, columns } = table;
+    const id = table[ID_ATTR];
+    const values = Array.from(attributeMap.keys()).map(attr => table.attributes[attr]);
 
     const dispatch = useDispatch();
-
     const {searchString} = useSelector(({ui}) => ui);
     const [isPressed, setIsPressed] = useState(false);
+    
     const [{isDragging}, dragRef, previewRef] = useDrag(() => ({
             type: tableInstance,
             item: {id},
@@ -47,16 +48,14 @@ export default function Row({table, isSelected, isHovered}) {
         []
     );
 
-    const items = [name, type, columnCount, rowCount, date_created, last_modified ];
-    const isDisabled = items.join("^").indexOf(searchString) < 0;
-
+    const isDisabled = values.join("^").indexOf(searchString) < 0;
     const state = [
         isHovered   ? "hover"       : undefined,
         isSelected  ? "selected"    : undefined,
         isDisabled  ? "disabled"    : undefined,
         isPressed   ? "pressed"     : undefined,        
         isDragging  ? "dragging"    : undefined,        
-    ].filter(name => name).join(" ");
+    ].filter(Boolean).join(" ");
 
     return (
         <>
@@ -85,7 +84,7 @@ export default function Row({table, isSelected, isHovered}) {
                         <CheckBoxOutlineBlank />
                     )}
                 </td>
-                {items.map((text, i) => (
+                {values.map((text, i) => (
                     <td key={i}>
                         <Typography color={isDisabled ? "textDisabled" : "normal"}>
                             <HighlightText pattern={searchString} text={String(text)} />

@@ -1,0 +1,239 @@
+{
+    "projects": {
+        "2134092257652": {
+            "created": "2025-03-26T16:27:30.380688Z",
+            "modified": "2025-03-26T16:27:30.418526Z",
+            "name": "results",
+            "tags": [
+                "open-roundup",
+                "babyname-politics"
+            ],
+            "creator": "",
+            "contributors": "",
+            "subject": "",
+            "description": "",
+            "rowCount": 51,
+            "title": "",
+            "version": "",
+            "license": "",
+            "homepage": "",
+            "image": "",
+            "importOptionMetadata": [
+                {
+                    "encoding": "US-ASCII",
+                    "separator": ",",
+                    "ignoreLines": -1,
+                    "headerLines": 1,
+                    "skipDataLines": 0,
+                    "limit": -1,
+                    "storeBlankRows": true,
+                    "storeBlankColumns": true,
+                    "guessCellValueTypes": false,
+                    "processQuotes": true,
+                    "quoteCharacter": "\"",
+                    "storeBlankCellsAsNulls": true,
+                    "includeFileSources": false,
+                    "includeArchiveFileName": false,
+                    "trimStrings": false,
+                    "disableAutoPreview": false,
+                    "projectName": "results",
+                    "projectTags": [
+                        "open-roundup",
+                        "babyname-politics"
+                    ],
+                    "fileSource": "results.csv",
+                    "archiveFileName": null
+                }
+            ],
+            "customMetadata": {}
+        },
+        "2060634868909": {
+            "created": "2025-03-26T16:22:21.095663Z",
+            "modified": "2025-03-26T16:22:21.556145Z",
+            "name": "violent crimes",
+            "tags": [
+                "crime-and-heat",
+                "open-roundup"
+            ],
+            "creator": "",
+            "contributors": "",
+            "subject": "",
+            "description": "",
+            "rowCount": 64739,
+            "title": "",
+            "version": "",
+            "license": "",
+            "homepage": "",
+            "image": "",
+            "importOptionMetadata": [
+                {
+                    "encoding": "US-ASCII",
+                    "separator": ",",
+                    "ignoreLines": -1,
+                    "headerLines": 1,
+                    "skipDataLines": 0,
+                    "limit": -1,
+                    "storeBlankRows": true,
+                    "storeBlankColumns": true,
+                    "guessCellValueTypes": false,
+                    "processQuotes": true,
+                    "quoteCharacter": "\"",
+                    "storeBlankCellsAsNulls": true,
+                    "includeFileSources": false,
+                    "includeArchiveFileName": false,
+                    "trimStrings": false,
+                    "disableAutoPreview": false,
+                    "projectName": "violent crimes",
+                    "projectTags": [
+                        "crime-and-heat",
+                        "open-roundup"
+                    ],
+                    "fileSource": "violent_crimes.csv",
+                    "archiveFileName": null
+                }
+            ],
+            "customMetadata": {}
+        },
+        "2646279702716": {
+            "created": "2025-03-26T16:21:03.527833Z",
+            "modified": "2025-03-26T16:21:03.870089Z",
+            "name": "lambert 1",
+            "tags": [
+                "open-roundup",
+                "crime-and-heat"
+            ],
+            "creator": "",
+            "contributors": "",
+            "subject": "",
+            "description": "",
+            "rowCount": 3653,
+            "title": "",
+            "version": "",
+            "license": "",
+            "homepage": "",
+            "image": "",
+            "importOptionMetadata": [
+                {
+                    "encoding": "US-ASCII",
+                    "separator": ",",
+                    "ignoreLines": -1,
+                    "headerLines": 1,
+                    "skipDataLines": 0,
+                    "limit": -1,
+                    "storeBlankRows": true,
+                    "storeBlankColumns": true,
+                    "guessCellValueTypes": false,
+                    "processQuotes": true,
+                    "quoteCharacter": "\"",
+                    "storeBlankCellsAsNulls": true,
+                    "includeFileSources": false,
+                    "includeArchiveFileName": false,
+                    "trimStrings": false,
+                    "disableAutoPreview": false,
+                    "projectName": "lambert 1",
+                    "projectTags": [
+                        "open-roundup",
+                        "crime-and-heat"
+                    ],
+                    "fileSource": "lambert_1.csv",
+                    "archiveFileName": null
+                }
+            ],
+            "customMetadata": {}
+        },
+        "2491520988186": {
+            "created": "2025-03-26T16:21:36.386711Z",
+            "modified": "2025-03-26T16:21:36.414483Z",
+            "name": "lambert 2",
+            "tags": [
+                "crime-and-heat",
+                "open-roundup"
+            ],
+            "creator": "",
+            "contributors": "",
+            "subject": "",
+            "description": "",
+            "rowCount": 120,
+            "title": "",
+            "version": "",
+            "license": "",
+            "homepage": "",
+            "image": "",
+            "importOptionMetadata": [
+                {
+                    "encoding": "US-ASCII",
+                    "separator": ",",
+                    "ignoreLines": -1,
+                    "headerLines": 1,
+                    "skipDataLines": 0,
+                    "limit": -1,
+                    "storeBlankRows": true,
+                    "storeBlankColumns": true,
+                    "guessCellValueTypes": false,
+                    "processQuotes": true,
+                    "quoteCharacter": "\"",
+                    "storeBlankCellsAsNulls": true,
+                    "includeFileSources": false,
+                    "includeArchiveFileName": false,
+                    "trimStrings": false,
+                    "disableAutoPreview": false,
+                    "projectName": "lambert 2",
+                    "projectTags": [
+                        "crime-and-heat",
+                        "open-roundup"
+                    ],
+                    "fileSource": "lambert_2.csv",
+                    "archiveFileName": null
+                }
+            ],
+            "customMetadata": {}
+        },
+        "2603321492518": {
+            "created": "2025-03-26T16:26:30.785825Z",
+            "modified": "2025-03-26T16:26:30.801980Z",
+            "name": "candidates",
+            "tags": [
+                "open-roundup",
+                "democratic-candidate-codonors"
+            ],
+            "creator": "",
+            "contributors": "",
+            "subject": "",
+            "description": "",
+            "rowCount": 15,
+            "title": "",
+            "version": "",
+            "license": "",
+            "homepage": "",
+            "image": "",
+            "importOptionMetadata": [
+                {
+                    "encoding": "UTF-8",
+                    "separator": ",",
+                    "ignoreLines": -1,
+                    "headerLines": 1,
+                    "skipDataLines": 0,
+                    "limit": -1,
+                    "storeBlankRows": true,
+                    "storeBlankColumns": true,
+                    "guessCellValueTypes": false,
+                    "processQuotes": true,
+                    "quoteCharacter": "\"",
+                    "storeBlankCellsAsNulls": true,
+                    "includeFileSources": false,
+                    "includeArchiveFileName": false,
+                    "trimStrings": false,
+                    "disableAutoPreview": false,
+                    "projectName": "candidates",
+                    "projectTags": [
+                        "open-roundup",
+                        "democratic-candidate-codonors"
+                    ],
+                    "fileSource": "candidates.csv",
+                    "archiveFileName": null
+                }
+            ],
+            "customMetadata": {}
+        }
+    }
+}

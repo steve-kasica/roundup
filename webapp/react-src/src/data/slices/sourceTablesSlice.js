@@ -22,13 +22,15 @@ const slice = createSlice({
         },
         fetchTablesSuccess: (state, action) => {
             state.loading = false;
-            state.data = action.payload;
-            console.log(action.payload);
+            state.data = action.payload.data;
+            state.ids = action.payload.ids;
         },
         fetchTablesFailure: (state, action) => {
+            if (process.env.NODE_ENV === "development") {
+                console.error("Error: fetch tables failure", action);                        
+            }
             state.loading = false;
             state.error = action.payload;
-            console.log(action.payload);            
         }
     }
 });

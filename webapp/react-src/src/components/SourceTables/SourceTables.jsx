@@ -33,16 +33,10 @@ const selectSelectedTableIds = createSelector(
 
 export default function SourceTables() {
     const dispatch = useDispatch();
-
-    const selectedTableIds = useSelector(selectSelectedTableIds);
-    const {firstPaneWidth, workflow, searchString} = useSelector(({ui}) => ui);
+    // const selectedTableIds = useSelector(selectSelectedTableIds);
+    const {firstPaneWidth, searchString} = useSelector(({ui}) => ui);
 
     const layout = (firstPaneWidth < FIRST_PANE_THRESHOLD) ? LIST_LAYOUT : TABLE_LAYOUT;
-    const { data: sourceTables, error, isLoading } = useGetWorkflowSchemasQuery(workflow.value);
-
-    useEffect(() => {
-        dispatch(fetchTablesRequest());
-    }, []);
 
     return (
         <div className="SourceTables">
@@ -51,23 +45,17 @@ export default function SourceTables() {
                 placeholder="Search tables"
                 onChange={({currentTarget}) => dispatch(setSearchString(currentTarget.value))}
             />
-            {(error || isLoading) ? (
-                <p>TODO...</p>
-            ) : (sourceTables && layout === LIST_LAYOUT) ? (
+            {(layout === LIST_LAYOUT && false) ? (
                 <ListLayout 
                     searchString={searchString} 
                     handleTablePrimaryClick={handleTablePrimaryClick}
-                    sourceTables={sourceTables} 
-                    selectedTableIds={selectedTableIds}
                 />
-            ) : (sourceTables && layout === TABLE_LAYOUT) ? (
+            ) : (
                 <TableLayout 
                     handleTablePrimaryClick={handleTablePrimaryClick}
                     handleSelectAllClick={handleSelectAllClick}
-                    sourceTables={sourceTables}
-                    selectedTableIds={selectedTableIds}
                 />
-            ) : null}        
+            )}        
         </div>
     );
 

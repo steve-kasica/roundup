@@ -4,6 +4,7 @@ import schemaReducer from "./schemaSlice";
 import uiReducer from "./uiSlice";
 import issuesReducer from "./issuesSlice";
 import tableTreeReducer from "./tableTreeSlice";
+import sourceTablesReducer from "./slices/sourceTablesSlice";
 
 import { tableAPI } from "../services/table";
 import { workflowAPI } from "../services/workflows";
@@ -20,6 +21,7 @@ const store = configureStore({
         issues: issuesReducer,
         ui: uiReducer,
         tableTree: tableTreeReducer,
+        sourceTables: sourceTablesReducer,
 
         // Add the generated reducer as a specific top-level slices
         [tableAPI.reducerPath]: tableAPI.reducer,

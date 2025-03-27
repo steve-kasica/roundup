@@ -1,10 +1,8 @@
 /**
  * vite.config.js
  * -----------------------------------------------
- * A configuration file used by Vite and shadcn/ui.
- * See these pages for more
- *  - https://vite.dev/config/
- *  - https://ui.shadcn.com/docs/installation/vite
+ * A configuration file used by Vite
+ * See these https://vite.dev/config for more.
  */
 
 import path from "path";
@@ -14,12 +12,15 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: path.resolve(__dirname, '../resouces/module'),
+    outDir: path.resolve(__dirname, '../../module'),
     rollupOptions: {
       output: {
         entryFileNames: 'open-roundup.js',
         assetFileNames: 'open-roundup.[ext]'
-      }
+      },
+      external: [
+        'public/command'
+      ]
     }
   },
   base: './',

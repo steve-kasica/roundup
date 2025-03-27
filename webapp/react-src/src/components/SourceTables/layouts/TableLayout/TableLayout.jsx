@@ -2,43 +2,47 @@
  * TableLayout.jsx
  * -------------------------------
  */
-import { properties as tableProperties } from "../../../../lib/types/Table";
+import { attributeMap } from "../../../../lib/types/Table";
 import { Button, Checkbox } from "@mui/material";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
 import Row from "./Row";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchTablesRequest } from "../../../../data/slices/sourceTablesSlice";
 
-const COLUMNS = tableProperties.map((prop) => ({
-    prop,
-    label: prop.replace("_", " ")
-  }));
+const tableAttributes = Array.from(attributeMap.entries(), ([attr, label]) => ({attr, label}));
 
-  /**
-   * 
-   * @param {*} props
-   *  - selectedTableIds is a Set
-   * @returns 
-   */
-export default function TableLayout({ 
-  handleSelectAllClick,
-  sourceTables,
-  selectedTableIds,
-}) {
-
-  const [sortColumn, setSortColumn] = useState(COLUMNS.at(0).prop);
+export default function TableLayout({ handleSelectAllClick }) {
+  const dispatch = useDispatch();
+  const [sortAttribute, setSortAttribute] = useState(tableAttributes.at(0).attr);
   const [isAscending, setIsAscending] = useState(true);
 
-  const rows = sourceTables.toSorted((a, b) => {
-    if (isAscending) {
-      return ascending(a[sortColumn], b[sortColumn])
-    } else {
-      return descending(a[sortColumn], b[sortColumn])
-    }
-  });
+  // TODO (optimization)
+  // memoize selector here for sourceTables, sourceTable and isAscending and sortAttribute
+  const {sourceTables, loading, error} = useSelector(({sourceTables}) => ({
+    sourceTables: Array.from(
+        Object.entries(sourceTables.data), ([id, table]) => (table)
+      )
+      .toSorted((a, b) => (isAscending)
+        ? ascending(a.attributes[sortAttribute], b.attributes[sortAttribute])
+        : descending(a.attributes[sortAttribute], b.attributes[sortAttribute])),
+    loading: sourceTables.loading,
+    error: sourceTables.error
+    })
+  );
 
-  const areAllTablesSelected = (sourceTables.length === selectedTableIds.size);
-  const areSomeTablesChecked = selectedTableIds.size > 0;
+  useEffect(() => {
+      dispatch(fetchTablesRequest());
+  }, [dispatch]);
+
+  const selectedTableIds = new Set();
+
+  // const areAllTablesSelected = (sourceTables.length === selectedTableIds.size);
+  // const areSomeTablesChecked = selectedTableIds.size > 0;
+  const areAllTablesSelected = false;
+  const areSomeTablesChecked = false;
 
   return (
     <div className="table-layout">
@@ -46,18 +50,23 @@ export default function TableLayout({
         <thead>
           <tr>
             <th>
-              <Checkbox 
+              {/* TODO (guidance): a check-all button could be an easy way for the user
+                to specify that it wants the system to make an attempt at automagically
+                combining the tables currently in the selection, with or without the 
+                already selected tables
+               */}
+              {/* <Checkbox 
                 edge="start"
                 tabIndex={-1}
                 checked={areAllTablesSelected}
                 indeterminate={!areAllTablesSelected && areSomeTablesChecked}
                 onChange={(event) => handleSelectAllClick(event.target)}
                 disableRipple
-              />
+              /> */}
             </th>
-            {COLUMNS.map((column) => (
+            {tableAttributes.map(({attr, label}) => (
               <th 
-                key={column.prop}
+                key={attr}
                 className="table-head"
               >
                   <Button 
@@ -67,30 +76,31 @@ export default function TableLayout({
                       textAlign: "left"
                     }} 
                     onClick={() => {
-                      if (sortColumn === column.prop) {
+                      if (sortAttribute === attr) {
                         setIsAscending(!isAscending);
                       } else {
-                        setSortColumn(column.prop)
+                        setSortAttribute(attr)
                       }
                     }}
                   >
-                    {column.label}
-                    <SortIcon column={column} />
+                    {label}
+                    <SortIcon attr={attr} />
                   </Button>
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map(table => {
+          {(loading || error) ? (
+            <p>Loading/error</p>
+          ) : 
+          sourceTables.map(table => {
             const isSelected = selectedTableIds.has(table.id);
             return (<Row 
               key={table.id}
               table={table} 
               isSelected={isSelected}
-              isHovered={(isSelected && false)} 
-              // ? selectedTables.find(t => t.id === id).columns.filter(column => column.isHovered).length > 0
-              // : false;}
+              isHovered={(isSelected && false)}
             />);
           })}
         </tbody>
@@ -98,8 +108,8 @@ export default function TableLayout({
     </div>
   ); // end return statement
 
-  function SortIcon({column}) {
-    if (sortColumn === column.prop) {
+  function SortIcon({attr}) {
+    if (sortAttribute === attr) {
       if (isAscending) {
         return <ArrowUp />
       } else {

@@ -20,9 +20,16 @@ import CompositeTableSchema from './components/CompositeTableSchema';
 import OperationDetail from "./components/OperationDetail";
 import WorkflowDetail from './components/WorkflowDetail';
 import OperationsList from './components/OperationsList';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchTablesRequest } from './data/slices/sourceTablesSlice';
 
 function App() {
+  // const dispatch = useDispatch();
   const {stage} = useSelector(({ui}) => ui);
+  // useEffect(() => {
+  //   dispatch(fetchTablesRequest());
+  // }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -34,7 +41,7 @@ function App() {
                 <NavigationRail currentStage={stage} />
               }
               firstPane={
-                <WorkflowSelector />
+                <SourceTables />
               }
               secondPane={
                 <WorkflowDetail />
