@@ -23,3 +23,7 @@ clean:
 restart:
 	@echo "Restarting OpenRefine..."
 	pkill -f openrefine || true
+
+dev:
+	@echo "Starting development server"
+	npm run dev --prefix webapp/react-src
