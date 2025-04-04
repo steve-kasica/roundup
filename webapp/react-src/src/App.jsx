@@ -15,21 +15,13 @@ import { STAGE_ARRANGE_TABLES, STAGE_CONFIG_SOURCES, STAGE_REFINE_OPS } from './
 import {ListDetail, SupportingPane} from './layouts';
 import NavigationRail from './components/NavigationRail';
 import SourceTables from './components/SourceTables';
-import WorkflowSelector from './components/WorkflowSelector';
 import CompositeTableSchema from './components/CompositeTableSchema';
 import OperationDetail from "./components/OperationDetail";
 import WorkflowDetail from './components/WorkflowDetail';
 import OperationsList from './components/OperationsList';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { fetchTablesRequest } from './data/slices/sourceTablesSlice';
 
 function App() {
-  // const dispatch = useDispatch();
   const {stage} = useSelector(({ui}) => ui);
-  // useEffect(() => {
-  //   dispatch(fetchTablesRequest());
-  // }, []);
 
   return (
     <ThemeProvider theme={theme}>

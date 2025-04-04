@@ -1,5 +1,9 @@
 /**
  * TableDropTarget.jsx
+ * 
+ * Notes:
+ *  - Table instance in the SourceTables component dispatch actions,
+ *    only operationTypes are defined in this component
  */
 import { useDrop } from "react-dnd";
 import {type as tableInstances} from "../../lib/types/Table";
@@ -20,6 +24,7 @@ export default function TableDropTarget({operationType, children}) {
     return (
         <div 
             ref={dropRef}
+            // TODO: add styles to stylesheet, no-inline styles
             style={{
                 display: "flex",
                 justifyContent: "center",

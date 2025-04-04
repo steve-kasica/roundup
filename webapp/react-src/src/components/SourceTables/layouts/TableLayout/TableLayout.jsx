@@ -22,9 +22,7 @@ export default function TableLayout({ handleSelectAllClick }) {
   // TODO (optimization)
   // memoize selector here for sourceTables, sourceTable and isAscending and sortAttribute
   const {sourceTables, loading, error} = useSelector(({sourceTables}) => ({
-    sourceTables: Array.from(
-        Object.entries(sourceTables.data), ([id, table]) => (table)
-      )
+    sourceTables: Object.values(sourceTables.data)
       .toSorted((a, b) => (isAscending)
         ? ascending(a.attributes[sortAttribute], b.attributes[sortAttribute])
         : descending(a.attributes[sortAttribute], b.attributes[sortAttribute])),

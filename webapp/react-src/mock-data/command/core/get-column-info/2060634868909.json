@@ -1,0 +1,34 @@
+[
+    {
+        "name": "Date",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 64739,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "Count",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 64739,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "Crime",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 64739,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "Description",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 64739,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    }
+]

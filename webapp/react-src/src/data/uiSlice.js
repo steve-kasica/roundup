@@ -33,7 +33,7 @@ export const initialState = {
     sidebarStatus: SIDEBAR_DATA_SOURCES,
     insertionMode: SYSTEM_DECIDES,
     focusedNode: null,
-    stage: STAGE_CONFIG_SOURCES,
+    stage: STAGE_ARRANGE_TABLES,
     searchString: "",
     firstPaneWidth: 20,
     hoverOperation: null,

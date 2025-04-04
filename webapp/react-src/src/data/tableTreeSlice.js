@@ -282,6 +282,22 @@ function balanceStackColumns(tree, operationId) {
  * @returns {Hierarchy}
  */
 export function stratify(data) {
+
+    const transformedData = [...data];  // Copy the original data
+
+    data.forEach(node => {
+        if (node.children && node.children.length > 0) {
+            node.children.forEach(childId => {
+                // Find the child node and set it's parentId
+                const childIndex = transformedData.findIndex(n => n.id === child.id);
+                if (childIndex >= 0) {
+                    
+                }
+            })
+        }
+    })
+
+
     return d3stratify()
         .id(d => d.id)
         .parentId(d => d.operation_group)

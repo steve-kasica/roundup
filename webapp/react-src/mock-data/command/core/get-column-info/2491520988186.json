@@ -1,0 +1,170 @@
+[
+    {
+        "name": "STATION",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 120,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "NAME",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 120,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "DATE",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 120,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "PRCP",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 120,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "PRCP_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 120,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "TMAX",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 120,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "TMAX_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 120,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "TMIN",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 120,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "TMIN_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 120,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "WT01",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 36,
+        "error_row_count": 0,
+        "blank_row_count": 84
+    },
+    {
+        "name": "WT01_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 36,
+        "error_row_count": 0,
+        "blank_row_count": 84
+    },
+    {
+        "name": "WT02",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3,
+        "error_row_count": 0,
+        "blank_row_count": 117
+    },
+    {
+        "name": "WT02_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3,
+        "error_row_count": 0,
+        "blank_row_count": 117
+    },
+    {
+        "name": "WT03",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 12,
+        "error_row_count": 0,
+        "blank_row_count": 108
+    },
+    {
+        "name": "WT03_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 12,
+        "error_row_count": 0,
+        "blank_row_count": 108
+    },
+    {
+        "name": "WT04",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 2,
+        "error_row_count": 0,
+        "blank_row_count": 118
+    },
+    {
+        "name": "WT04_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 2,
+        "error_row_count": 0,
+        "blank_row_count": 118
+    },
+    {
+        "name": "WT06",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 1,
+        "error_row_count": 0,
+        "blank_row_count": 119
+    },
+    {
+        "name": "WT06_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 1,
+        "error_row_count": 0,
+        "blank_row_count": 119
+    },
+    {
+        "name": "WT08",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 5,
+        "error_row_count": 0,
+        "blank_row_count": 115
+    },
+    {
+        "name": "WT08_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 5,
+        "error_row_count": 0,
+        "blank_row_count": 115
+    }
+]

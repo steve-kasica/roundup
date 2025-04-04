@@ -6,8 +6,9 @@
 import Grid from "@mui/material/Grid2"
 import { Add as PlusIcon } from "@mui/icons-material"
 
-import { isOperation, PACK, STACK } from "../../lib/types/Operation"
-import Operation from "./Operation"
+import { PACK, STACK } from "../../lib/types/Operation"
+import { isOperationNode } from "../../data/slices/compositeSchemaSlice"
+import OperationView from "./OperationView"
 // import Table from "../TableView/layouts/BlockLayout"
 import TableDropTarget from "./TableDropTarget"
 import { useSelector } from "react-redux"
@@ -22,11 +23,14 @@ export default function Root({node}) {
     const gridWidth = stage === STAGE_ARRANGE_TABLES ? GRID_COLUMNS - 2 : GRID_COLUMNS;
     const colorScale = scaleSequential([node.height + 1, -1], interpolateGreys);
 
-    if (isOperation(node.data)) 
+    if (isOperationNode(node.data)) 
         return (
             <Grid container spacing={0.5}>
                 <Grid size={gridWidth}>
-                    <Operation node={node} colorScale={colorScale}/>
+                    <OperationView 
+                        node={node} 
+                        colorScale={colorScale} 
+                    />
                 </Grid>
                 {(stage === STAGE_ARRANGE_TABLES) ? (
                 <>

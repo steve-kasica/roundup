@@ -35,7 +35,8 @@ export default function({table, parentOperation}) {
     //     state => selectOperationAndStage(state, operation_group)
     // );
     
-    const isHovered = columns.filter(column => column.isHovered).length > 0;
+    // const isHovered = columns.filter(column => column.isHovered).length > 0;
+    const isHovered = false;
     const state = [
         isHovered ? "hover" : undefined,
     ].filter(className => className).join(" ");

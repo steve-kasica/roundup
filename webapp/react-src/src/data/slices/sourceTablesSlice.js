@@ -2,6 +2,7 @@
  * @name sourceTablesSlice
  */
 import { createSlice } from "@reduxjs/toolkit";
+import { Table } from "../../lib/types";
 
 const initialState = {
     ids: [],
@@ -18,12 +19,24 @@ const slice = createSlice({
         fetchTablesRequest: (state) => {
             state.loading = true;
             state.error = null;
-            console.log('request');                        
         },
         fetchTablesSuccess: (state, action) => {
+            const projects = action.payload;
+
+            state.ids = Object.keys(projects);
+
+            state.ids.forEach(id => {
+                state.data[id] = new Table(
+                    id,                             // id        
+                    projects[id].name,              // name
+                    Number(projects[id].rowCount),  // row count
+                    Number(0),                      // column count
+                    projects[id].created,           // date created
+                    projects[id].modified,          // last modified
+                    projects[id].tags,              // tags
+                );
+            });
             state.loading = false;
-            state.data = action.payload.data;
-            state.ids = action.payload.ids;
         },
         fetchTablesFailure: (state, action) => {
             if (process.env.NODE_ENV === "development") {

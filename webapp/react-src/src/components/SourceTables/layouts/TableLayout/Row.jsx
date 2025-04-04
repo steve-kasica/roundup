@@ -17,10 +17,12 @@ import HighlightText from "../../../ui/HighlightText";
 import { Typography } from "@mui/material";
 import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useDispatch, useSelector } from "react-redux";
-import { addTable, setTableHover } from "../../../../data/tableTreeSlice";
+import { setTableHover } from "../../../../data/tableTreeSlice";
+import { createOperation } from "../../../../data/slices/compositeSchemaSlice";
 
 export default function Row({table, isSelected, isHovered}) {
     const id = table[ID_ATTR];
+    const {name, rowCount} = table.attributes;
     const values = Array.from(attributeMap.keys()).map(attr => table.attributes[attr]);
 
     const dispatch = useDispatch();
@@ -34,7 +36,7 @@ export default function Row({table, isSelected, isHovered}) {
                 const result = monitor.getDropResult();
                 if (monitor.didDrop() && item.id === result.id) {
                     // Table has dropped
-                    dispatch(addTable(({
+                    dispatch(createOperation(({
                         table,
                         operationType: result.operationType
                     })));
@@ -78,20 +80,44 @@ export default function Row({table, isSelected, isHovered}) {
                 }
             >
                 <td>
-                    {(isSelected) ? (
-                        <CheckBox />
-                    ) : (
-                        <CheckBoxOutlineBlank />
-                    )}
+                    {(isSelected) ? <CheckBox /> : <CheckBoxOutlineBlank />}
                 </td>
-                {values.map((text, i) => (
-                    <td key={i}>
-                        <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                            <HighlightText pattern={searchString} text={String(text)} />
-                        </Typography> 
-                    </td>
-                ))}
+                <td>
+                    <Typography color={isDisabled ? "textDisabled" : "normal"}>
+                        <HighlightText pattern={searchString} text={name} />
+                    </Typography>                     
+                </td>
+                <td>
+                    <Typography color={isDisabled ? "textDisabled" : "normal"}>
+                        {rowCount}
+                    </Typography>                     
+                </td>
+                <td>
+                    <Typography color={isDisabled ? "textDisabled" : "normal"}>
+                        <ColumnCount tableId={table.id} />
+                    </Typography>
+                </td>
             </tr>
         </>
     );
+}
+
+function ColumnCount({tableId}) {
+    const {columns, loading, error} = useSelector(({sourceColumns}) => ({
+        columns: sourceColumns.data[tableId],
+        loading: sourceColumns.loading,
+        error: sourceColumns.error
+    }));
+    console.log(loading, error, columns)
+
+    if (loading) {
+        return <>...</>;
+    } else if (error) {
+        return <>ERR</>;
+    } else if (Array.isArray(columns)) {
+        // TODO: fix until fetchRequest TODO is done
+        return <>{columns.length}</>;
+    } else {
+        return <>?</>
+    }
 }

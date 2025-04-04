@@ -10,11 +10,11 @@
 
 import { Fragment, useState } from "react";
 import TableView from "./TableView";
-import { isOperation } from "../../lib/types/Operation";
+import { isOperationNode } from "../../data/slices/compositeSchemaSlice";
 import { useSelector } from "react-redux";
 import { isTable } from "../../lib/types/Table";
 
-export default function Operation({node, style, colorScale}) {
+export default function OperationView({node, style, colorScale}) {
     const {data, children} = node;
     const {selectedOperation} = useSelector(({ui}) => ui);
     const isSelected = (selectedOperation && selectedOperation.id === data.id);
@@ -44,7 +44,7 @@ export default function Operation({node, style, colorScale}) {
                 {children.map(childNode => (
                     <Fragment key={childNode.data.id}>
                         {
-                            (isOperation(childNode.data))
+                            (isOperationNode(childNode.data))
                             ? (<Operation 
                                 node={childNode} 
                                 colorScale={colorScale}

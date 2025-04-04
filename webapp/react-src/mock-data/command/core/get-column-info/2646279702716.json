@@ -1,0 +1,362 @@
+[
+    {
+        "name": "STATION",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3653,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "NAME",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3653,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "DATE",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3653,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "PRCP",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3653,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "PRCP_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3653,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "TMAX",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3653,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "TMAX_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3653,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "TMIN",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3653,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "TMIN_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 3653,
+        "error_row_count": 0,
+        "blank_row_count": 0
+    },
+    {
+        "name": "WT01",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 1028,
+        "error_row_count": 0,
+        "blank_row_count": 2625
+    },
+    {
+        "name": "WT01_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 1028,
+        "error_row_count": 0,
+        "blank_row_count": 2625
+    },
+    {
+        "name": "WT02",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 85,
+        "error_row_count": 0,
+        "blank_row_count": 3568
+    },
+    {
+        "name": "WT02_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 85,
+        "error_row_count": 0,
+        "blank_row_count": 3568
+    },
+    {
+        "name": "WT03",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 498,
+        "error_row_count": 0,
+        "blank_row_count": 3155
+    },
+    {
+        "name": "WT03_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 498,
+        "error_row_count": 0,
+        "blank_row_count": 3155
+    },
+    {
+        "name": "WT04",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 61,
+        "error_row_count": 0,
+        "blank_row_count": 3592
+    },
+    {
+        "name": "WT04_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 61,
+        "error_row_count": 0,
+        "blank_row_count": 3592
+    },
+    {
+        "name": "WT05",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 368,
+        "error_row_count": 0,
+        "blank_row_count": 3285
+    },
+    {
+        "name": "WT05_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 368,
+        "error_row_count": 0,
+        "blank_row_count": 3285
+    },
+    {
+        "name": "WT06",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 27,
+        "error_row_count": 0,
+        "blank_row_count": 3626
+    },
+    {
+        "name": "WT06_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 27,
+        "error_row_count": 0,
+        "blank_row_count": 3626
+    },
+    {
+        "name": "WT07",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 133,
+        "error_row_count": 0,
+        "blank_row_count": 3520
+    },
+    {
+        "name": "WT07_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 133,
+        "error_row_count": 0,
+        "blank_row_count": 3520
+    },
+    {
+        "name": "WT08",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 602,
+        "error_row_count": 0,
+        "blank_row_count": 3051
+    },
+    {
+        "name": "WT08_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 602,
+        "error_row_count": 0,
+        "blank_row_count": 3051
+    },
+    {
+        "name": "WT09",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 24,
+        "error_row_count": 0,
+        "blank_row_count": 3629
+    },
+    {
+        "name": "WT09_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 24,
+        "error_row_count": 0,
+        "blank_row_count": 3629
+    },
+    {
+        "name": "WT10",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 1,
+        "error_row_count": 0,
+        "blank_row_count": 3652
+    },
+    {
+        "name": "WT10_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 1,
+        "error_row_count": 0,
+        "blank_row_count": 3652
+    },
+    {
+        "name": "WT11",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 19,
+        "error_row_count": 0,
+        "blank_row_count": 3634
+    },
+    {
+        "name": "WT11_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 19,
+        "error_row_count": 0,
+        "blank_row_count": 3634
+    },
+    {
+        "name": "WT13",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 506,
+        "error_row_count": 0,
+        "blank_row_count": 3147
+    },
+    {
+        "name": "WT13_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 506,
+        "error_row_count": 0,
+        "blank_row_count": 3147
+    },
+    {
+        "name": "WT14",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 185,
+        "error_row_count": 0,
+        "blank_row_count": 3468
+    },
+    {
+        "name": "WT14_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 185,
+        "error_row_count": 0,
+        "blank_row_count": 3468
+    },
+    {
+        "name": "WT15",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 9,
+        "error_row_count": 0,
+        "blank_row_count": 3644
+    },
+    {
+        "name": "WT15_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 9,
+        "error_row_count": 0,
+        "blank_row_count": 3644
+    },
+    {
+        "name": "WT16",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 787,
+        "error_row_count": 0,
+        "blank_row_count": 2866
+    },
+    {
+        "name": "WT16_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 787,
+        "error_row_count": 0,
+        "blank_row_count": 2866
+    },
+    {
+        "name": "WT17",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 12,
+        "error_row_count": 0,
+        "blank_row_count": 3641
+    },
+    {
+        "name": "WT17_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 12,
+        "error_row_count": 0,
+        "blank_row_count": 3641
+    },
+    {
+        "name": "WT18",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 208,
+        "error_row_count": 0,
+        "blank_row_count": 3445
+    },
+    {
+        "name": "WT18_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 208,
+        "error_row_count": 0,
+        "blank_row_count": 3445
+    },
+    {
+        "name": "WT22",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 11,
+        "error_row_count": 0,
+        "blank_row_count": 3642
+    },
+    {
+        "name": "WT22_ATTRIBUTES",
+        "is_numeric": false,
+        "numeric_row_count": 0,
+        "non_numeric_row_count": 11,
+        "error_row_count": 0,
+        "blank_row_count": 3642
+    }
+]
