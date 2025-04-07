@@ -90,7 +90,7 @@ export default function TableLayout({ handleSelectAllClick }) {
         </thead>
         <tbody>
           {(loading || error) ? (
-            <p>Loading/error</p>
+            <tr><td>Loading/error</td></tr>
           ) : 
           sourceTables.map(table => {
             const isSelected = selectedTableIds.has(table.id);

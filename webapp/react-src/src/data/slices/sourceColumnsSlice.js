@@ -42,14 +42,30 @@ const slice = createSlice({
     initialState,
     reducers: {
         // Action to trigger the saga
-        fetchRequest: (state) => {
-            // TODO: my main worker Saga in getSourceColumns needs to 
-            // call this so that the loading and error states
-            // match accordingly
+        fetchMultipleRequest: (state) => {
             state.loading = true;
             state.error = null;
         },
-        fetchSuccess: (state, action) => {
+        fetchMultipleSuccess: (state) => {
+            state.loading = false;
+            state.error = null;
+        },
+        fetchMultipleFailure: (state, action) => {
+            if (process.env.NODE_ENV === "development") {
+                console.error("Error fetching columns", action);                        
+            }
+            state.loading = false;
+            state.error = action.payload;
+        },
+        fetchSingleRequest: (state, action) => {
+            const projectId = action.payload;
+            state.data[projectId] = {
+                loading: true,
+                error: null,
+                columns: [],       
+            };
+        },
+        fetchSingleSuccess: (state, action) => {
             const {response:columnsInfo, projectId} = action.payload;
 
             // Process columnInfo response into array of Column instances
@@ -62,23 +78,30 @@ const slice = createSlice({
                 )
             );
             
-            // Update state
-            state.ids.splice(-1, 0, ...columns.map(({id}) => id));
-            state.data[projectId] = columns;
-            state.loading = false;
-            state.error = null;
-
+            state.data[projectId].loading = false;
+            state.data[projectId].error = null;            
+            state.data[projectId].columns = columns;
         },
-        fetchFailure: (state, action) => {
+        fetchSingleFailure: (state, action) => {
             if (process.env.NODE_ENV === "development") {
-                console.error("Error: fetch tables failure", action);                        
+                console.error("Error fetching columns", action);                        
             }
-            state.loading = false;
-            state.error = action.payload;
-        }
+            const {error, projectId} = action.payload;
+
+            state.data[projectId].loading = false;
+            state.data[projectId].columns = [];
+            state.data[projectId].error = error;
+        },
     }
 });
 
-export const {fetchRequest, fetchSuccess, fetchFailure} = slice.actions;
+export const {
+    fetchMultipleRequest, 
+    fetchMultipleSuccess, 
+    fetchMultipleFailure,
+    fetchSingleRequest,
+    fetchSingleSuccess,
+    fetchSingleFailure
+} = slice.actions;
 
 export default slice.reducer;

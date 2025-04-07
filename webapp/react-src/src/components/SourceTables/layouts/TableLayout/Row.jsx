@@ -19,10 +19,19 @@ import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useDispatch, useSelector } from "react-redux";
 import { setTableHover } from "../../../../data/tableTreeSlice";
 import { createOperation } from "../../../../data/slices/compositeSchemaSlice";
+import { utcFormat, utcParse } from "d3";
+import AnimatedEllipsis from "../../../ui/AnimatedElipse";
+
+// Parse date string in ISO 8601 extended format with UTC designator and microsecond precision
+const parseDate = utcParse("%Y-%m-%dT%H:%M:%S.%fZ");
+const formatDate = utcFormat("%B %d, %Y");
 
 export default function Row({table, isSelected, isHovered}) {
     const id = table[ID_ATTR];
     const {name, rowCount} = table.attributes;
+    const dateCreated = parseDate(table.attributes.dateCreated);
+    const dateLastModified = parseDate(table.attributes.dateLastModified);
+
     const values = Array.from(attributeMap.keys()).map(attr => table.attributes[attr]);
 
     const dispatch = useDispatch();
@@ -97,27 +106,32 @@ export default function Row({table, isSelected, isHovered}) {
                         <ColumnCount tableId={table.id} />
                     </Typography>
                 </td>
+                <td>
+                    <Typography color={isDisabled ? "textDisabled" : "normal"}>
+                        {formatDate(dateCreated)}
+                    </Typography>
+                </td>
+                <td>
+                    <Typography color={isDisabled ? "textDisabled" : "normal"}>
+                        {formatDate(dateLastModified)}
+                    </Typography>
+                </td>
             </tr>
         </>
     );
 }
 
 function ColumnCount({tableId}) {
-    const {columns, loading, error} = useSelector(({sourceColumns}) => ({
-        columns: sourceColumns.data[tableId],
-        loading: sourceColumns.loading,
-        error: sourceColumns.error
-    }));
-    console.log(loading, error, columns)
+    const {loading, error, columns} = useSelector(({sourceColumns}) => sourceColumns.data[tableId]);
+    console.log(loading, error, columns);
 
     if (loading) {
-        return <>...</>;
+        return <>Loading<AnimatedEllipsis /></>
     } else if (error) {
-        return <>ERR</>;
-    } else if (Array.isArray(columns)) {
-        // TODO: fix until fetchRequest TODO is done
+        return <>Error</>;
+    } else if (columns.length >= 0) {
         return <>{columns.length}</>;
     } else {
-        return <>?</>
+        throw new Error("Unknown state for ColumnCount component");
     }
 }
