@@ -24,8 +24,8 @@ export default function TableLayout({ handleSelectAllClick }) {
   const {sourceTables, loading, error} = useSelector(({sourceTables}) => ({
     sourceTables: Object.values(sourceTables.data)
       .toSorted((a, b) => (isAscending)
-        ? ascending(a.attributes[sortAttribute], b.attributes[sortAttribute])
-        : descending(a.attributes[sortAttribute], b.attributes[sortAttribute])),
+        ? ascending(a[sortAttribute], b[sortAttribute])
+        : descending(a[sortAttribute], b[sortAttribute])),
     loading: sourceTables.loading,
     error: sourceTables.error
     })

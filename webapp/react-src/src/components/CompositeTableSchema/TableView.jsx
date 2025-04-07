@@ -25,7 +25,10 @@ import { createSelector } from "@reduxjs/toolkit";
 // );
 
 export default function({table, parentOperation}) {
-    const {name, id, columns} = table;
+    const {name, id, tableId} = table;
+    const columnData = useSelector(({sourceColumns}) => sourceColumns.data);
+    console.log(table, columnData);
+    const columns = [];
 
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();

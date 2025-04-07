@@ -35,9 +35,9 @@ export default function CompositeTableSchema() {
                 if (isOperationNode(node)) {
                     return node;
                 } else if (isTableNode(node)) {
-                    console.log(sourceTables.data);
                     return {
                         ...sourceTables.data[node.tableId].attributes,
+                        tableId: node.tableId,
                         parentId: node.parentId
                     }
                 } else {

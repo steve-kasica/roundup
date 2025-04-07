@@ -1,6 +1,6 @@
 
 
-import { put, takeLatest, call } from "redux-saga/effects";
+import { put, takeLatest, call, all } from "redux-saga/effects";
 import OpenRefine from "../../services/open-refine";
 import { 
   fetchTablesFailure, 
@@ -22,6 +22,13 @@ function* primarySagaWorker(action) {
   try {
     // Call the OpenRefine API
     const {projects} = yield call(OpenRefine.getAllProjectMetadata, action.payload);
+
+    const projectIds = Object.keys(projects);
+    // Make request for column counts of each project
+    // TODO: if the all-project-metadata actually included the number of columns, I wouldn't need to do this
+    const columnsInfo = yield all(projectIds.map(projectId => call(OpenRefine.getColumnsInfo, projectId)));
+    
+    projectIds.forEach((projectId, i) => projects[projectId].columnCount = columnsInfo[i].length);
 
     // Dispatch success action
     yield put(fetchTablesSuccess(projects));

@@ -11,7 +11,7 @@
  */
 import { useState } from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import {attributeMap, ID_ATTR, isTable, type as tableInstance} from "../../../../lib/types/Table";
+import {attributeMap, ID_ATTR, type as tableInstance} from "../../../../lib/types/Table";
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 import HighlightText from "../../../ui/HighlightText";
 import { Typography } from "@mui/material";
@@ -28,11 +28,11 @@ const formatDate = utcFormat("%B %d, %Y");
 
 export default function Row({table, isSelected, isHovered}) {
     const id = table[ID_ATTR];
-    const {name, rowCount} = table.attributes;
-    const dateCreated = parseDate(table.attributes.dateCreated);
-    const dateLastModified = parseDate(table.attributes.dateLastModified);
+    const {name, rowCount, columnCount} = table;
+    const dateCreated = parseDate(table.dateCreated);
+    const dateLastModified = parseDate(table.dateLastModified);
 
-    const values = Array.from(attributeMap.keys()).map(attr => table.attributes[attr]);
+    const values = Array.from(attributeMap.keys()).map(attr => table[attr]);
 
     const dispatch = useDispatch();
     const {searchString} = useSelector(({ui}) => ui);
@@ -103,7 +103,7 @@ export default function Row({table, isSelected, isHovered}) {
                 </td>
                 <td>
                     <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                        <ColumnCount tableId={table.id} />
+                        {columnCount}
                     </Typography>
                 </td>
                 <td>
@@ -123,7 +123,6 @@ export default function Row({table, isSelected, isHovered}) {
 
 function ColumnCount({tableId}) {
     const {loading, error, columns} = useSelector(({sourceColumns}) => sourceColumns.data[tableId]);
-    console.log(loading, error, columns);
 
     if (loading) {
         return <>Loading<AnimatedEllipsis /></>
