@@ -8,7 +8,7 @@
  * **Table Tree**, by design.
  */
 
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import TableView from "./TableView";
 import { isOperationNode } from "../../data/slices/compositeSchemaSlice";
 import { useSelector } from "react-redux";
@@ -20,7 +20,7 @@ export default function OperationView({node, style, colorScale}) {
     const isSelected = (selectedOperation && selectedOperation.id === data.id);
     const className=[
         "operation",
-        data.type,
+        data.operationType,
         (isSelected) ? "selected" : undefined,
         `depth-${node.depth}`
     ].filter(name => name).join(" ");
@@ -45,12 +45,12 @@ export default function OperationView({node, style, colorScale}) {
                     <Fragment key={childNode.data.id}>
                         {
                             (isOperationNode(childNode.data))
-                            ? (<Operation 
+                            ? (<OperationView 
                                 node={childNode} 
                                 colorScale={colorScale}
                             />)
                             : (<TableView 
-                                table={childNode.data} 
+                                node={childNode.data} 
                                 parentOperation={data}
                             />)
                         }

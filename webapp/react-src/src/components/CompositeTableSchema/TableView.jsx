@@ -8,7 +8,7 @@ import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
-import { COLUMN_STATUS_REMOVED } from "../../lib/types/Column";
+import Column, { COLUMN_STATUS_REMOVED, COLUMN_STATUS_VISABLE } from "../../lib/types/Column";
 import { isOperation } from "../../lib/types/Operation";
 import ColumnView from "./ColumnView";
 import { createSelector } from "@reduxjs/toolkit";
@@ -24,11 +24,10 @@ import { createSelector } from "@reduxjs/toolkit";
 //     })
 // );
 
-export default function({table, parentOperation}) {
-    const {name, id, tableId} = table;
-    const columnData = useSelector(({sourceColumns}) => sourceColumns.data);
-    console.log(table, columnData);
-    const columns = [];
+export default function({node, parentOperation}) {
+    const {tableId} = node;
+    const table = useSelector(({sourceTables}) => sourceTables.data[tableId]);
+    const columns = useSelector(({sourceColumns}) => sourceColumns.data[tableId] ?? Array.from({length: table.columnCount}, (_, i) => new Column('foo', i, null, {}, null, tableId, COLUMN_STATUS_VISABLE)));
 
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
@@ -46,7 +45,7 @@ export default function({table, parentOperation}) {
 
     const menuItems = [
         {
-            label: `Remove ${name}`,
+            label: `Remove ${table.name}`,
             isVisable: true,
             onClick: () => dispatch(removeTable(table))
         },{
@@ -67,11 +66,11 @@ export default function({table, parentOperation}) {
     return (
         <>
             <div 
-                data-id={id}
+                data-id={tableId}
                 className={`block table ${state}`}
                 onContextMenu={handleContextMenu}
             >
-                <div className="label">{name} <span className="column-count">({columns.length})</span></div>
+                <div className="label">{table.name} <span className="column-count">({table.columnCount})</span></div>
                 {columns
                     .filter(column => column.status !== COLUMN_STATUS_REMOVED)
                     .map((column) => <ColumnView key={column.id} column={column} />)}

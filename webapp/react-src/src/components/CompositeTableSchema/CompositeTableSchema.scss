@@ -100,7 +100,7 @@ $label-font-family: sans-serif;
         }
 
         &.stack {
-            flex-direction: column-reverse; // newly added tables go to bottom
+            flex-direction: column; // newly added tables go to bottom
     
             &.depth-0 { @include operation-color($stack-0-color, #fff); }
             &.depth-1 { @include operation-color($stack-1-color, $pack-0-color); }
@@ -113,14 +113,14 @@ $label-font-family: sans-serif;
                 border-bottom-color: $table-border-color;
                 &:first-child {
                     // Top child of the stack
-                    border-bottom: none;
+                    border-top: none;
                 }
             }
 
         }
 
         &.pack {
-            flex-direction: row-reverse;  // newly added tables go to right side
+            flex-direction: row;  // newly added tables go to right side
     
             &.depth-0 { @include operation-color($pack-0-color, $pack-0-color); }
             &.depth-1 { @include operation-color($pack-1-color, $stack-0-color); }

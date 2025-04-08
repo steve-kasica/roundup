@@ -31,6 +31,7 @@ export default function CompositeTableSchema() {
         if (compositeSchema.ids.length === 0) {
             return null;
         } else {
+            console.log(compositeSchema.data);
             const data = Object.values(compositeSchema.data).map(node => {
                 if (isOperationNode(node)) {
                     return node;
@@ -47,7 +48,7 @@ export default function CompositeTableSchema() {
             return stratify(data);
         }
     });
-    // console.log(root);
+    console.log(root);
     const {stage} = useSelector(({ui}) => ui);
 
     return (<div className={`CompositeTableSchema ${stage}`}>
