@@ -5,11 +5,12 @@
  * **Table Tree**.
  */
 import { Menu, MenuItem } from "@mui/material";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setHover, setSelectedOperation, STAGE_REFINE_OPS, unsetHover } from "../../data/uiSlice";
 import Column, { COLUMN_STATUS_REMOVED, COLUMN_STATUS_VISABLE } from "../../lib/types/Column";
 import ColumnView from "./ColumnView";
+import { isMouseOverElement } from "../../lib/utilities/dom";
 
 // const selectTableTree = (state) => state.tableTree.tree;
 // const selectStage = (state) => state.stage;
@@ -28,6 +29,7 @@ export default function({node, parentOperation}) {
     const columns = useSelector(({sourceColumns}) => sourceColumns.data[tableId] ?? Array.from({length: table.columnCount}, (_, i) => new Column('foo', i, null, {}, null, tableId, COLUMN_STATUS_VISABLE)));
 
     const [contextMenu, setContextMenu] = useState(null);
+    const tableRef = useRef();
     const dispatch = useDispatch();
 
     const {stage, hover} = useSelector(({ui}) => ui);
@@ -63,12 +65,14 @@ export default function({node, parentOperation}) {
     return (
         <>
             <div 
+                ref={tableRef}
                 data-id={tableId}
                 className={`block table ${state}`}
                 onMouseEnter={() => dispatch(setHover({dataType: "table", id: table.id}))}
                 onMouseLeave={() => {
-                    console.log("mouseLeave");
-                    dispatch(unsetHover())
+                    if (!contextMenu) {
+                        dispatch(unsetHover());
+                    }
                 }}
                 onContextMenu={handleContextMenu}
             >
@@ -94,7 +98,7 @@ export default function({node, parentOperation}) {
                             key={i}
                             onClick={(event) => {
                                 item.onClick(event);
-                                closeMenu();
+                                closeMenu(event);
                             }}
                         >
                             {item.label}
@@ -104,9 +108,14 @@ export default function({node, parentOperation}) {
             </Menu>        
         </>
     );
-    
-    function closeMenu() {
-        setContextMenu(null);
+
+    function closeMenu(event) {
+        const {clientX, clientY} = event;
+        const isHovered = isMouseOverElement(tableRef, clientX, clientY);
+        if (!isHovered) {
+            dispatch(unsetHover());
+        }
+        setContextMenu(null);        
     }
 
     function handleContextMenu(event) {
