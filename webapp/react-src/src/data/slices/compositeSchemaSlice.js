@@ -5,6 +5,7 @@ import { NO_OP } from "../../lib/types/Operation";
 
 const initialState = {
     ids: [],
+    selectedTables: [],
     prevOperationId: null,
     data: {},
     loading: false,
@@ -45,7 +46,6 @@ const slice = createSlice({
             try {
                 let operationNode, tableNode;
                 const {operationType, table} = action.payload;
-                console.log(operationType, table, state.prevOperationId);
                 
                 if (state.prevOperationId === null) {
                     // initialize
@@ -57,6 +57,7 @@ const slice = createSlice({
                     state.ids.push(operationNode.id);
                     state.ids.push(tableNode.id);
                     state.prevOperationId = operationNode.id;
+                    state.selectedTables.push(tableNode.tableId);
                 } else if (state.data[state.prevOperationId].operationType === NO_OP) {
                     // Second table
                     operationNode = new OperationNode(operationType);
@@ -71,13 +72,15 @@ const slice = createSlice({
                     state.data[operationNode.id] = operationNode;
                     state.data[prevTableNode.id] = prevTableNode;
                     state.data[tableNode.id] = tableNode;
-                    state.prevOperationId = operationNode.id;          
+                    state.prevOperationId = operationNode.id;
+                    state.selectedTables.push(tableNode.tableId); 
 
                 } else if (state.data[state.prevOperationId].operationType === operationType) {
                     // add table to previous operation
                     tableNode = new TableNode(table, state.prevOperationId);
                     state.data[tableNode.id] = tableNode;
                     state.ids.push(tableNode.id);
+                    state.selectedTables.push(tableNode.tableId);
                 } else if (state.data[state.prevOperationId].operationType !== operationType) {
                     // Create new operation as a child of the previous operation,
                     // e.g. switching to STACK after PACK or vice versa
@@ -93,6 +96,7 @@ const slice = createSlice({
                     state.ids.push(operationNode.id);
                     state.ids.push(tableNode.id);                    
                     state.prevOperationId = operationNode.id;
+                    state.selectedTables.push(tableNode.tableId);
                 } else {
                     throw new Error("Unknown state");
                 }

@@ -14,28 +14,27 @@ import { DragPreviewImage, useDrag } from "react-dnd";
 import {attributeMap, ID_ATTR, type as tableInstance} from "../../../../lib/types/Table";
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 import HighlightText from "../../../ui/HighlightText";
-import { Typography } from "@mui/material";
+import { Chip, Typography } from "@mui/material";
 import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useDispatch, useSelector } from "react-redux";
 import { setTableHover } from "../../../../data/tableTreeSlice";
 import { createOperation } from "../../../../data/slices/compositeSchemaSlice";
-import { utcFormat, utcParse } from "d3";
+import { format, utcFormat, utcParse } from "d3";
 import AnimatedEllipsis from "../../../ui/AnimatedElipse";
+import { setHover, unsetHover } from "../../../../data/uiSlice";
 
 // Parse date string in ISO 8601 extended format with UTC designator and microsecond precision
 const parseDate = utcParse("%Y-%m-%dT%H:%M:%S.%fZ");
 const formatDate = utcFormat("%B %d, %Y");
 
-export default function Row({table, isSelected, isHovered}) {
-    const id = table[ID_ATTR];
-    const {name, rowCount, columnCount} = table;
-    const dateCreated = parseDate(table.dateCreated);
-    const dateLastModified = parseDate(table.dateLastModified);
+const formatNumber = format(",");
 
+export default function Row({searchString, table}) {
+    const dispatch = useDispatch();
+    const id = table[ID_ATTR];
+    const {isSelected, isHovered} = table;
     const values = Array.from(attributeMap.keys()).map(attr => table[attr]);
 
-    const dispatch = useDispatch();
-    const {searchString} = useSelector(({ui}) => ui);
     const [isPressed, setIsPressed] = useState(false);
     
     const [{isDragging}, dragRef, previewRef] = useDrag(() => ({
@@ -73,47 +72,43 @@ export default function Row({table, isSelected, isHovered}) {
             <DragPreviewImage connect={previewRef} src={tableIconImage} />
             <tr className={`TableView ${state}`}
                 ref={dragRef}
-                onMouseEnter={() => (isSelected) 
-                    ? dispatch(setTableHover({
-                        tableId: table.id, 
-                        isHovered: true
-                    }))
-                    : null
-                }
-                onMouseLeave={() => (isSelected) 
-                    ? dispatch(setTableHover({
-                        tableId: table.id, 
-                        isHovered: false
-                    }))
-                    : null
-                }
+                onMouseEnter={() => (isSelected) ? dispatch(setHover({
+                    dataType: "table",
+                    id: table.id
+                })) : null}
+                onMouseLeave={() => (isSelected) ? dispatch(unsetHover()) : null}
             >
                 <td>
                     {(isSelected) ? <CheckBox /> : <CheckBoxOutlineBlank />}
                 </td>
                 <td>
                     <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                        <HighlightText pattern={searchString} text={name} />
+                        <HighlightText pattern={searchString} text={table.name} />
+                    </Typography>                     
+                </td>
+                <td>
+                    {table.tags.map(tag => (
+                        <Chip key={tag} label={tag} size="small" />
+                    ))}
+                </td>
+                <td>
+                    <Typography color={isDisabled ? "textDisabled" : "normal"}>
+                        {formatNumber(table.rowCount)}
                     </Typography>                     
                 </td>
                 <td>
                     <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                        {rowCount}
-                    </Typography>                     
-                </td>
-                <td>
-                    <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                        {columnCount}
+                        {formatNumber(table.columnCount)}
                     </Typography>
                 </td>
                 <td>
                     <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                        {formatDate(dateCreated)}
+                        {formatDate(parseDate(table.dateCreated))}
                     </Typography>
                 </td>
                 <td>
                     <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                        {formatDate(dateLastModified)}
+                        {formatDate(parseDate(table.dateLastModified))}
                     </Typography>
                 </td>
             </tr>

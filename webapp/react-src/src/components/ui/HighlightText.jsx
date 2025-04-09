@@ -15,7 +15,7 @@ export default function HighlightText({pattern, text}) {
         return (
             <>
                 {beginning}
-                <span className="bg-yellow-100">{middle}</span>
+                <span className="highlight">{middle}</span>
                 {end}
             </>);
     }

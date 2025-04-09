@@ -3,100 +3,100 @@
  * -------------------------------
  */
 import { attributeMap } from "../../../../lib/types/Table";
-import { Button, Checkbox } from "@mui/material";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { Button, Checkbox, IconButton, Tooltip } from "@mui/material";
+import { ArrowDown, ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownNarrowWide, ArrowDownZA, ArrowUp, ArrowUp01, ArrowUp10, ArrowUpDown, ArrowUpWideNarrow, ArrowUpZA, Filter } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
 import Row from "./Row";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchTablesRequest } from "../../../../data/slices/sourceTablesSlice";
+import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 
 const tableAttributes = Array.from(attributeMap.entries(), ([attr, label]) => ({attr, label}));
 
-export default function TableLayout({ handleSelectAllClick }) {
-  const dispatch = useDispatch();
+const COLUMN_TYPE_CATEGORICAL = "categorical";
+const COLUMN_TYPE_NUMERIC = "numeric";
+const COLUMN_TYPE_DATE = "date";
+
+export default function TableLayout({ searchString, sourceTables, loading, error }) {
   const [sortAttribute, setSortAttribute] = useState(tableAttributes.at(0).attr);
   const [isAscending, setIsAscending] = useState(true);
-
-  // TODO (optimization)
-  // memoize selector here for sourceTables, sourceTable and isAscending and sortAttribute
-  const {sourceTables, loading, error} = useSelector(({sourceTables}) => ({
-    sourceTables: Object.values(sourceTables.data)
-      .toSorted((a, b) => (isAscending)
-        ? ascending(a[sortAttribute], b[sortAttribute])
-        : descending(a[sortAttribute], b[sortAttribute])),
-    loading: sourceTables.loading,
-    error: sourceTables.error
-    })
-  );
-
-  useEffect(() => {
-      dispatch(fetchTablesRequest());
-  }, [dispatch]);
-
-  const selectedTableIds = new Set();
 
   // const areAllTablesSelected = (sourceTables.length === selectedTableIds.size);
   // const areSomeTablesChecked = selectedTableIds.size > 0;
   const areAllTablesSelected = false;
   const areSomeTablesChecked = false;
 
+  const headers=[
+    {attr: "name", label: "Name", tooltip: "Sort by selected tables", attrType: COLUMN_TYPE_CATEGORICAL},
+    {attr: "tags", label: "Tags", tooltip: null, },
+    {attr: "rowCount", label: "Rows", tooltip: "Sort by total rows", attrType: COLUMN_TYPE_NUMERIC},
+    {attr: "columnCount", label: "Columns", tooltip: "Sort by total columns", attrType: COLUMN_TYPE_NUMERIC},
+    {attr: "dateCreated", label: "Created", tooltip: "Sort by date created", attrType: COLUMN_TYPE_DATE},
+    {attr: "dateLastModified", label: "Modified", tooltip: "Sort by date last modified", attrType: COLUMN_TYPE_DATE},
+  ];
+
   return (
     <div className="table-layout">
       <table>
         <thead>
           <tr>
-            <th>
-              {/* TODO (guidance): a check-all button could be an easy way for the user
-                to specify that it wants the system to make an attempt at automagically
-                combining the tables currently in the selection, with or without the 
-                already selected tables
-               */}
-              {/* <Checkbox 
-                edge="start"
-                tabIndex={-1}
-                checked={areAllTablesSelected}
-                indeterminate={!areAllTablesSelected && areSomeTablesChecked}
-                onChange={(event) => handleSelectAllClick(event.target)}
-                disableRipple
-              /> */}
-            </th>
-            {tableAttributes.map(({attr, label}) => (
-              <th 
-                key={attr}
-                className="table-head"
+            <th style={{minWidth: "65px"}}>
+              <IconButton
+                onClick={() => {
+                  if ("isSelected" === sortAttribute) {
+                    setIsAscending(!isAscending)
+                  } else {
+                    setSortAttribute("isSelected");
+                  }
+                }}
               >
-                  <Button 
-                    color="danger"
-                    sx={{
-                      width: "100%", 
-                      textAlign: "left"
-                    }} 
-                    onClick={() => {
-                      if (sortAttribute === attr) {
-                        setIsAscending(!isAscending);
-                      } else {
-                        setSortAttribute(attr)
-                      }
-                    }}
-                  >
-                    {label}
-                    <SortIcon attr={attr} />
-                  </Button>
+                <Tooltip placement="top" title="Sort by selected tables">
+                  <CheckBoxOutlineBlank />
+                  &nbsp;
+                  <SortIcon isSort={"isSelected"=== sortAttribute} attrType="boolean" />
+                </Tooltip>
+              </IconButton>
+            </th>
+            {headers.map(header => (
+              <th key={header.attr}>
+                <Button
+                  color="inherit"
+                  fullWidth
+                  onClick={() => {
+                    if (header.attr === sortAttribute) {
+                      setIsAscending(!isAscending);
+                    } else {
+                      setSortAttribute(header.attr);
+                    }
+                  }}
+                >
+                  <Tooltip placement="top" title={header.tooltip}>
+                    {header.label}
+                  </Tooltip>
+                  &nbsp;
+                  <SortIcon isSort={header.attr === sortAttribute} attrType={header.attrType}/>
+                </Button>
               </th>
             ))}
-          </tr>
+            </tr>
         </thead>
         <tbody>
           {(loading || error) ? (
             <tr><td>Loading/error</td></tr>
           ) : 
-          sourceTables.map(table => {
-            const isSelected = selectedTableIds.has(table.id);
+          sourceTables.toSorted((a, b) => (isAscending)
+            ? ascending(a[sortAttribute], b[sortAttribute])
+            : descending(a[sortAttribute], b[sortAttribute]))
+          .map(table => {
+            // TODO
+            // const isSelected = selectedTableIds.has(table.id);
+            const isSelected = false;
             return (<Row 
               key={table.id}
               table={table} 
+              searchString={searchString}
               isSelected={isSelected}
               isHovered={(isSelected && false)}
             />);
@@ -106,15 +106,24 @@ export default function TableLayout({ handleSelectAllClick }) {
     </div>
   ); // end return statement
 
-  function SortIcon({attr}) {
-    if (sortAttribute === attr) {
-      if (isAscending) {
-        return <ArrowUp />
-      } else {
-        return <ArrowDown />
-      }
+  function SortIcon({attr, isSort, attrType}) {
+    const iconProps = {strokeWidth: 1, size: 18};
+
+    let AscIcon, DescIcon;
+    if (attrType === COLUMN_TYPE_CATEGORICAL) {
+      [AscIcon, DescIcon] = [ArrowDownAZ, ArrowUpZA];
+    } else if (attrType === COLUMN_TYPE_NUMERIC) {
+      [AscIcon, DescIcon] = [ArrowDown01, ArrowUp10];
     } else {
-      return null;
+      [AscIcon, DescIcon] = [ArrowDownNarrowWide, ArrowUpWideNarrow];          
     }
+
+    return (
+      (isSort) 
+        ? (isAscending)
+          ? <AscIcon {...iconProps} /> 
+          : <DescIcon {...iconProps} />
+        : <ArrowUpDown {...iconProps} />
+    );
   }
 }

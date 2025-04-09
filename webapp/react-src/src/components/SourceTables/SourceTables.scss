@@ -5,6 +5,10 @@
 
 .SourceTables {
 
+    span.highlight {
+        background-color: yellow;
+    }
+
     .TableView {
         cursor: grab;
         user-select: none;
@@ -21,25 +25,33 @@
     .table-layout {
         overflow: auto;
         max-height: 100vh;
-        background-color: whitesmoke;
+        border: 1px solid black;
 
         table {
             background: inherit;
+            border-collapse: collapse;
 
             thead {
-                background: inherit;
+                background: #aaa;
                 position: sticky;
                 top: 0;
                 z-index: 1;
+                border: 2px solid black;
+
+                tr > th {
+                    border-left: 1px solid black;
+                    border-left: 1px solid black;
+                }
             }
 
             td {
                 padding: 0 10px;
             }
 
-            tbody > tr {
-                border-bottom: 1px solid #d0d0d0;
-                border-top: 1px solid #d0d0d0;
+            tbody > tr > td {
+                border: 1px solid black;
+                border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;
             }
         }
     }

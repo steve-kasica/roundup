@@ -7,11 +7,9 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedOperation, STAGE_REFINE_OPS } from "../../data/uiSlice";
+import { setHover, setSelectedOperation, STAGE_REFINE_OPS, unsetHover } from "../../data/uiSlice";
 import Column, { COLUMN_STATUS_REMOVED, COLUMN_STATUS_VISABLE } from "../../lib/types/Column";
-import { isOperation } from "../../lib/types/Operation";
 import ColumnView from "./ColumnView";
-import { createSelector } from "@reduxjs/toolkit";
 
 // const selectTableTree = (state) => state.tableTree.tree;
 // const selectStage = (state) => state.stage;
@@ -32,13 +30,12 @@ export default function({node, parentOperation}) {
     const [contextMenu, setContextMenu] = useState(null);
     const dispatch = useDispatch();
 
-    const {stage} = useSelector(({ui}) => ui);
+    const {stage, hover} = useSelector(({ui}) => ui);
+    const isHovered = hover.dataType === "table" && hover.id === table.id;
     // const {parentOperation, stage} = useSelector(
     //     state => selectOperationAndStage(state, operation_group)
     // );
     
-    // const isHovered = columns.filter(column => column.isHovered).length > 0;
-    const isHovered = false;
     const state = [
         isHovered ? "hover" : undefined,
     ].filter(className => className).join(" ");
@@ -68,6 +65,11 @@ export default function({node, parentOperation}) {
             <div 
                 data-id={tableId}
                 className={`block table ${state}`}
+                onMouseEnter={() => dispatch(setHover({dataType: "table", id: table.id}))}
+                onMouseLeave={() => {
+                    console.log("mouseLeave");
+                    dispatch(unsetHover())
+                }}
                 onContextMenu={handleContextMenu}
             >
                 <div className="label">{table.name} <span className="column-count">({table.columnCount})</span></div>

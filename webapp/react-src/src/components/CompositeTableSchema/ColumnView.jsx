@@ -31,16 +31,16 @@ export default function({column}) {
             //     property: "isSelected",
             //     value: !isSelected
             // }))}
-            onMouseEnter={() => dispatch(setColumnHover({
-                tableId: column.tableId,
-                columnId: column.id,
-                isHovered: true
-            }))}
-            onMouseLeave={() => dispatch(setColumnHover({
-                tableId: column.tableId,
-                columnId: column.id,
-                isHovered: false
-            }))}
+            // onMouseEnter={() => dispatch(setColumnHover({
+            //     tableId: column.tableId,
+            //     columnId: column.id,
+            //     isHovered: true
+            // }))}
+            // onMouseLeave={() => dispatch(setColumnHover({
+            //     tableId: column.tableId,
+            //     columnId: column.id,
+            //     isHovered: false
+            // }))}
         >
             &nbsp;
         </div>

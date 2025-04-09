@@ -38,6 +38,10 @@ export const initialState = {
     firstPaneWidth: 20,
     hoverOperation: null,
     selectedOperation: null,
+    hover: {
+        dataType: null,
+        id: null,
+    }
 };
 
 export const uiSlice = createSlice({
@@ -71,7 +75,9 @@ export const uiSlice = createSlice({
         },
         setSelectedOperation: (state, action) => {
             state.selectedOperation = action.payload;
-        }
+        },
+        setHover: (state, action) => { state.hover = action.payload; },
+        unsetHover: (state) => { state.hover = initialState.hover; },
     }
 });
 
@@ -91,7 +97,9 @@ export const {
     setSearchString,
     setFirstPaneWidth,
     setHoverOperation,
-    setSelectedOperation
+    setSelectedOperation,
+    setHover,
+    unsetHover
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

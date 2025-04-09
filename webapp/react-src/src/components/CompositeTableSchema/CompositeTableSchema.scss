@@ -149,6 +149,7 @@ $label-font-family: sans-serif;
                     .ColumnView {
                         user-select: none;
                         background-color: inherit;
+                        pointer-events: none;
                     }
     
                     .label > .column-count {

@@ -32,7 +32,6 @@ export default function SearchBar(props) {
                 startAdornment: <InputAdornment position="start"><Search /></InputAdornment>
             }
         }}
-        fullWidth={true}
         {...props} 
     />
 }
