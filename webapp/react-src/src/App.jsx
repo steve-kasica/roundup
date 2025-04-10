@@ -11,13 +11,11 @@ import theme from "./themes/theme-default";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
-import { STAGE_ARRANGE_TABLES, STAGE_CONFIG_SOURCES, STAGE_REFINE_OPS } from './data/uiSlice';
-import {ListDetail, SupportingPane} from './layouts';
+import {SupportingPane} from './layouts';
 import NavigationRail from './components/NavigationRail';
 import SourceTables from './components/SourceTables';
 import CompositeTableSchema from './components/CompositeTableSchema';
 import OperationDetail from "./components/OperationDetail";
-import WorkflowDetail from './components/WorkflowDetail';
 import OperationsList from './components/OperationsList';
 
 function App() {
@@ -26,48 +24,17 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <DndProvider backend={HTML5Backend}>
-        {
-          (stage === STAGE_CONFIG_SOURCES) ? (
-            <ListDetail 
-              navigation={
-                <NavigationRail currentStage={stage} />
-              }
-              firstPane={
-                <SourceTables />
-              }
-              secondPane={
-                <WorkflowDetail />
-              }
-            />
-          ) : (
-            <SupportingPane 
-              navigation={
-                <NavigationRail currentStage={stage} />
-              }
-              primaryContent={
-                (stage === STAGE_ARRANGE_TABLES) ? (
-                  <SourceTables />
-                ) : (stage == STAGE_REFINE_OPS) ? (
-                  <>
-                    <CompositeTableSchema />
-                    <OperationsList />                  
-                  </>
-                ) : null
-              }
-              secondaryContent={
-                (stage === STAGE_ARRANGE_TABLES) ? (
-                  <>
-                    <CompositeTableSchema />
-                    <OperationsList />
-                    {/* <OperationDetail />                                     */}
-                  </>
-                ) : (stage === STAGE_REFINE_OPS) ? (
-                  <OperationDetail />
-                ) : null
-              }
-            />
-          )
-        }
+        <SupportingPane 
+          navigation={
+            <NavigationRail currentStage={stage} />
+          }
+          primaryContent={<SourceTables />}
+          secondaryContent={<>
+            <CompositeTableSchema />
+            <OperationsList />
+            <OperationDetail />                                        
+          </>}
+        />
       </DndProvider>
     </ThemeProvider>
   );
