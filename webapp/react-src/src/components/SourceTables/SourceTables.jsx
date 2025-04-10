@@ -17,7 +17,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
 import { fetchTablesRequest } from "../../data/slices/sourceTablesSlice";
 import { Box, Button, Checkbox, Chip, FormControl, Grid2, InputLabel, ListItemText, Menu, MenuItem, OutlinedInput, Select, TextField } from "@mui/material";
-import { isTableNode } from "../../data/slices/compositeSchemaSlice";
+import { isTableNode } from "../../data/slices/compositeSchemaSlice/compositeSchemaSlice";
 
 const TABLE_LAYOUT = "table";
 const LIST_LAYOUT = "list";

@@ -10,7 +10,7 @@
 
 import { Fragment } from "react";
 import TableView from "./TableView";
-import { isOperationNode } from "../../data/slices/compositeSchemaSlice";
+import { isOperationNode } from "../../data/slices/compositeSchemaSlice/compositeSchemaSlice";
 import { useSelector } from "react-redux";
 import { isTable } from "../../lib/types/Table";
 
@@ -50,7 +50,7 @@ export default function OperationView({node, style, colorScale}) {
                                 colorScale={colorScale}
                             />)
                             : (<TableView 
-                                node={childNode.data} 
+                                node={childNode} 
                                 parentOperation={data}
                             />)
                         }

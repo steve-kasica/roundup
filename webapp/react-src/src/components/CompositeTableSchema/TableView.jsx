@@ -11,6 +11,7 @@ import { setHover, setSelectedOperation, STAGE_REFINE_OPS, unsetHover } from "..
 import Column, { COLUMN_STATUS_REMOVED, COLUMN_STATUS_VISABLE } from "../../lib/types/Column";
 import ColumnView from "./ColumnView";
 import { isMouseOverElement } from "../../lib/utilities/dom";
+import { removeTable, removeOperation } from "../../data/slices/compositeSchemaSlice";
 
 // const selectTableTree = (state) => state.tableTree.tree;
 // const selectStage = (state) => state.stage;
@@ -24,7 +25,8 @@ import { isMouseOverElement } from "../../lib/utilities/dom";
 // );
 
 export default function({node, parentOperation}) {
-    const {tableId} = node;
+    const {tableId} = node.data;
+    console.log(node);
     const table = useSelector(({sourceTables}) => sourceTables.data[tableId]);
     const columns = useSelector(({sourceColumns}) => sourceColumns.data[tableId] ?? Array.from({length: table.columnCount}, (_, i) => new Column('foo', i, null, {}, null, tableId, COLUMN_STATUS_VISABLE)));
 
@@ -46,11 +48,11 @@ export default function({node, parentOperation}) {
         {
             label: `Remove ${table.name}`,
             isVisable: true,
-            onClick: () => dispatch(removeTable(table))
+            onClick: () => dispatch(removeTable(node.data.id))
         },{
             label: "Remove operation",
             isVisable: true,
-            onClick: () => dispatch(removeOperation(parentOperation))
+            onClick: () => dispatch(removeOperation(node.data.parentId))
         },{
             // label: "Add table",
             // isVisable: true,

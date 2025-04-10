@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid2"
 import { Add as PlusIcon } from "@mui/icons-material"
 
 import { PACK, STACK } from "../../lib/types/Operation"
-import { isOperationNode } from "../../data/slices/compositeSchemaSlice"
+import { isOperationNode } from "../../data/slices/compositeSchemaSlice/compositeSchemaSlice"
 import OperationView from "./OperationView"
 // import Table from "../TableView/layouts/BlockLayout"
 import TableDropTarget from "./TableDropTarget"

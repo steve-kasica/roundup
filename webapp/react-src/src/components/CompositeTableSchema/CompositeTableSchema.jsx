@@ -13,7 +13,7 @@ import { Typography } from "@mui/material";
 import { NO_OP } from "../../lib/types/Operation";
 import { createSelector } from "@reduxjs/toolkit";
 import { isTable } from "../../lib/types/Table";
-import { isOperationNode, isTableNode, stratify } from "../../data/slices/compositeSchemaSlice";
+import { isOperationNode, isTableNode, stratify } from "../../data/slices/compositeSchemaSlice/compositeSchemaSlice";
 
 // const selectTable = (state) => state.tableTree.tree;
 
@@ -26,27 +26,11 @@ import { isOperationNode, isTableNode, stratify } from "../../data/slices/compos
 // });
 
 export default function CompositeTableSchema() {
-    // const root = useSelector(selectRoot);
-    const root = useSelector(({sourceTables, compositeSchema}) => {
-        if (compositeSchema.ids.length === 0) {
-            return null;
-        } else {
-            const data = Object.values(compositeSchema.data).map(node => {
-                if (isOperationNode(node)) {
-                    return node;
-                } else if (isTableNode(node)) {
-                    return {
-                        ...sourceTables.data[node.tableId].attributes,
-                        tableId: node.tableId,
-                        parentId: node.parentId
-                    }
-                } else {
-                    throw Error("Unknown node type");
-                }
-            });
-            return stratify(data);
-        }
-    });
+    const root = useSelector(({compositeSchema}) => 
+        (Object.keys(compositeSchema.data).length > 0)
+            ? stratify(Object.values(compositeSchema.data))    
+            : null
+    );
     const {stage} = useSelector(({ui}) => ui);
 
     return (<div className={`CompositeTableSchema ${stage}`}>
