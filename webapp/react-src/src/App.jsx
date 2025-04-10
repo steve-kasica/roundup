@@ -56,7 +56,11 @@ function App() {
               }
               secondaryContent={
                 (stage === STAGE_ARRANGE_TABLES) ? (
-                  <CompositeTableSchema />
+                  <>
+                    <CompositeTableSchema />
+                    <OperationsList />
+                    {/* <OperationDetail />                                     */}
+                  </>
                 ) : (stage === STAGE_REFINE_OPS) ? (
                   <OperationDetail />
                 ) : null
