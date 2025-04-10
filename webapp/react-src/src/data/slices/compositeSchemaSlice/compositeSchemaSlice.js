@@ -1,6 +1,5 @@
 
 import { createSlice } from "@reduxjs/toolkit";
-import { stratify as d3Stratify } from "d3";
 import { NO_OP } from "../../../lib/types/Operation";
 
 const initialState = {
@@ -34,10 +33,6 @@ function OperationNode(operationType, parentId) {
 }
 
 export const isOperationNode = node => Object.hasOwn(node, "operationType");
-
-export const stratify = d3Stratify()
-    .id(d => d.id)
-    .parentId(d => d.parentId || null);
 
 const slice = createSlice({
     name: "compositeSchema",
