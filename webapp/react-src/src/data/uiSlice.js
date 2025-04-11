@@ -38,6 +38,11 @@ export const initialState = {
     firstPaneWidth: 20,
     hoverOperation: null,
     selectedOperation: null,
+
+    // interaction states
+    focused: {
+        operation: null,
+    },
     hover: {
         dataType: null,
         id: null,
@@ -76,8 +81,20 @@ export const uiSlice = createSlice({
         setSelectedOperation: (state, action) => {
             state.selectedOperation = action.payload;
         },
-        setHover: (state, action) => { state.hover = action.payload; },
-        unsetHover: (state) => { state.hover = initialState.hover; },
+
+        setHover: (state, action) => { 
+            state.hover = action.payload; 
+        },
+        unsetHover: (state) => { 
+            state.hover = initialState.hover; 
+        },
+        focusOperation: (state, action) => {
+            const operationNodeId = action.payload;
+            state.focused.operation = operationNodeId; 
+        },
+        unfocusOperation: (state) => { 
+            state.focused.operation = initialState.focused.operation;
+        }
     }
 });
 
@@ -99,7 +116,9 @@ export const {
     setHoverOperation,
     setSelectedOperation,
     setHover,
-    unsetHover
+    unsetHover,
+    focusOperation,
+    unfocusOperation
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

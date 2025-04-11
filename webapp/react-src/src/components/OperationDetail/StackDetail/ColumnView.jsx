@@ -15,9 +15,23 @@ import { useEffect, useState, useRef } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
-import { removeColumnsAfter, setColumnHover, setColumnProperty } from "../../../data/tableTreeSlice";
 import { drag, select, selectAll } from "d3";
-import { swapColumnPositions } from "../../../data/tableTreeSlice";
+
+function swapColumnPositions() {
+    // TODO
+}
+
+function removeColumnsAfter() {
+    // TODO
+}
+
+function setColumnHover() {
+    // TODO
+}
+
+function setColumnProperty() {
+    // TODO
+}
 
 // const DEBOUNCE_DELAY = 500;
 const OVERLAP_THRESHOLD = 0.5; // percent

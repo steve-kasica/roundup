@@ -1,15 +1,15 @@
 import { useSelector } from "react-redux";
-import { isStackOperation } from "../../lib/types/Operation";
 import StackDetail from "./StackDetail/StackDetail";
 import PackDetail from "./PackDetail";
+import { getFocusedOperation } from "../../data/selectors";
 
 
 export default function() {
-    const {selectedOperation} = useSelector(({ui}) => ui);
+    const focusedOperation = useSelector(getFocusedOperation);
 
-    if (selectedOperation === null) {
+    if (focusedOperation === null) {
         return <div></div>;
-    } else if (isStackOperation(selectedOperation)) {
+    } else if (focusedOperation.operationType === "STACK") {
         return <StackDetail />;
     } else {
         return <PackDetail />;

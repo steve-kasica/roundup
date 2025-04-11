@@ -12,23 +12,12 @@ import Column, { COLUMN_STATUS_REMOVED, COLUMN_STATUS_VISABLE } from "../../lib/
 import ColumnView from "./ColumnView";
 import { isMouseOverElement } from "../../lib/utilities/dom";
 import { removeTable, removeOperation } from "../../data/slices/compositeSchemaSlice";
-
-// const selectTableTree = (state) => state.tableTree.tree;
-// const selectStage = (state) => state.stage;
-
-// const selectOperationAndStage = createSelector(
-//     [selectTableTree, selectStage, (_, operation_group) => operation_group],
-//     (tree, stage, operation_group) => ({
-//         parentOperation: tree.find(d => isOperation(d) && d.id === operation_group),
-//         stage
-//     })
-// );
+import { getTableById, getColumnsByTableId } from "../../data/selectors";
 
 export default function({node, parentOperation}) {
     const {tableId} = node.data;
-    console.log(node);
-    const table = useSelector(({sourceTables}) => sourceTables.data[tableId]);
-    const columns = useSelector(({sourceColumns}) => sourceColumns.data[tableId] ?? Array.from({length: table.columnCount}, (_, i) => new Column('foo', i, null, {}, null, tableId, COLUMN_STATUS_VISABLE)));
+    const table = useSelector(state => getTableById(state, tableId));
+    const columns = useSelector(state => getColumnsByTableId(state, node));
 
     const [contextMenu, setContextMenu] = useState(null);
     const tableRef = useRef();
@@ -36,9 +25,6 @@ export default function({node, parentOperation}) {
 
     const {stage, hover} = useSelector(({ui}) => ui);
     const isHovered = hover.dataType === "table" && hover.id === table.id;
-    // const {parentOperation, stage} = useSelector(
-    //     state => selectOperationAndStage(state, operation_group)
-    // );
     
     const state = [
         isHovered ? "hover" : undefined,

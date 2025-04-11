@@ -5,10 +5,9 @@ import reducer, {
   removeTable,
   isTableNode,
   isOperationNode,
+  NO_OP,
   stratify
 } from '.'; // Update path as needed
-
-import { NO_OP } from "../../../lib/types/Operation"; // Update path as needed
 
 describe('compositeSchema reducer', () => {
   // Initial state tests

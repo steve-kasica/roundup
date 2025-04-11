@@ -12,7 +12,7 @@ import { getRoot } from "../../data/selectors";
 import Root from "./Root";
 import TableDropTarget from "./TableDropTarget";
 import { Typography } from "@mui/material";
-import { NO_OP } from "../../lib/types/Operation";
+import { NO_OP } from "../../data/slices/compositeSchemaSlice/types/OperationNode";
 
 export default function CompositeTableSchema() {
     const root = useSelector(getRoot);

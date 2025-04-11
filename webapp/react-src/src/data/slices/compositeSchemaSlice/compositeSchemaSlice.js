@@ -1,6 +1,6 @@
 
 import { createSlice } from "@reduxjs/toolkit";
-import { NO_OP } from "../../../lib/types/Operation";
+import {TableNode, OperationNode, isTableNode, isOperationNode, NO_OP} from ".";
 
 const initialState = {
     selectedTables: [],
@@ -9,30 +9,6 @@ const initialState = {
     loading: false,
     error: null,
 };
-
-let nodeIdCounter = 0;  // each node gets a unique ID, regardless if it's a table vs operation node
-
-function TableNode(table, parentId) {
-    const id = `node-${++nodeIdCounter}`;
-    return {
-        id,
-        nodeId: id,
-        parentId,
-        tableId: table.id,
-    };
-}
-
-export const isTableNode = node => Object.hasOwn(node, "tableId");
-
-function OperationNode(operationType, parentId) {
-    return {
-        id: `node-${++nodeIdCounter}`,
-        parentId,
-        operationType,
-    };
-}
-
-export const isOperationNode = node => Object.hasOwn(node, "operationType");
 
 const slice = createSlice({
     name: "compositeSchema",

@@ -30,7 +30,7 @@ export default function TableLayout({ searchString, sourceTables, loading, error
 
   const headers=[
     {attr: "name", label: "Name", tooltip: "Sort by selected tables", attrType: COLUMN_TYPE_CATEGORICAL},
-    {attr: "tags", label: "Tags", tooltip: null, },
+    {attr: "tags", label: "Tags", tooltip: "", },
     {attr: "rowCount", label: "Rows", tooltip: "Sort by total rows", attrType: COLUMN_TYPE_NUMERIC},
     {attr: "columnCount", label: "Columns", tooltip: "Sort by total columns", attrType: COLUMN_TYPE_NUMERIC},
     {attr: "dateCreated", label: "Created", tooltip: "Sort by date created", attrType: COLUMN_TYPE_DATE},
@@ -42,6 +42,7 @@ export default function TableLayout({ searchString, sourceTables, loading, error
       <table>
         <thead>
           <tr>
+            {/* <Tooltip placement="top" title="Sort by selected tables"> */}
             <th style={{minWidth: "65px"}}>
               <IconButton
                 onClick={() => {
@@ -52,13 +53,12 @@ export default function TableLayout({ searchString, sourceTables, loading, error
                   }
                 }}
               >
-                <Tooltip placement="top" title="Sort by selected tables">
                   <CheckBoxOutlineBlank />
-                  &nbsp;
-                  <SortIcon isSort={"isSelected"=== sortAttribute} attrType="boolean" />
-                </Tooltip>
+                  {/* &nbsp;
+                  <SortIcon isSort={"isSelected"=== sortAttribute} attrType="boolean" />                   */}
               </IconButton>
             </th>
+            {/* </Tooltip>             */}
             {headers.map(header => (
               <th key={header.attr}>
                 <Button
@@ -72,9 +72,9 @@ export default function TableLayout({ searchString, sourceTables, loading, error
                     }
                   }}
                 >
-                  <Tooltip placement="top" title={header.tooltip}>
+                  {/* <Tooltip placement="top" title={header.tooltip}> */}
                     {header.label}
-                  </Tooltip>
+                  {/* </Tooltip> */}
                   &nbsp;
                   <SortIcon isSort={header.attr === sortAttribute} attrType={header.attrType}/>
                 </Button>

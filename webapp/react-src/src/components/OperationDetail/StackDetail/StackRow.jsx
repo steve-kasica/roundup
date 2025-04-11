@@ -3,14 +3,17 @@
  * 
  * 
  */
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as d3 from "d3";
 
-import {Input, Menu, MenuItem} from "@mui/material"
+import {Menu, MenuItem} from "@mui/material"
 import { useDispatch } from "react-redux";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
-import { setColumnProperty } from "../../../data/tableTreeSlice";
 import StackCell from "./StackCell";
+
+function setColumnProperty() {
+    // TODO
+}
 
 export const CELL_WIDTH = 50;  // pixels (px)
 export const OVERLAP_THRESHOLD = 0.5; // percent

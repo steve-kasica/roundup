@@ -1,6 +1,6 @@
 import { List, ListItemText, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedOperation } from "../../data/uiSlice";
+import { focusOperation } from "../../data/uiSlice";
 import { getOperations } from "../../data/selectors";
 
 export default function OperationsList() {
@@ -11,13 +11,14 @@ export default function OperationsList() {
         <>
             <h3>Operations list</h3>
             <List dense>
-            {operations.map((op, i) => (
+            {operations.map(({id, operationType}, i) => (
                 <ListItemButton 
-                    key={op.id}
+                    key={id}
                     selected={false}
+                    onClick={() => dispatch(focusOperation(id))}
                 >
                     <ListItemText
-                        primary={`${i + 1}. ${op.operationType}`}
+                        primary={`${i + 1}. ${operationType}`}
                     />
                 </ListItemButton>
             ))}

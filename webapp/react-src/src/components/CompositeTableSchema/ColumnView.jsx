@@ -10,7 +10,6 @@
 
 import { useDispatch } from "react-redux";
 import { COLUMN_STATUS_NULLED } from "../../lib/types/Column";
-import { setColumnHover, setColumnProperty } from "../../data/tableTreeSlice";
 
 export default function({column}) {
     const {status, isSelected, isHovered} = column;

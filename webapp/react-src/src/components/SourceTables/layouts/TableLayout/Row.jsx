@@ -17,7 +17,6 @@ import HighlightText from "../../../ui/HighlightText";
 import { Chip, Typography } from "@mui/material";
 import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useDispatch, useSelector } from "react-redux";
-import { setTableHover } from "../../../../data/tableTreeSlice";
 import { createOperation } from "../../../../data/slices/compositeSchemaSlice";
 import { format, utcFormat, utcParse } from "d3";
 import AnimatedEllipsis from "../../../ui/AnimatedElipse";

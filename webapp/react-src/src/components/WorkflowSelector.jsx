@@ -1,15 +1,19 @@
 /**
  * WorkflowSelector.jsx
  * -----------------------------------------------------------------------------
+ * TODO: remove workflow selector
  */
 
 import { useGetWorkflowsQuery } from '@/services/workflows';
 import { useDispatch, useSelector } from "react-redux";
 import { setWorkflow } from "@/data/uiSlice";
-import { reset } from '../data/tableTreeSlice';
 import { Button, Card, CardActionArea, CardActions, CardContent, CardHeader, IconButton, Link } from '@mui/material';
 import { setStage, STAGE_ARRANGE_TABLES } from '../data/uiSlice';
 import { Launch } from '@mui/icons-material';
+
+function reset(){
+    return null;
+}
 
 export default () => {
     const dispatch = useDispatch();

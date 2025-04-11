@@ -10,7 +10,7 @@
 
 import { Fragment } from "react";
 import TableView from "./TableView";
-import { isOperationNode } from "../../data/slices/compositeSchemaSlice/compositeSchemaSlice";
+import { isOperationNode } from "../../data/slices/compositeSchemaSlice";
 import { useSelector } from "react-redux";
 import { isTable } from "../../lib/types/Table";
 

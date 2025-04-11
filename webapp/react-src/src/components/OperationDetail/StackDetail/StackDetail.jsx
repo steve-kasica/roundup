@@ -11,8 +11,19 @@ import "./StackDetail.scss"
 import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
 import { COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
-import { setColumnProperty, setTableHover, setColumnIndexHover } from "../../../data/tableTreeSlice";
 import { createSelector } from "@reduxjs/toolkit";
+
+function setColumnProperty() {
+    // TODO
+}
+
+function setTableHover() {
+    // TODO
+}
+
+function setColumnHover() {
+    // TODO
+}
 
 const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";

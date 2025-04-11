@@ -6,23 +6,20 @@
 
 import {TableLayout, ListLayout} from "./layouts";
 import { useSelector } from "react-redux";
-import { addTable, insertTableInGroup, removeTable } from "../../data/tableTreeSlice";
 import { useDispatch } from "react-redux";
 import { isTable } from "../../lib/types/Table";
-import { ADD_TO_GROUP, SYSTEM_DECIDES } from "../../data/uiSlice";
-import { STACK } from "../../lib/types/Operation";
 import "./SourceTables.scss"
 
 import { createSelector } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
 import { fetchTablesRequest } from "../../data/slices/sourceTablesSlice";
-import { Box, Button, Checkbox, Chip, FormControl, Grid2, InputLabel, ListItemText, Menu, MenuItem, OutlinedInput, Select, TextField } from "@mui/material";
-import { isTableNode } from "../../data/slices/compositeSchemaSlice/compositeSchemaSlice";
+import { Button, Chip, FormControl, Grid2 as Grid, InputLabel, MenuItem, OutlinedInput, Select, TextField } from "@mui/material";
 
 const TABLE_LAYOUT = "table";
 const LIST_LAYOUT = "list";
 const FIRST_PANE_THRESHOLD = 30;
 
+// TODO: move to memoized function
 const selectTree = (state) => state.tableTree.tree;
 const selectSelectedTableIds = createSelector(
     [selectTree], 
@@ -43,7 +40,7 @@ const MenuProps = {
 
 export default function SourceTables() {
     const dispatch = useDispatch();
-    const [selectedTag, setSelectedTag] = useState(null);
+    const [selectedTag, setSelectedTag] = useState("");
     const [searchString, setSearchString] = useState("");
     const {firstPaneWidth} = useSelector(({ui}) => ui);
 
@@ -67,7 +64,7 @@ export default function SourceTables() {
 
     const filteredTables = sourceTables
         .filter(table => table.isSelected || table.name.includes(searchString))
-        .filter(table => table.isSelected || selectedTag === null || table.tags.includes(selectedTag));    
+        .filter(table => table.isSelected || selectedTag.length === 0 || table.tags.includes(selectedTag));    
 
     const tags = Array.from(new Set((!(loading && error)) 
         ? sourceTables.map(table => table.tags).flat()
@@ -78,8 +75,8 @@ export default function SourceTables() {
     return (
         <div className="SourceTables">
             <h3>Source tables</h3>
-            <Grid2 container spacing={1} sx={{marginBottom: "10px"}}>
-                <Grid2 item size={6}>
+            <Grid container spacing={1} sx={{marginBottom: "10px"}}>
+                <Grid size={6}>
                     <TextField
                         label="Search tables"
                         variant="outlined"
@@ -88,8 +85,8 @@ export default function SourceTables() {
                         value={searchString}
                         onChange={(event) => dispatch(setSearchString(event.target.value))}
                     />
-                </Grid2>
-                <Grid2 item size={4}>
+                </Grid>
+                <Grid size={4}>
                     <FormControl fullWidth>
                             <InputLabel 
                                 size="small" 
@@ -126,13 +123,13 @@ export default function SourceTables() {
                                 ))}
                             </Select>
                         </FormControl>
-                    </Grid2>
-                    <Grid2 item size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <Button 
                             variant="outlined"
                             color="info"
                             disableElevation
-                            disabled={(searchString === "") && (selectedTag === null)}
+                            disabled={(searchString === "") && (selectedTag.length === 0)}
                             fullWidth
                             sx={{height: "100%"}}
                             onClick={() => {
@@ -142,8 +139,8 @@ export default function SourceTables() {
                         >
                             Clear
                         </Button>
-                    </Grid2>
-            </Grid2>
+                    </Grid>
+            </Grid>
             {(layout === LIST_LAYOUT && false) ? (
                 <ListLayout 
                     searchString={searchString} 

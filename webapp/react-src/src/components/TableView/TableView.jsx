@@ -7,7 +7,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { TABLE_LAYOUT_BLOCK, TABLE_LAYOUT_ROW, TABLE_LAYOUT_LIST_ITEM, TABLE_STATE_HOVER } from ".";
 import ListItemLayout from "./layouts/ListItemLayout";
-import { addTable, removeTable, setColumnProperty } from "../../data/tableTreeSlice";
 
 export default function TableView({table, layout, style}) {
     const {columns} = table;

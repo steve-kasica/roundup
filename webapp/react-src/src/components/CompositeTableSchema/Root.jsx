@@ -6,14 +6,13 @@
 import Grid from "@mui/material/Grid2"
 import { Add as PlusIcon } from "@mui/icons-material"
 
-import { PACK, STACK } from "../../lib/types/Operation"
-import { isOperationNode } from "../../data/slices/compositeSchemaSlice/compositeSchemaSlice"
+import { PACK_OPERATION, STACK_OPERATION } from "../../data/slices/compositeSchemaSlice"
+import { isOperationNode } from "../../data/slices/compositeSchemaSlice"
 import OperationView from "./OperationView"
-// import Table from "../TableView/layouts/BlockLayout"
 import TableDropTarget from "./TableDropTarget"
 import { useSelector } from "react-redux"
 import { STAGE_ARRANGE_TABLES } from "../../data/uiSlice"
-import { interpolateCividis, interpolateCool, interpolateGreys, interpolatePlasma, scaleSequential } from "d3";
+import { interpolateGreys, scaleSequential } from "d3";
 import TableView from "./TableView"
 
 const GRID_COLUMNS = 12;
@@ -35,12 +34,12 @@ export default function Root({node}) {
                 {(stage === STAGE_ARRANGE_TABLES) ? (
                 <>
                     <Grid size={GRID_COLUMNS - gridWidth}>
-                        <TableDropTarget operationType={PACK}>
+                        <TableDropTarget operationType={PACK_OPERATION}>
                             <PlusIcon />
                         </TableDropTarget>
                     </Grid>
                     <Grid size={gridWidth}>
-                        <TableDropTarget operationType={STACK}>
+                        <TableDropTarget operationType={STACK_OPERATION}>
                             <PlusIcon />
                         </TableDropTarget>
                     </Grid>
