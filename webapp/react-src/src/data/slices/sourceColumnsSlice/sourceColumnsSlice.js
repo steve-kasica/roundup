@@ -1,34 +1,5 @@
-/**
- * @name sourceColumnsSlice.js
- * 
- * 
- * 
- * 
- */
 import { createSlice } from "@reduxjs/toolkit";
-
-// export const COLUMN_STATUS_VISABLE = 'visable';
-// export const COLUMN_STATUS_REMOVED = 'removed';
-// export const COLUMN_STATUS_NULLED = 'nulled';
-
-let idCounter = 0;
-
-function Column(
-    name,
-    index,
-    columnType,
-    // values
-    parentId,  // projectID in OpenRefine
-) {
-    return {
-        id: `c-${++idCounter}`,
-        parentId,
-        name,
-        index,
-        columnType,
-        // values,
-    }
-}
+import {Column} from ".";
 
 const initialState = {
     ids: [],
@@ -95,13 +66,4 @@ const slice = createSlice({
     }
 });
 
-export const {
-    fetchMultipleRequest, 
-    fetchMultipleSuccess, 
-    fetchMultipleFailure,
-    fetchSingleRequest,
-    fetchSingleSuccess,
-    fetchSingleFailure
-} = slice.actions;
-
-export default slice.reducer;
+export default slice;
