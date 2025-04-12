@@ -3,6 +3,8 @@ import { shallowEqual } from "react-redux";
 
 export const getFocused = ({ui}) => ui.focused;
 
+export const getFocusedOperationId = (state) => state.ui.focused.operation;
+
 // export const getFocusedOperation = ({ui}) => {
 //     if (shallowEqual(ui.focused, initialState.focused)) {
 //         return initialState.focused.id;

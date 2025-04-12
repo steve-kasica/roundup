@@ -1,6 +1,47 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { stratify as d3Stratify, descending } from "d3";
-import { isOperationNode } from "../slices/compositeSchemaSlice";
+import { isOperationNode, isTableNode } from "../slices/compositeSchemaSlice";
+
+/**
+ * 
+ */
+export const getColumnById = createSelector(
+    [
+        state => state.sourceColumns.data,
+        (_, tableId) => tableId,
+        (_, columnId) => columnId
+    ],
+    (columnsRequest, tableId, columnId) => columnsRequest[tableId].columns
+        .find(({id}) => id === columnId)
+);
+
+/**
+ * Get source table metadata for all tables that are a child
+ * of the focused operation, with columnIds associated with
+ * the given tables.
+ */
+export const getFocusedOperationTablesWithColumns = createSelector(
+    [
+        state => state.compositeSchema.data,
+        state => state.sourceTables.data,
+        state => state.sourceColumns.data,
+        state => state.ui.focused.operation,
+    ],
+    (
+        schemaData, 
+        sourceTablesData, 
+        sourceColumnsData, 
+        focusedOperationId
+    ) => Object.values(schemaData)
+            .filter(node => 
+                isTableNode(node) && node.parentId === focusedOperationId
+            )
+            .map(node => ({
+                ...sourceTablesData[node.tableId],
+                columnIds: sourceColumnsData[node.tableId].columns
+                    .map(({id}) => id),
+            }))
+);
 
 export const stratify = d3Stratify()
     .id(d => d.id)
@@ -40,4 +81,13 @@ export const getFocusedOperation = createSelector(
             return node;
         }
     }
-)
+);
+
+// TODO: memoize, if necessary
+export const getMaxColumnsInOperation = (state, operationNodeId) => {
+    const columnCounts = Object.values(state.compositeSchema.data)
+        .filter(node => isTableNode(node) && node.parentId === operationNodeId)
+        .map(tableNode => state.sourceTables.data[tableNode.tableId].columnCount);
+    const max = Math.max(...columnCounts);
+    return max;
+}

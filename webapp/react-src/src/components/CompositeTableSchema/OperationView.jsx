@@ -10,26 +10,22 @@
 
 import { Fragment } from "react";
 import TableView from "./TableView";
-import { isOperationNode } from "../../data/slices/compositeSchemaSlice";
+import { isOperationNode, isTableNode } from "../../data/slices/compositeSchemaSlice";
 import { useSelector } from "react-redux";
 import { isTable } from "../../lib/types/Table";
+import { getFocusedOperationId, getMaxColumnsInOperation } from "../../data/selectors";
 
 export default function OperationView({node, style, colorScale}) {
     const {data, children} = node;
-    const {selectedOperation} = useSelector(({ui}) => ui);
-    const isSelected = (selectedOperation && selectedOperation.id === data.id);
+    const focusedOperationId = useSelector(getFocusedOperationId);
+    const columnCount = useSelector(state => getMaxColumnsInOperation(state, data.id));
+    const isFocused = focusedOperationId === data.id;
     const className=[
         "operation",
         data.operationType,
-        (isSelected) ? "selected" : undefined,
+        (isFocused) ? "focused" : undefined,
         `depth-${node.depth}`
     ].filter(name => name).join(" ");
-
-    const columnCount = Math.max(
-        ...children.map(node => node.data)
-            .filter(isTable)
-            .map(({columns}) => columns.length)
-    );
 
     return (
         <div 
@@ -52,6 +48,7 @@ export default function OperationView({node, style, colorScale}) {
                             : (<TableView 
                                 node={childNode} 
                                 parentOperation={data}
+                                columnCount={columnCount}
                             />)
                         }
                     </Fragment>

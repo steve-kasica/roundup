@@ -16,6 +16,7 @@ const slice = createSlice({
         fetchMultipleRequest: (state) => {
             state.loading = true;
             state.error = null;
+            console.log("multiple request");
         },
         fetchMultipleSuccess: (state) => {
             state.loading = false;
@@ -42,10 +43,10 @@ const slice = createSlice({
             // Process columnInfo response into array of Column instances
             const columns = columnsInfo.map(
                 (columnInfo, index) => new Column(
+                    projectId,
+                    index,
                     columnInfo.name,                                    // name
-                    index,                                              // index
                     columnInfo.is_numeric ? "categorical" : "numeric",  // columnType
-                    projectId,                                          // parentId
                 )
             );
             

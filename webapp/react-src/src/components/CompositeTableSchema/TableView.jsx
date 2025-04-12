@@ -8,16 +8,16 @@ import { Menu, MenuItem } from "@mui/material";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setHover, setSelectedOperation, STAGE_REFINE_OPS, unsetHover } from "../../data/uiSlice";
-import Column, { COLUMN_STATUS_REMOVED, COLUMN_STATUS_VISABLE } from "../../lib/types/Column";
+// import Column, { COLUMN_STATUS_REMOVED, COLUMN_STATUS_VISABLE } from "../../lib/types/Column";
+import { Column, COLUMN_STATUS_REMOVED } from "../../data/slices/sourceColumnsSlice";
 import ColumnView from "./ColumnView";
 import { isMouseOverElement } from "../../lib/utilities/dom";
 import { removeTable, removeOperation } from "../../data/slices/compositeSchemaSlice";
-import { getTableById, getColumnsByTableId } from "../../data/selectors";
+import { getTableById } from "../../data/selectors";
 
-export default function({node, parentOperation}) {
+export default function({node, parentOperation, columnCount}) {
     const {tableId} = node.data;
     const table = useSelector(state => getTableById(state, tableId));
-    const columns = useSelector(state => getColumnsByTableId(state, node));
 
     const [contextMenu, setContextMenu] = useState(null);
     const tableRef = useRef();
@@ -54,7 +54,7 @@ export default function({node, parentOperation}) {
         <>
             <div 
                 ref={tableRef}
-                data-id={tableId}
+                data-id={table.id}
                 className={`block table ${state}`}
                 onMouseEnter={() => dispatch(setHover({dataType: "table", id: table.id}))}
                 onMouseLeave={() => {
@@ -65,9 +65,18 @@ export default function({node, parentOperation}) {
                 onContextMenu={handleContextMenu}
             >
                 <div className="label">{table.name} <span className="column-count">({table.columnCount})</span></div>
-                {columns
-                    .filter(column => column.status !== COLUMN_STATUS_REMOVED)
-                    .map((column) => <ColumnView key={column.id} column={column} />)}
+                {Array.from(
+                    {length: columnCount}, 
+                    ( _, index ) => (
+                    // TODO: to accomidate removed columns?
+                    // .filter(column => column.status !== COLUMN_STATUS_REMOVED)                        
+                    <ColumnView 
+                        key={`${table.id}-${index}`} 
+                        tableId={table.id}
+                        index={index} 
+                    />
+                    )
+                )}
             </div>
             <Menu
                 open={contextMenu !== null}

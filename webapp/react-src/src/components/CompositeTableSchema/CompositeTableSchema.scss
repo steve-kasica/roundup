@@ -132,6 +132,65 @@ $label-font-family: sans-serif;
                 border-color: $table-border-color;
             }
         }
+
+        // Styles for when Operation is in a focused state
+        &.focused {
+            // pointer-events: none;
+            pointer-events: auto;
+            cursor: default;            
+
+            > .label {
+                display: none;
+            }
+
+            .table {
+                background-color: #ddd !important;
+            }
+
+            &.pack > div {
+                border-top-color: $selected-color;
+                border-left: none;
+                border-bottom-color: $selected-color;
+                border-right: none;
+
+                &:first-child {
+                    // right-most-child
+                    border-right-color: $selected-color;
+                }
+            }
+
+            .table {
+                background-color: inherit !important;  // Toggles table color from gray
+                .ColumnView {
+                    border-right: 1px solid #bbb;
+                    &:last-child { border-right: none; }
+                }
+            }
+            > .operation {
+                > .label { display: block; }
+                > .table > .label { display: none; }
+            }
+
+            &.stack {
+                .table {
+                    .ColumnView {
+                        cursor: pointer;
+                        &.null {
+                            cursor: default;
+                            background-color: #ddd;
+                        }
+
+                        &.selected {
+                            background-color: $selected-color;
+                        }
+
+                        &:hover, &.hover {
+                            background-color: $hover-color;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Styles specific to different application stages
@@ -150,6 +209,10 @@ $label-font-family: sans-serif;
                         user-select: none;
                         background-color: inherit;
                         pointer-events: none;
+
+                        &.loading {
+                            background-color: pink;
+                        }
                     }
     
                     .label > .column-count {
@@ -174,81 +237,81 @@ $label-font-family: sans-serif;
     // Refine Operations
     &.ro {
         .operation {
-            pointer-events: none;
+            // pointer-events: none;
 
-            &.selected {
-                pointer-events: auto;
-                cursor: default;
-            }
-            > .label {
-                display: none;
-            }
+            // &.selected {
+            //     pointer-events: auto;
+            //     cursor: default;
+            // }
+            // > .label {
+            //     display: none;
+            // }
 
-            .table {
-                background-color: #ddd !important;
-            }
+            // .table {
+            //     background-color: #ddd !important;
+            // }
 
-            &.pack {
+            // &.pack {
                 
-                &.selected {
-                    > div {
-                        border-top-color: $selected-color;
-                        border-left: none;
-                        border-bottom-color: $selected-color;
-                        border-right: none;
+            //     &.selected {
+            //         > div {
+            //             border-top-color: $selected-color;
+            //             border-left: none;
+            //             border-bottom-color: $selected-color;
+            //             border-right: none;
 
-                        &:first-child {
-                            // right-most-child
-                            border-right-color: $selected-color;
-                        }
-                    }
-                }
-            }
+            //             &:first-child {
+            //                 // right-most-child
+            //                 border-right-color: $selected-color;
+            //             }
+            //         }
+            //     }
+            // }
 
-            &.selected {
-                .table {
-                    background-color: inherit !important;  // Toggles table color from gray
-                    .ColumnView {
-                        border-right: 1px solid #bbb;
-                        &:last-child {
-                            border-right: none;
-                        }
-                    }
-                }
+            // &.selected {
+            //     .table {
+            //         background-color: inherit !important;  // Toggles table color from gray
+            //         .ColumnView {
+            //             border-right: 1px solid #bbb;
+            //             &:last-child {
+            //                 border-right: none;
+            //             }
+            //         }
+            //     }
 
-                > .operation {
+            //     > .operation {
 
-                    > .label {
-                        display: block;
-                    }
+            //         > .label {
+            //             display: block;
+            //         }
 
-                    > .table {
-                        > .label {
-                            display: none;
-                        }
-                    }
-                }
-            }
+            //         > .table {
+            //             > .label {
+            //                 display: none;
+            //             }
+            //         }
+            //     }
+            // }
 
-            &.selected.stack {
-                .table {
-                    .ColumnView {
-                        cursor: pointer;
-                        &.null {
-                            cursor: default;
-                            background-color: #ddd;
-                        }
+            // &.selected.stack {
+            //     .table {
+            //         .ColumnView {
+            //             cursor: pointer;
+            //             &.null {
+            //                 cursor: default;
+            //                 background-color: #ddd;
+            //             }
 
-                        &.selected {
-                            background-color: $selected-color;
-                        }
+            //             &.selected {
+            //                 background-color: $selected-color;
+            //             }
 
-                        &:hover, &.hover {
-                            background-color: $hover-color;
-                        }
-                    }
-                }
-            }
+            //             &:hover, &.hover {
+            //                 background-color: $hover-color;
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
 }

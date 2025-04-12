@@ -16,6 +16,7 @@ import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
 import { drag, select, selectAll } from "d3";
+import { getColumnById } from "../../../data/selectors";
 
 function swapColumnPositions() {
     // TODO
@@ -36,79 +37,97 @@ function setColumnProperty() {
 // const DEBOUNCE_DELAY = 500;
 const OVERLAP_THRESHOLD = 0.5; // percent
 
-export default function({ column, position, tableName, columnCount }) {
-    const { name, status, tableId, isSelected, isHovered} = column;
-    const isLastInTable = (position === columnCount);
-
+export default function({ tableId, columnId, position, tableName, columnCount }) {
     const dispatch = useDispatch();
-    const {hoverColumnIndex, hoverTable} = useSelector(({ui}) => ui);
-
-    const columnDataRef = useRef();
-    useEffect(() => {
-        select(columnDataRef.current)
-            .call(drag()
-            .on("start", function() {
-                const {top, left} = this.getBoundingClientRect();
-                const originalElement = select(this);
-                const clone = originalElement.clone(true);
-                clone.classed("ghost", true);
-
-                originalElement
-                    .classed("drag", true)
-                    .style("position", "fixed")
-                    .style("top", `${top}px`)
-                    .style("left", `${left}px`);
-            })
-            .on("drag", function({dx}) {
-                const that = this;
-                const dragging = select(that);
-                const left = parseInt(dragging.style("left").replace("px"));
-                dragging.style("left", `${left + dx}px`);
-
-                selectAll(`.ColumnView[data-table-id="${tableId}"]`)
-                    .filter(function() { return (this !== that); })
-                    .classed("hovered", function() {
-                        return getPercentOverlap(this, dragging.node()) > OVERLAP_THRESHOLD;
-                    })
-            })
-            .on("end", function() {
-                const source = select(this);
-                const target = select(".ColumnView.hovered");
-
-                // reset all dragging styles
-                source
-                    .classed("drag", false)
-                    .style("position", null)
-                    .style("top", null)
-                    .style("left", null);             
-                selectAll(".ColumnView.ghost")
-                    .remove();
-                selectAll(".ColumnView.hovered")
-                    .classed("hovered", false);
-
-                // Update data state
-                if (target.node()) {
-                    dispatch(swapColumnPositions({
-                        tableId: source.attr("data-table-id"),
-                        sourceIndex: parseInt(source.attr("data-column-index")),
-                        targetIndex: parseInt(target.attr("data-column-index")),
-                    }));
-                } else {
-                    // Treat as if a regular click, equivalent to callback for onMouseUp
-                    dispatch(setColumnProperty({
-                        column,
-                        property: "isSelected",
-                        value: !isSelected
-                    }));
-                }
-            })
+    let column, name, isNull;
+    if (columnId) {
+        column = useSelector(({sourceColumns}) => 
+            sourceColumns.data[tableId].columns.find(({id}) => id === columnId)
         );
-    }, []);
+        // column = useSelector((state) => getColumnById(state, tableId, columnId));
+        isNull = false;
+        name = column.name;        
+        // const { name, status, tableId, isSelected, isHovered} = column;
+    } else {
+        // is a NULL column
+        isNull = true;
+        column = null;
+        name = "null";        
+    }
+    const isLastInTable = (position === columnCount);    
+    const isHovered = false;
+    const isSelected = false;
 
-    // Keep hover persistent when context menu opens
-    const hoverTimeoutRef = useRef(null);
 
-    // Local state variables and functions for displaying context menu
+    // const {hoverColumnIndex, hoverTable} = useSelector(({ui}) => ui);
+
+    // const columnDataRef = useRef();
+    // useEffect(() => {
+    //     select(columnDataRef.current)
+    //         .call(drag()
+    //         .on("start", function() {
+    //             const {top, left} = this.getBoundingClientRect();
+    //             const originalElement = select(this);
+    //             const clone = originalElement.clone(true);
+    //             clone.classed("ghost", true);
+
+    //             originalElement
+    //                 .classed("drag", true)
+    //                 .style("position", "fixed")
+    //                 .style("top", `${top}px`)
+    //                 .style("left", `${left}px`);
+    //         })
+    //         .on("drag", function({dx}) {
+    //             const that = this;
+    //             const dragging = select(that);
+    //             const left = parseInt(dragging.style("left").replace("px"));
+    //             dragging.style("left", `${left + dx}px`);
+
+    //             selectAll(`.ColumnView[data-table-id="${tableId}"]`)
+    //                 .filter(function() { return (this !== that); })
+    //                 .classed("hovered", function() {
+    //                     return getPercentOverlap(this, dragging.node()) > OVERLAP_THRESHOLD;
+    //                 })
+    //         })
+    //         .on("end", function() {
+    //             const source = select(this);
+    //             const target = select(".ColumnView.hovered");
+
+    //             // reset all dragging styles
+    //             source
+    //                 .classed("drag", false)
+    //                 .style("position", null)
+    //                 .style("top", null)
+    //                 .style("left", null);             
+    //             selectAll(".ColumnView.ghost")
+    //                 .remove();
+    //             selectAll(".ColumnView.hovered")
+    //                 .classed("hovered", false);
+
+    //             // Update data state
+    //             if (target.node()) {
+    //                 dispatch(swapColumnPositions({
+    //                     tableId: source.attr("data-table-id"),
+    //                     sourceIndex: parseInt(source.attr("data-column-index")),
+    //                     targetIndex: parseInt(target.attr("data-column-index")),
+    //                 }));
+    //             } else {
+    //                 // Treat as if a regular click, equivalent to callback for onMouseUp
+    //                 dispatch(setColumnProperty({
+    //                     column,
+    //                     property: "isSelected",
+    //                     value: !isSelected
+    //                 }));
+    //             }
+    //         })
+    //     );
+    // }, []);
+
+    // // Keep hover persistent when context menu opens
+    // const hoverTimeoutRef = useRef(null);
+
+    // Setup context menu
+    //
     const [anchorEl, setAnchorEl] = useState(null);
     const isPopoverOpen = Boolean(anchorEl);
     const closePopover = () => {
@@ -128,16 +147,16 @@ export default function({ column, position, tableName, columnCount }) {
         );
     };
 
-    // Weird workaround to trigger focus on column from context menu clicks
-    const inputRef = useRef(null);    
-    const [isFocused, setIsFocused] = useState(false);
-    useEffect(() => {
-        if (!isFocused) return;
-       inputRef.current?.focus();
-    }, [isFocused]);
+    // // Weird workaround to trigger focus on column from context menu clicks
+    // const inputRef = useRef(null);    
+    // const [isFocused, setIsFocused] = useState(false);
+    // useEffect(() => {
+    //     if (!isFocused) return;
+    //    inputRef.current?.focus();
+    // }, [isFocused]);
 
     // Debounce input when modifying column attributes in the DOM
-    const [value, setValue] = useState(status !== COLUMN_STATUS_NULLED ? name : "null");
+    const [value, setValue] = useState(name);
     // useEffect(() => {
     //     const timeoutId = setTimeout(
     //         () => dispatch(setColumnProperty({
@@ -152,7 +171,7 @@ export default function({ column, position, tableName, columnCount }) {
 
     // Set class-based state styles
     const state = [
-        (status === COLUMN_STATUS_NULLED) ? "null" : undefined,
+        (isNull) ? "null" : undefined,
         (isHovered) ? "hovered" : undefined,
         (isSelected) ? "selected" : undefined
     ].filter(className => className).join(" ");
@@ -160,7 +179,7 @@ export default function({ column, position, tableName, columnCount }) {
     // Render ColumnView
     return (
         <div
-            ref={columnDataRef} 
+            // ref={columnDataRef} 
             data-table-id={tableId}
             data-column-index={position - 1}
             className={`ColumnView ${state}`}
@@ -171,34 +190,34 @@ export default function({ column, position, tableName, columnCount }) {
                     event.preventDefault();
                     setAnchorEl(event.target);
                 }}
-                onMouseEnter={() => {
-                    dispatch(setColumnHover({
-                        tableId: column.tableId,
-                        columnId: column.id,
-                        isHovered: true
-                    }));
-                    if (hoverTimeoutRef.current) {
-                        clearTimeout(hoverTimeoutRef.current);
-                        hoverTimeoutRef.current = null;
-                    }
-                }}
-                onMouseLeave={() => {
-                    if (!isPopoverOpen) {
-                        dispatch(setColumnHover({
-                            tableId: column.tableId,                            
-                            columnId: column.id,
-                            isHovered: false
-                        }));
-                    }
-                }}
-                onDoubleClick={() => setIsFocused(true)}
+                // onMouseEnter={() => {
+                //     dispatch(setColumnHover({
+                //         tableId: column.tableId,
+                //         columnId: column.id,
+                //         isHovered: true
+                //     }));
+                //     if (hoverTimeoutRef.current) {
+                //         clearTimeout(hoverTimeoutRef.current);
+                //         hoverTimeoutRef.current = null;
+                //     }
+                // }}
+                // onMouseLeave={() => {
+                //     if (!isPopoverOpen) {
+                //         dispatch(setColumnHover({
+                //             tableId: column.tableId,                            
+                //             columnId: column.id,
+                //             isHovered: false
+                //         }));
+                //     }
+                // }}
+                // onDoubleClick={() => setIsFocused(true)}
             >
                 <input 
-                    ref={inputRef}
+                    // ref={inputRef}
                     type="text"
                     value={value}
-                    onChange={event => setValue(event.target.value)}
-                    onBlur={() => setIsFocused(false)}
+                    // onChange={event => setValue(event.target.value)}
+                    // onBlur={() => setIsFocused(false)}
                     minLength={1}
                 />
             </div>
@@ -213,19 +232,19 @@ export default function({ column, position, tableName, columnCount }) {
             >
                 <List>
                     <ListItemButton onClick={() => {
-                        dispatch(setColumnProperty({
-                            column,
-                            property: "status",
-                            value: COLUMN_STATUS_REMOVED
-                        }));
-                        dispatch(setColumnHover({
-                            tableId: column.tableId,
-                            columnId: column.id,
-                            isHovered: true
-                        }));
-                        closePopover();
+                        // dispatch(setColumnProperty({
+                        //     column,
+                        //     property: "status",
+                        //     value: COLUMN_STATUS_REMOVED
+                        // }));
+                        // dispatch(setColumnHover({
+                        //     tableId: column.tableId,
+                        //     columnId: column.id,
+                        //     isHovered: true
+                        // }));
+                        // closePopover();
                     }}>
-                        Remove {column.name}
+                        Remove {name}
                     </ListItemButton>
                     <ListItemButton 
                         disabled={isLastInTable}
@@ -237,7 +256,7 @@ export default function({ column, position, tableName, columnCount }) {
                     </ListItemButton>
                     <hr></hr>
                     <ListItemButton 
-                        disabled={status === COLUMN_STATUS_NULLED}
+                        disabled={isNull}
                         onClick={() => {
                             dispatch(setColumnProperty({
                                 column,

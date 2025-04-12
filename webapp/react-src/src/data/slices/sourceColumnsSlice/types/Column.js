@@ -1,16 +1,25 @@
 
 let idCounter = 0;
 
-// export const COLUMN_STATUS_VISABLE = 'visable';
-// export const COLUMN_STATUS_REMOVED = 'removed';
-// export const COLUMN_STATUS_NULLED = 'nulled';
+export const COLUMN_STATUS_VISABLE = 'visable';
+export const COLUMN_STATUS_REMOVED = 'removed';
+export const COLUMN_STATUS_NULLED = 'nulled';
 
+/**
+ * 
+ * @param {*} tableId 
+ * @param {*} index 
+ * @param {*} name 
+ * @param {*} columnType 
+ * @param {*} status 
+ * @returns 
+ */
 export function Column(
     tableId,
     index,
     name,
     columnType,
-    status,
+    status=COLUMN_STATUS_VISABLE,
 ) {
     if (tableId === undefined) {
         throw new Error("Param undefined `tableId`");

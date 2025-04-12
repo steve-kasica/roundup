@@ -26,7 +26,7 @@ function App() {
       <DndProvider backend={HTML5Backend}>
         <SupportingPane 
           navigation={
-            <NavigationRail currentStage={stage} />
+            <></>
           }
           primaryContent={<SourceTables />}
           secondaryContent={<>

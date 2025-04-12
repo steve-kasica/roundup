@@ -12,6 +12,7 @@ import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
 import { COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
 import { createSelector } from "@reduxjs/toolkit";
+import { getFocusedOperationTablesWithColumns } from "../../../data/selectors";
 
 function setColumnProperty() {
     // TODO
@@ -29,38 +30,13 @@ const X_AXIS_LABEL = "column index"
 const Y_AXIS_LABEL = "table name";
 const cellSize = 50;  // in height and width of cells (in pixels)
 
-const selectTree = state => state.tableTree.tree;
-const selectSelectedOperation = state => state.ui.selectedOperation;
-
-const selectedTablesByOperation = createSelector(
-    [selectTree, selectSelectedOperation],
-    (tree, selectedOperation) => {
-        // Only process if we have a selected operation
-        if (!selectSelectedOperation) return new Array();
-
-        const tables = tree
-            .filter(node => (
-                isTable(node) && node.operation_group === selectedOperation.id)
-            )
-            .map(table => ({
-                ...table,
-                columns: table.columns.filter(({status}) => status !== COLUMN_STATUS_REMOVED)
-            }));
-        // Reverses table order to match flex-direction (in-place)            
-        tables.reverse();
-
-        return tables;
-    }
-);
-
 export default function StackDetail() {
     const dispatch = useDispatch();
-    const tables = useSelector(selectedTablesByOperation);
+    // TODO: delete
+    // const tables = useSelector(selectedTablesByOperation);
+    const tables = useSelector(getFocusedOperationTablesWithColumns);
 
-
-
-
-    const maxColumnCount = Math.max(...tables.map(table => table.columns.length));
+    const maxColumnCount = Math.max(...tables.map(table => table.columnCount));
     const columnPositions = Array.from({length: maxColumnCount}, (_, i) => i);
 
     const xScale = scaleBand(
@@ -83,7 +59,7 @@ export default function StackDetail() {
                             key={table.id}
                             className="tick"
                             onMouseEnter={() => dispatch(setTableHover({
-                                tableId: table.id, 
+                                tableId: table.id,
                                 isHovered: true
                             }))}
                             onMouseLeave={() => dispatch(setTableHover({
@@ -107,54 +83,55 @@ export default function StackDetail() {
                             >
                                 <div 
                                     className="index-label"
-                                    onClick={() => {
-                                        const columns = tables
-                                            .map(table => (j < table.columns.length) ? table.columns.at(j) : null)
-                                            .filter(column => column);
-                                        const isIndexSelected = columns.filter(column => column.isSelected).length === columns.length;
-                                        if (isIndexSelected) {
-                                            // If every column in the index is selected, unselect all columns in the index
-                                            columns.forEach(column => dispatch(setColumnProperty({
-                                                column,
-                                                property: "isSelected",
-                                                value: false
-                                            })))
-                                        } else {
-                                            // Select all unselected columns in the index
-                                            columns
-                                                .filter(column => !column.isSelected)
-                                                .forEach(column => dispatch(setColumnProperty({
-                                                    column,
-                                                    property: "isSelected",
-                                                    value: true
-                                                })))
-                                        }
-                                    }}
-                                    onMouseEnter={() => dispatch(setColumnIndexHover({
-                                        tableIds: tables.map(table => table.id),
-                                        index: j,
-                                        isHovered: true
-                                    }))}
-                                    onMouseLeave={() => dispatch(setColumnIndexHover({
-                                        tableIds: tables.map(table => table.id),
-                                        index: j,
-                                        isHovered: false
-                                    }))}
+                                    // onClick={() => {
+                                    //     const columns = tables
+                                    //         .map(table => (j < table.columnCount) ? table.columns.at(j) : null)
+                                    //         .filter(column => column);
+                                    //     // const isIndexSelected = columns.filter(column => column.isSelected).length === columns.length;
+                                    //     const isIndexSelected = false;
+                                    //     if (isIndexSelected) {
+                                    //         // If every column in the index is selected, unselect all columns in the index
+                                    //         columns.forEach(column => dispatch(setColumnProperty({
+                                    //             column,
+                                    //             property: "isSelected",
+                                    //             value: false
+                                    //         })))
+                                    //     } else {
+                                    //         // Select all unselected columns in the index
+                                    //         columns
+                                    //             .filter(column => !column.isSelected)
+                                    //             .forEach(column => dispatch(setColumnProperty({
+                                    //                 column,
+                                    //                 property: "isSelected",
+                                    //                 value: true
+                                    //             })))
+                                    //     }
+                                    // }}
+                                    // onMouseEnter={() => dispatch(setColumnIndexHover({
+                                    //     tableIds: tables.map(table => table.id),
+                                    //     index: j,
+                                    //     isHovered: true
+                                    // }))}
+                                    // onMouseLeave={() => dispatch(setColumnIndexHover({
+                                    //     tableIds: tables.map(table => table.id),
+                                    //     index: j,
+                                    //     isHovered: false
+                                    // }))}
                                 >
                                     <label>
                                         {j + 1}
                                     </label>
                                 </div>
-                                {tables.map(table => {
-                                    const column = table.columns.at(j);
-                                    return <ColumnView 
-                                        key={column.id} 
-                                        column={column} 
+                                {tables.map(table => (
+                                    <ColumnView 
+                                        key={`${table.id}-${j}`}
+                                        tableId={table.id}                                        
+                                        columnId={table.columnIds[j]}  // undefined (out of bounds) is allowed
                                         position={j + 1}
-                                        columnCount={table.columns.length}
+                                        columnCount={table.columnCount}
                                         tableName={table.name}
-                                    />;
-                                })}
+                                    />)
+                                )}
                             </form>
                         ))}
                     </div>

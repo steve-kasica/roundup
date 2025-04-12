@@ -8,23 +8,47 @@
  *    width when nesting operations and tables.
  */
 
-import { useDispatch } from "react-redux";
-import { COLUMN_STATUS_NULLED } from "../../lib/types/Column";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import { memo } from "react";
 
-export default function({column}) {
-    const {status, isSelected, isHovered} = column;
-    const isNull = (status === COLUMN_STATUS_NULLED);
-    const dispatch = useDispatch();
+const ColumnView = memo(function({tableId, index}) {
+
+    // TODO: this kind of loading and error handling 
+    // should happen at the TableView level
+    const {isLoading, data, error} = useSelector(({sourceColumns}) => {
+        const tableColumns = sourceColumns.data[tableId];
+        if (tableColumns) {
+            const {loading:isLoading, columns, error} = tableColumns;
+            return {
+                isLoading,
+                data: columns[index] ?? null,
+                error
+            };            
+        } else {
+            return {
+                isLoading: true,
+                data: null,
+                error: null
+            }
+        }
+    }, shallowEqual);
+
+    // TODO
+    const isSelected = false;
+    const isHovered = false;
+    const isNull = (data === null);
 
     const state = [
+        "ColumnView",
+        (isLoading) ? "loading" : undefined,
         (isNull) ? "null" : undefined,
         (isHovered) ? "hover" : undefined,
         (isSelected) ? "selected" : undefined
-    ].filter(className => className).join(" ");
+    ].filter(className => className);
 
     return (
         <div 
-            className={`ColumnView ${state}`}
+            className={state.join(" ")}
             // onClick={() => dispatch(setColumnProperty({
             //     column,
             //     property: "isSelected",
@@ -44,4 +68,6 @@ export default function({column}) {
             &nbsp;
         </div>
     );
-}
+});
+
+export default ColumnView;

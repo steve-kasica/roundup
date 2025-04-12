@@ -10,6 +10,7 @@ import {
     fetchSingleSuccess
 } from '../slices/sourceColumnsSlice';
 import OpenRefineAPI from "../../services/open-refine";
+import { createOperation } from '../slices/compositeSchemaSlice';
 
 /**
  * @description Saga watcher for individual requests
@@ -34,4 +35,13 @@ function* singleSourceColumnsSagaWorker(action) {
         // Dispatch failure action
         yield put(fetchSingleFailure({error, projectId}));
     }
+}
+
+
+export function* watchTableAdded() {
+    yield takeEvery(createOperation.type, handleWatchTableAdded);
+}
+function* handleWatchTableAdded(action) {
+    const projectId = action.payload.table.id;
+    yield put({type: fetchSingleRequest.type, payload: projectId});
 }
