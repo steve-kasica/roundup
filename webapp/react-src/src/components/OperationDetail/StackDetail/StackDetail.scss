@@ -88,6 +88,9 @@ $cell-border-color: $table-border-color;
                 padding-top: $cellPadding;
                 padding-bottom: $cellPadding;
                 margin-top: $horizontalGutterWidth;
+
+                // TODO: should I add a consistent typographic style for hover state?
+                // &:hover, &.hover { }
             }
         }
     }
@@ -169,7 +172,7 @@ $cell-border-color: $table-border-color;
                         }
                     }
 
-                    &.hover {
+                    &:hover, &.hover {
                         background-color: $hover-color;
                     }
                     
@@ -178,42 +181,26 @@ $cell-border-color: $table-border-color;
                         // left: set inline dynamically
                         // top: set inline dynamically
                         filter: drop-shadow(2px 2px 2px black);
-                        // input {
-                        //     opacity: 0.1;
-                        // }
-                        // display: none;
                     }
 
                     &.ghost {
                         opacity: 0.75;
-                        // border: 1px solid red;
-                    }
-
-                    &.hovered {
-                        background-color: teal !important;
                     }
 
                     &.selected {
                         background-color: $selected-color;
                     }
 
-                }  // end .ColumnView
+                }
 
                 &:focus-within {
                     max-width: unset;
                     text-overflow: unset;
-                    .ColumnView input {
-                        pointer-events: all;
-                    }
+                    .ColumnView input { pointer-events: all; }
 
                 }
 
-                &.hover {
-                // &:hover, &.hover {
-                    .screen input {
-                        background-color: $hover-color;
-                    }
-                }
+                &.hover .screen input { background-color: $hover-color; }
             }
         }
     }

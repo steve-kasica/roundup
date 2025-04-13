@@ -44,8 +44,9 @@ export const initialState = {
         operation: null,
     },
     hover: {
-        dataType: null,
-        id: null,
+        table: null,
+        operation: null,
+        columnIndex: null,
     }
 };
 
@@ -53,45 +54,202 @@ export const uiSlice = createSlice({
     name: "ui",
     initialState,
     reducers: {
-        setWorkflow: ( state, action ) => {
+        /**
+         * Sets the current workflow
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {Object} action.payload - The workflow object to set
+         */
+        setWorkflow: (state, action) => {
             state.workflow = action.payload
         },
+    
+        /**
+         * Updates the sidebar status
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string|boolean} action.payload - The new sidebar status
+         */
         setSidebarStatus: (state, action) => {
             state.sidebarStatus = action.payload
         },
+    
+        /**
+         * Sets the current insertion mode
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string} action.payload - The insertion mode to set
+         */
         setInsertionMode: (state, action) => {
             state.insertionMode = action.payload
         },
-        setFocusedNode: (state, action)  => {
+    
+        /**
+         * Updates the currently focused node
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string|null} action.payload - The ID of the node to focus
+         */
+        setFocusedNode: (state, action) => {
             state.focusedNode = action.payload
         },
+    
+        /**
+         * Sets the current application stage
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string} action.payload - The stage to set (validated against STAGES)
+         */
         setStage: (state, action) => { 
             checkPayload(action.payload, STAGES);
             state.stage = action.payload; 
         },
+    
+        /**
+         * Updates the current search string
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string} action.payload - The search string to set
+         */
         setSearchString: (state, action) => {
             state.searchString = action.payload;
         },
+    
+        /**
+         * Sets the width of the first pane
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {number} action.payload - The width to set for the first pane
+         */
         setFirstPaneWidth: (state, action) => {
             state.firstPaneWidth = action.payload;
         },
-        setHoverOperation: (state, action) => {
-            state.hoverOperation = action.payload;
-        },
+    
+        /**
+         * Updates the currently selected operation
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string|null} action.payload - The ID of the operation to select
+         */
         setSelectedOperation: (state, action) => {
             state.selectedOperation = action.payload;
         },
-
-        setHover: (state, action) => { 
-            state.hover = action.payload; 
+    
+        // hover actions
+        /**
+         * Sets an operation as being hovered over
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string} action.payload - The ID of the operation node being hovered
+         */
+        hoverOperation: (state, action) => {
+            const operationNodeId = action.payload;
+            state.hover.operation = operationNodeId;
         },
-        unsetHover: (state) => { 
-            state.hover = initialState.hover; 
+    
+        /**
+         * Sets a table as being hovered over
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string} action.payload - The ID of the table being hovered
+         */
+        hoverTable: (state, action) => {
+            const tableId = action.payload;
+            state.hover.table = tableId;
         },
+    
+        /**
+         * Sets a column index as being hovered over
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {number} action.payload - The index of the column being hovered
+         */
+        hoverColumnIndex: (state, action) => {
+            const columnIndex = action.payload;
+            state.hover.columnIndex = columnIndex;
+        },
+    
+        /**
+         * Sets both a table and column index as being hovered over
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {Object} action.payload - The hover information
+         * @param {string} action.payload.tableId - The ID of the table being hovered
+         * @param {number} action.payload.columnIndex - The index of the column being hovered
+         */
+        hoverColumnIndexInTable: (state, action) => {
+            const {tableId, columnIndex} = action.payload;
+            state.hover.table = tableId;
+            state.hover.columnIndex = columnIndex;
+        },
+    
+        // Unhover actions
+        /**
+         * Removes the hover state from the current operation
+         * 
+         * @param {Object} state - The current state
+         */
+        unhoverOperation: (state) => {
+            state.hover.operation = initialState.hover.operation;
+        },
+    
+        /**
+         * Removes the hover state from the current table
+         * 
+         * @param {Object} state - The current state
+         */
+        unhoverTable: (state) => {
+            state.hover.table = initialState.hover.table;
+        },
+    
+        /**
+         * Removes the hover state from the current column index
+         * 
+         * @param {Object} state - The current state
+         */
+        unhoverColumnIndex: (state) => {
+            state.hover.columnIndex = initialState.hover.columnIndex;
+        },
+    
+        /**
+         * Removes the hover state from both table and column index
+         * 
+         * @param {Object} state - The current state
+         */
+        unhoverColumnIndexInTable: (state) => {
+            state.hover.table = null;
+            state.hover.columnIndex = null;
+        },
+    
+        /**
+         * Sets an operation as focused
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string} action.payload - The ID of the operation node to focus
+         */
         focusOperation: (state, action) => {
             const operationNodeId = action.payload;
             state.focused.operation = operationNodeId; 
         },
+    
+        /**
+         * Removes focus from the current operation
+         * 
+         * @param {Object} state - The current state
+         */
         unfocusOperation: (state) => { 
             state.focused.operation = initialState.focused.operation;
         }
@@ -113,10 +271,16 @@ export const {
     setStage,
     setSearchString,
     setFirstPaneWidth,
-    setHoverOperation,
     setSelectedOperation,
-    setHover,
-    unsetHover,
+
+    hoverOperation,
+    hoverTable,
+    hoverColumnIndex,
+    hoverColumnIndexInTable,
+    unhoverOperation,
+    unhoverTable,
+    unhoverColumnIndex,
+    unhoverColumnIndexInTable,
     focusOperation,
     unfocusOperation
 } = uiSlice.actions;

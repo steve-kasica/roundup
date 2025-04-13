@@ -7,13 +7,11 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setHover, setSelectedOperation, STAGE_REFINE_OPS, unsetHover } from "../../data/uiSlice";
-// import Column, { COLUMN_STATUS_REMOVED, COLUMN_STATUS_VISABLE } from "../../lib/types/Column";
-import { Column, COLUMN_STATUS_REMOVED } from "../../data/slices/sourceColumnsSlice";
+import { setSelectedOperation, STAGE_REFINE_OPS, unhoverTable, hoverTable } from "../../data/uiSlice";
 import ColumnView from "./ColumnView";
 import { isMouseOverElement } from "../../lib/utilities/dom";
 import { removeTable, removeOperation } from "../../data/slices/compositeSchemaSlice";
-import { getTableById } from "../../data/selectors";
+import { getHoverTable, getTableById } from "../../data/selectors";
 
 export default function({node, parentOperation, columnCount}) {
     const {tableId} = node.data;
@@ -23,9 +21,10 @@ export default function({node, parentOperation, columnCount}) {
     const tableRef = useRef();
     const dispatch = useDispatch();
 
-    const {stage, hover} = useSelector(({ui}) => ui);
-    const isHovered = hover.dataType === "table" && hover.id === table.id;
-    
+    const {stage} = useSelector(({ui}) => ui);
+    const hoverTableId = useSelector(getHoverTable);
+
+    const isHovered = hoverTableId === table.id;    
     const state = [
         isHovered ? "hover" : undefined,
     ].filter(className => className).join(" ");
@@ -40,10 +39,6 @@ export default function({node, parentOperation, columnCount}) {
             isVisable: true,
             onClick: () => dispatch(removeOperation(node.data.parentId))
         },{
-            // label: "Add table",
-            // isVisable: true,
-            // onClick: () => dispatch(setInsertionMode(ADD_TO_GROUP))
-        },{
             label: "Select operation",
             isVisable: stage === STAGE_REFINE_OPS,
             onClick: () => dispatch(setSelectedOperation(parentOperation))
@@ -56,24 +51,20 @@ export default function({node, parentOperation, columnCount}) {
                 ref={tableRef}
                 data-id={table.id}
                 className={`block table ${state}`}
-                onMouseEnter={() => dispatch(setHover({dataType: "table", id: table.id}))}
-                onMouseLeave={() => {
-                    if (!contextMenu) {
-                        dispatch(unsetHover());
-                    }
-                }}
+                onMouseEnter={() => (!isHovered) ? dispatch(hoverTable(table.id)) : null}
+                onMouseLeave={() => (!contextMenu) ? dispatch(unhoverTable()) : null}
                 onContextMenu={handleContextMenu}
             >
                 <div className="label">{table.name} <span className="column-count">({table.columnCount})</span></div>
                 {Array.from(
                     {length: columnCount}, 
-                    ( _, index ) => (
+                    ( _, columnIndex ) => (
                     // TODO: to accomidate removed columns?
                     // .filter(column => column.status !== COLUMN_STATUS_REMOVED)                        
                     <ColumnView 
-                        key={`${table.id}-${index}`} 
+                        key={`${table.id}-${columnIndex}`} 
                         tableId={table.id}
-                        index={index} 
+                        columnIndex={columnIndex} 
                     />
                     )
                 )}

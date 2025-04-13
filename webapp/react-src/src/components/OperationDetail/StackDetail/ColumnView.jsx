@@ -16,7 +16,8 @@ import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
 import { drag, select, selectAll } from "d3";
-import { getColumnById } from "../../../data/selectors";
+import { getHoverTable, getHoverColumnIndex, isColumnHover } from "../../../data/selectors";
+import { hoverColumnIndexInTable, unhoverColumnIndexInTable } from "../../../data/uiSlice";
 
 function swapColumnPositions() {
     // TODO
@@ -39,6 +40,7 @@ const OVERLAP_THRESHOLD = 0.5; // percent
 
 export default function({ tableId, columnId, position, tableName, columnCount }) {
     const dispatch = useDispatch();
+    const index = position - 1; // TODO
     let column, name, isNull;
     if (columnId) {
         column = useSelector(({sourceColumns}) => 
@@ -46,18 +48,20 @@ export default function({ tableId, columnId, position, tableName, columnCount })
         );
         // column = useSelector((state) => getColumnById(state, tableId, columnId));
         isNull = false;
-        name = column.name;        
+        name = column.name;  
+        columnId = column.id;      
         // const { name, status, tableId, isSelected, isHovered} = column;
     } else {
         // is a NULL column
         isNull = true;
         column = null;
+        columnId = null;
         name = "null";        
     }
-    const isLastInTable = (position === columnCount);    
-    const isHovered = false;
-    const isSelected = false;
 
+    const isLastInTable = (position === columnCount);    
+    const isHovered = useSelector(state => isColumnHover(state, { tableId, index }));
+    const isSelected = false;
 
     // const {hoverColumnIndex, hoverTable} = useSelector(({ui}) => ui);
 
@@ -172,7 +176,7 @@ export default function({ tableId, columnId, position, tableName, columnCount })
     // Set class-based state styles
     const state = [
         (isNull) ? "null" : undefined,
-        (isHovered) ? "hovered" : undefined,
+        (isHovered) ? "hover" : undefined,
         (isSelected) ? "selected" : undefined
     ].filter(className => className).join(" ");
 
@@ -190,26 +194,21 @@ export default function({ tableId, columnId, position, tableName, columnCount })
                     event.preventDefault();
                     setAnchorEl(event.target);
                 }}
-                // onMouseEnter={() => {
-                //     dispatch(setColumnHover({
-                //         tableId: column.tableId,
-                //         columnId: column.id,
-                //         isHovered: true
-                //     }));
-                //     if (hoverTimeoutRef.current) {
-                //         clearTimeout(hoverTimeoutRef.current);
-                //         hoverTimeoutRef.current = null;
-                //     }
-                // }}
-                // onMouseLeave={() => {
-                //     if (!isPopoverOpen) {
-                //         dispatch(setColumnHover({
-                //             tableId: column.tableId,                            
-                //             columnId: column.id,
-                //             isHovered: false
-                //         }));
-                //     }
-                // }}
+                onMouseEnter={() => {
+                    dispatch(hoverColumnIndexInTable({ 
+                        tableId: tableId, 
+                        columnIndex: index 
+                    }));
+                    if (hoverTimeoutRef.current) {
+                        clearTimeout(hoverTimeoutRef.current);
+                        hoverTimeoutRef.current = null;
+                    }
+                }}
+                onMouseLeave={() => {
+                    if (!isPopoverOpen) {
+                        dispatch(unhoverColumnIndexInTable());
+                    }
+                }}
                 // onDoubleClick={() => setIsFocused(true)}
             >
                 <input 

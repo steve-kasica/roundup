@@ -20,7 +20,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { createOperation } from "../../../../data/slices/compositeSchemaSlice";
 import { format, utcFormat, utcParse } from "d3";
 import AnimatedEllipsis from "../../../ui/AnimatedElipse";
-import { setHover, unsetHover } from "../../../../data/uiSlice";
+import { unhoverTable, hoverTable } from "../../../../data/uiSlice";
+import { isTableHover } from "../../../../data/selectors";
 
 // Parse date string in ISO 8601 extended format with UTC designator and microsecond precision
 const parseDate = utcParse("%Y-%m-%dT%H:%M:%S.%fZ");
@@ -31,7 +32,7 @@ const formatNumber = format(",");
 export default function Row({searchString, table}) {
     const dispatch = useDispatch();
     const id = table[ID_ATTR];
-    const {isSelected, isHovered} = table;
+    const {isSelected} = table;
     const values = Array.from(attributeMap.keys()).map(attr => table[attr]);
 
     const [isPressed, setIsPressed] = useState(false);
@@ -58,8 +59,9 @@ export default function Row({searchString, table}) {
     );
 
     const isDisabled = values.join("^").indexOf(searchString) < 0;
+    const isHover = useSelector((state) => isTableHover(state, table.id));
     const state = [
-        isHovered   ? "hover"       : undefined,
+        isHover     ? "hover"       : undefined,
         isSelected  ? "selected"    : undefined,
         isDisabled  ? "disabled"    : undefined,
         isPressed   ? "pressed"     : undefined,        
@@ -71,11 +73,8 @@ export default function Row({searchString, table}) {
             <DragPreviewImage connect={previewRef} src={tableIconImage} />
             <tr className={`TableView ${state}`}
                 ref={dragRef}
-                onMouseEnter={() => (isSelected) ? dispatch(setHover({
-                    dataType: "table",
-                    id: table.id
-                })) : null}
-                onMouseLeave={() => (isSelected) ? dispatch(unsetHover()) : null}
+                onMouseEnter={() => (isSelected) ? dispatch(hoverTable(table.id)) : null}
+                onMouseLeave={() => (isSelected) ? dispatch(unhoverTable()) : null}
             >
                 <td>
                     {(isSelected) ? <CheckBox /> : <CheckBoxOutlineBlank />}

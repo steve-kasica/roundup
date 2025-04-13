@@ -10,9 +10,11 @@
 
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { memo } from "react";
+import { hoverColumnIndexInTable, unhoverColumnIndexInTable } from "../../data/uiSlice";
+import { isColumnHover } from "../../data/selectors/uiSelectors";
 
-const ColumnView = memo(function({tableId, index}) {
-
+const ColumnView = memo(function({tableId, columnIndex}) {
+    const dispatch = useDispatch();
     // TODO: this kind of loading and error handling 
     // should happen at the TableView level
     const {isLoading, data, error} = useSelector(({sourceColumns}) => {
@@ -21,7 +23,7 @@ const ColumnView = memo(function({tableId, index}) {
             const {loading:isLoading, columns, error} = tableColumns;
             return {
                 isLoading,
-                data: columns[index] ?? null,
+                data: columns[columnIndex] ?? null,
                 error
             };            
         } else {
@@ -35,7 +37,7 @@ const ColumnView = memo(function({tableId, index}) {
 
     // TODO
     const isSelected = false;
-    const isHovered = false;
+    const isHovered = useSelector(state => isColumnHover(state, { tableId, index: columnIndex }));
     const isNull = (data === null);
 
     const state = [
@@ -49,21 +51,16 @@ const ColumnView = memo(function({tableId, index}) {
     return (
         <div 
             className={state.join(" ")}
+            // TODO: setup selected/focused UIs
             // onClick={() => dispatch(setColumnProperty({
             //     column,
             //     property: "isSelected",
             //     value: !isSelected
             // }))}
-            // onMouseEnter={() => dispatch(setColumnHover({
-            //     tableId: column.tableId,
-            //     columnId: column.id,
-            //     isHovered: true
-            // }))}
-            // onMouseLeave={() => dispatch(setColumnHover({
-            //     tableId: column.tableId,
-            //     columnId: column.id,
-            //     isHovered: false
-            // }))}
+            onMouseEnter={() => 
+                dispatch(hoverColumnIndexInTable({ tableId, columnIndex }))
+            }
+            onMouseLeave={() => dispatch(unhoverColumnIndexInTable())}
         >
             &nbsp;
         </div>

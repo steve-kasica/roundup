@@ -6,13 +6,11 @@
  */
 
 import { useDispatch, useSelector } from "react-redux";
-import { isTable } from "../../../lib/types/Table";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
-import { COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
-import { createSelector } from "@reduxjs/toolkit";
 import { getFocusedOperationTablesWithColumns } from "../../../data/selectors";
+import { hoverColumnIndex, hoverTable, unhoverColumnIndex, unhoverTable } from "../../../data/uiSlice";
 
 function setColumnProperty() {
     // TODO
@@ -58,14 +56,8 @@ export default function StackDetail() {
                         <div 
                             key={table.id}
                             className="tick"
-                            onMouseEnter={() => dispatch(setTableHover({
-                                tableId: table.id,
-                                isHovered: true
-                            }))}
-                            onMouseLeave={() => dispatch(setTableHover({
-                                tableId: table.id, 
-                                isHovered: false
-                            }))}
+                            onMouseEnter={() => dispatch(hoverTable(table.id))}
+                            onMouseLeave={() => dispatch(unhoverTable())}
                         >
                             {table.name}
                         </div>
@@ -107,16 +99,8 @@ export default function StackDetail() {
                                     //             })))
                                     //     }
                                     // }}
-                                    // onMouseEnter={() => dispatch(setColumnIndexHover({
-                                    //     tableIds: tables.map(table => table.id),
-                                    //     index: j,
-                                    //     isHovered: true
-                                    // }))}
-                                    // onMouseLeave={() => dispatch(setColumnIndexHover({
-                                    //     tableIds: tables.map(table => table.id),
-                                    //     index: j,
-                                    //     isHovered: false
-                                    // }))}
+                                    onMouseEnter={() => dispatch(hoverColumnIndex(j))}
+                                    onMouseLeave={() => dispatch(unhoverColumnIndex())}
                                 >
                                     <label>
                                         {j + 1}
