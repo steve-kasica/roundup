@@ -5,12 +5,14 @@
  * a specific width.
  */
 import { List } from "@mui/material";
-import TableView, { TABLE_LAYOUT_LIST_ITEM } from "../../TableView";
+import TableView, { TABLE_LAYOUT_LIST_ITEM } from "../../../TableView";
+import ListItem from "./ListItem";
 
 export default function TablesList({
     searchString, 
     sourceTables,
-    selectedTableIds
+    loading,
+    error,
 }) {
 
     return (
@@ -29,12 +31,11 @@ export default function TablesList({
                         const [a, b] = [tableA.name.includes(searchString), tableB.name.includes(searchString)];
                         return (a === b) ? 0 : (a < b) ? 1 : -1;
                     })
-                    .map(table => (
-                        <TableView
-                            key={table.id}
-                            table={table}
-                            layout={TABLE_LAYOUT_LIST_ITEM}
-                            isSelected={selectedTableIds.has(table.id)}
+                    .map(sourceTable => (
+                        <ListItem 
+                            key={sourceTable.id}
+                            sourceTable={sourceTable}
+                            searchString={searchString}
                         />
                     ))
                 }

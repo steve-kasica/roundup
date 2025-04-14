@@ -18,27 +18,21 @@ import { Chip, Typography } from "@mui/material";
 import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useDispatch, useSelector } from "react-redux";
 import { createOperation } from "../../../../data/slices/compositeSchemaSlice";
-import { format, utcFormat, utcParse } from "d3";
 import AnimatedEllipsis from "../../../ui/AnimatedElipse";
 import { unhoverTable, hoverTable } from "../../../../data/uiSlice";
 import { isTableHover } from "../../../../data/selectors";
-
-// Parse date string in ISO 8601 extended format with UTC designator and microsecond precision
-const parseDate = utcParse("%Y-%m-%dT%H:%M:%S.%fZ");
-const formatDate = utcFormat("%B %d, %Y");
-
-const formatNumber = format(",");
+import { formatDate, formatNumber, parseOpenRefineDate } from "../../../../lib/utilities";
 
 export default function Row({searchString, table}) {
     const dispatch = useDispatch();
-    const {isSelected, id} = table;
+    const {isSelected} = table;
     const isDisabled = [table.name].join("^").indexOf(searchString) < 0;
 
     const [isPressed, setIsPressed] = useState(false);
     
     const [{isDragging}, dragRef, previewRef] = useDrag(() => ({
             type: sourceTable,
-            item: {id},
+            item: table.id,
             end: (item, monitor) => {
                 const result = monitor.getDropResult();
                 if (monitor.didDrop() && item.id === result.id) {
@@ -98,12 +92,12 @@ export default function Row({searchString, table}) {
                 </td>
                 <td>
                     <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                        {formatDate(parseDate(table.dateCreated))}
+                        {formatDate(parseOpenRefineDate(table.dateCreated))}
                     </Typography>
                 </td>
                 <td>
                     <Typography color={isDisabled ? "textDisabled" : "normal"}>
-                        {formatDate(parseDate(table.dateLastModified))}
+                        {formatDate(parseOpenRefineDate(table.dateLastModified))}
                     </Typography>
                 </td>
             </tr>

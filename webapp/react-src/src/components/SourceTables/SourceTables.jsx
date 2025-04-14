@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {TableLayout, ListLayout} from "./layouts";
 import { fetchTablesRequest } from "../../data/slices/sourceTablesSlice";
-import { Button, Chip, FormControl, Grid2 as Grid, InputLabel, MenuItem, OutlinedInput, Select, TextField } from "@mui/material";
+import { Button, Chip, FormControl, Grid2 as Grid, InputLabel, MenuItem, OutlinedInput, Select, Switch, TextField } from "@mui/material";
 import "./SourceTables.scss"
 
 const TABLE_LAYOUT = "table";
@@ -30,7 +30,9 @@ export default function SourceTables() {
     const dispatch = useDispatch();
     const [selectedTag, setSelectedTag] = useState("");
     const [searchString, setSearchString] = useState("");
-    const {firstPaneWidth} = useSelector(({ui}) => ui);
+
+    const {firstPaneWidth} = useSelector(({ui}) => ui);    
+    const [layout, setLayout] = useState(TABLE_LAYOUT);
 
     // TODO (optimization)
     // memoize selector here for sourceTables, sourceTable and isAscending and sortAttribute
@@ -56,14 +58,12 @@ export default function SourceTables() {
 
     const tags = Array.from(new Set((!(loading && error)) 
         ? sourceTables.map(table => table.tags).flat()
-        : []));        
-
-    const layout = (firstPaneWidth < FIRST_PANE_THRESHOLD) ? LIST_LAYOUT : TABLE_LAYOUT;
+        : []));
 
     return (
         <div className="SourceTables">
             <Grid container spacing={1} sx={{marginBottom: "10px"}}>
-                <Grid size={6}>
+                <Grid size={5}>
                     <TextField
                         label="Search tables"
                         variant="outlined"
@@ -127,8 +127,13 @@ export default function SourceTables() {
                             Clear
                         </Button>
                     </Grid>
+                    <Grid size={1}>
+                        <Switch 
+                            onChange={event => setLayout((event.target.checked ? LIST_LAYOUT : TABLE_LAYOUT))}
+                        />
+                    </Grid>
             </Grid>
-            {(layout === LIST_LAYOUT && false) ? (
+            {(layout === LIST_LAYOUT) ? (
                 <ListLayout 
                     searchString={searchString} 
                     sourceTables={filteredTables}

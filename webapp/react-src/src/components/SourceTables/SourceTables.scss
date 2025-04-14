@@ -55,4 +55,13 @@
             }
         }
     }
+
+    .list-layout {
+        .list-item {
+            cursor: grab;
+            &.hover, &:hover > li {
+                background-color: $hover-color;
+            }
+        }
+    }
 }
