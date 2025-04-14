@@ -11,7 +11,7 @@
  */
 import { useState } from "react";
 import { DragPreviewImage, useDrag } from "react-dnd";
-import {attributeMap, ID_ATTR, type as tableInstance} from "../../../../lib/types/Table";
+import {type as sourceTable} from "../../../../data/slices/sourceTablesSlice";
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 import HighlightText from "../../../ui/HighlightText";
 import { Chip, Typography } from "@mui/material";
@@ -31,14 +31,13 @@ const formatNumber = format(",");
 
 export default function Row({searchString, table}) {
     const dispatch = useDispatch();
-    const id = table[ID_ATTR];
-    const {isSelected} = table;
-    const values = Array.from(attributeMap.keys()).map(attr => table[attr]);
+    const {isSelected, id} = table;
+    const isDisabled = [table.name].join("^").indexOf(searchString) < 0;
 
     const [isPressed, setIsPressed] = useState(false);
     
     const [{isDragging}, dragRef, previewRef] = useDrag(() => ({
-            type: tableInstance,
+            type: sourceTable,
             item: {id},
             end: (item, monitor) => {
                 const result = monitor.getDropResult();
@@ -57,8 +56,6 @@ export default function Row({searchString, table}) {
         }),
         []
     );
-
-    const isDisabled = values.join("^").indexOf(searchString) < 0;
     const isHover = useSelector((state) => isTableHover(state, table.id));
     const state = [
         isHover     ? "hover"       : undefined,

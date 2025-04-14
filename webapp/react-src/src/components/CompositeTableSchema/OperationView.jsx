@@ -10,9 +10,8 @@
 
 import { Fragment } from "react";
 import TableView from "./TableView";
-import { isOperationNode, isTableNode } from "../../data/slices/compositeSchemaSlice";
+import { isOperationNode } from "../../data/slices/compositeSchemaSlice";
 import { useSelector } from "react-redux";
-import { isTable } from "../../lib/types/Table";
 import { getFocusedOperationId, getMaxColumnsInOperation } from "../../data/selectors";
 
 export default function OperationView({node, style, colorScale}) {

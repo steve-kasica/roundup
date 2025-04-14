@@ -4,29 +4,17 @@
  * A component for displaying and interacting with the set of source tables.
  */
 
-import {TableLayout, ListLayout} from "./layouts";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { isTable } from "../../lib/types/Table";
-import "./SourceTables.scss"
 
-import { createSelector } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {TableLayout, ListLayout} from "./layouts";
 import { fetchTablesRequest } from "../../data/slices/sourceTablesSlice";
 import { Button, Chip, FormControl, Grid2 as Grid, InputLabel, MenuItem, OutlinedInput, Select, TextField } from "@mui/material";
+import "./SourceTables.scss"
 
 const TABLE_LAYOUT = "table";
 const LIST_LAYOUT = "list";
 const FIRST_PANE_THRESHOLD = 30;
-
-// TODO: move to memoized function
-const selectTree = (state) => state.tableTree.tree;
-const selectSelectedTableIds = createSelector(
-    [selectTree], 
-    (tree) => new Set(tree
-        .filter(isTable)
-        .map(table => table.id))
-);
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;

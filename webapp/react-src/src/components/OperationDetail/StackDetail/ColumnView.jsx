@@ -14,7 +14,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../lib/types/Column";
+import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../data/slices/sourceColumnsSlice";
 import { drag, select, selectAll } from "d3";
 import { getHoverTable, getHoverColumnIndex, isColumnHover } from "../../../data/selectors";
 import { hoverColumnIndexInTable, unhoverColumnIndexInTable } from "../../../data/uiSlice";

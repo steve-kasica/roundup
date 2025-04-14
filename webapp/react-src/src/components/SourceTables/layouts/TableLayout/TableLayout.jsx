@@ -2,25 +2,20 @@
  * TableLayout.jsx
  * -------------------------------
  */
-import { attributeMap } from "../../../../lib/types/Table";
-import { Button, Checkbox, IconButton, Tooltip } from "@mui/material";
-import { ArrowDown, ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownNarrowWide, ArrowDownZA, ArrowUp, ArrowUp01, ArrowUp10, ArrowUpDown, ArrowUpWideNarrow, ArrowUpZA, Filter } from "lucide-react";
+import { Button, IconButton } from "@mui/material";
+import { ArrowDown01, ArrowDownAZ, ArrowDownNarrowWide, ArrowUp10, ArrowUpDown, ArrowUpWideNarrow, ArrowUpZA } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
 import Row from "./Row";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { fetchTablesRequest } from "../../../../data/slices/sourceTablesSlice";
-import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
+import { CheckBoxOutlineBlank } from "@mui/icons-material";
 
-const tableAttributes = Array.from(attributeMap.entries(), ([attr, label]) => ({attr, label}));
-
+// TODO: move this to SourceColumn Type
 const COLUMN_TYPE_CATEGORICAL = "categorical";
 const COLUMN_TYPE_NUMERIC = "numeric";
 const COLUMN_TYPE_DATE = "date";
 
 export default function TableLayout({ searchString, sourceTables, loading, error }) {
-  const [sortAttribute, setSortAttribute] = useState(tableAttributes.at(0).attr);
+  const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
 
   // const areAllTablesSelected = (sourceTables.length === selectedTableIds.size);

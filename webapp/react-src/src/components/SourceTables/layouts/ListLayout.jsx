@@ -6,7 +6,6 @@
  */
 import { List } from "@mui/material";
 import TableView, { TABLE_LAYOUT_LIST_ITEM } from "../../TableView";
-import { isTable } from "../../../lib/types/Table";
 
 export default function TablesList({
     searchString, 
