@@ -12,7 +12,7 @@ import { Fragment } from "react";
 import TableView from "./TableView";
 import { isOperationNode } from "../../data/slices/compositeSchemaSlice";
 import { useSelector } from "react-redux";
-import { getFocusedOperationId, getMaxColumnsInOperation } from "../../data/selectors";
+import { getFocusedOperationId, getMaxColumnsInOperation } from "../../data/selectors.js";
 
 export default function OperationView({node, style, colorScale}) {
     const {data, children} = node;

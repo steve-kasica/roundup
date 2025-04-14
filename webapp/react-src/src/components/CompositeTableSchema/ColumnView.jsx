@@ -11,7 +11,7 @@
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { memo } from "react";
 import { hoverColumnIndexInTable, unhoverColumnIndexInTable } from "../../data/uiSlice";
-import { isColumnHover } from "../../data/selectors/uiSelectors";
+import { isColumnHover } from "../../data/selectors.js";
 
 const ColumnView = memo(function({tableId, columnIndex}) {
     const dispatch = useDispatch();

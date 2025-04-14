@@ -7,7 +7,7 @@
 import "./CompositeTableSchema.scss";
 
 import { useSelector } from "react-redux";
-import { getRoot } from "../../data/selectors";
+import { getRoot } from "../../data/selectors.js";
 
 import Root from "./Root";
 import TableDropTarget from "./TableDropTarget";

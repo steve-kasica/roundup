@@ -11,7 +11,7 @@ import { setSelectedOperation, STAGE_REFINE_OPS, unhoverTable, hoverTable } from
 import ColumnView from "./ColumnView";
 import { isMouseOverElement } from "../../lib/utilities/dom";
 import { removeTable, removeOperation } from "../../data/slices/compositeSchemaSlice";
-import { getHoverTable, getTableById } from "../../data/selectors";
+import { getHoverTable, getTableById } from "../../data/selectors.js";
 
 export default function({node, parentOperation, columnCount}) {
     const {tableId} = node.data;

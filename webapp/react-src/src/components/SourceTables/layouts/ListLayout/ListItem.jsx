@@ -8,7 +8,7 @@ import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useState } from "react";
 import {type as SourceTable} from "../../../../data/slices/sourceTablesSlice";
 import { createOperation } from "../../../../data/slices/compositeSchemaSlice";
-import { isTableHover } from "../../../../data/selectors";
+import { isTableHover } from "../../../../data/selectors.js";
 import { hoverTable, unhoverTable } from "../../../../data/uiSlice";
 
 // TODO: parsing dates should be something that's done at the data layer

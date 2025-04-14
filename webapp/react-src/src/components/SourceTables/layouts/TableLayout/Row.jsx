@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createOperation } from "../../../../data/slices/compositeSchemaSlice";
 import AnimatedEllipsis from "../../../ui/AnimatedElipse";
 import { unhoverTable, hoverTable } from "../../../../data/uiSlice";
-import { isTableHover } from "../../../../data/selectors";
+import { isTableHover } from "../../../../data/selectors.js";
 import { formatDate, formatNumber, parseOpenRefineDate } from "../../../../lib/utilities";
 
 export default function Row({searchString, table}) {

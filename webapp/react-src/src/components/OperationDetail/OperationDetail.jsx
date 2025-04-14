@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import StackDetail from "./StackDetail/StackDetail";
 import PackDetail from "./PackDetail";
-import { getFocusedOperation } from "../../data/selectors";
+import { getFocusedOperation } from "../../data/selectors.js";
 import { STACK_OPERATION } from "../../data/slices/compositeSchemaSlice";
 
 
