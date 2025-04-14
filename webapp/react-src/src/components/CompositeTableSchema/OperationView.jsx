@@ -33,9 +33,6 @@ export default function OperationView({node, style, colorScale}) {
             className={className}
             style={style}
         >
-            <div className="label">
-                {data.type} {data.id} <span className="column-count">({columnCount})</span>
-            </div>
             <div className="children">
                 {children.map(childNode => (
                     <Fragment key={childNode.data.id}>
