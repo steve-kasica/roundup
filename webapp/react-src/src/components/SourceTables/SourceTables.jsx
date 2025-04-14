@@ -9,7 +9,9 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {TableLayout, ListLayout} from "./layouts";
 import { fetchTablesRequest } from "../../data/slices/sourceTablesSlice";
-import { Button, Chip, FormControl, Grid2 as Grid, InputLabel, MenuItem, OutlinedInput, Select, Switch, TextField } from "@mui/material";
+import { Button, Chip, FormControl, FormControlLabel, FormGroup, Grid2 as Grid, InputLabel, MenuItem, OutlinedInput, Select, Switch, TextField } from "@mui/material";
+import { styled } from '@mui/material/styles';
+
 import "./SourceTables.scss"
 
 const TABLE_LAYOUT = "table";
@@ -25,6 +27,59 @@ const MenuProps = {
     },
   },
 };
+
+const LayoutSwitch = styled(Switch)(({ theme }) => ({
+    width: 62,
+    height: 34,
+    padding: 7,
+    '& .MuiSwitch-switchBase': {
+      margin: 1,
+      padding: 0,
+      transform: 'translateX(6px)',
+      '&.Mui-checked': {
+        color: '#fff',
+        transform: 'translateX(22px)',
+        '& .MuiSwitch-thumb:before': {
+            backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-icon lucide-list"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></svg>')`,
+        },
+        '& + .MuiSwitch-track': {
+          opacity: 1,
+          backgroundColor: '#aab4be',
+          ...theme.applyStyles('dark', {
+            backgroundColor: '#8796A5',
+          }),
+        },
+      },
+    },
+    '& .MuiSwitch-thumb': {
+    //   backgroundColor: '#001e3c',
+    backgroundColor: '#ddd',    
+      width: 32,
+      height: 32,
+      '&::before': {
+        content: "''",
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        left: 0,
+        top: 0,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table-icon lucide-table"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>')`,
+      },
+      ...theme.applyStyles('dark', {
+        backgroundColor: '#003892',
+      }),
+    },
+    '& .MuiSwitch-track': {
+      opacity: 1,
+      backgroundColor: '#aab4be',
+      borderRadius: 20 / 2,
+      ...theme.applyStyles('dark', {
+        backgroundColor: '#8796A5',
+      }),
+    },
+  }));
 
 export default function SourceTables() {
     const dispatch = useDispatch();
@@ -73,7 +128,7 @@ export default function SourceTables() {
                         onChange={(event) => dispatch(setSearchString(event.target.value))}
                     />
                 </Grid>
-                <Grid size={4}>
+                <Grid size={3}>
                     <FormControl fullWidth>
                             <InputLabel 
                                 size="small" 
@@ -127,10 +182,15 @@ export default function SourceTables() {
                             Clear
                         </Button>
                     </Grid>
-                    <Grid size={1}>
-                        <Switch 
-                            onChange={event => setLayout((event.target.checked ? LIST_LAYOUT : TABLE_LAYOUT))}
-                        />
+                    <Grid size={2}>
+                        <FormGroup>
+                            <FormControlLabel 
+                                control={<LayoutSwitch 
+                                    onChange={event => setLayout((event.target.checked ? LIST_LAYOUT : TABLE_LAYOUT))}
+                                />}
+                                label="Layout"
+                            />
+                        </FormGroup>
                     </Grid>
             </Grid>
             {(layout === LIST_LAYOUT) ? (
