@@ -62,7 +62,6 @@ export default function SourceTables() {
 
     return (
         <div className="SourceTables">
-            <h3>Source tables</h3>
             <Grid container spacing={1} sx={{marginBottom: "10px"}}>
                 <Grid size={6}>
                     <TextField

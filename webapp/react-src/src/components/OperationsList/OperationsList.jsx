@@ -9,7 +9,6 @@ export default function OperationsList() {
 
     return (
         <>
-            <h3>Operations list</h3>
             <List dense>
             {operations.map(({id, operationType}, i) => (
                 <ListItemButton 

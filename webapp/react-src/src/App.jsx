@@ -11,7 +11,7 @@ import theme from "./themes/theme-default";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
-import {SupportingPane} from './layouts';
+import {DashboardGrid, SupportingPane} from './layouts';
 import NavigationRail from './components/NavigationRail';
 import SourceTables from './components/SourceTables';
 import CompositeTableSchema from './components/CompositeTableSchema';
@@ -24,16 +24,10 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <DndProvider backend={HTML5Backend}>
-        <SupportingPane 
-          navigation={
-            <></>
-          }
-          primaryContent={<SourceTables />}
-          secondaryContent={<>
-            <CompositeTableSchema />
-            <OperationsList />
-            <OperationDetail />                                        
-          </>}
+        <DashboardGrid 
+          components={[SourceTables, CompositeTableSchema, OperationsList, OperationDetail]}
+          titles={["Source Tables", "Composite Table Schema", "Operations List", "Operations Detail"]}
+          dashboardTitle="Open Roundup"
         />
       </DndProvider>
     </ThemeProvider>

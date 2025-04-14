@@ -19,7 +19,6 @@ export default function CompositeTableSchema() {
     const {stage} = useSelector(({ui}) => ui);
 
     return (<div className={`CompositeTableSchema ${stage}`}>
-        <h3>Composite Table Schema</h3>
         {
             (root !== null) ? (
                 <Root node={root} />

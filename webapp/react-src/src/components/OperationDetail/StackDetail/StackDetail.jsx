@@ -44,8 +44,6 @@ export default function StackDetail() {
 
     return (
         (tables.length > 0) ? (
-            <div>
-                <p>Stack operation detail view</p>
             <div className="StackDetail">
                 <div className="left-panel">
                     <div className="label">
@@ -121,7 +119,6 @@ export default function StackDetail() {
                     </div>
                 </div>
             </div>
-        </div>
         ) : null
     );
 }
