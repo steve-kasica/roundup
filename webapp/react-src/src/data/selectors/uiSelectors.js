@@ -1,3 +1,4 @@
+import { isTableNode } from "../slices/compositeSchemaSlice";
 import { initialState } from "../uiSlice";
 
 /**
@@ -52,11 +53,31 @@ export const isColumnHover = (state, column) => {
     );    
 }
 
+export const getHoverOperationTablesIds = (state) => {
+    const hoverOperationId = state.ui.hover.operation;
+    if (hoverOperationId) {
+        return Object.values(state.compositeSchema.data)
+            .filter((node) => isTableNode(node) && node.parentId === hoverOperationId)
+            .map(node => node.tableId);
+    } else {
+        return [];
+    } 
+};
+
 /**
- * Determines whether the specified table is currently being hovered over
+ * Determines whether the specified table is currently being hovered 
+ * over directly or indirectly via its parent operation.
  * 
  * @param {Object} state - The Redux state object
  * @param {string} tableId - The ID of the table to check
- * @returns {boolean} True if the table is being hovered over, false otherwise
+ * @returns {boolean} True if the table is being hovered over or 
+ *  if the table is the child of an operation currently being hovered,
+ *  false otherwise
  */
-export const isTableHover = (state, tableId) => (getHoverTable(state) === tableId);
+export const isTableHover = (state, tableId) => {
+    const hoverTableId = getHoverTable(state);
+    return (
+        (hoverTableId === tableId) || 
+        (hoverTableId === initialState.hover.table && getHoverOperationTablesIds(state).includes(tableId))
+    );
+}
