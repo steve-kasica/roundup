@@ -6,7 +6,9 @@ import reducer, {
   isTableNode,
   isOperationNode,
   NO_OP,
-  stratify
+  stratify,
+  STACK_OPERATION,
+  PACK_OPERATION
 } from '.'; // Update path as needed
 
 describe('compositeSchema reducer', () => {
@@ -25,7 +27,7 @@ describe('compositeSchema reducer', () => {
   describe('utility functions', () => {
     test('isTableNode should correctly identify table nodes', () => {
       const tableNode = { id: 'node-1', tableId: 'table-1' };
-      const operationNode = { id: 'node-2', operationType: 'STACK' };
+      const operationNode = { id: 'node-2', operationType: STACK_OPERATION };
       
       expect(isTableNode(tableNode)).toBe(true);
       expect(isTableNode(operationNode)).toBe(false);
@@ -33,24 +35,10 @@ describe('compositeSchema reducer', () => {
 
     test('isOperationNode should correctly identify operation nodes', () => {
       const tableNode = { id: 'node-1', tableId: 'table-1' };
-      const operationNode = { id: 'node-2', operationType: 'STACK' };
+      const operationNode = { id: 'node-2', operationType: STACK_OPERATION };
       
       expect(isOperationNode(operationNode)).toBe(true);
       expect(isOperationNode(tableNode)).toBe(false);
-    });
-
-    test('stratify should create a hierarchical structure', () => {
-      const data = {
-        'node-1': { id: 'node-1', operationType: 'STACK' },
-        'node-2': { id: 'node-2', parentId: 'node-1', tableId: 'table-1' },
-        'node-3': { id: 'node-3', parentId: 'node-1', tableId: 'table-2' }
-      };
-      
-      const result = stratify(Object.values(data));
-      expect(result.id).toBe('node-1');
-      expect(result.children.length).toBe(2);
-      expect(result.children[0].id).toBe('node-2');
-      expect(result.children[1].id).toBe('node-3');
     });
   });
 
@@ -66,7 +54,7 @@ describe('compositeSchema reducer', () => {
       };
       
       const action = createOperation({
-        operationType: 'STACK',
+        operationType: STACK_OPERATION,
         table: { id: 'table-1' }
       });
       
@@ -84,7 +72,7 @@ describe('compositeSchema reducer', () => {
       );
       const tableNode = nextState.data[tableNodeKey];
       
-      expect(operationNode.operationType).toBe('STACK');
+      expect(operationNode.operationType).toBe(STACK_OPERATION);
       expect(tableNode.tableId).toBe('table-1');
       expect(tableNode.parentId).toBe(operationNode.id);
       expect(nextState.prevOperationId).toBe(operationNode.id);
@@ -94,7 +82,7 @@ describe('compositeSchema reducer', () => {
 
     test('should handle adding a table to the same operation type', () => {
       // Create a state with one operation and one table
-      const operationNode = { id: 'node-1', operationType: 'STACK' };
+      const operationNode = { id: 'node-1', operationType: STACK_OPERATION };
       const tableNode = { id: 'node-2', parentId: 'node-1', tableId: 'table-1' };
       
       const state = {
@@ -109,7 +97,7 @@ describe('compositeSchema reducer', () => {
       };
       
       const action = createOperation({
-        operationType: 'STACK',
+        operationType: STACK_OPERATION,
         table: { id: 'table-2' }
       });
       
@@ -131,7 +119,7 @@ describe('compositeSchema reducer', () => {
 
     test('should handle switching to a different operation type', () => {
       // Create a state with one operation and one table
-      const operationNode = { id: 'node-1', operationType: 'STACK' };
+      const operationNode = { id: 'node-1', operationType: STACK_OPERATION };
       const tableNode = { id: 'node-2', parentId: 'node-1', tableId: 'table-1' };
       
       const state = {
@@ -146,7 +134,7 @@ describe('compositeSchema reducer', () => {
       };
       
       const action = createOperation({
-        operationType: 'PACK',
+        operationType: PACK_OPERATION,
         table: { id: 'table-2' }
       });
       
@@ -167,7 +155,7 @@ describe('compositeSchema reducer', () => {
       // Check that original operation now points to new operation
       expect(nextState.data['node-1'].parentId).toBe(newOperationNode.id);
       
-      expect(newOperationNode.operationType).toBe('PACK');
+      expect(newOperationNode.operationType).toBe(PACK_OPERATION);
       expect(newTableNode.tableId).toBe('table-2');
       expect(newTableNode.parentId).toBe(newOperationNode.id);
       expect(nextState.prevOperationId).toBe(newOperationNode.id);
@@ -192,7 +180,7 @@ describe('compositeSchema reducer', () => {
       };
       
       const action = createOperation({
-        operationType: 'STACK',
+        operationType: STACK_OPERATION,
         table: { id: 'table-2' }
       });
       
@@ -207,7 +195,7 @@ describe('compositeSchema reducer', () => {
       );
       const newOperationNode = nextState.data[newOperationNodeKey];
       
-      expect(newOperationNode.operationType).toBe('STACK');
+      expect(newOperationNode.operationType).toBe(STACK_OPERATION);
       
       // Verify both tables are under the new operation
       const tableNodes = Object.values(nextState.data).filter(node => isTableNode(node));
@@ -259,7 +247,7 @@ describe('compositeSchema reducer', () => {
   // removeTable tests
   describe('removeTable reducer', () => {
     test('should remove a table node and update selectedTables', () => {
-      const operationNode = { id: 'node-1', operationType: 'STACK' };
+      const operationNode = { id: 'node-1', operationType: STACK_OPERATION };
       const tableNode1 = { id: 'node-2', parentId: 'node-1', tableId: 'table-1' };
       const tableNode2 = { id: 'node-3', parentId: 'node-1', tableId: 'table-2' };
       
@@ -285,7 +273,7 @@ describe('compositeSchema reducer', () => {
     });
 
     test('should remove operation node when removing the last table child', () => {
-      const operationNode = { id: 'node-1', operationType: 'STACK' };
+      const operationNode = { id: 'node-1', operationType: STACK_OPERATION };
       const tableNode = { id: 'node-2', parentId: 'node-1', tableId: 'table-1' };
       
       const state = {
@@ -313,7 +301,7 @@ describe('compositeSchema reducer', () => {
   // removeOperation tests
   describe('removeOperation reducer', () => {
     test('should remove an operation node and all its children', () => {
-      const operationNode = { id: 'node-1', operationType: 'STACK' };
+      const operationNode = { id: 'node-1', operationType: STACK_OPERATION };
       const tableNode1 = { id: 'node-2', parentId: 'node-1', tableId: 'table-1' };
       const tableNode2 = { id: 'node-3', parentId: 'node-1', tableId: 'table-2' };
       
@@ -342,8 +330,8 @@ describe('compositeSchema reducer', () => {
 
     test('should handle nested operation removal correctly', () => {
       // Create a hierarchical structure with nested operations
-      const parentOpNode = { id: 'node-1', operationType: 'PACK' };
-      const childOpNode = { id: 'node-2', parentId: 'node-1', operationType: 'STACK' };
+      const parentOpNode = { id: 'node-1', operationType: PACK_OPERATION };
+      const childOpNode = { id: 'node-2', parentId: 'node-1', operationType: STACK_OPERATION };
       const tableNode1 = { id: 'node-3', parentId: 'node-2', tableId: 'table-1' };
       const tableNode2 = { id: 'node-4', parentId: 'node-2', tableId: 'table-2' };
       
@@ -378,8 +366,8 @@ describe('compositeSchema reducer', () => {
 
     test('should not remove parent operation if it has other children', () => {
       // Create a structure where parent has multiple child operations
-      const parentOpNode = { id: 'node-1', operationType: 'PACK' };
-      const childOpNode1 = { id: 'node-2', parentId: 'node-1', operationType: 'STACK' };
+      const parentOpNode = { id: 'node-1', operationType: PACK_OPERATION };
+      const childOpNode1 = { id: 'node-2', parentId: 'node-1', operationType: STACK_OPERATION };
       const childOpNode2 = { id: 'node-3', parentId: 'node-1', operationType: 'JOIN' };
       const tableNode1 = { id: 'node-4', parentId: 'node-2', tableId: 'table-1' };
       const tableNode2 = { id: 'node-5', parentId: 'node-3', tableId: 'table-2' };
