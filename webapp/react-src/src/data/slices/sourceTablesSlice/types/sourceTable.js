@@ -19,8 +19,8 @@ export function SourceTable(
     name,
     rowCount,
     columnCount,
-    dateCreated=new Date(),
-    dateLastModified=new Date(),
+    dateCreated,
+    dateLastModified,
     tags=[]
 ) {
     if (!id) {
@@ -28,7 +28,6 @@ export function SourceTable(
     } else if (!Number.isInteger(rowCount)) {
         throw new Error("`rowCount` must be an integer", rowCount);
     } else if (!Number.isInteger(columnCount)) {
-        console.log(columnCount, id);
         throw new Error("`columnCount` must be an integer", rowCount);
     } else if (dateCreated instanceof Date) {
         throw new Error("`dateCreated` cannot be a Date instance for serializability");
@@ -46,3 +45,12 @@ export function SourceTable(
         tags
     };
 }
+
+export const isSourceTable = (obj) =>
+    Object.hasOwn(obj, "id") &&
+    Object.hasOwn(obj, "name") &&    
+    Object.hasOwn(obj, "rowCount") &&
+    Object.hasOwn(obj, "columnCount") &&
+    Object.hasOwn(obj, "dateCreated") &&
+    Object.hasOwn(obj, "dateLastModified") &&
+    Object.hasOwn(obj, "tags");

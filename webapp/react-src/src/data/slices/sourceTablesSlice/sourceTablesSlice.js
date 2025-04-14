@@ -15,12 +15,14 @@ const slice = createSlice({
     name: "sourceTables",
     initialState,
     reducers: {
-        // Action to trigger the saga
+        // Action to trigger the saga,
+        // initialize a request of source tables
         fetchTablesRequest: (state) => {
             state.loading = true;
             state.error = null;
         },
         // Action to fire when saga has completed successfully
+        // Updates slice with data fetched from Saga
         fetchTablesSuccess: (state, action) => {
             const projects = action.payload;
 
@@ -39,14 +41,16 @@ const slice = createSlice({
             });
             state.loading = false;
         },
-        // Action when saga has not completed successfully
+        // Action to handle when a saga has not completed successfully
+        // 
         fetchTablesFailure: (state, action) => {
+            const error = action.payload;
             // Print error to console only if React is in dev mode
             if (process.env.NODE_ENV === "development") {
                 console.error("Error: fetch tables failure", action);                        
             }
             state.loading = false;
-            state.error = action.payload;
+            state.error = error;
         }
     }
 });
