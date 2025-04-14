@@ -57,7 +57,6 @@ export default function Row({searchString, table}) {
         []
     );
     const isHover = useSelector((state) => isTableHover(state, table.id));
-    console.log(isHover);
     const state = [
         isHover     ? "hover"       : undefined,
         isSelected  ? "selected"    : undefined,

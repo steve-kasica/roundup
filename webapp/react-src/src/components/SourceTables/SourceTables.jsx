@@ -121,7 +121,7 @@ export default function SourceTables() {
                             sx={{height: "100%"}}
                             onClick={() => {
                                 setSearchString(""); 
-                                setSelectedTag(null);
+                                setSelectedTag("");
                             }}
                         >
                             Clear
