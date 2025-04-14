@@ -85,7 +85,7 @@ export default function TableLayout({ searchString, sourceTables, loading, error
             ? ascending(a[sortAttribute], b[sortAttribute])
             : descending(a[sortAttribute], b[sortAttribute]))
           .map(table => {
-            // TODO
+            // TODO: can't I delete this? Isn't isSelected being passed as table props?
             // const isSelected = selectedTableIds.has(table.id);
             const isSelected = false;
             return (<Row 

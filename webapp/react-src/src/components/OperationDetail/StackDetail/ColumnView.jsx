@@ -27,10 +27,6 @@ function removeColumnsAfter() {
     // TODO
 }
 
-function setColumnHover() {
-    // TODO
-}
-
 function setColumnProperty() {
     // TODO
 }

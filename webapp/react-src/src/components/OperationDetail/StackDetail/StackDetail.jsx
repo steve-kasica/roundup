@@ -13,15 +13,7 @@ import { getFocusedOperationTablesWithColumns } from "../../../data/selectors";
 import { hoverColumnIndex, hoverTable, unhoverColumnIndex, unhoverTable } from "../../../data/uiSlice";
 
 function setColumnProperty() {
-    // TODO
-}
-
-function setTableHover() {
-    // TODO
-}
-
-function setColumnHover() {
-    // TODO
+    // TODO need up update column name
 }
 
 const X_AXIS_LABEL = "column index"
@@ -30,8 +22,6 @@ const cellSize = 50;  // in height and width of cells (in pixels)
 
 export default function StackDetail() {
     const dispatch = useDispatch();
-    // TODO: delete
-    // const tables = useSelector(selectedTablesByOperation);
     const tables = useSelector(getFocusedOperationTablesWithColumns);
 
     const maxColumnCount = Math.max(...tables.map(table => table.columnCount));

@@ -35,7 +35,6 @@ const ColumnView = memo(function({tableId, columnIndex}) {
         }
     }, shallowEqual);
 
-    // TODO
     const isSelected = false;
     const isHovered = useSelector(state => isColumnHover(state, { tableId, index: columnIndex }));
     const isNull = (data === null);
