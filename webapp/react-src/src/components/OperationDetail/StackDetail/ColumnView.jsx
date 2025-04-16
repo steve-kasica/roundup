@@ -14,10 +14,10 @@
 import { useEffect, useState, useRef } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED } from "../../../data/slices/sourceColumnsSlice";
+import { COLUMN_STATUS_NULLED, COLUMN_STATUS_REMOVED, renameColumnRequest } from "../../../data/slices/sourceColumnsSlice";
 import { drag, select, selectAll } from "d3";
-import { getHoverTable, getHoverColumnIndex, isColumnHover } from "../../../data/selectors.js";
-import { hoverColumnIndexInTable, unhoverColumnIndexInTable } from "../../../data/uiSlice";
+import { getHoverTable, getHoverColumnIndex, isColumnHover, getFocusedColumnId } from "../../../data/selectors.js";
+import { focusColumn, hoverColumnIndexInTable, unfocusColumn, unhoverColumnIndexInTable } from "../../../data/uiSlice";
 
 function swapColumnPositions() {
     // TODO
@@ -31,7 +31,7 @@ function setColumnProperty() {
     // TODO
 }
 
-// const DEBOUNCE_DELAY = 500;
+const DEBOUNCE_DELAY = 500;  // in ms
 const OVERLAP_THRESHOLD = 0.5; // percent
 
 export default function({ tableId, columnId, position, tableName, columnCount }) {
@@ -51,13 +51,15 @@ export default function({ tableId, columnId, position, tableName, columnCount })
         // is a NULL column
         isNull = true;
         column = null;
-        columnId = null;
+        columnId = undefined;
         name = "null";        
     }
 
-    const isLastInTable = (position === columnCount);    
+    // Reactive variables
+    const isFocused = useSelector(state => getFocusedColumnId(state) === columnId);
+
+    const isLastInTable = (position === columnCount);
     const isHovered = useSelector(state => isColumnHover(state, { tableId, index }));
-    const isSelected = false;
 
     // const {hoverColumnIndex, hoverTable} = useSelector(({ui}) => ui);
 
@@ -123,8 +125,8 @@ export default function({ tableId, columnId, position, tableName, columnCount })
     //     );
     // }, []);
 
-    // // Keep hover persistent when context menu opens
-    // const hoverTimeoutRef = useRef(null);
+    // Keep hover persistent when context menu opens
+    const hoverTimeoutRef = useRef(null);
 
     // Setup context menu
     //
@@ -148,32 +150,33 @@ export default function({ tableId, columnId, position, tableName, columnCount })
     };
 
     // // Weird workaround to trigger focus on column from context menu clicks
-    // const inputRef = useRef(null);    
+    const inputRef = useRef(null);    
     // const [isFocused, setIsFocused] = useState(false);
-    // useEffect(() => {
-    //     if (!isFocused) return;
-    //    inputRef.current?.focus();
-    // }, [isFocused]);
+    useEffect(() => {
+        if (!isFocused) return;
+       inputRef.current?.focus();
+    }, [isFocused]);
 
     // Debounce input when modifying column attributes in the DOM
     const [value, setValue] = useState(name);
-    // useEffect(() => {
-    //     const timeoutId = setTimeout(
-    //         () => dispatch(setColumnProperty({
-    //             column,
-    //             property: "name",
-    //             value
-    //         })),
-    //         DEBOUNCE_DELAY
-    //     );
-    //     return () => clearTimeout(timeoutId);
-    // }, [value, DEBOUNCE_DELAY])
+    useEffect(() => {
+        const timeoutId = setTimeout(
+            () => dispatch(renameColumnRequest({
+                projectId: tableId,
+                columnIndex: index,
+                newColumnName: value,
+                oldColumnName: name,
+            })),
+            DEBOUNCE_DELAY
+        );
+        return () => clearTimeout(timeoutId);
+    }, [value, DEBOUNCE_DELAY])
 
     // Set class-based state styles
     const state = [
         (isNull) ? "null" : undefined,
         (isHovered) ? "hover" : undefined,
-        (isSelected) ? "selected" : undefined
+        (isFocused) ? "focused" : undefined,
     ].filter(className => className).join(" ");
 
     // Render ColumnView
@@ -205,14 +208,14 @@ export default function({ tableId, columnId, position, tableName, columnCount })
                         dispatch(unhoverColumnIndexInTable());
                     }
                 }}
-                // onDoubleClick={() => setIsFocused(true)}
+                onDoubleClick={() => dispatch(focusColumn(columnId))}
             >
                 <input 
-                    // ref={inputRef}
+                    ref={inputRef}
                     type="text"
                     value={value}
-                    // onChange={event => setValue(event.target.value)}
-                    // onBlur={() => setIsFocused(false)}
+                    onChange={event => setValue(event.target.value)}
+                    onBlur={() => dispatch(unfocusColumn())}
                     minLength={1}
                 />
             </div>
@@ -253,20 +256,22 @@ export default function({ tableId, columnId, position, tableName, columnCount })
                     <ListItemButton 
                         disabled={isNull}
                         onClick={() => {
-                            dispatch(setColumnProperty({
-                                column,
-                                property: "status",            
-                                value: COLUMN_STATUS_NULLED
-                            }));
+                            // TODO update
+                            // dispatch(setColumnProperty({
+                            //     column,
+                            //     property: "status",
+                            //     value: COLUMN_STATUS_NULLED
+                            // }));
                             setValue("null");
                             closePopover();
                         }}>
                         Null column {position} in {tableName}
                     </ListItemButton>                    
                     <ListItemButton 
-                        disabled={status === COLUMN_STATUS_NULLED}
+                        // TODO: can't rename null columns
+                        // disabled={status === COLUMN_STATUS_NULLED}
                         onClick={() => {
-                            setIsFocused(true);
+                            dispatch(focusColumn(columnId));
                             closePopover();
                         }}>
                         Rename

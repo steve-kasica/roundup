@@ -42,6 +42,7 @@ export const initialState = {
     // interaction states
     focused: {
         operation: null,
+        column: null,
     },
     hover: {
         table: null,
@@ -244,6 +245,19 @@ export const uiSlice = createSlice({
             const operationNodeId = action.payload;
             state.focused.operation = operationNodeId; 
         },
+
+        /**
+         * 
+         * Sets a column as focused
+         * 
+         * @param {Object} state - The current state
+         * @param {Object} action - The action object
+         * @param {string} action.payload - The ID of the column to focus
+         */
+        focusColumn: (state, action) => {
+            const columnId = action.payload;
+            state.focused.column = columnId;
+        },
     
         /**
          * Removes focus from the current operation
@@ -252,7 +266,16 @@ export const uiSlice = createSlice({
          */
         unfocusOperation: (state) => { 
             state.focused.operation = initialState.focused.operation;
-        }
+        },
+
+        /**
+         * Removes focus from the current operation
+         * 
+         * @param {Object} state - The current state
+         */
+        unfocusColumn: (state) => {
+            state.focused.column = null;
+        },
     }
 });
 
@@ -277,12 +300,17 @@ export const {
     hoverTable,
     hoverColumnIndex,
     hoverColumnIndexInTable,
+
     unhoverOperation,
     unhoverTable,
     unhoverColumnIndex,
     unhoverColumnIndexInTable,
+
     focusOperation,
-    unfocusOperation
+    focusColumn,
+
+    unfocusOperation,
+    unfocusColumn,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

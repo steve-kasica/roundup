@@ -6,9 +6,14 @@ export const {
     fetchMultipleRequest, 
     fetchMultipleSuccess, 
     fetchMultipleFailure,
+    
     fetchSingleRequest,
     fetchSingleSuccess,
-    fetchSingleFailure
+    fetchSingleFailure,
+
+    renameColumnRequest,
+    renameColumnSuccess,
+    renameColumnFailure
 } = slice.actions;
 
 export default slice.reducer;

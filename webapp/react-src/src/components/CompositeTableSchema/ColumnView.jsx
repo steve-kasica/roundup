@@ -11,7 +11,7 @@
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { memo } from "react";
 import { hoverColumnIndexInTable, unhoverColumnIndexInTable } from "../../data/uiSlice";
-import { isColumnHover } from "../../data/selectors.js";
+import { getFocusedColumnId, isColumnHover } from "../../data/selectors.js";
 
 const ColumnView = memo(function({tableId, columnIndex}) {
     const dispatch = useDispatch();
@@ -38,13 +38,15 @@ const ColumnView = memo(function({tableId, columnIndex}) {
     const isSelected = false;
     const isHovered = useSelector(state => isColumnHover(state, { tableId, index: columnIndex }));
     const isNull = (data === null);
+    const isFocused = useSelector(state => getFocusedColumnId(state) === data?.id);
 
     const state = [
         "ColumnView",
         (isLoading) ? "loading" : undefined,
         (isNull) ? "null" : undefined,
         (isHovered) ? "hover" : undefined,
-        (isSelected) ? "selected" : undefined
+        (isSelected) ? "selected" : undefined,
+        (isFocused) ? "focused" : undefined,
     ].filter(className => className);
 
     return (

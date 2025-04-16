@@ -1,13 +1,14 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { stratify as d3Stratify, descending } from "d3";
 import { useSelector } from "react-redux";
-
 import { isOperationNode, isTableNode } from "./slices/compositeSchemaSlice";
-
 import { initialState as uiInitialState } from "./uiSlice";
+
 const initialState = {
     ui: uiInitialState
 };
+
+export const getFocusedColumnId = state => state.ui.focused.column;
 
 export const getHoverOperationId = () => useSelector(state => {
     return state.ui.hover.operation;
@@ -25,7 +26,7 @@ export const getColumnById = createSelector(
     (columnsRequest, tableId, columnId) => columnsRequest[tableId].columns
         .find(({id}) => id === columnId)
 );
-
+ 
 /**
  * Get source table metadata for all tables that are a child
  * of the focused operation, with columnIds associated with

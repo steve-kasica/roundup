@@ -2,8 +2,6 @@
 
 // Interaction state color
 
-// Hover
 $hover-color: #EDC948;
-
-// Selected
 $selected-color: darken($hover-color, 10%);
+$focused-color: darken($hover-color, 20%);

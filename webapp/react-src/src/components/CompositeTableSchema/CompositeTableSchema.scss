@@ -46,7 +46,8 @@ $null-column-background: #ddd;
             > .ColumnView { 
                 background-color: inherit; 
                 &.null { background-color: $null-column-background; }                
-                &.hover { background-color: $hover-color; }                
+                &.hover { background-color: $hover-color; }   
+                &.focused { background-color: $focused-color;}             
             }
         }
     }

@@ -172,9 +172,8 @@ $cell-border-color: $table-border-color;
                         }
                     }
 
-                    &:hover, &.hover {
-                        background-color: $hover-color;
-                    }
+                    &:hover, &.hover { background-color: $hover-color; }
+                    &.focused { background-color: $focused-color; }                    
                     
                     &.drag {
                         position: fixed;

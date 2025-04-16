@@ -64,6 +64,31 @@ const slice = createSlice({
             state.data[projectId].columns = [];
             state.data[projectId].error = error;
         },
+        renameColumnRequest: (state, action) => {
+            const {projectId, columnIndex} = action.payload;
+            const column = state.data[projectId].columns[columnIndex];
+            if (column) {
+                column.loading = true;
+                column.error = null;                
+            }
+        },
+        renameColumnSuccess: (state, action) => {
+            const {projectId, columnIndex, newColumnName} = action.payload;
+            const column = state.data[projectId].columns[columnIndex];
+            if (column) {
+                column.name = newColumnName;                
+                column.loading = false;
+                column.error = null;
+            }
+        },
+        renameColumnFailure: (state, action) => {
+            const {projectId, columnIndex} = action.payload;
+            const column = state.data[projectId].columns[columnIndex];
+            if (column) {
+                column.loading = false;
+                column.error = action.payload.error;
+            }
+        },
     }
 });
 
