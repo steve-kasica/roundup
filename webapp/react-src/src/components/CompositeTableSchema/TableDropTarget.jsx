@@ -6,14 +6,19 @@
  *    only operationTypes are defined in this component
  */
 import { useDrop } from "react-dnd";
-import {type as sourceTable} from "../../data/slices/sourceTablesSlice";
+import {dataType as SourceTable} from "../../data/slices/sourceTablesSlice";
+import { OPERATION_TYPE_PACK, OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice";
 
-export default function TableDropTarget({operationType, children}) {
+export const DROP_TARGET_EVENT_INITIALIZE = "initialize";
+export const DROP_TARGET_EVENT_STACK = OPERATION_TYPE_STACK;
+export const DROP_TARGET_EVENT_PACK = OPERATION_TYPE_PACK;
+
+export default function TableDropTarget({dropTargetEvent, children}) {
     const [{ isOver, canDrop }, dropRef] = useDrop({
-        accept: sourceTable,
+        accept: SourceTable,
         drop: (item, monitor) => ({
             ...item,
-            operationType,
+            dropTargetEvent,
         }),
         collect: (monitor) => ({
             isOver: monitor.isOver(),

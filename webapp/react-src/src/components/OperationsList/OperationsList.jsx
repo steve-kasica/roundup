@@ -16,9 +16,9 @@ export default function OperationsList() {
                 <ListItemButton 
                     key={op.id}
                     selected={op.isSelected}
-                    onMouseEnter={() => dispatch(hoverOperation(op.id))}
-                    onMouseLeave={() => dispatch(unhoverOperation())}
-                    onClick={() => dispatch(focusOperation(op.id))}
+                    // onMouseEnter={() => dispatch(hoverOperation(op.id))}
+                    // onMouseLeave={() => dispatch(unhoverOperation())}
+                    // onClick={() => dispatch(focusOperation(op.id))}
                 >
                     <ListItemText
                         primary={`${i + 1}. ${op.operationType}`}

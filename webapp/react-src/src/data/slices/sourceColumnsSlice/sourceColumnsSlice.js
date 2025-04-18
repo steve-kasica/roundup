@@ -1,9 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {Column} from ".";
+import {Column, getColumnId} from ".";
 
 const initialState = {
-    ids: [],
-    data: {},
+    entries: {},
     loading: false,
     error: null,
 }
@@ -16,7 +15,6 @@ const slice = createSlice({
         fetchMultipleRequest: (state) => {
             state.loading = true;
             state.error = null;
-            console.log("multiple request");
         },
         fetchMultipleSuccess: (state) => {
             state.loading = false;
@@ -30,63 +28,101 @@ const slice = createSlice({
             state.error = action.payload;
         },
         fetchSingleRequest: (state, action) => {
-            const projectId = action.payload;
-            state.data[projectId] = {
+            const {tableId, index} = action.payload;
+            const columnId = getColumnId(tableId, index);
+            state.entries[columnId] = {
                 loading: true,
                 error: null,
-                columns: [],       
+                data: null,
             };
         },
         fetchSingleSuccess: (state, action) => {
-            const {response:columnsInfo, projectId} = action.payload;
+            const {response:columnsInfo, tableId} = action.payload;
 
             // Process columnInfo response into array of Column instances
-            const columns = columnsInfo.map(
-                (columnInfo, index) => new Column(
-                    projectId,
-                    index,
-                    columnInfo.name,                                    // name
-                    columnInfo.is_numeric ? "categorical" : "numeric",  // columnType
-                )
-            );
-            
-            state.data[projectId].loading = false;
-            state.data[projectId].error = null;            
-            state.data[projectId].columns = columns;
+            columnsInfo.forEach((columnInfo, index) => {
+                const columnId = getColumnId(tableId, index);
+                state.entries[columnId] = {
+                    loading: false,
+                    error: null,
+                    data: new Column(
+                        tableId,
+                        index,
+                        columnInfo.name,                                    // name
+                        columnInfo.is_numeric ? "categorical" : "numeric",  // columnType
+                    )
+                }
+            });
         },
         fetchSingleFailure: (state, action) => {
             if (process.env.NODE_ENV === "development") {
                 console.error("Error fetching columns", action);                        
             }
-            const {error, projectId} = action.payload;
-
-            state.data[projectId].loading = false;
-            state.data[projectId].columns = [];
-            state.data[projectId].error = error;
+            // TODO: handle error
         },
         renameColumnRequest: (state, action) => {
-            const {projectId, columnIndex} = action.payload;
-            const column = state.data[projectId].columns[columnIndex];
+            const {tableId, columnIndex} = action.payload;
+            const columnId = getColumnId(tableId, columnIndex);
+            const column = state.entries[columnId];
             if (column) {
                 column.loading = true;
                 column.error = null;                
             }
         },
         renameColumnSuccess: (state, action) => {
-            const {projectId, columnIndex, newColumnName} = action.payload;
-            const column = state.data[projectId].columns[columnIndex];
+            const {tableId, columnIndex, newColumnName} = action.payload;
+            const columnId = getColumnId(tableId, columnIndex);
+            const column = state.entries[columnId];
             if (column) {
-                column.name = newColumnName;                
                 column.loading = false;
                 column.error = null;
+                column.data.name = newColumnName;                
             }
         },
         renameColumnFailure: (state, action) => {
-            const {projectId, columnIndex} = action.payload;
-            const column = state.data[projectId].columns[columnIndex];
+            const {tableId, columnIndex} = action.payload;
+            const columnId = getColumnId(tableId, columnIndex);
+            const column = state.entries[columnId];
             if (column) {
                 column.loading = false;
                 column.error = action.payload.error;
+            }
+        },
+        /**
+         * Update state to reflect the start of a column removal process.
+         */
+        removeColumnRequest: (state, action) => {
+            const {tableId, columnIndex} = action.payload;
+            const columnId = getColumnId(tableId, columnIndex);
+            const column = state.entries[columnId];
+            if (column) {
+                column.loading = true;
+                column.error = null;                
+            }
+        },
+        /**
+         * Update state to reflect the successful removal of a column
+         * and remove the column from the columns array for that particular
+         * project.
+         */
+        removeColumnSuccess: (state, action) => {
+            const {tableId, columnIndex} = action.payload;
+            const columnId = getColumnId(tableId, columnIndex);
+            const column = state.entries[columnId];
+            if (column) {
+                delete state.entries[columnId];
+            }
+        },
+        /**
+         * Update state to reflect the failure of a column removal process.
+         */
+        removeColumnFailure: (state, action) => {
+            const {tableId, columnIndex} = action.payload;
+            const columnId = getColumnId(tableId, columnIndex);
+            const column = state.entries[columnId];
+            if (column) {
+                column.loading = false;
+                column.error = error;
             }
         },
     }

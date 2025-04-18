@@ -6,6 +6,13 @@ import { endpoint as getAllProjectMetadataEndpoint } from "../src/services/open-
 import { endpoint as getColumnsInfoEndpoint } from "../src/services/open-refine/get-columns-info"
 import { endpoint as setProjectMetadataEndpoint } from "../src/services/open-refine/set-project-metadata";
 import { endpoint as renameColumnEndpoint } from "../src/services/open-refine/rename-column";
+import { endpoint as removeColumnEndpoint } from "../src/services/open-refine/remove-column";
+
+function generateRandom13DigitNumber() {
+    const min = 1000000000000; // Minimum 13-digit number
+    const max = 9999999999999; // Maximum 13-digit number
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 export default function makeServer() {
     return createServer({
@@ -29,15 +36,31 @@ export default function makeServer() {
                 const now = new Date();
                 const oldColumnName = request.queryParams["oldColumnName"];
                 const newColumnName = request.queryParams["newColumnName"];
+                const id = generateRandom13DigitNumber();                
                 return {
                     "historyEntry": {
-                        "id": 1744745307984,
+                        "id": id,
                         "description": `Rename column ${oldColumnName} to ${newColumnName}`,
                         "time": now.toISOString(),
                     },
                     "code": "ok"
                 }
-            })
+            });
+
+            this.post(removeColumnEndpoint, (schema, request) => {
+                const now = new Date();
+                const columnName = request.queryParams["columnName"];
+                const id = generateRandom13DigitNumber();
+                return {
+                    "historyEntry": {
+                        "id": id,
+                        "description": `Remove column ${columnName}`,
+                        "time": now.toISOString(),
+                    },
+                    "code": "ok"
+                }
+            });
+
         }
     });
 }

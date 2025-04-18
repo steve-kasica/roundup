@@ -1,7 +1,7 @@
 
 
 export const ID_ATTR = "id";
-export const type = "SourceTable";
+export const dataType = "SourceTable";
 
 /**
  * 

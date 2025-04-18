@@ -9,11 +9,16 @@ import { useDispatch, useSelector } from "react-redux";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
 import ColumnView from "./ColumnView";
-import { getFocusedOperationTablesWithColumns } from "../../../data/selectors.js";
+// import { getFocusedOperationTablesWithColumns } from "../../../data/selectors.js";
 import { hoverColumnIndex, hoverTable, unhoverColumnIndex, unhoverTable } from "../../../data/uiSlice";
 
 function setColumnProperty() {
     // TODO need up update column name
+}
+
+function getFocusedOperationTablesWithColumns(state) {
+    // TODO need to implement this function
+    return [];
 }
 
 const X_AXIS_LABEL = "column index"

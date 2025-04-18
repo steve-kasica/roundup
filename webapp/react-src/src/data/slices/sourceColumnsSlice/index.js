@@ -13,7 +13,11 @@ export const {
 
     renameColumnRequest,
     renameColumnSuccess,
-    renameColumnFailure
+    renameColumnFailure,
+
+    removeColumnRequest,
+    removeColumnSuccess,
+    removeColumnFailure
 } = slice.actions;
 
 export default slice.reducer;

@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import StackDetail from "./StackDetail/StackDetail";
 import PackDetail from "./PackDetail";
 import { getFocusedOperation } from "../../data/selectors.js";
-import { STACK_OPERATION } from "../../data/slices/compositeSchemaSlice";
+import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice";
 
 
 export default function() {
@@ -10,7 +10,7 @@ export default function() {
 
     if (focusedOperation === null) {
         return <div></div>;
-    } else if (focusedOperation.operationType === STACK_OPERATION) {
+    } else if (focusedOperation.operationType === OPERATION_TYPE_STACK) {
         return <StackDetail />;
     } else {
         return <PackDetail />;

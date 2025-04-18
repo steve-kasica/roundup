@@ -8,12 +8,12 @@ import { Add as PlusIcon } from "@mui/icons-material"
 
 import { PACK_OPERATION, STACK_OPERATION } from "../../data/slices/compositeSchemaSlice"
 import { isOperationNode } from "../../data/slices/compositeSchemaSlice"
-import OperationView from "./OperationView"
+import OperationView from "../OperationContainer/OperationBlockView"
 import TableDropTarget from "./TableDropTarget"
 import { useSelector } from "react-redux"
 import { STAGE_ARRANGE_TABLES } from "../../data/uiSlice"
 import { interpolateGreys, scaleSequential } from "d3";
-import TableView from "./TableView"
+import TableView from "../TableContainer/TableBlockView"
 
 const GRID_COLUMNS = 12;
 

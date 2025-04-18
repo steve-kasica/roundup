@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useDrag, DragPreviewImage } from "react-dnd";
 import tableIconImage from "../../../../../public/images/table-icon.png";
 import { useState } from "react";
-import {type as SourceTable} from "../../../../data/slices/sourceTablesSlice";
+import {dataType as SourceTable} from "../../../../data/slices/sourceTablesSlice";
 import { createOperation } from "../../../../data/slices/compositeSchemaSlice";
 import { isTableHover } from "../../../../data/selectors.js";
 import { hoverTable, unhoverTable } from "../../../../data/uiSlice";

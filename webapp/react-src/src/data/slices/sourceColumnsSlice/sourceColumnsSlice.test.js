@@ -5,9 +5,14 @@ import reducer, {
     fetchMultipleRequest, 
     fetchMultipleSuccess, 
     fetchMultipleFailure,
+
     fetchSingleRequest,
     fetchSingleSuccess,
-    fetchSingleFailure
+    fetchSingleFailure,
+
+    removeColumnRequest,
+    removeColumnSuccess,
+    removeColumnFailure
 } from '.';
 
 import { 
@@ -338,6 +343,332 @@ describe('sourceColumns slice', () => {
         type: expect.stringContaining('/fetchSingleFailure'),
         payload
       });
+    });
+    
+    // New action creators for column removal
+    it('should create removeColumnRequest action', () => {
+      const payload = { projectId: 'project123', columnIndex: 1 };
+      expect(removeColumnRequest(payload)).toEqual({
+        type: expect.stringContaining('/removeColumnRequest'),
+        payload
+      });
+    });
+    
+    it('should create removeColumnSuccess action', () => {
+      const payload = { projectId: 'project123', columnIndex: 1 };
+      expect(removeColumnSuccess(payload)).toEqual({
+        type: expect.stringContaining('/removeColumnSuccess'),
+        payload
+      });
+    });
+    
+    it('should create removeColumnFailure action', () => {
+      const payload = { projectId: 'project123', columnIndex: 1, error: 'Error message' };
+      expect(removeColumnFailure(payload)).toEqual({
+        type: expect.stringContaining('/removeColumnFailure'),
+        payload
+      });
+    });
+  });
+  
+  // New tests for column removal functionality
+  describe('removeColumnRequest', () => {
+    it('should set loading state for specific column', () => {
+      const projectId = 'project123';
+      const columnIndex = 1;
+      
+      // Create initial state with columns
+      const initialState = {
+        ids: [],
+        data: {
+          [projectId]: {
+            loading: false,
+            error: null,
+            columns: [
+              { id: 'c-1', loading: false, error: null, name: 'Column 1' },
+              { id: 'c-2', loading: false, error: null, name: 'Column 2' },
+              { id: 'c-3', loading: false, error: null, name: 'Column 3' }
+            ]
+          }
+        },
+        loading: false,
+        error: null
+      };
+      
+      const nextState = reducer(
+        initialState,
+        removeColumnRequest({ projectId, columnIndex })
+      );
+      
+      // The specified column should be in loading state
+      expect(nextState.data[projectId].columns[columnIndex].loading).toBe(true);
+      expect(nextState.data[projectId].columns[columnIndex].error).toBeNull();
+      
+      // Other columns should remain untouched
+      expect(nextState.data[projectId].columns[0].loading).toBe(false);
+      expect(nextState.data[projectId].columns[2].loading).toBe(false);
+    });
+    
+    it('should handle gracefully when column does not exist', () => {
+      const projectId = 'project123';
+      const nonExistentIndex = 999;
+      
+      // Create initial state with columns
+      const initialState = {
+        ids: [],
+        data: {
+          [projectId]: {
+            loading: false,
+            error: null,
+            columns: [
+              { id: 'c-1', loading: false, error: null, name: 'Column 1' }
+            ]
+          }
+        },
+        loading: false,
+        error: null
+      };
+      
+      // This should not throw an error
+      const nextState = reducer(
+        initialState,
+        removeColumnRequest({ projectId, columnIndex: nonExistentIndex })
+      );
+      
+      // State should remain unchanged
+      expect(nextState).toEqual(initialState);
+    });
+  });
+  
+  describe('removeColumnSuccess', () => {
+    it('should remove the specified column', () => {
+      const projectId = 'project123';
+      const columnIndex = 1;
+      
+      // Create initial state with columns
+      const initialState = {
+        ids: [],
+        data: {
+          [projectId]: {
+            loading: false,
+            error: null,
+            columns: [
+              { id: 'c-1', loading: false, error: null, name: 'Column 1' },
+              { id: 'c-2', loading: true, error: null, name: 'Column 2' },
+              { id: 'c-3', loading: false, error: null, name: 'Column 3' }
+            ]
+          }
+        },
+        loading: false,
+        error: null
+      };
+      
+      const nextState = reducer(
+        initialState,
+        removeColumnSuccess({ projectId, columnIndex })
+      );
+      
+      // Verify column is removed
+      expect(nextState.data[projectId].columns.map(col => col.id)).not.toContain('c-2');
+      expect(nextState.data[projectId].columns).toHaveLength(2);
+      expect(nextState.data[projectId].columns[0].id).toBe('c-1');
+      expect(nextState.data[projectId].columns[1].id).toBe('c-3');
+    });
+    
+    it('should handle gracefully when column does not exist', () => {
+      const projectId = 'project123';
+      const nonExistentIndex = 999;
+      
+      // Create initial state with columns
+      const initialState = {
+        ids: [],
+        data: {
+          [projectId]: {
+            loading: false,
+            error: null,
+            columns: [
+              { id: 'c-1', loading: false, error: null, name: 'Column 1' }
+            ]
+          }
+        },
+        loading: false,
+        error: null
+      };
+      
+      // This should not throw an error
+      const nextState = reducer(
+        initialState,
+        removeColumnSuccess({ projectId, columnIndex: nonExistentIndex })
+      );
+      
+      // State should remain unchanged
+      expect(nextState).toEqual(initialState);
+    });
+  });
+  
+  describe('removeColumnFailure', () => {
+    it('should set error and reset loading for the column', () => {
+      const projectId = 'project123';
+      const columnIndex = 1;
+      const error = 'Error removing column';
+      
+      // Create initial state with columns
+      const initialState = {
+        ids: [],
+        data: {
+          [projectId]: {
+            loading: false,
+            error: null,
+            columns: [
+              { id: 'c-1', loading: false, error: null, name: 'Column 1' },
+              { id: 'c-2', loading: true, error: null, name: 'Column 2' },
+              { id: 'c-3', loading: false, error: null, name: 'Column 3' }
+            ]
+          }
+        },
+        loading: false,
+        error: null
+      };
+      
+      const nextState = reducer(
+        initialState,
+        removeColumnFailure({ projectId, columnIndex, error })
+      );
+      
+      // The specified column should have error set and loading reset
+      expect(nextState.data[projectId].columns[columnIndex].loading).toBe(false);
+      expect(nextState.data[projectId].columns[columnIndex].error).toBe(error);
+      
+      // The column should still exist
+      expect(nextState.data[projectId].columns[columnIndex].name).toBe('Column 2');
+      
+      // Other columns should remain untouched
+      expect(nextState.data[projectId].columns[0].error).toBeNull();
+      expect(nextState.data[projectId].columns[2].error).toBeNull();
+    });
+    
+    it('should handle gracefully when column does not exist', () => {
+      const projectId = 'project123';
+      const nonExistentIndex = 999;
+      const error = 'Error removing column';
+      
+      // Create initial state with columns
+      const initialState = {
+        ids: [],
+        data: {
+          [projectId]: {
+            loading: false,
+            error: null,
+            columns: [
+              { id: 'c-1', loading: false, error: null, name: 'Column 1' }
+            ]
+          }
+        },
+        loading: false,
+        error: null
+      };
+      
+      // This should not throw an error
+      const nextState = reducer(
+        initialState,
+        removeColumnFailure({ projectId, columnIndex: nonExistentIndex, error })
+      );
+      
+      // State should remain unchanged
+      expect(nextState).toEqual(initialState);
+    });
+  });
+  
+  // Test the complete column removal workflow
+  describe('column removal workflow', () => {
+    it('should handle successful column removal workflow', () => {
+      const projectId = 'project123';
+      const columnIndex = 1;
+      
+      // Create initial state with columns
+      const initialState = {
+        ids: [],
+        data: {
+          [projectId]: {
+            loading: false,
+            error: null,
+            columns: [
+              { id: 'c-1', loading: false, error: null, name: 'Column 1' },
+              { id: 'c-2', loading: false, error: null, name: 'Column 2' },
+              { id: 'c-3', loading: false, error: null, name: 'Column 3' }
+            ]
+          }
+        },
+        loading: false,
+        error: null
+      };
+      
+      // Step 1: Start column removal
+      let state = reducer(
+        initialState,
+        removeColumnRequest({ projectId, columnIndex })
+      );
+      
+      // Verify column is in loading state
+      expect(state.data[projectId].columns[columnIndex].loading).toBe(true);
+      expect(state.data[projectId].columns[columnIndex].error).toBeNull();
+      
+      // Step 2: Complete column removal
+      state = reducer(
+        state,
+        removeColumnSuccess({ projectId, columnIndex })
+      );
+      
+      // Verify column is removed
+      expect(state.data[projectId].columns.map(col => col.id)).not.toContain('c-2');
+      expect(state.data[projectId].columns).toHaveLength(2);
+      expect(state.data[projectId].columns[0].id).toBe('c-1');
+      expect(state.data[projectId].columns[1].id).toBe('c-3');
+    });
+    
+    it('should handle failed column removal workflow', () => {
+      const projectId = 'project123';
+      const columnIndex = 1;
+      const error = 'Error removing column';
+      
+      // Create initial state with columns
+      const initialState = {
+        ids: [],
+        data: {
+          [projectId]: {
+            loading: false,
+            error: null,
+            columns: [
+              { id: 'c-1', loading: false, error: null, name: 'Column 1' },
+              { id: 'c-2', loading: false, error: null, name: 'Column 2' },
+              { id: 'c-3', loading: false, error: null, name: 'Column 3' }
+            ]
+          }
+        },
+        loading: false,
+        error: null
+      };
+      
+      // Step 1: Start column removal
+      let state = reducer(
+        initialState,
+        removeColumnRequest({ projectId, columnIndex })
+      );
+      
+      // Verify column is in loading state
+      expect(state.data[projectId].columns[columnIndex].loading).toBe(true);
+      
+      // Step 2: Column removal fails
+      state = reducer(
+        state,
+        removeColumnFailure({ projectId, columnIndex, error })
+      );
+      
+      // Verify column still exists but has error
+      expect(state.data[projectId].columns[columnIndex]).toBeDefined();
+      expect(state.data[projectId].columns[columnIndex].loading).toBe(false);
+      expect(state.data[projectId].columns[columnIndex].error).toBe(error);
+      expect(state.data[projectId].columns[columnIndex].name).toBe('Column 2');
     });
   });
 });

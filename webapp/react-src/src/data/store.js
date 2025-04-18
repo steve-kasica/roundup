@@ -5,6 +5,7 @@ import issuesReducer from "./issuesSlice";
 import sourceTablesReducer from "./slices/sourceTablesSlice";
 import compositeSchemaReducer from "./slices/compositeSchemaSlice";
 import sourceColumnsReducer from "./slices/sourceColumnsSlice";
+import operationsReducer from "./slices/operationsSlice";
 
 import { listenerMiddleware } from "../listenerMiddleware";
 import createSagaMiddleware from "redux-saga";
@@ -17,6 +18,7 @@ const store = configureStore({
         ui: uiReducer,
         sourceTables: sourceTablesReducer,
         sourceColumns: sourceColumnsReducer,
+        operations: operationsReducer,
         compositeSchema: compositeSchemaReducer,
 
         // Add the generated reducer as a specific top-level slices

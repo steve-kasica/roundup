@@ -6,70 +6,68 @@
  */
 import { Menu, MenuItem } from "@mui/material";
 import { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setSelectedOperation, STAGE_REFINE_OPS, unhoverTable, hoverTable } from "../../data/uiSlice";
-import ColumnView from "./ColumnView";
-import { isMouseOverElement } from "../../lib/utilities/dom";
-import { removeTable, removeOperation } from "../../data/slices/compositeSchemaSlice";
-import { getHoverTable, getTableById } from "../../data/selectors.js";
+import { useDispatch } from "react-redux";
+import { isMouseOverElement } from "../../lib/utilities/dom.js";
+import ColumnContainer, { COLUMN_LAYOUT_BLOCK } from "../ColumnContainer";
 
-export default function({node, parentOperation, columnCount}) {
-    const {tableId} = node.data;
-    const table = useSelector(state => getTableById(state, tableId));
-
+// export default function({node, parentOperation, columnCount}) {
+export default function TableBlockView({
+    id, 
+    name, 
+    rowCount, 
+    columnCount, 
+    dateCreated, 
+    dateLastModified, 
+    tags, 
+    isHovered,
+    handleOnHover,
+    handleOffHover,
+    handleRemoveTable,
+    handleRemoveOperation,
+    handleSelectOperation,
+}) {
+    const dispatch = useDispatch();    
     const [contextMenu, setContextMenu] = useState(null);
     const tableRef = useRef();
-    const dispatch = useDispatch();
-
-    const {stage} = useSelector(({ui}) => ui);
-    const hoverTableId = useSelector(getHoverTable);
-
-    const isHovered = hoverTableId === table.id;    
-    const state = [
-        isHovered ? "hover" : undefined,
-    ].filter(className => className).join(" ");
 
     const menuItems = [
         {
-            label: `Remove ${table.name}`,
+            label: `Remove ${name}`,
             isVisable: true,
-            onClick: () => dispatch(removeTable(node.data.id))
+            onClick: handleRemoveTable
         },{
             label: "Remove operation",
             isVisable: true,
-            onClick: () => dispatch(removeOperation(node.data.parentId))
+            onClick: handleRemoveOperation
         },{
             label: "Select operation",
-            isVisable: stage === STAGE_REFINE_OPS,
-            onClick: () => dispatch(setSelectedOperation(parentOperation))
+            isVisable: false,
+            onClick: handleSelectOperation
         }
     ];
     
     return (
         <>
-            <div 
+            {/* <div 
                 ref={tableRef}
-                data-id={table.id}
-                className={`block table ${state}`}
-                onMouseEnter={() => (!isHovered) ? dispatch(hoverTable(table.id)) : null}
-                onMouseLeave={() => (!contextMenu) ? dispatch(unhoverTable()) : null}
+                data-id={id}
                 onContextMenu={handleContextMenu}
-            >
-                <div className="label">{table.name} <span className="column-count">({table.columnCount})</span></div>
+            > */}
+                <div className="label">{name} <span className="column-count">({columnCount})</span></div>
                 {Array.from(
                     {length: columnCount}, 
                     ( _, columnIndex ) => (
-                    // TODO: to accomidate removed columns?
-                    // .filter(column => column.status !== COLUMN_STATUS_REMOVED)                        
-                    <ColumnView 
-                        key={`${table.id}-${columnIndex}`} 
-                        tableId={table.id}
+                    <ColumnContainer 
+                        key={`${id}-${columnIndex}`} 
+                        tableId={id}
                         columnIndex={columnIndex} 
+                        layout={COLUMN_LAYOUT_BLOCK}
                     />
                     )
                 )}
-            </div>
-            <Menu
+            {/* </div> */}
+
+            {/* <Menu
                 open={contextMenu !== null}
                 onClose={closeMenu}
                 anchorReference="anchorPosition"
@@ -93,7 +91,7 @@ export default function({node, parentOperation, columnCount}) {
                         </MenuItem>
                     ))
                 }
-            </Menu>        
+            </Menu>         */}
         </>
     );
 

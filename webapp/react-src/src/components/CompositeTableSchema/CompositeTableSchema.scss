@@ -36,19 +36,19 @@ $label-font-family: sans-serif;
 $null-column-background: #ddd;
 
 @mixin background-color($color, $parent-color) {
-    background-color: $color;
-    > .children {
+    background-color: $color;        
+    > .TableView {
         background-color: inherit;
-
-        > .table { 
-            background-color: inherit;
-
-            > .ColumnView { 
-                background-color: inherit; 
-                &.null { background-color: $null-column-background; }                
-                &.hover { background-color: $hover-color; }   
-                &.focused { background-color: $focused-color;}             
-            }
+        > .ColumnView { 
+            background-color: inherit; 
+            &.null { background-color: $null-column-background; }                
+            &.hover { background-color: $hover-color; }   
+            &.focused { background-color: $focused-color;}             
+        }
+                        
+        &.hover { 
+            background-color: $hover-color; 
+            > .ColumnView { background-color: inherit; }
         }
     }
 }
@@ -67,39 +67,38 @@ $null-column-background: #ddd;
 
     // Unfocused general operation styles
     // -----------------------------------------------------------
-    .operation {
+    .OperationView {
         display: flex;
         position: relative;
         padding: $operation-padding;
         overflow: hidden;
+        height: 100%;
         border-style: $table-border-style;
         border-width: $table-border-width;
         border-color: $table-border-color;
 
-        .children {
+        > .TableView {
             width: 100%;
+            height: inherit;
             display: flex;
-            flex-direction: inherit;
+            flex-direction: row;                
+            position: relative;
+            flex-grow: 1;
+            flex-basis: inherit;
+            min-height: $table-height;
+            overflow: hidden; // prevent column divs from poking out of rounded corners
 
-            > .table {
-                display: flex;
-                position: relative;
-                flex-grow: 1;
-                flex-basis: inherit;
-                min-height: $table-height;
-                overflow: hidden; // prevent column divs from poking out of rounded corners
-    
-                > .ColumnView {
-                    pointer-events: none;  // Disable mouse events when operation is not focused
-                    flex-grow: 1;  // set individual item width to fill available space
-                    line-height: $table-height;
+            > .ColumnView {
+                pointer-events: none;  // Disable mouse events when operation is not focused
+                flex-grow: 1;  // set individual item width to fill available space
+                line-height: $table-height;
 
-                    &.null {
-                        cursor: default;
-                    }
+                &.null {
+                    cursor: default;
                 }
             }
         }
+        
 
         .label {
             position: absolute;
@@ -112,6 +111,11 @@ $null-column-background: #ddd;
             font-family: $label-font-family;
             font-size: $label-font-size;
             color: $label-text-color;
+        }
+
+        &.no-op {
+            flex-direction: column;
+            @include background-color($null-column-background, $null-column-background);
         }
 
         // Unfocused stack operation styles

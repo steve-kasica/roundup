@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 import { useDrag, DragPreviewImage } from "react-dnd";
 import tableIconImage from "../../../../public/images/table-icon.png";
 import { useState } from "react";
-import {type as SourceTable} from "../../../data/slices/sourceTablesSlice";
+import {dataType as SourceTable} from "../../../data/slices/sourceTablesSlice";
 
 export default function ListItemLayout({
     className,

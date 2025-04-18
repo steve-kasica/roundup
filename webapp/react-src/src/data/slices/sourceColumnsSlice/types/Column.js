@@ -5,6 +5,8 @@ export const COLUMN_STATUS_VISABLE = 'visable';
 export const COLUMN_STATUS_REMOVED = 'removed';
 export const COLUMN_STATUS_NULLED = 'nulled';
 
+export const getColumnId = (tableId, index) => `${tableId}-${index}`;
+
 /**
  * 
  * @param {*} tableId 
@@ -15,21 +17,22 @@ export const COLUMN_STATUS_NULLED = 'nulled';
  * @returns 
  */
 export function Column(
-    tableId,
+    parentId,
     index,
     name,
     columnType,
     status=COLUMN_STATUS_VISABLE,
 ) {
-    if (tableId === undefined) {
-        throw new Error("Param undefined `tableId`");
+    if (parentId === undefined) {
+        throw new Error("Param undefined `parentId`");
     } else if (index === undefined) {
         throw new Error("Param undefined, `index`");
     }
+    const id = getColumnId(tableId, index);
 
     return {
-        id: `c-${++idCounter}`,
-        tableId,
+        id,
+        parentId,
         name,
         index,
         columnType,

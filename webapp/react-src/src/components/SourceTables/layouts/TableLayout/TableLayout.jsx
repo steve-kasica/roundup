@@ -6,8 +6,8 @@ import { Button, IconButton } from "@mui/material";
 import { ArrowDown01, ArrowDownAZ, ArrowDownNarrowWide, ArrowUp10, ArrowUpDown, ArrowUpWideNarrow, ArrowUpZA } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
-import Row from "./Row";
 import { CheckBoxOutlineBlank } from "@mui/icons-material";
+import TableContainer from "../../../TableContainer";
 
 // TODO: move this to SourceColumn Type
 const COLUMN_TYPE_CATEGORICAL = "categorical";
@@ -78,24 +78,17 @@ export default function TableLayout({ searchString, sourceTables, loading, error
             </tr>
         </thead>
         <tbody>
-          {(loading || error) ? (
-            <tr><td>Loading/error</td></tr>
-          ) : 
-          sourceTables.toSorted((a, b) => (isAscending)
-            ? ascending(a[sortAttribute], b[sortAttribute])
-            : descending(a[sortAttribute], b[sortAttribute]))
-          .map(table => {
-            // TODO: can't I delete this? Isn't isSelected being passed as table props?
-            // const isSelected = selectedTableIds.has(table.id);
-            const isSelected = false;
-            return (<Row 
-              key={table.id}
-              table={table} 
-              searchString={searchString}
-              isSelected={isSelected}
-              isHovered={(isSelected && false)}
-            />);
-          })}
+          {
+            (loading || error) 
+              ? (<tr><td>Loading/error</td></tr>)
+              : sourceTables
+                .toSorted((a, b) => (isAscending)
+                  ? ascending(a[sortAttribute], b[sortAttribute])
+                  : descending(a[sortAttribute], b[sortAttribute]))
+                .map(table => (
+                  <TableContainer id={table.id} layout="row" isDraggable={true} />
+                ))
+          }
         </tbody>
       </table>
     </div>
