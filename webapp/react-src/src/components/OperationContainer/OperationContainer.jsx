@@ -13,7 +13,7 @@ export default function OperationContainer({ id, layout }) {
     const dispatch = useDispatch();
     const operation = useSelector(state => getOperationById(state, id));
     const focusedOperationId = useSelector(getFocusedOperationId);
-    // const hoverOperationId = useSelector(getHoverOperationId);
+    const hoverOperationId = useSelector(getHoverOperationId);
 
     let OperationView;
     switch(layout) {

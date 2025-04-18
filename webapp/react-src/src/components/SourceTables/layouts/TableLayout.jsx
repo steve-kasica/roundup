@@ -7,12 +7,14 @@ import { ArrowDown01, ArrowDownAZ, ArrowDownNarrowWide, ArrowUp10, ArrowUpDown, 
 import { useState } from "react";
 import { ascending, descending } from "d3";
 import { CheckBoxOutlineBlank } from "@mui/icons-material";
-import TableContainer from "../../../TableContainer";
+import TableContainer from "../../TableContainer";
 
 // TODO: move this to SourceColumn Type
 const COLUMN_TYPE_CATEGORICAL = "categorical";
 const COLUMN_TYPE_NUMERIC = "numeric";
 const COLUMN_TYPE_DATE = "date";
+
+export const LAYOUT_ID = "table";
 
 export default function TableLayout({ searchString, sourceTables, loading, error }) {
   const [sortAttribute, setSortAttribute] = useState(null);
@@ -86,7 +88,12 @@ export default function TableLayout({ searchString, sourceTables, loading, error
                   ? ascending(a[sortAttribute], b[sortAttribute])
                   : descending(a[sortAttribute], b[sortAttribute]))
                 .map(table => (
-                  <TableContainer id={table.id} layout="row" isDraggable={true} />
+                  <TableContainer 
+                    key={table.id}
+                    id={table.id} 
+                    layout="row" 
+                    isDraggable={true} 
+                  />
                 ))
           }
         </tbody>

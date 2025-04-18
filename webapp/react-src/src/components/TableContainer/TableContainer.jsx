@@ -10,9 +10,12 @@ import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
 import tableIconImage from "../../../public/images/table-icon.png";
 import { DROP_TARGET_EVENT_INITIALIZE } from '../CompositeTableSchema/TableDropTarget';
 import { CHILD_TYPE_TABLE, createOperation, OPERATION_TYPE_NO_OP } from '../../data/slices/operationsSlice';
+import TableListItemView from './TableListItemView';
+import {formatDate, formatNumber} from "../../lib/utilities/formaters";
 
 export const TABLE_LAYOUT_BLOCK = 'block';
 export const TABLE_LAYOUT_ROW = 'row';
+export const TABLE_LAYOUT_LIST_ITEM = 'list-item';
 
 export default function TableContainer({ id, layout, isDraggable }) {
   const dispatch = useDispatch();
@@ -28,6 +31,10 @@ export default function TableContainer({ id, layout, isDraggable }) {
     case TABLE_LAYOUT_ROW:
       TableView = TableRowView;
       containerElementType = "tr";
+      break;
+    case TABLE_LAYOUT_LIST_ITEM:
+      TableView = TableListItemView;
+      containerElementType = "div";
       break;
     default:
       throw new Error(`Unknown layout type: ${layout}`);

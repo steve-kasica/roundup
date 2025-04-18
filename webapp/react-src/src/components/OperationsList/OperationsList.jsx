@@ -1,7 +1,7 @@
 import { List, ListItemText, ListItemButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { focusOperation, hoverOperation, unhoverOperation } from "../../data/uiSlice";
-import { getHoverOperationId, getOperations } from "../../data/selectors.js";
+import { getHoverOperationId, getOperations } from "../../data/selectors";
 
 export default function OperationsList() {
     const dispatch = useDispatch();

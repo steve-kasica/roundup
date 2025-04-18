@@ -7,7 +7,7 @@
 import "./CompositeTableSchema.scss";
 
 import { useSelector } from "react-redux";
-import { getMaxOperationDepth, getRootOperationId } from "../../data/selectors.js";
+import { getMaxOperationDepth, getRootOperationId } from "../../data/selectors";
 
 import TableDropTarget, { DROP_TARGET_EVENT_INITIALIZE, DROP_TARGET_EVENT_PACK, DROP_TARGET_EVENT_STACK } from "./TableDropTarget";
 import { Typography } from "@mui/material";
@@ -22,7 +22,6 @@ const gridWidth = gridColumns - 2;
 export default function CompositeTableSchema() {
     const rootOperationId = useSelector(getRootOperationId);
     const maxOperationDepth = useSelector(getMaxOperationDepth);
-    console.log("max operation depth", maxOperationDepth);
 
     return (<div className="CompositeTableSchema">
         {

@@ -1,17 +1,18 @@
 import { useSelector } from 'react-redux';
-import ColumnBlockView from './ColumnBlockView';
+import ColumnBlockView from './ColumnTickView';
 import { 
     getColumnByTableIndex, 
     getHoverColumnIndex, 
     getFocusedColumnId 
 } from '../../data/selectors';
 
-import { COLUMN_LAYOUT_BLOCK } from './ColumnBlockView';
 import { getColumnId } from '../../data/slices/sourceColumnsSlice';
 import {
     hoverColumnIndexInTable,
     unhoverColumnIndexInTable
 } from '../../data/uiSlice';
+
+import { COLUMN_LAYOUT_BLOCK, COLUMN_LAYOUT_TICK } from '.';
 
 export default function ColumnContainer({ tableId, index, layout }) {
     const column = useSelector(state => getColumnByTableIndex(state, tableId, index));
@@ -33,6 +34,9 @@ export default function ColumnContainer({ tableId, index, layout }) {
     switch (layout) {
         case COLUMN_LAYOUT_BLOCK:
             ColumnView = ColumnBlockView;
+            break;
+        case COLUMN_LAYOUT_TICK:
+            ColumnView = ColumnTickView;
             break;
         default:
             throw new Error(`Unsupported layout: ${layout}`);
@@ -65,10 +69,32 @@ export default function ColumnContainer({ tableId, index, layout }) {
                 isNull={isNull}
                 isHovered={isHovered}
                 isFocused={isFocused}
+                handleRemoveColumn={handleRemoveColumn}
+                handleColumnHover={handleColumnHover}
+                handleColumnUnhover={handleColumnUnhover}
+                handleColumnFocus={handleColumnFocus}
+                handleColumnUnfocus={handleColumnUnfocus}
+                handleRemoveColumnsAfter={handleRemoveColumnsAfter}
             />
         </div>
     );
 
+    function handleRemoveColumn() {
+        dispatch(removeColumn({
+            tableId, 
+            columnIndex: index,
+            columnName: name
+        }));
+    }
+
+    function handleRemoveColumnsAfter() {
+        // TODO: implement remove columns after
+    }
+
+    function handleColumnUnfocus() { 
+        dispatch(unfocusColumnId());
+    }
+    
     function handleColumnFocus() {
             // TODO: setup selected/focused UIs
             // onClick={() => dispatch(setColumnProperty({

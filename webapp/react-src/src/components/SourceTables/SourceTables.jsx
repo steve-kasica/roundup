@@ -13,9 +13,9 @@ import { Button, Chip, FormControl, FormControlLabel, FormGroup, Grid2 as Grid, 
 import { styled } from '@mui/material/styles';
 
 import "./SourceTables.scss"
+import { getAllSourceTables, getSelectedSourceTables, getSourceTablesError, getSourceTablesLoadingStatus } from "../../data/selectors";
+import {TABLE_LAYOUT, LIST_LAYOUT} from "./layouts"
 
-const TABLE_LAYOUT = "table";
-const LIST_LAYOUT = "list";
 const FIRST_PANE_THRESHOLD = 30;
 
 const ITEM_HEIGHT = 48;
@@ -89,29 +89,20 @@ export default function SourceTables() {
     const {firstPaneWidth} = useSelector(({ui}) => ui);    
     const [layout, setLayout] = useState(TABLE_LAYOUT);
 
-    // TODO (optimization)
-    // memoize selector here for sourceTables, sourceTable and isAscending and sortAttribute
-    const {sourceTables, loading, error} = useSelector(({ui, sourceTables, compositeSchema}) => ({
-        sourceTables: Object.values(sourceTables.data)
-            .map(table => ({
-                ...table, 
-                isSelected: compositeSchema.selectedTables.includes(table.id),
-                isHovered: (ui.hover.dataType === "table" && ui.hover.id === table.id)
-                })),
-        loading: sourceTables.loading,
-        error: sourceTables.error
-        })
-    );
+    const sourceTables = useSelector(getAllSourceTables);
+    const selectedSourceTables = useSelector(getSelectedSourceTables);
+    const isLoading = useSelector(getSourceTablesLoadingStatus);
+    const error = useSelector(getSourceTablesError);
 
     useEffect(() => {
         dispatch(fetchTablesRequest());
     }, [dispatch]);
 
     const filteredTables = sourceTables
-        .filter(table => table.isSelected || table.name.includes(searchString))
-        .filter(table => table.isSelected || selectedTag.length === 0 || table.tags.includes(selectedTag));    
+        .filter(table => selectedSourceTables.includes(table.id) || table.name.includes(searchString))
+        .filter(table => selectedSourceTables.includes(table.id) || selectedTag.length === 0 || table.tags.includes(selectedTag));
 
-    const tags = Array.from(new Set((!(loading && error)) 
+    const tags = Array.from(new Set((!(isLoading && error)) 
         ? sourceTables.map(table => table.tags).flat()
         : []));
 
@@ -152,7 +143,7 @@ export default function SourceTables() {
                                 renderValue={tag => ( <Chip label={tag} /> )}
                                 MenuProps={MenuProps}
                             >
-                                <MenuItem value={null}>
+                                <MenuItem value="">
                                     <em>None</em>
                                 </MenuItem>
                                 {tags.map(tag => (
@@ -197,14 +188,14 @@ export default function SourceTables() {
                 <ListLayout 
                     searchString={searchString} 
                     sourceTables={filteredTables}
-                    loading={loading}
+                    loading={isLoading}
                     error={error}
                 />
             ) : (
                 <TableLayout 
                     searchString={searchString}
                     sourceTables={filteredTables}
-                    loading={loading}
+                    loading={isLoading}
                     error={error}                    
                 />
             )}        

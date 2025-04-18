@@ -8,8 +8,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import "./StackDetail.scss"
 import { scaleBand } from "d3";
-import ColumnView from "./ColumnView";
-// import { getFocusedOperationTablesWithColumns } from "../../../data/selectors.js";
+import ColumnContainer from "../../ColumnContainer";
+// import { getFocusedOperationTablesWithColumns } from "../../../data/selectors";
 import { hoverColumnIndex, hoverTable, unhoverColumnIndex, unhoverTable } from "../../../data/uiSlice";
 
 function setColumnProperty() {
@@ -100,13 +100,10 @@ export default function StackDetail() {
                                     </label>
                                 </div>
                                 {tables.map(table => (
-                                    <ColumnView 
+                                    <ColumnContainer
                                         key={`${table.id}-${j}`}
                                         tableId={table.id}                                        
-                                        columnId={table.columnIds[j]}  // undefined (out of bounds) is allowed
-                                        position={j + 1}
-                                        columnCount={table.columnCount}
-                                        tableName={table.name}
+                                        index={j}                                        
                                     />)
                                 )}
                             </form>

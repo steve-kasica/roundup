@@ -5,8 +5,9 @@
  * a specific width.
  */
 import { List } from "@mui/material";
-import TableView, { TABLE_LAYOUT_LIST_ITEM } from "../../../TableView";
-import ListItem from "./ListItem";
+import TableContainer, { TABLE_LAYOUT_LIST_ITEM } from "../../TableContainer";
+
+export const LAYOUT_ID = "list";
 
 export default function TablesList({
     searchString, 
@@ -14,32 +15,30 @@ export default function TablesList({
     loading,
     error,
 }) {
-
     return (
-        <>
-            <List
-                className="list-layout" 
-                dense 
-                sx={{ 
-                    height: "inherit", 
-                    overflowY: "auto"
-                }}
-            >
-                {
+        <List
+            className="list-layout" 
+            dense 
+            sx={{ 
+                height: "inherit", 
+                overflowY: "auto"
+            }}
+        >
+            {
                 sourceTables
                     .toSorted((tableA, tableB) => {
                         const [a, b] = [tableA.name.includes(searchString), tableB.name.includes(searchString)];
                         return (a === b) ? 0 : (a < b) ? 1 : -1;
                     })
                     .map(sourceTable => (
-                        <ListItem 
+                        <TableContainer
                             key={sourceTable.id}
-                            sourceTable={sourceTable}
-                            searchString={searchString}
+                            id={sourceTable.id}
+                            layout={TABLE_LAYOUT_LIST_ITEM}
+                            isDraggable={true}
                         />
                     ))
-                }
-            </List>
-        </>
+            }
+        </List>
     );
 }  // end ListLayout()

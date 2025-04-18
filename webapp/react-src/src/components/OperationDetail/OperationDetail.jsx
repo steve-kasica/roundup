@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import StackDetail from "./StackDetail/StackDetail";
 import PackDetail from "./PackDetail";
-import { getFocusedOperation } from "../../data/selectors.js";
+import { getFocusedOperation } from "../../data/selectors";
 import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice";
 
 
