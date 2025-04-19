@@ -50,10 +50,13 @@ export default function ColumnBlockView({
     handleColumnHover,
     handleColumnUnhover,
     handleColumnFocus,
-    handleRemoveColumnsAfter
+    handleColumnUnfocus,
+    handleRemoveColumnsAfter,
+    handleRenameColumn
 }) {
     // const isLastInTable = (position === columnCount);
     const isLastInTable = false; // TODO: implement logic
+    const position = index + 1;  // 1-indexed column indexes for user 
 
     const columnDataRef = useRef();
     useEffect(() => {
@@ -100,18 +103,18 @@ export default function ColumnBlockView({
 
                 // Update data state
                 if (target.node()) {
-                    dispatch(swapColumnPositions({
-                        tableId: source.attr("data-table-id"),
-                        sourceIndex: parseInt(source.attr("data-column-index")),
-                        targetIndex: parseInt(target.attr("data-column-index")),
-                    }));
+                    // dispatch(swapColumnPositions({
+                    //     tableId: source.attr("data-table-id"),
+                    //     sourceIndex: parseInt(source.attr("data-column-index")),
+                    //     targetIndex: parseInt(target.attr("data-column-index")),
+                    // }));
                 } else {
                     // Treat as if a regular click, equivalent to callback for onMouseUp
-                    dispatch(setColumnProperty({
-                        column,
-                        property: "isSelected",
-                        value: !isSelected
-                    }));
+                    // dispatch(setColumnProperty({
+                    //     column,
+                    //     property: "isSelected",
+                    //     value: !isSelected
+                    // }));
                 }
             })
         );
@@ -132,7 +135,7 @@ export default function ColumnBlockView({
         // Determine if we should still be hovering based on mouse position
         // This could be improved with a check if mouse is still over element
         hoverTimeoutRef.current = setTimeout(
-            () => handleColumnHover(),
+            handleColumnHover,
             265
         );
     };
@@ -149,12 +152,7 @@ export default function ColumnBlockView({
     const [value, setValue] = useState(name);
     useEffect(() => {
         const timeoutId = setTimeout(
-            () => dispatch(renameColumnRequest({
-                projectId: tableId,
-                columnIndex: index,
-                newColumnName: value,
-                oldColumnName: name,
-            })),
+            handleRenameColumn,
             DEBOUNCE_DELAY
         );
         return () => clearTimeout(timeoutId);
@@ -165,7 +163,7 @@ export default function ColumnBlockView({
         <div
             // ref={columnDataRef} 
             data-table-id={tableId}
-            data-column-index={position - 1}
+            data-column-index={index}
         >
             <div 
                 className="screen"
@@ -192,7 +190,7 @@ export default function ColumnBlockView({
                     type="text"
                     value={value}
                     onChange={event => setValue(event.target.value)}
-                    onBlur={handleColumnUnfocus()}
+                    onBlur={handleColumnUnfocus}
                     minLength={1}
                 />
             </div>
@@ -238,7 +236,7 @@ export default function ColumnBlockView({
                             setValue("null");
                             closePopover();
                         }}>
-                        Null column {position} in {tableName}
+                        Null column {position} in {tableId}
                     </ListItemButton>                    
                     <ListItemButton 
                         // TODO: can't rename null columns

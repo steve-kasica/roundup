@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
-import ColumnBlockView from './ColumnTickView';
+import ColumnBlockView from './ColumnBlockView';
+import ColumnTickView from "./ColumnTickView"
 import { 
     getColumnByTableIndex, 
     getHoverColumnIndex, 
@@ -75,10 +76,15 @@ export default function ColumnContainer({ tableId, index, layout }) {
                 handleColumnFocus={handleColumnFocus}
                 handleColumnUnfocus={handleColumnUnfocus}
                 handleRemoveColumnsAfter={handleRemoveColumnsAfter}
+                handleRenameColumn={handleRenameColumn}
             />
         </div>
     );
 
+    function handleRenameColumn() {
+        console.log("rename column");
+    }
+    
     function handleRemoveColumn() {
         dispatch(removeColumn({
             tableId, 
@@ -94,7 +100,7 @@ export default function ColumnContainer({ tableId, index, layout }) {
     function handleColumnUnfocus() { 
         dispatch(unfocusColumnId());
     }
-    
+
     function handleColumnFocus() {
             // TODO: setup selected/focused UIs
             // onClick={() => dispatch(setColumnProperty({

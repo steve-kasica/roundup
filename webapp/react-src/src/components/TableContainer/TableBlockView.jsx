@@ -8,7 +8,7 @@ import { Menu, MenuItem } from "@mui/material";
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { isMouseOverElement } from "../../lib/utilities/dom.js";
-import ColumnContainer, { COLUMN_LAYOUT_BLOCK } from "../ColumnContainer";
+import ColumnContainer, { COLUMN_LAYOUT_BLOCK, COLUMN_LAYOUT_TICK } from "../ColumnContainer";
 
 // export default function({node, parentOperation, columnCount}) {
 export default function TableBlockView({
@@ -61,7 +61,7 @@ export default function TableBlockView({
                         key={`${id}-${columnIndex}`} 
                         tableId={id}
                         columnIndex={columnIndex} 
-                        layout={COLUMN_LAYOUT_BLOCK}
+                        layout={COLUMN_LAYOUT_TICK}
                     />
                     )
                 )}
