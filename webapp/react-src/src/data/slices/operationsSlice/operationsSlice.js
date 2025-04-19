@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import Operation, {
-    isOperation,
     Child, 
     CHILD_TYPE_OPERATION, 
-    CHILD_TYPE_TABLE
+    CHILD_TYPE_TABLE,
+    OPERATION_TYPE_NO_OP
 } from './Operation';
 
 const initialState = {
@@ -21,7 +21,8 @@ const operationsSlice = createSlice({
             state.ids.push(operation.id);
         },
         createOperation(state, action) {
-            const { operationType, children, parentId } = action.payload;
+            const { operationType, children } = action.payload;
+            const parentId = state.ids.length > 0 ? state.ids[state.ids.length - 1] : null;
             const depth = state.entities[parentId] ? state.entities[parentId].depth + 1 : 1;
             const operation = Operation(
                 operationType, 
@@ -63,13 +64,42 @@ const operationsSlice = createSlice({
                 console.warn(`Deepest operation with ID ${deepestOperationId} not found.`);
             }
         },
-        addChildrenToOperation(state, action) {
+        addNewChildren(state, action) {
+            const {operationType, children} = action.payload;
+            const lastOperationId = state.ids[state.ids.length - 1];
+            const lastOperationType = state.entities[lastOperationId].operationType;
+            if (lastOperationType === OPERATION_TYPE_NO_OP) {
+                // Handle post initialization
+                state.entities[lastOperationId].operationType = operationType;
+                state.entities[lastOperationId].children = [
+                    ...(state.entities[lastOperationId].children || []),
+                    ...children.map(id => new Child(CHILD_TYPE_TABLE, id)),                    
+                ]                
+            } else if (state.entities[lastOperationId].operationType === operationType) {
+                // Handle adding tables with operation
+                state.entities[lastOperationId].children = [
+                    ...(state.entities[lastOperationId].children || []),
+                    ...children.map(id => new Child(CHILD_TYPE_TABLE, id)),                    
+                ]
+            } else {
+                // Handle add tables with different operation type
+                const operation = new Operation(
+                    operationType,
+                    lastOperationId,
+                    state.entities[lastOperationId].depth + 1,
+                    [children.map(id => new Child(CHILD_TYPE_TABLE, id))]
+                );
+                state.ids.push(operation.id);
+                state.entities[operation.id] = operation;
+            }
+        },
+        addChildrenToLastOperation(state, action) {
             const { operationId, children } = action.payload;
             if (state.entities[operationId]) {
-            state.entities[operationId].children = [
-                ...(state.entities[operationId].children || []),
-                ...children.map(id => new Child(CHILD_TYPE_TABLE, id)),
-            ];
+                state.entities[operationId].children = [
+                    ...(state.entities[operationId].children || []),
+                    ...children.map(id => new Child(CHILD_TYPE_TABLE, id)),
+                ];
             }
         },
     }

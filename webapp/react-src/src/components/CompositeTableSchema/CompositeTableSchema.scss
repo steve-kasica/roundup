@@ -123,9 +123,9 @@ $null-column-background: #ddd;
         &.stack {
             flex-direction: column; // newly added tables go to bottom
     
-            &.depth-0 { @include background-color($stack-0-color, #fff); }
-            &.depth-1 { @include background-color($stack-1-color, $pack-0-color); }
-            &.depth-2 { @include background-color($stack-2-color, $pack-1-color); }
+            &.depth-1 { @include background-color($stack-0-color, #fff); }
+            &.depth-2 { @include background-color($stack-1-color, $pack-0-color); }
+            &.depth-3 { @include background-color($stack-2-color, $pack-1-color); }
 
             > .children > div {
                 border: none;
@@ -145,9 +145,9 @@ $null-column-background: #ddd;
         &.pack {
             flex-direction: row;  // newly added tables go to right side
     
-            &.depth-0 { @include background-color($pack-0-color, $pack-0-color); }
-            &.depth-1 { @include background-color($pack-1-color, $stack-0-color); }
-            &.depth-2 { @include background-color($pack-2-color, $stack-1-color); }
+            &.depth-1 { @include background-color($pack-0-color, $pack-0-color); }
+            &.depth-2 { @include background-color($pack-1-color, $stack-0-color); }
+            &.depth-3 { @include background-color($pack-2-color, $stack-1-color); }
 
             > .children > div {
                 border-style: $table-border-style;

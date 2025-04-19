@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { getHoverTableId, getTableById } from '../../data/selectors';
+import { getHoverTableId, getTableById, getHoverOperationTableIds } from '../../data/selectors';
 import { hoverTable, unhoverTable } from '../../data/uiSlice';
-import TableBlockView from './TableBlockView';
-import TableRowView from './TableRowView';
 import { DragPreviewImage, useDrag } from "react-dnd";
 import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
 import tableIconImage from "../../../public/images/table-icon.png";
-import { DROP_TARGET_EVENT_INITIALIZE } from '../CompositeTableSchema/TableDropTarget';
-import { CHILD_TYPE_TABLE, createOperation, OPERATION_TYPE_NO_OP } from '../../data/slices/operationsSlice';
+import { DROP_TARGET_EVENT_INITIALIZE, DROP_TARGET_EVENT_PACK, DROP_TARGET_EVENT_STACK } from '../CompositeTableSchema/TableDropTarget';
+import { addNewChildren, CHILD_TYPE_TABLE, createOperation, OPERATION_TYPE_NO_OP, OPERATION_TYPE_PACK, OPERATION_TYPE_STACK } from '../../data/slices/operationsSlice';
+
 import TableListItemView from './TableListItemView';
-import {formatDate, formatNumber} from "../../lib/utilities/formaters";
+import TableBlockView from './TableBlockView';
+import TableRowView from './TableRowView';
 
 export const TABLE_LAYOUT_BLOCK = 'block';
 export const TABLE_LAYOUT_ROW = 'row';
@@ -21,6 +21,7 @@ export default function TableContainer({ id, layout, isDraggable }) {
   const dispatch = useDispatch();
   const table = useSelector(state => getTableById(state, id));
   const hoverTableId = useSelector(getHoverTableId);
+  const hoverOperationTableIds = useSelector(getHoverOperationTableIds);
 
   let TableView, containerElementType;
   switch(layout) { 
@@ -40,7 +41,8 @@ export default function TableContainer({ id, layout, isDraggable }) {
       throw new Error(`Unknown layout type: ${layout}`);
   }
 
-  const isHover = table.id === hoverTableId;
+  const isHover = table.id === hoverTableId ||
+                  (hoverTableId === null && hoverOperationTableIds.includes(table.id));
 
   // TODO: does this cause a re-render?
   const selectedTables = useSelector(state => {
@@ -62,7 +64,8 @@ export default function TableContainer({ id, layout, isDraggable }) {
       isHover={isHover}
       isSelected={isSelected}
       isDraggable={isDraggable}
-      handleSelectedTable={handleSelectedTable}
+      handleTableSelected={handleTableSelected}
+      handleInitializeSchema={handleInitializeSchema}
     >
       <TableView
         parentId={id}    
@@ -74,7 +77,6 @@ export default function TableContainer({ id, layout, isDraggable }) {
         dateLastModified={table.dateLastModified}
         tags={table.tags}
         handleRemoveTable={handleRemoveTable}
-        handleSelectTable={handleSelectedTable}        
         handleRemoveOperation={handleRemoveOperation}
         handleSelectOperation={handleSelectedOperation}
         isSelected={isSelected}
@@ -94,14 +96,18 @@ export default function TableContainer({ id, layout, isDraggable }) {
     // ?
   }
 
-  function handleSelectedTable(dropTargetEventType) {
-    if (dropTargetEventType === DROP_TARGET_EVENT_INITIALIZE) {
-      return dispatch(createOperation({
-        operationType: OPERATION_TYPE_NO_OP,
-        children: [table.id],
-        parentId: null
-      }));
-    }
+  function handleTableSelected(operationType) {
+    return dispatch(addNewChildren({
+      operationType, 
+      children: [table.id]
+    }));
+  }
+
+  function handleInitializeSchema() {
+    return dispatch(createOperation({
+      operationType: OPERATION_TYPE_NO_OP,
+      children: [table.id],
+    }));
   }
 }
 
@@ -113,7 +119,8 @@ function ContainerComponent({
   isHover,
   isSelected,
   isDraggable,
-  handleSelectedTable,
+  handleInitializeSchema,
+  handleTableSelected,
 }) {
   const dispatch = useDispatch();
   let dragState = {isDragging:false}, dragRef, previewRef;
@@ -127,7 +134,15 @@ function ContainerComponent({
         const result = monitor.getDropResult();
         if (monitor.didDrop() && tableId === result.tableId) {
           // Table has dropped
-          handleSelectedTable(result.dropTargetEvent);
+          if (result.dropTargetEvent === DROP_TARGET_EVENT_INITIALIZE) { 
+            handleInitializeSchema();
+          } else if (result.dropTargetEvent === DROP_TARGET_EVENT_STACK) {
+            handleTableSelected(OPERATION_TYPE_STACK);
+          } else if (result.dropTargetEvent === DROP_TARGET_EVENT_PACK) {
+            handleTableSelected(OPERATION_TYPE_PACK);
+          } else {
+            throw new Error("unknown drop target");
+          }
         }
         setIsPressed(false);
       },

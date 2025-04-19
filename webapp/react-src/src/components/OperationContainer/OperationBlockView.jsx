@@ -9,10 +9,11 @@
  */
 
 import { Fragment } from "react";
-import { isOperation } from "../../data/slices/operationsSlice/Operation.js";
 import TableContainer, { TABLE_LAYOUT_BLOCK } from "../TableContainer/TableContainer.jsx";
-import { OPERATION_LAYOUT_BLOCK } from "./OperationContainer.jsx";
 import { CHILD_TYPE_OPERATION } from "../../data/slices/operationsSlice/Operation.js";
+import OperationContainer from "./OperationContainer.jsx";
+
+export const LAYOUT_ID = "block";
 
 export default function OperationBlockView({
     id, 
@@ -20,6 +21,7 @@ export default function OperationBlockView({
     operationType, 
     children,
     depth,
+    isFocused,
 }) {
     return (
         <>
@@ -29,7 +31,7 @@ export default function OperationBlockView({
                         (child.type === CHILD_TYPE_OPERATION)
                             ? <OperationContainer 
                                 id={child.id} 
-                                layout={OPERATION_LAYOUT_BLOCK}
+                                layout={LAYOUT_ID}
                             />
                             : <TableContainer 
                                 id={child.id}

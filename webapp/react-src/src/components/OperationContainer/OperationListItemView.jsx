@@ -1,28 +1,23 @@
 
-import { ListItemButton } from "@mui/material";
+import { ListItemButton, ListItemText } from "@mui/material";
+
+export const LAYOUT_ID = "operationListItem";
 
 export default function OperationListItemView({
     id,
     parentId,
     operationType,
     children,
-    maxColumns,
-    isFocused,
     depth,
-    handleOnHover,
-    handleOffHover,
-    handleOnFocus
+    isFocused
  }) {
     return (
         <ListItemButton 
             selected={isFocused}
-            onMouseEnter={handleOnHover}
-            onMouseLeave={handleOffHover}
-            onClick={handleOnFocus}
-    >
-        <ListItemText
-            primary={`${depth + 1}. ${operationType}`}
-        />
-    </ListItemButton>
+        >
+            <ListItemText
+                primary={`${depth}. ${operationType}`}
+            />
+        </ListItemButton>
     );
 }

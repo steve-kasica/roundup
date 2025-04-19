@@ -89,21 +89,3 @@
 //         return [];
 //     } 
 // };
-
-/**
- * Determines whether the specified table is currently being hovered 
- * over directly or indirectly via its parent operation.
- * 
- * @param {Object} state - The Redux state object
- * @param {string} tableId - The ID of the table to check
- * @returns {boolean} True if the table is being hovered over or 
- *  if the table is the child of an operation currently being hovered,
- *  false otherwise
- */
-// export const isTableHover = (state, tableId) => {
-//     const hoverTableId = getHoverTable(state);
-//     return (
-//         (hoverTableId === tableId) || 
-//         (hoverTableId === initialState.ui.hover.table && getHoverOperationTablesIds(state).includes(tableId))
-//     );
-// }

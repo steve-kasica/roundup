@@ -1,0 +1,11 @@
+
+@import "../../styles/variables.scss";
+
+.OperationsList {
+    .OperationView {
+        &:hover, &.hover {
+            background-color: $hover-color;
+        }
+    }
+}
+

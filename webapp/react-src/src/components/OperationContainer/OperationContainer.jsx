@@ -1,19 +1,17 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { getFocusedOperationId, getHoverOperationId, getOperationById } from '../../data/selectors';
+import { getFocusedOperationId, getHoverOperationId, getHoverTableId, getOperationById } from '../../data/selectors';
 import { unhoverOperation, hoverOperation, focusOperation } from '../../data/uiSlice';
-
+import { OPERATION_LAYOUT_LIST_ITEM, OPERATION_LAYOUT_BLOCK } from '.';
 // view layouts
 import OperationBlockView from './OperationBlockView';
 import OperationListItemView from './OperationListItemView';
-
-export const OPERATION_LAYOUT_BLOCK = 'block';
-export const OPERATION_LAYOUT_LIST_ITEM = 'list-item';
 
 export default function OperationContainer({ id, layout }) {
     const dispatch = useDispatch();
     const operation = useSelector(state => getOperationById(state, id));
     const focusedOperationId = useSelector(getFocusedOperationId);
     const hoverOperationId = useSelector(getHoverOperationId);
+    const hoverTableId = useSelector(getHoverTableId);
 
     let OperationView;
     switch(layout) {
@@ -29,8 +27,9 @@ export default function OperationContainer({ id, layout }) {
     }
 
     const isFocused = operation.id === focusedOperationId;
-    // const isHover = operation.id === hoverOperationId;
-    const isHover = false; // TODO: implement hover state
+    const isHover = operation.id === hoverOperationId ||
+                    (hoverOperationId === null && operation.children.some(child => child.id === hoverTableId));
+
     const className = [
         "OperationView",
         operation.operationType,
@@ -43,9 +42,9 @@ export default function OperationContainer({ id, layout }) {
         <div 
             className={className}
             data-id={id}
-            // onMouseEnter={handleOnMouseEnter}
-            // onMouseLeave={handleOnMouseLeave}
-            // onClick={handleOnClick}            
+            onMouseEnter={handleHoverOperation}
+            onMouseLeave={handleUnhoverOperation}
+            onClick={handleFocusOperation}            
         >
             <OperationView 
                 id={operation.id}
@@ -53,22 +52,20 @@ export default function OperationContainer({ id, layout }) {
                 operationType={operation.operationType}
                 children={operation.children}
                 depth={operation.depth}
+                isFocused={isFocused}
             />
         </div>
     );
 
-    function handleOnClick() {
-        console.log("OperationContainer clicked");
-        // dispatch(focusOperation(id));
+    function handleFocusOperation() {
+        dispatch(focusOperation(id));
     }
 
-    function handleOnMouseEnter() {
-        console.log("OperationContainer hovered");
-        // dispatch(hoverOperation(id));
+    function handleHoverOperation() {
+        dispatch(hoverOperation(id));
     }
 
-    function handleOnMouseLeave() {
-        console.log("OperationContainer unhovered");
-        // dispatch(unhoverOperation());
+    function handleUnhoverOperation() {
+        dispatch(unhoverOperation());
     }
 }

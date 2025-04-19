@@ -12,8 +12,7 @@ import { getMaxOperationDepth, getRootOperationId } from "../../data/selectors";
 import TableDropTarget, { DROP_TARGET_EVENT_INITIALIZE, DROP_TARGET_EVENT_PACK, DROP_TARGET_EVENT_STACK } from "./TableDropTarget";
 import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import OperationContainer from "../OperationContainer";
-import { OPERATION_LAYOUT_BLOCK } from "../OperationContainer/OperationContainer.jsx";
+import OperationContainer, { OPERATION_LAYOUT_BLOCK } from "../OperationContainer";
 import PlusIcon from "@mui/icons-material/Add";
 
 const gridColumns = 12;

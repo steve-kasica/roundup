@@ -23,13 +23,13 @@ export const getRootOperationId = ({operations}) => {
     return nullParentOperations[0].id;
 }
 
-export const getOperationById = ({operations}, operationId) => {
-    const operation = operations.entities[operationId];
+export const getOperationById = (state, operationId) => {
+    const operation = state.operations.entities[operationId];
     return operation;
 };
 
-export const getOperations = ({operations}) => {
-    return Object.values(operations.entities);
+export const getOperations = (state) => {
+    return Object.values(state.operations.entities);
 }
 
 export const getSelectedSourceTables = ({operations}) => {
@@ -39,4 +39,14 @@ export const getSelectedSourceTables = ({operations}) => {
     return Object.values(operations.entities)
         .filter(operation => operation.type === "table")
         .map(operation => operation.id);
+}
+
+export const getOperationTableIds = ((operation) => operation.children
+    .filter(child => child.type === "table")
+    .map(child => child.id)
+);
+
+export const getLastOperation = (state) => {
+    const operationId = state.operations.ids[state.operations.ids.length - 1];
+    return getOperationById(state, operationId);
 }

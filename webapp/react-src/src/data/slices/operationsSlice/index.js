@@ -7,7 +7,8 @@ export const {
     createOperation,
     removeOperation,
     updateOperation,
-    addChildrenToOperation,
+    addChildrenToLastOperation,
+    addNewChildren,
 } = slice.actions;
 
 export default slice.reducer;

@@ -1,31 +1,23 @@
-import { List, ListItemText, ListItemButton } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { focusOperation, hoverOperation, unhoverOperation } from "../../data/uiSlice";
-import { getHoverOperationId, getOperations } from "../../data/selectors";
+import { List } from "@mui/material";
+import { useSelector } from "react-redux";
+import { getOperations } from "../../data/selectors";
+import OperationContainer from "../OperationContainer/OperationContainer";
+import { OPERATION_LAYOUT_LIST_ITEM } from "../OperationContainer";
+
+import "./OperationsList.scss";
 
 export default function OperationsList() {
-    const dispatch = useDispatch();
-    const operations = useSelector(getOperations).map(operation => ({
-        ...operation
-    }));
+    const operations = useSelector(getOperations);
 
     return (
-        <>
-            <List dense>
-            {operations.map((op, i) => (
-                <ListItemButton 
-                    key={op.id}
-                    selected={op.isSelected}
-                    // onMouseEnter={() => dispatch(hoverOperation(op.id))}
-                    // onMouseLeave={() => dispatch(unhoverOperation())}
-                    // onClick={() => dispatch(focusOperation(op.id))}
-                >
-                    <ListItemText
-                        primary={`${i + 1}. ${op.operationType}`}
-                    />
-                </ListItemButton>
+        <List className="OperationsList" dense>
+            {operations.map(operation => (
+                <OperationContainer
+                    key={operation.id}
+                    id={operation.id}
+                    layout={OPERATION_LAYOUT_LIST_ITEM}
+                />
             ))}
-            </List>
-        </>
+        </List>
     );
 }

@@ -1,5 +1,6 @@
 
-import { getFocusedOperationId } from "./uiSelectors";
+import { getOperationById, getOperationTableIds } from "./operationsSelectors";
+import { getFocusedOperationId, getHoverOperationId } from "./uiSelectors";
 
 // TODO: memoize, if necessary
 export const getFocusedOperation = (state) => {
@@ -12,5 +13,18 @@ export const getFocusedOperation = (state) => {
             throw new Error("Node not found");
         }
         return operation;
+    }
+}
+
+export const getHoverOperationTableIds = (state) => {
+    const hoverOperationId = getHoverOperationId(state);;
+    if (hoverOperationId === null) {
+        return [];
+    } else {
+        const operation = getOperationById(state, hoverOperationId);
+        if (operation === undefined) {
+            throw new Error("Node not found");
+        }
+        return getOperationTableIds(operation);
     }
 }
