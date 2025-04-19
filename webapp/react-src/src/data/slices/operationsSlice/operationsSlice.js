@@ -28,7 +28,7 @@ const operationsSlice = createSlice({
                 operationType, 
                 parentId, 
                 depth, 
-                children.map(id => new Child(CHILD_TYPE_TABLE, id))
+                children.map(table => new Child(CHILD_TYPE_TABLE, table.id))
             );
             state.entities[operation.id] = operation;
             state.ids.push(operation.id);
@@ -73,24 +73,29 @@ const operationsSlice = createSlice({
                 state.entities[lastOperationId].operationType = operationType;
                 state.entities[lastOperationId].children = [
                     ...(state.entities[lastOperationId].children || []),
-                    ...children.map(id => new Child(CHILD_TYPE_TABLE, id)),                    
-                ]                
+                    ...children.map(table => new Child(CHILD_TYPE_TABLE, table.id)),                    
+                ]
             } else if (state.entities[lastOperationId].operationType === operationType) {
                 // Handle adding tables with operation
                 state.entities[lastOperationId].children = [
                     ...(state.entities[lastOperationId].children || []),
-                    ...children.map(id => new Child(CHILD_TYPE_TABLE, id)),                    
+                    ...children.map(table => new Child(CHILD_TYPE_TABLE, table.id)),                    
                 ]
             } else {
                 // Handle add tables with different operation type
                 const operation = new Operation(
                     operationType,
-                    lastOperationId,
-                    state.entities[lastOperationId].depth + 1,
-                    [children.map(id => new Child(CHILD_TYPE_TABLE, id))]
+                    null,
+                    state.entities[lastOperationId].depth,
+                    [
+                        new Child(CHILD_TYPE_OPERATION, lastOperationId),
+                        ...children.map(table => new Child(CHILD_TYPE_TABLE, table.id))
+                    ]
                 );
-                state.ids.push(operation.id);
+                state.entities[lastOperationId].parentId = operation.id;
+                state.entities[lastOperationId].depth++;                
                 state.entities[operation.id] = operation;
+                state.ids.push(operation.id);
             }
         },
         addChildrenToLastOperation(state, action) {

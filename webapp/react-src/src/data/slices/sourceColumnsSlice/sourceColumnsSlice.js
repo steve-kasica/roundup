@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {Column, getColumnId} from ".";
+import {Column, COLUMN_STATUS_VISABLE, getColumnId} from ".";
 
 const initialState = {
     entries: {},
@@ -12,20 +12,33 @@ const slice = createSlice({
     initialState,
     reducers: {
         // Action to trigger the saga
-        fetchMultipleRequest: (state) => {
-            state.loading = true;
-            state.error = null;
+        fetchSourceTableColumnsRequest: (state, action) => {
+            const {tableId, columnCount} = action.payload;
+            for (let i = 0; i < columnCount; i++) {
+                const columnId = getColumnId(tableId, i);
+                state.entries[columnId] = new Column(
+                    tableId,
+                    i,
+                    undefined,
+                    undefined,
+                    COLUMN_STATUS_LOADING
+                );
+            }
         },
-        fetchMultipleSuccess: (state) => {
-            state.loading = false;
-            state.error = null;
+        fetchSourceTableColumnsSuccess: (state) => {
+            const {tableId, response:columnsInfo} = action.payload;
+            columnsInfo.forEach((columnInfo, i) => {
+                const columnId = getColumnId(tableId, i);
+                state.entries[columnId].name = columnInfo.name;
+                state.entries[columnId].columnType = columnInfo.is_numeric ? "categorical" : "numeric";
+                state.entries[columnId].status = COLUMN_STATUS_VISABLE;
+                state.entries[columnId].error = null;
+            });
         },
-        fetchMultipleFailure: (state, action) => {
+        fetchSourceTablesColumnsFailure: (state, action) => {
             if (process.env.NODE_ENV === "development") {
                 console.error("Error fetching columns", action);                        
             }
-            state.loading = false;
-            state.error = action.payload;
         },
         fetchSingleRequest: (state, action) => {
             const {tableId, index} = action.payload;

@@ -99,14 +99,14 @@ export default function TableContainer({ id, layout, isDraggable }) {
   function handleTableSelected(operationType) {
     return dispatch(addNewChildren({
       operationType, 
-      children: [table.id]
+      children: [table]
     }));
   }
 
   function handleInitializeSchema() {
     return dispatch(createOperation({
       operationType: OPERATION_TYPE_NO_OP,
-      children: [table.id],
+      children: [table],
     }));
   }
 }

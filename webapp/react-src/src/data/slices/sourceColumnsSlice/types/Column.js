@@ -4,6 +4,7 @@ let idCounter = 0;
 export const COLUMN_STATUS_VISABLE = 'visable';
 export const COLUMN_STATUS_REMOVED = 'removed';
 export const COLUMN_STATUS_NULLED = 'nulled';
+export const COLUMN_STATUS_LOADING = 'loading';
 
 export const getColumnId = (tableId, index) => `${tableId}-${index}`;
 
@@ -37,5 +38,6 @@ export function Column(
         index,
         columnType,
         status,
+        error: null,
     }
 }

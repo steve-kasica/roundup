@@ -11,6 +11,10 @@ export const {
     fetchSingleSuccess,
     fetchSingleFailure,
 
+    fetchSourceTableColumnsRequest,
+    fetchSourceTableColumnsSuccess,
+    fetchSourceTablesColumnsFailure,
+
     renameColumnRequest,
     renameColumnSuccess,
     renameColumnFailure,

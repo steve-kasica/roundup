@@ -4,7 +4,7 @@
 import {all, call} from "redux-saga/effects"
 import getSourceTablesSaga from "./getSourceTablesSaga";
 import getMultipleSourceColumnsSaga from "./getMultipleSourceColumnsSaga";
-import getSingleSourceColumnsSaga, { watchTableAdded } from "./getSingleSourceColumnsSaga";
+import getSourceTableColumnsSaga, { watchTableAdded } from "./getSourceTableColumnsSaga";
 import renameColumnSaga from "./renameColumnSaga";
 import removeColumnSaga from "./removeColumnSaga";
 
@@ -12,7 +12,7 @@ export default function* rootSaga() {
     yield all([
         call(getSourceTablesSaga),
         // call(getMultipleSourceColumnsSaga),
-        call(getSingleSourceColumnsSaga),
+        call(getSourceTableColumnsSaga),
         call(watchTableAdded),
         // call(renameColumnSaga),
         call(removeColumnSaga)

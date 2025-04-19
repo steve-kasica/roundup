@@ -4,7 +4,7 @@ import { Typography, IconButton, Box, Divider } from "@mui/material"
 
 import ClosePopoverIcon from "@mui/icons-material/Close";  // aliased export
 
-import BarChart from "./Visualizations/BarChart"
+import BarChart from "../Visualizations/BarChart"
 import { ascending, descending, format, sum } from "d3";
 
 const formatPercent = format("0.2f");
