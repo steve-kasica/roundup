@@ -1,18 +1,13 @@
 import { useSelector } from "react-redux";
-import StackDetail from "./StackDetail/StackDetail";
-import PackDetail from "./PackDetail";
-import { getFocusedOperation } from "../../data/selectors";
-import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice";
+import { getFocusedOperationId } from "../../data/selectors";
+import OperationContainer from "../OperationContainer";
 
+export default function OperationDetail() {
+  const focusedOperationId = useSelector(getFocusedOperationId);
 
-export default function() {
-    const focusedOperation = useSelector(getFocusedOperation);
-
-    if (focusedOperation === null) {
-        return <div></div>;
-    } else if (focusedOperation.operationType === OPERATION_TYPE_STACK) {
-        return <StackDetail />;
-    } else {
-        return <PackDetail />;
-    }
+  if (focusedOperationId === null) {
+    return <div>No focused operations</div>;
+  } else {
+    return <OperationContainer id={focusedOperationId} layout="Detail" />;
+  }
 }

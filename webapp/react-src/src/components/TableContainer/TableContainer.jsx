@@ -35,7 +35,12 @@ export const TABLE_LAYOUT_BLOCK = "block";
 export const TABLE_LAYOUT_ROW = "row";
 export const TABLE_LAYOUT_LIST_ITEM = "list-item";
 
-export default function TableContainer({ id, layout, isDraggable }) {
+export default function TableContainer({
+  id,
+  layout,
+  isDraggable,
+  operationColumnCount,
+}) {
   const dispatch = useDispatch();
   const table = useSelector((state) => getTableById(state, id));
   // const columns = useSelector((state) => getColumnsByTableId(state, id));
@@ -98,6 +103,7 @@ export default function TableContainer({ id, layout, isDraggable }) {
         name={table.name}
         rowCount={table.rowCount}
         columnCount={table.columnCount}
+        operationColumnCount={operationColumnCount}
         dateCreated={table.dateCreated}
         dateLastModified={table.dateLastModified}
         tags={table.tags}

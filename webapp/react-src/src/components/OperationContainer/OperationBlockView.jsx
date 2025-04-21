@@ -36,6 +36,7 @@ export default function OperationBlockView({
             <TableContainer
               id={child.id}
               layout={TABLE_LAYOUT_BLOCK}
+              operationColumnCount={columnCount}
               isDraggable={false}
             />
           )}

@@ -19,6 +19,7 @@ export default function TableBlockView({
   name,
   rowCount,
   columnCount,
+  operationColumnCount,
   dateCreated,
   dateLastModified,
   tags,
@@ -61,7 +62,7 @@ export default function TableBlockView({
       <div className="label">
         {name} <span className="column-count">({columnCount})</span>
       </div>
-      {Array.from({ length: columnCount }, (_, columnIndex) => (
+      {Array.from({ length: operationColumnCount }, (_, columnIndex) => (
         <ColumnContainer
           key={`${id}-${columnIndex}`}
           tableId={id}

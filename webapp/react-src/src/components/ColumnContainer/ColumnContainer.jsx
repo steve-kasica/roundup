@@ -1,10 +1,11 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ColumnBlockView from "./ColumnBlockView";
 import ColumnTickView from "./ColumnTickView";
 import {
   getColumnByTableIndex,
   getHoverColumnIndex,
   getFocusedColumnId,
+  getHoverTableId,
 } from "../../data/selectors";
 
 import {
@@ -19,22 +20,22 @@ import {
 import { COLUMN_LAYOUT_BLOCK, COLUMN_LAYOUT_TICK } from ".";
 
 export default function ColumnContainer({ tableId, index, layout }) {
+  const dispatch = useDispatch();
   const column = useSelector((state) =>
     getColumnByTableIndex(state, tableId, index)
   );
 
-  if (column === undefined) {
-    throw new Error("Column is undefined");
-  }
-
-  const hoveredColumnIndex = useSelector(getHoverColumnIndex);
+  const hoverColumnIndex = useSelector(getHoverColumnIndex);
   const focusedColumnId = useSelector(getFocusedColumnId);
+  const hoverTableId = useSelector(getHoverTableId);
 
   const isNull = !column;
   const isSelected = false; // TODO: implement selection logic
-  const isHovered = hoveredColumnIndex === index; // TODO: implement more complex logic
+  const isHovered =
+    (hoverColumnIndex === index && hoverTableId === null) ||
+    (hoverColumnIndex === null && hoverTableId === tableId);
   const isFocused = column && column.id === focusedColumnId;
-  const isLoading = column.status === COLUMN_STATUS_LOADING;
+  const isLoading = !isNull && column.status === COLUMN_STATUS_LOADING;
 
   // Determine props based on null status
   const id = isNull ? getColumnId(tableId, index) : column.id;
@@ -98,13 +99,13 @@ export default function ColumnContainer({ tableId, index, layout }) {
   }
 
   function handleRemoveColumn() {
-    dispatch(
-      removeColumn({
-        tableId,
-        columnIndex: index,
-        columnName: name,
-      })
-    );
+    // dispatch(
+    //   removeColumn({
+    //     tableId,
+    //     columnIndex: index,
+    //     columnName: name,
+    //   })
+    // );
   }
 
   function handleRemoveColumnsAfter() {
@@ -112,7 +113,7 @@ export default function ColumnContainer({ tableId, index, layout }) {
   }
 
   function handleColumnUnfocus() {
-    dispatch(unfocusColumnId());
+    // dispatch(unfocusColumnId());
   }
 
   function handleColumnFocus() {

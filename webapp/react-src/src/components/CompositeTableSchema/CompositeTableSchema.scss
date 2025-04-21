@@ -239,8 +239,17 @@ $null-column-background: #ddd;
         }
       }
 
-      &.stack .table .ColumnView {
-        cursor: pointer;
+      // focused stack operation styles
+      &.stack {
+        pointer-events: none;
+        > .TableView {
+          pointer-events: none;
+          > .ColumnView {
+            pointer-events: all;
+            cursor: pointer;
+            border: 0.5px solid black;
+          }
+        }
       }
     }
   }

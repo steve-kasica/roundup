@@ -14,6 +14,7 @@ import { OPERATION_LAYOUT_LIST_ITEM, OPERATION_LAYOUT_BLOCK } from ".";
 // view layouts
 import OperationBlockView from "./OperationBlockView";
 import OperationListItemView from "./OperationListItemView";
+import StackDetailView from "../OperationDetail/StackDetail/StackDetailView";
 
 export default function OperationContainer({ id, layout }) {
   const dispatch = useDispatch();
@@ -29,6 +30,9 @@ export default function OperationContainer({ id, layout }) {
       break;
     case OPERATION_LAYOUT_LIST_ITEM:
       OperationView = OperationListItemView;
+      break;
+    case "Detail":
+      OperationView = StackDetailView;
       break;
     default:
       OperationView = OperationBlockView;
