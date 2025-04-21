@@ -1,7 +1,7 @@
 //
-
+@use "sass:color";
 // Interaction state color
 
-$hover-color: #EDC948;
-$selected-color: darken($hover-color, 10%);
-$focused-color: darken($hover-color, 20%);
+$hover-color: #edc948;
+$selected-color: color.adjust($hover-color, $lightness: -10%);
+$focused-color: color.adjust($hover-color, $lightness: -20%);

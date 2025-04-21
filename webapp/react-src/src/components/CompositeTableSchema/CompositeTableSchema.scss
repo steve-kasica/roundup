@@ -4,8 +4,10 @@
  * Styles for the Composite Table Schema.
  *
  */
-
-@import "../../styles/variables.scss";
+@use "sass:color";
+@use "sass:string";
+@use "sass:meta";
+@use "../../styles/variables.scss" as *;
 
 $operation-border-radius: 0px;
 $operation-padding: 0px;
@@ -16,14 +18,14 @@ $label-offset-top: 0px;
 $label-offset-left: 5px;
 
 // Stack background colors, max depth = 3
-$stack-0-color: #deebf7;
-$stack-1-color: #9ecae1;
-$stack-2-color: #3182bd;
+$stack-1-color: #deebf7;
+$stack-2-color: #9ecae1;
+$stack-3-color: #3182bd;
 
 // Pack background color, max depth = 3
-$pack-0-color: #e5f5e0;
-$pack-1-color: #a1d99b;
-$pack-2-color: #31a354;
+$pack-1-color: #e5f5e0;
+$pack-2-color: #a1d99b;
+$pack-3-color: #31a354;
 
 $table-height: 20px;
 $table-border-color: #000;
@@ -36,158 +38,210 @@ $label-font-family: sans-serif;
 $null-column-background: #ddd;
 
 @mixin background-color($color, $parent-color) {
-    background-color: $color;        
-    > .TableView {
-        background-color: inherit;
-        > .ColumnView { 
-            background-color: inherit; 
-            &.null { background-color: $null-column-background; }                
-            &.hover { background-color: $hover-color; }   
-            &.focused { background-color: $focused-color;}             
-        }
-                        
-        &.hover { 
-            background-color: $hover-color; 
-            > .ColumnView { background-color: inherit; }
-        }
+  background-color: $color;
+
+  $keyframe-name: "pulse-" + string.slice(#{meta.inspect($color)}, 2); // quick unique-ish name
+  @keyframes #{$keyframe-name} {
+    0% {
+      background-color: $color;
     }
+    50% {
+      background-color: color.adjust($color, $lightness: -10%);
+    }
+    100% {
+      background-color: $color;
+    }
+  }
+
+  > .TableView {
+    background-color: $color;
+    > .ColumnView {
+      background-color: $color;
+
+      &.loading {
+        // background-color: $color;
+        animation: #{$keyframe-name} 1s ease-in-out infinite;
+      }
+
+      &.null {
+        background-color: $null-column-background;
+      }
+      &.hover {
+        background-color: $hover-color;
+      }
+      &.focused {
+        background-color: $focused-color;
+      }
+    }
+
+    &.hover {
+      background-color: $hover-color;
+      > .ColumnView {
+        background-color: inherit;
+        animation: none;
+      }
+    }
+  }
 }
 
 .CompositeTableSchema {
-    text-align: left;
+  text-align: left;
 
-    .TableStack-empty {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 1px dashed #ddd;
-        color: #999;
-        min-height: 500px;
+  .TableStack-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #ddd;
+    color: #999;
+    min-height: 500px;
+  }
+
+  // Unfocused general operation styles
+  // -----------------------------------------------------------
+  .OperationView {
+    display: flex;
+    position: relative;
+    padding: $operation-padding;
+    overflow: hidden;
+    height: 100%;
+    border-style: $table-border-style;
+    border-width: $table-border-width;
+    border-color: $table-border-color;
+
+    > .TableView {
+      width: 100%;
+      height: inherit;
+      display: flex;
+      flex-direction: row;
+      position: relative;
+      flex-grow: 1;
+      flex-basis: inherit;
+      min-height: $table-height;
+      overflow: hidden; // prevent column divs from poking out of rounded corners
+
+      > .ColumnView {
+        pointer-events: none; // Disable mouse events when operation is not focused
+        flex-grow: 1; // set individual item width to fill available space
+        line-height: $table-height;
+
+        &.null {
+          cursor: default;
+        }
+      }
     }
 
-    // Unfocused general operation styles
+    .label {
+      position: absolute;
+      top: $label-offset-top;
+      left: $label-offset-left;
+      z-index: 1;
+      border: none !important;
+      line-height: $table-height;
+      pointer-events: none;
+      font-family: $label-font-family;
+      font-size: $label-font-size;
+      color: $label-text-color;
+    }
+
+    &.no-op {
+      flex-direction: column;
+      @include background-color(
+        $null-column-background,
+        $null-column-background
+      );
+    }
+
+    // Unfocused stack operation styles
     // -----------------------------------------------------------
-    .OperationView {
-        display: flex;
-        position: relative;
-        padding: $operation-padding;
-        overflow: hidden;
-        height: 100%;
+    &.stack {
+      flex-direction: column; // newly added tables go to bottom
+
+      &.depth-1 {
+        @include background-color($stack-1-color, #fff);
+      }
+      &.depth-2 {
+        @include background-color($stack-2-color, $pack-1-color);
+      }
+      &.depth-3 {
+        @include background-color($stack-3-color, $pack-2-color);
+      }
+
+      > .children > div {
+        border: none;
+        border-bottom-style: $table-border-style;
+        border-bottom-width: $table-border-width;
+        border-bottom-color: $table-border-color;
+        &:first-child {
+          // Top child of the stack
+          border-top: none;
+        }
+      }
+    }
+
+    // Unfocused pack operation styles
+    // -----------------------------------------------------------
+    &.pack {
+      flex-direction: row; // newly added tables go to right side
+
+      &.depth-1 {
+        @include background-color($pack-1-color, #fff);
+      }
+      &.depth-2 {
+        @include background-color($pack-2-color, $stack-1-color);
+      }
+      &.depth-3 {
+        @include background-color($pack-3-color, $stack-2-color);
+      }
+
+      > .children > div {
         border-style: $table-border-style;
         border-width: $table-border-width;
         border-color: $table-border-color;
-
-        > .TableView {
-            width: 100%;
-            height: inherit;
-            display: flex;
-            flex-direction: row;                
-            position: relative;
-            flex-grow: 1;
-            flex-basis: inherit;
-            min-height: $table-height;
-            overflow: hidden; // prevent column divs from poking out of rounded corners
-
-            > .ColumnView {
-                pointer-events: none;  // Disable mouse events when operation is not focused
-                flex-grow: 1;  // set individual item width to fill available space
-                line-height: $table-height;
-
-                &.null {
-                    cursor: default;
-                }
-            }
-        }
-        
-
-        .label {
-            position: absolute;
-            top: $label-offset-top;
-            left: $label-offset-left;
-            z-index: 1;
-            border: none !important;
-            line-height: $table-height;
-            pointer-events: none;
-            font-family: $label-font-family;
-            font-size: $label-font-size;
-            color: $label-text-color;
-        }
-
-        &.no-op {
-            flex-direction: column;
-            @include background-color($null-column-background, $null-column-background);
-        }
-
-        // Unfocused stack operation styles
-        // -----------------------------------------------------------
-        &.stack {
-            flex-direction: column; // newly added tables go to bottom
-    
-            &.depth-1 { @include background-color($stack-0-color, #fff); }
-            &.depth-2 { @include background-color($stack-1-color, $pack-0-color); }
-            &.depth-3 { @include background-color($stack-2-color, $pack-1-color); }
-
-            > .children > div {
-                border: none;
-                border-bottom-style: $table-border-style;
-                border-bottom-width: $table-border-width;
-                border-bottom-color: $table-border-color;
-                &:first-child {
-                    // Top child of the stack
-                    border-top: none;
-                }
-            }
-
-        }
-
-        // Unfocused pack operation styles
-        // -----------------------------------------------------------
-        &.pack {
-            flex-direction: row;  // newly added tables go to right side
-    
-            &.depth-1 { @include background-color($pack-0-color, $pack-0-color); }
-            &.depth-2 { @include background-color($pack-1-color, $stack-0-color); }
-            &.depth-3 { @include background-color($pack-2-color, $stack-1-color); }
-
-            > .children > div {
-                border-style: $table-border-style;
-                border-width: $table-border-width;                    
-                border-color: $table-border-color;
-            }
-        }
-
-        // Focused general operation styles
-        // -----------------------------------------------------------
-        &.focused {
-            cursor: default;            
-            > .label { display: none; }
-
-            > .children > .table .ColumnView {
-                pointer-events: all;  // Enable mouse events when operation is focused
-                border-right: 1px solid #bbb;
-                &:last-child { border-right: none; }
-            }
-
-            // Focused pack operation styles
-            // -----------------------------------------------------------
-            &.pack > div {
-                border-top-color: $selected-color;
-                border-left: none;
-                border-bottom-color: $selected-color;
-                border-right: none;
-
-                &:first-child {
-                    // right-most-child
-                    border-right-color: $selected-color;
-                }
-            }
-
-            > .operation {
-                > .label { display: block; }
-                > .table > .label { display: none; }
-            }
-
-            &.stack .table .ColumnView { cursor: pointer };
-        }
+      }
     }
+
+    // Focused general operation styles
+    // -----------------------------------------------------------
+    &.focused {
+      cursor: default;
+      > .label {
+        display: none;
+      }
+
+      > .children > .table .ColumnView {
+        pointer-events: all; // Enable mouse events when operation is focused
+        border-right: 1px solid #bbb;
+        &:last-child {
+          border-right: none;
+        }
+      }
+
+      // Focused pack operation styles
+      // -----------------------------------------------------------
+      &.pack > div {
+        border-top-color: $selected-color;
+        border-left: none;
+        border-bottom-color: $selected-color;
+        border-right: none;
+
+        &:first-child {
+          // right-most-child
+          border-right-color: $selected-color;
+        }
+      }
+
+      > .operation {
+        > .label {
+          display: block;
+        }
+        > .table > .label {
+          display: none;
+        }
+      }
+
+      &.stack .table .ColumnView {
+        cursor: pointer;
+      }
+    }
+  }
 }

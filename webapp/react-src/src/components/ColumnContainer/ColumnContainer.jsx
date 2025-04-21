@@ -1,124 +1,140 @@
-import { useSelector } from 'react-redux';
-import ColumnBlockView from './ColumnBlockView';
-import ColumnTickView from "./ColumnTickView"
-import { 
-    getColumnByTableIndex, 
-    getHoverColumnIndex, 
-    getFocusedColumnId 
-} from '../../data/selectors';
-
-import { getColumnId } from '../../data/slices/sourceColumnsSlice';
+import { useSelector } from "react-redux";
+import ColumnBlockView from "./ColumnBlockView";
+import ColumnTickView from "./ColumnTickView";
 import {
-    hoverColumnIndexInTable,
-    unhoverColumnIndexInTable
-} from '../../data/uiSlice';
+  getColumnByTableIndex,
+  getHoverColumnIndex,
+  getFocusedColumnId,
+} from "../../data/selectors";
 
-import { COLUMN_LAYOUT_BLOCK, COLUMN_LAYOUT_TICK } from '.';
+import {
+  COLUMN_STATUS_LOADING,
+  getColumnId,
+} from "../../data/slices/sourceColumnsSlice";
+import {
+  hoverColumnIndexInTable,
+  unhoverColumnIndexInTable,
+} from "../../data/uiSlice";
+
+import { COLUMN_LAYOUT_BLOCK, COLUMN_LAYOUT_TICK } from ".";
 
 export default function ColumnContainer({ tableId, index, layout }) {
-    const column = useSelector(state => getColumnByTableIndex(state, tableId, index));
-    const hoveredColumnIndex = useSelector(getHoverColumnIndex);
-    const focusedColumnId = useSelector(getFocusedColumnId);
+  const column = useSelector((state) =>
+    getColumnByTableIndex(state, tableId, index)
+  );
 
-    const isNull = !column;
-    const isSelected = false; // TODO: implement selection logic
-    const isHovered = hoveredColumnIndex === index;
-    const isFocused = column && column.id === focusedColumnId;
-    const isLoading = false; // TODO: implement loading logic
+  if (column === undefined) {
+    throw new Error("Column is undefined");
+  }
 
-    // Determine props based on null status
-    const id = isNull ? getColumnId(tableId, index) : column.id;
-    const name = isNull ? "null" : column.name;
-    const columnType = isNull ? "null" : column.columnType;
+  const hoveredColumnIndex = useSelector(getHoverColumnIndex);
+  const focusedColumnId = useSelector(getFocusedColumnId);
 
-    let ColumnView;
-    switch (layout) {
-        case COLUMN_LAYOUT_BLOCK:
-            ColumnView = ColumnBlockView;
-            break;
-        case COLUMN_LAYOUT_TICK:
-            ColumnView = ColumnTickView;
-            break;
-        default:
-            throw new Error(`Unsupported layout: ${layout}`);
-    }
+  const isNull = !column;
+  const isSelected = false; // TODO: implement selection logic
+  const isHovered = hoveredColumnIndex === index; // TODO: implement more complex logic
+  const isFocused = column && column.id === focusedColumnId;
+  const isLoading = column.status === COLUMN_STATUS_LOADING;
 
-    const className = [
-        "ColumnView",
-        (isLoading)     ? "loading"     : undefined,
-        (isNull)        ? "null"        : undefined,
-        (isHovered)     ? "hover"       : undefined,
-        (isSelected)    ? "selected"    : undefined,
-        (isFocused)     ? "focused"     : undefined,
-    ].filter(cn => cn).join(" ");
+  // Determine props based on null status
+  const id = isNull ? getColumnId(tableId, index) : column.id;
+  const name = isNull ? "null" : column.name;
+  const columnType = isNull ? "null" : column.columnType;
 
-    return (
-        <div 
-            className={className}
-            onClick={handleColumnFocus}
-            onMouseEnter={handleColumnHover}
-            onMouseLeave={handleColumnUnhover}
-        >
-            <ColumnView 
-                id={id}
-                tableId={tableId}
-                name={name}
-                index={index}
-                columnType={columnType}
-                isLoading={isLoading}
-                isSelected={isSelected}
-                isNull={isNull}
-                isHovered={isHovered}
-                isFocused={isFocused}
-                handleRemoveColumn={handleRemoveColumn}
-                handleColumnHover={handleColumnHover}
-                handleColumnUnhover={handleColumnUnhover}
-                handleColumnFocus={handleColumnFocus}
-                handleColumnUnfocus={handleColumnUnfocus}
-                handleRemoveColumnsAfter={handleRemoveColumnsAfter}
-                handleRenameColumn={handleRenameColumn}
-            />
-        </div>
+  let ColumnView;
+  switch (layout) {
+    case COLUMN_LAYOUT_BLOCK:
+      ColumnView = ColumnBlockView;
+      break;
+    case COLUMN_LAYOUT_TICK:
+      ColumnView = ColumnTickView;
+      break;
+    default:
+      throw new Error(`Unsupported layout: ${layout}`);
+  }
+
+  const className = [
+    "ColumnView",
+    isLoading ? "loading" : undefined,
+    isNull ? "null" : undefined,
+    isHovered ? "hover" : undefined,
+    isSelected ? "selected" : undefined,
+    isFocused ? "focused" : undefined,
+  ]
+    .filter((cn) => cn)
+    .join(" ");
+
+  return (
+    <div
+      className={className}
+      onClick={handleColumnFocus}
+      onMouseEnter={handleColumnHover}
+      onMouseLeave={handleColumnUnhover}
+    >
+      <ColumnView
+        id={id}
+        tableId={tableId}
+        name={name}
+        index={index}
+        columnType={columnType}
+        isLoading={isLoading}
+        isSelected={isSelected}
+        isNull={isNull}
+        isHovered={isHovered}
+        isFocused={isFocused}
+        handleRemoveColumn={handleRemoveColumn}
+        handleColumnHover={handleColumnHover}
+        handleColumnUnhover={handleColumnUnhover}
+        handleColumnFocus={handleColumnFocus}
+        handleColumnUnfocus={handleColumnUnfocus}
+        handleRemoveColumnsAfter={handleRemoveColumnsAfter}
+        handleRenameColumn={handleRenameColumn}
+      />
+    </div>
+  );
+
+  function handleRenameColumn() {
+    console.log("rename column");
+  }
+
+  function handleRemoveColumn() {
+    dispatch(
+      removeColumn({
+        tableId,
+        columnIndex: index,
+        columnName: name,
+      })
     );
+  }
 
-    function handleRenameColumn() {
-        console.log("rename column");
-    }
-    
-    function handleRemoveColumn() {
-        dispatch(removeColumn({
-            tableId, 
-            columnIndex: index,
-            columnName: name
-        }));
-    }
+  function handleRemoveColumnsAfter() {
+    // TODO: implement remove columns after
+  }
 
-    function handleRemoveColumnsAfter() {
-        // TODO: implement remove columns after
-    }
+  function handleColumnUnfocus() {
+    dispatch(unfocusColumnId());
+  }
 
-    function handleColumnUnfocus() { 
-        dispatch(unfocusColumnId());
-    }
+  function handleColumnFocus() {
+    // TODO: setup selected/focused UIs
+    // onClick={() => dispatch(setColumnProperty({
+    //     column,
+    //     property: "isSelected",
+    //     value: !isSelected
+    // }))}
+  }
 
-    function handleColumnFocus() {
-            // TODO: setup selected/focused UIs
-            // onClick={() => dispatch(setColumnProperty({
-            //     column,
-            //     property: "isSelected",
-            //     value: !isSelected
-            // }))}
-    }
-
-    function handleColumnHover() {
-        dispatch(hoverColumnIndexInTable({ 
-            tableId, 
-            columnIndex: index 
-        }));
-    }
-    function handleColumnUnhover() {
-        dispatch(unhoverColumnIndexInTable());
-    }
+  function handleColumnHover() {
+    dispatch(
+      hoverColumnIndexInTable({
+        tableId,
+        columnIndex: index,
+      })
+    );
+  }
+  function handleColumnUnhover() {
+    dispatch(unhoverColumnIndexInTable());
+  }
 }
 
 /* 
@@ -132,27 +148,3 @@ export const isColumnHover = (state, column) => {
     );    
 }
 */
- 
-
-/**
- *     const dispatch = useDispatch();
-    // TODO: this kind of loading and error handling 
-    // should happen at the TableView level
-    // const {isLoading, data, error} = useSelector(({sourceColumns}) => {
-    //     const tableColumns = sourceColumns.data[tableId];
-    //     if (tableColumns) {
-    //         const {loading:isLoading, columns, error} = tableColumns;
-    //         return {
-    //             isLoading,
-    //             data: columns[columnIndex] ?? null,
-    //             error
-    //         };            
-    //     } else {
-    //         return {
-    //             isLoading: true,
-    //             data: null,
-    //             error: null
-    //         }
-    //     }
-    // }, shallowEqual);
- */

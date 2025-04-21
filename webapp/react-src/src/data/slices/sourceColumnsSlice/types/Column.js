@@ -29,7 +29,7 @@ export function Column(
     } else if (index === undefined) {
         throw new Error("Param undefined, `index`");
     }
-    const id = getColumnId(tableId, index);
+    const id = getColumnId(parentId, index);
 
     return {
         id,

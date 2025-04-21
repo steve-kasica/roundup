@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {Column, COLUMN_STATUS_VISABLE, getColumnId} from ".";
+import {Column, COLUMN_STATUS_LOADING, COLUMN_STATUS_VISABLE, getColumnId} from ".";
 
 const initialState = {
     entries: {},
@@ -25,7 +25,7 @@ const slice = createSlice({
                 );
             }
         },
-        fetchSourceTableColumnsSuccess: (state) => {
+        fetchSourceTableColumnsSuccess: (state, action) => {
             const {tableId, response:columnsInfo} = action.payload;
             columnsInfo.forEach((columnInfo, i) => {
                 const columnId = getColumnId(tableId, i);

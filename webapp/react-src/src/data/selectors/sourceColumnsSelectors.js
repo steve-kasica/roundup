@@ -1,31 +1,35 @@
-import { createSelector } from 'reselect';
+import { createSelector } from "reselect";
 import { getColumnId } from "../slices/sourceColumnsSlice";
 
 export const getColumnByTableIndex = (state, tableId, index) => {
-    const columnId = getColumnId(tableId, index);
-    const column = state.sourceColumns.entries[columnId];
-    return column;
+  const columnId = getColumnId(tableId, index);
+  const column = state.sourceColumns.entries[columnId];
+  return column;
+};
+
+export function getColumnsByTableId(state, tableId) {
+  const columns = Object.values(state.sourceColumns).filter(
+    (column) => column.tableId === tableId
+  );
+  return columns;
 }
 
 /**
- * 
+ *
  */
 export const getColumnById = createSelector(
-    [
-        state => state.sourceColumns.data,
-        (_, tableId) => tableId,
-        (_, columnId) => columnId
-    ],
-    (columnsRequest, tableId, columnId) => columnsRequest[tableId].columns
-        .find(({id}) => id === columnId)
+  [
+    (state) => state.sourceColumns.data,
+    (_, tableId) => tableId,
+    (_, columnId) => columnId,
+  ],
+  (columnsRequest, tableId, columnId) =>
+    columnsRequest[tableId].columns.find(({ id }) => id === columnId)
 );
 
-export const getColumnsByTableId = createSelector(
-    [
-        state => state.sourceColumns.data,
-        (_, node) => node.data.tableId,
-    ],
-    (columnData, tableId) => {
-        return null;
-    }
-);
+// export const getColumnsByTableId = createSelector(
+//   [(state) => state.sourceColumns.data, (_, node) => node.data.tableId],
+//   (columnData, tableId) => {
+//     return null;
+//   }
+// );
