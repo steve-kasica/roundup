@@ -65,7 +65,7 @@ export default function StackDetailView({ id }) {
               onMouseEnter={() => dispatch(hoverTable(child.id))}
               onMouseLeave={() => dispatch(unhoverTable())}
             >
-              {child.id}
+              {child.name}
             </div>
           ))}
         </div>

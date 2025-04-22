@@ -237,7 +237,7 @@ export default function ColumnBlockView({
               closePopover();
             }}
           >
-            Null column {position} in {tableId}
+            Null column at {position}
           </ListItemButton>
           <ListItemButton
             disabled={isNull} // can't rename null columns
