@@ -96,7 +96,7 @@ const slice = createSlice({
         delete state.entries[id];
         state.columnsByTable[column.parentId] = state.columnsByTable[
           column.parentId
-        ].filter((c) => c.id !== id);
+        ].filter((cid) => cid !== id);
       }
     },
     /**

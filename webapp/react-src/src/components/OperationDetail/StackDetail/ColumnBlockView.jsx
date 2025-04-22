@@ -12,7 +12,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
-import { renameColumnRequest } from "../../../data/slices/sourceColumnsSlice";
+import {
+  removeColumnRequest,
+  renameColumnRequest,
+} from "../../../data/slices/sourceColumnsSlice";
 import { drag, select, selectAll } from "d3";
 import {
   focusColumn,
@@ -42,14 +45,13 @@ const OVERLAP_THRESHOLD = 0.5; // percent
 // export default function({ tableId, columnId, position, tableName, columnCount }) {
 export default function ColumnBlockView({
   column,
-  handleRemoveColumn,
   handleRemoveColumnsAfter,
   handleRenameColumn,
 }) {
   const dispatch = useDispatch();
   const isNull = !column;
   const id = isNull ? "" : column.id;
-  const tableId = isNull ? "" : column.tableId;
+  const tableId = isNull ? "" : column.parentId;
   const name = isNull ? "null" : column.name;
   const index = isNull ? 0 : column.index;
   // const isLastInTable = (position === columnCount);
@@ -203,8 +205,15 @@ export default function ColumnBlockView({
       >
         <List>
           <ListItemButton
+            disabled={isNull} // can't remove null column
             onClick={() => {
-              handleRemoveColumn();
+              dispatch(
+                removeColumnRequest({
+                  tableId,
+                  id,
+                  name,
+                })
+              );
               closePopover();
             }}
           >

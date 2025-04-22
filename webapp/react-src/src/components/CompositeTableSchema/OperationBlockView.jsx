@@ -14,7 +14,6 @@ import { TableContainer, OperationContainer } from "../Containers";
 import TableBlockView from "./TableBlockView";
 
 export default function OperationBlockView({ operation, columnCount }) {
-  console.log(columnCount);
   return (
     <>
       {operation.children.map((child) => (

@@ -6,8 +6,6 @@ import {
 } from "../slices/sourceColumnsSlice";
 import OpenRefine from "../../services/open-refine";
 import { decrementColumnCount } from "../slices/sourceTablesSlice";
-import { useSelector } from "react-redux";
-import { getTableById } from "../selectors";
 
 export default function* removeColumnSaga() {
   yield takeLatest(removeColumnRequest.type, removeColumnSagaWorker);

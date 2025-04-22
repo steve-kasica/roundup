@@ -1,13 +1,18 @@
+import { memo } from "react";
 import { getColumnIdsByTableId } from "../../data/selectors";
 import { ColumnContainer } from "../Containers";
 import { useSelector } from "react-redux";
 
 const nbsp = "\u00A0";
 
-export default function ColumnTicksContainer({ tableId, ticksCount }) {
+const ColumnTicksContainer = memo(function ColumnTicksContainer({
+  tableId,
+  ticksCount,
+}) {
   const columnIds = useSelector((state) =>
     getColumnIdsByTableId(state, tableId)
   );
+  console.log("columnIds", columnIds);
   const ticks = Array.from({ length: ticksCount }, (_, i) =>
     i < columnIds.length ? columnIds[i] : null
   );
@@ -21,4 +26,6 @@ export default function ColumnTicksContainer({ tableId, ticksCount }) {
       ))}
     </>
   );
-}
+});
+
+export default ColumnTicksContainer;
