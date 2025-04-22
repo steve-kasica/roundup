@@ -62,12 +62,11 @@ $null-column-background: #ddd;
         // background-color: $color;
         animation: #{$keyframe-name} 1s ease-in-out infinite;
       }
-
-      &.null {
-        background-color: $null-column-background;
-      }
       &.hover {
         background-color: $hover-color;
+      }
+      &.null {
+        background-color: $null-column-background;
       }
       &.focused {
         background-color: $focused-color;
@@ -79,6 +78,9 @@ $null-column-background: #ddd;
       > .ColumnView {
         background-color: inherit;
         animation: none;
+        &.null {
+          background-color: $null-column-background;
+        }
       }
     }
   }

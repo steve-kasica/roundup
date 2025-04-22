@@ -1,4 +1,4 @@
-import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
+import { DragIndicator } from "@mui/icons-material";
 import {
   Chip,
   ListItem,
@@ -9,23 +9,12 @@ import {
 import HighlightText from "../../ui/HighlightText";
 import { formatNumber } from "../../../lib/utilities/formaters";
 
-export default function ({
-  parentId,
-  id,
-  name,
-  rowCount,
-  columnCount,
-  dateCreated,
-  dateLastModified,
-  tags,
-  handleRemoveTable,
-  handleSelectTable,
-  handleRemoveOperation,
-  handleSelectOperation,
-  isSelected,
+export default function TableListItemView({
+  table,
   isDisabled = false,
   searchString = "",
 }) {
+  const { name, rowCount, columnCount, tags } = table;
   return (
     <ListItem
       // TODO: add context menu
@@ -33,7 +22,7 @@ export default function ({
       disablePadding
     >
       <ListItemIcon>
-        {isSelected ? <CheckBox /> : <CheckBoxOutlineBlank />}
+        <DragIndicator />
       </ListItemIcon>
       <ListItemText
         primary={
