@@ -1,27 +1,27 @@
-import slice from "./sourceColumnsSlice.js"
+import slice from "./sourceColumnsSlice.js";
 
 export * from "./types";
 
 export const {
-    fetchMultipleRequest, 
-    fetchMultipleSuccess, 
-    fetchMultipleFailure,
-    
-    fetchSingleRequest,
-    fetchSingleSuccess,
-    fetchSingleFailure,
+  fetchMultipleRequest,
+  fetchMultipleSuccess,
+  fetchMultipleFailure,
 
-    fetchSourceTableColumnsRequest,
-    fetchSourceTableColumnsSuccess,
-    fetchSourceTablesColumnsFailure,
+  fetchSingleRequest,
+  fetchSingleSuccess,
+  fetchSingleFailure,
 
-    renameColumnRequest,
-    renameColumnSuccess,
-    renameColumnFailure,
+  fetchSourceTableColumnsRequest,
+  fetchSourceTableColumnsSuccess,
+  fetchSourceTableColumnsFailure,
 
-    removeColumnRequest,
-    removeColumnSuccess,
-    removeColumnFailure
+  renameColumnRequest,
+  renameColumnSuccess,
+  renameColumnFailure,
+
+  removeColumnRequest,
+  removeColumnSuccess,
+  removeColumnFailure,
 } = slice.actions;
 
 export default slice.reducer;

@@ -6,9 +6,12 @@ import {
   unhoverTable,
   unhoverColumnIndex,
 } from "../../../data/uiSlice";
-import { getChildrenData } from "../../../data/selectors";
-import { isSourceTable } from "../../../data/slices/sourceTablesSlice";
-import ColumnContainer, { COLUMN_LAYOUT_BLOCK } from "../../ColumnContainer";
+import {
+  getOperationColumnIds,
+  getTablesByOperationId,
+} from "../../../data/selectors";
+import { ColumnContainer } from "../../Containers";
+import ColumnBlockView from "./ColumnBlockView";
 
 import "./StackDetail.scss";
 
@@ -16,22 +19,37 @@ const yAxisLabel = "table name";
 const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
-export default function StackDetailView({
-  id,
-  parentId,
-  operationType,
-  children,
-  depth,
-  columnCount,
-  isFocused,
-}) {
+function transposeAndBackfill(matrix) {
+  const maxLength = Math.max(...matrix.map((row) => row.length));
+
+  const transposed = [];
+
+  for (let col = 0; col < maxLength; col++) {
+    const newRow = matrix.map((row) =>
+      row[col] !== undefined ? row[col] : null
+    );
+    transposed.push(newRow);
+  }
+
+  return transposed;
+}
+
+export default function StackDetailView({ id }) {
   const dispatch = useDispatch();
-  const width = columnCount * cellSize;
+
+  const tables = useSelector((state) => getTablesByOperationId(state, id));
+  const columnIdsByTable = useSelector((state) =>
+    getOperationColumnIds(state, id)
+  );
+  const columnIdsByIndex = transposeAndBackfill(columnIdsByTable);
+
+  const maxColumnCount = Math.max(...columnIdsByTable.map((c) => c.length));
+  const width = maxColumnCount * cellSize;
   const xScale = scaleBand(
-    Array.from({ length: columnCount }, (_, i) => i),
+    Array.from({ length: maxColumnCount }, (_, i) => i),
     [0, width]
   );
-  const childrenData = useSelector((state) => getChildrenData(state, children));
+
   return (
     <div className="StackDetail">
       <div className="left-panel">
@@ -39,7 +57,8 @@ export default function StackDetailView({
           <span>{yAxisLabel}</span>
         </div>
         <div className="ticks">
-          {children.map((child) => (
+          {tables.map((child) => (
+            // TODO: what if child is an operation?
             <div
               key={child.id}
               className="tick"
@@ -63,20 +82,11 @@ export default function StackDetailView({
               >
                 <label>{j + 1}</label>
               </div>
-              {childrenData.map((childData) => {
-                if (isSourceTable(childData)) {
-                  return (
-                    <ColumnContainer
-                      key={`${childData.id}-${j}`}
-                      tableId={childData.id}
-                      index={j}
-                      layout={COLUMN_LAYOUT_BLOCK}
-                    />
-                  );
-                } else {
-                  // child is an operation
-                }
-              })}
+              {columnIdsByIndex[j].map((columnId) => (
+                <ColumnContainer key={columnId} id={columnId}>
+                  <ColumnBlockView />
+                </ColumnContainer>
+              ))}
             </form>
           ))}
         </div>

@@ -4,32 +4,20 @@
  * A visual representation of **source table** data in the
  * **Table Tree**.
  */
-import { Menu, MenuItem } from "@mui/material";
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { isMouseOverElement } from "../../lib/utilities/dom.js";
-import ColumnContainer, {
-  COLUMN_LAYOUT_BLOCK,
-  COLUMN_LAYOUT_TICK,
-} from "../ColumnContainer";
+import ColumnTicksContainer from "./ColumnTicksContainer.jsx";
 
 // export default function({node, parentOperation, columnCount}) {
 export default function TableBlockView({
-  id,
-  name,
-  rowCount,
-  columnCount,
-  operationColumnCount,
-  dateCreated,
-  dateLastModified,
-  tags,
-  isHovered,
-  handleOnHover,
-  handleOffHover,
+  table,
   handleRemoveTable,
   handleRemoveOperation,
   handleSelectOperation,
+  operationColumnCount,
 }) {
+  const { id, name, columnCount } = table;
   const dispatch = useDispatch();
   const [contextMenu, setContextMenu] = useState(null);
   const tableRef = useRef();
@@ -38,20 +26,23 @@ export default function TableBlockView({
     {
       label: `Remove ${name}`,
       isVisable: true,
-      onClick: handleRemoveTable,
+      onClick: () => {
+        console.log("remove table");
+      },
     },
     {
       label: "Remove operation",
       isVisable: true,
-      onClick: handleRemoveOperation,
+      onClick: () => {
+        console.log("remove operation");
+      },
     },
-    {
-      label: "Select operation",
-      isVisable: false,
-      onClick: handleSelectOperation,
-    },
+    // {
+    //   label: "Select operation",
+    //   isVisable: false,
+    //   onClick: handleSelectOperation,
+    // },
   ];
-
   return (
     <>
       {/* <div 
@@ -62,16 +53,7 @@ export default function TableBlockView({
       <div className="label">
         {name} <span className="column-count">({columnCount})</span>
       </div>
-      {Array.from({ length: operationColumnCount }, (_, columnIndex) => (
-        <ColumnContainer
-          key={`${id}-${columnIndex}`}
-          tableId={id}
-          index={columnIndex}
-          layout={COLUMN_LAYOUT_TICK}
-        />
-      ))}
-      {/* </div> */}
-
+      <ColumnTicksContainer tableId={id} ticksCount={operationColumnCount} />
       {/* <Menu
                 open={contextMenu !== null}
                 onClose={closeMenu}

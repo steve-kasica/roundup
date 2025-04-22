@@ -1,43 +1,43 @@
+import { Children, cloneElement } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getFocusedOperationId,
   getHoverOperationId,
   getHoverTableId,
   getOperationById,
+  getOperationColumnCount,
 } from "../../data/selectors";
 import {
   unhoverOperation,
   hoverOperation,
   focusOperation,
 } from "../../data/uiSlice";
-import { OPERATION_LAYOUT_LIST_ITEM, OPERATION_LAYOUT_BLOCK } from ".";
-// view layouts
-import OperationBlockView from "./OperationBlockView";
-import OperationListItemView from "./OperationListItemView";
-import StackDetailView from "../OperationDetail/StackDetail/StackDetailView";
 
-export default function OperationContainer({ id, layout }) {
+export function OperationContainer({ id, children }) {
   const dispatch = useDispatch();
   const operation = useSelector((state) => getOperationById(state, id));
   const focusedOperationId = useSelector(getFocusedOperationId);
   const hoverOperationId = useSelector(getHoverOperationId);
   const hoverTableId = useSelector(getHoverTableId);
+  const columnCount = useSelector((state) =>
+    getOperationColumnCount(state, id)
+  );
 
-  let OperationView;
-  switch (layout) {
-    case OPERATION_LAYOUT_BLOCK:
-      OperationView = OperationBlockView;
-      break;
-    case OPERATION_LAYOUT_LIST_ITEM:
-      OperationView = OperationListItemView;
-      break;
-    case "Detail":
-      OperationView = StackDetailView;
-      break;
-    default:
-      OperationView = OperationBlockView;
-      break;
-  }
+  // let OperationView;
+  // switch (layout) {
+  //   case OPERATION_LAYOUT_BLOCK:
+  //     OperationView = OperationBlockView;
+  //     break;
+  //   case OPERATION_LAYOUT_LIST_ITEM:
+  //     OperationView = OperationListItemView;
+  //     break;
+  //   case "Detail":
+  //     OperationView = StackDetailView;
+  //     break;
+  //   default:
+  //     OperationView = OperationBlockView;
+  //     break;
+  // }
 
   const isFocused = operation.id === focusedOperationId;
   const isHover =
@@ -55,6 +55,13 @@ export default function OperationContainer({ id, layout }) {
     .filter((name) => name)
     .join(" ");
 
+  const enhancedChildren = Children.map(children, (child) =>
+    cloneElement(child, {
+      operation,
+      columnCount,
+    })
+  );
+
   return (
     <div
       className={className}
@@ -63,15 +70,16 @@ export default function OperationContainer({ id, layout }) {
       onMouseLeave={handleUnhoverOperation}
       onClick={handleFocusOperation}
     >
-      <OperationView
+      {/* <OperationView
         id={operation.id}
         parentId={operation.parentId}
         operationType={operation.operationType}
         children={operation.children}
-        columnCount={operation.columnCount}
+        columnCount={columnCount}
         depth={operation.depth}
         isFocused={isFocused}
-      />
+      /> */}
+      {enhancedChildren}
     </div>
   );
 

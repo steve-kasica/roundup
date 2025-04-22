@@ -1,35 +1,22 @@
-import { createSelector } from "reselect";
-import { getColumnId } from "../slices/sourceColumnsSlice";
-
 export const getColumnByTableIndex = (state, tableId, index) => {
-  const columnId = getColumnId(tableId, index);
-  const column = state.sourceColumns.entries[columnId];
-  return column;
+  return Object.values(state.sourceColumns).find(
+    (column) => column.parentId === tableId && column.index === index
+  );
 };
 
 export function getColumnsByTableId(state, tableId) {
   const columns = Object.values(state.sourceColumns).filter(
-    (column) => column.tableId === tableId
+    (column) => column.parentId === tableId
   );
   return columns;
 }
 
-/**
- *
- */
-export const getColumnById = createSelector(
-  [
-    (state) => state.sourceColumns.data,
-    (_, tableId) => tableId,
-    (_, columnId) => columnId,
-  ],
-  (columnsRequest, tableId, columnId) =>
-    columnsRequest[tableId].columns.find(({ id }) => id === columnId)
-);
+// TODO: maybe this slice should cache a map of column Ids to table Ids
+export function getColumnIdsByTableId(state, tableId) {
+  return state.sourceColumns.columnsByTable[tableId];
+}
 
-// export const getColumnsByTableId = createSelector(
-//   [(state) => state.sourceColumns.data, (_, node) => node.data.tableId],
-//   (columnData, tableId) => {
-//     return null;
-//   }
-// );
+export function getColumnById(state, id) {
+  const column = state.sourceColumns.entries[id];
+  return column;
+}

@@ -1,23 +1,32 @@
 import { takeLatest, put, call } from "redux-saga/effects";
-import { 
-    removeColumnRequest as request, 
-    removeColumnSuccess as success, 
-    removeColumnFailure as failure 
+import {
+  removeColumnRequest,
+  removeColumnSuccess,
+  removeColumnFailure,
 } from "../slices/sourceColumnsSlice";
 import OpenRefine from "../../services/open-refine";
+import { decrementColumnCount } from "../slices/sourceTablesSlice";
+import { useSelector } from "react-redux";
+import { getTableById } from "../selectors";
 
-export default function* removeColumnSaga(action) { 
-    yield takeLatest(request.type, removeColumnSagaWorker);
-};
+export default function* removeColumnSaga() {
+  yield takeLatest(removeColumnRequest.type, removeColumnSagaWorker);
+}
 
 function* removeColumnSagaWorker(action) {
-    const {projectId, columnIndex, columnName} = action.payload;
+  const { tableId: projectId, id, name } = action.payload;
+
+  try {
+    // Call the OpenRefine API
     const csrf_token = "csrf_token"; // TODO: get this from the OpenRefine API
-    try {
-        // Call the OpenRefine API
-        yield call(OpenRefine.removeColumn, projectId, columnName, csrf_token);
-        yield put(success({ projectId, columnIndex }));
-    } catch (error) {
-        yield put(failure({ projectId, columnIndex, error }));
-    }
+    yield call(OpenRefine.removeColumn, projectId, name, csrf_token);
+
+    // Remove column from source columns slice
+    yield put(removeColumnSuccess({ id }));
+
+    // Update column count of associated table
+    yield put(decrementColumnCount({ projectId }));
+  } catch (error) {
+    yield put(removeColumnFailure({ id, error }));
+  }
 }

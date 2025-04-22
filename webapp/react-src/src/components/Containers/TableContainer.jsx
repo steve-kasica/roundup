@@ -1,0 +1,156 @@
+import { Children, cloneElement, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { DragPreviewImage, useDrag } from "react-dnd";
+import tableIconImage from "../../../public/images/table-icon.png";
+import {
+  DROP_TARGET_EVENT_INITIALIZE,
+  DROP_TARGET_EVENT_PACK,
+  DROP_TARGET_EVENT_STACK,
+} from "../CompositeTableSchema/TableDropTarget";
+import {
+  OPERATION_TYPE_NO_OP,
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
+} from "../../data/slices/operationsSlice";
+import {
+  getHoverTableId,
+  getTableById,
+  getHoverOperationTableIds,
+  getColumnsByTableId,
+  getColumnIdsByTableId,
+} from "../../data/selectors";
+import { sourceTableSelected } from "../../data/actions";
+import { hoverTable, unhoverTable } from "../../data/uiSlice";
+import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
+import { CHILD_TYPE_TABLE } from "../../data/slices/operationsSlice";
+
+export function TableContainer({
+  id,
+  as: Component = "div",
+  operationColumnCount,
+  isDraggable = false,
+  children,
+}) {
+  const dispatch = useDispatch();
+  const table = useSelector((state) => getTableById(state, id));
+  const hoverTableId = useSelector(getHoverTableId);
+  const hoverOperationTableIds = useSelector(getHoverOperationTableIds);
+
+  const isHover =
+    table.id === hoverTableId ||
+    (hoverTableId === null && hoverOperationTableIds.includes(table.id));
+
+  // TODO: does this cause a re-render?
+  const selectedTables = useSelector((state) => {
+    if (Object.keys(state.operations.entities).length === 0) {
+      return [];
+    }
+    return Object.values(state.operations.entities)
+      .map((operation) => {
+        return operation.children
+          .filter((child) => child.type === CHILD_TYPE_TABLE)
+          .map((child) => child.id);
+      })
+      .flat();
+  });
+  const isSelected = selectedTables.includes(table.id);
+  const isDisabled = false;
+  const [isPressed, setIsPressed] = useState(false);
+
+  const [{ isDragging }, dragRef, previewRef] = useDrag(
+    () => ({
+      type: SourceTable,
+      item: { tableId: id },
+      canDrag: isDraggable,
+      end: (item, monitor) => {
+        const result = monitor.getDropResult();
+        if (monitor.didDrop() && id === result.tableId) {
+          // Table has dropped
+          let operationType;
+          switch (result.dropTargetEvent) {
+            case DROP_TARGET_EVENT_INITIALIZE:
+              operationType = OPERATION_TYPE_NO_OP;
+              break;
+            case DROP_TARGET_EVENT_PACK:
+              operationType = OPERATION_TYPE_PACK;
+              break;
+            case DROP_TARGET_EVENT_STACK:
+              operationType = OPERATION_TYPE_STACK;
+              break;
+            default:
+              throw new Error("Unknown drop target event");
+          }
+          handleTableSelected(operationType);
+        }
+        setIsPressed(false);
+      },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+    }),
+    [id]
+  );
+
+  const className = [
+    "TableView",
+    isHover ? "hover" : undefined,
+    isSelected ? "selected" : undefined,
+    isDisabled ? "disabled" : undefined,
+    isDragging ? "dragging" : undefined,
+    isPressed ? "pressed" : undefined,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const enhancedChildren = Children.map(children, (child) =>
+    cloneElement(child, {
+      table,
+      operationColumnCount,
+      handleRemoveTable,
+      handleRemoveOperation,
+      handleSelectedOperation,
+    })
+  );
+
+  return (
+    <Component
+      ref={dragRef}
+      className={className}
+      data-id={id}
+      onMouseEnter={handleTableHover}
+      onMouseLeave={handleTableUnhover}
+    >
+      <DragPreviewImage connect={previewRef} src={tableIconImage} />
+      {enhancedChildren}
+    </Component>
+  );
+
+  function handleTableHover() {
+    return dispatch(hoverTable(table.id));
+  }
+
+  function handleTableUnhover() {
+    return dispatch(unhoverTable());
+  }
+
+  function handleRemoveTable() {
+    // return dispatch(removeTable(table.id));
+  }
+
+  function handleRemoveOperation() {
+    // return dispatch(removeOperation(table.parentId));
+  }
+
+  function handleSelectedOperation() {
+    // ?
+  }
+
+  function handleTableSelected(operationType) {
+    dispatch(
+      sourceTableSelected({
+        operationType,
+        table,
+      })
+    );
+  }
+}

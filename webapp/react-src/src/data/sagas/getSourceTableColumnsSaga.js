@@ -9,7 +9,7 @@ import { put, takeEvery } from "redux-saga/effects";
 import {
   fetchSourceTableColumnsRequest,
   fetchSourceTableColumnsSuccess,
-  fetchSourceTablesColumnsFailure,
+  fetchSourceTableColumnsFailure,
 } from "../slices/sourceColumnsSlice";
 import OpenRefineAPI from "../../services/open-refine";
 import {
@@ -63,8 +63,6 @@ function* sourceTableColumnsSagaWorker(action) {
     // Call the OpenRefine API
     const response = yield OpenRefineAPI.getColumnsInfo(tableId);
 
-    console.log(response);
-
     // Dispatch success action for column info request
     yield put(
       fetchSourceTableColumnsSuccess({
@@ -75,7 +73,7 @@ function* sourceTableColumnsSagaWorker(action) {
   } catch (error) {
     // Dispatch failure action
     yield put(
-      fetchSourceTablesColumnsFailure({
+      fetchSourceTableColumnsFailure({
         tableId,
         error,
       })

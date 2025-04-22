@@ -9,36 +9,28 @@
  */
 
 import { Fragment } from "react";
-import TableContainer, {
-  TABLE_LAYOUT_BLOCK,
-} from "../TableContainer/TableContainer.jsx";
 import { CHILD_TYPE_OPERATION } from "../../data/slices/operationsSlice/Operation.js";
-import OperationContainer from "./OperationContainer.jsx";
+import { TableContainer, OperationContainer } from "../Containers";
+import TableBlockView from "./TableBlockView";
 
-export const LAYOUT_ID = "block";
-
-export default function OperationBlockView({
-  id,
-  parentId,
-  operationType,
-  children,
-  depth,
-  columnCount,
-  isFocused,
-}) {
+export default function OperationBlockView({ operation, columnCount }) {
+  console.log(columnCount);
   return (
     <>
-      {children.map((child) => (
+      {operation.children.map((child) => (
         <Fragment key={child.id}>
           {child.type === CHILD_TYPE_OPERATION ? (
-            <OperationContainer id={child.id} layout={LAYOUT_ID} />
+            <OperationContainer id={child.id}>
+              <OperationBlockView />
+            </OperationContainer>
           ) : (
             <TableContainer
               id={child.id}
-              layout={TABLE_LAYOUT_BLOCK}
-              operationColumnCount={columnCount}
               isDraggable={false}
-            />
+              operationColumnCount={columnCount}
+            >
+              <TableBlockView />
+            </TableContainer>
           )}
         </Fragment>
       ))}
