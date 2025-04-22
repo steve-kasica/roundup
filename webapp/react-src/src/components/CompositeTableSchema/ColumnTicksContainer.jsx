@@ -12,7 +12,7 @@ const ColumnTicksContainer = memo(function ColumnTicksContainer({
   const columnIds = useSelector((state) =>
     getColumnIdsByTableId(state, tableId)
   );
-  console.log("columnIds", columnIds);
+
   const ticks = Array.from({ length: ticksCount }, (_, i) =>
     i < columnIds.length ? columnIds[i] : null
   );

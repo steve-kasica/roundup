@@ -19,29 +19,13 @@ import {
 import { drag, select, selectAll } from "d3";
 import {
   focusColumn,
-  hoverColumnIndexInTable,
   setHoverColumnId,
   unfocusColumn,
-  unhoverColumnIndexInTable,
   unsetHoverColumnId,
 } from "../../../data/uiSlice";
 import { useDispatch } from "react-redux";
 
-export const LAYOUT_ID = "block";
-
-function swapColumnPositions() {
-  // TODO
-}
-
-function removeColumnsAfter() {
-  // TODO
-}
-
-function setColumnProperty() {
-  // TODO
-}
-
-const DEBOUNCE_DELAY = 500; // in ms
+const delay = 500; // in ms for input changes
 const OVERLAP_THRESHOLD = 0.5; // percent
 
 // export default function({ tableId, columnId, position, tableName, columnCount }) {
@@ -56,6 +40,7 @@ export default function ColumnBlockView({
   const tableId = isNull ? "" : column.parentId;
   const name = isNull ? "null" : column.name;
   const index = isNull ? 0 : column.index;
+
   // const isLastInTable = (position === columnCount);
   const isLastInTable = false; // TODO: implement logic
   const position = index + 1; // 1-indexed column indexes for user
@@ -142,17 +127,25 @@ export default function ColumnBlockView({
   };
 
   // Input reference is necessary to trigger focus on column
-  //
   const inputRef = useRef(null);
 
   // Debounce input when modifying column attributes in the DOM
-  // const [value, setValue] = useState(name);
-  const value = name;
-  const setValue = () => null;
+  const [value, setValue] = useState(name);
   useEffect(() => {
-    const timeoutId = setTimeout(handleRenameColumn, DEBOUNCE_DELAY);
+    const timeoutId = setTimeout(() => {
+      if (name !== value) {
+        dispatch(
+          renameColumnRequest({
+            projectId: tableId,
+            oldColumnName: name,
+            newColumnName: value,
+            id,
+          })
+        );
+      }
+    }, delay);
     return () => clearTimeout(timeoutId);
-  }, [value, DEBOUNCE_DELAY]);
+  }, [value, delay]);
 
   // Render ColumnView
   return (
