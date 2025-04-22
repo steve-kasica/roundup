@@ -4,6 +4,7 @@ import {
   getFocusedColumnId,
   getHoverTableId,
   getColumnById,
+  getHoverColumnId,
 } from "../../data/selectors";
 
 import {
@@ -11,7 +12,6 @@ import {
   removeColumnRequest,
 } from "../../data/slices/sourceColumnsSlice";
 import {
-  focusColumn,
   hoverColumnIndexInTable,
   unhoverColumnIndexInTable,
 } from "../../data/uiSlice";
@@ -23,14 +23,18 @@ export function ColumnContainer({ id, index, tableId, children }) {
 
   const column = useSelector((state) => getColumnById(state, id));
   const hoverColumnIndex = useSelector(getHoverColumnIndex);
+  const hoverColumnId = useSelector(getHoverColumnId);
   const focusedColumnId = useSelector(getFocusedColumnId);
   const hoverTableId = useSelector(getHoverTableId);
 
   const isNull = !column;
   const isSelected = false; // TODO: implement selection logic
   const isHovered =
-    (hoverColumnIndex === index && hoverTableId === null) ||
-    (hoverColumnIndex === null && hoverTableId === tableId);
+    hoverColumnId === id ||
+    (!hoverColumnId && !hoverTableId && hoverColumnIndex === index) ||
+    (!hoverColumnId && !hoverColumnIndex && hoverTableId === tableId);
+  // (hoverColumnIndex === index && hoverTableId === null) ||
+  // (hoverColumnIndex === null && hoverTableId === tableId);
   const isFocused = column && id === focusedColumnId;
   // const isLoading = !isNull && status === COLUMN_STATUS_LOADING;
   const isLoading = false;

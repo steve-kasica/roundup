@@ -20,8 +20,10 @@ import { drag, select, selectAll } from "d3";
 import {
   focusColumn,
   hoverColumnIndexInTable,
+  setHoverColumnId,
   unfocusColumn,
   unhoverColumnIndexInTable,
+  unsetHoverColumnId,
 } from "../../../data/uiSlice";
 import { useDispatch } from "react-redux";
 
@@ -167,7 +169,7 @@ export default function ColumnBlockView({
           setAnchorEl(event.target);
         }}
         onMouseEnter={() => {
-          // handleColumnHover();
+          dispatch(setHoverColumnId(id));
           if (hoverTimeoutRef.current) {
             clearTimeout(hoverTimeoutRef.current);
             hoverTimeoutRef.current = null;
@@ -175,7 +177,7 @@ export default function ColumnBlockView({
         }}
         onMouseLeave={() => {
           if (!isPopoverOpen) {
-            // handleColumnUnhover();
+            dispatch(unsetHoverColumnId());
           }
         }}
         onDoubleClick={() => {

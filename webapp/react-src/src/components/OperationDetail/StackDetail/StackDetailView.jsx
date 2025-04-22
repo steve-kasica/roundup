@@ -2,9 +2,9 @@ import { scaleBand } from "d3";
 import { useDispatch, useSelector } from "react-redux";
 import {
   hoverTable,
-  hoverColumnIndex,
   unhoverTable,
-  unhoverColumnIndex,
+  setHoverColumnIndex,
+  unsetHoverColumnIndex,
 } from "../../../data/uiSlice";
 import {
   getOperationColumnIds,
@@ -77,13 +77,18 @@ export default function StackDetailView({ id }) {
             <form key={`index-${j}`}>
               <div
                 className="index-label"
-                onMouseEnter={() => dispatch(hoverColumnIndex(j))}
-                onMouseLeave={() => dispatch(unhoverColumnIndex())}
+                onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
+                onMouseLeave={() => dispatch(unsetHoverColumnIndex())}
               >
                 <label>{j + 1}</label>
               </div>
-              {columnIdsByIndex[j].map((columnId) => (
-                <ColumnContainer key={columnId} id={columnId}>
+              {columnIdsByIndex[j].map((columnId, i) => (
+                <ColumnContainer
+                  key={columnId}
+                  id={columnId}
+                  index={j}
+                  tableId={tables[i].id}
+                >
                   <ColumnBlockView />
                 </ColumnContainer>
               ))}

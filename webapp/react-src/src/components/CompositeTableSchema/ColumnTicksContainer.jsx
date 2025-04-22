@@ -20,7 +20,7 @@ const ColumnTicksContainer = memo(function ColumnTicksContainer({
   return (
     <>
       {ticks.map((id, i) => (
-        <ColumnContainer key={`${i}-${id}`} id={id}>
+        <ColumnContainer key={`${i}-${id}`} id={id} index={i} tableId={tableId}>
           <span>{nbsp}</span>
         </ColumnContainer>
       ))}
