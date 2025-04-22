@@ -15,10 +15,12 @@ import { Popover, List, ListItemButton } from "@mui/material";
 import { renameColumnRequest } from "../../../data/slices/sourceColumnsSlice";
 import { drag, select, selectAll } from "d3";
 import {
+  focusColumn,
   hoverColumnIndexInTable,
   unfocusColumn,
   unhoverColumnIndexInTable,
 } from "../../../data/uiSlice";
+import { useDispatch } from "react-redux";
 
 export const LAYOUT_ID = "block";
 
@@ -41,17 +43,15 @@ const OVERLAP_THRESHOLD = 0.5; // percent
 export default function ColumnBlockView({
   column,
   handleRemoveColumn,
-  handleColumnFocus,
-  handleColumnUnfocus,
   handleRemoveColumnsAfter,
   handleRenameColumn,
 }) {
+  const dispatch = useDispatch();
   const isNull = !column;
   const id = isNull ? "" : column.id;
   const tableId = isNull ? "" : column.tableId;
   const name = isNull ? "null" : column.name;
   const index = isNull ? 0 : column.index;
-  const isFocused = false;
   // const isLastInTable = (position === columnCount);
   const isLastInTable = false; // TODO: implement logic
   const position = index + 1; // 1-indexed column indexes for user
@@ -137,13 +137,9 @@ export default function ColumnBlockView({
     // hoverTimeoutRef.current = setTimeout(handleColumnHover, 265);
   };
 
-  // // Weird workaround to trigger focus on column from context menu clicks
+  // Input reference is necessary to trigger focus on column
+  //
   const inputRef = useRef(null);
-  // const [isFocused, setIsFocused] = useState(false);
-  useEffect(() => {
-    if (!isFocused) return;
-    inputRef.current?.focus();
-  }, [isFocused]);
 
   // Debounce input when modifying column attributes in the DOM
   // const [value, setValue] = useState(name);
@@ -180,14 +176,19 @@ export default function ColumnBlockView({
             // handleColumnUnhover();
           }
         }}
-        onDoubleClick={handleColumnFocus}
+        onDoubleClick={() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }}
       >
         <input
           ref={inputRef}
           type="text"
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          onBlur={handleColumnUnfocus}
+          onBlur={() => dispatch(unfocusColumn())}
+          onFocus={() => dispatch(focusColumn(id))}
           minLength={1}
         />
       </div>
@@ -235,11 +236,13 @@ export default function ColumnBlockView({
             Null column {position} in {tableId}
           </ListItemButton>
           <ListItemButton
-            // TODO: can't rename null columns
-            // disabled={status === COLUMN_STATUS_NULLED}
+            disabled={isNull} // can't rename null columns
             onClick={() => {
-              handleColumnFocus();
               closePopover();
+              // Delay focus to allow menu to close first
+              setTimeout(() => {
+                inputRef.current?.focus();
+              }, 100); // 50-100ms is usually enough
             }}
           >
             Rename

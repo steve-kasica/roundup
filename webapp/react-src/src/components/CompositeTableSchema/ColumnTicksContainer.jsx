@@ -11,7 +11,6 @@ export default function ColumnTicksContainer({ tableId, ticksCount }) {
   const ticks = Array.from({ length: ticksCount }, (_, i) =>
     i < columnIds.length ? columnIds[i] : null
   );
-  console.log("ticks", ticksCount);
 
   return (
     <>
