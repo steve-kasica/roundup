@@ -47,7 +47,7 @@ export const initialState = {
   // interaction states
   focused: {
     operation: null,
-    column: null,
+    columns: [],
   },
   hover: {
     table: null,
@@ -270,8 +270,13 @@ export const uiSlice = createSlice({
      * @param {string} action.payload - The ID of the column to focus
      */
     focusColumn: (state, action) => {
-      const columnId = action.payload;
-      state.focused.column = columnId;
+      if (Array.isArray(action.payload)) {
+        const columnIds = action.payload;
+        state.focused.columns = [...state.focused.columns, ...columnIds];
+      } else {
+        const columnId = action.payload;
+        state.focused.columns.push(columnId);
+      }
     },
 
     /**
@@ -288,8 +293,11 @@ export const uiSlice = createSlice({
      *
      * @param {Object} state - The current state
      */
-    unfocusColumn: (state) => {
-      state.focused.column = null;
+    unfocusColumn: (state, action) => {
+      const unfocusColumnId = action.payload;
+      state.focused.columns = state.focused.columns.filter(
+        (columnId) => columnId !== unfocusColumnId
+      );
     },
   },
 });

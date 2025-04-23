@@ -184,7 +184,7 @@ export default function ColumnBlockView({
           type="text"
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          onBlur={() => dispatch(unfocusColumn())}
+          onBlur={() => dispatch(unfocusColumn(id))}
           onFocus={() => dispatch(focusColumn(id))}
           minLength={1}
         />
@@ -202,13 +202,7 @@ export default function ColumnBlockView({
           <ListItemButton
             disabled={isNull} // can't remove null column
             onClick={() => {
-              dispatch(
-                removeColumnRequest({
-                  tableId,
-                  id,
-                  name,
-                })
-              );
+              dispatch(removeColumnRequest(id));
               closePopover();
             }}
           >

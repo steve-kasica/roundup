@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
 import {
   getHoverColumnIndex,
-  getFocusedColumnId,
   getHoverTableId,
   getColumnById,
   getHoverColumnId,
+  getFocusedColumnIds,
 } from "../../data/selectors";
 
 import {
@@ -22,7 +22,7 @@ export function ColumnContainer({ id, index, tableId, children }) {
   const column = useSelector((state) => getColumnById(state, id));
   const hoverColumnIndex = useSelector(getHoverColumnIndex);
   const hoverColumnId = useSelector(getHoverColumnId);
-  const focusedColumnId = useSelector(getFocusedColumnId);
+  const focusedColumnIds = useSelector(getFocusedColumnIds);
   const hoverTableId = useSelector(getHoverTableId);
 
   const isNull = !column;
@@ -31,7 +31,7 @@ export function ColumnContainer({ id, index, tableId, children }) {
     hoverColumnId === id ||
     (!hoverColumnId && !hoverTableId && hoverColumnIndex === index) ||
     (!hoverColumnId && !hoverColumnIndex && hoverTableId === tableId);
-  const isFocused = column && id === focusedColumnId;
+  const isFocused = column && focusedColumnIds.includes(id);
   // const isLoading = !isNull && status === COLUMN_STATUS_LOADING;
   const isLoading = false;
 

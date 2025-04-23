@@ -20,3 +20,10 @@ export function getColumnById(state, id) {
   const column = state.sourceColumns.entries[id];
   return column;
 }
+
+export function getColumnIdsByIndex(state, index) {
+  const columnIds = Object.values(state.sourceColumns.columnsByTable).map(
+    (columnIds) => (index < columnIds.length ? columnIds[index] : null)
+  );
+  return columnIds;
+}

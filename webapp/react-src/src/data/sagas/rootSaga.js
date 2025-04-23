@@ -7,6 +7,7 @@ import getMultipleSourceColumnsSaga from "./getMultipleSourceColumnsSaga";
 import getSourceTableColumnsSaga from "./getSourceTableColumnsSaga";
 import renameColumnSaga from "./renameColumnSaga";
 import removeColumnSaga from "./removeColumnSaga";
+import removeColumnsMultipleSaga from "./removeColumnsMultipleSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -15,5 +16,6 @@ export default function* rootSaga() {
     call(getSourceTableColumnsSaga),
     call(renameColumnSaga),
     call(removeColumnSaga),
+    call(removeColumnsMultipleSaga),
   ]);
 }

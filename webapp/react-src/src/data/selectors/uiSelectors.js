@@ -4,7 +4,7 @@
  */
 import { initialState } from "../uiSlice";
 
-export const getFocusedColumnId = ({ ui }) => ui.focused.column;
+export const getFocusedColumnIds = ({ ui }) => ui.focused.columns;
 
 /**
  * Retrieves the ID of the currently focused operation

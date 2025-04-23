@@ -1,4 +1,4 @@
-import { takeLatest, put, call } from "redux-saga/effects";
+import { put, call, select, takeEvery } from "redux-saga/effects";
 import {
   removeColumnRequest,
   removeColumnSuccess,
@@ -8,11 +8,15 @@ import OpenRefine from "../../services/open-refine";
 import { decrementColumnCount } from "../slices/sourceTablesSlice";
 
 export default function* removeColumnSaga() {
-  yield takeLatest(removeColumnRequest.type, removeColumnSagaWorker);
+  yield takeEvery(removeColumnRequest.type, removeColumnSagaWorker);
 }
 
 function* removeColumnSagaWorker(action) {
-  const { tableId: projectId, id, name } = action.payload;
+  console.log("removeColumnSaga");
+  const id = action.payload;
+  const { parentId: projectId, name } = yield select(
+    (state) => state.sourceColumns.entries[id]
+  );
 
   try {
     // Call the OpenRefine API

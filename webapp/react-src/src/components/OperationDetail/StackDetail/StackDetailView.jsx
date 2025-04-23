@@ -14,6 +14,7 @@ import { ColumnContainer } from "../../Containers";
 import ColumnBlockView from "./ColumnBlockView";
 
 import "./StackDetail.scss";
+import ColumnIndex from "./ColumnIndex";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
@@ -74,25 +75,7 @@ export default function StackDetailView({ id }) {
         <div className="x-axis label">{xAxisLabel}</div>
         <div className="grid-container">
           {xScale.domain().map((j) => (
-            <form key={`index-${j}`}>
-              <div
-                className="index-label"
-                onMouseEnter={() => dispatch(setHoverColumnIndex(j))}
-                onMouseLeave={() => dispatch(unsetHoverColumnIndex())}
-              >
-                <label>{j + 1}</label>
-              </div>
-              {columnIdsByIndex[j].map((columnId, i) => (
-                <ColumnContainer
-                  key={columnId}
-                  id={columnId}
-                  index={j}
-                  tableId={tables[i].id}
-                >
-                  <ColumnBlockView />
-                </ColumnContainer>
-              ))}
-            </form>
+            <ColumnIndex key={j} jIndex={j} />
           ))}
         </div>
       </div>

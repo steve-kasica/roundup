@@ -77,7 +77,7 @@ const slice = createSlice({
      * Update state to reflect the start of a column removal process.
      */
     removeColumnRequest: (state, action) => {
-      const { id } = action.payload;
+      const id = action.payload;
       const column = state.entries[id];
       if (column) {
         column.loading = true;
