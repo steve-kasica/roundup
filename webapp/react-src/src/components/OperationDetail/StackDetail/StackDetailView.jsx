@@ -1,10 +1,10 @@
-import { scaleBand } from "d3";
+import { scaleBand, select } from "d3";
 import { useDispatch, useSelector } from "react-redux";
 import {
   hoverTable,
   unhoverTable,
-  setHoverColumnIndex,
-  unsetHoverColumnIndex,
+  clearFocusedColumns,
+  getFocusedColumns,
 } from "../../../data/uiSlice";
 import {
   getOperationColumnIds,
@@ -15,6 +15,8 @@ import ColumnBlockView from "./ColumnBlockView";
 
 import "./StackDetail.scss";
 import ColumnIndex from "./ColumnIndex";
+import { Button } from "@mui/material";
+import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
@@ -42,6 +44,8 @@ export default function StackDetailView({ id }) {
   const columnIdsByTable = useSelector((state) =>
     getOperationColumnIds(state, id)
   );
+  const focusedColumns = useSelector(getFocusedColumns);
+
   const columnIdsByIndex = transposeAndBackfill(columnIdsByTable);
 
   const maxColumnCount = Math.max(...columnIdsByTable.map((c) => c.length));
@@ -53,6 +57,22 @@ export default function StackDetailView({ id }) {
 
   return (
     <div className="StackDetail">
+      <Button
+        disabled={focusedColumns.length === 0}
+        variant="outlined"
+        color="error"
+        onClick={() => dispatch(clearFocusedColumns())}
+      >
+        Clear selection
+      </Button>
+      <Button
+        disabled={focusedColumns.length === 0}
+        variant="outlined"
+        color="error"
+        onClick={() => dispatch(removeColumns(focusedColumns))}
+      >
+        Remove selected columns
+      </Button>
       <div className="left-panel">
         <div className="label">
           <span>{yAxisLabel}</span>

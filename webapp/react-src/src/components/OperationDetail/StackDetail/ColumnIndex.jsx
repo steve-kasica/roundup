@@ -10,7 +10,6 @@ import { ColumnContainer } from "../../Containers";
 import ColumnBlockView from "./ColumnBlockView";
 import { List, ListItemButton, Popover } from "@mui/material";
 import { useRef, useState } from "react";
-import { removeMultipleColumns } from "../../../data/actions";
 
 export default function ColumnIndex({ jIndex }) {
   const dispatch = useDispatch();
@@ -27,7 +26,8 @@ export default function ColumnIndex({ jIndex }) {
         className="index-label"
         onMouseEnter={() => dispatch(setHoverColumnIndex(jIndex))}
         onMouseLeave={() => dispatch(unsetHoverColumnIndex(jIndex))}
-        onClick={(event) => setAnchorEl(anchorEl ? null : event.currentTarget)}
+        // onClick={(event) => setAnchorEl(anchorEl ? null : event.currentTarget)}
+        onClick={() => dispatch(focusColumn(columnIds))}
       >
         <label>{index1}</label>
         <Popover
@@ -43,12 +43,10 @@ export default function ColumnIndex({ jIndex }) {
             <ListItemButton
               onClick={() => {
                 setAnchorEl(null);
-                dispatch(
-                  removeMultipleColumns(columnIds.filter((id) => id !== null))
-                );
+                dispatch(focusColumn(columnIds));
               }}
             >
-              Remove all columns
+              Select columns in index
             </ListItemButton>
           </List>
         </Popover>

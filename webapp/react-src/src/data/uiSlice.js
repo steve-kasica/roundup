@@ -294,10 +294,20 @@ export const uiSlice = createSlice({
      * @param {Object} state - The current state
      */
     unfocusColumn: (state, action) => {
-      const unfocusColumnId = action.payload;
-      state.focused.columns = state.focused.columns.filter(
-        (columnId) => columnId !== unfocusColumnId
-      );
+      if (Array.isArray(action.payload)) {
+        const columnIds = action.payload;
+        state.focused.columns = state.focused.columns.filter(
+          (columnId) => !columnIds.includes(columnId)
+        );
+      } else {
+        const unfocusColumnId = action.payload;
+        state.focused.columns = state.focused.columns.filter(
+          (columnId) => columnId !== unfocusColumnId
+        );
+      }
+    },
+    clearFocusedColumns: function (state) {
+      state.focused.columns = initialState.focused.columns;
     },
   },
 });
@@ -334,10 +344,14 @@ export const {
   unhoverColumnIndexInTable,
 
   focusOperation,
-  focusColumn,
 
   unfocusOperation,
+
+  focusColumn,
   unfocusColumn,
+  clearFocusedColumns,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;
+
+export const getFocusedColumns = (state) => state.ui.focused.columns;

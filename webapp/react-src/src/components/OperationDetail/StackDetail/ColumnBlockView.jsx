@@ -154,6 +154,7 @@ export default function ColumnBlockView({
       id={id}
       data-table-id={tableId}
       data-column-index={index}
+      onClick={() => dispatch(focusColumn(id))}
     >
       <div
         className="screen"
