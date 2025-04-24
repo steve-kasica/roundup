@@ -9,7 +9,7 @@ import { getColumnIdsByIndex } from "../../../data/selectors";
 import { ColumnContainer } from "../../Containers";
 import ColumnBlockView from "./ColumnBlockView";
 import { List, ListItemButton, Popover } from "@mui/material";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 export default function ColumnIndex({ jIndex }) {
   const dispatch = useDispatch();
@@ -43,7 +43,7 @@ export default function ColumnIndex({ jIndex }) {
             <ListItemButton
               onClick={() => {
                 setAnchorEl(null);
-                dispatch(focusColumn(columnIds));
+                dispatch(addToSelectedColumnIds(columnIds));
               }}
             >
               Select columns in index
