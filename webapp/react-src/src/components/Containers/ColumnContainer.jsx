@@ -9,20 +9,26 @@ import {
 
 import { Children, cloneElement } from "react";
 
-export function ColumnContainer({ id, index, tableId, onClick, children }) {
+export function ColumnContainer({
+  id,
+  index,
+  tableId,
+  onClickHandler = () => null,
+  children,
+}) {
   const column = useSelector((state) => getColumnById(state, id));
+
   const hoverColumnIndex = useSelector(selectHoveredColumnIndex);
   const hoverColumnId = useSelector(selectHoveredColumnId);
-  const focusedColumnIds = useSelector(selectSelectedColumnIds);
+  const selectedColumnIds = useSelector(selectSelectedColumnIds);
   const hoverTableId = useSelector(selectHoveredTableId);
 
   const isNull = !column;
-  const isSelected = false; // TODO: implement selection logic
   const isHovered =
-    hoverColumnId === id ||
+    (hoverColumnId !== null && hoverColumnId === id) ||
     (!hoverColumnId && !hoverTableId && hoverColumnIndex === index) ||
     (!hoverColumnId && !hoverColumnIndex && hoverTableId === tableId);
-  const isFocused = column && focusedColumnIds.includes(id);
+  const isSelected = column && selectedColumnIds.includes(id);
   // const isLoading = !isNull && status === COLUMN_STATUS_LOADING;
   const isLoading = false;
 
@@ -32,7 +38,6 @@ export function ColumnContainer({ id, index, tableId, onClick, children }) {
     isNull ? "null" : undefined,
     isHovered ? "hover" : undefined,
     isSelected ? "selected" : undefined,
-    isFocused ? "focused" : undefined,
   ]
     .filter(Boolean)
     .join(" ");
@@ -44,7 +49,7 @@ export function ColumnContainer({ id, index, tableId, onClick, children }) {
   );
 
   return (
-    <div className={className} onClick={() => onClick(column)}>
+    <div className={className} onClick={() => onClickHandler(column)}>
       {enhancedChildren}
     </div>
   );
