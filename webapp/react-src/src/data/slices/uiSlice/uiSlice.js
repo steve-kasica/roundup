@@ -155,6 +155,30 @@ export const uiSlice = createSlice({
     },
 
     /**
+     * Toggles the selection state of one or more column IDs.
+     * If a column ID is already selected, it will be removed from the selection.
+     * If it is not selected, it will be added to the selection.
+     * @param {Object} state - The current state of the slice.
+     * @param {Object} action - The dispatched action.
+     * @param {string|string[]} action.payload - The column ID(s) to toggle.
+     * @returns
+     */
+    toggleSelectedColumnIds(state, { payload }) {
+      const columnIdsToToggle = Array.isArray(payload) ? payload : [payload];
+      const currentSelection = new Set(state.selected.columnIds);
+
+      columnIdsToToggle.forEach((columnId) => {
+        if (currentSelection.has(columnId)) {
+          currentSelection.delete(columnId); // Remove if already selected
+        } else {
+          currentSelection.add(columnId); // Add if not selected
+        }
+      });
+
+      state.selected.columnIds = Array.from(currentSelection);
+    },
+
+    /**
      * Removes one or more table IDs from the selected table IDs.
      * @param {Object} state - The current state of the slice.
      * @param {Object} action - The dispatched action.
@@ -199,6 +223,7 @@ export const {
   addToSelectedColumnIds,
   addToSelectedTableIds,
   unsetSelectedOperationId,
+  toggleSelectedColumnIds,
   removeFromSelectedColumnIds,
   removeFromSelectedTableIds,
   clearSelectedColumnIds,

@@ -21,6 +21,7 @@ import {
   addToSelectedColumnIds,
   removeFromSelectedColumnIds,
   setHoverColumnId,
+  toggleSelectedColumnIds,
   unsetHoverColumnId,
 } from "../../../data/slices/uiSlice/uiSlice";
 
@@ -29,7 +30,6 @@ import { useDispatch } from "react-redux";
 const delay = 500; // in ms for input changes
 const OVERLAP_THRESHOLD = 0.5; // percent
 
-// export default function({ tableId, columnId, position, tableName, columnCount }) {
 export default function ColumnBlockView({ column, handleRemoveColumnsAfter }) {
   const dispatch = useDispatch();
   const isNull = !column;
@@ -151,7 +151,7 @@ export default function ColumnBlockView({ column, handleRemoveColumnsAfter }) {
       id={id}
       data-table-id={tableId}
       data-column-index={index}
-      onClick={() => dispatch(addToSelectedColumnIds(id))}
+      onClick={() => dispatch(toggleSelectedColumnIds(id))}
     >
       <div
         className="screen"

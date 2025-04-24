@@ -17,6 +17,7 @@ import reducer, {
   removeFromSelectedTableIds,
   clearSelectedColumnIds,
   clearSelectedTableIds,
+  toggleSelectedColumnIds,
 } from "./uiSlice";
 
 describe("uiSlice reducer", () => {
@@ -181,6 +182,78 @@ describe("uiSlice reducer", () => {
       };
       const state = reducer(stateWithSelection, clearSelectedTableIds());
       expect(state.selected.tableIds).toEqual([]);
+    });
+  });
+
+  describe("toggleSelectedColumnIds", () => {
+    it("should add a column ID to selected.columnIds if it is not already selected", () => {
+      const stateWithSelection = {
+        ...initialState,
+        selected: {
+          ...initialState.selected,
+          columnIds: ["column-1"],
+        },
+      };
+
+      const action = toggleSelectedColumnIds("column-2");
+      const state = reducer(stateWithSelection, action);
+      expect(state.selected.columnIds).toEqual(["column-1", "column-2"]);
+    });
+
+    it("should remove a column ID from selected.columnIds if it is already selected", () => {
+      const stateWithSelection = {
+        ...initialState,
+        selected: {
+          ...initialState.selected,
+          columnIds: ["column-1", "column-2"],
+        },
+      };
+      const action = toggleSelectedColumnIds("column-1");
+      const state = reducer(stateWithSelection, action);
+      expect(state.selected.columnIds).toEqual(["column-2"]);
+    });
+
+    it("should add multiple column IDs to selected.columnIds if none are already selected", () => {
+      const stateWithSelection = {
+        ...initialState,
+        selected: {
+          ...initialState.selected,
+          columnIds: ["column-1"],
+        },
+      };
+      const action = toggleSelectedColumnIds(["column-2", "column-3"]);
+      const state = reducer(stateWithSelection, action);
+      expect(state.selected.columnIds).toEqual([
+        "column-1",
+        "column-2",
+        "column-3",
+      ]);
+    });
+
+    it("should remove multiple column IDs from selected.columnIds if all are already selected", () => {
+      const stateWithSelection = {
+        ...initialState,
+        selected: {
+          ...initialState.selected,
+          columnIds: ["column-1", "column-2", "column-3"],
+        },
+      };
+      const action = toggleSelectedColumnIds(["column-2", "column-3"]);
+      const state = reducer(stateWithSelection, action);
+      expect(state.selected.columnIds).toEqual(["column-1"]);
+    });
+
+    it("should toggle a mix of adding and removing column IDs", () => {
+      const stateWithSelection = {
+        ...initialState,
+        selected: {
+          ...initialState.selected,
+          columnIds: ["column-1", "column-2"],
+        },
+      };
+      const action = toggleSelectedColumnIds(["column-2", "column-3"]);
+      const state = reducer(stateWithSelection, action);
+      expect(state.selected.columnIds).toEqual(["column-1", "column-3"]);
     });
   });
 });
