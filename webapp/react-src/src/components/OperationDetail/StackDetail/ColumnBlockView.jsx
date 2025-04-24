@@ -18,22 +18,19 @@ import {
 } from "../../../data/slices/sourceColumnsSlice";
 import { drag, select, selectAll } from "d3";
 import {
-  focusColumn,
+  addToSelectedColumnIds,
+  removeFromSelectedColumnIds,
   setHoverColumnId,
-  unfocusColumn,
   unsetHoverColumnId,
-} from "../../../data/uiSlice";
+} from "../../../data/slices/uiSlice/uiSlice";
+
 import { useDispatch } from "react-redux";
 
 const delay = 500; // in ms for input changes
 const OVERLAP_THRESHOLD = 0.5; // percent
 
 // export default function({ tableId, columnId, position, tableName, columnCount }) {
-export default function ColumnBlockView({
-  column,
-  handleRemoveColumnsAfter,
-  handleRenameColumn,
-}) {
+export default function ColumnBlockView({ column, handleRemoveColumnsAfter }) {
   const dispatch = useDispatch();
   const isNull = !column;
   const id = isNull ? "" : column.id;
@@ -154,7 +151,7 @@ export default function ColumnBlockView({
       id={id}
       data-table-id={tableId}
       data-column-index={index}
-      onClick={() => dispatch(focusColumn(id))}
+      onClick={() => dispatch(addToSelectedColumnIds(id))}
     >
       <div
         className="screen"
@@ -185,8 +182,8 @@ export default function ColumnBlockView({
           type="text"
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          onBlur={() => dispatch(unfocusColumn(id))}
-          onFocus={() => dispatch(focusColumn(id))}
+          onBlur={() => dispatch(removeFromSelectedColumnIds(id))}
+          onFocus={() => dispatch(addToSelectedColumnIds(id))}
           minLength={1}
         />
       </div>

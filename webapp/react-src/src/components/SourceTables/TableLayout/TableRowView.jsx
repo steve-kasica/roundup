@@ -1,16 +1,3 @@
-/**
- * TableView/layouts/RowLayout.jsx
- *
- * This component handles interaction events that modify global state,
- * independent of table item layout, in order to support different
- * layouts for source table attributes. It also handles some basic styles
- * linked with interaction that's consistent across layout modes.
- *
- * See:
- *  - [`useDrag`](https://react-dnd.github.io/react-dnd/docs/api/use-drag)
- */
-import { useState } from "react";
-
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
 import { Chip, Typography } from "@mui/material";
@@ -21,14 +8,7 @@ import {
 } from "../../../lib/utilities";
 
 // export default function TableRowView({searchString, table}) {
-export default function TableRowView({
-  table,
-  operationColumnCount,
-  handleRemoveTable,
-  handleRemoveOperation,
-  handleSelectedOperation,
-  searchString = "",
-}) {
+export default function TableRowView({ table, searchString = "" }) {
   const {
     parentId,
     name,

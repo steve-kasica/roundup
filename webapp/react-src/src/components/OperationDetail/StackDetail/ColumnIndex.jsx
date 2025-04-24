@@ -1,9 +1,9 @@
 import { useDispatch } from "react-redux";
 import {
-  focusColumn,
+  addToSelectedColumnIds,
   setHoverColumnIndex,
   unsetHoverColumnIndex,
-} from "../../../data/uiSlice";
+} from "../../../data/slices/uiSlice";
 import { useSelector } from "react-redux";
 import { getColumnIdsByIndex } from "../../../data/selectors";
 import { ColumnContainer } from "../../Containers";
@@ -27,7 +27,7 @@ export default function ColumnIndex({ jIndex }) {
         onMouseEnter={() => dispatch(setHoverColumnIndex(jIndex))}
         onMouseLeave={() => dispatch(unsetHoverColumnIndex(jIndex))}
         // onClick={(event) => setAnchorEl(anchorEl ? null : event.currentTarget)}
-        onClick={() => dispatch(focusColumn(columnIds))}
+        onClick={() => dispatch(addToSelectedColumnIds(columnIds))}
       >
         <label>{index1}</label>
         <Popover

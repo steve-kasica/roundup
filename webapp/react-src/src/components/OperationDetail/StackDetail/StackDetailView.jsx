@@ -1,22 +1,21 @@
-import { scaleBand, select } from "d3";
+import { scaleBand } from "d3";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  hoverTable,
-  unhoverTable,
-  clearFocusedColumns,
-  getFocusedColumns,
-} from "../../../data/uiSlice";
+  setHoverTableId,
+  unsetHoverTableId,
+  clearSelectedColumnIds,
+  selectSelectedColumnIds,
+} from "../../../data/slices/uiSlice";
 import {
   getOperationColumnIds,
   getTablesByOperationId,
 } from "../../../data/selectors";
-import { ColumnContainer } from "../../Containers";
-import ColumnBlockView from "./ColumnBlockView";
 
-import "./StackDetail.scss";
 import ColumnIndex from "./ColumnIndex";
 import { Button } from "@mui/material";
 import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
+
+import "./StackDetail.scss";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
@@ -44,7 +43,7 @@ export default function StackDetailView({ id }) {
   const columnIdsByTable = useSelector((state) =>
     getOperationColumnIds(state, id)
   );
-  const focusedColumns = useSelector(getFocusedColumns);
+  const focusedColumns = useSelector(selectSelectedColumnIds);
 
   const columnIdsByIndex = transposeAndBackfill(columnIdsByTable);
 
@@ -61,7 +60,7 @@ export default function StackDetailView({ id }) {
         disabled={focusedColumns.length === 0}
         variant="outlined"
         color="error"
-        onClick={() => dispatch(clearFocusedColumns())}
+        onClick={() => dispatch(clearSelectedColumnIds())}
       >
         Clear selection
       </Button>
@@ -83,8 +82,8 @@ export default function StackDetailView({ id }) {
             <div
               key={child.id}
               className="tick"
-              onMouseEnter={() => dispatch(hoverTable(child.id))}
-              onMouseLeave={() => dispatch(unhoverTable())}
+              onMouseEnter={() => dispatch(setHoverTableId(child.id))}
+              onMouseLeave={() => dispatch(unsetHoverTableId())}
             >
               {child.name}
             </div>

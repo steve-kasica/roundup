@@ -6,7 +6,7 @@ import {
 } from "../slices/sourceColumnsSlice";
 import OpenRefine from "../../services/open-refine";
 import { decrementColumnCount } from "../slices/sourceTablesSlice";
-import { unfocusColumn } from "../uiSlice";
+import { removeFromSelectedColumnIds } from "../slices/uiSlice";
 
 export default function* removeColumnSaga() {
   yield takeEvery(removeColumnRequest.type, removeColumnSagaWorker);
@@ -27,7 +27,7 @@ function* removeColumnSagaWorker(action) {
     yield put(removeColumnSuccess({ id }));
 
     // Remove column for set of selected columns, if present
-    yield put(unfocusColumn(id));
+    yield put(removeFromSelectedColumnIds(id));
 
     // Update column count of associated table
     yield put(decrementColumnCount({ projectId }));

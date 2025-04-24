@@ -4,9 +4,9 @@ export const LAYOUT_ID = "operationListItem";
 
 export default function OperationListItemView({ operation, columnCount }) {
   const { depth, operationType } = operation;
-  const isFocused = false;
+
   return (
-    <ListItemButton selected={isFocused}>
+    <ListItemButton>
       <ListItemText
         primary={`${depth}. ${operationType}`}
         secondary={columnCount}

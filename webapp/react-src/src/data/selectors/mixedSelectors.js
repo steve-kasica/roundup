@@ -5,11 +5,14 @@ import {
 import { getOperationById, getOperationTableIds } from "./operationsSelectors";
 import { getColumnIdsByTableId } from "./sourceColumnsSelectors";
 import { getSourceTableById } from "./sourceTablesSelectors";
-import { getFocusedOperationId, getHoverOperationId } from "./uiSelectors";
+import {
+  selectSelectedOperationId,
+  selectHoveredOperationId,
+} from "../slices/uiSlice";
 
 // TODO: memoize, if necessary
 export const getFocusedOperation = (state) => {
-  const focusedOperationNodeId = getFocusedOperationId(state);
+  const focusedOperationNodeId = selectSelectedOperationId(state);
   if (focusedOperationNodeId === null) {
     return null;
   } else {
@@ -33,7 +36,7 @@ export function getChildrenData(state, children) {
 }
 
 export const getHoverOperationTableIds = (state) => {
-  const hoverOperationId = getHoverOperationId(state);
+  const hoverOperationId = selectHoveredOperationId(state);
   if (hoverOperationId === null) {
     return [];
   } else {

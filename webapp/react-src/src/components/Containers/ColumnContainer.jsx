@@ -1,29 +1,20 @@
 import { useSelector } from "react-redux";
+import { getColumnById } from "../../data/selectors";
 import {
-  getHoverColumnIndex,
-  getHoverTableId,
-  getColumnById,
-  getHoverColumnId,
-  getFocusedColumnIds,
-} from "../../data/selectors";
-
-import {
-  COLUMN_STATUS_LOADING,
-  removeColumnRequest,
-} from "../../data/slices/sourceColumnsSlice";
-import {
-  hoverColumnIndexInTable,
-  unhoverColumnIndexInTable,
-} from "../../data/uiSlice";
+  selectSelectedColumnIds,
+  selectHoveredColumnId,
+  selectHoveredColumnIndex,
+  selectHoveredTableId,
+} from "../../data/slices/uiSlice";
 
 import { Children, cloneElement } from "react";
 
-export function ColumnContainer({ id, index, tableId, children }) {
+export function ColumnContainer({ id, index, tableId, onClick, children }) {
   const column = useSelector((state) => getColumnById(state, id));
-  const hoverColumnIndex = useSelector(getHoverColumnIndex);
-  const hoverColumnId = useSelector(getHoverColumnId);
-  const focusedColumnIds = useSelector(getFocusedColumnIds);
-  const hoverTableId = useSelector(getHoverTableId);
+  const hoverColumnIndex = useSelector(selectHoveredColumnIndex);
+  const hoverColumnId = useSelector(selectHoveredColumnId);
+  const focusedColumnIds = useSelector(selectSelectedColumnIds);
+  const hoverTableId = useSelector(selectHoveredTableId);
 
   const isNull = !column;
   const isSelected = false; // TODO: implement selection logic
@@ -52,5 +43,9 @@ export function ColumnContainer({ id, index, tableId, children }) {
     })
   );
 
-  return <div className={className}>{enhancedChildren}</div>;
+  return (
+    <div className={className} onClick={() => onClick(column)}>
+      {enhancedChildren}
+    </div>
+  );
 }

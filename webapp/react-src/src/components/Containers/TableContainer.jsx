@@ -12,17 +12,17 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../data/slices/operationsSlice";
-import {
-  getHoverTableId,
-  getTableById,
-  getHoverOperationTableIds,
-  getColumnsByTableId,
-  getColumnIdsByTableId,
-} from "../../data/selectors";
+import { getTableById, getHoverOperationTableIds } from "../../data/selectors";
+
 import { sourceTableSelected } from "../../data/actions";
-import { hoverTable, unhoverTable } from "../../data/uiSlice";
 import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
 import { CHILD_TYPE_TABLE } from "../../data/slices/operationsSlice";
+
+import {
+  selectHoveredTableId,
+  setHoverTableId,
+  unsetHoverTableId,
+} from "../../data/slices/uiSlice";
 
 export function TableContainer({
   id,
@@ -33,7 +33,8 @@ export function TableContainer({
 }) {
   const dispatch = useDispatch();
   const table = useSelector((state) => getTableById(state, id));
-  const hoverTableId = useSelector(getHoverTableId);
+  const hoverTableId = useSelector(selectHoveredTableId);
+
   const hoverOperationTableIds = useSelector(getHoverOperationTableIds);
 
   const isHover =
@@ -106,9 +107,6 @@ export function TableContainer({
     cloneElement(child, {
       table,
       operationColumnCount,
-      handleRemoveTable,
-      handleRemoveOperation,
-      handleSelectedOperation,
     })
   );
 
@@ -116,34 +114,14 @@ export function TableContainer({
     <Component
       ref={dragRef}
       className={className}
-      data-id={id}
-      onMouseEnter={handleTableHover}
-      onMouseLeave={handleTableUnhover}
+      data-table-id={id}
+      onMouseEnter={() => dispatch(setHoverTableId(id))}
+      onMouseLeave={() => dispatch(unsetHoverTableId())}
     >
       <DragPreviewImage connect={previewRef} src={tableIconImage} />
       {enhancedChildren}
     </Component>
   );
-
-  function handleTableHover() {
-    return dispatch(hoverTable(table.id));
-  }
-
-  function handleTableUnhover() {
-    return dispatch(unhoverTable());
-  }
-
-  function handleRemoveTable() {
-    // return dispatch(removeTable(table.id));
-  }
-
-  function handleRemoveOperation() {
-    // return dispatch(removeOperation(table.parentId));
-  }
-
-  function handleSelectedOperation() {
-    // ?
-  }
 
   function handleTableSelected(operationType) {
     dispatch(
