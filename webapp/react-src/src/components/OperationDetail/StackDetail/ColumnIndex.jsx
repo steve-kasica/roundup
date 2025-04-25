@@ -1,25 +1,21 @@
-import { useDispatch } from "react-redux";
-import {
-  addToSelectedColumnIds,
-  setHoverColumnIndex,
-  toggleSelectedColumnIds,
-  unsetHoverColumnIndex,
-} from "../../../data/slices/uiSlice";
-import { useSelector } from "react-redux";
-import { selectColumnIdsByIndex } from "../../../data/slices/columnsSlice";
-import { ColumnContainer } from "../../Containers";
-import ColumnBlockView from "./ColumnBlockView";
+import { useDispatch, useSelector } from "react-redux";
 import { Box, IconButton, List, ListItemButton, Popover } from "@mui/material";
 import { useState } from "react";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
-import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 import { memo } from "react";
+import {
+  clearSelectedColumns,
+  selectColumnIdsByIndex,
+  setColumnSelectedStatus,
+} from "../../../data/slices/columnsSlice";
+import { ColumnContainer } from "../../Containers";
+import ColumnBlockView from "./ColumnBlockView";
+import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 
 const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const [isMenuIconVisable, setIsMenuIconVisible] = useState(false);
-  const [isSelected, setIsSelected] = useState(false);
   const isPopoverOpen = Boolean(anchorEl);
 
   const columnIds = useSelector((state) =>
@@ -30,11 +26,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
 
   const menuItems = [
     {
-      label: "Select columns in index",
-      action: () => dispatch(addToSelectedColumnIds(columnIds)),
-    },
-    {
-      label: "Remove columns in index",
+      label: "Remove all columns at index",
       action: () => dispatch(removeColumns(columnIds)),
     },
     {
@@ -62,25 +54,19 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
           padding: "4px",
           position: "relative",
           border: "1px solid #000",
-          cursor: isSelected ? "grab" : "default",
-          backgroundColor: isSelected ? "#e0e0e0" : "#fff",
         }}
         onMouseEnter={() => {
-          dispatch(setHoverColumnIndex(jIndex));
           setIsMenuIconVisible(true);
         }}
         onMouseLeave={() => {
-          dispatch(unsetHoverColumnIndex(jIndex));
           setIsMenuIconVisible(false);
         }}
-        // onClick={(event) => {
-        //   if (event.ctrlKey) {
-        //     dispatch(toggleSelectedColumnIds(columnIds));
-        //   } else {
-        //     dispatch(clearSelectedColumnIds());
-        //     dispatch(addToSelectedColumnIds(columnIds));
-        //   }
-        // }}
+        onClick={() => {
+          dispatch(clearSelectedColumns());
+          columnIds.forEach((id) => {
+            dispatch(setColumnSelectedStatus({ id, isSelected: true }));
+          });
+        }}
       >
         <label>{index1}</label>
         <IconButton
@@ -126,7 +112,6 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
           id={columnId}
           index={jIndex}
           isDraggable={true}
-          onClickHandler={() => dispatch(toggleSelectedColumnIds(columnId))}
         >
           <ColumnBlockView />
         </ColumnContainer>

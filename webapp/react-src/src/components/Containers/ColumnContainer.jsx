@@ -2,24 +2,15 @@ import { Children, cloneElement, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-import { DATA_TYPE as COLUMN } from "../../data/slices/columnsSlice";
+import {
+  DATA_TYPE as COLUMN,
+  clearSelectedColumns,
+  setColumnDragStatus,
+  setColumnHoverStatus,
+  setColumnSelectedStatus,
+} from "../../data/slices/columnsSlice";
 
 import { selectColumnById } from "../../data/slices/columnsSlice";
-import {
-  selectSelectedColumnIds,
-  selectHoveredColumnId,
-  selectHoveredColumnIndex,
-  selectHoveredTableId,
-  clearSelectedColumnIds,
-  selectDraggedSrcColumnId,
-  selectDraggedTargetColumnId,
-  setDraggedSrcColumnId,
-  unsetDraggedSrcColumnId,
-  setDraggedTargetColumnId,
-  unsetDraggedTargetColumnId,
-  unsetHoverColumnId,
-} from "../../data/slices/uiSlice";
-import { clear } from "console";
 
 export function ColumnContainer({
   id,
@@ -32,45 +23,39 @@ export function ColumnContainer({
   const dispatch = useDispatch();
   const column = useSelector((state) => selectColumnById(state, id));
 
-  const hoverColumnIndex = useSelector(selectHoveredColumnIndex);
-  const hoverColumnId = useSelector(selectHoveredColumnId);
-  const selectedColumnIds = useSelector(selectSelectedColumnIds);
-  const hoverTableId = useSelector(selectHoveredTableId);
-  const draggedSrcColumnId = useSelector(selectDraggedSrcColumnId);
-  const draggedTargetColumnId = useSelector(selectDraggedTargetColumnId);
-
   const isNull = !column;
-  const isHovered =
-    (hoverColumnId !== null && hoverColumnId === id) ||
-    (!hoverColumnId && !hoverTableId && hoverColumnIndex === index) ||
-    (!hoverColumnId && !hoverColumnIndex && hoverTableId === tableId);
-  const isSelected = column && selectedColumnIds.includes(id);
-  // const isLoading = !isNull && status === COLUMN_STATUS_LOADING;
-  const isLoading = false;
-  const isDragging = draggedSrcColumnId && draggedSrcColumnId === id;
-  const isDraggingOver = draggedTargetColumnId && draggedTargetColumnId === id;
 
-  const [, dragRef, previewRef] = useDrag({
+  const [{ isDragging }, dragRef, previewRef] = useDrag({
     type: COLUMN,
-    canDrag: isDraggable && isSelected,
+    canDrag: isDraggable && column?.status.isSelected,
     item: () => {
-      dispatch(setDraggedSrcColumnId(id));
+      // In this context `id` is the dragging column. It's different from `id` in useDrop
       return { id, name, tableId, isNull, index };
     },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
     end: () => {
-      dispatch(unsetDraggedSrcColumnId());
-      dispatch(unsetHoverColumnId());
+      dispatch(setColumnDragStatus({ id, isDragging: false }));
+      dispatch(setColumnHoverStatus({ id, isHovered: false }));
     },
   });
+
+  useEffect(() => {
+    dispatch(setColumnDragStatus({ id, isDragging }));
+  }, [isDragging, id, dispatch]);
+
   const [{ isOver }, dropRef] = useDrop({
     accept: COLUMN,
     drop: (droppedItem) => {
+      // In this context `droppedItem.id` === `id` in useDrag
+
       if (droppedItem.tableId === tableId && !isNull) {
         // Handle the drop logic here
         // dispatch(swapColumns({ sourceId: droppedItem.id, targetId: id }));
       }
-      dispatch(unsetDraggedTargetColumnId());
-      dispatch(clearSelectedColumnIds());
+      dispatch(setColumnDragStatus({ id, isDragging: false }));
+      dispatch(clearSelectedColumns());
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -82,21 +67,18 @@ export function ColumnContainer({
     previewRef(getEmptyImage(), { captureDraggingState: true });
   }, []);
 
-  // Dispatch global drag target set
+  // If dragging over a column, set the hover status
   useEffect(() => {
-    if (isOver) {
-      dispatch(setDraggedTargetColumnId(id));
-    }
+    dispatch(setColumnHoverStatus({ id, isHovered: isOver }));
   }, [isOver, id, dispatch]);
 
   const className = [
     "ColumnView",
-    isLoading ? "loading" : undefined,
+    column?.status.isLoading ? "loading" : undefined,
     isNull ? "null" : undefined,
-    isHovered ? "hover" : undefined,
-    isSelected ? "selected" : undefined,
-    isDragging ? "dragged" : undefined,
-    isDraggingOver || isOver ? "dragged-over" : undefined,
+    column?.status.isHovered || isOver ? "hover" : undefined,
+    column?.status.isSelected ? "selected" : undefined,
+    column?.status.isDragging ? "dragged" : undefined,
   ]
     .filter(Boolean)
     .join(" ");
@@ -104,7 +86,6 @@ export function ColumnContainer({
   const enhancedChildren = Children.map(children, (child) =>
     cloneElement(child, {
       column,
-      isSelected,
     })
   );
 
@@ -115,7 +96,20 @@ export function ColumnContainer({
         dropRef(node);
       }}
       className={className}
-      onClick={() => onClickHandler(column)}
+      onClick={() =>
+        dispatch(
+          setColumnSelectedStatus({
+            id,
+            isSelected: !column?.status.isSelected,
+          })
+        )
+      }
+      onMouseEnter={() =>
+        dispatch(setColumnHoverStatus({ id, isHovered: true }))
+      }
+      onMouseLeave={() =>
+        dispatch(setColumnHoverStatus({ id, isHovered: false }))
+      }
     >
       {enhancedChildren}
     </div>

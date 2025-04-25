@@ -4,12 +4,12 @@ import { Box, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ClearIcon from "@mui/icons-material/Clear";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import {
-  clearSelectedColumnIds,
-  removeFromSelectedColumnIds,
-} from "../../../data/slices/uiSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { selectSelectedColumnIds } from "../../../data/slices/uiSlice";
+import {
+  clearSelectedColumns,
+  selectSelectedColumnIds,
+} from "../../../data/slices/columnsSlice";
+import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 
 export default function StackDetailToolbar() {
   const dispatch = useDispatch();
@@ -25,7 +25,7 @@ export default function StackDetailToolbar() {
       label: "Remove selected columns",
       icon: <DeleteIcon />,
       action: () => {
-        dispatch(removeFromSelectedColumnIds(selectedColumnIds));
+        dispatch(removeColumns(selectedColumnIds));
         handleMenuClose();
       },
     },
@@ -33,7 +33,7 @@ export default function StackDetailToolbar() {
       label: "Clear column selection",
       icon: <ClearIcon />,
       action: () => {
-        dispatch(clearSelectedColumnIds());
+        dispatch(clearSelectedColumns());
         handleMenuClose();
       },
     },

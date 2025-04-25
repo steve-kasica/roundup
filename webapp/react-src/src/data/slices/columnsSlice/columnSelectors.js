@@ -86,3 +86,11 @@ export const selectColumnIdsByIndex = createSelector(
     );
   }
 );
+
+/**
+ * Selects the selected column IDs.
+ *
+ * @param {Object} state - The Redux state.
+ * @returns {Array<string>} - An array of column IDs where `status.isSelected` is true
+ */
+export const selectSelectedColumnIds = (state) => state.columns.selected;

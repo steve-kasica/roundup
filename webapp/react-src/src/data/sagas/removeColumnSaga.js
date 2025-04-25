@@ -14,7 +14,7 @@ export default function* removeColumnSaga() {
 
 function* removeColumnSagaWorker(action) {
   const id = action.payload;
-  const { parentId: projectId, name } = yield select(
+  const { tableId: projectId, name } = yield select(
     (state) => state.columns.data[id]
   );
 

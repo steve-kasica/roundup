@@ -4,6 +4,7 @@ import Column, { COLUMN_STATUS_LOADING, COLUMN_STATUS_VISABLE } from "./Column";
 const initialState = {
   idsByTable: {},
   data: {},
+  selected: [],
 };
 
 const columnsSlice = createSlice({
@@ -25,13 +26,7 @@ const columnsSlice = createSlice({
         state.idsByTable[tableId] = [];
       }
       for (let i = 0; i < columnCount; i++) {
-        const column = new Column(
-          tableId,
-          i,
-          undefined,
-          undefined,
-          COLUMN_STATUS_LOADING
-        );
+        const column = Column(tableId, i, undefined, undefined);
         state.data[column.id] = column;
         state.idsByTable[tableId].push(column.id);
       }
@@ -53,9 +48,8 @@ const columnsSlice = createSlice({
 
         column.name = columnInfo.name;
         column.columnType = columnInfo.is_numeric ? "categorical" : "numeric";
-        column.status = COLUMN_STATUS_VISABLE;
-        column.isLoading = false;
-        column.error = null;
+        column.status.isLoading = false;
+        column.status.error = null;
       });
     },
 
@@ -83,8 +77,8 @@ const columnsSlice = createSlice({
       const { id } = action.payload;
       const column = state.data[id];
       if (column) {
-        column.loading = true;
-        column.error = null;
+        column.status.isLoading = true;
+        column.status.error = null;
       }
     },
 
@@ -100,8 +94,8 @@ const columnsSlice = createSlice({
       const { id, newColumnName } = action.payload;
       const column = state.data[id];
       if (column) {
-        column.loading = false;
-        column.error = null;
+        column.status.isLoading = false;
+        column.status.error = null;
         column.name = newColumnName;
       }
     },
@@ -119,8 +113,8 @@ const columnsSlice = createSlice({
       const { id } = action.payload;
       const column = state.data[id];
       if (column) {
-        column.loading = false;
-        column.error = action.payload.error;
+        column.status.isLoading = false;
+        column.status.error = action.payload.error;
       }
     },
 
@@ -135,8 +129,8 @@ const columnsSlice = createSlice({
       const id = action.payload;
       const column = state.data[id];
       if (column) {
-        column.loading = true;
-        column.error = null;
+        column.status.isLoading = true;
+        column.status.error = null;
       }
     },
 
@@ -171,11 +165,49 @@ const columnsSlice = createSlice({
       const { id, error } = action.payload;
       const column = state.data[id];
       if (column) {
-        column.loading = false;
-        column.error = error;
+        column.status.isLoading = false;
+        column.status.error = error;
       }
     },
-  },
+
+    setColumnSelectedStatus(state, action) {
+      const { id, isSelected } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isSelected = isSelected;
+        if (isSelected) {
+          state.selected.push(id);
+        } else {
+          state.selected = state.selected.filter(
+            (selectedId) => selectedId !== id
+          );
+        }
+      }
+    },
+    clearSelectedColumns(state) {
+      state.selected.forEach((id) => {
+        const column = state.data[id];
+        if (column) {
+          column.status.isSelected = false;
+        }
+      });
+      state.selected = initialState.selected;
+    },
+    setColumnHoverStatus(state, action) {
+      const { id, isHovered } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isHovered = isHovered;
+      }
+    },
+    setColumnDragStatus(state, action) {
+      const { id, isDragging } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isDragging = isDragging;
+      }
+    },
+  }, // end reducers
 });
 
 export default columnsSlice.reducer;
@@ -190,4 +222,8 @@ export const {
   removeColumnRequest,
   removeColumnSuccess,
   removeColumnFailure,
+  setColumnSelectedStatus,
+  clearSelectedColumns,
+  setColumnHoverStatus,
+  setColumnDragStatus,
 } = columnsSlice.actions;

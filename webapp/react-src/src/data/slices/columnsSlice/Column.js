@@ -66,13 +66,7 @@ export const COLUMN_STATUS_LOADING = "loading";
  * //   error: null
  * // }
  */
-export default function Column(
-  tableId,
-  index,
-  name,
-  columnType,
-  status = COLUMN_STATUS_VISABLE
-) {
+export default function Column(tableId, index, name, columnType) {
   if (tableId === undefined) {
     throw new Error("Param undefined `tableId`");
   } else if (index === undefined) {
@@ -85,8 +79,14 @@ export default function Column(
     name,
     index,
     columnType,
-    status,
     error: null,
+    status: {
+      isSelected: false,
+      isLoading: true, // Initially set to true to indicate loading state,
+      isHovered: false,
+      isDragging: false,
+      error: null,
+    },
   };
 }
 
@@ -110,6 +110,7 @@ export function isColumn(obj) {
     "name" in obj &&
     "columnType" in obj &&
     typeof obj.status === "string" &&
-    obj.error === null
+    obj.error === null &&
+    typeof obj.isSelected === "boolean"
   );
 }

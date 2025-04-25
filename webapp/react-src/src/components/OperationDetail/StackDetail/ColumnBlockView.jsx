@@ -89,7 +89,7 @@ export default function ColumnBlockView({ column }) {
           setAnchorEl(event.currentTarget);
         }}
         onMouseEnter={() => {
-          dispatch(setHoverColumnId(id));
+          // dispatch(setHoverColumnId(id));
           if (hoverTimeoutRef.current) {
             clearTimeout(hoverTimeoutRef.current);
             hoverTimeoutRef.current = null;
@@ -97,7 +97,7 @@ export default function ColumnBlockView({ column }) {
         }}
         onMouseLeave={() => {
           if (!isPopoverOpen) {
-            dispatch(unsetHoverColumnId());
+            // dispatch(unsetHoverColumnId());
           }
         }}
         inputRef={inputRef}
