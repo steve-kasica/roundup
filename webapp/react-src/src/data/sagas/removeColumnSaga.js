@@ -3,7 +3,7 @@ import {
   removeColumnRequest,
   removeColumnSuccess,
   removeColumnFailure,
-} from "../slices/sourceColumnsSlice";
+} from "../slices/columnsSlice";
 import OpenRefine from "../../services/open-refine";
 import { decrementColumnCount } from "../slices/sourceTablesSlice";
 import { removeFromSelectedColumnIds } from "../slices/uiSlice";
@@ -15,7 +15,7 @@ export default function* removeColumnSaga() {
 function* removeColumnSagaWorker(action) {
   const id = action.payload;
   const { parentId: projectId, name } = yield select(
-    (state) => state.sourceColumns.entries[id]
+    (state) => state.columns.data[id]
   );
 
   try {

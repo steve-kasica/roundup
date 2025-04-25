@@ -3,7 +3,7 @@ import {
   renameColumnRequest,
   renameColumnSuccess,
   renameColumnFailure,
-} from "../slices/sourceColumnsSlice";
+} from "../slices/columnsSlice";
 import OpenRefine from "../../services/open-refine";
 
 export default function* renameColumnSaga() {

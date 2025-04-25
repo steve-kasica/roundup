@@ -10,7 +10,7 @@ import {
   fetchSourceTableColumnsRequest,
   fetchSourceTableColumnsSuccess,
   fetchSourceTableColumnsFailure,
-} from "../slices/sourceColumnsSlice";
+} from "../slices/columnsSlice";
 import OpenRefineAPI from "../../services/open-refine";
 import {
   addNewChildren,

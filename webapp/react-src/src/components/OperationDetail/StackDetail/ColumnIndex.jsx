@@ -1,17 +1,16 @@
 import { useDispatch } from "react-redux";
 import {
   addToSelectedColumnIds,
-  clearSelectedColumnIds,
   setHoverColumnIndex,
   toggleSelectedColumnIds,
   unsetHoverColumnIndex,
 } from "../../../data/slices/uiSlice";
 import { useSelector } from "react-redux";
-import { getColumnIdsByIndex } from "../../../data/selectors";
+import { selectColumnIdsByIndex } from "../../../data/slices/columnsSlice";
 import { ColumnContainer } from "../../Containers";
 import ColumnBlockView from "./ColumnBlockView";
 import { Box, IconButton, List, ListItemButton, Popover } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
 import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 import { memo } from "react";
@@ -23,7 +22,9 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
   const [isSelected, setIsSelected] = useState(false);
   const isPopoverOpen = Boolean(anchorEl);
 
-  const columnIds = useSelector((state) => getColumnIdsByIndex(state, jIndex));
+  const columnIds = useSelector((state) =>
+    selectColumnIdsByIndex(state, jIndex)
+  );
 
   const index1 = jIndex + 1;
 

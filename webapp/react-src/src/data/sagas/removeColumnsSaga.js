@@ -1,5 +1,5 @@
 import { takeEvery, put, all } from "redux-saga/effects";
-import { removeColumnRequest } from "../slices/sourceColumnsSlice";
+import { removeColumnRequest } from "../slices/columnsSlice";
 import { createAction } from "@reduxjs/toolkit";
 
 export const removeColumns = createAction("SourceColumn/removeMultipleColumns");

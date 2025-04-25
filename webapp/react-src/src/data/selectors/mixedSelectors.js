@@ -3,7 +3,7 @@ import {
   CHILD_TYPE_TABLE,
 } from "../slices/operationsSlice/Operation";
 import { getOperationById, getOperationTableIds } from "./operationsSelectors";
-import { getColumnIdsByTableId } from "./sourceColumnsSelectors";
+import { selectColumnIdsByTableId } from "../slices/columnsSlice/columnSelectors";
 import { getSourceTableById } from "./sourceTablesSelectors";
 import {
   selectSelectedOperationId,
@@ -64,16 +64,16 @@ export function getOperationColumnCount(state, id) {
 
 export function getOperationColumnIds(state, operationId) {
   const operation = getOperationById(state, operationId);
-  const columnsByTable = operation.children.map((child) => {
+  const idsByTable = operation.children.map((child) => {
     if (child.type === CHILD_TYPE_TABLE) {
-      const columnIds = getColumnIdsByTableId(state, child.id);
+      const columnIds = selectColumnIdsByTableId(state, child.id);
       return columnIds;
     } else {
       // child is another operation
       throw new Error("not implemented yet");
     }
   });
-  return columnsByTable;
+  return idsByTable;
 }
 
 export function getTablesByOperationId(state, operationId) {

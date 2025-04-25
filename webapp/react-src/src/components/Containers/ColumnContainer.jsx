@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { getColumnById } from "../../data/selectors";
+import { selectColumnById } from "../../data/slices/columnsSlice";
 import {
   selectSelectedColumnIds,
   selectHoveredColumnId,
@@ -16,7 +16,7 @@ export function ColumnContainer({
   onClickHandler = () => null,
   children,
 }) {
-  const column = useSelector((state) => getColumnById(state, id));
+  const column = useSelector((state) => selectColumnById(state, id));
 
   const hoverColumnIndex = useSelector(selectHoveredColumnIndex);
   const hoverColumnId = useSelector(selectHoveredColumnId);

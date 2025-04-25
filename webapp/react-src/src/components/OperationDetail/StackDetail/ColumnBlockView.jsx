@@ -15,7 +15,7 @@ import { Popover, List, ListItemButton } from "@mui/material";
 import {
   removeColumnRequest,
   renameColumnRequest,
-} from "../../../data/slices/sourceColumnsSlice";
+} from "../../../data/slices/columnsSlice";
 import { drag, select, selectAll } from "d3";
 import {
   addToSelectedColumnIds,
@@ -37,7 +37,7 @@ export default function ColumnBlockView({ column, isSelected }) {
   const dispatch = useDispatch();
   const isNull = !column;
   const id = isNull ? "" : column.id;
-  const tableId = isNull ? "" : column.parentId;
+  const tableId = isNull ? "" : column.tableId;
   const name = isNull ? "null" : column.name;
   const index = isNull ? 0 : column.index;
 

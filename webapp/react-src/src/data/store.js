@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import uiReducer from "./slices/uiSlice";
 import sourceTablesReducer from "./slices/sourceTablesSlice";
-import sourceColumnsReducer from "./slices/sourceColumnsSlice";
+import columnsReducer from "./slices/columnsSlice";
 import operationsReducer from "./slices/operationsSlice";
 
 import createSagaMiddleware from "redux-saga";
@@ -14,7 +14,7 @@ const store = configureStore({
   reducer: {
     ui: uiReducer,
     sourceTables: sourceTablesReducer,
-    sourceColumns: sourceColumnsReducer,
+    columns: columnsReducer,
     operations: operationsReducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,

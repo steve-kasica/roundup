@@ -1,5 +1,4 @@
 export * from "./mixedSelectors.js";
 export * from "./operationsSelectors.js";
 export * from "./selectors.js";
-export * from "./sourceColumnsSelectors.js";
 export * from "./sourceTablesSelectors.js";

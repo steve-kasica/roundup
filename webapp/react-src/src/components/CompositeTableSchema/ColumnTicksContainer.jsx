@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { getColumnIdsByTableId } from "../../data/selectors";
+import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
 import { ColumnContainer } from "../Containers";
 import { useSelector } from "react-redux";
 
@@ -10,7 +10,7 @@ const ColumnTicksContainer = memo(function ColumnTicksContainer({
   ticksCount,
 }) {
   const columnIds = useSelector((state) =>
-    getColumnIdsByTableId(state, tableId)
+    selectColumnIdsByTableId(state, tableId)
   );
 
   const ticks = Array.from({ length: ticksCount }, (_, i) =>
