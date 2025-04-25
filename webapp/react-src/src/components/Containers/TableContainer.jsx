@@ -118,7 +118,7 @@ export function TableContainer({
       onMouseEnter={() => dispatch(setHoverTableId(id))}
       onMouseLeave={() => dispatch(unsetHoverTableId())}
     >
-      <DragPreviewImage connect={previewRef} src={tableIconImage} />
+      {/* <DragPreviewImage connect={previewRef} src={tableIconImage} /> */}
       {enhancedChildren}
     </Component>
   );

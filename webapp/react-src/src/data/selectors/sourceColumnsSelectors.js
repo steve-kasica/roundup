@@ -1,3 +1,5 @@
+import { createSelector } from "reselect";
+
 export const getColumnByTableIndex = (state, tableId, index) => {
   return Object.values(state.sourceColumns).find(
     (column) => column.parentId === tableId && column.index === index
@@ -21,9 +23,15 @@ export function getColumnById(state, id) {
   return column;
 }
 
-export function getColumnIdsByIndex(state, index) {
-  const columnIds = Object.values(state.sourceColumns.columnsByTable).map(
-    (columnIds) => (index < columnIds.length ? columnIds[index] : null)
-  );
-  return columnIds;
-}
+export const selectColumnIdsByTable = (state) =>
+  state.sourceColumns.columnsByTable;
+
+// Memoized selector
+export const getColumnIdsByIndex = createSelector(
+  [selectColumnIdsByTable, (_, index) => index],
+  (columnsByTable, index) => {
+    return Object.values(columnsByTable).map((columnIds) =>
+      index < columnIds.length ? columnIds[index] : null
+    );
+  }
+);

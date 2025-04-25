@@ -112,7 +112,6 @@ $cell-border-color: $table-border-color;
       height: 100%;
 
       form {
-        max-width: 100px;
         text-overflow: ellipsis;
         // TODO add animated transition on width changes
         width: fit-content;
@@ -149,11 +148,10 @@ $cell-border-color: $table-border-color;
             border-right-style: $cell-border-style;
             border-left: none;
             background-color: inherit;
-            cursor: context-menu;
           }
 
           input {
-            width: calc(100% - $verticalGutterWidth);
+            width: 10ch;
             overflow: hidden;
             padding: $cellPadding;
             background: inherit;
@@ -177,9 +175,6 @@ $cell-border-color: $table-border-color;
           &.hover {
             background-color: $hover-color;
           }
-          &.focused {
-            background-color: $focused-color;
-          }
 
           &.drag {
             position: fixed;
@@ -194,6 +189,7 @@ $cell-border-color: $table-border-color;
 
           &.selected {
             background-color: $selected-color;
+            cursor: grab;
           }
         }
 

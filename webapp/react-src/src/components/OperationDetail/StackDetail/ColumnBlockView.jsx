@@ -19,6 +19,7 @@ import {
 import { drag, select, selectAll } from "d3";
 import {
   addToSelectedColumnIds,
+  clearSelectedColumnIds,
   removeFromSelectedColumnIds,
   setHoverColumnId,
   toggleSelectedColumnIds,
@@ -26,11 +27,13 @@ import {
 } from "../../../data/slices/uiSlice/uiSlice";
 
 import { useDispatch } from "react-redux";
+import { useDrag, useDrop } from "react-dnd";
+import { getEmptyImage } from "react-dnd-html5-backend";
 
 const delay = 500; // in ms for input changes
 const OVERLAP_THRESHOLD = 0.5; // percent
 
-export default function ColumnBlockView({ column, handleRemoveColumnsAfter }) {
+export default function ColumnBlockView({ column, isSelected }) {
   const dispatch = useDispatch();
   const isNull = !column;
   const id = isNull ? "" : column.id;
@@ -41,69 +44,32 @@ export default function ColumnBlockView({ column, handleRemoveColumnsAfter }) {
   // const isLastInTable = (position === columnCount);
   const isLastInTable = false; // TODO: implement logic
   const position = index + 1; // 1-indexed column indexes for user
+  console.log(isSelected);
 
-  const columnDataRef = useRef();
+  const [{ isDragging }, dragRef, previewRef] = useDrag({
+    type: "column",
+    canDrag: isSelected,
+    item: () => {
+      return { id, name, tableId, isNull, index };
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+  const [, dropRef] = useDrop({
+    accept: "column",
+    drop: (droppedItem) => {
+      if (droppedItem.tableId === tableId && !isNull) {
+        // Handle the drop logic here
+        dispatch(clearSelectedColumnIds());
+        // dispatch(swapColumns({ sourceId: droppedItem.id, targetId: id }));
+      }
+    },
+  });
+
+  // Disable the default drag preview
   useEffect(() => {
-    select(columnDataRef.current).call(
-      drag()
-        .on("start", function () {
-          const { top, left } = this.getBoundingClientRect();
-          const originalElement = select(this);
-          const clone = originalElement.clone(true);
-          clone.classed("ghost", true);
-
-          originalElement
-            .classed("drag", true)
-            .style("position", "fixed")
-            .style("top", `${top}px`)
-            .style("left", `${left}px`);
-        })
-        .on("drag", function ({ dx }) {
-          const that = this;
-          const dragging = select(that);
-          const left = parseInt(dragging.style("left").replace("px"));
-          dragging.style("left", `${left + dx}px`);
-
-          selectAll(`.ColumnView[data-table-id="${tableId}"]`)
-            .filter(function () {
-              return this !== that;
-            })
-            .classed("hovered", function () {
-              return (
-                getPercentOverlap(this, dragging.node()) > OVERLAP_THRESHOLD
-              );
-            });
-        })
-        .on("end", function () {
-          const source = select(this);
-          const target = select(".ColumnView.hovered");
-
-          // reset all dragging styles
-          source
-            .classed("drag", false)
-            .style("position", null)
-            .style("top", null)
-            .style("left", null);
-          selectAll(".ColumnView.ghost").remove();
-          selectAll(".ColumnView.hovered").classed("hovered", false);
-
-          // Update data state
-          if (target.node()) {
-            // dispatch(swapColumnPositions({
-            //     tableId: source.attr("data-table-id"),
-            //     sourceIndex: parseInt(source.attr("data-column-index")),
-            //     targetIndex: parseInt(target.attr("data-column-index")),
-            // }));
-          } else {
-            // Treat as if a regular click, equivalent to callback for onMouseUp
-            // dispatch(setColumnProperty({
-            //     column,
-            //     property: "isSelected",
-            //     value: !isSelected
-            // }));
-          }
-        })
-    );
+    previewRef(getEmptyImage(), { captureDraggingState: true });
   }, []);
 
   // Keep hover persistent when context menu opens
@@ -147,11 +113,14 @@ export default function ColumnBlockView({ column, handleRemoveColumnsAfter }) {
   // Render ColumnView
   return (
     <div
+      ref={(node) => {
+        dragRef(node);
+        dropRef(node);
+      }}
       // ref={columnDataRef}
       id={id}
       data-table-id={tableId}
       data-column-index={index}
-      onClick={() => dispatch(toggleSelectedColumnIds(id))}
     >
       <div
         className="screen"
@@ -169,11 +138,6 @@ export default function ColumnBlockView({ column, handleRemoveColumnsAfter }) {
         onMouseLeave={() => {
           if (!isPopoverOpen) {
             dispatch(unsetHoverColumnId());
-          }
-        }}
-        onDoubleClick={() => {
-          if (inputRef.current) {
-            inputRef.current.focus();
           }
         }}
       >

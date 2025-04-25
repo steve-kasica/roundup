@@ -15,11 +15,13 @@ import SourceTables from "./components/SourceTables";
 import CompositeTableSchema from "./components/CompositeTableSchema";
 import OperationDetail from "./components/OperationDetail";
 import OperationsList from "./components/OperationsList";
+import CustomDragLayer from "./CustomDragLayer";
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <DndProvider backend={HTML5Backend}>
+        <CustomDragLayer />
         <DashboardGrid
           components={[
             SourceTables,

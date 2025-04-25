@@ -45,6 +45,7 @@ export function ColumnContainer({
   const enhancedChildren = Children.map(children, (child) =>
     cloneElement(child, {
       column,
+      isSelected,
     })
   );
 
