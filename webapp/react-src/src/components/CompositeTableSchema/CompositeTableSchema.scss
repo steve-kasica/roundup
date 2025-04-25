@@ -68,6 +68,12 @@ $null-column-background: #ddd;
       &.null {
         background-color: $null-column-background;
       }
+      &.dragged {
+        background-color: $dragged-src-color;
+      }
+      &.dragged-over {
+        background-color: $dragged-target-color;
+      }
       &.selected {
         background-color: $focused-color;
       }

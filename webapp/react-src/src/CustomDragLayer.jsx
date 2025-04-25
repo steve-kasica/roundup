@@ -1,5 +1,7 @@
 import { current } from "@reduxjs/toolkit";
 import { useDragLayer } from "react-dnd";
+import { DATA_TYPE as COLUMN } from "./data/slices/columnsSlice";
+import { ColumnView } from "./components/OperationDetail/StackDetail/ColumnBlockView";
 
 export default function CustomDragLayer() {
   const {
@@ -40,18 +42,16 @@ export default function CustomDragLayer() {
   // Render different effects based on the item type
   const renderDragPreview = () => {
     switch (itemType) {
-      case "column":
+      case COLUMN:
         return (
           <div
             style={{
               backgroundColor: "lightblue",
-              border: "1px solid blue",
               width: `${blockWidth}px`,
-              height: "35.27px",
+              height: "37px",
+              opacity: 0.5,
             }}
-          >
-            {item.name.substr(0, 3)}
-          </div>
+          ></div>
         );
       case "row":
         return (

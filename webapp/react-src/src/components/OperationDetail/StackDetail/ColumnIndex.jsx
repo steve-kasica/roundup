@@ -125,6 +125,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
           key={columnId}
           id={columnId}
           index={jIndex}
+          isDraggable={true}
           onClickHandler={() => dispatch(toggleSelectedColumnIds(columnId))}
         >
           <ColumnBlockView />

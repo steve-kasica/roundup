@@ -61,3 +61,18 @@ export const selectSelectedColumnIds = (state) => state.ui.selected.columnIds;
  * @returns {string[]} The selected table IDs.
  */
 export const selectSelectedTableIds = (state) => state.ui.selected.tableIds;
+
+/**
+ * Selects the column ID that is currently being dragged.
+ * @param {Object} state - The Redux state.
+ * @returns {string|null} The ID of the column being dragged, or `null` if none.
+ */
+export const selectDraggedSrcColumnId = (state) => state.ui.dragged.srcColumnId;
+
+/**
+ * Selects the column ID that is currently being dragged.
+ * @param {Object} state - The Redux state.
+ * @returns {string|null} The ID of the column being dragged, or `null` if none.
+ */
+export const selectDraggedTargetColumnId = (state) =>
+  state.ui.dragged.targetColumnId;

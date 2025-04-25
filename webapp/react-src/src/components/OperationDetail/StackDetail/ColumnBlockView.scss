@@ -1,0 +1,35 @@
+@use "sass:math";
+
+$horizontalGutterWidth: 10px;
+$enabledCellOutlineColor: #aaa;
+$table-border-style: solid;
+$table-border-width: 1px;
+$cell-border-width: $table-border-width;
+$cell-border-style: dotted;
+$cellPadding: 5px;
+
+.ColumnBlockView {
+  .screen {
+    padding-top: math.div($horizontalGutterWidth, 2);
+    padding-bottom: math.div($horizontalGutterWidth, 2);
+    border-color: $enabledCellOutlineColor;
+    border-style: $table-border-style;
+    border-width: $cell-border-width;
+    border-right-style: $cell-border-style;
+    border-left: none;
+    background-color: inherit;
+  }
+
+  input {
+    width: 10ch;
+    overflow: hidden;
+    padding: $cellPadding;
+    background: inherit;
+    border: none;
+    field-sizing: content;
+    white-space: nowrap;
+    text-align: center;
+    text-overflow: ellipsis;
+    pointer-events: none;
+  }
+}

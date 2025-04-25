@@ -139,30 +139,6 @@ $cell-border-color: $table-border-color;
         }
 
         .ColumnView {
-          .screen {
-            padding-top: math.div($horizontalGutterWidth, 2);
-            padding-bottom: math.div($horizontalGutterWidth, 2);
-            border-color: $enabledCellOutlineColor;
-            border-style: $table-border-style;
-            border-width: $cell-border-width;
-            border-right-style: $cell-border-style;
-            border-left: none;
-            background-color: inherit;
-          }
-
-          input {
-            width: 10ch;
-            overflow: hidden;
-            padding: $cellPadding;
-            background: inherit;
-            border: none;
-            field-sizing: content;
-            white-space: nowrap;
-            text-align: center;
-            text-overflow: ellipsis;
-            pointer-events: none;
-          }
-
           &.null {
             background-color: #ddd;
             input {

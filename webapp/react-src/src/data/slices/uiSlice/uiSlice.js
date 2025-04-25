@@ -17,6 +17,10 @@ export const initialState = {
     columnIds: [],
     tableIds: [],
   },
+  dragged: {
+    srcColumnId: null, // Tracks the column ID being dragged
+    targetColumnId: null, // Tracks the column ID being hovered over
+  },
 };
 
 export const uiSlice = createSlice({
@@ -206,6 +210,41 @@ export const uiSlice = createSlice({
     clearSelectedTableIds(state) {
       state.selected.tableIds = initialState.selected.tableIds;
     },
+
+    /**
+     * Sets the column ID that is being dragged.
+     * @param {Object} state - The current state of the slice.
+     * @param {Object} action - The dispatched action.
+     * @param {string|null} action.payload - The ID of the column being dragged.
+     */
+    setDraggedSrcColumnId(state, action) {
+      state.dragged.srcColumnId = action.payload;
+    },
+
+    /**
+     * Resets the drag column ID to its initial state.
+     * @param {Object} state - The current state of the slice.
+     */
+    unsetDraggedSrcColumnId(state) {
+      state.dragged.srcColumnId = initialState.dragged.srcColumnId;
+    },
+    /**
+     * Sets the column ID that is being dragged.
+     * @param {Object} state - The current state of the slice.
+     * @param {Object} action - The dispatched action.
+     * @param {string|null} action.payload - The ID of the column being dragged.
+     */
+    setDraggedTargetColumnId(state, action) {
+      state.dragged.targetColumnId = action.payload;
+    },
+
+    /**
+     * Resets the drag column ID to its initial state.
+     * @param {Object} state - The current state of the slice.
+     */
+    unsetDraggedTargetColumnId(state) {
+      state.dragged.targetColumnId = initialState.dragged.targetColumnId;
+    },
   },
 });
 
@@ -228,6 +267,10 @@ export const {
   removeFromSelectedTableIds,
   clearSelectedColumnIds,
   clearSelectedTableIds,
+  setDraggedSrcColumnId,
+  unsetDraggedSrcColumnId,
+  setDraggedTargetColumnId,
+  unsetDraggedTargetColumnId,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

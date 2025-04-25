@@ -3,5 +3,8 @@
 // Interaction state color
 
 $hover-color: #edc948;
-$selected-color: color.adjust($hover-color, $lightness: -10%);
+// $selected-color: color.adjust($hover-color, $lightness: -10%);
+$selected-color: tomato;
 $focused-color: color.adjust($hover-color, $lightness: -20%);
+$dragged-src-color: aquamarine;
+$dragged-target-color: $dragged-src-color;

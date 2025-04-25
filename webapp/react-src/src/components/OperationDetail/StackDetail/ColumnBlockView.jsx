@@ -16,24 +16,20 @@ import {
   removeColumnRequest,
   renameColumnRequest,
 } from "../../../data/slices/columnsSlice";
-import { drag, select, selectAll } from "d3";
 import {
   addToSelectedColumnIds,
-  clearSelectedColumnIds,
   removeFromSelectedColumnIds,
   setHoverColumnId,
-  toggleSelectedColumnIds,
   unsetHoverColumnId,
 } from "../../../data/slices/uiSlice/uiSlice";
 
 import { useDispatch } from "react-redux";
-import { useDrag, useDrop } from "react-dnd";
-import { getEmptyImage } from "react-dnd-html5-backend";
+
+import "./ColumnBlockView.scss";
 
 const delay = 500; // in ms for input changes
-const OVERLAP_THRESHOLD = 0.5; // percent
 
-export default function ColumnBlockView({ column, isSelected }) {
+export default function ColumnBlockView({ column }) {
   const dispatch = useDispatch();
   const isNull = !column;
   const id = isNull ? "" : column.id;
@@ -44,33 +40,6 @@ export default function ColumnBlockView({ column, isSelected }) {
   // const isLastInTable = (position === columnCount);
   const isLastInTable = false; // TODO: implement logic
   const position = index + 1; // 1-indexed column indexes for user
-  console.log(isSelected);
-
-  const [{ isDragging }, dragRef, previewRef] = useDrag({
-    type: "column",
-    canDrag: isSelected,
-    item: () => {
-      return { id, name, tableId, isNull, index };
-    },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-  const [, dropRef] = useDrop({
-    accept: "column",
-    drop: (droppedItem) => {
-      if (droppedItem.tableId === tableId && !isNull) {
-        // Handle the drop logic here
-        dispatch(clearSelectedColumnIds());
-        // dispatch(swapColumns({ sourceId: droppedItem.id, targetId: id }));
-      }
-    },
-  });
-
-  // Disable the default drag preview
-  useEffect(() => {
-    previewRef(getEmptyImage(), { captureDraggingState: true });
-  }, []);
 
   // Keep hover persistent when context menu opens
   const hoverTimeoutRef = useRef(null);
@@ -112,21 +81,12 @@ export default function ColumnBlockView({ column, isSelected }) {
 
   // Render ColumnView
   return (
-    <div
-      ref={(node) => {
-        dragRef(node);
-        dropRef(node);
-      }}
-      // ref={columnDataRef}
-      id={id}
-      data-table-id={tableId}
-      data-column-index={index}
-    >
-      <div
-        className="screen"
+    <div id={id} data-table-id={tableId} data-column-index={index}>
+      <ColumnView
+        value={value}
         onContextMenu={(event) => {
           event.preventDefault();
-          setAnchorEl(event.target);
+          setAnchorEl(event.currentTarget);
         }}
         onMouseEnter={() => {
           dispatch(setHoverColumnId(id));
@@ -140,17 +100,11 @@ export default function ColumnBlockView({ column, isSelected }) {
             dispatch(unsetHoverColumnId());
           }
         }}
-      >
-        <input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          onBlur={() => dispatch(removeFromSelectedColumnIds(id))}
-          onFocus={() => dispatch(addToSelectedColumnIds(id))}
-          minLength={1}
-        />
-      </div>
+        inputRef={inputRef}
+        onChange={(event) => setValue(event.target.value)}
+        onBlur={() => dispatch(removeFromSelectedColumnIds(id))}
+        onFocus={() => dispatch(addToSelectedColumnIds(id))}
+      />
       <Popover
         open={isPopoverOpen}
         anchorEl={anchorEl}
@@ -228,4 +182,36 @@ function getPercentOverlap(a, b) {
   const { right: bRight, left: bLeft } = b.getBoundingClientRect();
   const overlap = 1 - Math.abs(aRight - bRight) / width;
   return Math.max(0, overlap);
+}
+
+export function ColumnView({
+  value,
+  onContextMenu = () => null,
+  onMouseEnter = () => null,
+  onMouseLeave = () => null,
+  inputRef = null,
+  onChange = () => null,
+  onBlur = () => null,
+  onFocus = () => null,
+}) {
+  return (
+    <div className="ColumnBlockView">
+      <div
+        className="screen"
+        onContextMenu={onContextMenu}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          onFocus={onFocus}
+          minLength={1}
+        />
+      </div>
+    </div>
+  );
 }
