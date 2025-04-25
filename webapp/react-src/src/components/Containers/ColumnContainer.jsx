@@ -82,6 +82,7 @@ export function ColumnContainer({
   ]
     .filter(Boolean)
     .join(" ");
+  console.log(column?.status.isSelected);
 
   const enhancedChildren = Children.map(children, (child) =>
     cloneElement(child, {

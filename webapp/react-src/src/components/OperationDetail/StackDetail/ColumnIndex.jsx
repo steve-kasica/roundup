@@ -7,6 +7,7 @@ import {
   clearSelectedColumns,
   selectColumnIdsByIndex,
   setColumnSelectedStatus,
+  setColumnSelectedStatusAfterIndex,
 } from "../../../data/slices/columnsSlice";
 import { ColumnContainer } from "../../Containers";
 import ColumnBlockView from "./ColumnBlockView";
@@ -31,9 +32,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
     },
     {
       label: "Select all columns to the right",
-      action: () => null,
-      // TODO: implement logic to select all columns to the right
-      // dispatch(addToSelectedColumnIds(allColumnIds));
+      action: () => dispatch(setColumnSelectedStatusAfterIndex({ jIndex })),
     },
   ];
 
@@ -62,10 +61,12 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
           setIsMenuIconVisible(false);
         }}
         onClick={() => {
-          dispatch(clearSelectedColumns());
-          columnIds.forEach((id) => {
-            dispatch(setColumnSelectedStatus({ id, isSelected: true }));
-          });
+          if (!isPopoverOpen) {
+            dispatch(clearSelectedColumns());
+            columnIds.forEach((id) => {
+              dispatch(setColumnSelectedStatus({ id, isSelected: true }));
+            });
+          }
         }}
       >
         <label>{index1}</label>

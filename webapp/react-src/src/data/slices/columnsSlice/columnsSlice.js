@@ -145,6 +145,11 @@ const columnsSlice = createSlice({
       const { id } = action.payload;
       const column = state.data[id];
       if (column) {
+        if (column.status.isSelected) {
+          state.selected = state.selected.filter(
+            (selectedId) => selectedId !== id
+          );
+        }
         delete state.data[id];
         state.idsByTable[column.tableId] = state.idsByTable[
           column.tableId
@@ -183,6 +188,19 @@ const columnsSlice = createSlice({
           );
         }
       }
+    },
+    setColumnSelectedStatusAfterIndex(state, action) {
+      const { jIndex } = action.payload;
+      Object.values(state.idsByTable)
+        .map((tableColumnIds) => tableColumnIds.filter((_, j) => j >= jIndex))
+        .flat()
+        .forEach((id) => {
+          const column = state.data[id];
+          if (column && column.status.isSelected === false) {
+            column.status.isSelected = true;
+            state.selected.push(id);
+          }
+        });
     },
     clearSelectedColumns(state) {
       state.selected.forEach((id) => {
@@ -223,6 +241,7 @@ export const {
   removeColumnSuccess,
   removeColumnFailure,
   setColumnSelectedStatus,
+  setColumnSelectedStatusAfterIndex,
   clearSelectedColumns,
   setColumnHoverStatus,
   setColumnDragStatus,
