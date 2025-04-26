@@ -6,6 +6,7 @@ import { memo } from "react";
 import {
   clearSelectedColumns,
   selectColumnIdsByIndex,
+  setColumnHoverStatus,
   setColumnSelectedStatus,
   setColumnSelectedStatusAfterIndex,
 } from "../../../data/slices/columnsSlice";
@@ -56,9 +57,15 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
         }}
         onMouseEnter={() => {
           setIsMenuIconVisible(true);
+          columnIds.forEach((id) => {
+            dispatch(setColumnHoverStatus({ id, isHovered: true }));
+          });
         }}
         onMouseLeave={() => {
           setIsMenuIconVisible(false);
+          columnIds.forEach((id) => {
+            dispatch(setColumnHoverStatus({ id, isHovered: false }));
+          });
         }}
         onClick={() => {
           if (!isPopoverOpen) {
