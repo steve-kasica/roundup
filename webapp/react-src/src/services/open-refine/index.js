@@ -3,13 +3,15 @@ import { getColumnsInfo } from "./get-columns-info";
 import { getProjectModels } from "./get-project-models";
 import renameColumn from "./rename-column";
 import removeColumn from "./remove-column";
+import reorderColumns from "./reorder-columns";
 
 const api = {
-    getAllProjectMetadata,
-    getColumnsInfo,
-    getProjectModels,
-    renameColumn,
-    removeColumn
+  getAllProjectMetadata,
+  getColumnsInfo,
+  getProjectModels,
+  renameColumn,
+  removeColumn,
+  reorderColumns,
 };
 
 export default api;

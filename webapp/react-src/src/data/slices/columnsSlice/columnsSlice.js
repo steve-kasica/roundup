@@ -225,6 +225,46 @@ const columnsSlice = createSlice({
         column.status.isDragging = isDragging;
       }
     },
+    swapColumnsRequest(state, action) {
+      const { sourceId, targetId } = action.payload;
+      const sourceColumn = state.data[sourceId];
+      const targetColumn = state.data[targetId];
+
+      if (sourceColumn && targetColumn) {
+        sourceColumn.status.isLoading = true;
+        targetColumn.status.isLoading = true;
+      }
+    },
+    swapColumnsSuccess(state, action) {
+      const { sourceId, targetId } = action.payload;
+      const sourceColumn = state.data[sourceId];
+      const targetColumn = state.data[targetId];
+
+      const sourceIndex =
+        state.idsByTable[sourceColumn.tableId].indexOf(sourceId);
+      const targetIndex =
+        state.idsByTable[targetColumn.tableId].indexOf(targetId);
+
+      // Swap the columns in the data object
+      state.data[sourceId].index,
+        (state.data[targetId].index = [targetColumn.index, sourceColumn.index]);
+
+      // Update the idsByTable mapping
+      [
+        state.idsByTable[sourceColumn.tableId][sourceIndex],
+        state.idsByTable[targetColumn.tableId][targetIndex],
+      ] = [targetColumn.id, sourceColumn.id];
+    },
+    swapColumnsFailure(state, action) {
+      const { sourceId, targetId } = action.payload;
+      const sourceColumn = state.data[sourceId];
+      const targetColumn = state.data[targetId];
+
+      if (sourceColumn && targetColumn) {
+        sourceColumn.status.isLoading = false;
+        targetColumn.status.isLoading = false;
+      }
+    },
   }, // end reducers
 });
 
@@ -245,4 +285,7 @@ export const {
   clearSelectedColumns,
   setColumnHoverStatus,
   setColumnDragStatus,
+  swapColumnsRequest,
+  swapColumnsSuccess,
+  swapColumnsFailure,
 } = columnsSlice.actions;

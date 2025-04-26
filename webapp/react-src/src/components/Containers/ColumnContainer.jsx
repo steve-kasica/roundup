@@ -8,6 +8,7 @@ import {
   setColumnDragStatus,
   setColumnHoverStatus,
   setColumnSelectedStatus,
+  swapColumnsRequest,
 } from "../../data/slices/columnsSlice";
 
 import { selectColumnById } from "../../data/slices/columnsSlice";
@@ -51,8 +52,9 @@ export function ColumnContainer({
       // In this context `droppedItem.id` === `id` in useDrag
 
       if (droppedItem.tableId === tableId && !isNull) {
-        // Handle the drop logic here
-        // dispatch(swapColumns({ sourceId: droppedItem.id, targetId: id }));
+        dispatch(
+          swapColumnsRequest({ sourceId: droppedItem.id, targetId: id })
+        );
       }
       dispatch(setColumnDragStatus({ id, isDragging: false }));
       dispatch(clearSelectedColumns());
@@ -82,7 +84,6 @@ export function ColumnContainer({
   ]
     .filter(Boolean)
     .join(" ");
-  console.log(column?.status.isSelected);
 
   const enhancedChildren = Children.map(children, (child) =>
     cloneElement(child, {
