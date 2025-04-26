@@ -158,6 +158,9 @@ $cell-border-color: $table-border-color;
             // top: set inline dynamically
             filter: drop-shadow(2px 2px 2px black);
           }
+          &.dragged {
+            background-color: aquamarine;
+          }
 
           &.ghost {
             opacity: 0.75;

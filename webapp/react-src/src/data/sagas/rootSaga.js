@@ -8,6 +8,7 @@ import renameColumnSaga from "./renameColumnSaga";
 import removeColumnSaga from "./removeColumnSaga";
 import removeColumnsSaga from "./removeColumnsSaga";
 import swapColumnsSaga from "./swapColumnsSaga";
+import swapColumnIndicesSaga from "./swapColumnIndicesSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -17,5 +18,6 @@ export default function* rootSaga() {
     call(removeColumnSaga),
     call(removeColumnsSaga),
     call(swapColumnsSaga),
+    call(swapColumnIndicesSaga),
   ]);
 }

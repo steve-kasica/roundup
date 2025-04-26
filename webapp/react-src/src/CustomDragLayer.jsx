@@ -2,6 +2,7 @@ import { current } from "@reduxjs/toolkit";
 import { useDragLayer } from "react-dnd";
 import { DATA_TYPE as COLUMN } from "./data/slices/columnsSlice";
 import { ColumnView } from "./components/OperationDetail/StackDetail/ColumnBlockView";
+import { COLUMN_INDEX } from "./components/OperationDetail/StackDetail/ColumnIndex";
 
 export default function CustomDragLayer() {
   const {
@@ -53,17 +54,16 @@ export default function CustomDragLayer() {
             }}
           ></div>
         );
-      case "row":
+      case COLUMN_INDEX:
         return (
           <div
             style={{
-              padding: "8px",
-              backgroundColor: "lightgreen",
-              border: "1px solid green",
+              backgroundColor: "lightblue",
+              width: `${blockWidth}px`,
+              height: "20px",
+              opacity: 0.5,
             }}
-          >
-            Dragging Row: {item.rowId}
-          </div>
+          ></div>
         );
       default:
         return null;

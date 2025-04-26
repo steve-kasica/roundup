@@ -61,7 +61,11 @@ export default function StackDetailView({ id }) {
           <div className="x-axis label">{xAxisLabel}</div>
           <div className="grid-container">
             {xScale.domain().map((j) => (
-              <ColumnIndex key={j} jIndex={j} />
+              <ColumnIndex
+                key={j}
+                jIndex={j}
+                tableIds={tables.map(({ id }) => id)}
+              />
             ))}
           </div>
         </div>

@@ -1,11 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Box, IconButton, List, ListItemButton, Popover } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
 import { memo } from "react";
 import {
   clearSelectedColumns,
   selectColumnIdsByIndex,
+  setColumnDragStatus,
   setColumnHoverStatus,
   setColumnSelectedStatus,
   setColumnSelectedStatusAfterIndex,
@@ -13,16 +14,74 @@ import {
 import { ColumnContainer } from "../../Containers";
 import ColumnBlockView from "./ColumnBlockView";
 import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
+import { useDrag, useDrop } from "react-dnd";
+import { getEmptyImage } from "react-dnd-html5-backend";
+import { swapColumnIndices } from "../../../data/sagas/swapColumnIndicesSaga";
 
-const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
+export const COLUMN_INDEX = "COLUMN_INDEX";
+
+const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isSelected, setIsSelected] = useState(false);
   const [isMenuIconVisable, setIsMenuIconVisible] = useState(false);
   const isPopoverOpen = Boolean(anchorEl);
 
   const columnIds = useSelector((state) =>
     selectColumnIdsByIndex(state, jIndex)
   );
+
+  const [{ isDragging }, dragRef, previewRef] = useDrag({
+    type: COLUMN_INDEX,
+    item: () => {
+      return { columnIds, jIndex };
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+    end: () => {
+      // This is called when the drag operation ends
+      columnIds.forEach((id) => {
+        dispatch(setColumnDragStatus({ id, isDragging: false }));
+        dispatch(setColumnHoverStatus({ id, isHovered: false }));
+      });
+    },
+  });
+
+  useEffect(() => {
+    columnIds.forEach((id) => {
+      dispatch(setColumnDragStatus({ id, isDragging }));
+    });
+  }, [isDragging, columnIds, dispatch]);
+
+  const [{ isHovered }, dropRef] = useDrop({
+    accept: COLUMN_INDEX,
+    drop: (droppedItem) => {
+      // Remember, in this context `droppedItem.columnIds` === `columnIds` in useDrag
+      if (droppedItem.jIndex !== jIndex) {
+        dispatch(
+          swapColumnIndices({
+            sourceColumnIds: droppedItem.columnIds,
+            targetColumnIds: columnIds,
+          })
+        );
+      }
+    },
+    collect: (monitor) => ({
+      isHovered: monitor.isOver(),
+    }),
+  });
+
+  useEffect(() => {
+    columnIds.forEach((id) => {
+      dispatch(setColumnHoverStatus({ id, isHovered }));
+    });
+  }, [isHovered, columnIds, dispatch]);
+
+  // Disable the default drag preview
+  useEffect(() => {
+    previewRef(getEmptyImage(), { captureDraggingState: true });
+  }, []);
 
   const index1 = jIndex + 1;
 
@@ -37,17 +96,12 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
     },
   ];
 
-  // const memoizedChildren = useMemo(() => {
-  //   return columnIds.map((columnId) => (
-  //     <ColumnContainer key={columnId} id={columnId} index={jIndex}>
-  //       <ColumnBlockView />
-  //     </ColumnContainer>
-  //   ));
-  // }, [columnIds, jIndex]);
-
   return (
-    <form key={`index-${jIndex}`}>
+    <form>
       <Box
+        ref={(node) => {
+          dragRef(dropRef(node));
+        }}
         className="index-label"
         sx={{
           textAlign: "center",
@@ -70,8 +124,9 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex }) {
         onClick={() => {
           if (!isPopoverOpen) {
             dispatch(clearSelectedColumns());
+            setIsSelected(!isSelected);
             columnIds.forEach((id) => {
-              dispatch(setColumnSelectedStatus({ id, isSelected: true }));
+              dispatch(setColumnSelectedStatus({ id, isSelected }));
             });
           }
         }}

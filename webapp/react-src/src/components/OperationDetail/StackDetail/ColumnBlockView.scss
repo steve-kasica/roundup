@@ -32,4 +32,8 @@ $cellPadding: 5px;
     text-overflow: ellipsis;
     pointer-events: none;
   }
+
+  &.dragged {
+    background-color: aquamarine;
+  }
 }
