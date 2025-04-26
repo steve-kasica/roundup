@@ -225,6 +225,15 @@ const columnsSlice = createSlice({
         column.status.isDragging = isDragging;
       }
     },
+    setColumnVisibleStatus(state, action) {
+      const { ids, isVisible } = action.payload;
+      ids.forEach((id) => {
+        const column = state.data[id];
+        if (column) {
+          column.status.isVisible = isVisible;
+        }
+      });
+    },
     swapColumnsRequest(state, action) {
       const { sourceId, targetId } = action.payload;
       const sourceColumn = state.data[sourceId];
@@ -285,6 +294,7 @@ export const {
   clearSelectedColumns,
   setColumnHoverStatus,
   setColumnDragStatus,
+  setColumnVisibleStatus,
   swapColumnsRequest,
   swapColumnsSuccess,
   swapColumnsFailure,

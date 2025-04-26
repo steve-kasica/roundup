@@ -97,7 +97,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
   ];
 
   return (
-    <form>
+    <form className="ColumnIndex" data-columnIds={columnIds.join(",")}>
       <Box
         ref={(node) => {
           dragRef(dropRef(node));

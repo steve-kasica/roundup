@@ -81,6 +81,7 @@ export function ColumnContainer({
     column?.status.isHovered || isOver ? "hover" : undefined,
     column?.status.isSelected ? "selected" : undefined,
     column?.status.isDragging ? "dragged" : undefined,
+    column?.status.isVisible ? "visible" : undefined,
   ]
     .filter(Boolean)
     .join(" ");

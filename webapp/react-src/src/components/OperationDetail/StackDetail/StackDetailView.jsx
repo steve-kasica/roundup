@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setHoverTableId,
   unsetHoverTableId,
-  clearSelectedColumnIds,
-  selectSelectedColumnIds,
 } from "../../../data/slices/uiSlice";
 import {
   getOperationColumnIds,
@@ -15,6 +13,9 @@ import ColumnIndex from "./ColumnIndex";
 import StackDetailToolbar from "./StackDetailToolbar";
 
 import "./StackDetail.scss";
+import { useEffect } from "react";
+import { setColumnVisibleStatus } from "../../../data/slices/columnsSlice";
+import { useRef } from "react";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
@@ -34,6 +35,37 @@ export default function StackDetailView({ id }) {
     Array.from({ length: maxColumnCount }, (_, i) => i),
     [0, width]
   );
+
+  // Use a ref to track the grid container
+  const gridContainerRef = useRef();
+
+  useEffect(() => {
+    const gridContainer = gridContainerRef.current;
+    const columnElements = gridContainer.querySelectorAll(".ColumnIndex");
+
+    // Create an IntersectionObserver
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          console.log("entry", entry);
+          const columnIds = entry.target
+            .getAttribute("data-columnIds")
+            .split(",");
+          const isVisible = entry.isIntersecting;
+          dispatch(setColumnVisibleStatus({ ids: columnIds, isVisible }));
+        });
+      },
+      {
+        root: gridContainer,
+        threshold: 0.1, // Trigger when 10% of the element is visible
+      }
+    );
+
+    columnElements.forEach((columnElement) => {
+      observer.observe(columnElement);
+    });
+    return () => observer.disconnect();
+  }, [dispatch]);
 
   return (
     <div>
@@ -59,8 +91,12 @@ export default function StackDetailView({ id }) {
         </div>
         <div className="right-panel">
           <div className="x-axis label">{xAxisLabel}</div>
-          <div className="grid-container">
+          <div ref={gridContainerRef} className="grid-container">
             {xScale.domain().map((j) => (
+              // TODO: this is going to break if there are tables in the
+              // application that are not part of this specific operation,
+              // Thus, I need to use tableIds to index into that particualr
+              // table.
               <ColumnIndex
                 key={j}
                 jIndex={j}

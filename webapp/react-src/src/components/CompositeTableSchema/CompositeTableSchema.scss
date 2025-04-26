@@ -57,6 +57,9 @@ $null-column-background: #ddd;
     background-color: $color;
     > .ColumnView {
       background-color: $color;
+      border-width: 0.5px;
+      border-style: solid;
+      border-color: $color;
 
       &.loading {
         // background-color: $color;
@@ -73,6 +76,11 @@ $null-column-background: #ddd;
       }
       &.dragged {
         background-color: $dragged-src-color;
+      }
+      &.visible,
+      &.null.visable {
+        border-color: #000;
+        opacity: 1;
       }
     }
 
@@ -213,14 +221,6 @@ $null-column-background: #ddd;
         display: none;
       }
 
-      > .children > .table .ColumnView {
-        pointer-events: all; // Enable mouse events when operation is focused
-        border-right: 1px solid #bbb;
-        &:last-child {
-          border-right: none;
-        }
-      }
-
       // Focused pack operation styles
       // -----------------------------------------------------------
       &.pack > div {
@@ -235,15 +235,6 @@ $null-column-background: #ddd;
         }
       }
 
-      > .operation {
-        > .label {
-          display: block;
-        }
-        > .table > .label {
-          display: none;
-        }
-      }
-
       // focused stack operation styles
       &.stack {
         pointer-events: none;
@@ -252,7 +243,6 @@ $null-column-background: #ddd;
           > .ColumnView {
             pointer-events: all;
             cursor: pointer;
-            border: 0.5px solid black;
           }
         }
       }
