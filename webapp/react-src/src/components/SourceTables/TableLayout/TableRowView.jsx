@@ -1,6 +1,11 @@
-import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
+import {
+  CheckBox,
+  CheckBoxOutlineBlank,
+  DragIndicator,
+  MoreVert,
+} from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
-import { Chip, Typography } from "@mui/material";
+import { Chip, IconButton, Typography } from "@mui/material";
 import {
   formatDate,
   formatNumber,
@@ -20,11 +25,12 @@ export default function TableRowView({ table, searchString = "" }) {
   } = table;
   // const isDisabled = [table.name].join("^").indexOf(searchString) < 0;
   const isDisabled = false; // Placeholder for actual disabled logic
-  const isSelected = false;
 
   return (
     <>
-      <td>{isSelected ? <CheckBox /> : <CheckBoxOutlineBlank />}</td>
+      <td className="drag-handle">
+        <DragIndicator />
+      </td>
       <td>
         <Typography color={isDisabled ? "textDisabled" : "normal"}>
           <HighlightText pattern={searchString} text={name} />
@@ -55,15 +61,12 @@ export default function TableRowView({ table, searchString = "" }) {
           {formatDate(parseOpenRefineDate(dateLastModified))}
         </Typography>
       </td>
+      <td className="more-options">
+        <IconButton>
+          <MoreVert />
+        </IconButton>
+        {/* TODO: add context menu */}
+      </td>
     </>
   );
 }
-
-// function SearchableField({text}) {
-//     const searchString = useSelector(getSearchString);
-//     return (
-//         <Typography>
-//             <HighlightText pattern={searchString} text={text} />
-//         </Typography>
-//     );
-// }

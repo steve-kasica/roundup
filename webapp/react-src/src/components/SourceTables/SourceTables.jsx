@@ -27,7 +27,6 @@ import {
 
 import {
   getAllSourceTables,
-  getSelectedSourceTables,
   getSourceTablesError,
   getSourceTablesLoadingStatus,
 } from "../../data/selectors";
@@ -110,7 +109,6 @@ export default function SourceTables() {
   const [layout, setLayout] = useState(tableLayout);
 
   const sourceTables = useSelector(getAllSourceTables);
-  const selectedSourceTables = useSelector(getSelectedSourceTables);
   const isLoading = useSelector(getSourceTablesLoadingStatus);
   const error = useSelector(getSourceTablesError);
 
@@ -119,16 +117,9 @@ export default function SourceTables() {
   }, [dispatch]);
 
   const filteredTables = sourceTables
+    .filter((table) => table.name.includes(searchString))
     .filter(
-      (table) =>
-        selectedSourceTables.includes(table.id) ||
-        table.name.includes(searchString)
-    )
-    .filter(
-      (table) =>
-        selectedSourceTables.includes(table.id) ||
-        selectedTag.length === 0 ||
-        table.tags.includes(selectedTag)
+      (table) => selectedTag.length === 0 || table.tags.includes(selectedTag)
     );
 
   const tags = Array.from(

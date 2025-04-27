@@ -78,23 +78,7 @@ export default function TableLayout({
       <table>
         <thead>
           <tr>
-            {/* <Tooltip placement="top" title="Sort by selected tables"> */}
-            <th style={{ minWidth: "65px" }}>
-              <IconButton
-                onClick={() => {
-                  if ("isSelected" === sortAttribute) {
-                    setIsAscending(!isAscending);
-                  } else {
-                    setSortAttribute("isSelected");
-                  }
-                }}
-              >
-                <CheckBoxOutlineBlank />
-                {/* &nbsp;
-                  <SortIcon isSort={"isSelected"=== sortAttribute} attrType="boolean" />                   */}
-              </IconButton>
-            </th>
-            {/* </Tooltip>             */}
+            <th></th>
             {headers.map((header) => (
               <th key={header.attr}>
                 <Button
@@ -119,6 +103,7 @@ export default function TableLayout({
                 </Button>
               </th>
             ))}
+            <th></th>
           </tr>
         </thead>
         <tbody>

@@ -6,5 +6,6 @@ export const {
   fetchTablesSuccess,
   fetchTablesFailure,
   decrementColumnCount,
+  setTableSelectedStatus,
 } = slice.actions;
 export default slice.reducer;

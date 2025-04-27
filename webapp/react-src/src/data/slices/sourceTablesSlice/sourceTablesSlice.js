@@ -57,6 +57,10 @@ const slice = createSlice({
       state.data[tableId].columnCount--;
       // TODO: if columnCount === 0;
     },
+    setTableSelectedStatus: (state, action) => {
+      const { tableId, isSelected } = action.payload;
+      state.data[tableId].status.isSelected = isSelected;
+    },
   },
 });
 

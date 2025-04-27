@@ -12,10 +12,17 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../data/slices/operationsSlice";
-import { getTableById, getHoverOperationTableIds } from "../../data/selectors";
+import {
+  getTableById,
+  getHoverOperationTableIds,
+  getOperationByTableId,
+} from "../../data/selectors";
 
 import { sourceTableSelected } from "../../data/actions";
-import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
+import {
+  setTableSelectedStatus,
+  dataType as SourceTable,
+} from "../../data/slices/sourceTablesSlice";
 import { CHILD_TYPE_TABLE } from "../../data/slices/operationsSlice";
 
 import {
@@ -33,6 +40,9 @@ export function TableContainer({
 }) {
   const dispatch = useDispatch();
   const table = useSelector((state) => getTableById(state, id));
+  const parentOperation = useSelector((state) =>
+    getOperationByTableId(state, id)
+  );
   const hoverTableId = useSelector(selectHoveredTableId);
 
   const hoverOperationTableIds = useSelector(getHoverOperationTableIds);
@@ -41,20 +51,6 @@ export function TableContainer({
     table.id === hoverTableId ||
     (hoverTableId === null && hoverOperationTableIds.includes(table.id));
 
-  // TODO: does this cause a re-render?
-  const selectedTables = useSelector((state) => {
-    if (Object.keys(state.operations.entities).length === 0) {
-      return [];
-    }
-    return Object.values(state.operations.entities)
-      .map((operation) => {
-        return operation.children
-          .filter((child) => child.type === CHILD_TYPE_TABLE)
-          .map((child) => child.id);
-      })
-      .flat();
-  });
-  const isSelected = selectedTables.includes(table.id);
   const isDisabled = false;
   const [isPressed, setIsPressed] = useState(false);
 
@@ -81,7 +77,13 @@ export function TableContainer({
             default:
               throw new Error("Unknown drop target event");
           }
-          handleTableSelected(operationType);
+          // TODO: I think this logic should be encapsulated in a saga to handle
+          // whether or not to create new operation or add it to an existing one
+          // as well as update the table status in the table slice
+          // We might also store operation data in the custom metadata attribute of
+          // the table in OpenRefine
+          dispatch(sourceTableSelected({ operationType, table }));
+          dispatch(setTableSelectedStatus({ tableId: id, isSelected: true }));
         }
         setIsPressed(false);
       },
@@ -95,7 +97,9 @@ export function TableContainer({
   const className = [
     "TableView",
     isHover ? "hover" : undefined,
-    isSelected ? "selected" : undefined,
+    table.status.isSelected ? "selected" : undefined,
+    table.status.isSelected ? `depth-${parentOperation.depth}` : undefined,
+    table.status.isSelected ? parentOperation.operationType : undefined,
     isDisabled ? "disabled" : undefined,
     isDragging ? "dragging" : undefined,
     isPressed ? "pressed" : undefined,
@@ -122,13 +126,4 @@ export function TableContainer({
       {enhancedChildren}
     </Component>
   );
-
-  function handleTableSelected(operationType) {
-    dispatch(
-      sourceTableSelected({
-        operationType,
-        table,
-      })
-    );
-  }
 }
