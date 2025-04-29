@@ -94,3 +94,8 @@ export const selectColumnIdsByIndex = createSelector(
  * @returns {Array<string>} - An array of column IDs where `status.isSelected` is true
  */
 export const selectSelectedColumnIds = (state) => state.columns.selected;
+
+export function selectColumnCountByTableId(state, tableId) {
+  const columnIds = selectColumnIdsByTableId(state, tableId);
+  return columnIds.length;
+}

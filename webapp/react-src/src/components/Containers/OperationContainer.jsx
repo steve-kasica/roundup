@@ -1,35 +1,36 @@
 import { Children, cloneElement } from "react";
 import { useSelector } from "react-redux";
+import { selectOperationColumnCount } from "../../data/selectors";
 import {
-  getOperationById,
-  getOperationColumnCount,
-} from "../../data/selectors";
-
+  selectOperation,
+  selectOperationDepth,
+} from "../../data/slices/operationsSlice";
 import {
   selectHoveredOperationId,
   selectHoveredTableId,
   selectSelectedOperationId,
 } from "../../data/slices/uiSlice";
 
-export function OperationContainer({ id, onClick, children }) {
-  const operation = useSelector((state) => getOperationById(state, id));
+export function OperationContainer({ id, onClick, children, style }) {
+  const operation = useSelector((state) => selectOperation(state, id));
+  const depth = useSelector((state) => selectOperationDepth(state, id));
   const focusedOperationId = useSelector(selectSelectedOperationId);
   const hoverOperationId = useSelector(selectHoveredOperationId);
   const hoverTableId = useSelector(selectHoveredTableId);
   const columnCount = useSelector((state) =>
-    getOperationColumnCount(state, id)
+    selectOperationColumnCount(state, id)
   );
 
   const isFocused = operation.id === focusedOperationId;
   const isHover =
     operation.id === hoverOperationId ||
     (hoverOperationId === null &&
-      operation.children.some((child) => child.id === hoverTableId));
+      operation.tableIds.some((child) => child.id === hoverTableId));
 
   const className = [
-    "OperationView",
+    "OperationContainer",
     operation.operationType,
-    `depth-${operation.depth}`,
+    `depth-${depth}`,
     isFocused ? "focused" : undefined,
     isHover ? "hover" : undefined,
   ]
@@ -44,7 +45,12 @@ export function OperationContainer({ id, onClick, children }) {
   );
 
   return (
-    <div className={className} data-operation-id={id} onClick={onClick}>
+    <div
+      className={className}
+      data-operation-id={id}
+      onClick={onClick}
+      style={style}
+    >
       {enhancedChildren}
     </div>
   );

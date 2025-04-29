@@ -28,7 +28,7 @@ $label-font-family: sans-serif;
 $null-column-background: #ddd;
 
 @mixin background-color($color, $parent-color) {
-  background-color: $color;
+  // background-color: $color;
 
   $keyframe-name: "pulse-" + string.slice(#{meta.inspect($color)}, 2); // quick unique-ish name
   @keyframes #{$keyframe-name} {
@@ -43,13 +43,14 @@ $null-column-background: #ddd;
     }
   }
 
-  > .TableView {
-    background-color: $color;
+  > .TableContainer > .TableBlockView {
+    // background-color: $color;
+    height: 100%;
     > .ColumnView {
       background-color: $color;
       border-width: 0.5px;
       border-style: solid;
-      border-color: $color;
+      border-color: black;
 
       &.loading {
         // background-color: $color;
@@ -71,6 +72,7 @@ $null-column-background: #ddd;
       &.null.visable {
         border-color: #000;
         opacity: 1;
+        background-color: purple;
       }
     }
 
@@ -101,52 +103,55 @@ $null-column-background: #ddd;
 
   // Unfocused general operation styles
   // -----------------------------------------------------------
-  .OperationView {
-    display: flex;
-    position: relative;
-    padding: $operation-padding;
-    overflow: hidden;
-    height: 100%;
-    border-style: $table-border-style;
-    border-width: $table-border-width;
-    border-color: $table-border-color;
-
-    > .TableView {
-      width: 100%;
-      height: inherit;
+  .OperationContainer {
+    > .OperationBlockView {
       display: flex;
-      flex-direction: row;
       position: relative;
-      flex-grow: 1;
-      flex-basis: inherit;
-      min-height: $table-height;
-      overflow: hidden; // prevent column divs from poking out of rounded corners
+      padding: $operation-padding;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      border-style: $table-border-style;
+      border-width: $table-border-width;
+      border-color: $table-border-color;
 
-      > .ColumnView {
-        pointer-events: none; // Disable mouse events when operation is not focused
-        flex-grow: 1; // set individual item width to fill available space
-        line-height: $table-height;
+      > .TableContainer > .TableBlockView {
+        width: 100%;
+        height: inherit;
+        display: flex;
+        flex-direction: row;
+        position: relative;
+        flex-grow: 1;
+        flex-basis: inherit;
+        min-height: $table-height;
+        overflow: hidden; // prevent column divs from poking out of rounded corners
 
-        &.null {
-          cursor: default;
+        > .ColumnView {
+          pointer-events: none; // Disable mouse events when operation is not focused
+          flex-grow: 1; // set individual item width to fill available space
+          line-height: $table-height;
+
+          &.null {
+            cursor: default;
+          }
         }
+      }
+
+      .label {
+        position: absolute;
+        top: $label-offset-top;
+        left: $label-offset-left;
+        z-index: 1;
+        border: none !important;
+        line-height: $table-height;
+        pointer-events: none;
+        font-family: $label-font-family;
+        font-size: $label-font-size;
+        color: $label-text-color;
       }
     }
 
-    .label {
-      position: absolute;
-      top: $label-offset-top;
-      left: $label-offset-left;
-      z-index: 1;
-      border: none !important;
-      line-height: $table-height;
-      pointer-events: none;
-      font-family: $label-font-family;
-      font-size: $label-font-size;
-      color: $label-text-color;
-    }
-
-    &.no-op {
+    &.no-op > .OperationBlockView {
       flex-direction: column;
       @include background-color(
         $null-column-background,
@@ -157,19 +162,24 @@ $null-column-background: #ddd;
     // Unfocused stack operation styles
     // -----------------------------------------------------------
     &.stack {
-      flex-direction: column; // newly added tables go to bottom
+      display: flex;
+      flex: 1;
+      > .OperationBlockView {
+        flex: 0 0 auto;
+        flex-direction: column; // newly added tables go to bottom
+      }
 
-      &.depth-1 {
+      &.depth-1 > .OperationBlockView {
         @include background-color($stack-1-color, #fff);
       }
-      &.depth-2 {
+      &.depth-2 > .OperationBlockView {
         @include background-color($stack-2-color, $pack-1-color);
       }
-      &.depth-3 {
+      &.depth-3 > .OperationBlockView {
         @include background-color($stack-3-color, $pack-2-color);
       }
 
-      > .children > div {
+      > .OperationBlockView > .children > div {
         border: none;
         border-bottom-style: $table-border-style;
         border-bottom-width: $table-border-width;
@@ -184,19 +194,20 @@ $null-column-background: #ddd;
     // Unfocused pack operation styles
     // -----------------------------------------------------------
     &.pack {
-      flex-direction: row; // newly added tables go to right side
-
-      &.depth-1 {
+      > .OperationBlockView {
+        flex-direction: row; // newly added tables go to right side
+      }
+      &.depth-1 > .OperationBlockView {
         @include background-color($pack-1-color, #fff);
       }
-      &.depth-2 {
+      &.depth-2 > .OperationBlockView {
         @include background-color($pack-2-color, $stack-1-color);
       }
-      &.depth-3 {
+      &.depth-3 > .OperationBlockView {
         @include background-color($pack-3-color, $stack-2-color);
       }
 
-      > .children > div {
+      > .OperationBlockView > .children > div {
         border-style: $table-border-style;
         border-width: $table-border-width;
         border-color: $table-border-color;

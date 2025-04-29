@@ -8,31 +8,46 @@
  * **Table Tree**, by design.
  */
 
-import { Fragment } from "react";
-import { CHILD_TYPE_OPERATION } from "../../data/slices/operationsSlice/Operation.js";
 import { TableContainer, OperationContainer } from "../Containers";
 import TableBlockView from "./TableBlockView";
+import { selectOperationImmediateChildId } from "../../data/slices/operationsSlice";
+import { useSelector } from "react-redux";
+import AddIcon from "@mui/icons-material/Add";
 
-export default function OperationBlockView({ operation, columnCount }) {
+import { ADD_TABLE_EVENT } from "../../data/sagas/AddTableToSchemaSaga";
+import { useDrop } from "react-dnd";
+
+export default function OperationBlockView({
+  operation,
+  columnCount,
+  parentColumnCount,
+}) {
+  const childOperationId = useSelector((state) =>
+    selectOperationImmediateChildId(state, operation.id)
+  );
+
+  // const width = `${(columnCount / parentColumnCount) * 100}%`;
+
   return (
-    <>
-      {operation.children.map((child) => (
-        <Fragment key={child.id}>
-          {child.type === CHILD_TYPE_OPERATION ? (
-            <OperationContainer id={child.id}>
-              <OperationBlockView />
-            </OperationContainer>
-          ) : (
-            <TableContainer
-              id={child.id}
-              isDraggable={false}
-              operationColumnCount={columnCount}
-            >
-              <TableBlockView />
-            </TableContainer>
-          )}
-        </Fragment>
+    <div
+      className="OperationBlockView"
+      // style={{ width }}
+      data-columnCount={columnCount}
+      data-parentColumnCount={parentColumnCount}
+    >
+      {childOperationId && (
+        <OperationContainer id={childOperationId}>
+          <OperationBlockView parentColumnCount={columnCount} />
+        </OperationContainer>
+      )}
+      {operation.tableIds.map((tableId) => (
+        <TableContainer key={tableId} id={tableId} isDraggable={false}>
+          <TableBlockView
+            parentOperationType={operation.operationType}
+            parentColumnCount={columnCount}
+          />
+        </TableContainer>
       ))}
-    </>
+    </div>
   );
 }

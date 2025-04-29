@@ -1,8 +1,15 @@
 import {
-  CHILD_TYPE_OPERATION,
-  CHILD_TYPE_TABLE,
+  OPERATION_TYPE_NO_OP,
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
 } from "../slices/operationsSlice/Operation";
-import { getOperationById, getOperationTableIds } from "./operationsSelectors";
+import {
+  selectAllOperations,
+  selectOperation,
+  selectOperationChildren,
+  selectOperationImmediateChildId,
+  selectRootOperation,
+} from "../slices/operationsSlice";
 import { selectColumnIdsByTableId } from "../slices/columnsSlice/columnSelectors";
 import { getSourceTableById } from "./sourceTablesSelectors";
 import {
@@ -24,23 +31,23 @@ export const getFocusedOperation = (state) => {
   }
 };
 
-export function getChildrenData(state, children) {
-  const childrenData = children.map((child) => {
-    if (child.type === CHILD_TYPE_OPERATION) {
-      return getOperationById(state, child.id);
-    } else {
-      return getSourceTableById(state, child.id);
-    }
-  });
-  return childrenData;
-}
+// export function getChildrenData(state, children) {
+//   const childrenData = children.map((child) => {
+//     if (child.type === CHILD_TYPE_OPERATION) {
+//       return selectOperation(state, child.id);
+//     } else {
+//       return getSourceTableById(state, child.id);
+//     }
+//   });
+//   return childrenData;
+// }
 
 export const getHoverOperationTableIds = (state) => {
   const hoverOperationId = selectHoveredOperationId(state);
   if (hoverOperationId === null) {
     return [];
   } else {
-    const operation = getOperationById(state, hoverOperationId);
+    const operation = selectOperation(state, hoverOperationId);
     if (operation === undefined) {
       throw new Error("Node not found");
     }
@@ -48,42 +55,86 @@ export const getHoverOperationTableIds = (state) => {
   }
 };
 
-export function getOperationColumnCount(state, id) {
-  const operation = getOperationById(state, id);
-  const columnCounts = operation.children.map((child) => {
-    if (child.type === CHILD_TYPE_TABLE) {
-      return state.sourceTables.data[child.id].columnCount;
-    } else {
-      // child is another operation
-      throw new Error("Not implemented yet");
-    }
+// Obviously a good candidate for memoization
+// Recursive function
+export function selectOperationColumnCount(state, id) {
+  let columnCount = 0,
+    operation;
+  try {
+    operation = selectOperation(state, id);
+  } catch {
+    return columnCount;
+  }
+  operation.tableIds.forEach((tableId) => {
+    const columns = selectColumnIdsByTableId(state, tableId);
+    updateCount(columns.length);
   });
-  const maxColumnCount = Math.max(...columnCounts);
-  return maxColumnCount;
+  const childOperationId = selectOperationImmediateChildId(state, id);
+  if (childOperationId !== null) {
+    updateCount(selectOperationColumnCount(state, childOperationId));
+  }
+
+  return columnCount;
+
+  function updateCount(count) {
+    switch (operation.operationType) {
+      case OPERATION_TYPE_NO_OP:
+      case OPERATION_TYPE_PACK:
+        columnCount += count;
+        break;
+      case OPERATION_TYPE_STACK:
+        columnCount = Math.max(columnCount, count);
+        break;
+      default:
+        throw new Error("Invalid operation type");
+    }
+  }
+}
+
+export function selectSchemaColumnCount(state) {
+  let columnCount = 0;
+  let operations = selectAllOperations(state); // orders operations from bottom to top
+  if (operations.length === 0) {
+    return columnCount;
+  } else {
+    operations.forEach((operation) => {
+      switch (operation.operationType) {
+        case OPERATION_TYPE_NO_OP:
+        case OPERATION_TYPE_PACK:
+          columnCount += selectOperationColumnCount(state, operation.id);
+          break;
+        case OPERATION_TYPE_STACK:
+          columnCount = Math.max(
+            columnCount,
+            selectOperationColumnCount(state, operation.id)
+          );
+          break;
+        default:
+          throw new Error("Invalid operation type");
+      }
+    });
+    return columnCount;
+  }
 }
 
 export function getOperationColumnIds(state, operationId) {
-  const operation = getOperationById(state, operationId);
-  const idsByTable = operation.children.map((child) => {
-    if (child.type === CHILD_TYPE_TABLE) {
-      const columnIds = selectColumnIdsByTableId(state, child.id);
-      return columnIds;
-    } else {
-      // child is another operation
-      throw new Error("not implemented yet");
-    }
+  const operation = selectOperation(state, operationId);
+  if (operation === undefined) {
+    throw new Error("Operation not found");
+  }
+  return operation.tableIds.map((tableId) => {
+    const columnIds = selectColumnIdsByTableId(state, tableId);
+    return columnIds;
   });
-  return idsByTable;
 }
 
 export function getTablesByOperationId(state, operationId) {
-  const operation = state.operations.entities[operationId];
-  const tables = operation.children.map((child) => {
-    if (child.type === CHILD_TYPE_TABLE) {
-      return state.sourceTables.data[child.id];
-    } else {
-      throw new Error("Operations not yet implemented");
-    }
+  const operation = selectOperation(state, operationId);
+  if (operation === undefined) {
+    throw new Error("Operation not found");
+  }
+  return operation.tableIds.map((tableId) => {
+    const table = getSourceTableById(state, tableId);
+    return table;
   });
-  return tables;
 }

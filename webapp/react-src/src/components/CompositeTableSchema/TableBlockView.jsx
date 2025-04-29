@@ -8,14 +8,12 @@ import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { isMouseOverElement } from "../../lib/utilities/dom.js";
 import ColumnTicksContainer from "./ColumnTicksContainer.jsx";
+import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice/Operation.js";
 
-// export default function({node, parentOperation, columnCount}) {
 export default function TableBlockView({
   table,
-  handleRemoveTable,
-  handleRemoveOperation,
-  handleSelectOperation,
-  operationColumnCount,
+  parentOperationType,
+  parentColumnCount,
 }) {
   const { id, name, columnCount } = table;
   const dispatch = useDispatch();
@@ -43,17 +41,24 @@ export default function TableBlockView({
     //   onClick: handleSelectOperation,
     // },
   ];
+
+  // const width = `${(columnCount / parentColumnCount) * 100}%`;
+  const ticksCount =
+    parentOperationType === OPERATION_TYPE_STACK
+      ? parentColumnCount
+      : columnCount;
+
   return (
-    <>
-      {/* <div 
-                ref={tableRef}
-                data-id={id}
-                onContextMenu={handleContextMenu}
-            > */}
+    <div
+      className="TableBlockView"
+      // style={{ width }}
+      data-columnCount={columnCount}
+      data-parentColumnCount={parentColumnCount}
+    >
       <div className="label">
         {name} <span className="column-count">({columnCount})</span>
       </div>
-      <ColumnTicksContainer tableId={id} ticksCount={operationColumnCount} />
+      <ColumnTicksContainer tableId={id} ticksCount={ticksCount} />
       {/* <Menu
                 open={contextMenu !== null}
                 onClose={closeMenu}
@@ -79,7 +84,7 @@ export default function TableBlockView({
                     ))
                 }
             </Menu>         */}
-    </>
+    </div>
   );
 
   function closeMenu(event) {

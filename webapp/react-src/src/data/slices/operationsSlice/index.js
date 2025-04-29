@@ -1,14 +1,5 @@
-import slice from "./operationsSlice";
+import reducer from "./operationsSlice";
+export * from "./operationsSlice"; // export all actions
+export * from "./operationsSelectors";
 export * from "./Operation";
-
-export const {
-    addOperation,
-    addTableToDeepestOperation,
-    createOperation,
-    removeOperation,
-    updateOperation,
-    addChildrenToLastOperation,
-    addNewChildren,
-} = slice.actions;
-
-export default slice.reducer;
+export default reducer;

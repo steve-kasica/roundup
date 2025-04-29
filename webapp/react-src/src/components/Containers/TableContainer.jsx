@@ -1,7 +1,6 @@
 import { Children, cloneElement, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { DragPreviewImage, useDrag } from "react-dnd";
-import tableIconImage from "../../../public/images/table-icon.png";
+import { useDrag } from "react-dnd";
 import {
   DROP_TARGET_EVENT_INITIALIZE,
   DROP_TARGET_EVENT_PACK,
@@ -11,25 +10,21 @@ import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
+  selectOperationDepth,
+  selectOperationByTableId,
 } from "../../data/slices/operationsSlice";
-import {
-  getTableById,
-  getHoverOperationTableIds,
-  getOperationByTableId,
-} from "../../data/selectors";
-
+import { getTableById, getHoverOperationTableIds } from "../../data/selectors";
 import { sourceTableSelected } from "../../data/actions";
 import {
   setTableSelectedStatus,
   dataType as SourceTable,
 } from "../../data/slices/sourceTablesSlice";
-import { CHILD_TYPE_TABLE } from "../../data/slices/operationsSlice";
-
 import {
   selectHoveredTableId,
   setHoverTableId,
   unsetHoverTableId,
 } from "../../data/slices/uiSlice";
+import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 
 export function TableContainer({
   id,
@@ -41,7 +36,10 @@ export function TableContainer({
   const dispatch = useDispatch();
   const table = useSelector((state) => getTableById(state, id));
   const parentOperation = useSelector((state) =>
-    getOperationByTableId(state, id)
+    selectOperationByTableId(state, id)
+  );
+  const depth = useSelector((state) =>
+    selectOperationDepth(state, parentOperation?.id)
   );
   const hoverTableId = useSelector(selectHoveredTableId);
 
@@ -62,28 +60,12 @@ export function TableContainer({
       end: (item, monitor) => {
         const result = monitor.getDropResult();
         if (monitor.didDrop() && id === result.tableId) {
-          // Table has dropped
-          let operationType;
-          switch (result.dropTargetEvent) {
-            case DROP_TARGET_EVENT_INITIALIZE:
-              operationType = OPERATION_TYPE_NO_OP;
-              break;
-            case DROP_TARGET_EVENT_PACK:
-              operationType = OPERATION_TYPE_PACK;
-              break;
-            case DROP_TARGET_EVENT_STACK:
-              operationType = OPERATION_TYPE_STACK;
-              break;
-            default:
-              throw new Error("Unknown drop target event");
-          }
-          // TODO: I think this logic should be encapsulated in a saga to handle
-          // whether or not to create new operation or add it to an existing one
-          // as well as update the table status in the table slice
-          // We might also store operation data in the custom metadata attribute of
-          // the table in OpenRefine
-          dispatch(sourceTableSelected({ operationType, table }));
-          dispatch(setTableSelectedStatus({ tableId: id, isSelected: true }));
+          dispatch(
+            addTableToSchema({
+              tableId: id,
+              operationType: result.operationType,
+            })
+          );
         }
         setIsPressed(false);
       },
@@ -95,11 +77,11 @@ export function TableContainer({
   );
 
   const className = [
-    "TableView",
+    "TableContainer",
     isHover ? "hover" : undefined,
-    table.status.isSelected ? "selected" : undefined,
-    table.status.isSelected ? `depth-${parentOperation.depth}` : undefined,
-    table.status.isSelected ? parentOperation.operationType : undefined,
+    parentOperation ? "selected" : undefined,
+    depth ? `depth-${depth}` : undefined,
+    parentOperation ? parentOperation.operationType : undefined,
     isDisabled ? "disabled" : undefined,
     isDragging ? "dragging" : undefined,
     isPressed ? "pressed" : undefined,
