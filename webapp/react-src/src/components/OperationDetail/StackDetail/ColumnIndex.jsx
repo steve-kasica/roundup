@@ -7,7 +7,7 @@ import {
   clearSelectedColumns,
   selectColumnIdsByIndex,
   setColumnDragStatus,
-  setColumnHoverStatus,
+  setColumnHoveredStatus,
   setColumnSelectedStatus,
   setColumnSelectedStatusAfterIndex,
 } from "../../../data/slices/columnsSlice";
@@ -43,7 +43,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
       // This is called when the drag operation ends
       columnIds.forEach((id) => {
         dispatch(setColumnDragStatus({ id, isDragging: false }));
-        dispatch(setColumnHoverStatus({ id, isHovered: false }));
+        dispatch(setColumnHoveredStatus({ id, isHovered: false }));
       });
     },
   });
@@ -72,11 +72,11 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
     }),
   });
 
-  useEffect(() => {
-    columnIds.forEach((id) => {
-      dispatch(setColumnHoverStatus({ id, isHovered }));
-    });
-  }, [isHovered, columnIds, dispatch]);
+  // useEffect(() => {
+  //   columnIds.forEach((id) => {
+  //     dispatch(setColumnHoveredStatus({ id, isHovered }));
+  //   });
+  // }, [isHovered, columnIds, dispatch]);
 
   // Disable the default drag preview
   useEffect(() => {
@@ -109,18 +109,18 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
           position: "relative",
           border: "1px solid #000",
         }}
-        onMouseEnter={() => {
-          setIsMenuIconVisible(true);
-          columnIds.forEach((id) => {
-            dispatch(setColumnHoverStatus({ id, isHovered: true }));
-          });
-        }}
-        onMouseLeave={() => {
-          setIsMenuIconVisible(false);
-          columnIds.forEach((id) => {
-            dispatch(setColumnHoverStatus({ id, isHovered: false }));
-          });
-        }}
+        // onMouseEnter={() => {
+        //   setIsMenuIconVisible(true);
+        //   columnIds.forEach((id) => {
+        //     dispatch(setColumnHoveredStatus({ id, isHovered: true }));
+        //   });
+        // }}
+        // onMouseLeave={() => {
+        //   setIsMenuIconVisible(false);
+        //   columnIds.forEach((id) => {
+        //     dispatch(setColumnHoveredStatus({ id, isHovered: false }));
+        //   });
+        // }}
         onClick={() => {
           if (!isPopoverOpen) {
             dispatch(clearSelectedColumns());

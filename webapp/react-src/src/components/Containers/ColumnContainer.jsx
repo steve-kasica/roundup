@@ -6,7 +6,7 @@ import {
   DATA_TYPE as COLUMN,
   clearSelectedColumns,
   setColumnDragStatus,
-  setColumnHoverStatus,
+  setColumnHoveredStatus,
   setColumnSelectedStatus,
   swapColumnsRequest,
 } from "../../data/slices/columnsSlice";
@@ -17,7 +17,6 @@ export function ColumnContainer({
   id,
   index,
   tableId,
-  onClickHandler = () => null,
   children,
   isDraggable = false,
 }) {
@@ -38,7 +37,7 @@ export function ColumnContainer({
     }),
     end: () => {
       dispatch(setColumnDragStatus({ id, isDragging: false }));
-      dispatch(setColumnHoverStatus({ id, isHovered: false }));
+      dispatch(setColumnHoveredStatus({ id, isHovered: false }));
     },
   });
 
@@ -70,16 +69,16 @@ export function ColumnContainer({
   }, []);
 
   // If dragging over a column, set the hover status
-  useEffect(() => {
-    dispatch(setColumnHoverStatus({ id, isHovered: isOver }));
-  }, [isOver, id, dispatch]);
+  // useEffect(() => {
+  //   dispatch(setColumnHoveredStatus({ id, isHovered: isOver }));
+  // }, [isOver, id, dispatch]);
 
   const className = [
     "ColumnView",
     column?.status.isLoading ? "loading" : undefined,
-    isNull ? "null" : undefined,
-    column?.status.isHovered || isOver ? "hover" : undefined,
-    column?.status.isSelected ? "selected" : undefined,
+    !column ? "null" : false,
+    column?.status.isHovered ? "hover" : false,
+    column?.status.isSelected ? "selected" : false,
     column?.status.isDragging ? "dragged" : undefined,
     column?.status.isVisible ? "visible" : undefined,
   ]
@@ -88,7 +87,10 @@ export function ColumnContainer({
 
   const enhancedChildren = Children.map(children, (child) =>
     cloneElement(child, {
-      column,
+      id: column?.id,
+      name: column?.name,
+      index: column?.index,
+      tableId: column?.tableId,
     })
   );
 
@@ -106,12 +108,6 @@ export function ColumnContainer({
             isSelected: !column?.status.isSelected,
           })
         )
-      }
-      onMouseEnter={() =>
-        dispatch(setColumnHoverStatus({ id, isHovered: true }))
-      }
-      onMouseLeave={() =>
-        dispatch(setColumnHoverStatus({ id, isHovered: false }))
       }
     >
       {enhancedChildren}

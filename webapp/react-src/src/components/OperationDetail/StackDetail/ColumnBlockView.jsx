@@ -15,6 +15,7 @@ import { Popover, List, ListItemButton } from "@mui/material";
 import {
   removeColumnRequest,
   renameColumnRequest,
+  setColumnHoveredStatus,
 } from "../../../data/slices/columnsSlice";
 import {
   addToSelectedColumnIds,
@@ -26,23 +27,25 @@ import {
 import { useDispatch } from "react-redux";
 
 import "./ColumnBlockView.scss";
+import { memo } from "react";
 
 const delay = 500; // in ms for input changes
 
-export default function ColumnBlockView({ column }) {
+const ColumnBlockView = memo(function ColumnBlockView({
+  id,
+  tableId,
+  name,
+  index,
+}) {
   const dispatch = useDispatch();
-  const isNull = !column;
-  const id = isNull ? "" : column.id;
-  const tableId = isNull ? "" : column.tableId;
-  const name = isNull ? "null" : column.name;
-  const index = isNull ? 0 : column.index;
 
-  // const isLastInTable = (position === columnCount);
-  const isLastInTable = false; // TODO: implement logic
+  // Additional variables derived from props
+  const isNull = id === undefined;
+  const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table
   const position = index + 1; // 1-indexed column indexes for user
 
   // Keep hover persistent when context menu opens
-  const hoverTimeoutRef = useRef(null);
+  // const hoverTimeoutRef = useRef(null);
 
   // Setup context menu
   //
@@ -50,9 +53,9 @@ export default function ColumnBlockView({ column }) {
   const isPopoverOpen = Boolean(anchorEl);
   const closePopover = () => {
     setAnchorEl(null);
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
+    // if (hoverTimeoutRef.current) {
+    //   clearTimeout(hoverTimeoutRef.current);
+    // }
     // Determine if we should still be hovering based on mouse position
     // This could be improved with a check if mouse is still over element
     // hoverTimeoutRef.current = setTimeout(handleColumnHover, 265);
@@ -89,9 +92,19 @@ export default function ColumnBlockView({ column }) {
           setAnchorEl(event.currentTarget);
         }}
         onMouseEnter={() => {
-          if (hoverTimeoutRef.current) {
-            clearTimeout(hoverTimeoutRef.current);
-            hoverTimeoutRef.current = null;
+          if (!isNull) {
+            dispatch(setColumnHoveredStatus({ id, isHovered: true }));
+          }
+
+          // if (hoverTimeoutRef.current) {
+          //   clearTimeout(hoverTimeoutRef.current);
+          //   hoverTimeoutRef.current = null;
+          //   dispatch(setColumnHoveredStatus({ id, isHovered: true }));
+          // }
+        }}
+        onMouseLeave={() => {
+          if (!isNull) {
+            dispatch(setColumnHoveredStatus({ id, isHovered: false }));
           }
         }}
         inputRef={inputRef}
@@ -159,7 +172,9 @@ export default function ColumnBlockView({ column }) {
       </Popover>
     </div>
   );
-}
+});
+
+export default ColumnBlockView;
 
 /**
  * getPercentOverlap
