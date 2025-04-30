@@ -9,26 +9,33 @@
 @use "sass:meta";
 @use "../../styles/variables.scss" as *;
 
-$operation-border-radius: 0px;
 $operation-padding: 0px;
+$operation-border-radius: 0px;
+$operation-border-color: #555;
 $operation-border-width: 1px;
 $operation-border-style: solid;
 
+$table-height: 20px;
+$table-border-radius: $operation-border-radius;
+$table-border-color: #555;
+$table-border-width: $operation-border-width;
+$table-border-style: $operation-border-style;
+
+$column-border-radius: $table-border-radius;
+$column-border-width: $table-border-width;
+$column-border-style: $table-border-style;
+$focused-operation-column-border-color: black;
+
 $label-offset-top: 0px;
 $label-offset-left: 5px;
-
-$table-height: 20px;
-$table-border-color: #000;
-$table-border-style: solid;
-$table-border-width: 1px;
-
 $label-text-color: $table-border-color;
 $label-font-size: 10px;
 $label-font-family: sans-serif;
+
 $null-column-background: #ddd;
 
 @mixin background-color($color, $parent-color) {
-  // background-color: $color;
+  color: $color; // Allows support for `currentColor` keyword
 
   $keyframe-name: "pulse-" + string.slice(#{meta.inspect($color)}, 2); // quick unique-ish name
   @keyframes #{$keyframe-name} {
@@ -44,16 +51,12 @@ $null-column-background: #ddd;
   }
 
   > .TableContainer > .TableBlockView {
-    // background-color: $color;
     height: 100%;
     > .ColumnView {
       background-color: $color;
-      border-width: 0.5px;
-      border-style: solid;
-      border-color: black;
+      border-color: $color;
 
       &.loading {
-        // background-color: $color;
         animation: #{$keyframe-name} 1s ease-in-out infinite;
       }
       &.hover {
@@ -70,9 +73,7 @@ $null-column-background: #ddd;
       }
       &.visible,
       &.null.visable {
-        border-color: #000;
         opacity: 1;
-        background-color: purple;
       }
     }
 
@@ -104,35 +105,59 @@ $null-column-background: #ddd;
   // Unfocused general operation styles
   // -----------------------------------------------------------
   .OperationContainer {
+    display: flex;
     > .OperationBlockView {
       display: flex;
+      box-sizing: border-box;
       position: relative;
       padding: $operation-padding;
       overflow: hidden;
       height: 100%;
       width: 100%;
-      border-style: $table-border-style;
-      border-width: $table-border-width;
-      border-color: $table-border-color;
+      border-radius: $operation-border-radius;
+      border-style: $operation-border-style;
+      border-width: $operation-border-width;
+      border-color: $operation-border-color;
 
-      > .TableContainer > .TableBlockView {
-        width: 100%;
-        height: inherit;
+      > .TableContainer {
         display: flex;
-        flex-direction: row;
-        position: relative;
-        flex-grow: 1;
-        flex-basis: inherit;
-        min-height: $table-height;
-        overflow: hidden; // prevent column divs from poking out of rounded corners
+        flex: 1;
+        > .TableBlockView {
+          width: 100%;
+          height: inherit;
+          display: flex;
+          box-sizing: border-box;
+          flex-direction: row;
+          position: relative;
+          flex-grow: 1;
+          flex-basis: inherit;
+          min-height: $table-height;
+          overflow: hidden; // prevent column divs from poking out of rounded corners
+          border-style: $table-border-style;
+          border-width: $table-border-width;
+          border-color: $table-border-color;
+          border-radius: $table-border-radius;
 
-        > .ColumnView {
-          pointer-events: none; // Disable mouse events when operation is not focused
-          flex-grow: 1; // set individual item width to fill available space
-          line-height: $table-height;
+          > .ColumnView {
+            pointer-events: none; // Disable mouse events when operation is not focused
+            flex-grow: 1; // set individual item width to fill available space
+            box-sizing: border-box;
+            line-height: $table-height;
+            border-style: $column-border-style;
+            border-width: $column-border-width;
+            // border-color: $column-border-color;
 
-          &.null {
-            cursor: default;
+            border-radius: $column-border-radius;
+            border-top: none;
+            border-bottom: none;
+            border-left: none;
+            &:last-child {
+              border-right: none;
+            }
+
+            &.null {
+              cursor: default;
+            }
           }
         }
       }
@@ -179,15 +204,8 @@ $null-column-background: #ddd;
         @include background-color($stack-3-color, $pack-2-color);
       }
 
-      > .OperationBlockView > .children > div {
-        border: none;
-        border-bottom-style: $table-border-style;
-        border-bottom-width: $table-border-width;
-        border-bottom-color: $table-border-color;
-        &:first-child {
-          // Top child of the stack
-          border-top: none;
-        }
+      > .OperationBlockView > div:not(:last-child) > div {
+        border-bottom: none;
       }
     }
 
@@ -207,45 +225,28 @@ $null-column-background: #ddd;
         @include background-color($pack-3-color, $stack-2-color);
       }
 
-      > .OperationBlockView > .children > div {
-        border-style: $table-border-style;
-        border-width: $table-border-width;
-        border-color: $table-border-color;
+      > .OperationBlockView > div:not(:last-child) > div {
+        border-left: none;
       }
     }
 
     // Focused general operation styles
     // -----------------------------------------------------------
-    &.focused {
-      cursor: default;
-      > .label {
-        display: none;
+    &:has(.OperationContainer.focused)
+      > .OperationBlockView
+      > .TableContainer
+      > .TableBlockView {
+      opacity: 0.3333;
+      transition: opacity 0.3s ease;
+    }
+    &.focused > .OperationBlockView {
+      .OperationContainer.stack .TableBlockView {
+        border-top-color: currentColor; // hide border without changing size
       }
 
-      // Focused pack operation styles
-      // -----------------------------------------------------------
-      &.pack > div {
-        border-top-color: $selected-color;
-        border-left: none;
-        border-bottom-color: $selected-color;
-        border-right: none;
-
-        &:first-child {
-          // right-most-child
-          border-right-color: $selected-color;
-        }
-      }
-
-      // focused stack operation styles
-      &.stack {
-        pointer-events: none;
-        > .TableView {
-          pointer-events: none;
-          > .ColumnView {
-            pointer-events: all;
-            cursor: pointer;
-          }
-        }
+      .TableContainer {
+        opacity: 1;
+        transition: opacity 0.3s ease;
       }
     }
   }
