@@ -28,7 +28,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
   const isPopoverOpen = Boolean(anchorEl);
 
   const columnIds = useSelector((state) =>
-    selectColumnIdsByIndex(state, jIndex)
+    selectColumnIdsByIndex(state, jIndex, tableIds)
   );
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({

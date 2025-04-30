@@ -79,11 +79,16 @@ export const selectLoadingColumnsByTable = (state, tableId) => {
  * @returns {Array<string|null>} - An array of column IDs at the specified index across all tables.
  */
 export const selectColumnIdsByIndex = createSelector(
-  [(state) => state.columns.idsByTable, (_, index) => index],
-  (idsByTable, index) => {
-    return Object.values(idsByTable).map((columnIds) =>
-      index < columnIds.length ? columnIds[index] : null
-    );
+  [
+    (state) => state.columns.idsByTable,
+    (_, index) => index,
+    (_, __, tableIds) => tableIds,
+  ],
+  (idsByTable, index, tableIds) => {
+    return tableIds.map((tableId) => {
+      const columnIds = idsByTable[tableId];
+      return columnIds && index < columnIds.length ? columnIds[index] : null;
+    });
   }
 );
 

@@ -124,3 +124,7 @@ export function selectOperationImmediateChildId(state, operationId) {
     return state.operations.ids[index - 1];
   }
 }
+
+export function selectFocusedOperationId(state) {
+  return state.operations.focused;
+}

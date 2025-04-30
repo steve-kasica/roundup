@@ -5,6 +5,7 @@ import { selectOperation, selectRootOperation } from "./operationsSelectors";
 const initialState = {
   data: {}, // Normalized operations stored by ID
   ids: [], // Array of operation IDs
+  focused: null, // ID of the currently focused operation
 };
 
 const operationsSlice = createSlice({
@@ -44,6 +45,10 @@ const operationsSlice = createSlice({
       const { id } = action.payload;
       removeOperationFromState(state, id);
     },
+    setFocusedOperation(state, action) {
+      const { id } = action.payload;
+      state.focused = id;
+    },
   },
 });
 
@@ -53,6 +58,7 @@ export const {
   appendOperation,
   addTableToOperation,
   removeOperation,
+  setFocusedOperation,
 } = operationsSlice.actions;
 
 export default operationsSlice.reducer;

@@ -21,12 +21,14 @@ const yAxisLabel = "table name";
 const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
-export default function StackDetailView({ id }) {
+export default function StackDetailView({ operationId }) {
   const dispatch = useDispatch();
 
-  const tables = useSelector((state) => getTablesByOperationId(state, id));
+  const tables = useSelector((state) =>
+    getTablesByOperationId(state, operationId)
+  );
   const columnIdsByTable = useSelector((state) =>
-    getOperationColumnIds(state, id)
+    getOperationColumnIds(state, operationId)
   );
 
   const maxColumnCount = Math.max(...columnIdsByTable.map((c) => c.length));
@@ -93,10 +95,6 @@ export default function StackDetailView({ id }) {
           <div className="x-axis label">{xAxisLabel}</div>
           <div ref={gridContainerRef} className="grid-container">
             {xScale.domain().map((j) => (
-              // TODO: this is going to break if there are tables in the
-              // application that are not part of this specific operation,
-              // Thus, I need to use tableIds to index into that particualr
-              // table.
               <ColumnIndex
                 key={j}
                 jIndex={j}

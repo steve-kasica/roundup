@@ -4,11 +4,11 @@ import { selectOperationColumnCount } from "../../data/selectors";
 import {
   selectOperation,
   selectOperationDepth,
+  selectFocusedOperationId,
 } from "../../data/slices/operationsSlice";
 import {
   selectHoveredOperationId,
   selectHoveredTableId,
-  selectSelectedOperationId,
 } from "../../data/slices/uiSlice";
 
 export function OperationContainer({ id, onClick, children, style }) {
@@ -18,7 +18,7 @@ export function OperationContainer({ id, onClick, children, style }) {
     selectOperationColumnCount(state, id)
   );
 
-  const focusedOperationId = useSelector(selectSelectedOperationId);
+  const focusedOperationId = useSelector(selectFocusedOperationId);
   const hoverOperationId = useSelector(selectHoveredOperationId);
   const hoverTableId = useSelector(selectHoveredTableId);
 
