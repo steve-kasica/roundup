@@ -13,15 +13,18 @@ export default function OperationsList() {
 
   return (
     <List className="OperationsList" dense>
-      {operationIds.map((operationId, i) => (
-        <OperationContainer
-          key={operationId}
-          id={operationId}
-          onClick={() => dispatch(setSelectedOperationId(operationId))}
-        >
-          <OperationListItemView index={i} />
-        </OperationContainer>
-      ))}
+      {operationIds
+        .slice()
+        .reverse()
+        .map((operationId, i) => (
+          <OperationContainer
+            key={operationId}
+            id={operationId}
+            onClick={() => dispatch(setSelectedOperationId(operationId))}
+          >
+            <OperationListItemView index={i} />
+          </OperationContainer>
+        ))}
     </List>
   );
 }

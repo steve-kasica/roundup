@@ -14,12 +14,13 @@ import {
 export function OperationContainer({ id, onClick, children, style }) {
   const operation = useSelector((state) => selectOperation(state, id));
   const depth = useSelector((state) => selectOperationDepth(state, id));
-  const focusedOperationId = useSelector(selectSelectedOperationId);
-  const hoverOperationId = useSelector(selectHoveredOperationId);
-  const hoverTableId = useSelector(selectHoveredTableId);
   const columnCount = useSelector((state) =>
     selectOperationColumnCount(state, id)
   );
+
+  const focusedOperationId = useSelector(selectSelectedOperationId);
+  const hoverOperationId = useSelector(selectHoveredOperationId);
+  const hoverTableId = useSelector(selectHoveredTableId);
 
   const isFocused = operation.id === focusedOperationId;
   const isHover =

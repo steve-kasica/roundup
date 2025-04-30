@@ -9,11 +9,14 @@ export default function OperationListItemView({
 }) {
   const { operationType } = operation;
 
+  const label = operationType.charAt(0).toUpperCase() + operationType.slice(1);
+  const position = index + 1;
+
   return (
     <ListItemButton>
       <ListItemText
-        primary={`${index + 1}. ${operationType}`}
-        secondary={columnCount}
+        primary={`${position}. ${label} (${columnCount})`}
+        secondary={operation.tableIds.join(", ")}
       />
     </ListItemButton>
   );
