@@ -8,6 +8,14 @@ import { createSelector } from "reselect";
  * @returns {Array<string>} - An array of column IDs for the table.
  */
 export function selectColumnIdsByTableId(state, tableId) {
+  // Check if the tableId exists in the state
+  if (!state.columns.idsByTable[tableId]) {
+    // If not, return an empty array
+    return [];
+  }
+  // If it exists, return the array of column IDs for that table
+  // This is a fallback to ensure that we always return an array
+  // even if the tableId is not found in the state
   return state.columns.idsByTable[tableId];
 }
 

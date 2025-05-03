@@ -12,38 +12,24 @@ import { TableContainer, OperationContainer } from "../Containers";
 import TableBlockView from "./TableBlockView";
 import { selectOperationImmediateChildId } from "../../data/slices/operationsSlice";
 import { useSelector } from "react-redux";
-import AddIcon from "@mui/icons-material/Add";
 
-import { ADD_TABLE_EVENT } from "../../data/sagas/AddTableToSchemaSaga";
-import { useDrop } from "react-dnd";
-
-export default function OperationBlockView({
-  operation,
-  columnCount,
-  parentColumnCount,
-}) {
+export default function OperationBlockView({ operation, columnCount }) {
+  const { tableIds, operationType } = operation;
   const childOperationId = useSelector((state) =>
     selectOperationImmediateChildId(state, operation.id)
   );
 
-  // const width = `${(columnCount / parentColumnCount) * 100}%`;
-
   return (
-    <div
-      className="OperationBlockView"
-      // style={{ width }}
-      data-columnCount={columnCount}
-      data-parentColumnCount={parentColumnCount}
-    >
+    <div className="OperationBlockView">
       {childOperationId && (
         <OperationContainer id={childOperationId}>
-          <OperationBlockView parentColumnCount={columnCount} />
+          <OperationBlockView />
         </OperationContainer>
       )}
-      {operation.tableIds.map((tableId) => (
+      {tableIds.map((tableId) => (
         <TableContainer key={tableId} id={tableId} isDraggable={false}>
           <TableBlockView
-            parentOperationType={operation.operationType}
+            parentOperationType={operationType}
             parentColumnCount={columnCount}
           />
         </TableContainer>

@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { isMouseOverElement } from "../../lib/utilities/dom.js";
 import ColumnTicksContainer from "./ColumnTicksContainer.jsx";
 import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice/Operation.js";
+import { setTableHoveredStatus } from "../../data/slices/sourceTablesSlice";
 
 export default function TableBlockView({
   table,
@@ -51,9 +52,12 @@ export default function TableBlockView({
   return (
     <div
       className="TableBlockView"
-      // style={{ width }}
-      data-columnCount={columnCount}
-      data-parentColumnCount={parentColumnCount}
+      onMouseEnter={() =>
+        dispatch(setTableHoveredStatus({ id, isHovered: true }))
+      }
+      onMouseLeave={() =>
+        dispatch(setTableHoveredStatus({ id, isHovered: false }))
+      }
     >
       <div className="label">
         {name} <span className="column-count">({columnCount})</span>

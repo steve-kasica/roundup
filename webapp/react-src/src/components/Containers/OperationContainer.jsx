@@ -19,21 +19,15 @@ export function OperationContainer({ id, onClick, children, style }) {
   );
 
   const focusedOperationId = useSelector(selectFocusedOperationId);
-  const hoverOperationId = useSelector(selectHoveredOperationId);
-  const hoverTableId = useSelector(selectHoveredTableId);
 
   const isFocused = operation.id === focusedOperationId;
-  const isHover =
-    operation.id === hoverOperationId ||
-    (hoverOperationId === null &&
-      operation.tableIds.some((child) => child.id === hoverTableId));
 
   const className = [
     "OperationContainer",
     operation.operationType,
     `depth-${depth}`,
     isFocused ? "focused" : undefined,
-    isHover ? "hover" : undefined,
+    operation.status.isHovered ? "hover" : undefined,
   ]
     .filter(Boolean)
     .join(" ");

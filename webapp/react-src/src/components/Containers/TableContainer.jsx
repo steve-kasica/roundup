@@ -2,28 +2,15 @@ import { Children, cloneElement, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrag } from "react-dnd";
 import {
-  DROP_TARGET_EVENT_INITIALIZE,
-  DROP_TARGET_EVENT_PACK,
-  DROP_TARGET_EVENT_STACK,
-} from "../CompositeTableSchema/TableDropTarget";
-import {
-  OPERATION_TYPE_NO_OP,
-  OPERATION_TYPE_PACK,
-  OPERATION_TYPE_STACK,
   selectOperationDepth,
   selectOperationByTableId,
 } from "../../data/slices/operationsSlice";
 import { getTableById, getHoverOperationTableIds } from "../../data/selectors";
-import { sourceTableSelected } from "../../data/actions";
 import {
-  setTableSelectedStatus,
+  setTableHoveredStatus,
   dataType as SourceTable,
 } from "../../data/slices/sourceTablesSlice";
-import {
-  selectHoveredTableId,
-  setHoverTableId,
-  unsetHoverTableId,
-} from "../../data/slices/uiSlice";
+import { selectHoveredTableId } from "../../data/slices/uiSlice";
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 
 export function TableContainer({
@@ -41,18 +28,11 @@ export function TableContainer({
   const depth = useSelector((state) =>
     selectOperationDepth(state, parentOperation?.id)
   );
-  const hoverTableId = useSelector(selectHoveredTableId);
-
-  const hoverOperationTableIds = useSelector(getHoverOperationTableIds);
-
-  const isHover =
-    table.id === hoverTableId ||
-    (hoverTableId === null && hoverOperationTableIds.includes(table.id));
 
   const isDisabled = false;
   const [isPressed, setIsPressed] = useState(false);
 
-  const [{ isDragging }, dragRef, previewRef] = useDrag(
+  const [{ isDragging }, dragRef] = useDrag(
     () => ({
       type: SourceTable,
       item: { tableId: id },
@@ -78,7 +58,7 @@ export function TableContainer({
 
   const className = [
     "TableContainer",
-    isHover ? "hover" : undefined,
+    table.status.isHovered ? "hover" : undefined,
     parentOperation ? "selected" : undefined,
     depth ? `depth-${depth}` : undefined,
     parentOperation ? parentOperation.operationType : undefined,
@@ -101,10 +81,13 @@ export function TableContainer({
       ref={dragRef}
       className={className}
       data-table-id={id}
-      onMouseEnter={() => dispatch(setHoverTableId(id))}
-      onMouseLeave={() => dispatch(unsetHoverTableId())}
+      onMouseEnter={() =>
+        dispatch(setTableHoveredStatus({ tableId: id, isHovered: true }))
+      }
+      onMouseLeave={() =>
+        dispatch(setTableHoveredStatus({ tableId: id, isHovered: false }))
+      }
     >
-      {/* <DragPreviewImage connect={previewRef} src={tableIconImage} /> */}
       {enhancedChildren}
     </Component>
   );

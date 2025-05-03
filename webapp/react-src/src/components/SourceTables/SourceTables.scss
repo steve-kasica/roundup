@@ -8,6 +8,12 @@
     background-color: yellow;
   }
 
+  .TableContainer {
+    &.hover {
+      background-color: $hover-color;
+    }
+  }
+
   .TableView {
     .drag-handle {
       text-align: center;
@@ -23,11 +29,6 @@
     &.dragging,
     &.pressed {
       cursor: grabbing;
-    }
-
-    &:hover,
-    &.hover {
-      background-color: $hover-color;
     }
 
     &.selected {

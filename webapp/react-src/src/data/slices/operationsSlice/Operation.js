@@ -24,6 +24,10 @@ export default function Operation(operationType, tableIds) {
     id: `o-${++idCounter}`, // Each operation has a unique ID
     operationType,
     tableIds,
+    status: {
+      isHovered: false,
+      isSelected: false,
+    },
   };
 }
 

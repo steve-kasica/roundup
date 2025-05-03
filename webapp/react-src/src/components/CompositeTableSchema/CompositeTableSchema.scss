@@ -50,43 +50,54 @@ $null-column-background: #ddd;
     }
   }
 
-  > .TableContainer > .TableBlockView {
-    height: 100%;
-    > .ColumnView {
+  > .TableContainer {
+    > .TableBlockView {
+      height: 100%;
       background-color: $color;
       border-color: $color;
 
-      &.loading {
-        animation: #{$keyframe-name} 1s ease-in-out infinite;
-      }
-      &.hover {
-        background-color: $hover-color;
-      }
-      &.null {
-        background-color: $null-column-background;
-      }
-      &.selected {
-        background-color: $focused-color;
-      }
-      &.dragged {
-        background-color: $dragged-src-color;
-      }
-      &.visible,
-      &.null.visable {
-        opacity: 1;
-      }
-    }
-
-    &.hover {
-      background-color: $hover-color;
       > .ColumnView {
         background-color: inherit;
-        animation: none;
+        border-color: inherit;
+
+        &.loading {
+          animation: #{$keyframe-name} 1s ease-in-out infinite;
+        }
+        &.hover {
+          background-color: $hover-color;
+        }
         &.null {
           background-color: $null-column-background;
         }
+        &.selected {
+          background-color: $focused-color;
+        }
+        &.dragged {
+          background-color: $dragged-src-color;
+        }
+        &.visible,
+        &.null.visable {
+          opacity: 1;
+        }
       }
     }
+
+    &.hover > .TableBlockView {
+      background-color: $hover-color;
+      &:has(.ColumnView.hover) {
+        background-color: $color;
+      }
+    }
+
+    // &.hover {
+    //   // > .ColumnView {
+    //   //   background-color: inherit;
+    //   //   animation: none;
+    //   //   &.null {
+    //   //     background-color: $null-column-background;
+    //   //   }
+    //   // }
+    // }
   }
 }
 

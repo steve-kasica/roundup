@@ -49,7 +49,6 @@ export default function StackDetailView({ operationId }) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          console.log("entry", entry);
           const columnIds = entry.target
             .getAttribute("data-columnIds")
             .split(",");

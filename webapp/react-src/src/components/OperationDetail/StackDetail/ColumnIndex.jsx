@@ -109,18 +109,16 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
           position: "relative",
           border: "1px solid #000",
         }}
-        // onMouseEnter={() => {
-        //   setIsMenuIconVisible(true);
-        //   columnIds.forEach((id) => {
-        //     dispatch(setColumnHoveredStatus({ id, isHovered: true }));
-        //   });
-        // }}
-        // onMouseLeave={() => {
-        //   setIsMenuIconVisible(false);
-        //   columnIds.forEach((id) => {
-        //     dispatch(setColumnHoveredStatus({ id, isHovered: false }));
-        //   });
-        // }}
+        onMouseEnter={() => {
+          setIsMenuIconVisible(true);
+          dispatch(setColumnHoveredStatus({ ids: columnIds, isHovered: true }));
+        }}
+        onMouseLeave={() => {
+          setIsMenuIconVisible(false);
+          dispatch(
+            setColumnHoveredStatus({ ids: columnIds, isHovered: false })
+          );
+        }}
         onClick={() => {
           if (!isPopoverOpen) {
             dispatch(clearSelectedColumns());

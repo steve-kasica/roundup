@@ -1,3 +1,17 @@
+/**
+ * Redux slice for managing columns in a data table.
+ * This slice handles fetching, renaming, removing, and selecting columns,
+ * as well as managing their loading and visibility states.
+ * 
+ * Input normalization is a programming concept where inputs to a function or method are transformed into a consistent format before processing. This ensures that the function can handle various input types or structures in a predictable and uniform way, reducing complexity and potential errors in the implementation.
+
+Why Normalize Inputs?
+- Flexibility: Allows the function to accept multiple input formats (e.g., a single value or an array).
+Simplified Logic: By converting inputs into a standard format, the function's core logic can focus on processing the data without worrying about input variations.
+Error Reduction: Reduces the likelihood of bugs caused by unexpected input types or structures.
+Reusability: Makes the function more versatile and reusable in different contexts.
+ */
+
 import { createSlice } from "@reduxjs/toolkit";
 import Column, { COLUMN_STATUS_LOADING, COLUMN_STATUS_VISABLE } from "./Column";
 
@@ -175,19 +189,38 @@ const columnsSlice = createSlice({
       }
     },
 
+    /**
+     * Updates the selected status of one or more columns.
+     * Accepts either a single column ID or an array of column IDs.
+     * Normalizes the input to handle both cases consistently.
+     *
+     * @param {Object} state - The current state of the slice.
+     * @param {Object} action - The dispatched action.
+     * @param {string} [action.payload.id] - A single column ID to update.
+     * @param {Array<string>} [action.payload.ids] - An array of column IDs to update.
+     * @param {boolean} action.payload.isSelected - The selection status to apply to the column(s).
+     */
     setColumnSelectedStatus(state, action) {
-      const { id, isSelected } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isSelected = isSelected;
-        if (isSelected) {
-          state.selected.push(id);
-        } else {
-          state.selected = state.selected.filter(
-            (selectedId) => selectedId !== id
-          );
+      const { id, ids, isSelected } = action.payload;
+
+      // Normalize to an array of IDs
+      const columnIds = Array.isArray(ids) ? ids : [id];
+
+      columnIds.forEach((columnId) => {
+        const column = state.data[columnId];
+        if (column) {
+          column.status.isSelected = isSelected;
+          if (isSelected) {
+            if (!state.selected.includes(columnId)) {
+              state.selected.push(columnId);
+            }
+          } else {
+            state.selected = state.selected.filter(
+              (selectedId) => selectedId !== columnId
+            );
+          }
         }
-      }
+      });
     },
     setColumnSelectedStatusAfterIndex(state, action) {
       const { jIndex } = action.payload;
@@ -211,12 +244,29 @@ const columnsSlice = createSlice({
       });
       state.selected = initialState.selected;
     },
-    setColumnHoverStatus(state, action) {
-      const { id, isHovered } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isHovered = isHovered;
-      }
+    /**
+     * Updates the hovered status of one or more columns.
+     * Accepts either a single column ID or an array of column IDs.
+     * Normalizes the input to handle both cases consistently.
+     *
+     * @param {Object} state - The current state of the slice.
+     * @param {Object} action - The dispatched action.
+     * @param {string} [action.payload.id] - A single column ID to update.
+     * @param {Array<string>} [action.payload.ids] - An array of column IDs to update.
+     * @param {boolean} action.payload.isHovered - The hovered status to apply to the column(s).
+     */
+    setColumnHoveredStatus(state, action) {
+      const { id, ids, isHovered } = action.payload;
+
+      // Normalize to an array of IDs
+      const columnIds = Array.isArray(ids) ? ids : [id];
+
+      columnIds.forEach((columnId) => {
+        const column = state.data[columnId];
+        if (column) {
+          column.status.isHovered = isHovered;
+        }
+      });
     },
     setColumnDragStatus(state, action) {
       const { id, isDragging } = action.payload;
@@ -292,7 +342,7 @@ export const {
   setColumnSelectedStatus,
   setColumnSelectedStatusAfterIndex,
   clearSelectedColumns,
-  setColumnHoverStatus,
+  setColumnHoveredStatus,
   setColumnDragStatus,
   setColumnVisibleStatus,
   swapColumnsRequest,

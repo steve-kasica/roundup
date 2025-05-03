@@ -36,9 +36,6 @@ const gridWidth = gridColumns - 2;
 export default function CompositeTableSchema() {
   const rootOperationId = useSelector(selectRootOperationId);
   const maxOperationDepth = useSelector(selectMaxOperationDepth);
-  const totalColumnCount = useSelector((state) =>
-    selectOperationColumnCount(state, rootOperationId)
-  );
 
   return (
     <div className="CompositeTableSchema">
@@ -46,7 +43,7 @@ export default function CompositeTableSchema() {
         <Grid container spacing={0}>
           <Grid size={gridWidth}>
             <OperationContainer id={rootOperationId}>
-              <OperationBlockView parentColumnCount={totalColumnCount} />
+              <OperationBlockView />
             </OperationContainer>
           </Grid>
           <Grid size={gridColumns - gridWidth}>

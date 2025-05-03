@@ -49,6 +49,11 @@ const operationsSlice = createSlice({
       const { id } = action.payload;
       state.focused = id;
     },
+    setOperationHoverStatus(state, action) {
+      const { operationId, isHovered } = action.payload;
+      const operation = selectOperation({ operations: state }, operationId);
+      operation.status.isHovered = isHovered;
+    },
   },
 });
 
@@ -59,6 +64,7 @@ export const {
   addTableToOperation,
   removeOperation,
   setFocusedOperation,
+  setOperationHoverStatus,
 } = operationsSlice.actions;
 
 export default operationsSlice.reducer;

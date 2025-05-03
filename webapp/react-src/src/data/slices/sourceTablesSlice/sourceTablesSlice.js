@@ -61,6 +61,19 @@ const slice = createSlice({
       const { tableId, isSelected } = action.payload;
       state.data[tableId].status.isSelected = isSelected;
     },
+    setTableHoveredStatus: (state, action) => {
+      const { tableId, isHovered } = action.payload;
+
+      // Normalize input to an array
+      const tableIds = Array.isArray(tableId) ? tableId : [tableId];
+
+      tableIds.forEach((id) => {
+        const table = state.data[id];
+        if (table) {
+          table.status.isHovered = isHovered;
+        }
+      });
+    },
   },
 });
 

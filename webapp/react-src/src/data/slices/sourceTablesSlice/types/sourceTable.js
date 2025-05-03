@@ -48,6 +48,7 @@ export function SourceTable(
     tags,
     status: {
       isSelected: false,
+      isHovered: false,
     },
   };
 }
