@@ -9,12 +9,11 @@
   }
 
   .TableContainer {
+    user-select: none;
+
     &.hover {
       background-color: $hover-color;
     }
-  }
-
-  .TableView {
     .drag-handle {
       text-align: center;
       cursor: grab;
@@ -24,7 +23,6 @@
         background-color: #ddd;
       }
     }
-    user-select: none;
 
     &.dragging,
     &.pressed {
