@@ -42,7 +42,7 @@ function* watchColumnHover() {
 function* triggerHoverColumnTable(action) {
   const { ids, id, isHovered } = action.payload;
 
-  const columnIds = ids || [id];
+  const columnIds = (ids || [id]).filter((id) => id !== null); // ignore null columns
 
   const tableIds = yield select((state) =>
     Array.from(
