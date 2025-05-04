@@ -313,6 +313,10 @@ const columnsSlice = createSlice({
         state.idsByTable[sourceColumn.tableId][sourceIndex],
         state.idsByTable[targetColumn.tableId][targetIndex],
       ] = [targetColumn.id, sourceColumn.id];
+
+      // Remove loading status
+      sourceColumn.status.isLoading = false;
+      targetColumn.status.isLoading = false;
     },
     swapColumnsFailure(state, action) {
       const { sourceId, targetId } = action.payload;
