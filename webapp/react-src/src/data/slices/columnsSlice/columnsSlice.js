@@ -13,7 +13,7 @@ Reusability: Makes the function more versatile and reusable in different context
  */
 
 import { createSlice } from "@reduxjs/toolkit";
-import Column, { COLUMN_STATUS_LOADING, COLUMN_STATUS_VISABLE } from "./Column";
+import Column from "./Column";
 
 const initialState = {
   idsByTable: {},
@@ -328,6 +328,34 @@ const columnsSlice = createSlice({
         targetColumn.status.isLoading = false;
       }
     },
+
+    fetchValueFacetsRequest(state, action) {
+      const { id } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isLoading = true;
+        column.status.error = null;
+      }
+    },
+
+    fetchValueFacetsSuccess(state, action) {
+      const { id, values } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isLoading = false;
+        column.status.error = null;
+        column.valueFacets = values;
+      }
+    },
+
+    fetchValueFacetsFailure(state, action) {
+      const { id, error } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isLoading = false;
+        column.status.error = error;
+      }
+    },
   }, // end reducers
 });
 
@@ -352,4 +380,7 @@ export const {
   swapColumnsRequest,
   swapColumnsSuccess,
   swapColumnsFailure,
+  fetchValueFacetsRequest,
+  fetchValueFacetsSuccess,
+  fetchValueFacetsFailure,
 } = columnsSlice.actions;

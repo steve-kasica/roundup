@@ -80,6 +80,7 @@ export default function Column(tableId, index, name, columnType) {
     index,
     columnType,
     error: null,
+    valueFacets: {},
     status: {
       isSelected: false,
       isLoading: true, // Initially set to true to indicate loading state,

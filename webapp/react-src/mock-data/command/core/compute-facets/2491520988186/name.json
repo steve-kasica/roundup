@@ -1,0 +1,21 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "NAME",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": "ST LOUIS LAMBERT INTERNATIONAL AIRPORT, MO US",
+                        "l": "ST LOUIS LAMBERT INTERNATIONAL AIRPORT, MO US"
+                    },
+                    "c": 120,
+                    "s": false
+                }
+            ],
+            "name": "NAME"
+        }
+    ],
+    "engine-mode": "row-based"
+}

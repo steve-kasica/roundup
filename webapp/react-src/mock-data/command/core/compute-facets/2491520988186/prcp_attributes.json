@@ -1,0 +1,29 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "PRCP_ATTRIBUTES",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": ",,W,2400",
+                        "l": ",,W,2400"
+                    },
+                    "c": 84,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "T,,W,2400",
+                        "l": "T,,W,2400"
+                    },
+                    "c": 36,
+                    "s": false
+                }
+            ],
+            "name": "PRCP_ATTRIBUTES"
+        }
+    ],
+    "engine-mode": "row-based"
+}

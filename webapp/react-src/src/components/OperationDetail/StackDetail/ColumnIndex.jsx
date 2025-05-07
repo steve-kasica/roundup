@@ -17,6 +17,7 @@ import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { swapColumnIndices } from "../../../data/sagas/swapColumnIndicesSaga";
+import { requestColumnValues } from "../../../data/sagas/requestColumnValues";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
 
@@ -93,6 +94,10 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
     {
       label: "Select all columns to the right",
       action: () => dispatch(setColumnSelectedStatusAfterIndex({ jIndex })),
+    },
+    {
+      label: "Inspect values",
+      action: () => dispatch(requestColumnValues({ columnIds })),
     },
   ];
 

@@ -1,0 +1,21 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "TMAX_ATTRIBUTES",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": ",,W",
+                        "l": ",,W"
+                    },
+                    "c": 120,
+                    "s": false
+                }
+            ],
+            "name": "TMAX_ATTRIBUTES"
+        }
+    ],
+    "engine-mode": "row-based"
+}

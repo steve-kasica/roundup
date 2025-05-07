@@ -11,6 +11,7 @@ import swapColumnsSaga from "./swapColumnsSaga";
 import swapColumnIndicesSaga from "./swapColumnIndicesSaga";
 import addTableToSchemaSaga from "./addTableToSchemaSaga";
 import coordinateHoverSaga from "./coordinateHoverSaga";
+import requestColumnValuesSaga from "./requestColumnValues";
 
 export default function* rootSaga() {
   yield all([
@@ -23,5 +24,6 @@ export default function* rootSaga() {
     call(swapColumnsSaga),
     call(swapColumnIndicesSaga),
     call(coordinateHoverSaga),
+    call(requestColumnValuesSaga),
   ]);
 }

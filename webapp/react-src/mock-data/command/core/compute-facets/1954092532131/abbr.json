@@ -1,0 +1,77 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "ABBR",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": "MN",
+                        "l": "MN"
+                    },
+                    "c": 119310,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "MO",
+                        "l": "MO"
+                    },
+                    "c": 144136,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "MA",
+                        "l": "MA"
+                    },
+                    "c": 123558,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "MS",
+                        "l": "MS"
+                    },
+                    "c": 117316,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "MD",
+                        "l": "MD"
+                    },
+                    "c": 116699,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "MT",
+                        "l": "MT"
+                    },
+                    "c": 47144,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "ME",
+                        "l": "ME"
+                    },
+                    "c": 51852,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "MI",
+                        "l": "MI"
+                    },
+                    "c": 190023,
+                    "s": false
+                }
+            ],
+            "name": "ABBR"
+        }
+    ],
+    "engine-mode": "row-based"
+}

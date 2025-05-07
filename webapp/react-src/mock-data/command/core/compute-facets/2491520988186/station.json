@@ -1,0 +1,21 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "STATION",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": "USW00013994",
+                        "l": "USW00013994"
+                    },
+                    "c": 120,
+                    "s": false
+                }
+            ],
+            "name": "STATION"
+        }
+    ],
+    "engine-mode": "row-based"
+}

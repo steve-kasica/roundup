@@ -1,0 +1,13 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "choiceCount": 2506,
+            "columnName": "VALUE",
+            "invert": false,
+            "error": "Too many choices",
+            "name": "VALUE"
+        }
+    ],
+    "engine-mode": "row-based"
+}

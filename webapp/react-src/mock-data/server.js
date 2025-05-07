@@ -1,6 +1,7 @@
 import { createServer } from "miragejs";
 import allProjectMetadata from "./command/core/get-all-project-metadata.json";
 import getColumnInfo from "./command/core/get-column-info";
+import computFacetsData from "./command/core/compute-facets";
 
 import { endpoint as getAllProjectMetadataEndpoint } from "../src/services/open-refine/get-all-project-metadata";
 import { endpoint as getColumnsInfoEndpoint } from "../src/services/open-refine/get-columns-info";
@@ -8,6 +9,7 @@ import { endpoint as setProjectMetadataEndpoint } from "../src/services/open-ref
 import { endpoint as renameColumnEndpoint } from "../src/services/open-refine/rename-column";
 import { endpoint as removeColumnEndpoint } from "../src/services/open-refine/remove-column";
 import { endpoint as reorderColumnsEndpoint } from "../src/services/open-refine/reorder-columns";
+import { endpoint as computeFacetsEndpoint } from "../src/services/open-refine/compute-facets";
 
 function generateRandom13DigitNumber() {
   const min = 1000000000000; // Minimum 13-digit number
@@ -74,6 +76,13 @@ export default function makeServer() {
           },
           code: "ok",
         };
+      });
+
+      this.post(computeFacetsEndpoint, (schema, request) => {
+        const projectId = request.queryParams["project"];
+        const requestBody = JSON.parse(request.requestBody);
+        const columnName = requestBody.engine.facets[0].columnName;
+        return computFacetsData[projectId][columnName.toLowerCase()];
       });
     },
   });
