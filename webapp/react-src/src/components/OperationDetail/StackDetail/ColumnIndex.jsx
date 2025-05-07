@@ -24,7 +24,6 @@ export const COLUMN_INDEX = "COLUMN_INDEX";
 const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [isSelected, setIsSelected] = useState(false);
   const [isMenuIconVisable, setIsMenuIconVisible] = useState(false);
   const isPopoverOpen = Boolean(anchorEl);
 
@@ -127,10 +126,9 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
         onClick={() => {
           if (!isPopoverOpen) {
             dispatch(clearSelectedColumns());
-            setIsSelected(!isSelected);
-            columnIds.forEach((id) => {
-              dispatch(setColumnSelectedStatus({ id, isSelected }));
-            });
+            dispatch(
+              setColumnSelectedStatus({ ids: columnIds, isSelected: true })
+            );
           }
         }}
       >
