@@ -1,0 +1,29 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "GENDER",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": "F",
+                        "l": "F"
+                    },
+                    "c": 838122,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "M",
+                        "l": "M"
+                    },
+                    "c": 657610,
+                    "s": false
+                }
+            ],
+            "name": "GENDER"
+        }
+    ],
+    "engine-mode": "row-based"
+}

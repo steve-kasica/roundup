@@ -1,0 +1,101 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "ABBR",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": "AR",
+                        "l": "AR"
+                    },
+                    "c": 105373,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "CT",
+                        "l": "CT"
+                    },
+                    "c": 84948,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "DE",
+                        "l": "DE"
+                    },
+                    "c": 33706,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "FL",
+                        "l": "FL"
+                    },
+                    "c": 218192,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "AZ",
+                        "l": "AZ"
+                    },
+                    "c": 122085,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "AK",
+                        "l": "AK"
+                    },
+                    "c": 29755,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "GA",
+                        "l": "GA"
+                    },
+                    "c": 191367,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "AL",
+                        "l": "AL"
+                    },
+                    "c": 139293,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "CO",
+                        "l": "CO"
+                    },
+                    "c": 112986,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "CA",
+                        "l": "CA"
+                    },
+                    "c": 400762,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "DC",
+                        "l": "DC"
+                    },
+                    "c": 57265,
+                    "s": false
+                }
+            ],
+            "name": "ABBR"
+        }
+    ],
+    "engine-mode": "row-based"
+}

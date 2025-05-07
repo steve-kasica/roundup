@@ -1,0 +1,45 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "ABBR",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": "HI",
+                        "l": "HI"
+                    },
+                    "c": 56069,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "IL",
+                        "l": "IL"
+                    },
+                    "c": 237839,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "IA",
+                        "l": "IA"
+                    },
+                    "c": 97515,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "ID",
+                        "l": "ID"
+                    },
+                    "c": 60445,
+                    "s": false
+                }
+            ],
+            "name": "ABBR"
+        }
+    ],
+    "engine-mode": "row-based"
+}

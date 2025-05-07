@@ -1,0 +1,53 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "ABBR",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": "IN",
+                        "l": "IN"
+                    },
+                    "c": 3571,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "LA",
+                        "l": "LA"
+                    },
+                    "c": 2795,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "KS",
+                        "l": "KS"
+                    },
+                    "c": 3616,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "I",
+                        "l": "I"
+                    },
+                    "c": 1,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "KY",
+                        "l": "KY"
+                    },
+                    "c": 3221,
+                    "s": false
+                }
+            ],
+            "name": "ABBR"
+        }
+    ],
+    "engine-mode": "row-based"
+}
