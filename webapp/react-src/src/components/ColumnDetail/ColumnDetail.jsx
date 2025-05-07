@@ -3,7 +3,7 @@ import {
   selectColumnById,
   selectSelectedColumnIds,
 } from "../../data/slices/columnsSlice";
-import { scaleLinear } from "d3";
+import { hsl, scaleLinear } from "d3";
 import { useEffect } from "react";
 import { requestColumnValues } from "../../data/sagas/requestColumnValues";
 import Chip from "@mui/material/Chip";
@@ -66,6 +66,8 @@ export default function ColumnDetail() {
   const colorScale = scaleLinear()
     .domain([0, maxCount])
     .range(["#f0f0f0", "#000000"]);
+
+  const isBelowThreshold = (colorValue) => hsl(colorValue).l < 0.5;
   // .range(["#f0f0f0", "#fff"]);
 
   // return <pre>{JSON.stringify(data)}</pre>;
@@ -107,7 +109,9 @@ export default function ColumnDetail() {
                         ? colorScale(cellData.count)
                         : "white",
                       color:
-                        cellData && cellData.count > 1000 ? "white" : "black",
+                        cellData && isBelowThreshold(colorScale(cellData.count))
+                          ? "white"
+                          : "black",
                     }}
                   />
                   {/* Add a horizontal line */}
