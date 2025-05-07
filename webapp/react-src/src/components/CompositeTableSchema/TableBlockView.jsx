@@ -10,13 +10,23 @@ import { isMouseOverElement } from "../../lib/utilities/dom.js";
 import ColumnTicksContainer from "./ColumnTicksContainer.jsx";
 import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice/Operation.js";
 import { setTableHoveredStatus } from "../../data/slices/sourceTablesSlice";
+import { withTableData } from "../HOC/withTableData.jsx";
 
-export default function TableBlockView({
-  table,
+function TableBlockView({
+  id,
+  name,
+  columnCount,
+  parentOperation,
+  depth,
+  isDragging,
+  isPressed,
+  isHovered,
+  isFocused,
+  dragRef,
   parentOperationType,
   parentColumnCount,
+  table,
 }) {
-  const { id, name, columnCount } = table;
   const dispatch = useDispatch();
   const [contextMenu, setContextMenu] = useState(null);
   const tableRef = useRef();
@@ -49,15 +59,17 @@ export default function TableBlockView({
       ? parentColumnCount
       : columnCount;
 
+  const state = [
+    isFocused ? "focused" : "",
+    isHovered ? "hover" : "",
+    isDragging ? "dragging" : "",
+    isPressed ? "pressed" : "",
+  ].filter(Boolean);
+
   return (
     <div
-      className="TableBlockView"
-      onMouseEnter={() =>
-        dispatch(setTableHoveredStatus({ id, isHovered: true }))
-      }
-      onMouseLeave={() =>
-        dispatch(setTableHoveredStatus({ id, isHovered: false }))
-      }
+      className={["table", ...state].join(" ")}
+      style={{ flexBasis: `${(columnCount / parentColumnCount) * 100}%` }}
     >
       <div className="label">
         {name} <span className="column-count">({columnCount})</span>
@@ -112,3 +124,6 @@ export default function TableBlockView({
     );
   }
 }
+
+const EnhancedTableBlockView = withTableData(TableBlockView);
+export default EnhancedTableBlockView;

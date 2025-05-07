@@ -128,3 +128,11 @@ export function selectOperationImmediateChildId(state, operationId) {
 export function selectFocusedOperationId(state) {
   return state.operations.focused;
 }
+
+export function selectOperationChildrenIds(state, operationId) {
+  const operationIds = state.operations.ids.filter((id) => {
+    const operation = state.operations.data[id];
+    return operation.parentId === operationId;
+  });
+  return operationIds;
+}

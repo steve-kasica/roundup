@@ -18,25 +18,16 @@ const ColumnTicksContainer = memo(function ColumnTicksContainer({
   return (
     <>
       {ticks.map((id, i) => (
-        <ColumnContainer key={`${i}-${id}`} id={id} index={i} tableId={tableId}>
-          <ColumnTickView />
-        </ColumnContainer>
+        <ColumnContainer
+          key={`${i}-${id}`}
+          id={id}
+          index={i}
+          tableId={tableId}
+          isDraggable={false}
+        ></ColumnContainer>
       ))}
     </>
   );
 });
-
-/* This component only re-render upon data changes to Column instance
- * passed from ColumnContainer.
- * The nbsp; HTML entity is necessary in order to define width of the div,
- * no matter what percentage that width actually is.
- */
-const ColumnTickView = memo(
-  function ColumnView() {
-    const nbsp = "\u00A0"; // Non-breaking space
-    return <span>{nbsp}</span>;
-  },
-  (prevProps, nextProps) => prevProps.id === nextProps.id
-);
 
 export default ColumnTicksContainer;

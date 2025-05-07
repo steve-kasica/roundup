@@ -91,6 +91,7 @@ export function ColumnContainer({
       name: column?.name,
       index: column?.index,
       tableId: column?.tableId,
+      isSelected: column?.status.isSelected,
     })
   );
 
@@ -101,14 +102,6 @@ export function ColumnContainer({
         dropRef(node);
       }}
       className={className}
-      onClick={() =>
-        dispatch(
-          setColumnSelectedStatus({
-            id,
-            isSelected: !column?.status.isSelected,
-          })
-        )
-      }
     >
       {enhancedChildren}
     </div>

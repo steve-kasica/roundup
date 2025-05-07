@@ -11,20 +11,22 @@
 
 $operation-padding: 0px;
 $operation-border-radius: 0px;
-$operation-border-color: #555;
-$operation-border-width: 1px;
+$operation-border-color: black;
+$operation-border-color-focused: black;
+$operation-border-width: 5px;
 $operation-border-style: solid;
 
 $table-height: 20px;
 $table-border-radius: $operation-border-radius;
-$table-border-color: #555;
-$table-border-width: $operation-border-width;
-$table-border-style: $operation-border-style;
+$table-border-color: $operation-border-color; // default table border color
+$table-border-width: 1px;
+$table-border-style: dotted;
 
 $column-border-radius: $table-border-radius;
 $column-border-width: $table-border-width;
 $column-border-style: $table-border-style;
 $focused-operation-column-border-color: black;
+$unfocused-alpha: 0.25;
 
 $label-offset-top: 0px;
 $label-offset-left: 5px;
@@ -37,7 +39,8 @@ $null-column-border-color: $null-column-background;
 
 @mixin background-color($color, $parent-color) {
   color: $color; // Allows support for `currentColor` keyword
-
+  border-color: $color;
+  transition: border-color 0.3s ease;
   $keyframe-name: "pulse-" + string.slice(#{meta.inspect($color)}, 2); // quick unique-ish name
   @keyframes #{$keyframe-name} {
     0% {
@@ -51,48 +54,61 @@ $null-column-border-color: $null-column-background;
     }
   }
 
-  > .TableContainer {
-    > .TableBlockView {
-      height: 100%;
-      background-color: $color;
-      border-color: $color;
+  > .table {
+    height: 100%;
+    background-color: $color;
+    transition: border-color 0.3s ease;
+    transition: background-color 0.3s ease;
 
-      > .ColumnView {
-        background-color: inherit;
-        border-color: inherit;
+    > .ColumnView {
+      background-color: inherit;
 
-        &.loading {
-          animation: #{$keyframe-name} 1s ease-in-out infinite;
-        }
-        &.hover {
-          background-color: $hover-color;
-          border-color: $hover-color;
-        }
-        &.null {
-          background-color: $null-column-background;
-          border-color: $null-column-border-color;
-        }
-        &.selected {
-          background-color: $focused-color;
-          border-color: $focused-color;
-        }
-        &.dragged {
-          background-color: $dragged-src-color;
-        }
-        &.visible,
-        &.null.visable {
-          opacity: 1;
-        }
+      &.loading {
+        animation: #{$keyframe-name} 1s ease-in-out infinite;
+      }
+      &.hover {
+        // background-color: $hover-color;
+      }
+      // &.selected {
+      //   background-color: $focused-color;
+      // }
+      &.dragged {
+        background-color: $dragged-src-color;
+      }
+      &.visible,
+      &.null.visable {
+        opacity: 1;
       }
     }
 
-    &.hover > .TableBlockView {
-      background-color: $hover-color;
-      border-color: $hover-color;
+    &.hover {
+      // background-color: $hover-color;
       &:has(.ColumnView.hover) {
         background-color: $color;
-        border-color: $color;
+        // border-color: $color;
       }
+    }
+  }
+
+  &.hover {
+    // background-color: $hover-color;
+    .table {
+      // background-color: $hover-color;
+    }
+    &:has(.table.hover) {
+      background-color: $color;
+      > .table:not(.hover) {
+        background-color: $color;
+      }
+    }
+  }
+
+  &:has(.operation.focused) {
+    border-color: rgba($color, $unfocused-alpha);
+
+    > .table {
+      border-color: rgba($table-border-color, $unfocused-alpha);
+      background-color: rgba($color, $unfocused-alpha);
     }
   }
 }
@@ -111,65 +127,47 @@ $null-column-border-color: $null-column-background;
 
   // Unfocused general operation styles
   // -----------------------------------------------------------
-  .OperationContainer {
+  .operation {
     display: flex;
-    > .OperationBlockView {
+    flex: 1;
+    height: 100%;
+    box-sizing: border-box;
+
+    position: relative;
+    padding: $operation-padding;
+    border-radius: $operation-border-radius;
+    border-style: $operation-border-style;
+    border-width: $operation-border-width;
+    border-color: $operation-border-color;
+
+    > .table {
       display: flex;
+      flex-direction: row;
+      flex: 1 1 0;
       box-sizing: border-box;
+      height: inherit;
       position: relative;
-      padding: $operation-padding;
-      overflow: hidden;
-      height: 100%;
-      width: 100%;
-      border-radius: $operation-border-radius;
-      border-style: $operation-border-style;
-      border-width: $operation-border-width;
-      border-color: $operation-border-color;
+      min-height: $table-height;
+      pointer-events: none; // Disable mouse events when operation is not focused
+      border-width: $table-border-width;
+      border-style: $table-border-style;
+      border-radius: $table-border-radius;
+      border-color: $table-border-color;
 
-      > .TableContainer {
-        display: flex;
-        flex: 1;
-        > .TableBlockView {
-          width: 100%;
-          height: inherit;
-          display: flex;
-          box-sizing: border-box;
-          flex-direction: row;
-          position: relative;
-          flex-grow: 1;
-          flex-basis: inherit;
-          min-height: $table-height;
-          overflow: hidden; // prevent column divs from poking out of rounded corners
-          border-style: $table-border-style;
-          border-width: $table-border-width;
-          border-color: $table-border-color;
-          border-radius: $table-border-radius;
+      > .ColumnView {
+        pointer-events: none; // Disable all mouse events
+        flex: 1 1 0;
+        box-sizing: border-box;
+        display: block;
+        border: none;
 
-          > .ColumnView {
-            pointer-events: none; // Disable mouse events when operation is not focused
-            flex-grow: 1; // set individual item width to fill available space
-            box-sizing: border-box;
-            line-height: $table-height;
-            border-style: $column-border-style;
-            border-width: $column-border-width;
-            // border-color: $column-border-color;
-
-            border-radius: $column-border-radius;
-            border-top: none;
-            border-bottom: none;
-            border-left: none;
-            &:last-child {
-              border-right: none;
-            }
-
-            &.null {
-              cursor: default;
-            }
-          }
+        &.null {
+          cursor: default;
         }
       }
 
       .label {
+        display: none; // DEBUG
         position: absolute;
         top: $label-offset-top;
         left: $label-offset-left;
@@ -185,88 +183,77 @@ $null-column-border-color: $null-column-background;
 
     // Unfocused no-op operation styles
     // -----------------------------------------------------------
-    &.no-op > .OperationBlockView {
+    &.no-op {
       flex-direction: column;
       @include background-color(
         $null-column-background,
         $null-column-background
       );
+      .table {
+        border: none;
+      }
     }
 
-    // Unfocused stack operation styles
+    // Stack operation styles
     // -----------------------------------------------------------
     &.stack {
-      display: flex;
-      flex: 1;
-      > .OperationBlockView {
-        flex: 0 0 auto;
-        flex-direction: column; // newly added tables go to bottom
-      }
+      flex-direction: column; // newly added tables go to bottom
 
-      &.depth-1 > .OperationBlockView {
+      &.depth-1 {
         @include background-color($stack-1-color, #fff);
       }
-      &.depth-2 > .OperationBlockView {
+      &.depth-2 {
         @include background-color($stack-2-color, $pack-1-color);
       }
-      &.depth-3 > .OperationBlockView {
+      &.depth-3 {
         @include background-color($stack-3-color, $pack-2-color);
       }
 
-      > .OperationBlockView > div:not(:last-child) > div {
+      > .table:not(:last-child) {
         border-bottom: none;
+      }
+
+      &.focused {
+        .ColumnView.null {
+          background-color: $null-column-background;
+        }
       }
     }
 
-    // Unfocused pack operation styles
+    // Pack operation styles
     // -----------------------------------------------------------
     &.pack {
-      > .OperationBlockView {
-        flex-direction: row; // newly added tables go to right side
-      }
-      &.depth-1 > .OperationBlockView {
+      flex-direction: row; // newly added tables go to right side
+      &.depth-1 {
         @include background-color($pack-1-color, #fff);
       }
-      &.depth-2 > .OperationBlockView {
+      &.depth-2 {
         @include background-color($pack-2-color, $stack-1-color);
       }
-      &.depth-3 > .OperationBlockView {
+      &.depth-3 {
         @include background-color($pack-3-color, $stack-2-color);
       }
 
-      > .OperationBlockView > div:not(:last-child) > div {
+      > .table:not(:last-child) {
+        border-right: none;
+      }
+      .operation + .table {
+        // disable border in children that
+        // are tables adjacent to operation
         border-left: none;
       }
     }
 
     // Focused general operation styles
     // -----------------------------------------------------------
-    &:has(.OperationContainer.focused)
-      > .OperationBlockView
-      > .TableContainer
-      > .TableBlockView {
-      opacity: 0.3333;
-      transition: opacity 0.3s ease;
-    }
+    // &:has(.operation.focused) > .table {
+    //   opacity: 0.3333;
+    //   transition: opacity 0.3s ease;
+    // }
 
     &.focused {
-      > .OperationBlockView {
-        .OperationContainer.stack .TableBlockView {
-          border-top-color: currentColor; // hide nested border without changing size
-        }
-
-        .TableContainer {
-          opacity: 1;
-          transition: opacity 0.3s ease;
-        }
-      }
-
-      &.stack
-        > .OperationBlockView
-        > .TableContainer:not(:first-child)
-        > .TableBlockView {
-        border-top-color: black;
-      }
+      // outline: 5px solid $focused-color;
+      border-color: $focused-color !important;
     }
   }
 }

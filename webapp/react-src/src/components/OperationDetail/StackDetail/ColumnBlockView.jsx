@@ -16,6 +16,7 @@ import {
   removeColumnRequest,
   renameColumnRequest,
   setColumnHoveredStatus,
+  setColumnSelectedStatus,
 } from "../../../data/slices/columnsSlice";
 import {
   addToSelectedColumnIds,
@@ -36,6 +37,7 @@ const ColumnBlockView = memo(function ColumnBlockView({
   tableId,
   name,
   index,
+  isSelected,
 }) {
   const dispatch = useDispatch();
 
@@ -105,6 +107,18 @@ const ColumnBlockView = memo(function ColumnBlockView({
         onMouseLeave={() => {
           if (!isNull) {
             dispatch(setColumnHoveredStatus({ id, isHovered: false }));
+          }
+        }}
+        onClick={(event) => {
+          if (event.shiftKey) {
+            // TODO
+          } else {
+            dispatch(
+              setColumnSelectedStatus({
+                id,
+                isSelected: !isSelected,
+              })
+            );
           }
         }}
         inputRef={inputRef}

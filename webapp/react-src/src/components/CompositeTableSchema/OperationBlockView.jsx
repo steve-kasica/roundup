@@ -12,28 +12,54 @@ import { TableContainer, OperationContainer } from "../Containers";
 import TableBlockView from "./TableBlockView";
 import { selectOperationImmediateChildId } from "../../data/slices/operationsSlice";
 import { useSelector } from "react-redux";
+import withOperationData from "../HOC/withOperationData";
 
-export default function OperationBlockView({ operation, columnCount }) {
-  const { tableIds, operationType } = operation;
-  const childOperationId = useSelector((state) =>
-    selectOperationImmediateChildId(state, operation.id)
-  );
+function OperationBlockView({
+  parentColumnCount,
+  id,
+  depth,
+  columnCount,
+  isFocused,
+  isHovered,
+  operationType,
+  tableIds = [],
+  childOperationId,
+  onHover,
+  onUnhover,
+}) {
+  const className = [
+    "operation",
+    operationType,
+    `depth-${depth}`,
+    isFocused ? "focused" : "",
+    isHovered ? "hover" : "",
+  ].filter(Boolean);
 
   return (
-    <div className="OperationBlockView">
-      {childOperationId && (
-        <OperationContainer id={childOperationId}>
-          <OperationBlockView />
-        </OperationContainer>
-      )}
+    <div
+      className={className.join(" ")}
+      style={{ flexBasis: `${(columnCount / parentColumnCount) * 100}%` }}
+      // onMouseEnter={onHover}
+      // onMouseLeave={onUnhover}
+    >
+      {childOperationId ? (
+        <EnhancedOperationBlockView
+          id={childOperationId}
+          parentColumnCount={columnCount}
+        />
+      ) : null}
       {tableIds.map((tableId) => (
-        <TableContainer key={tableId} id={tableId} isDraggable={false}>
-          <TableBlockView
-            parentOperationType={operationType}
-            parentColumnCount={columnCount}
-          />
-        </TableContainer>
+        <TableBlockView
+          key={tableId}
+          id={tableId}
+          isDraggable={false}
+          parentOperationType={operationType}
+          parentColumnCount={columnCount}
+        />
       ))}
     </div>
   );
 }
+
+const EnhancedOperationBlockView = withOperationData(OperationBlockView);
+export default EnhancedOperationBlockView;

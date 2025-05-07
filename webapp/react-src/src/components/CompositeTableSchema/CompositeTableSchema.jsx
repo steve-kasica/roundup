@@ -42,9 +42,7 @@ export default function CompositeTableSchema() {
       {maxOperationDepth > 0 ? (
         <Grid container spacing={0}>
           <Grid size={gridWidth}>
-            <OperationContainer id={rootOperationId}>
-              <OperationBlockView />
-            </OperationContainer>
+            <OperationBlockView id={rootOperationId} />
           </Grid>
           <Grid size={gridColumns - gridWidth}>
             <TableDropTarget operationType={OPERATION_TYPE_PACK}>
