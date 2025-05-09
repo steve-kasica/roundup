@@ -68,9 +68,7 @@ export default function ColumnDetail() {
     .range(["#f0f0f0", "#000000"]);
 
   const isBelowThreshold = (colorValue) => hsl(colorValue).l < 0.5;
-  // .range(["#f0f0f0", "#fff"]);
 
-  // return <pre>{JSON.stringify(data)}</pre>;
   return (
     <table>
       <thead>
