@@ -1,0 +1,69 @@
+{
+    "facets": [
+        {
+            "expression": "value",
+            "columnName": "ABBR",
+            "invert": false,
+            "choices": [
+                {
+                    "v": {
+                        "v": "WI",
+                        "l": "WI"
+                    },
+                    "c": 121398,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "WY",
+                        "l": "WY"
+                    },
+                    "c": 28751,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "WA",
+                        "l": "WA"
+                    },
+                    "c": 130809,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "VA",
+                        "l": "VA"
+                    },
+                    "c": 154400,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "VT",
+                        "l": "VT"
+                    },
+                    "c": 29483,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "UT",
+                        "l": "UT"
+                    },
+                    "c": 93764,
+                    "s": false
+                },
+                {
+                    "v": {
+                        "v": "WV",
+                        "l": "WV"
+                    },
+                    "c": 79250,
+                    "s": false
+                }
+            ],
+            "name": "ABBR"
+        }
+    ],
+    "engine-mode": "row-based"
+}
