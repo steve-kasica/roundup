@@ -2,6 +2,7 @@ import { createServer } from "miragejs";
 import allProjectMetadata from "./command/core/get-all-project-metadata.json";
 import getColumnInfo from "./command/core/get-column-info";
 import computFacetsData from "./command/core/compute-facets";
+import uniqColumnValueData from "./command/open-roundup/get-unique-column-values";
 
 import { endpoint as getAllProjectMetadataEndpoint } from "../src/services/open-refine/get-all-project-metadata";
 import { endpoint as getColumnsInfoEndpoint } from "../src/services/open-refine/get-columns-info";
@@ -10,6 +11,7 @@ import { endpoint as renameColumnEndpoint } from "../src/services/open-refine/re
 import { endpoint as removeColumnEndpoint } from "../src/services/open-refine/remove-column";
 import { endpoint as reorderColumnsEndpoint } from "../src/services/open-refine/reorder-columns";
 import { endpoint as computeFacetsEndpoint } from "../src/services/open-refine/compute-facets";
+import { endpoint as getUniqueColumnValuesEndpoint } from "../src/services/open-refine/get-unique-column-values";
 
 function generateRandom13DigitNumber() {
   const min = 1000000000000; // Minimum 13-digit number
@@ -83,6 +85,12 @@ export default function makeServer() {
         const requestBody = JSON.parse(request.requestBody);
         const columnName = requestBody.engine.facets[0].columnName;
         return computFacetsData[projectId][columnName.toLowerCase()];
+      });
+
+      this.get(getUniqueColumnValuesEndpoint, (schema, request) => {
+        const projectId = request.queryParams["project"];
+        const columnName = request.queryParams["columnName"];
+        return uniqColumnValueData[projectId][columnName.toLowerCase()];
       });
     },
   });

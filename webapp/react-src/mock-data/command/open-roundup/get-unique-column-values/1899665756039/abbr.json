@@ -1,0 +1,13 @@
+{
+  "status": "ok",
+  "columnName": "ABBR",
+  "uniqueValues": [
+    "WI",
+    "WY",
+    "WA",
+    "VA",
+    "VT",
+    "UT",
+    "WV"
+  ]
+}

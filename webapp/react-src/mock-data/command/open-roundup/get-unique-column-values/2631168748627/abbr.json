@@ -1,0 +1,10 @@
+{
+  "status": "ok",
+  "columnName": "ABBR",
+  "uniqueValues": [
+    "HI",
+    "IL",
+    "IA",
+    "ID"
+  ]
+}

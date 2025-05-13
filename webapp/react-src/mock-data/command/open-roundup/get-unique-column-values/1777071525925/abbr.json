@@ -1,0 +1,17 @@
+{
+  "status": "ok",
+  "columnName": "ABBR",
+  "uniqueValues": [
+    "AR",
+    "CT",
+    "DE",
+    "FL",
+    "AZ",
+    "AK",
+    "GA",
+    "AL",
+    "CO",
+    "CA",
+    "DC"
+  ]
+}
