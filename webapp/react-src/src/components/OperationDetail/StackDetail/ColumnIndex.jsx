@@ -207,14 +207,15 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
         </Popover>
       </Box>
       {columnIds.map((columnId) => (
-        <ColumnContainer
-          key={columnId}
-          id={columnId}
-          index={jIndex}
-          isDraggable={true}
-        >
-          <ColumnBlockView />
-        </ColumnContainer>
+        <ColumnBlockView key={columnId} isDraggable={true} id={columnId} />
+        // TODO: delete
+        // <ColumnContainer
+        //   key={columnId}
+        //   id={columnId}
+        //   index={jIndex}
+        //   isDraggable={true}
+        // >
+        // </ColumnContainer>
       ))}
     </form>
   );

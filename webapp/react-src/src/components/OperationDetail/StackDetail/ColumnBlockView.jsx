@@ -1,5 +1,5 @@
 /**
- * ColumnView.jsx
+ * ColumnBlockView.jsx
  *
  * A view for Column instance data within the StackDetail component
  *
@@ -10,57 +10,55 @@
  *
  */
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
-import {
-  removeColumnRequest,
-  renameColumnRequest,
-  setColumnHoveredStatus,
-  setColumnSelectedStatus,
-} from "../../../data/slices/columnsSlice";
-import {
-  addToSelectedColumnIds,
-  removeFromSelectedColumnIds,
-  setHoverColumnId,
-  unsetHoverColumnId,
-} from "../../../data/slices/uiSlice/uiSlice";
-
-import { useDispatch } from "react-redux";
+import { removeFromSelectedColumnIds } from "../../../data/slices/uiSlice/uiSlice";
 
 import "./ColumnBlockView.scss";
 import { memo } from "react";
+import withColumnData from "../../HOC/withColumnData";
 
 const delay = 500; // in ms for input changes
 
-const ColumnBlockView = memo(function ColumnBlockView({
+function ColumnBlockView({
+  dragRef,
+  dropRef,
   id,
   tableId,
   name,
   index,
+  columnType,
+  values,
+  isNull,
   isSelected,
+  isLoading,
+  isHovered,
+  isDragging,
+  isOver,
+  error,
+  hoverColumn,
+  unHoverColumn,
+  nullColumn,
+  removeColumn,
+  renameColumn,
+  toggleColumnSelected,
 }) {
-  const dispatch = useDispatch();
-
   // Additional variables derived from props
-  const isNull = id === undefined;
   const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table
   const position = index + 1; // 1-indexed column indexes for user
 
-  // Keep hover persistent when context menu opens
-  // const hoverTimeoutRef = useRef(null);
-
-  // Setup context menu
-  //
+  // Context menu
   const [anchorEl, setAnchorEl] = useState(null);
   const isPopoverOpen = Boolean(anchorEl);
+  const hoverTimeoutRef = useRef(null);
   const closePopover = () => {
     setAnchorEl(null);
-    // if (hoverTimeoutRef.current) {
-    //   clearTimeout(hoverTimeoutRef.current);
-    // }
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
     // Determine if we should still be hovering based on mouse position
     // This could be improved with a check if mouse is still over element
-    // hoverTimeoutRef.current = setTimeout(handleColumnHover, 265);
+    hoverTimeoutRef.current = setTimeout(unHoverColumn, 235);
   };
 
   // Input reference is necessary to trigger focus on column
@@ -71,61 +69,113 @@ const ColumnBlockView = memo(function ColumnBlockView({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (name !== value) {
-        dispatch(
-          renameColumnRequest({
-            projectId: tableId,
-            oldColumnName: name,
-            newColumnName: value,
-            id,
-          })
-        );
+        renameColumn(value);
       }
     }, delay);
     return () => clearTimeout(timeoutId);
   }, [value, delay]);
 
+  const menuItems = [
+    {
+      label: `Remove ${name}`,
+      disabled: isNull,
+      onClick: () => {
+        removeColumn();
+        closePopover();
+      },
+    },
+    {
+      label: "Remove all to the right",
+      disabled: isLastInTable,
+      onClick: () => {
+        // TODO: implement logic to remove all columns to the right
+        // handleRemoveColumnsAfter();
+        closePopover();
+      },
+    },
+    {
+      label: "Null column",
+      disabled: isNull,
+      onClick: () => {
+        nullColumn();
+        closePopover();
+      },
+    },
+    {
+      label: "Rename",
+      disabled: isNull,
+      onClick: () => {
+        closePopover();
+        // Delay focus to allow menu to close first
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 100); // 50-100ms is usually enough
+      },
+    },
+  ];
+
+  const className = [
+    "ColumnBlockView",
+    isLoading ? "loading" : undefined,
+    isNull ? "null" : undefined,
+    isSelected ? "selected" : undefined,
+    isHovered ? "hover" : undefined,
+    isDragging ? "dragged" : undefined,
+    isOver ? "over" : undefined,
+    error ? "error" : undefined,
+    columnType ? `type-${columnType}` : undefined,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   // Render ColumnView
   return (
-    <div id={id} data-table-id={tableId} data-column-index={index}>
-      <ColumnView
-        value={value}
+    <div
+      className={className}
+      ref={(node) => {
+        dragRef(node);
+        dropRef(node);
+      }}
+      data-table-id={tableId}
+      data-column-index={index}
+      onClick={() => {
+        if (!isPopoverOpen) {
+          toggleColumnSelected();
+        }
+      }}
+    >
+      <div
+        className="screen"
         onContextMenu={(event) => {
           event.preventDefault();
           setAnchorEl(event.currentTarget);
         }}
-        onMouseEnter={() => {
-          if (!isNull) {
-            dispatch(setColumnHoveredStatus({ id, isHovered: true }));
-          }
-
-          // if (hoverTimeoutRef.current) {
-          //   clearTimeout(hoverTimeoutRef.current);
-          //   hoverTimeoutRef.current = null;
-          //   dispatch(setColumnHoveredStatus({ id, isHovered: true }));
-          // }
-        }}
+        onMouseEnter={hoverColumn}
         onMouseLeave={() => {
-          if (!isNull) {
-            dispatch(setColumnHoveredStatus({ id, isHovered: false }));
+          if (!isPopoverOpen) {
+            unHoverColumn();
           }
+          //       if (hoverTimeoutRef.current) {
+          //         clearTimeout(hoverTimeoutRef.current);
+          //       }
+          // // if (hoverTimeoutRef.current) {
+          // //   clearTimeout(hoverTimeoutRef.current);
+          // //   hoverTimeoutRef.current = null;
+          // //   dispatch(setColumnHoveredStatus({ id, isHovered: true }));
+          //       hoverTimeoutRef.current = setTimeout(unHoverColumn, 265);
         }}
-        onClick={(event) => {
-          if (event.shiftKey) {
-            // TODO
-          } else {
-            dispatch(
-              setColumnSelectedStatus({
-                id,
-                isSelected: !isSelected,
-              })
-            );
-          }
-        }}
-        inputRef={inputRef}
-        onChange={(event) => setValue(event.target.value)}
-        onBlur={() => dispatch(removeFromSelectedColumnIds(id))}
-        onFocus={() => dispatch(addToSelectedColumnIds(id))}
-      />
+      >
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          // TODO: implement logic to rename column
+          // onBlur={() => dispatch(removeFromSelectedColumnIds(id))}
+          // onFocus={selectColumn}
+          minLength={1}
+        />
+      </div>
       <Popover
         open={isPopoverOpen}
         anchorEl={anchorEl}
@@ -136,59 +186,36 @@ const ColumnBlockView = memo(function ColumnBlockView({
         }}
       >
         <List>
-          <ListItemButton
-            disabled={isNull} // can't remove null column
-            onClick={() => {
-              dispatch(removeColumnRequest(id));
-              closePopover();
-            }}
-          >
-            Remove column {name}
-          </ListItemButton>
-          <ListItemButton
-            disabled={isLastInTable}
-            onClick={() => {
-              handleRemoveColumnsAfter();
-              closePopover();
-            }}
-          >
-            Remove all to the right
-          </ListItemButton>
-          <hr></hr>
-          <ListItemButton
-            disabled={isNull}
-            onClick={() => {
-              // TODO update
-              // dispatch(setColumnProperty({
-              //     column,
-              //     property: "status",
-              //     value: COLUMN_STATUS_NULLED
-              // }));
-              setValue("null");
-              closePopover();
-            }}
-          >
-            Null column at {position}
-          </ListItemButton>
-          <ListItemButton
-            disabled={isNull} // can't rename null columns
-            onClick={() => {
-              closePopover();
-              // Delay focus to allow menu to close first
-              setTimeout(() => {
-                inputRef.current?.focus();
-              }, 100); // 50-100ms is usually enough
-            }}
-          >
-            Rename
-          </ListItemButton>
+          {menuItems.map((item) => (
+            <ListItemButton
+              key={item.label}
+              disabled={item.disabled}
+              onClick={item.onClick}
+            >
+              {item.label}
+            </ListItemButton>
+          ))}
         </List>
       </Popover>
     </div>
+    // <ColumnView
+    //   value={value}
+    // }
+    // }}
+    // onClick={(event) => {
+    //   if (event.shiftKey) {
+    //     // TODO
+    //   } else {
+    //     dispatch(
+    //       setColumnSelectedStatus({
+    //         id,
+    //         isSelected: !isSelected,
+    //       })
+    //     );
+    //   }
+    // }}
   );
-});
-
-export default ColumnBlockView;
+}
 
 /**
  * getPercentOverlap
@@ -207,34 +234,5 @@ function getPercentOverlap(a, b) {
   return Math.max(0, overlap);
 }
 
-export function ColumnView({
-  value,
-  onContextMenu = () => null,
-  onMouseEnter = () => null,
-  onMouseLeave = () => null,
-  inputRef = null,
-  onChange = () => null,
-  onBlur = () => null,
-  onFocus = () => null,
-}) {
-  return (
-    <div className="ColumnBlockView">
-      <div
-        className="screen"
-        onContextMenu={onContextMenu}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
-        <input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-          onFocus={onFocus}
-          minLength={1}
-        />
-      </div>
-    </div>
-  );
-}
+const EnhancedColumnBlockView = withColumnData(ColumnBlockView);
+export default EnhancedColumnBlockView;

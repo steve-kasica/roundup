@@ -1,5 +1,6 @@
 @use "sass:math";
 
+@import "../../../styles/variables.scss";
 $horizontalGutterWidth: 10px;
 $enabledCellOutlineColor: #aaa;
 $table-border-style: solid;
@@ -9,6 +10,33 @@ $cell-border-style: dotted;
 $cellPadding: 5px;
 
 .ColumnBlockView {
+  cursor: context-menu;
+  &.hover,
+  &:hover {
+    background-color: $hover-color;
+  }
+
+  &.null {
+    background-color: $null-color;
+    input {
+      font-style: italic;
+      text-transform: uppercase;
+    }
+  }
+
+  &.dragged {
+    filter: drop-shadow(2px 2px 2px black);
+    background-color: aquamarine;
+  }
+
+  &.selected,
+  &.focused {
+    background-color: $selected-color;
+    input {
+      font-weight: bold;
+    }
+  }
+
   .screen {
     padding-top: math.div($horizontalGutterWidth, 2);
     padding-bottom: math.div($horizontalGutterWidth, 2);
@@ -31,9 +59,5 @@ $cellPadding: 5px;
     text-align: center;
     text-overflow: ellipsis;
     pointer-events: none;
-  }
-
-  &.dragged {
-    background-color: aquamarine;
   }
 }

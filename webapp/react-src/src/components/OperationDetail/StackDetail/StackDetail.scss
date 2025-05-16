@@ -139,19 +139,6 @@ $cell-border-color: $table-border-color;
         }
 
         .ColumnView {
-          &.null {
-            background-color: #ddd;
-            input {
-              font-style: italic;
-              text-transform: uppercase;
-            }
-          }
-
-          &:hover,
-          &.hover {
-            background-color: $hover-color;
-          }
-
           &.drag {
             position: fixed;
             // left: set inline dynamically
