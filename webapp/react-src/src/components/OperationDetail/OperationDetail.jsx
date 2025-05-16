@@ -6,8 +6,8 @@ import {
   OPERATION_TYPE_STACK,
   selectFocusedOperationId,
 } from "../../data/slices/operationsSlice";
-import { OperationContainer } from "../Containers";
 import PackDetailView from "./PackDetailView";
+import withOperationData from "../HOC/withOperationData";
 
 export default function OperationDetail() {
   const focusedOperationId = useSelector(selectFocusedOperationId);
@@ -15,23 +15,19 @@ export default function OperationDetail() {
   if (focusedOperationId === null) {
     return <div>No focused operations</div>;
   } else {
-    return (
-      <OperationContainer id={focusedOperationId}>
-        <DynamicDetailView />
-      </OperationContainer>
-    );
+    return <DynamicOperationDetailView id={focusedOperationId} />;
   }
 }
 
-function DynamicDetailView({ operation, columnCount }) {
-  const { operationType, id } = operation;
+const DynamicOperationDetailView = withOperationData(OperationDetailView);
 
-  switch (operationType) {
+function OperationDetailView(props) {
+  switch (props.operationType) {
     case OPERATION_TYPE_STACK:
     case OPERATION_TYPE_NO_OP:
-      return <StackDetailView operationId={id} columnCount={columnCount} />;
+      return <StackDetailView {...props} />;
     case OPERATION_TYPE_PACK:
-      return <PackDetailView operationId={id} columnCount={columnCount} />;
+      return <PackDetailView {...props} />;
     default:
       return <div>Unknown operation type</div>;
   }

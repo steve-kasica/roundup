@@ -1,4 +1,3 @@
-import React from "react";
 import { useSelector } from "react-redux";
 import {
   selectOperation,
@@ -9,6 +8,7 @@ import {
 } from "../../data/slices/operationsSlice";
 import { selectOperationColumnCount } from "../../data/selectors";
 import { useDispatch } from "react-redux";
+
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
     const dispatch = useDispatch();

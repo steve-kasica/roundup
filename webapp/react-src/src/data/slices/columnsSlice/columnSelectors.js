@@ -20,6 +20,25 @@ export function selectColumnIdsByTableId(state, tableId) {
 }
 
 /**
+ * Selects all column IDs for a list of tables.
+ *
+ * @param {Object} state - The Redux state.
+ * @param {Array<string>} tableIds - An array of table IDs.
+ * @returns {Array<Array<string>>} - An array of arrays, where each inner array contains the column IDs for a specific table.
+ */
+export const selectColumnIdsByTableIds = createSelector(
+  // Input selectors
+  (state) => state.columns.idsByTable, // Extract the idsByTable object from the state
+  (_, tableIds) => tableIds, // Extract the tableIds argument
+
+  // Output selector
+  (idsByTable, tableIds) => {
+    console.log("selectColumnIdsByTableIds ran");
+    return tableIds.map((tableId) => idsByTable[tableId] || []);
+  }
+);
+
+/**
  * Selects a specific column by its ID.
  *
  * @param {Object} state - The Redux state.

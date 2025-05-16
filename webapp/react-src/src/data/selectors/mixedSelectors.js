@@ -6,9 +6,7 @@ import {
 import {
   selectAllOperations,
   selectOperation,
-  selectOperationChildren,
   selectOperationImmediateChildId,
-  selectRootOperation,
 } from "../slices/operationsSlice";
 import { selectColumnIdsByTableId } from "../slices/columnsSlice/columnSelectors";
 import { getSourceTableById } from "./sourceTablesSelectors";
@@ -16,6 +14,7 @@ import {
   selectSelectedOperationId,
   selectHoveredOperationId,
 } from "../slices/uiSlice";
+import { createSelector } from "@reduxjs/toolkit";
 
 // TODO: memoize, if necessary
 export const getFocusedOperation = (state) => {
@@ -117,24 +116,33 @@ export function selectSchemaColumnCount(state) {
   }
 }
 
-export function getOperationColumnIds(state, operationId) {
-  const operation = selectOperation(state, operationId);
-  if (operation === undefined) {
-    throw new Error("Operation not found");
-  }
-  return operation.tableIds.map((tableId) => {
-    const columnIds = selectColumnIdsByTableId(state, tableId);
-    return columnIds;
-  });
-}
+export const getOperationColumnIds = createSelector(
+  // Input selectors
+  (state, operationId) => selectOperation(state, operationId),
+  (state) => state,
 
-export function getTablesByOperationId(state, operationId) {
-  const operation = selectOperation(state, operationId);
-  if (operation === undefined) {
-    throw new Error("Operation not found");
+  // Output selector
+  (operation, state) => {
+    console.log("getOperationColumnIds Ran", operation);
+    return operation.tableIds.map((tableId) => {
+      const columnIds = selectColumnIdsByTableId(state, tableId);
+      return columnIds;
+    });
   }
-  return operation.tableIds.map((tableId) => {
-    const table = getSourceTableById(state, tableId);
-    return table;
-  });
-}
+);
+
+export const getTablesByOperationId = createSelector(
+  // Input selectors
+  (state) => state,
+  (_, operationId) => operationId,
+
+  // Results function
+  (state, operationId) => {
+    console.log("getTablesByOperationId Ran", operationId);
+    const operation = selectOperation(state, operationId);
+    return operation.tableIds.map((tableId) => {
+      const table = getSourceTableById(state, tableId);
+      return table;
+    });
+  }
+);

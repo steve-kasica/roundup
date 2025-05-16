@@ -13,7 +13,7 @@ Reusability: Makes the function more versatile and reusable in different context
  */
 
 import { createSlice } from "@reduxjs/toolkit";
-import Column from "./Column";
+import Column, { ColumnValue } from "./Column";
 
 const initialState = {
   idsByTable: {},
@@ -356,6 +356,36 @@ const columnsSlice = createSlice({
         column.status.error = error;
       }
     },
+
+    fetchUniqueValuesRequest(state, action) {
+      const { id } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isLoading = true;
+        column.status.error = null;
+      }
+    },
+    fetchUniqueValuesSuccess(state, action) {
+      const { id, values } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        values.forEach((value) => {
+          if (!column.values[value]) {
+            column.values[value] = ColumnValue(value);
+          }
+        });
+        column.status.isLoading = false;
+        column.status.error = null;
+      }
+    },
+    fetchUniqueValuesFailure(state, action) {
+      const { id, error } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isLoading = false;
+        column.status.error = error;
+      }
+    },
   }, // end reducers
 });
 
@@ -383,4 +413,7 @@ export const {
   fetchValueFacetsRequest,
   fetchValueFacetsSuccess,
   fetchValueFacetsFailure,
+  fetchUniqueValuesRequest,
+  fetchUniqueValuesSuccess,
+  fetchUniqueValuesFailure,
 } = columnsSlice.actions;

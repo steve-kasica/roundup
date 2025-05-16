@@ -80,7 +80,7 @@ export default function Column(tableId, index, name, columnType) {
     index,
     columnType,
     error: null,
-    valueFacets: [],
+    values: {},
     status: {
       isSelected: false,
       isLoading: true, // Initially set to true to indicate loading state,
@@ -88,6 +88,14 @@ export default function Column(tableId, index, name, columnType) {
       isDragging: false,
       error: null,
     },
+  };
+}
+
+export function ColumnValue(value, label = null, count = null) {
+  return {
+    value,
+    label,
+    count,
   };
 }
 

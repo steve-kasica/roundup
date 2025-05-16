@@ -4,31 +4,31 @@ import {
   setHoverTableId,
   unsetHoverTableId,
 } from "../../../data/slices/uiSlice";
-import {
-  getOperationColumnIds,
-  getTablesByOperationId,
-} from "../../../data/selectors";
 
 import ColumnIndex from "./ColumnIndex";
 import StackDetailToolbar from "./StackDetailToolbar";
 
 import "./StackDetail.scss";
 import { useEffect } from "react";
-import { setColumnVisibleStatus } from "../../../data/slices/columnsSlice";
+import {
+  selectColumnIdsByTableIds,
+  setColumnVisibleStatus,
+} from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
+import { selectTables } from "../../../data/slices/sourceTablesSlice/tablesSelector";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
-export default function StackDetailView({ operationId }) {
+export default function StackDetailView({ tableIds }) {
   const dispatch = useDispatch();
 
-  const tables = useSelector((state) =>
-    getTablesByOperationId(state, operationId)
+  const tables = useSelector(
+    (state) => selectTables(state, tableIds) // Selector is memoized
   );
-  const columnIdsByTable = useSelector((state) =>
-    getOperationColumnIds(state, operationId)
+  const columnIdsByTable = useSelector(
+    (state) => selectColumnIdsByTableIds(state, tableIds) // Selector is memoized
   );
 
   const maxColumnCount = Math.max(...columnIdsByTable.map((c) => c.length));
@@ -94,11 +94,7 @@ export default function StackDetailView({ operationId }) {
           <div className="x-axis label">{xAxisLabel}</div>
           <div ref={gridContainerRef} className="grid-container">
             {xScale.domain().map((j) => (
-              <ColumnIndex
-                key={j}
-                jIndex={j}
-                tableIds={tables.map(({ id }) => id)}
-              />
+              <ColumnIndex key={j} jIndex={j} tables={tables} />
             ))}
           </div>
         </div>

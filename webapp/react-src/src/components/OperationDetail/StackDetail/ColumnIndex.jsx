@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Box, IconButton, List, ListItemButton, Popover } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
-import { memo } from "react";
+import { memo, useRef } from "react";
 import {
   clearSelectedColumns,
   selectColumnIdsByIndex,
@@ -18,15 +18,24 @@ import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { swapColumnIndices } from "../../../data/sagas/swapColumnIndicesSaga";
 import { requestColumnValues } from "../../../data/sagas/requestColumnValues";
+import IndexUniqueValues from "./IndexUniqueValues";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
 
-const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
+const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
   const dispatch = useDispatch();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [isMenuIconVisable, setIsMenuIconVisible] = useState(false);
-  const isPopoverOpen = Boolean(anchorEl);
+  const tableIds = useMemo(() => tables.map(({ id }) => id), [tables]);
+  // console.log("ColumnIndex", jIndex, tables);
 
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const isPopoverOpen = Boolean(menuAnchorEl);
+  const [isMenuIconVisable, setIsMenuIconVisible] = useState(false);
+
+  const [detailAnchorEl, setDetailAnchorEl] = useState(null);
+  const isDetailPopoverOpen = Boolean(detailAnchorEl);
+  const formRef = useRef(null);
+
+  // Note: selector is memoized, so it won't recompute unless the input changes
   const columnIds = useSelector((state) =>
     selectColumnIdsByIndex(state, jIndex, tableIds)
   );
@@ -95,13 +104,40 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
       action: () => dispatch(setColumnSelectedStatusAfterIndex({ jIndex })),
     },
     {
-      label: "Inspect values",
+      label: "Compute facets",
       action: () => dispatch(requestColumnValues({ columnIds })),
+    },
+    {
+      label: "Compare unique values",
+      action: () => setDetailAnchorEl(formRef?.current),
     },
   ];
 
   return (
-    <form className="ColumnIndex" data-columnIds={columnIds.join(",")}>
+    <form
+      ref={formRef}
+      className="ColumnIndex"
+      data-columnIds={columnIds.join(",")}
+    >
+      <Popover
+        open={isDetailPopoverOpen}
+        anchorEl={detailAnchorEl}
+        onClose={() => setDetailAnchorEl(null)}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        sx={{
+          zIndex: 1000,
+        }}
+        // TODO: add little arrow at the bottom of the popover
+      >
+        <IndexUniqueValues columnIds={columnIds} />
+      </Popover>
       <Box
         ref={(node) => {
           dragRef(dropRef(node));
@@ -142,14 +178,14 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
             top: 0,
             opacity: isMenuIconVisable ? 1 : 0,
           }}
-          onClick={(event) => setAnchorEl(event.currentTarget)}
+          onClick={(event) => setMenuAnchorEl(event.currentTarget)}
         >
           <ChevronDownIcon />
         </IconButton>
         <Popover
           open={isPopoverOpen}
-          anchorEl={anchorEl}
-          onClose={() => setAnchorEl(null)}
+          anchorEl={menuAnchorEl}
+          onClose={() => setMenuAnchorEl(null)}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "left",
@@ -161,7 +197,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tableIds }) {
                 key={index}
                 onClick={() => {
                   item.action();
-                  setAnchorEl(null);
+                  setMenuAnchorEl(null);
                 }}
               >
                 {item.label}
