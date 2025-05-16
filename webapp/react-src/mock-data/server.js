@@ -11,7 +11,7 @@ import { endpoint as renameColumnEndpoint } from "../src/services/open-refine/re
 import { endpoint as removeColumnEndpoint } from "../src/services/open-refine/remove-column";
 import { endpoint as reorderColumnsEndpoint } from "../src/services/open-refine/reorder-columns";
 import { endpoint as computeFacetsEndpoint } from "../src/services/open-refine/compute-facets";
-import { endpoint as getUniqueColumnValuesEndpoint } from "../src/services/open-refine/get-unique-column-values";
+import { endpoint as getUniqueColumnValuesEndpoint } from "../src/services/open-roundup/get-unique-column-values";
 
 function generateRandom13DigitNumber() {
   const min = 1000000000000; // Minimum 13-digit number
