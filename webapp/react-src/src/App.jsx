@@ -16,7 +16,9 @@ import CompositeTableSchema from "./components/CompositeTableSchema";
 import OperationDetail from "./components/OperationDetail";
 import OperationsList from "./components/OperationsList";
 import CustomDragLayer from "./CustomDragLayer";
-import ColumnDetail from "./components/ColumnDetail";
+import ColumnFacets from "./components/ColumnFacets";
+import { useSelector } from "react-redux";
+import { selectSelectedColumnIds } from "./data/slices/columnsSlice";
 
 function App() {
   return (
@@ -29,20 +31,26 @@ function App() {
             CompositeTableSchema,
             OperationsList,
             OperationDetail,
-            ColumnDetail,
+            ColumnFacetContainer,
           ]}
           titles={[
             "Source Tables",
             "Composite Table Schema",
             "Operations List",
             "Operations Detail",
-            "Column Detail",
+            "Column(s) Facets",
           ]}
           dashboardTitle="Open Roundup"
         />
       </DndProvider>
     </ThemeProvider>
   );
+}
+
+function ColumnFacetContainer() {
+  const columnIds = useSelector(selectSelectedColumnIds);
+
+  return columnIds.length > 0 ? <ColumnFacets columnIds={columnIds} /> : null;
 }
 
 export default App;

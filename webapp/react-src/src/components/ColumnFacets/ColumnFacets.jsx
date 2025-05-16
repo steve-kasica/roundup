@@ -1,53 +1,45 @@
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectColumnById,
-  selectSelectedColumnIds,
-} from "../../data/slices/columnsSlice";
-import { hsl, scaleLinear } from "d3";
+import { selectColumnById } from "../../data/slices/columnsSlice";
+import { hsl, InternMap, rollup, scaleLinear } from "d3";
 import { useEffect } from "react";
-import { requestColumnValues } from "../../data/sagas/requestColumnValues";
+import { requestColumnFacets } from "../../data/sagas/requestColumnFacets";
 import Chip from "@mui/material/Chip";
 
-export default function ColumnDetail() {
+export default function ColumnDetail({ columnIds }) {
   const dispatch = useDispatch();
-  const focusedColumnIds = useSelector(selectSelectedColumnIds);
-  const focusedColumns = useSelector((state) =>
-    focusedColumnIds.map((id) => selectColumnById(state, id))
-  );
 
   useEffect(() => {
-    if (focusedColumnIds.length === 0) {
+    if (columnIds.length === 0) {
       return;
-    }
-
-    const columnsWithMissingValues = focusedColumns.filter(
-      ({ valueFacets }) => valueFacets.length === 0
-    );
-    if (columnsWithMissingValues.length > 0) {
-      // If any of the columns have missing values, we need to request them
+    } else {
+      // If columnIds is not empty, we need to request the values for the columns
       dispatch(
-        requestColumnValues({
-          columnIds: columnsWithMissingValues.map(({ id }) => id),
+        requestColumnFacets({
+          columnIds,
         })
       );
     }
-  }, [focusedColumnIds, focusedColumns, dispatch]);
+  }, [columnIds, dispatch]);
+
+  const columns = useSelector((state) =>
+    columnIds.map((id) => selectColumnById(state, id))
+  );
 
   // Check if any column is still loading or missing valueFacets
-  const isLoading = focusedColumns.some(
+  const isLoading = columns.some(
     (column) =>
       column.status?.loading ||
       !column.valueFacets ||
       column.valueFacets.length === 0
   );
 
-  if (focusedColumns.length === 0) {
+  if (columns.length === 0) {
     return <div>No columns selected</div>;
   } else if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  const data = focusedColumns
+  const data = columns
     .map((column) =>
       column.valueFacets.map(({ value, count }) => ({
         tableId: column.tableId,
@@ -58,6 +50,7 @@ export default function ColumnDetail() {
     )
     .flat();
 
+  const tableIds = Array.from(new Set(data.map(({ tableId }) => tableId)));
   const yDomain = new Set(data.map(({ value }) => value));
   const xDomain = new Set(data.map(({ tableId }) => tableId));
 
@@ -112,20 +105,6 @@ export default function ColumnDetail() {
                           : "black",
                     }}
                   />
-                  {/* Add a horizontal line */}
-                  {/* {rowIndex > 0 && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "50%",
-                        left: 0,
-                        right: 0,
-                        height: "1px",
-                        backgroundColor: "#ccc",
-                        zIndex: -1,
-                      }}
-                    ></div>
-                  )} */}
                 </td>
               );
             })}
