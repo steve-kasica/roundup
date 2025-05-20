@@ -1,21 +1,24 @@
-import { useEffect, memo, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { requestColumnUniqueValues } from "../../../data/sagas/requestColumnUniqueValues";
-import { selectColumnById } from "../../../data/slices/columnsSlice";
-import Chip from "@mui/material/Chip";
-import Tooltip from "@mui/material/Tooltip";
+import {
+  selectColumnById,
+  selectSelectedColumnIds,
+} from "../../../data/slices/columnsSlice";
 import { intersection, union } from "d3";
 import AnimatedEllipsis from "../../ui/AnimatedElipse";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { selectTableById } from "../../../data/slices/sourceTablesSlice/tablesSelector";
 
 const ROW_HEIGHT = 32; // px, adjust as needed
 
-const IndexUniqueValues = memo(function IndexUniqueValues({ columnIds }) {
+export default function IndexUniqueValues() {
   const dispatch = useDispatch();
   let valuesByTableId = new Map(),
     tableIdsByValue = new Map(),
     jaccardIndex;
+
+  const columnIds = useSelector(selectSelectedColumnIds);
 
   useEffect(() => {
     dispatch(requestColumnUniqueValues({ columnIds }));
@@ -129,9 +132,8 @@ const IndexUniqueValues = memo(function IndexUniqueValues({ columnIds }) {
       style={{
         display: "flex",
         flexDirection: "column",
-        padding: "5px",
-        height: "300px",
-        width: "350px",
+        minWidth: "200px",
+        padding: "10px",
         overflow: "hidden",
       }}
     >
@@ -141,7 +143,7 @@ const IndexUniqueValues = memo(function IndexUniqueValues({ columnIds }) {
         <em>{categorizeJaccardIndex(jaccardIndex)} overlap between tables</em>
       </p>
       <div
-        style={{ display: "flex", flexDirection: "row", overflow: "hidden" }}
+        style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}
       >
         {/* --- Navigation bar for degrees --- */}
         {!isLoading && (
@@ -180,7 +182,7 @@ const IndexUniqueValues = memo(function IndexUniqueValues({ columnIds }) {
           </div>
         )}
         {/* --- End navigation bar --- */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
           {isLoading ? (
             <AnimatedEllipsis />
           ) : (
@@ -370,12 +372,10 @@ const IndexUniqueValues = memo(function IndexUniqueValues({ columnIds }) {
       </div>
     </div>
   );
-});
+}
 
 function categorizeJaccardIndex(score) {
   if (score === 0) return "No";
   if (score < 1) return "Partial"; // (0, 1)
   if (score === 1) return "Complete";
 }
-
-export default IndexUniqueValues;

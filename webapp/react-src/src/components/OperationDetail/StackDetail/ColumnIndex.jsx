@@ -16,7 +16,8 @@ import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { swapColumnIndices } from "../../../data/sagas/swapColumnIndicesSaga";
-import IndexUniqueValues from "./IndexUniqueValues";
+// import IndexUniqueValues from "./IndexUniqueValues";
+import { setDrawerContents } from "../../../data/slices/uiSlice/uiSlice";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
 
@@ -107,7 +108,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
     // },
     {
       label: "Compare unique values",
-      action: () => setDetailAnchorEl(formRef?.current),
+      action: () => dispatch(setDrawerContents("IndexUniqueValues")),
     },
   ];
 
@@ -134,7 +135,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
         }}
         // TODO: add little arrow at the bottom of the popover
       >
-        <IndexUniqueValues columnIds={columnIds} />
+        {/* <IndexUniqueValues columnIds={columnIds} /> */}
       </Popover>
       <Box
         ref={(node) => {

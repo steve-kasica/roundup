@@ -1,8 +1,19 @@
+import React, { lazy, Suspense, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
+import Drawer from "@mui/material/Drawer";
+import { selectDrawerContents } from "../data/slices/uiSlice/uiSliceSelectors";
+import { useDispatch, useSelector } from "react-redux";
+import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
+
+const componentMap = {
+  IndexUniqueValues: lazy(() =>
+    import("./../components/OperationDetail/StackDetail/IndexUniqueValues")
+  ),
+};
 
 /**
  * DashboardGrid component that arranges components in a responsive grid
@@ -21,6 +32,13 @@ const DashboardGrid = ({
   spacing = 2,
   cardElevation = 1,
 }) => {
+  let DrawerComponent;
+  const dispatch = useDispatch();
+  const drawerContents = useSelector(selectDrawerContents);
+  if (drawerContents) {
+    DrawerComponent = componentMap[drawerContents];
+  }
+
   // Use provided titles or generate placeholders
   const gridTitles = [...titles];
   while (gridTitles.length < components.length) {
@@ -28,12 +46,23 @@ const DashboardGrid = ({
   }
 
   return (
-    <Box sx={{ width: "100%", maxWidth: 1200, margin: "0 auto" }}>
-      {dashboardTitle && (
-        <Typography variant="h4" component="h1" gutterBottom>
-          {dashboardTitle}
-        </Typography>
-      )}
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 1200,
+        margin: "0 auto",
+        position: "relative",
+      }}
+    >
+      <Drawer
+        anchor="right"
+        open={drawerContents !== null}
+        onClose={() => dispatch(setDrawerContents(null))}
+      >
+        <Suspense fallback={<div>Loading...</div>}>
+          {DrawerComponent && <DrawerComponent />}
+        </Suspense>
+      </Drawer>
 
       <Grid container spacing={spacing}>
         {components.map((Component, index) => (
