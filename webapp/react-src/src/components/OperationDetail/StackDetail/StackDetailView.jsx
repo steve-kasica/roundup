@@ -74,7 +74,8 @@ export default function StackDetailView({ tableIds }) {
             <span>{yAxisLabel}</span>
           </div>
           <div className="ticks">
-            {tables.map((child) => (
+            {/* TODO: not sure why `tables` has to be reversed */}
+            {[...tables].reverse().map((child) => (
               // TODO: what if child is an operation?
               <div
                 key={child.id}

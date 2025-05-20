@@ -205,7 +205,8 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
           </List>
         </Popover>
       </Box>
-      {columnIds.map((columnId) => (
+      {/* TODO: not sure why this has to be reversed */}
+      {[...columnIds].reverse().map((columnId) => (
         <ColumnBlockView key={columnId} isDraggable={true} id={columnId} />
       ))}
     </form>

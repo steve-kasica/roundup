@@ -167,7 +167,6 @@ $null-column-border-color: $null-column-background;
       }
 
       .label {
-        display: none; // DEBUG
         position: absolute;
         top: $label-offset-top;
         left: $label-offset-left;
