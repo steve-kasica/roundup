@@ -13,7 +13,6 @@ import {
 import { useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-import { removeFromSelectedColumnIds } from "../../data/slices/uiSlice";
 
 export default function withColumnData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
@@ -158,7 +157,7 @@ export default function withColumnData(WrappedComponent) {
 
     function unfocusColumn() {
       if (!isNull) {
-        dispatch(removeFromSelectedColumnIds(id));
+        dispatch(setColumnSelectedStatus({ id, isSelected: false }));
       }
     }
 

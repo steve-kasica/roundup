@@ -3,10 +3,10 @@ import {
   removeColumnRequest,
   removeColumnSuccess,
   removeColumnFailure,
+  setColumnSelectedStatus,
 } from "../slices/columnsSlice";
 import OpenRefine from "../../services/open-refine";
 import { decrementColumnCount } from "../slices/sourceTablesSlice";
-import { removeFromSelectedColumnIds } from "../slices/uiSlice";
 
 export default function* removeColumnSaga() {
   yield takeEvery(removeColumnRequest.type, removeColumnSagaWorker);
@@ -27,7 +27,7 @@ function* removeColumnSagaWorker(action) {
     yield put(removeColumnSuccess({ id }));
 
     // Remove column for set of selected columns, if present
-    yield put(removeFromSelectedColumnIds(id));
+    yield put(setColumnSelectedStatus({ id, isSelected: false }));
 
     // Update column count of associated table
     yield put(decrementColumnCount({ projectId }));

@@ -5,12 +5,11 @@ import {
   selectOperationDepth,
   selectOperationByTableId,
 } from "../../data/slices/operationsSlice";
-import { getTableById, getHoverOperationTableIds } from "../../data/selectors";
+import { getTableById } from "../../data/selectors";
 import {
   setTableHoveredStatus,
   dataType as SourceTable,
 } from "../../data/slices/sourceTablesSlice";
-import { selectHoveredTableId } from "../../data/slices/uiSlice";
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 
 export function TableContainer({

@@ -12,10 +12,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
-import { removeFromSelectedColumnIds } from "../../../data/slices/uiSlice/uiSlice";
 
 import "./ColumnBlockView.scss";
-import { memo } from "react";
 import withColumnData from "../../HOC/withColumnData";
 
 const delay = 500; // in ms for input changes

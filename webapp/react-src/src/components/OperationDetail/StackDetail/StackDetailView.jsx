@@ -1,9 +1,5 @@
 import { scaleBand } from "d3";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setHoverTableId,
-  unsetHoverTableId,
-} from "../../../data/slices/uiSlice";
 
 import ColumnIndex from "./ColumnIndex";
 import StackDetailToolbar from "./StackDetailToolbar";
@@ -16,6 +12,7 @@ import {
 } from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
 import { selectTables } from "../../../data/slices/sourceTablesSlice/tablesSelector";
+import { setTableHoveredStatus } from "../../../data/slices/sourceTablesSlice";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
@@ -82,8 +79,22 @@ export default function StackDetailView({ tableIds }) {
               <div
                 key={child.id}
                 className="tick"
-                onMouseEnter={() => dispatch(setHoverTableId(child.id))}
-                onMouseLeave={() => dispatch(unsetHoverTableId())}
+                onMouseEnter={() =>
+                  dispatch(
+                    setTableHoveredStatus({
+                      tableId: child.id,
+                      isHovered: true,
+                    })
+                  )
+                }
+                onMouseLeave={() =>
+                  dispatch(
+                    setTableHoveredStatus({
+                      tableId: child.id,
+                      isHovered: false,
+                    })
+                  )
+                }
               >
                 {child.name}
               </div>

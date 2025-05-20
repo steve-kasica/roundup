@@ -10,25 +10,7 @@ import {
 } from "../slices/operationsSlice";
 import { selectColumnIdsByTableId } from "../slices/columnsSlice/columnSelectors";
 import { getSourceTableById } from "./sourceTablesSelectors";
-import {
-  selectSelectedOperationId,
-  selectHoveredOperationId,
-} from "../slices/uiSlice";
 import { createSelector } from "@reduxjs/toolkit";
-
-// TODO: memoize, if necessary
-export const getFocusedOperation = (state) => {
-  const focusedOperationNodeId = selectSelectedOperationId(state);
-  if (focusedOperationNodeId === null) {
-    return null;
-  } else {
-    const operation = state.operations.entities[focusedOperationNodeId];
-    if (operation === undefined) {
-      throw new Error("Node not found");
-    }
-    return operation;
-  }
-};
 
 // export function getChildrenData(state, children) {
 //   const childrenData = children.map((child) => {
@@ -40,19 +22,6 @@ export const getFocusedOperation = (state) => {
 //   });
 //   return childrenData;
 // }
-
-export const getHoverOperationTableIds = (state) => {
-  const hoverOperationId = selectHoveredOperationId(state);
-  if (hoverOperationId === null) {
-    return [];
-  } else {
-    const operation = selectOperation(state, hoverOperationId);
-    if (operation === undefined) {
-      throw new Error("Node not found");
-    }
-    return getOperationTableIds(operation);
-  }
-};
 
 // Obviously a good candidate for memoization
 // Recursive function
