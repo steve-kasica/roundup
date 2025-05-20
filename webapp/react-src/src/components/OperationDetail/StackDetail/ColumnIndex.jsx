@@ -11,7 +11,6 @@ import {
   setColumnSelectedStatus,
   setColumnSelectedStatusAfterIndex,
 } from "../../../data/slices/columnsSlice";
-import { ColumnContainer } from "../../Containers";
 import ColumnBlockView from "./ColumnBlockView";
 import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 import { useDrag, useDrop } from "react-dnd";
@@ -24,7 +23,6 @@ export const COLUMN_INDEX = "COLUMN_INDEX";
 const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
   const dispatch = useDispatch();
   const tableIds = useMemo(() => tables.map(({ id }) => id), [tables]);
-  // console.log("ColumnIndex", jIndex, tables);
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isPopoverOpen = Boolean(menuAnchorEl);
@@ -208,14 +206,6 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
       </Box>
       {columnIds.map((columnId) => (
         <ColumnBlockView key={columnId} isDraggable={true} id={columnId} />
-        // TODO: delete
-        // <ColumnContainer
-        //   key={columnId}
-        //   id={columnId}
-        //   index={jIndex}
-        //   isDraggable={true}
-        // >
-        // </ColumnContainer>
       ))}
     </form>
   );

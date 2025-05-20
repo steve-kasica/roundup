@@ -90,7 +90,10 @@ export default function makeServer() {
       this.get(getUniqueColumnValuesEndpoint, (schema, request) => {
         const projectId = request.queryParams["project"];
         const columnName = request.queryParams["columnName"];
-        return uniqColumnValueData[projectId][columnName.toLowerCase()];
+        const limit = request.queryParams["limit"] || 1000;
+        const data = uniqColumnValueData[projectId][columnName.toLowerCase()];
+        data.uniqueValues = data.uniqueValues.slice(0, limit);
+        return data;
       });
     },
   });

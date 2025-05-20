@@ -6,17 +6,18 @@ import Chip from "@mui/material/Chip";
 import Tooltip from "@mui/material/Tooltip";
 import { intersection, union } from "d3";
 import AnimatedEllipsis from "../../ui/AnimatedElipse";
+import React, { useRef } from "react";
+import { selectTableById } from "../../../data/slices/sourceTablesSlice/tablesSelector";
+
+const ROW_HEIGHT = 32; // px, adjust as needed
 
 const IndexUniqueValues = memo(function IndexUniqueValues({ columnIds }) {
   const dispatch = useDispatch();
-
-  // Local state for filtering groups
-  const [showAll, setShowAll] = useState(true);
-  const [showSome, setShowSome] = useState(true);
-  const [showOne, setShowOne] = useState(true);
+  let valuesByTableId = new Map(),
+    tableIdsByValue = new Map(),
+    jaccardIndex;
 
   useEffect(() => {
-    console.log("requestColumnUniqueValues", columnIds);
     dispatch(requestColumnUniqueValues({ columnIds }));
   }, [dispatch, columnIds]);
 
@@ -24,11 +25,11 @@ const IndexUniqueValues = memo(function IndexUniqueValues({ columnIds }) {
     columnIds.map((id) => selectColumnById(state, id))
   );
 
-  console.log("columns", columns);
+  const tables = useSelector((state) =>
+    columns.map((column) => selectTableById(state, column.tableId))
+  );
 
-  let valuesByTableId = new Map(),
-    tableIdsByValue = new Map(),
-    jaccardIndex;
+  const tableIdToName = new Map(tables.map((table) => [table.id, table.name]));
 
   const counts = {
     tableCount: columnIds.length,
@@ -67,118 +68,304 @@ const IndexUniqueValues = memo(function IndexUniqueValues({ columnIds }) {
         union(...valuesByTableId.values()).size || 0;
   }
 
-  const isLoading = valuesByTableId.size === 0 && jaccardIndex === undefined;
+  const isLoading = valuesByTableId.size === 0;
+
+  // Get all table IDs and unique values for the table
+  const allTableIds = Array.from(valuesByTableId.keys());
+  const allUniqueValues = Array.from(tableIdsByValue.keys());
+
+  // --- New code for navigation by degree ---
+  // Map degree (number of tables) to first value with that degree
+  const degreeToValue = new Map();
+  const valueToDegree = new Map();
+  allUniqueValues.forEach((value) => {
+    const degree = tableIdsByValue.get(value).length;
+    valueToDegree.set(value, degree);
+    if (!degreeToValue.has(degree)) {
+      degreeToValue.set(degree, value);
+    }
+  });
+  const sortedDegrees = Array.from(degreeToValue.keys()).sort((a, b) => a - b);
+
+  // Build a map: degree -> count of unique values with that degree
+  const degreeCounts = {};
+  allUniqueValues.forEach((value) => {
+    const degree = valueToDegree.get(value);
+    degreeCounts[degree] = (degreeCounts[degree] || 0) + 1;
+  });
+
+  // Refs for each value row
+  const valueRowRefs = useRef({});
+  const bodyRef = useRef(null); // <-- Add this
+
+  // Scroll to the first row with the selected degree
+  const scrollToDegree = (degree) => {
+    const value = degreeToValue.get(degree);
+    const rowEl = value && valueRowRefs.current[value];
+    const container = bodyRef.current;
+    if (rowEl && container) {
+      // Calculate offset relative to the scrollable container
+      const rowTop = rowEl.offsetTop;
+      // Optionally, center the row:
+      const scroll =
+        rowTop -
+        container.offsetTop -
+        container.clientHeight / 2 +
+        rowEl.clientHeight / 2 +
+        rowEl.clientHeight * 2; // compensate for sticky headers
+      container.scrollTo({
+        top: scroll > 0 ? scroll : 0,
+        behavior: "smooth",
+      });
+    }
+  };
+  // --- End new code ---
+
+  const colCount = allTableIds.length + 1;
+  const colWidth = `${100 / colCount}%`;
 
   return (
     <div
       style={{
-        padding: "10px",
-        width: "200px",
-        height: "200px",
-        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        padding: "5px",
+        height: "300px",
+        width: "350px",
+        overflow: "hidden",
       }}
     >
-      <div>
-        <strong>
-          {isLoading ? <AnimatedEllipsis /> : tableIdsByValue.size} unique
-          values <br />(
+      <p>
+        <strong> {tableIdsByValue.size} unique values</strong>
+        <br />
+        <em>{categorizeJaccardIndex(jaccardIndex)} overlap between tables</em>
+      </p>
+      <div
+        style={{ display: "flex", flexDirection: "row", overflow: "hidden" }}
+      >
+        {/* --- Navigation bar for degrees --- */}
+        {!isLoading && (
+          <div
+            style={{
+              minWidth: "90px",
+              marginRight: "8px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "4px",
+              alignItems: "flex-start",
+            }}
+          >
+            {[...sortedDegrees].reverse().map((degree) => (
+              <button
+                key={degree}
+                onClick={() => scrollToDegree(degree)}
+                style={{
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  border: "1px solid #888",
+                  background: "#f5f5f5",
+                  cursor: "pointer",
+                  fontSize: "0.95em",
+                  width: "100%",
+                  textAlign: "left",
+                }}
+                title={`Scroll to values in ${degree} table${
+                  degree > 1 ? "s" : ""
+                }`}
+              >
+                {degree} table{degree > 1 ? "s" : ""}{" "}
+                <span style={{ color: "#888" }}>({degreeCounts[degree]})</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {/* --- End navigation bar --- */}
+        <div style={{ flex: 1, minWidth: 0 }}>
           {isLoading ? (
             <AnimatedEllipsis />
           ) : (
-            `${categorizeJaccardIndex(jaccardIndex)} Overlap`
-          )}
-          )
-        </strong>
-      </div>
-      <br />
-
-      {/* Filter buttons as Chips */}
-      <div style={{ display: "flex", gap: "0.25em" }}>
-        <Chip
-          label={
-            <>All ({isLoading ? <AnimatedEllipsis /> : counts.inAllTables})</>
-          }
-          clickable
-          color={showAll ? "success" : "default"}
-          variant={showAll ? "filled" : "outlined"}
-          onClick={() => setShowAll((v) => !v)}
-          size="small"
-          disabled={counts.inAllTables === 0}
-        />
-        <Chip
-          label={
-            <>
-              One ({isLoading ? <AnimatedEllipsis /> : counts.inOnlyOneTable})
-            </>
-          }
-          clickable
-          color={showOne ? "error" : "default"}
-          variant={showOne ? "filled" : "outlined"}
-          onClick={() => setShowOne((v) => !v)}
-          size="small"
-          disabled={counts.inOnlyOneTable === 0}
-        />
-        <Chip
-          label={
-            <>Some ({isLoading ? <AnimatedEllipsis /> : counts.inSomeTables})</>
-          }
-          clickable
-          color={showSome ? "warning" : "default"}
-          variant={showSome ? "filled" : "outlined"}
-          onClick={() => setShowSome((v) => !v)}
-          size="small"
-          disabled={counts.inSomeTables === 0}
-        />
-      </div>
-      <hr></hr>
-
-      <div style={{ marginTop: "1em" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5em" }}>
-          {[...tableIdsByValue.entries()]
-            .filter(([_, tables]) => {
-              if (tables.length === counts.tableCount && showAll) return true;
-              if (tables.length === 1 && showOne) return true;
-              if (
-                tables.length !== 1 &&
-                tables.length !== counts.tableCount &&
-                showSome
-              )
-                return true;
-              return false;
-            })
-            .map(([key, tables]) => {
-              let sx = {};
-              if (tables.length === counts.tableCount) {
-                sx = { backgroundColor: "#e6f4ea", color: "#137333" };
-              } else if (tables.length === 1) {
-                sx = { backgroundColor: "#fdecea", color: "#b71c1c" };
-              } else {
-                sx = { backgroundColor: "#fff8e1", color: "#ff9800" };
-              }
-              return (
-                <Tooltip
-                  key={key}
-                  title={
-                    <div>
-                      <strong>Tables:</strong>
-                      <ul style={{ margin: 0, paddingLeft: "1.2em" }}>
-                        {[...valuesByTableId.keys()].map((tableId) => (
-                          <li key={tableId}>
-                            {tableId}: {tables.includes(tableId) ? "Yes" : "No"}
-                          </li>
-                        ))}
-                      </ul>
+            <div
+              style={{
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                overflow: "hidden",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              {/* Header */}
+              <div
+                style={{
+                  display: "flex",
+                  position: "sticky",
+                  top: 0,
+                  background: "#fff",
+                  zIndex: 2,
+                  borderBottom: "1px solid #ccc",
+                  fontWeight: "bold",
+                  height: ROW_HEIGHT,
+                  alignItems: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: colWidth,
+                    padding: "4px",
+                    textAlign: "right",
+                    borderRight: "1px solid #ccc",
+                    boxSizing: "border-box",
+                  }}
+                ></div>
+                {allTableIds.map((tableId) => (
+                  <div
+                    key={tableId}
+                    style={{
+                      width: colWidth,
+                      padding: "4px",
+                      textAlign: "center",
+                      borderLeft: "1px solid #ccc",
+                      boxSizing: "border-box",
+                      overflow: "visible",
+                    }}
+                  >
+                    <div
+                      style={{ transform: "rotate(-45deg)", wordWrap: "unset" }}
+                    >
+                      {tableIdToName.get(tableId)}
                     </div>
-                  }
-                  arrow
-                  placement="top"
-                >
-                  <span>
-                    <Chip label={key} size="small" sx={sx} />
-                  </span>
-                </Tooltip>
-              );
-            })}
+                  </div>
+                ))}
+              </div>
+              {/* Percent Row */}
+              <div
+                style={{
+                  display: "flex",
+                  position: "sticky",
+                  top: ROW_HEIGHT,
+                  background: "#fff",
+                  zIndex: 1,
+                  borderBottom: "1px solid #ccc",
+                  fontSize: "0.95em",
+                  height: ROW_HEIGHT,
+                  alignItems: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: colWidth,
+                    padding: "4px",
+                    boxSizing: "border-box",
+                  }}
+                ></div>
+                {allTableIds.map((tableId) => {
+                  const tableUniqueCount =
+                    valuesByTableId.get(tableId)?.size ?? 0;
+                  const percent =
+                    allUniqueValues.length > 0
+                      ? (
+                          (tableUniqueCount / allUniqueValues.length) *
+                          100
+                        ).toFixed(1)
+                      : "0.0";
+                  return (
+                    <div
+                      key={tableId + "-percent"}
+                      style={{
+                        width: colWidth,
+                        padding: "4px",
+                        textAlign: "center",
+                        borderLeft: "1px solid #ccc",
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      {percent}%
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Body */}
+              <div
+                ref={bodyRef}
+                style={{
+                  overflowY: "auto",
+                  // maxHeight: 128,
+                }}
+              >
+                {allUniqueValues
+                  .sort(
+                    (a, b) =>
+                      tableIdsByValue.get(b).length -
+                      tableIdsByValue.get(a).length
+                  )
+                  .map((value) => (
+                    <div
+                      key={value}
+                      ref={(el) => (valueRowRefs.current[value] = el)}
+                      data-degree={valueToDegree.get(value)}
+                      style={{
+                        display: "flex",
+                        borderBottom: "1px solid #eee",
+                        alignItems: "center",
+                        height: ROW_HEIGHT,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: colWidth,
+                          padding: "4px",
+                          textAlign: "right",
+                          borderRight: "1px solid #ccc",
+                          background: "#fafafa",
+                          boxSizing: "border-box",
+                        }}
+                      >
+                        {value}
+                      </div>
+                      {allTableIds.map((tableId) => (
+                        <div
+                          key={tableId}
+                          style={{
+                            width: colWidth,
+                            padding: "4px",
+                            textAlign: "center",
+                            borderLeft: "1px solid #eee",
+                            boxSizing: "border-box",
+                          }}
+                        >
+                          {
+                            tableIdsByValue.get(value).includes(tableId) ? (
+                              <div
+                                style={{
+                                  borderRadius: "50%",
+                                  width: "12px",
+                                  height: "12px",
+                                  backgroundColor: "black",
+                                  display: "inline-block",
+                                  margin: "0 auto",
+                                }}
+                              ></div> // filled circle
+                            ) : (
+                              <div
+                                style={{
+                                  borderRadius: "50%",
+                                  width: "12px",
+                                  height: "12px",
+                                  backgroundColor: "transparent",
+                                  border: "1px solid black",
+                                  display: "inline-block",
+                                  margin: "0 auto",
+                                }}
+                              ></div>
+                            ) // empty circle
+                          }
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -187,10 +374,7 @@ const IndexUniqueValues = memo(function IndexUniqueValues({ columnIds }) {
 
 function categorizeJaccardIndex(score) {
   if (score === 0) return "No";
-  if (score <= 0.25) return "Low"; // (0, 0.25]
-  if (score <= 0.5) return "Some"; // (0.25, 0.5]
-  if (score <= 0.75) return "Moderate"; // (0.5, 0.75]
-  if (score < 1) return "High"; // (0.75, 1]
+  if (score < 1) return "Partial"; // (0, 1)
   if (score === 1) return "Complete";
 }
 

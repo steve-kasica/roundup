@@ -31,7 +31,7 @@ function App() {
             CompositeTableSchema,
             OperationsList,
             OperationDetail,
-            ColumnFacetContainer,
+            // ColumnFacetContainer,
           ]}
           titles={[
             "Source Tables",

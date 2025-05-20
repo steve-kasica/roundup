@@ -13,3 +13,7 @@ export const selectTables = createSelector(
       .map(([tableId, table]) => table);
   }
 );
+
+export const selectTableById = (state, tableId) => {
+  return state.sourceTables.data[tableId];
+};

@@ -67,11 +67,11 @@ $null-column-border-color: $null-column-background;
         animation: #{$keyframe-name} 1s ease-in-out infinite;
       }
       &.hover {
-        // background-color: $hover-color;
+        background-color: $hover-color;
       }
-      // &.selected {
-      //   background-color: $focused-color;
-      // }
+      &.selected {
+        background-color: $focused-color;
+      }
       &.dragged {
         background-color: $dragged-src-color;
       }
