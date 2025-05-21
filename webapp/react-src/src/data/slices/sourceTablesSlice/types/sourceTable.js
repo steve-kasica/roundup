@@ -42,6 +42,7 @@ export function SourceTable(
     id,
     name,
     rowCount,
+    rowsExplored: 0,
     columnCount,
     dateCreated,
     dateLastModified,
@@ -57,6 +58,7 @@ export const isSourceTable = (obj) =>
   Object.hasOwn(obj, "id") &&
   Object.hasOwn(obj, "name") &&
   Object.hasOwn(obj, "rowCount") &&
+  Object.hasOwn(obj, "rowsExplored") &&
   Object.hasOwn(obj, "columnCount") &&
   Object.hasOwn(obj, "dateCreated") &&
   Object.hasOwn(obj, "dateLastModified") &&

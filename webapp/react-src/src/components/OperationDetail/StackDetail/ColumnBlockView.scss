@@ -15,49 +15,4 @@ $cellPadding: 5px;
   &:hover {
     background-color: $hover-color;
   }
-
-  &.null {
-    background-color: $null-color;
-    input {
-      font-style: italic;
-      text-transform: uppercase;
-    }
-  }
-
-  &.dragged {
-    filter: drop-shadow(2px 2px 2px black);
-    background-color: aquamarine;
-  }
-
-  &.selected,
-  &.focused {
-    background-color: $selected-color;
-    input {
-      font-weight: bold;
-    }
-  }
-
-  .screen {
-    padding-top: math.div($horizontalGutterWidth, 2);
-    padding-bottom: math.div($horizontalGutterWidth, 2);
-    border-color: $enabledCellOutlineColor;
-    border-style: $table-border-style;
-    border-width: $cell-border-width;
-    border-right-style: $cell-border-style;
-    border-left: none;
-    background-color: inherit;
-  }
-
-  input {
-    width: 10ch;
-    overflow: hidden;
-    padding: $cellPadding;
-    background: inherit;
-    border: none;
-    field-sizing: content;
-    white-space: nowrap;
-    text-align: center;
-    text-overflow: ellipsis;
-    pointer-events: none;
-  }
 }

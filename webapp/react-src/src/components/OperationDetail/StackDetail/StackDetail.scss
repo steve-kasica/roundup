@@ -36,10 +36,12 @@ $cellMaxWidth: 100px;
 $verticalGutterWidth: 10px;
 $horizontalGutterWidth: 10px;
 $cellPadding: 5px;
+$cellHeight: 30px;
+$cellWidth: 100px;
 
 $xAxisLabelHeight: 25px;
 $xAxisTickHeight: 10px;
-$yAxisTickoffset: $xAxisLabelHeight + $xAxisTickHeight + 10px;
+$yAxisOffset: $cellHeight * 2 + 2px;
 
 $table-border-width: 1px;
 $table-border-style: solid;
@@ -62,16 +64,79 @@ $cell-border-color: $table-border-color;
   text-align: center;
 
   .x-axis.label {
-    height: $xAxisLabelHeight;
+    height: $cellHeight;
   }
 
   > div {
     height: 100%;
   }
 
+  .index-label {
+    height: $cellHeight;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    border: 1px solid #000;
+    border-left: none;
+    border-right: none;
+  }
+
+  .cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: $cellHeight;
+    width: inherit;
+    border: 1px solid #aaa;
+    border-left: none;
+    border-right: none;
+    cursor: context-menu;
+
+    &.hover {
+      background-color: $hover-color;
+    }
+    &.null {
+      background-color: $null-color;
+      input {
+        font-style: italic;
+        text-transform: uppercase;
+      }
+    }
+    &.dragged {
+      filter: drop-shadow(2px 2px 2px black);
+      background-color: aquamarine;
+    }
+    &.selected,
+    &.focused {
+      background-color: $selected-color;
+      input {
+        font-weight: bold;
+      }
+    }
+
+    input {
+      width: auto;
+      overflow: hidden;
+      background: inherit;
+      border: none;
+      field-sizing: content;
+      white-space: nowrap;
+      text-align: center;
+      text-overflow: ellipsis;
+      pointer-events: none;
+
+      &:focus-visible {
+        outline: none;
+      }
+    }
+  }
+
   .left-panel {
     display: flex;
-    padding-top: $yAxisTickoffset;
+    padding-top: $yAxisOffset;
 
     > .label {
       // rotates text -90 degrees
@@ -80,19 +145,13 @@ $cell-border-color: $table-border-color;
       writing-mode: sideways-lr;
     }
 
-    > .ticks {
-      float: right;
-      text-align: right;
-      padding-left: 5px;
-
-      .tick {
-        padding-top: $cellPadding;
-        padding-bottom: $cellPadding;
-        margin-top: $horizontalGutterWidth;
-
-        // TODO: should I add a consistent typographic style for hover state?
-        // &:hover, &.hover { }
-      }
+    > .column-group {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      // float: right;
+      // text-align: center;
     }
   }
 
@@ -108,13 +167,11 @@ $cell-border-color: $table-border-color;
       flex-direction: row;
       flex-wrap: nowrap;
       overflow-x: auto;
-      padding-left: 5px;
       height: 100%;
 
       form {
-        text-overflow: ellipsis;
-        // TODO add animated transition on width changes
-        width: fit-content;
+        border-left: 1px solid #aaa;
+        border-right: 1px solid #aaa;
         font-family: sans-serif;
 
         &:first-child .ColumnView > .screen {
@@ -156,14 +213,6 @@ $cell-border-color: $table-border-color;
           &.selected {
             background-color: $selected-color;
             cursor: grab;
-          }
-        }
-
-        &:focus-within {
-          max-width: unset;
-          text-overflow: unset;
-          .ColumnView input {
-            pointer-events: all;
           }
         }
 

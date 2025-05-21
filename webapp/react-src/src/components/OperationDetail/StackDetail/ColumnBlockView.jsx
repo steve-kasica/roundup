@@ -113,7 +113,7 @@ function ColumnBlockView({
   ];
 
   const className = [
-    "ColumnBlockView",
+    "cell",
     isLoading ? "loading" : undefined,
     isNull ? "null" : undefined,
     isSelected ? "selected" : undefined,
@@ -125,6 +125,11 @@ function ColumnBlockView({
   ]
     .filter(Boolean)
     .join(" ");
+
+  const style = {};
+  if (isSelected && value.length > 10) {
+    style.width = `${value.length + 5}ch`;
+  }
 
   // Render ColumnView
   return (
@@ -141,39 +146,35 @@ function ColumnBlockView({
           toggleColumnSelected();
         }
       }}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        setAnchorEl(event.currentTarget);
+      }}
+      onMouseEnter={hoverColumn}
+      onMouseLeave={() => {
+        if (!isPopoverOpen) {
+          unHoverColumn();
+        }
+        //       if (hoverTimeoutRef.current) {
+        //         clearTimeout(hoverTimeoutRef.current);
+        //       }
+        // // if (hoverTimeoutRef.current) {
+        // //   clearTimeout(hoverTimeoutRef.current);
+        // //   hoverTimeoutRef.current = null;
+        // //   dispatch(setColumnHoveredStatus({ id, isHovered: true }));
+        //       hoverTimeoutRef.current = setTimeout(unHoverColumn, 265);
+      }}
     >
-      <div
-        className="screen"
-        onContextMenu={(event) => {
-          event.preventDefault();
-          setAnchorEl(event.currentTarget);
-        }}
-        onMouseEnter={hoverColumn}
-        onMouseLeave={() => {
-          if (!isPopoverOpen) {
-            unHoverColumn();
-          }
-          //       if (hoverTimeoutRef.current) {
-          //         clearTimeout(hoverTimeoutRef.current);
-          //       }
-          // // if (hoverTimeoutRef.current) {
-          // //   clearTimeout(hoverTimeoutRef.current);
-          // //   hoverTimeoutRef.current = null;
-          // //   dispatch(setColumnHoveredStatus({ id, isHovered: true }));
-          //       hoverTimeoutRef.current = setTimeout(unHoverColumn, 265);
-        }}
-      >
-        <input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          // TODO: implement logic to rename column
-          // onBlur={() => dispatch(removeFromSelectedColumnIds(id))}
-          // onFocus={selectColumn}
-          minLength={1}
-        />
-      </div>
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        // TODO: implement logic to rename column
+        // onBlur={() => dispatch(removeFromSelectedColumnIds(id))}
+        // onFocus={selectColumn}
+        minLength={1}
+      />
       <Popover
         open={isPopoverOpen}
         anchorEl={anchorEl}

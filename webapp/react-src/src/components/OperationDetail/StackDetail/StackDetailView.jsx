@@ -73,13 +73,13 @@ export default function StackDetailView({ tableIds }) {
           <div className="label">
             <span>{yAxisLabel}</span>
           </div>
-          <div className="ticks">
+          <div className="column-group">
             {/* TODO: not sure why `tables` has to be reversed */}
             {[...tables].reverse().map((child) => (
               // TODO: what if child is an operation?
               <div
                 key={child.id}
-                className="tick"
+                className="cell"
                 onMouseEnter={() =>
                   dispatch(
                     setTableHoveredStatus({
@@ -98,6 +98,13 @@ export default function StackDetailView({ tableIds }) {
                 }
               >
                 {child.name}
+              </div>
+            ))}
+          </div>
+          <div class="column-group">
+            {[...tables].reverse().map((child) => (
+              <div className="cell" key={child.id}>
+                {Math.floor(child.rowsExplored / child.rowCount) * 100}
               </div>
             ))}
           </div>

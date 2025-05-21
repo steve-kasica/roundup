@@ -5,6 +5,7 @@ import ChevronDownIcon from "@mui/icons-material/ExpandMore";
 import { memo, useRef } from "react";
 import {
   clearSelectedColumns,
+  selectColumnById,
   selectColumnIdsByIndex,
   setColumnDragStatus,
   setColumnHoveredStatus,
@@ -36,6 +37,15 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
   // Note: selector is memoized, so it won't recompute unless the input changes
   const columnIds = useSelector((state) =>
     selectColumnIdsByIndex(state, jIndex, tableIds)
+  );
+
+  const columns = useSelector((state) =>
+    columnIds.filter(Boolean).map((id) => selectColumnById(state, id))
+  );
+  const isExpanded = columns.some((column) => column.status.isSelected);
+  const maxColumnNameLength = Math.max(
+    ...columns.map(({ name }) => name.length),
+    0
   );
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
@@ -112,11 +122,20 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
     },
   ];
 
+  const defaultFormWidth = 10;
+
   return (
     <form
       ref={formRef}
       className="ColumnIndex"
       data-columnIds={columnIds.join(",")}
+      style={{
+        width:
+          isExpanded & (maxColumnNameLength > defaultFormWidth)
+            ? `${maxColumnNameLength + 5}ch`
+            : `${defaultFormWidth}ch`,
+        transition: "width 0.3s ease-in-out",
+      }}
     >
       <Popover
         open={isDetailPopoverOpen}
@@ -142,12 +161,6 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
           dragRef(dropRef(node));
         }}
         className="index-label"
-        sx={{
-          textAlign: "center",
-          padding: "4px",
-          position: "relative",
-          border: "1px solid #000",
-        }}
         onMouseEnter={() => {
           setIsMenuIconVisible(true);
           dispatch(setColumnHoveredStatus({ ids: columnIds, isHovered: true }));
@@ -167,20 +180,22 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
           }
         }}
       >
-        <label>{index1}</label>
-        <IconButton
-          size="small"
-          sx={{
-            position: "absolute",
-            right: 0,
-            padding: 0,
-            top: 0,
-            opacity: isMenuIconVisable ? 1 : 0,
-          }}
-          onClick={(event) => setMenuAnchorEl(event.currentTarget)}
-        >
-          <ChevronDownIcon />
-        </IconButton>
+        <div>
+          <label>{index1}</label>
+          <IconButton
+            size="small"
+            sx={{
+              position: "absolute",
+              right: 0,
+              padding: 0,
+              top: 4,
+              opacity: isMenuIconVisable ? 1 : 0,
+            }}
+            onClick={(event) => setMenuAnchorEl(event.currentTarget)}
+          >
+            <ChevronDownIcon />
+          </IconButton>
+        </div>
         <Popover
           open={isPopoverOpen}
           anchorEl={menuAnchorEl}
