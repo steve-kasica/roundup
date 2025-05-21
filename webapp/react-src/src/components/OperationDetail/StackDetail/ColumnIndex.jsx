@@ -13,11 +13,9 @@ import {
   setColumnSelectedStatusAfterIndex,
 } from "../../../data/slices/columnsSlice";
 import ColumnBlockView from "./ColumnBlockView";
-import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { swapColumnIndices } from "../../../data/sagas/swapColumnIndicesSaga";
-// import IndexUniqueValues from "./IndexUniqueValues";
 import { setDrawerContents } from "../../../data/slices/uiSlice/uiSlice";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
@@ -89,12 +87,6 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
     }),
   });
 
-  // useEffect(() => {
-  //   columnIds.forEach((id) => {
-  //     dispatch(setColumnHoveredStatus({ id, isHovered }));
-  //   });
-  // }, [isHovered, columnIds, dispatch]);
-
   // Disable the default drag preview
   useEffect(() => {
     previewRef(getEmptyImage(), { captureDraggingState: true });
@@ -104,18 +96,9 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
 
   const menuItems = [
     {
-      label: "Remove all columns at index",
-      action: () => dispatch(removeColumns(columnIds)),
-    },
-    {
       label: "Select all columns to the right",
       action: () => dispatch(setColumnSelectedStatusAfterIndex({ jIndex })),
     },
-    // TODO: update trigger
-    // {
-    //   label: "Compute facets",
-    //   action: () => dispatch(requestColumnValues({ columnIds })),
-    // },
     {
       label: "Compare unique values",
       action: () => dispatch(setDrawerContents("IndexUniqueValues")),
