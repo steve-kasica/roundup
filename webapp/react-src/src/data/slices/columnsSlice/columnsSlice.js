@@ -188,62 +188,6 @@ const columnsSlice = createSlice({
         column.status.error = error;
       }
     },
-
-    /**
-     * Updates the selected status of one or more columns.
-     * Accepts either a single column ID or an array of column IDs.
-     * Normalizes the input to handle both cases consistently.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string} [action.payload.id] - A single column ID to update.
-     * @param {Array<string>} [action.payload.ids] - An array of column IDs to update.
-     * @param {boolean} action.payload.isSelected - The selection status to apply to the column(s).
-     */
-    setColumnSelectedStatus(state, action) {
-      const { id, ids, isSelected } = action.payload;
-
-      // Normalize to an array of IDs
-      const columnIds = Array.isArray(ids) ? ids : [id];
-
-      columnIds.forEach((columnId) => {
-        const column = state.data[columnId];
-        if (column) {
-          column.status.isSelected = isSelected;
-          if (isSelected) {
-            if (!state.selected.includes(columnId)) {
-              state.selected.push(columnId);
-            }
-          } else {
-            state.selected = state.selected.filter(
-              (selectedId) => selectedId !== columnId
-            );
-          }
-        }
-      });
-    },
-    setColumnSelectedStatusAfterIndex(state, action) {
-      const { jIndex } = action.payload;
-      Object.values(state.idsByTable)
-        .map((tableColumnIds) => tableColumnIds.filter((_, j) => j >= jIndex))
-        .flat()
-        .forEach((id) => {
-          const column = state.data[id];
-          if (column && column.status.isSelected === false) {
-            column.status.isSelected = true;
-            state.selected.push(id);
-          }
-        });
-    },
-    clearSelectedColumns(state) {
-      state.selected.forEach((id) => {
-        const column = state.data[id];
-        if (column) {
-          column.status.isSelected = false;
-        }
-      });
-      state.selected = initialState.selected;
-    },
     /**
      * Updates the hovered status of one or more columns.
      * Accepts either a single column ID or an array of column IDs.
@@ -401,9 +345,6 @@ export const {
   removeColumnRequest,
   removeColumnSuccess,
   removeColumnFailure,
-  setColumnSelectedStatus,
-  setColumnSelectedStatusAfterIndex,
-  clearSelectedColumns,
   setColumnHoveredStatus,
   setColumnDragStatus,
   setColumnVisibleStatus,

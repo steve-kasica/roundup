@@ -1,15 +1,24 @@
 import { useSelector, useDispatch } from "react-redux";
-import { selectColumnById } from "../../data/slices/columnsSlice/columnSelectors";
+import {
+  selectColumnById,
+  selectColumnIdsByTableId,
+} from "../../data/slices/columnsSlice/columnSelectors";
 import {
   DATA_TYPE as COLUMN,
-  clearSelectedColumns,
   removeColumnRequest,
   renameColumnRequest,
   setColumnDragStatus,
   setColumnHoveredStatus,
-  setColumnSelectedStatus,
   swapColumnsRequest,
 } from "../../data/slices/columnsSlice";
+import {
+  clearSelectedColumns,
+  appendToSelectedColumns,
+  removeFromSelectedColumns,
+  isColumnSelected,
+  selectFirstSelectedColumn,
+  setSelectedColumns,
+} from "../../data/slices/uiSlice";
 import { useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
@@ -18,6 +27,10 @@ export default function withColumnData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
     const dispatch = useDispatch();
     const column = useSelector((state) => selectColumnById(state, id));
+    const tableColumnIds = useSelector((state) =>
+      selectColumnIdsByTableId(state, column?.tableId)
+    );
+    const firstSelectedColumnId = useSelector(selectFirstSelectedColumn);
 
     const name = column?.name;
     const tableId = column?.tableId;
@@ -25,7 +38,7 @@ export default function withColumnData(WrappedComponent) {
     const columnType = column?.columnType;
     const values = column?.values;
     const isNull = !column;
-    const isSelected = column?.status.isSelected;
+    const isSelected = useSelector((state) => isColumnSelected(state, id));
     const isLoading = column?.status.isLoading;
     const isHovered = column?.status.isHovered;
     const error = column?.error;
@@ -91,30 +104,53 @@ export default function withColumnData(WrappedComponent) {
         error={error}
         hoverColumn={hoverColumn}
         unHoverColumn={unHoverColumn}
-        renameColumn={renameColumn}
+        renameColumn={() => {
+          if (!isNull) {
+            dispatch(
+              // TODO: de-OpenRefine this action,
+              // actions should be agnostic at this layer
+              // and not depend on OpenRefine's data model
+              renameColumnRequest({
+                projectId: tableId,
+                oldColumnName: name,
+                newColumnName: newName,
+                id,
+              })
+            );
+          }
+        }}
         unfocusColumn={unfocusColumn}
         dragColumn={dragColumn}
         unDragColumn={unDragColumn}
         removeColumn={removeColumn}
-        selectColumn={selectColumn}
-        unselectColumn={unselectColumn}
-        toggleColumnSelected={toggleColumnSelected}
+        addColumnToSelection={() => {
+          if (!isNull) {
+            dispatch(appendToSelectedColumns(id));
+          }
+        }}
+        selectSingleColumn={() => {
+          if (!isNull) {
+            dispatch(clearSelectedColumns());
+            dispatch(appendToSelectedColumns(id));
+          }
+        }}
+        unselectColumn={() => {
+          if (!isNull) {
+            dispatch(removeFromSelectedColumns(id));
+          }
+        }}
+        // TODO: swapping columns messes with the index property used here
+        // investigate further
+        spanSelectionToColumn={() => {
+          if (!isNull && firstSelectedColumnId) {
+            const anchorIdx = tableColumnIds.indexOf(firstSelectedColumnId);
+            const [start, end] = [anchorIdx, index].sort((a, b) => a - b);
+            const selectedColumns = tableColumnIds.slice(start, end + 1);
+            dispatch(setSelectedColumns(selectedColumns));
+          }
+        }}
       />
     );
-
-    function renameColumn(newName) {
-      dispatch(
-        // TODO: de-OpenRefine this action,
-        // actions should be agnostic at this layer
-        // and not depend on OpenRefine's data model
-        renameColumnRequest({
-          projectId: tableId,
-          oldColumnName: name,
-          newColumnName: newName,
-          id,
-        })
-      );
-    }
 
     function swapColumnWithinTable(sourceId, targetId) {
       dispatch(swapColumnsRequest({ sourceId, targetId }));
@@ -135,29 +171,9 @@ export default function withColumnData(WrappedComponent) {
       }
     }
 
-    function unselectColumn() {
-      if (!isNull) {
-        dispatch(setColumnSelectedStatus({ id, isSelected: false }));
-      }
-    }
-    function selectColumn() {
-      if (!isNull) {
-        dispatch(setColumnSelectedStatus({ id, isSelected: true }));
-      }
-    }
-    function toggleColumnSelected() {
-      if (!isNull) {
-        if (!isSelected) {
-          selectColumn();
-        } else {
-          unselectColumn();
-        }
-      }
-    }
-
     function unfocusColumn() {
       if (!isNull) {
-        dispatch(setColumnSelectedStatus({ id, isSelected: false }));
+        dispatch(removeFromSelectedColumns(id));
       }
     }
 

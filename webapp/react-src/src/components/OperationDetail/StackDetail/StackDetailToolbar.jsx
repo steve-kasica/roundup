@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   clearSelectedColumns,
   selectSelectedColumnIds,
-} from "../../../data/slices/columnsSlice";
+} from "../../../data/slices/uiSlice";
 import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
 
 export default function StackDetailToolbar() {

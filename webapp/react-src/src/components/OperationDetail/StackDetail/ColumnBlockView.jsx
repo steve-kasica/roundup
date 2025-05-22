@@ -40,6 +40,10 @@ function ColumnBlockView({
   removeColumn,
   renameColumn,
   toggleColumnSelected,
+  spanSelectionToColumn,
+  selectSingleColumn,
+  addColumnToSelection,
+  unselectColumn,
 }) {
   // Additional variables derived from props
   const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table
@@ -141,9 +145,17 @@ function ColumnBlockView({
       }}
       data-table-id={tableId}
       data-column-index={index}
-      onClick={() => {
+      onClick={(event) => {
         if (!isPopoverOpen) {
-          toggleColumnSelected();
+          if (event.shiftKey) {
+            spanSelectionToColumn();
+          } else if (event.metaKey) {
+            // Command/Windows key
+            addColumnToSelection();
+          } else {
+            // Regular click
+            selectSingleColumn();
+          }
         }
       }}
       onContextMenu={(event) => {
@@ -197,22 +209,6 @@ function ColumnBlockView({
         </List>
       </Popover>
     </div>
-    // <ColumnView
-    //   value={value}
-    // }
-    // }}
-    // onClick={(event) => {
-    //   if (event.shiftKey) {
-    //     // TODO
-    //   } else {
-    //     dispatch(
-    //       setColumnSelectedStatus({
-    //         id,
-    //         isSelected: !isSelected,
-    //       })
-    //     );
-    //   }
-    // }}
   );
 }
 

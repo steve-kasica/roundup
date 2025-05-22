@@ -4,19 +4,19 @@ import { useEffect, useMemo, useState } from "react";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
 import { memo, useRef } from "react";
 import {
-  clearSelectedColumns,
   selectColumnById,
   selectColumnIdsByIndex,
   setColumnDragStatus,
   setColumnHoveredStatus,
-  setColumnSelectedStatus,
-  setColumnSelectedStatusAfterIndex,
 } from "../../../data/slices/columnsSlice";
 import ColumnBlockView from "./ColumnBlockView";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { swapColumnIndices } from "../../../data/sagas/swapColumnIndicesSaga";
-import { setDrawerContents } from "../../../data/slices/uiSlice/uiSlice";
+import {
+  setDrawerContents,
+  setSelectedColumns,
+} from "../../../data/slices/uiSlice/uiSlice";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
 
@@ -96,8 +96,9 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
 
   const menuItems = [
     {
-      label: "Select all columns to the right",
-      action: () => dispatch(setColumnSelectedStatusAfterIndex({ jIndex })),
+      // TODO
+      // label: "Select all columns to the right",
+      // action: () => dispatch(setColumnSelectedStatusAfterIndex({ jIndex })),
     },
     {
       label: "Compare unique values",
@@ -156,10 +157,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
         }}
         onClick={() => {
           if (!isPopoverOpen) {
-            dispatch(clearSelectedColumns());
-            dispatch(
-              setColumnSelectedStatus({ ids: columnIds, isSelected: true })
-            );
+            dispatch(setSelectedColumns(columnIds));
           }
         }}
       >
