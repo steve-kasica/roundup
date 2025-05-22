@@ -150,8 +150,9 @@ $cell-border-color: $table-border-color;
       flex-direction: column;
       justify-content: center;
       text-align: center;
-      // float: right;
-      // text-align: center;
+      width: 10ch; // sync with ColumnIndex.jsx
+      border-left: 1px solid #aaa;
+      background: #eee;
     }
   }
 
