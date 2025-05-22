@@ -1,1 +1,2533 @@
-{"projects":{"2429986839284":{"created":"2025-04-15T11:09:17.906933Z","modified":"2025-04-15T11:09:23.735524Z","name":"OH-TX","tags":["babyname-politics","open-roundup"],"creator":"","contributors":"","subject":"","description":"","rowCount":1354115,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"OH-TX","projectTags":["babyname-politics","open-roundup"],"fileSource":"OH.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"OH-TX","projectTags":["babyname-politics","open-roundup"],"fileSource":"OK.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"OH-TX","projectTags":["babyname-politics","open-roundup"],"fileSource":"OR.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"OH-TX","projectTags":["babyname-politics","open-roundup"],"fileSource":"PA.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"OH-TX","projectTags":["babyname-politics","open-roundup"],"fileSource":"RI.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"OH-TX","projectTags":["babyname-politics","open-roundup"],"fileSource":"SC.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"OH-TX","projectTags":["babyname-politics","open-roundup"],"fileSource":"SD.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"OH-TX","projectTags":["babyname-politics","open-roundup"],"fileSource":"TN.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"OH-TX","projectTags":["babyname-politics","open-roundup"],"fileSource":"TX.TXT","archiveFileName":null}],"customMetadata":{}},"2491520988186":{"created":"2025-03-26T16:21:36.386711Z","modified":"2025-03-26T16:21:36.414483Z","name":"lambert 2","tags":["crime-and-heat","open-roundup"],"creator":"","contributors":"","subject":"","description":"","rowCount":120,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"projectName":"lambert 2","projectTags":["crime-and-heat","open-roundup"],"fileSource":"lambert_2.csv","archiveFileName":null}],"customMetadata":{}},"2134092257652":{"created":"2025-03-26T16:27:30.380688Z","modified":"2025-03-26T16:27:30.418526Z","name":"results","tags":["open-roundup","babyname-politics"],"creator":"","contributors":"","subject":"","description":"","rowCount":51,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"projectName":"results","projectTags":["open-roundup","babyname-politics"],"fileSource":"results.csv","archiveFileName":null}],"customMetadata":{}},"1777071525925":{"created":"2025-04-15T10:39:26.917884Z","modified":"2025-04-15T10:39:36.042687Z","name":"AK-GA","tags":["babyname-politics","open-roundup"],"creator":"","contributors":"","subject":"","description":"","rowCount":1495732,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"AK.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"AL.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"AR.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"AZ.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"CA.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"CO.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"CT.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"DC.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"DE.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"FL.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"AK-GA","projectTags":["babyname-politics","open-roundup"],"fileSource":"GA.TXT","archiveFileName":null}],"customMetadata":{}},"2620962230195":{"created":"2025-04-15T11:36:43.036383Z","modified":"2025-04-15T11:37:41.663973Z","name":"IN-LA","tags":["babyname-politics","open-roundup"],"creator":"","contributors":"","subject":"","description":"","rowCount":13204,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"IN-LA","projectTags":["babyname-politics","open-roundup"],"fileSource":"IN.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"IN-LA","projectTags":["babyname-politics","open-roundup"],"fileSource":"KS.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"IN-LA","projectTags":["babyname-politics","open-roundup"],"fileSource":"KY.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"IN-LA","projectTags":["babyname-politics","open-roundup"],"fileSource":"LA.TXT","archiveFileName":null}],"customMetadata":{}},"2603321492518":{"created":"2025-03-26T16:26:30.785825Z","modified":"2025-03-26T16:26:30.801980Z","name":"candidates","tags":["open-roundup","democratic-candidate-codonors"],"creator":"","contributors":"","subject":"","description":"","rowCount":15,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"UTF-8","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"projectName":"candidates","projectTags":["open-roundup","democratic-candidate-codonors"],"fileSource":"candidates.csv","archiveFileName":null}],"customMetadata":{}},"2631168748627":{"created":"2025-04-15T11:31:11.123231Z","modified":"2025-04-15T11:31:18.552098Z","name":"HI-IL","tags":["babyname-politics","open-roundup"],"creator":"","contributors":"","subject":"","description":"","rowCount":451868,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"HI-IL","projectTags":["babyname-politics","open-roundup"],"fileSource":"HI.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"HI-IL","projectTags":["babyname-politics","open-roundup"],"fileSource":"IA.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"HI-IL","projectTags":["babyname-politics","open-roundup"],"fileSource":"ID.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"HI-IL","projectTags":["babyname-politics","open-roundup"],"fileSource":"IL.TXT","archiveFileName":null}],"customMetadata":{}},"1954092532131":{"created":"2025-04-15T10:46:07.467514Z","modified":"2025-04-15T10:46:23.056900Z","name":"MA-MT","tags":["babyname-politics","open-roundup"],"creator":"","contributors":"","subject":"","description":"","rowCount":910038,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"MA-MT","projectTags":["babyname-politics","open-roundup"],"fileSource":"MA.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"MA-MT","projectTags":["babyname-politics","open-roundup"],"fileSource":"MD.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"MA-MT","projectTags":["babyname-politics","open-roundup"],"fileSource":"ME.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"MA-MT","projectTags":["babyname-politics","open-roundup"],"fileSource":"MI.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"MA-MT","projectTags":["babyname-politics","open-roundup"],"fileSource":"MN.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"MA-MT","projectTags":["babyname-politics","open-roundup"],"fileSource":"MO.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"MA-MT","projectTags":["babyname-politics","open-roundup"],"fileSource":"MS.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"MA-MT","projectTags":["babyname-politics","open-roundup"],"fileSource":"MT.TXT","archiveFileName":null}],"customMetadata":{}},"2060634868909":{"created":"2025-03-26T16:22:21.095663Z","modified":"2025-03-26T16:22:21.556145Z","name":"violent crimes","tags":["crime-and-heat","open-roundup"],"creator":"","contributors":"","subject":"","description":"","rowCount":64739,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"projectName":"violent crimes","projectTags":["crime-and-heat","open-roundup"],"fileSource":"violent_crimes.csv","archiveFileName":null}],"customMetadata":{}},"1899665756039":{"created":"2025-04-15T11:11:30.121301Z","modified":"2025-04-15T11:11:32.854356Z","name":"UT-WY","tags":["babyname-politics","open-roundup"],"creator":"","contributors":"","subject":"","description":"","rowCount":637855,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"UT-WY","projectTags":["babyname-politics","open-roundup"],"fileSource":"UT.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"UT-WY","projectTags":["babyname-politics","open-roundup"],"fileSource":"VA.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"UT-WY","projectTags":["babyname-politics","open-roundup"],"fileSource":"VT.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"UT-WY","projectTags":["babyname-politics","open-roundup"],"fileSource":"WA.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"UT-WY","projectTags":["babyname-politics","open-roundup"],"fileSource":"WI.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"UT-WY","projectTags":["babyname-politics","open-roundup"],"fileSource":"WV.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"UT-WY","projectTags":["babyname-politics","open-roundup"],"fileSource":"WY.TXT","archiveFileName":null}],"customMetadata":{}},"2646279702716":{"created":"2025-03-26T16:21:03.527833Z","modified":"2025-04-15T10:12:41.999589Z","name":"lambert 1","tags":["open-roundup","crime-and-heat"],"creator":"","contributors":"","subject":"","description":"","rowCount":3653,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"projectName":"lambert 1","projectTags":["open-roundup","crime-and-heat"],"fileSource":"lambert_1.csv","archiveFileName":null}],"customMetadata":{}},"2469210019175":{"created":"2025-04-15T10:52:13.598817Z","modified":"2025-04-15T10:53:53.060378Z","name":"NC-NY","tags":["babyname-politics","open-roundup"],"creator":"","contributors":"","subject":"","description":"","rowCount":8761,"title":"","version":"","license":"","homepage":"","image":"","importOptionMetadata":[{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"NC-NY","projectTags":["babyname-politics","open-roundup"],"fileSource":"NC.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"NC-NY","projectTags":["babyname-politics","open-roundup"],"fileSource":"ND.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"NC-NY","projectTags":["babyname-politics","open-roundup"],"fileSource":"NE.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"NC-NY","projectTags":["babyname-politics","open-roundup"],"fileSource":"NH.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"NC-NY","projectTags":["babyname-politics","open-roundup"],"fileSource":"NJ.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"NC-NY","projectTags":["babyname-politics","open-roundup"],"fileSource":"NM.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"NC-NY","projectTags":["babyname-politics","open-roundup"],"fileSource":"NV.TXT","archiveFileName":null},{"encoding":"US-ASCII","separator":",","ignoreLines":-1,"headerLines":1,"skipDataLines":0,"limit":-1,"storeBlankRows":true,"storeBlankColumns":true,"guessCellValueTypes":false,"processQuotes":true,"quoteCharacter":"\"","storeBlankCellsAsNulls":true,"includeFileSources":false,"includeArchiveFileName":false,"trimStrings":false,"disableAutoPreview":false,"columnNames":["ABBR","GENDER","YEAR","NAME","VALUE"],"projectName":"NC-NY","projectTags":["babyname-politics","open-roundup"],"fileSource":"NY.TXT","archiveFileName":null}],"customMetadata":{}}}}
+{
+  "projects": {
+    "2643209139052": {
+      "created": "2025-05-21T19:25:54.025675Z",
+      "modified": "2025-05-21T19:25:54.197139Z",
+      "name": "ME",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 51852,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "ME",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "ME.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1938131725798": {
+      "created": "2025-05-21T19:16:35.239935Z",
+      "modified": "2025-05-21T19:16:43.781483Z",
+      "name": "CA",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 400762,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "CA",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "CA.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2585098455483": {
+      "created": "2025-05-21T19:17:54.561672Z",
+      "modified": "2025-05-21T19:18:30.875078Z",
+      "name": "DC",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 1669,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "DC",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "DC.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2227631131563": {
+      "created": "2025-05-21T19:04:05.205916Z",
+      "modified": "2025-05-21T19:04:05.547882Z",
+      "name": "WV",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 79250,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "WV",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "WV.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2444283205790": {
+      "created": "2025-05-21T19:03:50.006563Z",
+      "modified": "2025-05-21T19:03:50.272683Z",
+      "name": "WI",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 121398,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "WI",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "WI.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2366606897132": {
+      "created": "2025-05-21T19:30:14.367176Z",
+      "modified": "2025-05-21T19:30:14.612827Z",
+      "name": "MT",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 47144,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "MT",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "MT.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2240061363596": {
+      "created": "2025-05-21T19:17:05.226806Z",
+      "modified": "2025-05-21T19:17:05.726365Z",
+      "name": "CO",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 112986,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "CO",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "CO.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2698203261325": {
+      "created": "2025-05-21T19:04:57.236148Z",
+      "modified": "2025-05-21T19:04:57.549079Z",
+      "name": "WA",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 130809,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "WA",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "WA.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2643483591181": {
+      "created": "2025-05-21T19:26:39.448980Z",
+      "modified": "2025-05-21T19:26:46.438985Z",
+      "name": "MN",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 119310,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "MN",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "MN.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2659213894916": {
+      "created": "2025-05-21T19:23:00.615386Z",
+      "modified": "2025-05-21T19:23:01.102231Z",
+      "name": "KY",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 122608,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "KY",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "KY.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2148463993870": {
+      "created": "2025-05-21T19:11:25.103539Z",
+      "modified": "2025-05-21T19:11:25.271334Z",
+      "name": "NH",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 40557,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "NH",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "NH.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2460094250159": {
+      "created": "2025-05-21T19:21:08.203057Z",
+      "modified": "2025-05-21T19:21:08.998951Z",
+      "name": "GA",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 191367,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "GA",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "GA.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2060634868909": {
+      "created": "2025-03-26T16:22:21.095663Z",
+      "modified": "2025-03-26T16:22:21.556145Z",
+      "name": "violent crimes",
+      "tags": [
+        "crime-and-heat",
+        "open-roundup"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 64739,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "violent crimes",
+          "projectTags": [
+            "crime-and-heat",
+            "open-roundup"
+          ],
+          "fileSource": "violent_crimes.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1935655822195": {
+      "created": "2025-05-21T19:07:16.767375Z",
+      "modified": "2025-05-21T19:07:16.847076Z",
+      "name": "RI",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 41540,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "RI",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "RI.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2202510295028": {
+      "created": "2025-05-21T19:01:32.312860Z",
+      "modified": "2025-05-21T19:01:32.914791Z",
+      "name": "OH",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 204165,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "OH",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "OH.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1909433239682": {
+      "created": "2025-05-21T19:14:59.428556Z",
+      "modified": "2025-05-21T19:14:59.800711Z",
+      "name": "AL",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 139293,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "AL",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "AL.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1810581631389": {
+      "created": "2025-05-21T19:23:15.113291Z",
+      "modified": "2025-05-21T19:23:15.661599Z",
+      "name": "LA",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 153712,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "LA",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "LA.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2225447616683": {
+      "created": "2025-05-21T19:11:05.933108Z",
+      "modified": "2025-05-21T19:11:06.293418Z",
+      "name": "NJ",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 159695,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "NJ",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "NJ.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2425812435627": {
+      "created": "2025-05-21T19:24:37.758007Z",
+      "modified": "2025-05-21T19:24:45.364191Z",
+      "name": "IL",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 237839,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "IL",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "IL.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2176855679996": {
+      "created": "2025-05-21T19:27:03.886161Z",
+      "modified": "2025-05-21T19:27:04.453752Z",
+      "name": "MO",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 144136,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "MO",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "MO.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1756576000694": {
+      "created": "2025-05-21T19:01:17.130571Z",
+      "modified": "2025-05-21T19:01:17.607673Z",
+      "name": "OK",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 121465,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "OK",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "OK.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1822516864788": {
+      "created": "2025-05-21T19:05:49.836676Z",
+      "modified": "2025-05-21T19:05:50.027444Z",
+      "name": "UT",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 93764,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "UT",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "UT.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2092287855280": {
+      "created": "2025-05-21T19:22:28.787042Z",
+      "modified": "2025-05-21T19:22:29.163006Z",
+      "name": "IN",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 145357,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "IN",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "IN.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2305042611811": {
+      "created": "2025-05-21T19:00:53.240759Z",
+      "modified": "2025-05-21T19:00:53.635036Z",
+      "name": "OR",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 92410,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "OR",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "OR.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1852970863682": {
+      "created": "2025-05-21T19:22:46.839409Z",
+      "modified": "2025-05-21T19:22:47.199016Z",
+      "name": "KS",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 97839,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "KS",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "KS.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2134092257652": {
+      "created": "2025-03-26T16:27:30.380688Z",
+      "modified": "2025-05-21T19:31:46.315779Z",
+      "name": "results",
+      "tags": [
+        "open-roundup"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 51,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "results",
+          "projectTags": [
+            "open-roundup",
+            "babyname-politics"
+          ],
+          "fileSource": "results.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2568665024199": {
+      "created": "2025-05-21T19:09:07.571582Z",
+      "modified": "2025-05-21T19:09:07.785003Z",
+      "name": "NM",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 77755,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "NM",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "NM.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1902297155285": {
+      "created": "2025-05-21T19:06:39.579174Z",
+      "modified": "2025-05-21T19:06:39.733164Z",
+      "name": "SD",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 48865,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "SD",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "SD.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1914122511865": {
+      "created": "2025-05-21T19:09:33.367066Z",
+      "modified": "2025-05-21T19:09:39.517042Z",
+      "name": "NY",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 309532,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "NY",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "NY.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2140115492982": {
+      "created": "2025-05-21T19:17:20.100159Z",
+      "modified": "2025-05-21T19:17:20.404939Z",
+      "name": "CT",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 84948,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "CT",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "CT.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2596296861136": {
+      "created": "2025-05-21T19:26:18.620545Z",
+      "modified": "2025-05-21T19:26:19.552302Z",
+      "name": "MI",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 190023,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "MI",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "MI.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2745448596437": {
+      "created": "2025-05-21T19:12:21.742472Z",
+      "modified": "2025-05-21T19:12:21.965349Z",
+      "name": "NE",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 74699,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "NE",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "NE.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2646279702716": {
+      "created": "2025-03-26T16:21:03.527833Z",
+      "modified": "2025-04-15T10:12:41.999589Z",
+      "name": "lambert 1",
+      "tags": [
+        "open-roundup",
+        "crime-and-heat"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 3653,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "lambert 1",
+          "projectTags": [
+            "open-roundup",
+            "crime-and-heat"
+          ],
+          "fileSource": "lambert_1.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1785060666409": {
+      "created": "2025-05-21T19:07:58.521989Z",
+      "modified": "2025-05-21T19:07:58.608812Z",
+      "name": "ND",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 47666,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "ND",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "ND.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2350405459286": {
+      "created": "2025-05-21T19:21:26.503752Z",
+      "modified": "2025-05-21T19:21:26.663482Z",
+      "name": "HI",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 56069,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "HI",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "HI.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2141731430967": {
+      "created": "2025-05-21T19:25:39.702025Z",
+      "modified": "2025-05-21T19:25:40.130398Z",
+      "name": "MD",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 116699,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "MD",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "MD.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2483741564462": {
+      "created": "2025-05-21T19:13:19.982098Z",
+      "modified": "2025-05-21T19:13:20.147535Z",
+      "name": "NV",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 50829,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "NV",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "NV.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2491520988186": {
+      "created": "2025-03-26T16:21:36.386711Z",
+      "modified": "2025-03-26T16:21:36.414483Z",
+      "name": "lambert 2",
+      "tags": [
+        "crime-and-heat",
+        "open-roundup"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 120,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "lambert 2",
+          "projectTags": [
+            "crime-and-heat",
+            "open-roundup"
+          ],
+          "fileSource": "lambert_2.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2144555069674": {
+      "created": "2025-05-21T19:05:33.931599Z",
+      "modified": "2025-05-21T19:05:34.049094Z",
+      "name": "VT",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 29483,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "VT",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "VT.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2628895525615": {
+      "created": "2025-05-21T19:08:49.782468Z",
+      "modified": "2025-05-21T19:08:50.247708Z",
+      "name": "NC",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 181647,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "NC",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "NC.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2079673972400": {
+      "created": "2025-05-21T19:30:00.461357Z",
+      "modified": "2025-05-21T19:30:00.639396Z",
+      "name": "MS",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 117316,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "MS",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "MS.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2047736658098": {
+      "created": "2025-05-21T19:22:02.909975Z",
+      "modified": "2025-05-21T19:22:03.159554Z",
+      "name": "ID",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 60445,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "ID",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "ID.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1987480748207": {
+      "created": "2025-05-21T19:06:20.724708Z",
+      "modified": "2025-05-21T19:06:21.172525Z",
+      "name": "TN",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 147212,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "TN",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "TN.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2667365734522": {
+      "created": "2025-05-21T19:14:31.301804Z",
+      "modified": "2025-05-21T19:14:31.437095Z",
+      "name": "AK",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 29755,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "AK",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "AK.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2743850087359": {
+      "created": "2025-05-21T19:20:15.206105Z",
+      "modified": "2025-05-21T19:20:15.311948Z",
+      "name": "DE",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 33706,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "DE",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "DE.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2603321492518": {
+      "created": "2025-03-26T16:26:30.785825Z",
+      "modified": "2025-03-26T16:26:30.801980Z",
+      "name": "candidates",
+      "tags": [
+        "open-roundup",
+        "democratic-candidate-codonors"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 15,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "UTF-8",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "candidates",
+          "projectTags": [
+            "open-roundup",
+            "democratic-candidate-codonors"
+          ],
+          "fileSource": "candidates.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2118393821833": {
+      "created": "2025-05-21T19:05:14.402585Z",
+      "modified": "2025-05-21T19:05:14.648787Z",
+      "name": "VA",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 154400,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "VA",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "VA.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2341386446296": {
+      "created": "2025-05-21T19:06:57.217035Z",
+      "modified": "2025-05-21T19:06:57.588928Z",
+      "name": "SC",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 122527,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "SC",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "SC.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1896064407550": {
+      "created": "2025-05-21T19:15:57.689829Z",
+      "modified": "2025-05-21T19:15:58.013773Z",
+      "name": "AR",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 105373,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "AR",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "AR.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1920825867490": {
+      "created": "2025-05-21T19:21:42.020205Z",
+      "modified": "2025-05-21T19:21:42.291524Z",
+      "name": "IA",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 97515,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "IA",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "IA.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2291095612953": {
+      "created": "2025-05-21T19:06:03.213795Z",
+      "modified": "2025-05-21T19:06:04.203821Z",
+      "name": "TX",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 368987,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "TX",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "TX.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1784414679301": {
+      "created": "2025-05-21T19:16:19.288449Z",
+      "modified": "2025-05-21T19:16:19.779924Z",
+      "name": "AZ",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 122085,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "AZ",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "AZ.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2074301458207": {
+      "created": "2025-05-21T19:20:32.321244Z",
+      "modified": "2025-05-21T19:20:39.954598Z",
+      "name": "FL",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 218192,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "FL",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "FL.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2152497485522": {
+      "created": "2025-05-21T19:25:25.829001Z",
+      "modified": "2025-05-21T19:25:26.324400Z",
+      "name": "MA",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 123558,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "MA",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "MA.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "1977769817463": {
+      "created": "2025-05-21T19:00:23.068293Z",
+      "modified": "2025-05-21T19:00:23.858445Z",
+      "name": "PA",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 206944,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "PA",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "PA.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
+    "2200981508551": {
+      "created": "2025-05-21T19:03:33.974817Z",
+      "modified": "2025-05-21T19:03:34.025286Z",
+      "name": "WY",
+      "tags": [
+        "babyname-politics"
+      ],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 28751,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "WY",
+          "projectTags": [
+            "babyname-politics"
+          ],
+          "fileSource": "WY.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    }
+  }
+}

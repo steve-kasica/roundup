@@ -1,6 +1,6 @@
 import { createServer } from "miragejs";
 import allProjectMetadata from "./command/core/get-all-project-metadata.json";
-import getColumnInfo from "./command/core/get-column-info";
+import getColumnInfo from "./command/core/get-columns-info";
 import computFacetsData from "./command/core/compute-facets";
 import uniqColumnValueData from "./command/open-roundup/get-unique-column-values";
 

@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Candidate Name",
+    "is_numeric": false,
+    "numeric_row_count": 0,
+    "non_numeric_row_count": 15,
+    "error_row_count": 0,
+    "blank_row_count": 0
+  },
+  {
+    "name": "Candidate Sex",
+    "is_numeric": false,
+    "numeric_row_count": 0,
+    "non_numeric_row_count": 15,
+    "error_row_count": 0,
+    "blank_row_count": 0
+  },
+  {
+    "name": "Committee Name",
+    "is_numeric": false,
+    "numeric_row_count": 0,
+    "non_numeric_row_count": 15,
+    "error_row_count": 0,
+    "blank_row_count": 0
+  },
+  {
+    "name": "committee_id",
+    "is_numeric": false,
+    "numeric_row_count": 0,
+    "non_numeric_row_count": 15,
+    "error_row_count": 0,
+    "blank_row_count": 0
+  }
+]
