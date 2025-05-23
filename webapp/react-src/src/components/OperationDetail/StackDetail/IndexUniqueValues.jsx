@@ -257,7 +257,9 @@ export default function IndexUniqueValues() {
                     padding: "4px",
                     boxSizing: "border-box",
                   }}
-                ></div>
+                >
+                  Coverage
+                </div>
                 {allTableIds.map((tableId) => {
                   const tableUniqueCount =
                     valuesByTableId.get(tableId)?.size ?? 0;
