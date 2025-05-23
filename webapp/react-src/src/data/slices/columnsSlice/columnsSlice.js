@@ -330,6 +330,39 @@ const columnsSlice = createSlice({
         column.status.error = error;
       }
     },
+    fetchValuesRequest(state, action) {
+      const { id } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isLoading = true;
+        column.status.error = null;
+      }
+    },
+    fetchValuesSuccess(state, action) {
+      const { id, valueCounts } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        Object.entries(valueCounts).forEach(([value, count]) => {
+          if (!column.values[value]) {
+            column.values[value] = ColumnValue(value, null, count);
+          } else {
+            column.values[value].count += count;
+          }
+        });
+        column.status.isLoading = false;
+        column.status.error = null;
+      } else {
+        throw new Error(`Column with id ${id} not found`);
+      }
+    },
+    fetchValuesFailure(state, action) {
+      const { id, error } = action.payload;
+      const column = state.data[id];
+      if (column) {
+        column.status.isLoading = false;
+        column.status.error = error;
+      }
+    },
   }, // end reducers
 });
 
@@ -357,4 +390,7 @@ export const {
   fetchUniqueValuesRequest,
   fetchUniqueValuesSuccess,
   fetchUniqueValuesFailure,
+  fetchValuesRequest,
+  fetchValuesSuccess,
+  fetchValuesFailure,
 } = columnsSlice.actions;

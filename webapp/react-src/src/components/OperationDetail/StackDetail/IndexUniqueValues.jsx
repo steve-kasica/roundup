@@ -1,10 +1,8 @@
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import { requestColumnUniqueValues } from "../../../data/sagas/requestColumnUniqueValues";
-import {
-  selectColumnById,
-  selectSelectedColumnIds,
-} from "../../../data/slices/columnsSlice";
+import { selectColumnById } from "../../../data/slices/columnsSlice";
+import { selectSelectedColumnIds } from "../../../data/slices/uiSlice";
 import { intersection, union } from "d3";
 import AnimatedEllipsis from "../../ui/AnimatedElipse";
 import { useRef } from "react";
@@ -20,9 +18,9 @@ export default function IndexUniqueValues() {
 
   const columnIds = useSelector(selectSelectedColumnIds);
 
-  useEffect(() => {
-    dispatch(requestColumnUniqueValues({ columnIds }));
-  }, [dispatch, columnIds]);
+  // useEffect(() => {
+  //   dispatch(requestColumnUniqueValues({ columnIds }));
+  // }, [dispatch, columnIds]);
 
   const columns = useSelector((state) =>
     columnIds.map((id) => selectColumnById(state, id))

@@ -8,5 +8,6 @@ export const {
   decrementColumnCount,
   setTableSelectedStatus,
   setTableHoveredStatus,
+  incrementRowsExplored,
 } = slice.actions;
 export default slice.reducer;

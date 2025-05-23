@@ -3,6 +3,7 @@ import allProjectMetadata from "./command/core/get-all-project-metadata.json";
 import getColumnInfo from "./command/core/get-columns-info";
 import computFacetsData from "./command/core/compute-facets";
 import uniqColumnValueData from "./command/open-roundup/get-unique-column-values";
+import getRowsData from "./command/core/get-rows";
 
 import { endpoint as getAllProjectMetadataEndpoint } from "../src/services/open-refine/get-all-project-metadata";
 import { endpoint as getColumnsInfoEndpoint } from "../src/services/open-refine/get-columns-info";
@@ -12,6 +13,7 @@ import { endpoint as removeColumnEndpoint } from "../src/services/open-refine/re
 import { endpoint as reorderColumnsEndpoint } from "../src/services/open-refine/reorder-columns";
 import { endpoint as computeFacetsEndpoint } from "../src/services/open-refine/compute-facets";
 import { endpoint as getUniqueColumnValuesEndpoint } from "../src/services/open-roundup/get-unique-column-values";
+import { endpoint as getRowsEndpoint } from "../src/services/open-refine/get-rows";
 
 function generateRandom13DigitNumber() {
   const min = 1000000000000; // Minimum 13-digit number
@@ -93,6 +95,16 @@ export default function makeServer() {
         const limit = request.queryParams["limit"] || 1000;
         const data = uniqColumnValueData[projectId][columnName.toLowerCase()];
         data.uniqueValues = data.uniqueValues.slice(0, limit);
+        return data;
+      });
+
+      this.post(getRowsEndpoint, (schema, request) => {
+        const projectId = request.queryParams["project"];
+        const start = request.queryParams["start"] || 0;
+        const limit = request.queryParams["limit"] || 1000;
+        const data = getRowsData["2341386446296"];
+        console.log("getRowsData", request, data);
+        data.rows = data.rows.slice(start, start + limit);
         return data;
       });
     },

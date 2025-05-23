@@ -13,6 +13,7 @@ import addTableToSchemaSaga from "./addTableToSchemaSaga";
 import coordinateHoverSaga from "./coordinateHoverSaga";
 import requestMultipleColumnFacetsSaga from "./requestColumnFacets";
 import requestColumnUniqueValuesSaga from "./requestColumnUniqueValues";
+import getRowsSagaWatcher from "./getRowsSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -27,5 +28,6 @@ export default function* rootSaga() {
     call(coordinateHoverSaga),
     call(requestMultipleColumnFacetsSaga),
     call(requestColumnUniqueValuesSaga),
+    call(getRowsSagaWatcher),
   ]);
 }

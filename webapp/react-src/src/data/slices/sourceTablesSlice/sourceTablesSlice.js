@@ -74,6 +74,15 @@ const slice = createSlice({
         }
       });
     },
+    incrementRowsExplored: (state, action) => {
+      const { tableId, rowsExplored } = action.payload;
+      const table = state.data[tableId];
+      if (table) {
+        table.rowsExplored += rowsExplored;
+      } else {
+        throw new Error(`Table with ID ${tableId} not found`);
+      }
+    },
   },
 });
 

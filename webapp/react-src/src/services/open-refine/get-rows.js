@@ -9,18 +9,19 @@ export const endpoint = "/command/core/get-rows";
  * @param {Object} [params.engine] - Optional engine/filter object.
  * @returns {Promise<Object>} The response data from OpenRefine.
  */
-export async function getRows({
+export default async function getRows(
   projectId,
   start = 0,
   limit = 50,
   engine,
-  sorting,
-}) {
-  const url = "/command/core/get-rows";
+  sorting
+) {
+  const params = new URLSearchParams();
+  params.append("project", projectId);
+  params.append("start", start);
+  params.append("limit", limit);
+
   const formData = new URLSearchParams();
-  formData.append("project", projectId);
-  formData.append("start", start);
-  formData.append("limit", limit);
   if (engine) {
     formData.append("engine", JSON.stringify(engine));
   }
@@ -28,6 +29,7 @@ export async function getRows({
     formData.append("sorting", JSON.stringify(sorting));
   }
 
+  const url = `${endpoint}?${params.toString()}`;
   const response = await fetch(url, {
     method: "POST",
     headers: {

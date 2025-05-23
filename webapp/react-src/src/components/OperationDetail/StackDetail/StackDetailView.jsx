@@ -104,7 +104,7 @@ export default function StackDetailView({ tableIds }) {
           <div class="column-group">
             {[...tables].reverse().map((child) => (
               <div className="cell" key={child.id}>
-                {Math.floor(child.rowsExplored / child.rowCount) * 100}
+                {child.rowsExplored} / {child.rowCount}
               </div>
             ))}
           </div>

@@ -5,6 +5,7 @@ import renameColumn from "./rename-column";
 import removeColumn from "./remove-column";
 import reorderColumns from "./reorder-columns";
 import computeFacets from "./compute-facets";
+import getRows from "./get-rows";
 
 const api = {
   getAllProjectMetadata,
@@ -14,6 +15,7 @@ const api = {
   removeColumn,
   reorderColumns,
   computeFacets,
+  getRows,
 };
 
 export default api;
