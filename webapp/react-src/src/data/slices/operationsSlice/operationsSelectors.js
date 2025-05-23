@@ -7,7 +7,6 @@ export const selectOperation = createSelector(
 
   // Result function
   (data, operationId) => {
-    console.log("selectOperation ran");
     const operation = data[operationId];
     if (operation === undefined) {
       throw new Error("Operation not found");

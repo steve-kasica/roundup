@@ -7,7 +7,6 @@ export const selectTables = createSelector(
 
   // Result function
   (data, tableIds) => {
-    console.log("selectTables ran", data, tableIds);
     return Object.entries(data)
       .filter(([tableId, table]) => tableIds.includes(tableId))
       .map(([tableId, table]) => table);

@@ -23,7 +23,6 @@ export default function CustomDragLayer() {
     return null;
   }
 
-  // console.log(item);
   const blockWidth = 84.9; // Assuming this is the width of a block
   let { x: dx, y: dy } = deltaOffset;
   let [x, y] = [stepX(), initialOffset.y];

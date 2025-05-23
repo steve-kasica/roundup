@@ -55,7 +55,6 @@ export const COLUMN_STATUS_LOADING = "loading";
  * import { Column, COLUMN_STATUS_LOADING } from './Column';
  *
  * const newColumn = Column('parent-1', 0, 'Column Name', 'text', COLUMN_STATUS_LOADING);
- * console.log(newColumn);
  * // {
  * //   id: 'c-0',
  * //   tableId: 'parent-1',

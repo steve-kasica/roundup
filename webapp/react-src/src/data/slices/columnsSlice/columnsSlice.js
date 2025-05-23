@@ -288,7 +288,7 @@ const columnsSlice = createSlice({
           if (!column.values[value]) {
             column.values[value] = indicesArray;
           } else {
-            column.values[value].concat(indicesArray);
+            column.values[value] = column.values[value].concat(indicesArray);
           }
         });
         column.status.isLoading = false;

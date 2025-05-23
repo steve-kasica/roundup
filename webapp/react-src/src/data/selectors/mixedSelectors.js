@@ -92,7 +92,6 @@ export const getOperationColumnIds = createSelector(
 
   // Output selector
   (operation, state) => {
-    console.log("getOperationColumnIds Ran", operation);
     return operation.tableIds.map((tableId) => {
       const columnIds = selectColumnIdsByTableId(state, tableId);
       return columnIds;
@@ -107,7 +106,6 @@ export const getTablesByOperationId = createSelector(
 
   // Results function
   (state, operationId) => {
-    console.log("getTablesByOperationId Ran", operationId);
     const operation = selectOperation(state, operationId);
     return operation.tableIds.map((tableId) => {
       const table = getSourceTableById(state, tableId);

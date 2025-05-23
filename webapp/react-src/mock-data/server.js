@@ -102,8 +102,7 @@ export default function makeServer() {
         const projectId = request.queryParams["project"];
         const start = request.queryParams["start"] || 0;
         const limit = request.queryParams["limit"] || 1000;
-        const data = getRowsData["2341386446296"];
-        console.log("getRowsData", request, data);
+        const data = getRowsData[projectId];
         data.rows = data.rows.slice(start, start + limit);
         return data;
       });

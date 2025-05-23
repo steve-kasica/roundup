@@ -36,14 +36,12 @@
 //     //         context.tree = tree;
 //     //         op(context.tree, rootId, operationType, [{id: "table-3"}, {id: "table-4"}]);
 //     //     });
-//     //     it("Increases tables size by one", ({tree}) => 
+//     //     it("Increases tables size by one", ({tree}) =>
 //     //         expect(tree.children).to.have.lengthOf(3));
-//     //     it("Appends new operation", ({tree}) => 
+//     //     it("Appends new operation", ({tree}) =>
 //     //         expect(tree.children.at(2).type).to.equal(operationType));
 //     // });
 // // }));
-
-
 
 // // describe("removeChildrenInNode function", (() => {
 // //     const op = removeChildrenInNode;
@@ -54,7 +52,7 @@
 // //             context.root = op(tree, 1, removalTableId);
 // //         });
 
-// //         it("decreases leaves count by one", ({root, prev}) => 
+// //         it("decreases leaves count by one", ({root, prev}) =>
 // //             expect(root.leaves()).to.have.lengthOf(prev.leaves().length - 1));
 // //     });
 // // }));
@@ -77,13 +75,13 @@
 //             context.root = op(new Tree(), removalID);
 //         });
 
-//         it("decreases leaves by two", ({root, prev}) => 
+//         it("decreases leaves by two", ({root, prev}) =>
 //             expect(root.leaves()).to.have.lengthOf(prev.leaves().length - 2));
 
-//         it("decrease the root node's height by 1", ({root, prev}) => 
+//         it("decrease the root node's height by 1", ({root, prev}) =>
 //             expect(root.height).to.equal(prev.height - 1));
 
-//         it("does not change root node's depth", ({root, prev}) => 
+//         it("does not change root node's depth", ({root, prev}) =>
 //             expect(root.depth).to.equal(prev.depth));
 //     });
 
@@ -94,19 +92,19 @@
 //             context.root = op(new Tree(), removalID);
 //         });
 
-//         it("decreases leaves by 1", ({root, prev}) => 
+//         it("decreases leaves by 1", ({root, prev}) =>
 //             expect(root.leaves()).to.have.lengthOf(prev.leaves().length - 1));
 
-//         it("does not change root node's height", ({root, prev}) => 
+//         it("does not change root node's height", ({root, prev}) =>
 //             expect(root.height).to.equal(prev.height));
 
-//         it("does not change root node's depth", ({root, prev}) => 
+//         it("does not change root node's depth", ({root, prev}) =>
 //             expect(root.depth).to.equal(prev.depth));
 
-//         it("Remove child from `children` property", ({root}) => 
+//         it("Remove child from `children` property", ({root}) =>
 //             expect(root.children.map(({data}) => data.id)).to.not.contain(removalID));
 
-//         it("Remove child from `data.children` property", ({root, prev}) => 
+//         it("Remove child from `data.children` property", ({root, prev}) =>
 //             expect(root.data.children.map(({id}) => id)).to.not.contain(removalID));
 //     })
 // }));
@@ -118,15 +116,14 @@
 //         beforeEach(context => {
 //             context.prev = hierarchy(new Tree());
 //             context.root = op(new Tree(), "o1", [{id: "t5"}]);
-//             console.log(context.prev);
 //         });
 
-//         it("Adds child to operation data", 
+//         it("Adds child to operation data",
 //             ({root, prev}) => expect(root.data.children).toHaveLength(prev.data.children.length + 1));
-//         it("Adds child to operation node", 
-//             ({root, prev}) => expect(root.children).toHaveLength(prev.children.length + 1));            
+//         it("Adds child to operation node",
+//             ({root, prev}) => expect(root.children).toHaveLength(prev.children.length + 1));
 
-//         it("Increments leaf count by 1", 
+//         it("Increments leaf count by 1",
 //             ({root, prev}) => expect(root.leaves()).to.have.lengthOf(prev.leaves().length + 1));
 //     });
 // });

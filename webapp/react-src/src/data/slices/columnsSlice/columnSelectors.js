@@ -33,7 +33,6 @@ export const selectColumnIdsByTableIds = createSelector(
 
   // Output selector
   (idsByTable, tableIds) => {
-    console.log("selectColumnIdsByTableIds ran");
     return tableIds.map((tableId) => idsByTable[tableId] || []);
   }
 );

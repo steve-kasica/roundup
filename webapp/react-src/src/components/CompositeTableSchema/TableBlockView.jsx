@@ -35,16 +35,12 @@ function TableBlockView({
     {
       label: `Remove ${name}`,
       isVisable: true,
-      onClick: () => {
-        console.log("remove table");
-      },
+      onClick: () => {},
     },
     {
       label: "Remove operation",
       isVisable: true,
-      onClick: () => {
-        console.log("remove operation");
-      },
+      onClick: () => {},
     },
     // {
     //   label: "Select operation",

@@ -1,4 +1,3 @@
-
 // let operationId = 0;
 // import { hierarchy } from "d3";
 // import { serialize } from "v8";
@@ -11,13 +10,13 @@
 //     .includes(tableId);
 
 // /**
-//  * 
-//  * @param {string} endpoint 
-//  * @param {string} name 
-//  * @param {string} id 
-//  * @param {number} rowCount 
-//  * @param {Array} columns 
-//  * @returns 
+//  *
+//  * @param {string} endpoint
+//  * @param {string} name
+//  * @param {string} id
+//  * @param {number} rowCount
+//  * @param {Array} columns
+//  * @returns
 //  */
 // function Table(endpoint, name, id, rowCount, columns) {
 //     return {
@@ -32,12 +31,12 @@
 
 // /**
 //  * insertChildrenInNode
-//  * 
-//  * @param {Object} tree 
-//  * @param {string} id 
-//  * @param {Array} children 
+//  *
+//  * @param {Object} tree
+//  * @param {string} id
+//  * @param {Array} children
 //  * @param {number} insertIndex: (default=-1) to append
-//  * @returns 
+//  * @returns
 //  */
 // export function insertChildrenInNode(tree, id, children, insertIndex=-1) {
 //     const root = hierarchy(tree);
@@ -47,7 +46,6 @@
 //         throw Error("Can't find node by id");
 //     if (node.children === undefined)
 //         throw Error("Children are undefined")
-
 
 //     node.data.children.splice(...[insertIndex, 0, ...children]);
 //     node.children.splice(...[insertIndex, 0, ...children.map(child => hierarchy(child))]);
@@ -63,7 +61,7 @@
 //         // Initialize tree
 //         tree = new Operation(operationId++, operationType, tables);
 //     } else {
-//         tree = new Operation(operationId++, operationType, [...tables, tree]);        
+//         tree = new Operation(operationId++, operationType, [...tables, tree]);
 //     }
 //     return tree;
 // }
@@ -83,15 +81,14 @@
 // /**
 //  * removeNodeFromTree
 //  * removes node and all children from the tree
-//  * @param {} tree 
-//  * @param {*} id 
-//  * @returns 
+//  * @param {} tree
+//  * @param {*} id
+//  * @returns
 //  */
 // export function removeNodeFromTree(tree, id) {
 //     const root = hierarchy(tree);
 //     const node = root.find(({data}) => data.id === id);
 //     if (node === undefined) {
-//         console.log(root.children)
 //         throw Error(`Can't find node by id (${id})`);
 //     }
 
@@ -104,11 +101,11 @@
 
 // /**
 //  * Add a new operation as a table within an existing operation
-//  * @param {Object} tree 
-//  * @param {number} insertionID 
-//  * @param {string} operationType 
-//  * @param {Array} tables 
-//  * @returns 
+//  * @param {Object} tree
+//  * @param {number} insertionID
+//  * @param {string} operationType
+//  * @param {Array} tables
+//  * @returns
 //  */
 // export function insertOperation(tree, insertionID, operationType, tables) {
 //     const childOperation = new Operation(operationId++, operationType, tables);
@@ -149,7 +146,7 @@
 //     }
 // }
 
-// // Lifted from 
+// // Lifted from
 // // https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/index.js#L62C1-L66C2
 // function computeHeight(node) {
 //     var height = 0;
