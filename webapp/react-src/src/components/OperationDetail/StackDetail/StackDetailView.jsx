@@ -101,7 +101,7 @@ export default function StackDetailView({ tableIds }) {
               </div>
             ))}
           </div>
-          <div class="column-group">
+          <div className="column-group">
             {[...tables].reverse().map((child) => (
               <div className="cell" key={child.id}>
                 {child.rowsExplored} / {child.rowCount}
