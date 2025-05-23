@@ -11,8 +11,6 @@ import swapColumnsSaga from "./swapColumnsSaga";
 import swapColumnIndicesSaga from "./swapColumnIndicesSaga";
 import addTableToSchemaSaga from "./addTableToSchemaSaga";
 import coordinateHoverSaga from "./coordinateHoverSaga";
-import requestMultipleColumnFacetsSaga from "./requestColumnFacets";
-import requestColumnUniqueValuesSaga from "./requestColumnUniqueValues";
 import getRowsSagaWatcher from "./getRowsSaga";
 
 export default function* rootSaga() {
@@ -26,8 +24,6 @@ export default function* rootSaga() {
     call(swapColumnsSaga),
     call(swapColumnIndicesSaga),
     call(coordinateHoverSaga),
-    call(requestMultipleColumnFacetsSaga),
-    call(requestColumnUniqueValuesSaga),
     call(getRowsSagaWatcher),
   ]);
 }

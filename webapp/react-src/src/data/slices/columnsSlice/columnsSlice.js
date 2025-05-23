@@ -272,64 +272,6 @@ const columnsSlice = createSlice({
         targetColumn.status.isLoading = false;
       }
     },
-
-    fetchValueFacetsRequest(state, action) {
-      const { id } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = true;
-        column.status.error = null;
-      }
-    },
-
-    fetchValueFacetsSuccess(state, action) {
-      const { id, values } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = false;
-        column.status.error = null;
-        column.valueFacets = values;
-      }
-    },
-
-    fetchValueFacetsFailure(state, action) {
-      const { id, error } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = false;
-        column.status.error = error;
-      }
-    },
-
-    fetchUniqueValuesRequest(state, action) {
-      const { id } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = true;
-        column.status.error = null;
-      }
-    },
-    fetchUniqueValuesSuccess(state, action) {
-      const { id, values } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        values.forEach((value) => {
-          if (!column.values[value]) {
-            column.values[value] = ColumnValue(value);
-          }
-        });
-        column.status.isLoading = false;
-        column.status.error = null;
-      }
-    },
-    fetchUniqueValuesFailure(state, action) {
-      const { id, error } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = false;
-        column.status.error = error;
-      }
-    },
     fetchValuesRequest(state, action) {
       const { id } = action.payload;
       const column = state.data[id];
@@ -342,11 +284,11 @@ const columnsSlice = createSlice({
       const { id, valueCounts } = action.payload;
       const column = state.data[id];
       if (column) {
-        Object.entries(valueCounts).forEach(([value, count]) => {
+        Object.entries(valueCounts).forEach(([value, indicesArray]) => {
           if (!column.values[value]) {
-            column.values[value] = ColumnValue(value, null, count);
+            column.values[value] = indicesArray;
           } else {
-            column.values[value].count += count;
+            column.values[value].concat(indicesArray);
           }
         });
         column.status.isLoading = false;
@@ -384,12 +326,6 @@ export const {
   swapColumnsRequest,
   swapColumnsSuccess,
   swapColumnsFailure,
-  fetchValueFacetsRequest,
-  fetchValueFacetsSuccess,
-  fetchValueFacetsFailure,
-  fetchUniqueValuesRequest,
-  fetchUniqueValuesSuccess,
-  fetchUniqueValuesFailure,
   fetchValuesRequest,
   fetchValuesSuccess,
   fetchValuesFailure,

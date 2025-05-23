@@ -1,3 +1,3 @@
-import ColumnFacets from "./ColumnFacets.jsx";
+// import ColumnFacets from "./ColumnFacets.jsx";
 
-export default ColumnFacets;
+// export default ColumnFacets;

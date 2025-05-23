@@ -91,11 +91,14 @@ export default function Column(tableId, index, name, columnType) {
   };
 }
 
-export function ColumnValue(value, label = null, count = null) {
+export function ColumnValue(value, label = null, rowIndices = []) {
+  if (value === undefined) {
+    throw new Error("Param undefined `value`");
+  }
   return {
     value,
     label,
-    count,
+    rowIndices,
   };
 }
 

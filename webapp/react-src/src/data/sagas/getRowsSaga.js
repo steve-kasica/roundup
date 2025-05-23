@@ -47,12 +47,12 @@ function* getRowsSagaWorker(action) {
 
     const columnValues = response.rows
       .reduce(
-        (acc, { cells }) => {
-          cells.forEach(({ v }, i) => {
-            if (!Object.keys(acc[i]).includes(v)) {
-              acc[i][v] = 1;
+        (acc, { cells, i }) => {
+          cells.forEach(({ v }, j) => {
+            if (!Object.keys(acc[j]).includes(v)) {
+              acc[j][v] = [i];
             } else {
-              acc[i][v]++;
+              acc[j][v].push(i);
             }
           });
           return acc;
