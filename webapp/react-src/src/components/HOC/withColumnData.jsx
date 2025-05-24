@@ -39,8 +39,6 @@ export default function withColumnData(WrappedComponent) {
     const values = column?.values;
     const isNull = !column;
     const isSelected = useSelector((state) => isColumnSelected(state, id));
-    const isLoading = column?.status.isLoading;
-    const isHovered = column?.status.isHovered;
     const error = column?.error;
 
     const [{ isDragging }, dragRef, previewRef] = useDrag({
@@ -97,8 +95,8 @@ export default function withColumnData(WrappedComponent) {
         values={values}
         isNull={isNull}
         isSelected={isSelected}
-        isLoading={isLoading}
-        isHovered={isHovered}
+        isLoading={column?.status.isLoading}
+        isHovered={column?.status.isHovered}
         isDragging={isDragging}
         isOver={isOver}
         error={error}

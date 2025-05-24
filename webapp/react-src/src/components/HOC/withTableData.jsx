@@ -10,7 +10,7 @@ import { setTableHoveredStatus } from "../../data/slices/sourceTablesSlice";
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
 
-export function withTableData(WrappedComponent) {
+export default function withTableData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
     const dispatch = useDispatch();
     const table = useSelector((state) => getTableById(state, id));
@@ -54,7 +54,8 @@ export function withTableData(WrappedComponent) {
         id={id}
         name={table.name}
         columnCount={table.columnCount}
-        table={table}
+        rowCount={table.rowCount}
+        rowsExplored={table.rowsExplored}
         parentOperation={parentOperation}
         depth={depth}
         isDragging={isDragging}

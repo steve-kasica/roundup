@@ -36,6 +36,9 @@ const columnsSlice = createSlice({
      */
     fetchSourceTableColumnsRequest(state, action) {
       const { tableId, columnCount } = action.payload;
+      if (tableId === undefined || columnCount === undefined) {
+        throw new Error("fetchSourceTableColumnsRequest: tableId and columnCount are required in action.payload");
+      }
       if (!Object.hasOwn(state.idsByTable, tableId)) {
         state.idsByTable[tableId] = [];
       }

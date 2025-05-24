@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -8,11 +8,19 @@ import Drawer from "@mui/material/Drawer";
 import { selectDrawerContents } from "../data/slices/uiSlice/uiSliceSelectors";
 import { useDispatch, useSelector } from "react-redux";
 import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
+import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TableView/FocusedTableView";
 
-const componentMap = {
-  IndexUniqueValues: lazy(() =>
+const drawerComponentMap = {};
+drawerComponentMap["IndexUniqueValues"] = {
+  component: lazy(() =>
     import("./../components/OperationDetail/StackDetail/IndexUniqueValues")
   ),
+  anchor: "right",
+};
+
+drawerComponentMap[FOCUSED_TABLE_VIEW] = {
+  component: lazy(() => import("./../components/TableView/FocusedTableView")),
+  anchor: "bottom",
 };
 
 /**
@@ -32,11 +40,13 @@ const DashboardGrid = ({
   spacing = 2,
   cardElevation = 1,
 }) => {
-  let DrawerComponent;
+  let drawer;
   const dispatch = useDispatch();
+
   const drawerContents = useSelector(selectDrawerContents);
+  // Check if drawerContents is in the componentMap
   if (drawerContents) {
-    DrawerComponent = componentMap[drawerContents];
+    drawer = drawerComponentMap[drawerContents];
   }
 
   // Use provided titles or generate placeholders
@@ -55,12 +65,12 @@ const DashboardGrid = ({
       }}
     >
       <Drawer
-        anchor="right"
-        open={drawerContents !== null}
+        anchor={drawer ? drawer.anchor : undefined}
+        open={Boolean(drawerContents)}
         onClose={() => dispatch(setDrawerContents(null))}
       >
         <Suspense fallback={<div>Loading...</div>}>
-          {DrawerComponent && <DrawerComponent />}
+          {drawer && <drawer.component />}
         </Suspense>
       </Drawer>
 

@@ -25,3 +25,5 @@ export const selectFirstSelectedColumn = (state) => {
 };
 
 export const selectSelectedColumnIds = (state) => state.ui.selectedColumns;
+
+export const selectFocusedTableId = (state) => state.ui.focusedTableId;

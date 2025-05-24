@@ -10,7 +10,7 @@ import { isMouseOverElement } from "../../lib/utilities/dom.js";
 import ColumnTicksContainer from "./ColumnTicksContainer.jsx";
 import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice/Operation.js";
 import { setTableHoveredStatus } from "../../data/slices/sourceTablesSlice";
-import { withTableData } from "../HOC/withTableData.jsx";
+import withTableData from "../HOC/withTableData.jsx";
 
 function TableBlockView({
   id,

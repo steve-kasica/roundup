@@ -7,6 +7,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const initialState = {
   drawerContents: null,
   selectedColumns: [],
+  focusedTableId: null,
 };
 
 export const uiSlice = createSlice({
@@ -15,6 +16,9 @@ export const uiSlice = createSlice({
   reducers: {
     setDrawerContents(state, action) {
       state.drawerContents = action.payload;
+    },
+    setFocusedTableId(state, action) {
+      state.focusedTableId = action.payload;
     },
     appendToSelectedColumns(state, action) {
       const columnIds = Array.isArray(action.payload)
@@ -42,6 +46,7 @@ export const uiSlice = createSlice({
 // Action
 export const {
   setDrawerContents,
+  setFocusedTableId,
   setSelectedColumns,
   appendToSelectedColumns,
   clearSelectedColumns,

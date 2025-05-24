@@ -39,6 +39,15 @@ function* getRowsSagaWorker(action) {
     selectColumnIdsByTableId(state, tableId)
   );
 
+  const { rowsExplored } = yield select(
+    (state) => state.sourceTables.data[tableId]
+  );
+
+  if (start < rowsExplored) {
+    // These rows have already been fetched, so we don't need to fetch them again
+    return;
+  }
+
   yield all(columnIds.map((id) => put(fetchValuesRequest({ id }))));
 
   try {

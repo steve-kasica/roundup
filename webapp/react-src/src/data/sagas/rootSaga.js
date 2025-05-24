@@ -12,6 +12,7 @@ import swapColumnIndicesSaga from "./swapColumnIndicesSaga";
 import addTableToSchemaSaga from "./addTableToSchemaSaga";
 import coordinateHoverSaga from "./coordinateHoverSaga";
 import getRowsSagaWatcher from "./getRowsSaga";
+import peekTableSagaWatcher from "./peekTableSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -25,5 +26,6 @@ export default function* rootSaga() {
     call(swapColumnIndicesSaga),
     call(coordinateHoverSaga),
     call(getRowsSagaWatcher),
+    call(peekTableSagaWatcher),
   ]);
 }
