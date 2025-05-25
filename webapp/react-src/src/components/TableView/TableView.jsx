@@ -4,8 +4,8 @@ import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
 import ColumnValues from "./ColumnValues";
 import withTableData from "../../components/HOC/withTableData";
 
-function TableView({ id, rowCount, columnCount, name, rowsExplored }) {
-  const columnIds = useSelector((state) => selectColumnIdsByTableId(state, id));
+function TableView({ id, rowCount, columnIds, name, rowsExplored }) {
+  const columnCount = columnIds.length;
 
   return (
     <>

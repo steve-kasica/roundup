@@ -8,7 +8,6 @@ import {
   OPERATION_TYPE_NO_OP,
   selectRootOperation,
 } from "../slices/operationsSlice";
-import { fetchSourceTableColumnsRequest } from "../slices/columnsSlice";
 
 export const addTableToSchema = createAction("sagas/addTableToSchema");
 
@@ -26,16 +25,12 @@ export default function* addTableToSchemaSagaWatcher() {
 function* addTableToSchemaSagaWorker(action) {
   const { tableId, operationType } = action.payload;
 
-  const { columnCount, rootOperation } = yield select((state) => {
-    const table = state.sourceTables.data[tableId];
+  const { rootOperation } = yield select((state) => {
     return {
-      columnCount: table ? table.columnCount : 0,
+      // columnCount: table ? table.columnCount : 0,
       rootOperation: selectRootOperation(state),
     };
   });
-
-  // Start request for column data, creates placeholders in column slice
-  yield put(fetchSourceTableColumnsRequest({ tableId, columnCount }));
 
   if (!rootOperation) {
     yield put(initializeOperations({ tableId }));

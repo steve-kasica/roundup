@@ -15,7 +15,7 @@ import withTableData from "../HOC/withTableData.jsx";
 function TableBlockView({
   id,
   name,
-  columnCount,
+  columnIds,
   parentOperation,
   depth,
   isDragging,
@@ -27,6 +27,7 @@ function TableBlockView({
   parentColumnCount,
   table,
 }) {
+  const columnCount = columnIds.length;
   const dispatch = useDispatch();
   const [contextMenu, setContextMenu] = useState(null);
   const tableRef = useRef();

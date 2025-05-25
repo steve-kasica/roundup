@@ -8,7 +8,7 @@ import Drawer from "@mui/material/Drawer";
 import { selectDrawerContents } from "../data/slices/uiSlice/uiSliceSelectors";
 import { useDispatch, useSelector } from "react-redux";
 import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
-import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TableView/FocusedTableView";
+import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TableView/SelectedTableView";
 
 const drawerComponentMap = {};
 drawerComponentMap["IndexUniqueValues"] = {
@@ -19,7 +19,7 @@ drawerComponentMap["IndexUniqueValues"] = {
 };
 
 drawerComponentMap[FOCUSED_TABLE_VIEW] = {
-  component: lazy(() => import("./../components/TableView/FocusedTableView")),
+  component: lazy(() => import("./../components/TableView/SelectedTableView")),
   anchor: "bottom",
 };
 

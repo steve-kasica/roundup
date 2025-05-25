@@ -32,6 +32,10 @@ import {
 } from "../../data/selectors";
 
 import "./SourceTables.scss";
+import {
+  clearSelectedTables,
+  selectSelectedTables,
+} from "../../data/slices/uiSlice";
 
 const tableLayout = "table";
 const listLayout = "list";
@@ -104,11 +108,13 @@ export default function SourceTables() {
   const dispatch = useDispatch();
   const [selectedTag, setSelectedTag] = useState("");
   const [searchString, setSearchString] = useState("");
+  const [tableSelection, setTableSelection] = useState([]);
 
   const { firstPaneWidth } = useSelector(({ ui }) => ui);
   const [layout, setLayout] = useState(tableLayout);
 
   const sourceTables = useSelector(getAllSourceTables);
+  const selectedTables = useSelector(selectSelectedTables);
   const isLoading = useSelector(getSourceTablesLoadingStatus);
   const error = useSelector(getSourceTablesError);
 
@@ -183,12 +189,17 @@ export default function SourceTables() {
             variant="outlined"
             color="info"
             disableElevation
-            disabled={searchString === "" && selectedTag.length === 0}
+            disabled={
+              searchString === "" &&
+              selectedTag.length === 0 &&
+              selectedTables.length === 0
+            }
             fullWidth
             sx={{ height: "100%" }}
             onClick={() => {
               setSearchString("");
               setSelectedTag("");
+              dispatch(clearSelectedTables());
             }}
           >
             Clear
@@ -220,6 +231,8 @@ export default function SourceTables() {
         <TableLayout
           searchString={searchString}
           sourceTables={filteredTables}
+          tableSelection={tableSelection}
+          setTableSelection={setTableSelection}
           loading={isLoading}
           error={error}
         />

@@ -2,7 +2,7 @@
  * TableLayout.jsx
  * -------------------------------
  */
-import { Button, IconButton } from "@mui/material";
+import { Button } from "@mui/material";
 import {
   ArrowDown01,
   ArrowDownAZ,
@@ -14,9 +14,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
-import { CheckBoxOutlineBlank } from "@mui/icons-material";
-import { TableContainer } from "../../Containers";
 import TableRowView from "./TableRowView";
+import "./TableLayout.scss";
 
 // TODO: move this to SourceColumn Type
 const COLUMN_TYPE_CATEGORICAL = "categorical";
@@ -28,16 +27,21 @@ export const LAYOUT_ID = "table";
 export default function TableLayout({
   searchString,
   sourceTables,
+  tableSelection,
+  setTableSelection,
   loading,
   error,
 }) {
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
 
-  // const areAllTablesSelected = (sourceTables.length === selectedTableIds.size);
-  // const areSomeTablesChecked = selectedTableIds.size > 0;
-  const areAllTablesSelected = false;
-  const areSomeTablesChecked = false;
+  const tableIds = sourceTables
+    .toSorted((a, b) =>
+      isAscending
+        ? ascending(a[sortAttribute], b[sortAttribute])
+        : descending(a[sortAttribute], b[sortAttribute])
+    )
+    .map((table) => table.id);
 
   const headers = [
     {
@@ -74,7 +78,7 @@ export default function TableLayout({
   ];
 
   return (
-    <div className="table-layout">
+    <div className="TableLayout">
       <table>
         <thead>
           <tr>
@@ -112,16 +116,16 @@ export default function TableLayout({
               <td>Loading/error</td>
             </tr>
           ) : (
-            // TODO: this should just be table IDs
-            sourceTables
-              .toSorted((a, b) =>
-                isAscending
-                  ? ascending(a[sortAttribute], b[sortAttribute])
-                  : descending(a[sortAttribute], b[sortAttribute])
-              )
-              .map((table) => (
-                <TableRowView key={table.id} id={table.id} isDraggable={true} />
-              ))
+            tableIds.map((id, i) => (
+              <TableRowView
+                key={id}
+                id={id}
+                isDraggable={true}
+                setTableSelection={setTableSelection}
+                isSelectedRow={tableSelection.includes(id)} // avoids name collision with isSelected
+                // updateTableSelection={updateTableSelection}
+              />
+            ))
           )}
         </tbody>
       </table>
@@ -149,5 +153,30 @@ export default function TableLayout({
     ) : (
       <ArrowUpDown {...iconProps} />
     );
+  }
+
+  function getTrueRange(arr) {
+    let maxStart = -1,
+      maxEnd = -1,
+      maxLen = 0;
+    let currStart = -1,
+      currLen = 0;
+
+    arr.forEach((val, i) => {
+      if (val) {
+        if (currStart === -1) currStart = i;
+        currLen++;
+        if (currLen > maxLen) {
+          maxLen = currLen;
+          maxStart = currStart;
+          maxEnd = i;
+        }
+      } else {
+        currStart = -1;
+        currLen = 0;
+      }
+    });
+
+    return maxLen > 0 ? [maxStart, maxEnd] : null;
   }
 }

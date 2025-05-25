@@ -12,21 +12,33 @@ import withTableData from "../../HOC/withTableData";
 
 function TableRowView({
   // props from withTableData
+  id,
   name,
   rowCount,
-  columnCount,
+  columnIds,
   dateCreated,
   dateLastModified,
   tags,
+  isHovered,
+  depth,
+  parentOperation,
   dragRef,
   peekTable,
   hoverTable,
   unhoverTable,
+  selectTable,
+  unselectTable,
+  setTableSelection,
+  removeTableFromSchema,
 
   // props from parent component
   isDisabled = false,
+  isSelectedRow,
   searchString = "",
+  updateTableSelection,
 }) {
+  const columnCount = columnIds.length;
+  const isInSchema = parentOperation !== null;
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -38,11 +50,75 @@ function TableRowView({
     setAnchorEl(null);
   };
 
+  const menuItems = [
+    {
+      label: "Peek",
+      isDisabled: false,
+      onClick: () => {
+        peekTable();
+        handleMenuClose();
+      },
+    },
+    {
+      label: `Remove`,
+      isDisabled: !isInSchema,
+      onClick: removeTableFromSchema,
+    },
+  ];
+
+  const className = [
+    "TableRowView",
+    isSelectedRow ? "selected" : "",
+    isDisabled ? "disabled" : "",
+    isHovered ? "hovered" : "",
+    parentOperation ? parentOperation.operationType : "",
+    depth ? `depth-${depth}` : "",
+  ].filter(Boolean);
+
   return (
     <tr
-      className="TableRowView"
+      className={className.join(" ")}
+      data-tableid={id}
       onMouseEnter={hoverTable}
       onMouseLeave={unhoverTable}
+      onClick={(event) => {
+        setTableSelection((prev) => {
+          if (event.shiftKey) {
+            const tr = event.currentTarget;
+            const rows = Array.from(tr.parentNode.children);
+            const ids = rows.map((row) => row.getAttribute("data-tableid"));
+            const clickedIndex = ids.indexOf(id);
+            // Find indices of selected rows in DOM order
+            const selectedIndices = prev
+              .map((tableId) => ids.indexOf(tableId))
+              .filter((i) => i !== -1);
+
+            if (selectedIndices.length === 0) {
+              // No selection yet, just select clicked
+              return [id];
+            }
+
+            const min = Math.min(...selectedIndices);
+            const max = Math.max(...selectedIndices);
+
+            let range;
+            if (clickedIndex < min) {
+              range = [clickedIndex, min];
+            } else if (clickedIndex > max) {
+              range = [max, clickedIndex];
+            } else {
+              // Clicked inside the range, select only that row
+              return [id];
+            }
+
+            // Return the table IDs in the selected range
+            return ids.slice(range[0], range[1] + 1);
+          } else {
+            // Single select
+            return [id];
+          }
+        });
+      }}
     >
       <td className="drag-handle" ref={dragRef}>
         <DragIndicator />
@@ -94,14 +170,15 @@ function TableRowView({
             horizontal: "right",
           }}
         >
-          <MenuItem
-            onClick={() => {
-              peekTable();
-              handleMenuClose();
-            }}
-          >
-            Peek
-          </MenuItem>
+          {menuItems.map((item) => (
+            <MenuItem
+              key={item.label}
+              disabled={item.isDisabled}
+              onClick={item.onClick}
+            >
+              {item.label}
+            </MenuItem>
+          ))}
         </Menu>
       </td>
     </tr>

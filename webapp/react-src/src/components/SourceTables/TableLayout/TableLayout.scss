@@ -1,0 +1,83 @@
+@import "../../../styles/variables.scss";
+
+.TableLayout {
+  overflow: auto;
+  max-height: 100vh;
+  border: 1px solid black;
+
+  table {
+    background: inherit;
+    border-collapse: collapse;
+
+    thead {
+      background: #aaa;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      border: 2px solid black;
+
+      tr > th {
+        border-left: 1px solid black;
+        border-left: 1px solid black;
+      }
+    }
+
+    td {
+      padding: 0 10px;
+    }
+
+    tbody > tr > td {
+      border: 1px solid black;
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+    }
+  }
+  .TableRowView {
+    cursor: pointer;
+    user-select: none;
+
+    // Styles for different states
+    &.pack {
+      &.depth-1 {
+        background-color: $pack-1-color;
+      }
+      &.depth-2 {
+        background-color: $pack-2-color;
+      }
+      &.depth-3 {
+        background-color: $pack-3-color;
+      }
+    }
+    &.stack {
+      &.depth-1 {
+        background-color: $stack-1-color;
+      }
+      &.depth-2 {
+        background-color: $stack-2-color;
+      }
+      &.depth-3 {
+        background-color: $stack-3-color;
+      }
+    }
+    &.dragging,
+    &.pressed {
+      cursor: grabbing;
+    }
+    &.hovered {
+      background-color: $hover-color;
+    }
+    &.selected {
+      background-color: $selected-color;
+    }
+
+    .drag-handle {
+      text-align: center;
+      cursor: grab;
+      background-color: #eee;
+
+      &:hover {
+        background-color: #ddd;
+      }
+    }
+  }
+}

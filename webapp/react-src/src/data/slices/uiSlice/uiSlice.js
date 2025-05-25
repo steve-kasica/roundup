@@ -7,7 +7,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const initialState = {
   drawerContents: null,
   selectedColumns: [],
-  focusedTableId: null,
+  selectedTables: [],
 };
 
 export const uiSlice = createSlice({
@@ -17,8 +17,12 @@ export const uiSlice = createSlice({
     setDrawerContents(state, action) {
       state.drawerContents = action.payload;
     },
-    setFocusedTableId(state, action) {
-      state.focusedTableId = action.payload;
+
+    setSelectedColumns(state, action) {
+      if (!Array.isArray(action.payload)) {
+        throw new Error("setSelectedColumns: payload must be an array");
+      }
+      state.selectedColumns = action.payload;
     },
     appendToSelectedColumns(state, action) {
       const columnIds = Array.isArray(action.payload)
@@ -26,14 +30,29 @@ export const uiSlice = createSlice({
         : [action.payload];
       state.selectedColumns = [...state.selectedColumns, ...columnIds];
     },
-    setSelectedColumns(state, action) {
-      if (!Array.isArray(action.payload)) {
-        throw new Error("setSelectedColumns: payload must be an array");
-      }
-      state.selectedColumns = action.payload;
-    },
     clearSelectedColumns(state) {
       state.selectedColumns = initialState.selectedColumns;
+    },
+
+    setSelectedTables(state, action) {
+      const tableIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.selectedTables = tableIds;
+    },
+    appendToSelectedTables(state, action) {
+      const tableIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.selectedTables = [...state.selectedTables, ...tableIds];
+    },
+    clearSelectedTables(state) {
+      state.selectedTables = initialState.selectedTables;
+    },
+    removeFromSelectedTables(state, action) {
+      state.selectedTables = state.selectedTables.filter(
+        (table) => table !== action.payload
+      );
     },
     removeFromSelectedColumns(state, action) {
       state.selectedColumns = state.selectedColumns.filter(
@@ -46,7 +65,12 @@ export const uiSlice = createSlice({
 // Action
 export const {
   setDrawerContents,
-  setFocusedTableId,
+
+  setSelectedTables,
+  appendToSelectedTables,
+  clearSelectedTables,
+  removeFromSelectedTables,
+
   setSelectedColumns,
   appendToSelectedColumns,
   clearSelectedColumns,
