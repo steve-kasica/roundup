@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import TableLayout from "./TableLayout";
 import ListLayout from "./ListLayout";
-import { fetchTablesRequest } from "../../data/slices/sourceTablesSlice";
+import { fetchTablesRequest } from "../../data/sagas/fetchTablesSaga";
 import {
   Button,
   Chip,
@@ -113,7 +113,7 @@ export default function SourceTables() {
   const error = useSelector(getSourceTablesError);
 
   useEffect(() => {
-    dispatch(fetchTablesRequest());
+    dispatch(fetchTablesRequest({ source: "openrefine" }));
   }, [dispatch]);
 
   const filteredTables = sourceTables

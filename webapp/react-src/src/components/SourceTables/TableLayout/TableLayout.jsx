@@ -112,6 +112,7 @@ export default function TableLayout({
               <td>Loading/error</td>
             </tr>
           ) : (
+            // TODO: this should just be table IDs
             sourceTables
               .toSorted((a, b) =>
                 isAscending
@@ -119,14 +120,7 @@ export default function TableLayout({
                   : descending(a[sortAttribute], b[sortAttribute])
               )
               .map((table) => (
-                <TableContainer
-                  key={table.id}
-                  id={table.id}
-                  as="tr"
-                  isDraggable={true}
-                >
-                  <TableRowView />
-                </TableContainer>
+                <TableRowView key={table.id} id={table.id} isDraggable={true} />
               ))
           )}
         </tbody>

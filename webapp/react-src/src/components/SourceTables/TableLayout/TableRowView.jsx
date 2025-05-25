@@ -3,30 +3,30 @@ import HighlightText from "../../ui/HighlightText";
 import { Chip, IconButton, Typography } from "@mui/material";
 import { useState } from "react";
 import { Menu, MenuItem } from "@mui/material";
-import { useDispatch } from "react-redux";
 import {
   formatDate,
   formatNumber,
   parseOpenRefineDate,
 } from "../../../lib/utilities";
-import { peekTableAction } from "../../../data/sagas/peekTableSaga";
+import withTableData from "../../HOC/withTableData";
 
-// export default function TableRowView({searchString, table}) {
-export default function TableRowView({ table, searchString = "" }) {
-  const {
-    id,
-    parentId,
-    name,
-    rowCount,
-    columnCount,
-    dateCreated,
-    dateLastModified,
-    tags,
-  } = table;
-  // const isDisabled = [table.name].join("^").indexOf(searchString) < 0;
-  const isDisabled = false; // Placeholder for actual disabled logic
-  const dispatch = useDispatch();
+function TableRowView({
+  // props from withTableData
+  name,
+  rowCount,
+  columnCount,
+  dateCreated,
+  dateLastModified,
+  tags,
+  dragRef,
+  peekTable,
+  hoverTable,
+  unhoverTable,
 
+  // props from parent component
+  isDisabled = false,
+  searchString = "",
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -39,8 +39,12 @@ export default function TableRowView({ table, searchString = "" }) {
   };
 
   return (
-    <>
-      <td className="drag-handle">
+    <tr
+      className="TableRowView"
+      onMouseEnter={hoverTable}
+      onMouseLeave={unhoverTable}
+    >
+      <td className="drag-handle" ref={dragRef}>
         <DragIndicator />
       </td>
       <td>
@@ -92,7 +96,7 @@ export default function TableRowView({ table, searchString = "" }) {
         >
           <MenuItem
             onClick={() => {
-              dispatch(peekTableAction({ tableId: id, columnCount }));
+              peekTable();
               handleMenuClose();
             }}
           >
@@ -100,6 +104,9 @@ export default function TableRowView({ table, searchString = "" }) {
           </MenuItem>
         </Menu>
       </td>
-    </>
+    </tr>
   );
 }
+
+const EnhancedTableRowView = withTableData(TableRowView);
+export default EnhancedTableRowView;

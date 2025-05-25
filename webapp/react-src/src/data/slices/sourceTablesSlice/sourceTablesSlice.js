@@ -2,7 +2,7 @@
  * @name sourceTablesSlice
  */
 import { createSlice } from "@reduxjs/toolkit";
-import { SourceTable } from ".";
+import { Table } from "./Table";
 
 const initialState = {
   ids: [],
@@ -21,25 +21,25 @@ const slice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    // Action to fire when saga has completed successfully
-    // Updates slice with data fetched from Saga
-    fetchTablesSuccess: (state, action) => {
-      const projects = action.payload;
+    addOpenRefineProjects: (state, action) => {
+      const { projects } = action.payload;
 
-      state.ids = Object.keys(projects);
+      // TODO: use our internal IDs instead of OpenRefine IDs
+      // TODO: what if project already exists?
+      state.ids = state.ids.concat(Object.keys(projects));
 
       state.ids.forEach((id) => {
-        state.data[id] = new SourceTable(
+        state.data[id] = new Table(
           id, // id
           projects[id].name, // name
           Number(projects[id].rowCount), // row count
-          Number(projects[id].columnCount), // column count
-          projects[id].created, // date created
-          projects[id].modified, // last modified
+          projects[id].created, // dateCreated
+          projects[id].modified, // dateLastModified
           projects[id].tags // tags
         );
       });
       state.loading = false;
+      state.error = null;
     },
     // Action to handle when a saga has not completed successfully
     //

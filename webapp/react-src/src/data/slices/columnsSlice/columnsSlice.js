@@ -37,7 +37,9 @@ const columnsSlice = createSlice({
     fetchSourceTableColumnsRequest(state, action) {
       const { tableId, columnCount } = action.payload;
       if (tableId === undefined || columnCount === undefined) {
-        throw new Error("fetchSourceTableColumnsRequest: tableId and columnCount are required in action.payload");
+        throw new Error(
+          "fetchSourceTableColumnsRequest: tableId and columnCount are required in action.payload"
+        );
       }
       if (!Object.hasOwn(state.idsByTable, tableId)) {
         state.idsByTable[tableId] = [];
@@ -67,6 +69,26 @@ const columnsSlice = createSlice({
         column.columnType = columnInfo.is_numeric ? "categorical" : "numeric";
         column.status.isLoading = false;
         column.status.error = null;
+      });
+    },
+    addColumnsFromOpenRefine(state, action) {
+      const { projectId: tableId, columnsInfo } = action.payload;
+      if (!Object.hasOwn(state.idsByTable, tableId)) {
+        state.idsByTable[tableId] = [];
+      }
+      columnsInfo.forEach((columnInfo, i) => {
+        const column = Column(
+          tableId,
+          i,
+          columnInfo.name,
+          columnInfo.is_numeric ? "categorical" : "numeric"
+        );
+        // Update column dictionary (columnId => column metadata)
+        state.data[column.id] = column;
+
+        // Update list of column IDs for the table
+        // TODO: should this just be memoized in a selector?
+        state.idsByTable[tableId].push(column.id);
       });
     },
 
@@ -317,6 +339,7 @@ export const {
   fetchSourceTableColumnsRequest,
   fetchSourceTableColumnsSuccess,
   fetchSourceTableColumnsFailure,
+  addColumnsFromOpenRefine,
   renameColumnRequest,
   renameColumnSuccess,
   renameColumnFailure,

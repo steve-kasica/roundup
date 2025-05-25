@@ -1,5 +1,5 @@
 import { sum } from "d3";
-import { isSourceTable } from "../sourceTablesSlice";
+import { isTable } from "../sourceTablesSlice";
 
 export const OPERATION_TYPE_STACK = "stack";
 export const OPERATION_TYPE_PACK = "pack";

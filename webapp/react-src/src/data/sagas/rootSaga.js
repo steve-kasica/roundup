@@ -2,8 +2,8 @@
  * rootSaga.js
  */
 import { all, call } from "redux-saga/effects";
-import getSourceTablesSaga from "./getSourceTablesSaga";
-import getSourceTableColumnsSaga from "./getSourceTableColumnsSaga";
+import fetchTablesSaga from "./fetchTablesSaga";
+import fetchColumnMetadataSaga from "./fetchColumnMetadataSaga";
 import renameColumnSaga from "./renameColumnSaga";
 import removeColumnSaga from "./removeColumnSaga";
 import removeColumnsSaga from "./removeColumnsSaga";
@@ -16,8 +16,8 @@ import peekTableSagaWatcher from "./peekTableSaga";
 
 export default function* rootSaga() {
   yield all([
-    call(getSourceTablesSaga),
-    call(getSourceTableColumnsSaga),
+    call(fetchTablesSaga),
+    call(fetchColumnMetadataSaga),
     call(addTableToSchemaSaga),
     call(renameColumnSaga),
     call(removeColumnSaga),
