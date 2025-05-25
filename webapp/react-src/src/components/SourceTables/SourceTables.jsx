@@ -32,10 +32,6 @@ import {
 } from "../../data/selectors";
 
 import "./SourceTables.scss";
-import {
-  clearSelectedTables,
-  selectSelectedTables,
-} from "../../data/slices/uiSlice";
 
 const tableLayout = "table";
 const listLayout = "list";
@@ -114,7 +110,6 @@ export default function SourceTables() {
   const [layout, setLayout] = useState(tableLayout);
 
   const sourceTables = useSelector(getAllSourceTables);
-  const selectedTables = useSelector(selectSelectedTables);
   const isLoading = useSelector(getSourceTablesLoadingStatus);
   const error = useSelector(getSourceTablesError);
 
@@ -192,14 +187,14 @@ export default function SourceTables() {
             disabled={
               searchString === "" &&
               selectedTag.length === 0 &&
-              selectedTables.length === 0
+              tableSelection.length === 0
             }
             fullWidth
             sx={{ height: "100%" }}
             onClick={() => {
               setSearchString("");
               setSelectedTag("");
-              dispatch(clearSelectedTables());
+              dispatch(setTableSelection([]));
             }}
           >
             Clear
