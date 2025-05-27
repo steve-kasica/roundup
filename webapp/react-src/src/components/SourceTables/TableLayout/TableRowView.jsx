@@ -1,7 +1,7 @@
 import { DragIndicator, MoreVert } from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
 import { Chip, IconButton, Typography } from "@mui/material";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Menu, MenuItem } from "@mui/material";
 import {
   formatDate,
@@ -9,6 +9,7 @@ import {
   parseOpenRefineDate,
 } from "../../../lib/utilities";
 import withTableData from "../../HOC/withTableData";
+import { isPointInBoundingBox } from "../../../lib/utilities/dom";
 
 function TableRowView({
   // props from withTableData
@@ -38,23 +39,33 @@ function TableRowView({
   updateTableSelection,
 }) {
   const columnCount = columnIds.length;
-  const isInSchema = parentOperation !== null;
+  const isInSchema = parentOperation !== undefined;
   const [anchorEl, setAnchorEl] = useState(null);
+  const trRef = useRef(null);
   const open = Boolean(anchorEl);
 
   const handleMenuOpen = (event) => {
+    event.stopPropagation(); // Prevent row click from firing
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
+  const handleMenuClose = (event) => {
+    event.stopPropagation(); // Prevent row click from firing
+    const isMouseOver = isPointInBoundingBox(
+      { x: event.clientX, y: event.clientY },
+      trRef.current.getBoundingClientRect()
+    );
+    if (!isMouseOver) {
+      unhoverTable();
+    }
     setAnchorEl(null);
   };
 
   const menuItems = [
     {
-      label: "Peek",
+      label: "Peek at table",
       isDisabled: false,
-      onClick: () => {
+      onClick: (event) => {
         peekTable();
         handleMenuClose();
       },
@@ -62,7 +73,10 @@ function TableRowView({
     {
       label: `Remove`,
       isDisabled: !isInSchema,
-      onClick: removeTableFromSchema,
+      onClick: (event) => {
+        removeTableFromSchema();
+        handleMenuClose();
+      },
     },
   ];
 
@@ -77,6 +91,7 @@ function TableRowView({
 
   return (
     <tr
+      ref={trRef}
       className={className.join(" ")}
       data-tableid={id}
       onMouseEnter={hoverTable}

@@ -17,6 +17,7 @@ import {
   setDrawerContents,
   setSelectedColumns,
 } from "../../../data/slices/uiSlice/uiSlice";
+import { isPointInBoundingBox } from "../../../lib/utilities";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
 
@@ -173,11 +174,10 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
           onClose={({ clientX, clientY }) => {
             // use headerRef since currentTarget is the modal background
             const bbox = headerRef.current.getBoundingClientRect();
-            const isMouseOverHeader =
-              clientX >= bbox.left &&
-              clientX <= bbox.right &&
-              clientY >= bbox.top &&
-              clientY <= bbox.bottom;
+            const isMouseOverHeader = isPointInBoundingBox(
+              { x: clientX, y: clientY },
+              bbox
+            );
 
             if (!isMouseOverHeader) {
               dispatch(

@@ -9,3 +9,8 @@ export const isMouseOverElement = (ref, mouseX, mouseY) => {
     mouseY <= rect.bottom
   );
 };
+
+// Utility function to check if a point is inside a bounding box
+export function isPointInBoundingBox({ x, y }, bbox) {
+  return x >= bbox.left && x <= bbox.right && y >= bbox.top && y <= bbox.bottom;
+}
