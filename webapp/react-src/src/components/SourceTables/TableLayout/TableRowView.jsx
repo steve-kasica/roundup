@@ -67,7 +67,7 @@ function TableRowView({
       isDisabled: false,
       onClick: (event) => {
         peekTable();
-        handleMenuClose();
+        handleMenuClose(event);
       },
     },
     {
@@ -75,7 +75,7 @@ function TableRowView({
       isDisabled: !isInSchema,
       onClick: (event) => {
         removeTableFromSchema();
-        handleMenuClose();
+        handleMenuClose(event);
       },
     },
   ];
