@@ -25,11 +25,9 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
   const tableIds = useMemo(() => tables.map(({ id }) => id), [tables]);
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-  const isPopoverOpen = Boolean(menuAnchorEl);
+  const isMenuOpen = Boolean(menuAnchorEl);
   const [isMenuIconVisable, setIsMenuIconVisible] = useState(false);
 
-  const [detailAnchorEl, setDetailAnchorEl] = useState(null);
-  const isDetailPopoverOpen = Boolean(detailAnchorEl);
   const formRef = useRef(null);
 
   // Note: selector is memoized, so it won't recompute unless the input changes
@@ -107,6 +105,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
   ];
 
   const defaultFormWidth = 10;
+  const headerRef = useRef(null);
 
   return (
     <form
@@ -121,25 +120,6 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
         transition: "width 0.3s ease-in-out",
       }}
     >
-      <Popover
-        open={isDetailPopoverOpen}
-        anchorEl={detailAnchorEl}
-        onClose={() => setDetailAnchorEl(null)}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        sx={{
-          zIndex: 1000,
-        }}
-        // TODO: add little arrow at the bottom of the popover
-      >
-        {/* <IndexUniqueValues columnIds={columnIds} /> */}
-      </Popover>
       <Box
         ref={(node) => {
           dragRef(dropRef(node));
@@ -156,12 +136,13 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
           );
         }}
         onClick={() => {
-          if (!isPopoverOpen) {
+          // Select column vector on header click
+          if (!isMenuOpen) {
             dispatch(setSelectedColumns(columnIds));
           }
         }}
       >
-        <div>
+        <div ref={headerRef}>
           <label>{index1}</label>
           <IconButton
             size="small"
@@ -172,18 +153,39 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
               top: 4,
               opacity: isMenuIconVisable ? 1 : 0,
             }}
-            onClick={(event) => setMenuAnchorEl(event.currentTarget)}
+            onClick={(event) => {
+              // Prevent paraent onClick event from firing (column selection)
+              event.stopPropagation();
+              // Open the menu on icon button click
+              setMenuAnchorEl(event.currentTarget);
+            }}
           >
             <ChevronDownIcon />
           </IconButton>
         </div>
         <Popover
-          open={isPopoverOpen}
+          open={isMenuOpen}
           anchorEl={menuAnchorEl}
-          onClose={() => setMenuAnchorEl(null)}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "left",
+          }}
+          onClose={({ clientX, clientY }) => {
+            // use headerRef since currentTarget is the modal background
+            const bbox = headerRef.current.getBoundingClientRect();
+            const isMouseOverHeader =
+              clientX >= bbox.left &&
+              clientX <= bbox.right &&
+              clientY >= bbox.top &&
+              clientY <= bbox.bottom;
+
+            if (!isMouseOverHeader) {
+              dispatch(
+                setColumnHoveredStatus({ ids: columnIds, isHovered: false })
+              );
+              setIsMenuIconVisible(false);
+            }
+            setMenuAnchorEl(null);
           }}
         >
           <List>
