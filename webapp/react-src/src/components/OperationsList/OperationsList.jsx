@@ -15,9 +15,7 @@ export default function OperationsList() {
         .slice()
         .reverse()
         .map((operationId, i) => (
-          <OperationContainer key={operationId} id={operationId}>
-            <OperationListItemView index={i} />
-          </OperationContainer>
+          <OperationListItemView key={operationId} id={operationId} index={i} />
         ))}
     </List>
   );

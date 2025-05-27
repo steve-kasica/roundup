@@ -1,16 +1,19 @@
 import { ListItemButton, ListItemText } from "@mui/material";
 import { setFocusedOperation } from "../../data/slices/operationsSlice";
 import { useDispatch } from "react-redux";
+import withOperationData from "../HOC/withOperationData";
 
 export const LAYOUT_ID = "operationListItem";
 
-export default function OperationListItemView({
-  operation,
-  index,
+function OperationListItemView({
+  id,
+  operationType,
+  tableIds,
   columnCount,
+
+  index,
 }) {
   const dispatch = useDispatch();
-  const { operationType, id, tableIds } = operation;
 
   const label = operationType.charAt(0).toUpperCase() + operationType.slice(1);
   const position = index + 1;
@@ -24,3 +27,6 @@ export default function OperationListItemView({
     </ListItemButton>
   );
 }
+
+const EnhancedOperationListItemView = withOperationData(OperationListItemView);
+export default EnhancedOperationListItemView;
