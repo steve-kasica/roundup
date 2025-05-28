@@ -1,18 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrag } from "react-dnd";
 import {
   selectOperationDepth,
   selectOperationByTableId,
+  removeTableFromOperation,
 } from "../../data/slices/operationsSlice";
 import { getTableById } from "../../data/selectors";
 import { setTableHoveredStatus } from "../../data/slices/sourceTablesSlice";
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
-import {
-  selectColumnCountByTableId,
-  selectColumnIdsByTableId,
-} from "../../data/slices/columnsSlice";
+import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
 import { peekTableAction } from "../../data/sagas/peekTableSaga";
 import {
   appendToSelectedTables,
@@ -86,6 +84,14 @@ export default function withTableData(WrappedComponent) {
         }
         onUnhover={() =>
           dispatch(setTableHoveredStatus({ tableId: id, isHovered: false }))
+        }
+        removeTableFromSchema={() =>
+          dispatch(
+            removeTableFromOperation({
+              operationId: parentOperation.id,
+              tableId: id,
+            })
+          )
         }
         selectTable={(type, ids) => {
           switch (type) {

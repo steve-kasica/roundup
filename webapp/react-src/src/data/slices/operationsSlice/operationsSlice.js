@@ -45,6 +45,15 @@ const operationsSlice = createSlice({
       const { id } = action.payload;
       removeOperationFromState(state, id);
     },
+    removeTableFromOperation(state, action) {
+      const { operationId, tableId } = action.payload;
+      const operation = state.data[operationId];
+      operation.tableIds = operation.tableIds.filter((id) => id !== tableId);
+      // If no tables remain, remove the operation itself
+      if (operation.tableIds.length === 0) {
+        removeOperationFromState(state, operationId);
+      }
+    },
     setFocusedOperation(state, action) {
       const { id } = action.payload;
       state.focused = id;
@@ -65,6 +74,7 @@ export const {
   removeOperation,
   setFocusedOperation,
   setOperationHoverStatus,
+  removeTableFromOperation,
 } = operationsSlice.actions;
 
 export default operationsSlice.reducer;
