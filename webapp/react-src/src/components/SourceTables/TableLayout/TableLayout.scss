@@ -2,23 +2,26 @@
 
 .TableLayout {
   overflow: auto;
-  max-height: 100vh;
+  max-height: 500px;
   border: 1px solid black;
 
   table {
     background: inherit;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
 
     thead {
       background: #aaa;
       position: sticky;
       top: 0;
       z-index: 1;
-      border: 2px solid black;
 
-      tr > th {
-        border-left: 1px solid black;
-        border-left: 1px solid black;
+      th {
+        padding: 0 10px;
+        border: 1px solid black;
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        text-align: left;
       }
     }
 

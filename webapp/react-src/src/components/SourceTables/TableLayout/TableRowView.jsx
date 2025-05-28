@@ -71,6 +71,20 @@ function TableRowView({
       },
     },
     {
+      label: "Add to selection",
+      isDisabled: isSelectedRow || isDisabled || isInSchema,
+      onClick: (event) => {
+        setTableSelection((prev) => {
+          if (prev.includes(id)) {
+            return prev.filter((tableId) => tableId !== id);
+          } else {
+            return [...prev, id];
+          }
+        });
+        handleMenuClose(event);
+      },
+    },
+    {
       label: `Remove`,
       isDisabled: !isInSchema,
       onClick: (event) => {
