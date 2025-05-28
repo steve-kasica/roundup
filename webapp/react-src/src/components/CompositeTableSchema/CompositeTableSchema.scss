@@ -184,10 +184,7 @@ $null-column-border-color: $null-column-background;
     // -----------------------------------------------------------
     &.no-op {
       flex-direction: column;
-      @include background-color(
-        $null-column-background,
-        $null-column-background
-      );
+      @include background-color($no-op-color, $no-op-color);
       .table {
         border: none;
       }

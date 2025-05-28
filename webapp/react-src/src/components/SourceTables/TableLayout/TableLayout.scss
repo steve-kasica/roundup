@@ -37,6 +37,9 @@
     user-select: none;
 
     // Styles for different states
+    &.no-op {
+      background-color: $no-op-color;
+    }
     &.pack {
       &.depth-1 {
         background-color: $pack-1-color;
