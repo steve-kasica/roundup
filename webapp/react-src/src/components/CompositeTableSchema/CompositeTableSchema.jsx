@@ -15,20 +15,11 @@ import {
   selectRootOperationId,
 } from "../../data/slices/operationsSlice";
 
-import TableDropTarget, {
-  DROP_TARGET_EVENT_INITIALIZE,
-  DROP_TARGET_EVENT_PACK,
-  DROP_TARGET_EVENT_STACK,
-} from "./TableDropTarget";
+import TableDropTarget from "./TableDropTarget";
 import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
-import { OperationContainer } from "../Containers";
 import OperationBlockView from "./OperationBlockView";
-import {
-  selectOperationColumnCount,
-  selectSchemaColumnCount,
-} from "../../data/selectors";
 
 const gridColumns = 12;
 const gridWidth = gridColumns - 2;

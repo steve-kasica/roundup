@@ -8,10 +8,7 @@
  * **Table Tree**, by design.
  */
 
-import { TableContainer, OperationContainer } from "../Containers";
 import TableBlockView from "./TableBlockView";
-import { selectOperationImmediateChildId } from "../../data/slices/operationsSlice";
-import { useSelector } from "react-redux";
 import withOperationData from "../HOC/withOperationData";
 
 function OperationBlockView({
@@ -39,8 +36,6 @@ function OperationBlockView({
     <div
       className={className.join(" ")}
       style={{ flexBasis: `${(columnCount / parentColumnCount) * 100}%` }}
-      // onMouseEnter={onHover}
-      // onMouseLeave={onUnhover}
     >
       {childOperationId ? (
         <EnhancedOperationBlockView

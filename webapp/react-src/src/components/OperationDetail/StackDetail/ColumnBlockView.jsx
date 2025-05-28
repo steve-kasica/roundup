@@ -167,14 +167,6 @@ function ColumnBlockView({
         if (!isPopoverOpen) {
           unHoverColumn();
         }
-        //       if (hoverTimeoutRef.current) {
-        //         clearTimeout(hoverTimeoutRef.current);
-        //       }
-        // // if (hoverTimeoutRef.current) {
-        // //   clearTimeout(hoverTimeoutRef.current);
-        // //   hoverTimeoutRef.current = null;
-        // //   dispatch(setColumnHoveredStatus({ id, isHovered: true }));
-        //       hoverTimeoutRef.current = setTimeout(unHoverColumn, 265);
       }}
     >
       <input
