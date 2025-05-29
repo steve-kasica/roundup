@@ -54,15 +54,17 @@ export default function StackDetailToolbar() {
     >
       {menuItems.map((item, index) => (
         <Tooltip key={index} title={item.label} arrow placement="top">
-          <IconButton
-            disabled={selectedColumnIds.length === 0}
-            aria-label={item.label}
-            variant="outlined"
-            size="small"
-            onClick={item.action}
-          >
-            {item.icon}
-          </IconButton>
+          <span>
+            <IconButton
+              disabled={selectedColumnIds.length === 0}
+              aria-label={item.label}
+              variant="outlined"
+              size="small"
+              onClick={item.action}
+            >
+              {item.icon}
+            </IconButton>
+          </span>
         </Tooltip>
       ))}
       <Tooltip title="More options" arrow placement="top">
