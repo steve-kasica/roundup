@@ -1,5 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { selectColumnById } from "../../../data/slices/columnsSlice";
 import { selectSelectedColumnIds } from "../../../data/slices/uiSlice";
 import { intersection, union } from "d3";
@@ -10,7 +9,6 @@ import { selectTableById } from "../../../data/slices/sourceTablesSlice/tablesSe
 const ROW_HEIGHT = 32; // px, adjust as needed
 
 export default function IndexUniqueValues() {
-  const dispatch = useDispatch();
   let valuesByTableId = new Map(),
     tableIdsByValue = new Map(),
     jaccardIndex;

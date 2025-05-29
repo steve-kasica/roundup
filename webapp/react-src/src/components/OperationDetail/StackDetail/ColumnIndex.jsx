@@ -1,121 +1,67 @@
-import { useDispatch, useSelector } from "react-redux";
 import { Box, IconButton, List, ListItemButton, Popover } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
-import { memo, useRef } from "react";
-import {
-  selectColumnById,
-  selectColumnIdsByIndex,
-  setColumnDragStatus,
-  setColumnHoveredStatus,
-} from "../../../data/slices/columnsSlice";
+import { useRef } from "react";
 import ColumnBlockView from "./ColumnBlockView";
-import { useDrag, useDrop } from "react-dnd";
-import { getEmptyImage } from "react-dnd-html5-backend";
-import { swapColumnIndices } from "../../../data/sagas/swapColumnIndicesSaga";
-import {
-  setDrawerContents,
-  setSelectedColumns,
-} from "../../../data/slices/uiSlice/uiSlice";
 import { isPointInBoundingBox } from "../../../lib/utilities";
+import withColumnVectorData from "../../HOC/withColumnVectorData";
 
-export const COLUMN_INDEX = "COLUMN_INDEX";
+function ColumnIndex({
+  index,
+  columnIds,
+  columnNames,
+  isDragging,
+  isHovered,
+  dropRef,
+  dragRef,
+  hasSelected,
+  hoverColumnVector,
+  unhoverColumnVector,
+  selectColumnVector,
+  compareVectorValues,
+}) {
+  // Variables derived from props
+  const maxColumnNameLength = Math.max(
+    ...columnNames.map((name) => name.length),
+    0
+  );
+  const index1 = index + 1;
 
-const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
-  const dispatch = useDispatch();
-  const tableIds = useMemo(() => tables.map(({ id }) => id), [tables]);
-
+  // UI state and refs
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isMenuIconVisable, setIsMenuIconVisible] = useState(false);
 
   const formRef = useRef(null);
 
-  // Note: selector is memoized, so it won't recompute unless the input changes
-  const columnIds = useSelector((state) =>
-    selectColumnIdsByIndex(state, jIndex, tableIds)
-  );
-
-  const columns = useSelector((state) =>
-    columnIds.filter(Boolean).map((id) => selectColumnById(state, id))
-  );
-  const isExpanded = columns.some((column) => column.status.isSelected);
-  const maxColumnNameLength = Math.max(
-    ...columns.map(({ name }) => name.length),
-    0
-  );
-
-  const [{ isDragging }, dragRef, previewRef] = useDrag({
-    type: COLUMN_INDEX,
-    item: () => {
-      return { columnIds, jIndex };
-    },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-    end: () => {
-      // This is called when the drag operation ends
-      columnIds.forEach((id) => {
-        dispatch(setColumnDragStatus({ id, isDragging: false }));
-        dispatch(setColumnHoveredStatus({ id, isHovered: false }));
-      });
-    },
-  });
-
-  useEffect(() => {
-    columnIds.forEach((id) => {
-      dispatch(setColumnDragStatus({ id, isDragging }));
-    });
-  }, [isDragging, columnIds, dispatch]);
-
-  const [{ isHovered }, dropRef] = useDrop({
-    accept: COLUMN_INDEX,
-    drop: (droppedItem) => {
-      // Remember, in this context `droppedItem.columnIds` === `columnIds` in useDrag
-      if (droppedItem.jIndex !== jIndex) {
-        dispatch(
-          swapColumnIndices({
-            sourceColumnIds: droppedItem.columnIds,
-            targetColumnIds: columnIds,
-          })
-        );
-      }
-    },
-    collect: (monitor) => ({
-      isHovered: monitor.isOver(),
-    }),
-  });
-
-  // Disable the default drag preview
-  useEffect(() => {
-    previewRef(getEmptyImage(), { captureDraggingState: true });
-  }, []);
-
-  const index1 = jIndex + 1;
-
   const menuItems = [
     {
       // TODO
       // label: "Select all columns to the right",
-      // action: () => dispatch(setColumnSelectedStatusAfterIndex({ jIndex })),
+      // action: () => dispatch(setColumnSelectedStatusAfterIndex({ index })),
     },
     {
       label: "Compare unique values",
-      action: () => dispatch(setDrawerContents("IndexUniqueValues")),
+      action: compareVectorValues,
     },
   ];
 
   const defaultFormWidth = 10;
   const headerRef = useRef(null);
+  const className = [
+    "ColumnIndex",
+    isDragging ? "dragging" : "",
+    isHovered ? "hovered" : "",
+  ].filter(Boolean);
 
   return (
     <form
       ref={formRef}
-      className="ColumnIndex"
-      data-columnIds={columnIds.join(",")}
+      className={className.join(" ")}
+      data-columnids={columnIds.join(",")}
       style={{
         width:
-          isExpanded & (maxColumnNameLength > defaultFormWidth)
+          hasSelected & (maxColumnNameLength > defaultFormWidth)
             ? `${maxColumnNameLength + 5}ch`
             : `${defaultFormWidth}ch`,
         transition: "width 0.3s ease-in-out",
@@ -128,18 +74,16 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
         className="index-label"
         onMouseEnter={() => {
           setIsMenuIconVisible(true);
-          dispatch(setColumnHoveredStatus({ ids: columnIds, isHovered: true }));
+          hoverColumnVector();
         }}
         onMouseLeave={() => {
           setIsMenuIconVisible(false);
-          dispatch(
-            setColumnHoveredStatus({ ids: columnIds, isHovered: false })
-          );
+          unhoverColumnVector();
         }}
         onClick={() => {
           // Select column vector on header click
           if (!isMenuOpen) {
-            dispatch(setSelectedColumns(columnIds));
+            selectColumnVector();
           }
         }}
       >
@@ -180,9 +124,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
             );
 
             if (!isMouseOverHeader) {
-              dispatch(
-                setColumnHoveredStatus({ ids: columnIds, isHovered: false })
-              );
+              unhoverColumnVector();
               setIsMenuIconVisible(false);
             }
             setMenuAnchorEl(null);
@@ -209,6 +151,7 @@ const ColumnIndex = memo(function ColumnIndex({ jIndex, tables }) {
       ))}
     </form>
   );
-});
+}
 
-export default ColumnIndex;
+const EnhancedColumnIndex = withColumnVectorData(ColumnIndex);
+export default EnhancedColumnIndex;

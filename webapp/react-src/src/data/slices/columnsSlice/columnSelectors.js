@@ -44,10 +44,10 @@ export const selectColumnIdsByTableIds = createSelector(
  * @param {string} columnId - The ID of the column.
  * @returns {Object|null} - The column object or null if not found.
  */
-export function selectColumnById(state, id) {
-  const column = state.columns.data[id];
-  return column;
-}
+export const selectColumnById = createSelector(
+  [(state) => state.columns.data, (_, id) => id],
+  (data, id) => data[id] || null
+);
 
 /**
  * Selects the loading status of a specific column.
@@ -130,3 +130,12 @@ export function selectColumnCountByTableId(state, tableId) {
   const columnIds = selectColumnIdsByTableId(state, tableId);
   return columnIds.length;
 }
+
+// Memoized selector for columns by index across tables
+export const selectColumnsByIndex = createSelector(
+  [(state) => state, (_, index) => index, (_, __, tableIds) => tableIds],
+  (state, index, tableIds) => {
+    const columnIds = selectColumnIdsByIndex(state, index, tableIds);
+    return columnIds.map((id) => selectColumnById(state, id));
+  }
+);

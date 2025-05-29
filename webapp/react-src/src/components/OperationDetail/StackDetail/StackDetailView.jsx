@@ -47,7 +47,7 @@ export default function StackDetailView({ tableIds }) {
       (entries) => {
         entries.forEach((entry) => {
           const columnIds = entry.target
-            .getAttribute("data-columnIds")
+            .getAttribute("data-columnids")
             .split(",");
           const isVisible = entry.isIntersecting;
           dispatch(setColumnVisibleStatus({ ids: columnIds, isVisible }));
@@ -113,7 +113,11 @@ export default function StackDetailView({ tableIds }) {
           <div className="x-axis label">{xAxisLabel}</div>
           <div ref={gridContainerRef} className="grid-container">
             {xScale.domain().map((j) => (
-              <ColumnIndex key={j} jIndex={j} tables={tables} />
+              <ColumnIndex
+                key={j}
+                index={j}
+                tableIds={tables.map(({ id }) => id)}
+              />
             ))}
           </div>
         </div>
