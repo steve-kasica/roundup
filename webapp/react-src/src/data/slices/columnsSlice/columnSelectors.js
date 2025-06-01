@@ -139,3 +139,18 @@ export const selectColumnsByIndex = createSelector(
     return columnIds.map((id) => selectColumnById(state, id));
   }
 );
+
+// Memoized selector for column values by columnIds
+export const selectColumnValues = (state, columnIds) => {
+  if (!columnIds || columnIds.length === 0) {
+    return {};
+  }
+  const columnValues = {};
+  columnIds.forEach((id) => {
+    const column = selectColumnById(state, id);
+    if (column) {
+      columnValues[id] = column.values || [];
+    }
+  });
+  return columnValues;
+};

@@ -9,11 +9,12 @@ import { selectDrawerContents } from "../data/slices/uiSlice/uiSliceSelectors";
 import { useDispatch, useSelector } from "react-redux";
 import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
 import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TableView/SelectedTableView";
+import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnValueMatrix";
 
 const drawerComponentMap = {};
-drawerComponentMap["IndexUniqueValues"] = {
+drawerComponentMap[COLUMN_INDEX_VALUES_COMPONENT] = {
   component: lazy(() =>
-    import("./../components/OperationDetail/StackDetail/IndexUniqueValues")
+    import("../components/ColumnValueMatrix/SelectedColumns")
   ),
   anchor: "right",
 };

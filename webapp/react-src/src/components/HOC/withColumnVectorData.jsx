@@ -13,6 +13,7 @@ import {
   setDrawerContents,
   setSelectedColumns,
 } from "../../data/slices/uiSlice";
+import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnValueMatrix";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
 
@@ -104,7 +105,7 @@ export default function withColumnVectorData(WrappedComponent) {
           dispatch(setSelectedColumns(columnIds));
         }}
         compareVectorValues={() =>
-          dispatch(setDrawerContents("IndexUniqueValues"))
+          dispatch(setDrawerContents(COLUMN_INDEX_VALUES_COMPONENT))
         }
       />
     );
