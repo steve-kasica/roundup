@@ -143,7 +143,7 @@ export default function withColumnData(WrappedComponent) {
           if (!isNull && firstSelectedColumnId) {
             const anchorIdx = tableColumnIds.indexOf(firstSelectedColumnId);
             const [start, end] = [anchorIdx, index].sort((a, b) => a - b);
-            const selectedColumns = tableColumnIds.slice(start, end);
+            const selectedColumns = tableColumnIds.slice(start, end + 1);
             dispatch(setSelectedColumns(selectedColumns));
           }
         }}
