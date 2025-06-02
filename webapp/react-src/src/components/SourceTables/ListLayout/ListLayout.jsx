@@ -5,7 +5,7 @@
  * a specific width.
  */
 import { List } from "@mui/material";
-import { TableContainer } from "../../Containers";
+// import { TableContainer } from "../../Containers";
 import TableListItemView from "./TableListItemView";
 
 export const LAYOUT_ID = "list";
@@ -34,13 +34,11 @@ export default function ListLayout({
           return a === b ? 0 : a < b ? 1 : -1;
         })
         .map((sourceTable) => (
-          <TableContainer
+          <TableListItemView
             key={sourceTable.id}
             id={sourceTable.id}
             isDraggable={true}
-          >
-            <TableListItemView />
-          </TableContainer>
+          />
         ))}
     </List>
   );

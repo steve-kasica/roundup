@@ -29,3 +29,5 @@ export const selectSelectedColumnIds = (state) => state.ui.selectedColumns;
 export const selectSelectedTables = (state) => state.ui.selectedTables;
 
 export const selectHoveredColumns = (state) => state.ui.hoveredColumns;
+
+export const selectHoveredTable = (state) => state.ui.hoveredTable;

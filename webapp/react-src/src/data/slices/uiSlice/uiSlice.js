@@ -9,6 +9,7 @@ export const initialState = {
   selectedColumns: [],
   selectedTables: [],
   hoveredColumns: [],
+  hoveredTable: null,
 };
 
 export const uiSlice = createSlice({
@@ -83,6 +84,12 @@ export const uiSlice = createSlice({
         (column) => column !== action.payload
       );
     },
+    setHoveredTable(state, action) {
+      state.hoveredTable = action.payload;
+    },
+    clearHoveredTable(state) {
+      state.hoveredTable = initialState.hoveredTable;
+    },
   },
 });
 
@@ -104,6 +111,9 @@ export const {
   appendToHoveredColumns,
   clearHoveredColumns,
   removeFromHoveredColumns,
+
+  setHoveredTable,
+  clearHoveredTable,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

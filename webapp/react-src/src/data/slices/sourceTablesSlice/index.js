@@ -5,7 +5,6 @@ export const {
   fetchTablesFailure,
   decrementColumnCount,
   setTableSelectedStatus,
-  setTableHoveredStatus,
   incrementRowsExplored,
   addOpenRefineProjects,
 } = slice.actions;

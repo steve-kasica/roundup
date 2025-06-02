@@ -7,7 +7,11 @@ import {
   removeTableFromOperation,
 } from "../../data/slices/operationsSlice";
 import { getTableById } from "../../data/selectors";
-import { setTableHoveredStatus } from "../../data/slices/sourceTablesSlice";
+import {
+  setHoveredTable,
+  clearHoveredTable,
+  selectHoveredTable,
+} from "../../data/slices/uiSlice";
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
 import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
@@ -33,6 +37,8 @@ export default function withTableData(WrappedComponent) {
     const depth = useSelector((state) =>
       selectOperationDepth(state, parentOperation?.id)
     );
+
+    const hoveredTable = useSelector(selectHoveredTable);
 
     const [isPressed, setIsPressed] = useState(false);
 
@@ -68,23 +74,19 @@ export default function withTableData(WrappedComponent) {
         rowCount={table.rowCount}
         tags={table.tags}
         rowsExplored={table.rowsExplored}
-        isHovered={table.status.isHovered}
         dateCreated={table.dateCreated}
         dateLastModified={table.dateLastModified}
         columnIds={columnIds}
         parentOperation={parentOperation}
         depth={depth}
+        isHovered={hoveredTable === id}
         isSelected={selectedTables.includes(id)}
         isDragging={isDragging}
         isPressed={isPressed}
         isFocused={parentOperation ? true : false}
         dragRef={dragRef}
-        onHover={() =>
-          dispatch(setTableHoveredStatus({ tableId: id, isHovered: true }))
-        }
-        onUnhover={() =>
-          dispatch(setTableHoveredStatus({ tableId: id, isHovered: false }))
-        }
+        onHover={() => dispatch(setHoveredTable(id))}
+        onUnhover={() => dispatch(clearHoveredTable())}
         removeTableFromSchema={() =>
           dispatch(
             removeTableFromOperation({
@@ -110,12 +112,8 @@ export default function withTableData(WrappedComponent) {
               break;
           }
         }}
-        hoverTable={() =>
-          dispatch(setTableHoveredStatus({ tableId: id, isHovered: true }))
-        }
-        unhoverTable={() =>
-          dispatch(setTableHoveredStatus({ tableId: id, isHovered: false }))
-        }
+        hoverTable={() => dispatch(setHoveredTable(id))}
+        unhoverTable={() => dispatch(clearHoveredTable())}
         peekTable={() => dispatch(peekTableAction({ tableId: id }))}
       />
     );

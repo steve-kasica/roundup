@@ -12,7 +12,10 @@ import {
 } from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
 import { selectTables } from "../../../data/slices/sourceTablesSlice/tablesSelector";
-import { setTableHoveredStatus } from "../../../data/slices/sourceTablesSlice";
+import {
+  setHoveredTable,
+  clearHoveredTable,
+} from "../../../data/slices/uiSlice";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
@@ -80,22 +83,8 @@ export default function StackDetailView({ tableIds }) {
               <div
                 key={child.id}
                 className="cell"
-                onMouseEnter={() =>
-                  dispatch(
-                    setTableHoveredStatus({
-                      tableId: child.id,
-                      isHovered: true,
-                    })
-                  )
-                }
-                onMouseLeave={() =>
-                  dispatch(
-                    setTableHoveredStatus({
-                      tableId: child.id,
-                      isHovered: false,
-                    })
-                  )
-                }
+                onMouseEnter={() => dispatch(setHoveredTable(child.id))}
+                onMouseLeave={() => dispatch(clearHoveredTable())}
               >
                 {child.name}
               </div>

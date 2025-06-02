@@ -1,5 +1,5 @@
 import { takeEvery, put, all, call, select } from "redux-saga/effects";
-import { setTableHoveredStatus } from "../slices/sourceTablesSlice";
+import { setHoveredTable } from "../slices/uiSlice";
 import { selectOperationByTableId } from "../slices/operationsSlice/operationsSelectors";
 import { setOperationHoverStatus } from "../slices/operationsSlice/operationsSlice";
 
@@ -8,10 +8,11 @@ export default function* coordinateHoverSagaWatcher() {
 }
 
 function* watchTableHover() {
-  yield takeEvery(setTableHoveredStatus.type, triggerHoverTableOperation);
+  yield takeEvery(setHoveredTable.type, triggerHoverTableOperation);
 }
 function* triggerHoverTableOperation(action) {
-  const { tableId, isHovered } = action.payload;
+  const tableId = action.payload;
+  const isHovered = true;
 
   try {
     const { id: operationId } = yield select((state) =>
