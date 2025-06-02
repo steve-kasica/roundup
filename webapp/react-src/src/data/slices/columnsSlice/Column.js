@@ -81,9 +81,7 @@ export default function Column(tableId, index, name, columnType) {
     error: null,
     values: {},
     status: {
-      isSelected: false,
       isLoading: true, // Initially set to true to indicate loading state,
-      isHovered: false,
       isDragging: false,
       error: null,
     },

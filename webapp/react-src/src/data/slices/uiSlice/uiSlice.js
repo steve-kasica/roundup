@@ -8,6 +8,7 @@ export const initialState = {
   drawerContents: null,
   selectedColumns: [],
   selectedTables: [],
+  hoveredColumns: [],
 };
 
 export const uiSlice = createSlice({
@@ -49,6 +50,29 @@ export const uiSlice = createSlice({
     clearSelectedTables(state) {
       state.selectedTables = initialState.selectedTables;
     },
+    setHoveredColumns(state, action) {
+      const columnIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.hoveredColumns = columnIds;
+    },
+    appendToHoveredColumns(state, action) {
+      const columnIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.hoveredColumns = [...state.hoveredColumns, ...columnIds];
+    },
+    removeFromHoveredColumns(state, action) {
+      const columnIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.hoveredColumns = state.hoveredColumns.filter(
+        (column) => !columnIds.includes(column)
+      );
+    },
+    clearHoveredColumns(state) {
+      state.hoveredColumns = initialState.hoveredColumns;
+    },
     removeFromSelectedTables(state, action) {
       state.selectedTables = state.selectedTables.filter(
         (table) => table !== action.payload
@@ -75,6 +99,11 @@ export const {
   appendToSelectedColumns,
   clearSelectedColumns,
   removeFromSelectedColumns,
+
+  setHoveredColumns,
+  appendToHoveredColumns,
+  clearHoveredColumns,
+  removeFromHoveredColumns,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

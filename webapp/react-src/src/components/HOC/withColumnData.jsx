@@ -8,7 +8,6 @@ import {
   removeColumnRequest,
   renameColumnRequest,
   setColumnDragStatus,
-  setColumnHoveredStatus,
   swapColumnsRequest,
 } from "../../data/slices/columnsSlice";
 import {
@@ -18,6 +17,9 @@ import {
   isColumnSelected,
   selectFirstSelectedColumn,
   setSelectedColumns,
+  setHoveredColumns,
+  removeFromHoveredColumns,
+  selectHoveredColumns,
 } from "../../data/slices/uiSlice";
 import { useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
@@ -31,6 +33,7 @@ export default function withColumnData(WrappedComponent) {
       selectColumnIdsByTableId(state, column?.tableId)
     );
     const firstSelectedColumnId = useSelector(selectFirstSelectedColumn);
+    const hoveredColumns = useSelector(selectHoveredColumns);
 
     const name = column?.name;
     const tableId = column?.tableId;
@@ -96,7 +99,7 @@ export default function withColumnData(WrappedComponent) {
         isNull={isNull}
         isSelected={isSelected}
         isLoading={column?.status.isLoading}
-        isHovered={column?.status.isHovered}
+        isHovered={hoveredColumns.includes(id)}
         isDragging={isDragging}
         isOver={isOver}
         error={error}
@@ -120,11 +123,11 @@ export default function withColumnData(WrappedComponent) {
         unfocusColumn={unfocusColumn}
         dragColumn={dragColumn}
         unDragColumn={unDragColumn}
-        removeColumn={removeColumn}
+        removeColumn={() => {
+          if (!isNull) dispatch(removeColumnRequest(id));
+        }}
         addColumnToSelection={() => {
-          if (!isNull) {
-            dispatch(appendToSelectedColumns(id));
-          }
+          if (!isNull) dispatch(appendToSelectedColumns(id));
         }}
         selectSingleColumn={() => {
           if (!isNull) {
@@ -133,9 +136,7 @@ export default function withColumnData(WrappedComponent) {
           }
         }}
         unselectColumn={() => {
-          if (!isNull) {
-            dispatch(removeFromSelectedColumns(id));
-          }
+          if (!isNull) dispatch(removeFromSelectedColumns(id));
         }}
         // TODO: swapping columns messes with the index property used here
         // investigate further
@@ -163,12 +164,6 @@ export default function withColumnData(WrappedComponent) {
       dispatch(setColumnDragStatus({ id, isDragging: false }));
     }
 
-    function removeColumn() {
-      if (!isNull) {
-        dispatch(removeColumnRequest(id));
-      }
-    }
-
     function unfocusColumn() {
       if (!isNull) {
         dispatch(removeFromSelectedColumns(id));
@@ -177,13 +172,13 @@ export default function withColumnData(WrappedComponent) {
 
     function hoverColumn() {
       if (!isNull) {
-        dispatch(setColumnHoveredStatus({ id, isHovered: true }));
+        dispatch(setHoveredColumns(id));
       }
     }
 
     function unHoverColumn() {
       if (!isNull) {
-        dispatch(setColumnHoveredStatus({ id, isHovered: false }));
+        dispatch(removeFromHoveredColumns(id));
       }
     }
   };

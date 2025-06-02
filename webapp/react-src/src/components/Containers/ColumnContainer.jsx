@@ -6,10 +6,9 @@ import {
   DATA_TYPE as COLUMN,
   clearSelectedColumns,
   setColumnDragStatus,
-  setColumnHoveredStatus,
-  setColumnSelectedStatus,
   swapColumnsRequest,
 } from "../../data/slices/columnsSlice";
+import { clearHoveredColumns } from "../../data/slices/uiSlice";
 
 import { selectColumnById } from "../../data/slices/columnsSlice";
 
@@ -37,7 +36,7 @@ export function ColumnContainer({
     }),
     end: () => {
       dispatch(setColumnDragStatus({ id, isDragging: false }));
-      dispatch(setColumnHoveredStatus({ id, isHovered: false }));
+      dispatch(clearHoveredColumns());
     },
   });
 
@@ -70,7 +69,7 @@ export function ColumnContainer({
 
   // If dragging over a column, set the hover status
   // useEffect(() => {
-  //   dispatch(setColumnHoveredStatus({ id, isHovered: isOver }));
+  //   dispatch(TODO_HOVERSTATUS({ id, isHovered: isOver }));
   // }, [isOver, id, dispatch]);
 
   const className = [

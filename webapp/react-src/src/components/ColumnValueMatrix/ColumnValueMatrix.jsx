@@ -22,7 +22,6 @@ function ColumnValueMatrix({
   const totalValueCount = allValues.length;
   const yAxisWidth = 33.333; // a fixed percentage width for the Y-axis column (value names)
   const colWidth = `${(100 - yAxisWidth) / totalColumnCount}%`;
-  let jaccardIndex = 0;
 
   // Sort allValues and valueCountMatrix by degree (descending),
   // and for equal degree, group by the set of columns (tables) where the value appears
@@ -69,10 +68,7 @@ function ColumnValueMatrix({
     },
   };
 
-  // jaccardIndex =
-  //   intersection(...valuesByTableId.values()).size /
-  //     union(...valuesByTableId.values()).size || 0;
-  // }
+  const jaccardIndex = categories.all.count / totalValueCount;
 
   const valueDegree = new Map();
   sortedAllValues.forEach((value, rowIndex) => {
@@ -103,7 +99,7 @@ function ColumnValueMatrix({
         container.offsetTop -
         container.clientHeight / 2 +
         rowEl.clientHeight / 2 +
-        rowEl.clientHeight * 2; // compensate for sticky headers
+        rowEl.clientHeight * 7; // compensate for sticky headers
       container.scrollTo({
         top: scroll > 0 ? scroll : 0,
         behavior: "smooth",
@@ -116,16 +112,19 @@ function ColumnValueMatrix({
       sx={{
         display: "flex",
         flexDirection: "column",
-        minWidth: "300px",
+        width: "300px",
         overflow: "hidden",
       }}
     >
       <Box sx={{ mt: 2 }}>
-        <Typography sx={{ mb: 1 }}>Summary</Typography>
-        <Typography>
-          {totalValueCount} unique value{totalValueCount > 1 ? "s" : ""} between{" "}
-          {totalColumnCount} columns.
-          {/* <em>{categorizeJaccardIndex(jaccardIndex)} overlap between columns</em> */}
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          Summary
+        </Typography>
+        <Typography variant="body2">
+          {totalValueCount} unique value{totalValueCount > 1 ? "s" : ""} with{" "}
+          <em>{categorizeJaccardIndex(jaccardIndex)}</em> overlap between all{" "}
+          {totalColumnCount} columns (Jaccard Index = {jaccardIndex.toFixed(2)}
+          ).
         </Typography>
       </Box>
 
@@ -134,7 +133,10 @@ function ColumnValueMatrix({
           mt: 2,
         }}
       >
-        <Typography sx={{ mb: 1 }}>Column inclusion</Typography>
+        <Typography variant="h6">Column inclusion</Typography>
+        <Typography variant="subtitle2" sx={{ mb: 1 }}>
+          The number of unique values that appear in each category
+        </Typography>
         <Box
           sx={{
             minWidth: "90px",
@@ -161,7 +163,7 @@ function ColumnValueMatrix({
                   height: "15px",
                   lineHeight: "15px",
                 }}
-                title={`Scroll to values in ${label}`}
+                title={`Click to scroll to values in ${label}`}
               >
                 <Box
                   className="label"
@@ -234,7 +236,7 @@ function ColumnValueMatrix({
       </Box>
 
       <Box sx={{ mt: 2 }}>
-        <Typography sx={{ mb: 1 }}>
+        <Typography variant="h6" sx={{ mb: 1 }}>
           Value distribution across columns
         </Typography>
         {/* x-axis labels, columns or tables */}
@@ -294,6 +296,7 @@ function ColumnValueMatrix({
           ref={bodyRef}
           sx={{
             overflowY: "auto",
+            maxHeight: "400px",
           }}
         >
           {sortedValueCountMatrix.map((row, rowIndex) => (
@@ -353,9 +356,9 @@ function ColumnValueMatrix({
 }
 
 function categorizeJaccardIndex(score) {
-  if (score === 0) return "No";
-  if (score < 1) return "Partial"; // (0, 1)
-  if (score === 1) return "Complete";
+  if (score === 0) return "no";
+  if (score < 1) return "partial"; // (0, 1)
+  if (score === 1) return "complete";
 }
 
 function CircleMark({ isFilled }) {

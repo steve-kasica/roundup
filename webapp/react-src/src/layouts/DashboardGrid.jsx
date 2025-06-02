@@ -7,7 +7,10 @@ import Typography from "@mui/material/Typography";
 import Drawer from "@mui/material/Drawer";
 import { selectDrawerContents } from "../data/slices/uiSlice/uiSliceSelectors";
 import { useDispatch, useSelector } from "react-redux";
-import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
+import {
+  clearSelectedColumns,
+  setDrawerContents,
+} from "../data/slices/uiSlice/uiSlice";
 import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TableView/SelectedTableView";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnValueMatrix";
 import { Button, IconButton } from "@mui/material";
@@ -19,7 +22,7 @@ drawerComponentMap[COLUMN_INDEX_VALUES_COMPONENT] = {
     import("../components/ColumnValueMatrix/SelectedColumns")
   ),
   anchor: "right",
-  label: "Column Values",
+  label: "Compare Values",
 };
 
 drawerComponentMap[FOCUSED_TABLE_VIEW] = {
@@ -79,6 +82,7 @@ const DashboardGrid = ({
             padding: 2,
             display: "flex",
             flexDirection: "column",
+            overflow: "hidden",
           }}
         >
           <Box
@@ -91,26 +95,23 @@ const DashboardGrid = ({
               position: "relative",
             }}
           >
-            <Typography
-              sx={{
-                fontWeight: "bold",
-              }}
-            >
+            <Typography variant="h5">
               {drawer ? drawer.label : "Drawer"}
             </Typography>
             <IconButton
               aria-label="close drawer"
-              onClick={() => dispatch(setDrawerContents(null))}
+              onClick={() => {
+                dispatch(setDrawerContents(null));
+                dispatch(clearSelectedColumns());
+              }}
               size="small"
             >
               <CloseIcon />
             </IconButton>
           </Box>
-          <Box>
-            <Suspense fallback={<div>Loading...</div>}>
-              {drawer && <drawer.component />}
-            </Suspense>
-          </Box>
+          <Suspense fallback={<div>Loading...</div>}>
+            {drawer && <drawer.component />}
+          </Suspense>
         </Box>
       </Drawer>
 

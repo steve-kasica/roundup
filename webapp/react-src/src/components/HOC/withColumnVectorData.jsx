@@ -2,10 +2,12 @@ import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { selectColumnsByIndex } from "../../data/slices/columnsSlice/columnSelectors";
 import { useEffect, useMemo } from "react";
+import { setColumnDragStatus } from "../../data/slices/columnsSlice";
 import {
-  setColumnDragStatus,
-  setColumnHoveredStatus,
-} from "../../data/slices/columnsSlice";
+  setHoveredColumns,
+  removeFromHoveredColumns,
+  clearHoveredColumns,
+} from "../../data/slices/uiSlice";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { swapColumnIndices } from "../../data/sagas/swapColumnIndicesSaga";
@@ -48,7 +50,7 @@ export default function withColumnVectorData(WrappedComponent) {
         // This is called when the drag operation ends
         columnIds.forEach((id) => {
           dispatch(setColumnDragStatus({ id, isDragging: false }));
-          dispatch(setColumnHoveredStatus({ id, isHovered: false }));
+          dispatch(removeFromHoveredColumns(id));
         });
       },
     });
@@ -93,14 +95,8 @@ export default function withColumnVectorData(WrappedComponent) {
         dropRef={dropRef}
         isDragging={isDragging}
         isHovered={isHovered}
-        hoverColumnVector={() => {
-          dispatch(setColumnHoveredStatus({ ids: columnIds, isHovered: true }));
-        }}
-        unhoverColumnVector={() => {
-          dispatch(
-            setColumnHoveredStatus({ ids: columnIds, isHovered: false })
-          );
-        }}
+        hoverColumnVector={() => dispatch(setHoveredColumns(columnIds))}
+        unhoverColumnVector={() => dispatch(clearHoveredColumns())}
         selectColumnVector={() => {
           dispatch(setSelectedColumns(columnIds));
         }}

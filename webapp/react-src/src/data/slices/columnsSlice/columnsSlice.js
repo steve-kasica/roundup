@@ -213,30 +213,6 @@ const columnsSlice = createSlice({
         column.status.error = error;
       }
     },
-    /**
-     * Updates the hovered status of one or more columns.
-     * Accepts either a single column ID or an array of column IDs.
-     * Normalizes the input to handle both cases consistently.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string} [action.payload.id] - A single column ID to update.
-     * @param {Array<string>} [action.payload.ids] - An array of column IDs to update.
-     * @param {boolean} action.payload.isHovered - The hovered status to apply to the column(s).
-     */
-    setColumnHoveredStatus(state, action) {
-      const { id, ids, isHovered } = action.payload;
-
-      // Normalize to an array of IDs
-      const columnIds = Array.isArray(ids) ? ids : [id];
-
-      columnIds.forEach((columnId) => {
-        const column = state.data[columnId];
-        if (column) {
-          column.status.isHovered = isHovered;
-        }
-      });
-    },
     setColumnDragStatus(state, action) {
       const { id, isDragging } = action.payload;
       const column = state.data[id];
@@ -346,7 +322,6 @@ export const {
   removeColumnRequest,
   removeColumnSuccess,
   removeColumnFailure,
-  setColumnHoveredStatus,
   setColumnDragStatus,
   setColumnVisibleStatus,
   swapColumnsRequest,
