@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
 import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TableView/SelectedTableView";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnValueMatrix";
+import { Button, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const drawerComponentMap = {};
 drawerComponentMap[COLUMN_INDEX_VALUES_COMPONENT] = {
@@ -17,11 +19,13 @@ drawerComponentMap[COLUMN_INDEX_VALUES_COMPONENT] = {
     import("../components/ColumnValueMatrix/SelectedColumns")
   ),
   anchor: "right",
+  label: "Column Values",
 };
 
 drawerComponentMap[FOCUSED_TABLE_VIEW] = {
   component: lazy(() => import("./../components/TableView/SelectedTableView")),
   anchor: "bottom",
+  label: "Table Peek",
 };
 
 /**
@@ -70,9 +74,44 @@ const DashboardGrid = ({
         open={Boolean(drawerContents)}
         onClose={() => dispatch(setDrawerContents(null))}
       >
-        <Suspense fallback={<div>Loading...</div>}>
-          {drawer && <drawer.component />}
-        </Suspense>
+        <Box
+          sx={{
+            padding: 2,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Box
+            className="drawer-header"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderBottom: "1px solid black",
+              position: "relative",
+            }}
+          >
+            <Typography
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
+              {drawer ? drawer.label : "Drawer"}
+            </Typography>
+            <IconButton
+              aria-label="close drawer"
+              onClick={() => dispatch(setDrawerContents(null))}
+              size="small"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Box>
+            <Suspense fallback={<div>Loading...</div>}>
+              {drawer && <drawer.component />}
+            </Suspense>
+          </Box>
+        </Box>
       </Drawer>
 
       <Grid container spacing={spacing}>

@@ -4,6 +4,8 @@ import { ascending, descending, intersection, union } from "d3";
 import AnimatedEllipsis from "../ui/AnimatedElipse";
 import { useRef } from "react";
 import withColumnValuesData from "../HOC/withColumnValuesData";
+import Button from "@mui/material/Button";
+import { Box, Typography } from "@mui/material";
 
 export const COMPONENT_ID = "./ColumnValueMatrix";
 
@@ -47,21 +49,21 @@ function ColumnValueMatrix({
   // Calculate value distribution across columns
   const categories = {
     all: {
-      label: "all tables",
+      label: "all columns",
       count: valueDegreeEntries.filter(
         ({ degree }) => degree === totalColumnCount
       ).length,
       firstValue: null, // will be set later
     },
     some: {
-      label: "some tables",
+      label: "some columns",
       count: valueDegreeEntries.filter(
         ({ degree }) => degree < totalColumnCount && degree > 1
       ).length,
       firstValue: null, // will be set later
     },
     one: {
-      label: "one table",
+      label: "one column",
       count: valueDegreeEntries.filter(({ degree }) => degree === 1).length,
       firstValue: null, // will be set later
     },
@@ -73,7 +75,6 @@ function ColumnValueMatrix({
   // }
 
   const valueDegree = new Map();
-  const degreeToValue = new Map();
   sortedAllValues.forEach((value, rowIndex) => {
     const row = sortedValueCountMatrix[rowIndex];
     const degree = row.filter((c) => c > 0).length;
@@ -84,8 +85,6 @@ function ColumnValueMatrix({
       categories[degreeCategory].firstValue = value;
     }
   });
-
-  const degrees = ["all tables", "some tables", "one table"]; // fixed categories
 
   // Refs for each value row
   const valueRowRefs = useRef({});
@@ -113,182 +112,237 @@ function ColumnValueMatrix({
   };
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: "flex",
         flexDirection: "column",
-        minWidth: "200px",
-        padding: "10px",
+        minWidth: "300px",
         overflow: "hidden",
       }}
     >
-      <p>
-        <strong>
-          {totalValueCount} unique values between {totalColumnCount} columns
-        </strong>
-        <br />
-        <em>{categorizeJaccardIndex(jaccardIndex)} overlap between columns</em>
-      </p>
-      <div
-        style={{
-          minWidth: "90px",
-          marginRight: "8px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "4px",
-          alignItems: "flex-start",
+      <Box sx={{ mt: 2 }}>
+        <Typography sx={{ mb: 1 }}>Summary</Typography>
+        <Typography>
+          {totalValueCount} unique value{totalValueCount > 1 ? "s" : ""} between{" "}
+          {totalColumnCount} columns.
+          {/* <em>{categorizeJaccardIndex(jaccardIndex)} overlap between columns</em> */}
+        </Typography>
+      </Box>
+
+      <Box
+        sx={{
+          mt: 2,
         }}
       >
-        {Object.entries(categories).map(
-          ([key, { label, count, firstValue }]) => (
-            <div
-              key={key}
-              onClick={() => scrollToDegree(firstValue)}
-              style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                padding: "2px 8px",
-                width: "100%",
-                cursor: "pointer",
-                fontSize: "0.95em",
-                height: "20px",
-              }}
-              title={`Scroll to values in ${label}`}
-            >
-              <div
-                className="bar"
-                style={{
-                  position: "absolute",
-                  top: "0px",
-                  left: "0px",
-                  height: "100%",
-                  background: "#007bff",
-                  width: `${(count / totalValueCount) * 100}%`,
-                }}
-              >
-                <span
-                  style={{
-                    position: "relative",
-                    zIndex: 1,
-                    color: "#000",
-                    paddingLeft: "4px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {label}
-                </span>
-              </div>
-              {/* <span style={{ color: "#888" }}>({count})</span> */}
-            </div>
-          )
-        )}
-      </div>
-      {/* x-axis labels, columns or tables */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            borderRadius: "4px",
-            overflow: "hidden",
-            height: "100%",
+        <Typography sx={{ mb: 1 }}>Column inclusion</Typography>
+        <Box
+          sx={{
+            minWidth: "90px",
+            marginRight: "8px",
             display: "flex",
             flexDirection: "column",
+            gap: "4px",
+            alignItems: "flex-start",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              position: "sticky",
-              top: 0,
-              background: "#fff",
-              zIndex: 2,
-              borderBottom: "1px solid #ccc",
-              fontWeight: "bold",
-              height: ROW_HEIGHT + "px",
-              alignItems: "center",
-            }}
-          >
-            <div
-              style={{
-                width: yAxisWidth + "%",
-                padding: "4px",
-                textAlign: "right",
-                borderRight: "1px solid #ccc",
-                boxSizing: "border-box",
-              }}
-            ></div>
-            {columnIds.map((columnId) => (
-              <div
-                key={columnId}
-                style={{
-                  width: colWidth,
-                  padding: "4px",
-                  textAlign: "center",
-                  borderLeft: "1px solid #ccc",
-                  boxSizing: "border-box",
-                  overflow: "visible",
+          {Object.entries(categories).map(
+            ([key, { label, count, firstValue }]) => (
+              <Box
+                key={key}
+                sx={{
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "row",
+                  width: "100%",
+                  alignItems: "center",
+                  color: count > 0 ? "#333" : "#aaa",
+                  padding: "2px 8px",
+                  fontSize: "0.75em",
+                  height: "15px",
+                  lineHeight: "15px",
                 }}
+                title={`Scroll to values in ${label}`}
               >
-                <div style={{ transform: "rotate(-45deg)", wordWrap: "unset" }}>
-                  {columnTableMap.get(columnId)?.name}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div
-        ref={bodyRef}
-        style={{
-          overflowY: "auto",
-        }}
-      >
-        {sortedValueCountMatrix.map((row, rowIndex) => (
-          <div
-            key={rowIndex}
-            style={{
+                <Box
+                  className="label"
+                  onClick={() => scrollToDegree(firstValue)}
+                  sx={{
+                    width: "100px",
+                    textAlign: "right",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontSize: "1em",
+                      fontWeight: "bold",
+                      textTransform: "capitalize",
+                      whiteSpace: "nowrap",
+                      paddingRight: "15px",
+                    }}
+                  >
+                    {label}
+                  </Typography>
+                </Box>
+                <style>
+                  {`
+                .bar-container::before {
+                content: "—";
+                position: absolute;
+                margin-left: -10px;
+                margin-top: 3px;
+                ;}
+                `}
+                </style>
+                <Box
+                  className="bar-container"
+                  sx={{
+                    flex: 1,
+                  }}
+                >
+                  <Box
+                    className="bar"
+                    sx={{
+                      background: "#e0e0e0",
+                      width: `${(count / totalValueCount) * 100}%`,
+                      minWidth: "1px",
+                      textAlign: "right",
+                    }}
+                  >
+                    <Typography
+                      component="span"
+                      sx={{
+                        position: "relative",
+                        fontSize: "1em",
+                        zIndex: 1,
+                        paddingLeft: "4px",
+                        whiteSpace: "nowrap",
+                        lineHeight: "20px",
+                        paddingRight: "5px",
+                      }}
+                    >
+                      <small>{count}</small>
+                    </Typography>
+                  </Box>
+                </Box>
+                {/* <span sx={{ color: "#888" }}>({count})</span> */}
+              </Box>
+            )
+          )}
+        </Box>
+      </Box>
+
+      <Box sx={{ mt: 2 }}>
+        <Typography sx={{ mb: 1 }}>
+          Value distribution across columns
+        </Typography>
+        {/* x-axis labels, columns or tables */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box
+            sx={{
+              borderRadius: "4px",
+              overflow: "hidden",
+              height: "100%",
               display: "flex",
-              flexDirection: "row",
-              borderBottom: "1px solid #eee",
-              height: `${ROW_HEIGHT}px`,
-              alignItems: "center",
+              flexDirection: "column",
             }}
           >
-            <div
-              ref={(el) =>
-                (valueRowRefs.current[sortedAllValues[rowIndex]] = el)
-              }
-              style={{
-                width: yAxisWidth + "%",
-                padding: "4px",
-                textAlign: "right",
-                borderRight: "1px solid #ccc",
-                background: "#fafafa",
-                boxSizing: "border-box",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
+            <Box
+              sx={{
+                display: "flex",
+                position: "sticky",
+                top: 0,
+                background: "#fff",
+                zIndex: 2,
+                borderBottom: "1px solid #ccc",
+                fontWeight: "bold",
+                height: ROW_HEIGHT + "px",
+                alignItems: "center",
               }}
             >
-              {sortedAllValues[rowIndex]}
-            </div>
-            {row.map((count, colIndex) => (
-              <div
-                key={colIndex}
-                style={{
-                  width: colWidth,
+              <Box
+                sx={{
+                  width: yAxisWidth + "%",
                   padding: "4px",
-                  textAlign: "center",
-                  borderLeft: "1px solid #eee",
+                  textAlign: "right",
+                  borderRight: "1px solid #ccc",
                   boxSizing: "border-box",
                 }}
+              ></Box>
+              {columnIds.map((columnId) => (
+                <Box
+                  key={columnId}
+                  sx={{
+                    width: colWidth,
+                    padding: "4px",
+                    textAlign: "center",
+                    borderLeft: "1px solid #ccc",
+                    boxSizing: "border-box",
+                    overflow: "visible",
+                  }}
+                >
+                  <Box sx={{ transform: "rotate(-45deg)", wordWrap: "unset" }}>
+                    {columnTableMap.get(columnId)?.name}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        </Box>
+        <Box
+          ref={bodyRef}
+          sx={{
+            overflowY: "auto",
+          }}
+        >
+          {sortedValueCountMatrix.map((row, rowIndex) => (
+            <Box
+              key={rowIndex}
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                borderBottom: "1px solid #eee",
+                height: `${ROW_HEIGHT}px`,
+                alignItems: "center",
+              }}
+            >
+              <Box
+                ref={(el) =>
+                  (valueRowRefs.current[sortedAllValues[rowIndex]] = el)
+                }
+                sx={{
+                  width: yAxisWidth + "%",
+                  padding: "4px",
+                  textAlign: "right",
+                  borderRight: "1px solid #ccc",
+                  background: "#fafafa",
+                  boxSizing: "border-box",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
               >
-                <CircleMark isFilled={count > 0} />
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
+                {sortedAllValues[rowIndex]}
+              </Box>
+              {row.map((count, colIndex) => (
+                <Box
+                  key={colIndex}
+                  sx={{
+                    width: colWidth,
+                    padding: "4px",
+                    textAlign: "center",
+                    borderLeft: "1px solid #eee",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <CircleMark isFilled={count > 0} />
+                </Box>
+              ))}
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </Box>
   );
 
   function categorizeDegree(degree) {
@@ -306,8 +360,8 @@ function categorizeJaccardIndex(score) {
 
 function CircleMark({ isFilled }) {
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         borderRadius: "50%",
         width: "12px",
         height: "12px",
@@ -316,7 +370,7 @@ function CircleMark({ isFilled }) {
         display: "inline-block",
         margin: "0 auto",
       }}
-    ></div>
+    ></Box>
   );
 }
 
