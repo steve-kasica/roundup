@@ -20,24 +20,6 @@ export function selectColumnIdsByTableId(state, tableId) {
 }
 
 /**
- * Selects all column IDs for a list of tables.
- *
- * @param {Object} state - The Redux state.
- * @param {Array<string>} tableIds - An array of table IDs.
- * @returns {Array<Array<string>>} - An array of arrays, where each inner array contains the column IDs for a specific table.
- */
-export const selectColumnIdsByTableIds = createSelector(
-  // Input selectors
-  (state) => state.columns.idsByTable, // Extract the idsByTable object from the state
-  (_, tableIds) => tableIds, // Extract the tableIds argument
-
-  // Output selector
-  (idsByTable, tableIds) => {
-    return tableIds.map((tableId) => idsByTable[tableId] || []);
-  }
-);
-
-/**
  * Selects a specific column by its ID.
  *
  * @param {Object} state - The Redux state.
@@ -50,97 +32,64 @@ export const selectColumnById = createSelector(
 );
 
 /**
- * Selects the loading status of a specific column.
- *
- * @param {Object} state - The Redux state.
- * @param {string} columnId - The ID of the column.
- * @returns {boolean} - True if the column is loading, false otherwise.
- */
-export function selectColumnLoadingStatus(state, columnId) {
-  const column = selectColumnById(state, columnId);
-  return column ? column.loading : false;
-}
-
-/**
- * Selects all columns for a specific table.
- *
- * @param {Object} state - The Redux state.
- * @param {string} tableId - The ID of the table.
- * @returns {Array<Object>} - An array of column objects for the table.
- */
-export const selectColumnsByTable = (state, tableId) => {
-  const columnIds = selectColumnIdsByTableId(state, tableId);
-  return columnIds.map((id) => selectColumnById(state, id));
-};
-
-/**
- * Selects the error message of a specific column.
- *
- * @param {Object} state - The Redux state.
- * @param {string} columnId - The ID of the column.
- * @returns {string|null} - The error message or null if no error.
- */
-export const selectColumnError = (state, columnId) => {
-  const column = selectColumnById(state, columnId);
-  return column ? column.error : null;
-};
-
-/**
- * Selects all columns that are currently loading for a specific table.
- *
- * @param {Object} state - The Redux state.
- * @param {string} tableId - The ID of the table.
- * @returns {Array<Object>} - An array of columns that are loading.
- */
-export const selectLoadingColumnsByTable = (state, tableId) => {
-  const columns = selectColumnsByTable(state, tableId);
-  return columns.filter((column) => column.loading);
-};
-
-/**
- * Selects all columns across tables at a specific index.
- *
- * @param {Object} state - The Redux state.
- * @param {number} index - The index of the columns to select.
- * @returns {Array<string|null>} - An array of column IDs at the specified index across all tables.
- */
-export const selectColumnIdsByIndex = createSelector(
-  [
-    (state) => state.columns.idsByTable,
-    (_, index) => index,
-    (_, __, tableIds) => tableIds,
-  ],
-  (idsByTable, index, tableIds) => {
-    return tableIds.map((tableId) => {
-      const columnIds = idsByTable[tableId];
-      return columnIds && index < columnIds.length ? columnIds[index] : null;
-    });
-  }
-);
-
-/**
  * Selects the selected column IDs.
  *
  * @param {Object} state - The Redux state.
- * @returns {Array<string>} - An array of column IDs where `status.isSelected` is true
+ * @returns {Array<string>} - An array of column IDs that are currently selected.
  */
-export const selectSelectedColumnIds = (state) => state.columns.selected;
+export const selectSelectedColumns = (state) => state.columns.selected;
 
-export function selectColumnCountByTableId(state, tableId) {
-  const columnIds = selectColumnIdsByTableId(state, tableId);
-  return columnIds.length;
-}
+/**
+ * Selects the hovered column IDs.
+ *
+ * @param {Object} state - The Redux state.
+ * @returns {Array<string>} - An array of column IDs that are currently hovered.
+ */
+export const selectHoveredColumns = (state) => state.columns.hovered;
 
-// Memoized selector for columns by index across tables
+/**
+ * Selects the loading column IDs.
+ *
+ * @param {Object} state - The Redux state.
+ * @returns {Array<string>} - An array of column IDs that are currently loading.
+ */
+export const selectLoadingColumns = (state) => state.columns.loading;
+
+/**
+ * Selects the dragging column IDs.
+ *
+ * @param {Object} state - The Redux state.
+ * @returns {Array<string>} - An array of column IDs that are currently dragging.
+ */
+export const selectDraggingColumns = (state) => state.columns.dragging;
+
+/**
+ * Memoized selector to retrieve columns by their index across multiple tables.
+ *
+ * @function
+ * @param {Object} state - The Redux state.
+ * @param {number} index - The index of the column to select from each table.
+ * @param {string[]} tableIds - An array of table IDs to select columns from.
+ * @returns {Array<Object|null>} An array of column objects (or null if not found) corresponding to the specified index in each table.
+ */
 export const selectColumnsByIndex = createSelector(
   [(state) => state, (_, index) => index, (_, __, tableIds) => tableIds],
   (state, index, tableIds) => {
-    const columnIds = selectColumnIdsByIndex(state, index, tableIds);
+    const columnIds = tableIds.map((tableId) => {
+      const columnIds = state.columns.idsByTable[tableId];
+      return columnIds && index < columnIds.length ? columnIds[index] : null;
+    });
     return columnIds.map((id) => selectColumnById(state, id));
   }
 );
 
-// Memoized selector for column values by columnIds
+/**
+ * Selects the values for the specified column IDs from the state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {Array<string|number>} columnIds - An array of column IDs to retrieve values for.
+ * @returns {Object} An object mapping each column ID to its values array. If a column is not found, it is omitted.
+ */
 export const selectColumnValues = (state, columnIds) => {
   if (!columnIds || columnIds.length === 0) {
     return {};

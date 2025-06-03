@@ -7,14 +7,14 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearSelectedColumns,
-  selectSelectedColumnIds,
-} from "../../../data/slices/uiSlice";
-import { removeColumns } from "../../../data/sagas/removeColumnsSaga";
+  selectSelectedColumns,
+} from "../../../data/slices/columnsSlice";
+import { removeColumnsAction } from "../../../data/sagas/removeColumnsSaga";
 
 export default function StackDetailToolbar() {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
-  const selectedColumnIds = useSelector(selectSelectedColumnIds);
+  const selectedColumnIds = useSelector(selectSelectedColumns);
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -25,7 +25,7 @@ export default function StackDetailToolbar() {
       label: "Remove selected columns",
       icon: <DeleteIcon />,
       action: () => {
-        dispatch(removeColumns(selectedColumnIds));
+        dispatch(removeColumnsAction(selectedColumnIds));
         handleMenuClose();
       },
     },

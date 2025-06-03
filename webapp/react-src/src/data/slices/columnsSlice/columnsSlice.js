@@ -13,77 +13,27 @@ Reusability: Makes the function more versatile and reusable in different context
  */
 
 import { createSlice } from "@reduxjs/toolkit";
-import Column from "./Column";
+import Column, {
+  COLUMN_TYPE_CATEGORICAL,
+  COLUMN_TYPE_NUMERICAL,
+  COLUMN_TYPES,
+  InvalidColumnTypeError,
+} from "./Column";
 
 const initialState = {
   idsByTable: {},
   data: {},
   selected: [],
+  hovered: [],
+  loading: [],
+  dragging: [],
+  errors: {},
 };
 
 const columnsSlice = createSlice({
   name: "columns",
   initialState,
   reducers: {
-    /**
-     * Triggers a saga to fetch columns for a specific table.
-     * Initializes placeholder columns with a loading status.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string} action.payload.tableId - The ID of the table to fetch columns for.
-     * @param {number} action.payload.columnCount - The number of columns to initialize.
-     */
-    fetchSourceTableColumnsRequest(state, action) {
-      const { tableId, columnCount } = action.payload;
-      if (tableId === undefined || columnCount === undefined) {
-        throw new Error(
-          "fetchSourceTableColumnsRequest: tableId and columnCount are required in action.payload"
-        );
-      }
-      if (!Object.hasOwn(state.idsByTable, tableId)) {
-        state.idsByTable[tableId] = [];
-      }
-      for (let i = 0; i < columnCount; i++) {
-        const column = Column(tableId, i, undefined, undefined);
-        state.data[column.id] = column;
-        state.idsByTable[tableId].push(column.id);
-      }
-    },
-
-    /**
-     * Updates the state with the fetched column data for a specific table.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string} action.payload.tableId - The ID of the table whose columns were fetched.
-     * @param {Array<Object>} action.payload.response - The array of column data fetched from the server.
-     */
-    fetchSourceTableColumnsSuccess(state, action) {
-      const { tableId, response: columnsInfo } = action.payload;
-      columnsInfo.forEach((columnInfo, i) => {
-        const columnId = state.idsByTable[tableId].at(i);
-        const column = state.data[columnId];
-
-        column.name = columnInfo.name;
-        column.columnType = columnInfo.is_numeric ? "categorical" : "numeric";
-        column.status.isLoading = false;
-        column.status.error = null;
-      });
-    },
-    /**
-     * Handles a failure to fetch columns for a specific table.
-     * Logs an error in development mode.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     */
-    fetchSourceTableColumnsFailure(state, action) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("Error fetching columns", action);
-      }
-    },
-
     /**
      * Adds columns to the state from OpenRefine column information.
      *
@@ -113,7 +63,9 @@ const columnsSlice = createSlice({
           tableId,
           i,
           columnInfo.name,
-          columnInfo.is_numeric ? "categorical" : "numeric"
+          columnInfo.is_numeric
+            ? COLUMN_TYPE_CATEGORICAL
+            : COLUMN_TYPE_NUMERICAL
         );
         // Update column dictionary (columnId => column metadata)
         state.data[column.id] = column;
@@ -125,73 +77,29 @@ const columnsSlice = createSlice({
     },
 
     /**
-     * Marks a column as loading when a rename request is initiated.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string} action.payload.id - The ID of the column to rename.
-     */
-    renameColumnRequest(state, action) {
-      const { id } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = true;
-        column.status.error = null;
-      }
-    },
-
-    /**
      * Updates the column name after a successful rename operation.
+     * Accepts either a single column ID or an array of IDs as payload.
      *
      * @param {Object} state - The current state of the slice.
      * @param {Object} action - The dispatched action.
-     * @param {string} action.payload.id - The ID of the renamed column.
-     * @param {string} action.payload.newColumnName - The new name of the column.
+     * @param {string|string[]} action.payload.id - The ID(s) of the renamed column(s).
+     * @param {string} action.payload.newColumnName - The new name of the column(s).
      */
-    renameColumnSuccess(state, action) {
-      const { id, newColumnName } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = false;
-        column.status.error = null;
-        column.name = newColumnName;
+    renameColumns(state, action) {
+      let ids = action.payload.id;
+      const { newColumnName } = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
       }
+      ids.forEach((id) => {
+        const column = state.data[id];
+        if (column) {
+          column.name = newColumnName;
+        } else {
+          throw new Error(`Column with id ${id} not found`);
+        }
+      });
     },
-
-    /**
-     * Handles a failure to rename a column.
-     * Updates the column's error state.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string} action.payload.id - The ID of the column that failed to rename.
-     * @param {string} action.payload.error - The error message.
-     */
-    renameColumnFailure(state, action) {
-      const { id } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = false;
-        column.status.error = action.payload.error;
-      }
-    },
-
-    /**
-     * Marks a column as loading when a remove request is initiated.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string} action.payload - The ID of the column to remove.
-     */
-    removeColumnRequest(state, action) {
-      const id = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = true;
-        column.status.error = null;
-      }
-    },
-
     /**
      * Removes a column from the state after a successful removal operation.
      *
@@ -199,118 +107,159 @@ const columnsSlice = createSlice({
      * @param {Object} action - The dispatched action.
      * @param {string} action.payload.id - The ID of the removed column.
      */
-    removeColumnSuccess(state, action) {
-      const { id } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        if (column.status.isSelected) {
-          state.selected = state.selected.filter(
-            (selectedId) => selectedId !== id
-          );
-        }
-        delete state.data[id];
-        state.idsByTable[column.tableId] = state.idsByTable[
-          column.tableId
-        ].filter((cid) => cid !== id);
+    removeColumns(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
       }
-    },
-
-    /**
-     * Handles a failure to remove a column.
-     * Updates the column's error state.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string} action.payload.id - The ID of the column that failed to remove.
-     * @param {string} action.payload.error - The error message.
-     */
-    removeColumnFailure(state, action) {
-      const { id, error } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isLoading = false;
-        column.status.error = error;
-      }
-    },
-    setColumnDragStatus(state, action) {
-      const { id, isDragging } = action.payload;
-      const column = state.data[id];
-      if (column) {
-        column.status.isDragging = isDragging;
-      }
-    },
-    setColumnVisibleStatus(state, action) {
-      const { ids, isVisible } = action.payload;
       ids.forEach((id) => {
         const column = state.data[id];
         if (column) {
-          column.status.isVisible = isVisible;
+          // Remove the column from the data object
+          delete state.data[id];
+
+          // Remove the column ID from the idsByTable mapping
+          state.idsByTable[column.tableId] = state.idsByTable[
+            column.tableId
+          ].filter((cid) => cid !== id);
+
+          // Remove the column ID from the loading array if it exists
+          state.loading = state.loading.filter((cid) => cid !== id);
+        } else {
+          throw new Error(`Column with id ${id} not found`);
         }
       });
     },
-
-    /**
-     * Sets the `isLoading` status to `true` for both the source and target columns
-     * specified by their IDs in the action payload. This is typically used to indicate
-     * that a column swap operation is in progress.
-     *
-     * @param {Object} state - The current state of the columns slice.
-     * @param {Object} action - The Redux action containing the payload.
-     * @param {Object} action.payload - The payload object.
-     * @param {string|number} action.payload.sourceId - The ID of the source column.
-     * @param {string|number} action.payload.targetId - The ID of the target column.
-     */
-    swapColumnsRequest(state, action) {
-      const { sourceId, targetId } = action.payload;
-      const sourceColumn = state.data[sourceId];
-      const targetColumn = state.data[targetId];
-
-      if (sourceColumn && targetColumn) {
-        sourceColumn.status.isLoading = true;
-        targetColumn.status.isLoading = true;
+    addColumnsToDragging(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
       }
+      ids.forEach((id) => {
+        if (!state.dragging.includes(id)) {
+          state.dragging.push(id);
+        }
+      });
     },
-    swapColumnsSuccess(state, action) {
-      const { sourceId, targetId } = action.payload;
-      const sourceColumn = state.data[sourceId];
-      const targetColumn = state.data[targetId];
-
-      const sourceIndex =
-        state.idsByTable[sourceColumn.tableId].indexOf(sourceId);
-      const targetIndex =
-        state.idsByTable[targetColumn.tableId].indexOf(targetId);
-
-      // Swap the columns in the data object
-      state.data[sourceId].index,
-        (state.data[targetId].index = [targetColumn.index, sourceColumn.index]);
-
-      // Update the idsByTable mapping
-      [
-        state.idsByTable[sourceColumn.tableId][sourceIndex],
-        state.idsByTable[targetColumn.tableId][targetIndex],
-      ] = [targetColumn.id, sourceColumn.id];
-
-      // Remove loading status
-      sourceColumn.status.isLoading = false;
-      targetColumn.status.isLoading = false;
-    },
-    swapColumnsFailure(state, action) {
-      const { sourceId, targetId } = action.payload;
-      const sourceColumn = state.data[sourceId];
-      const targetColumn = state.data[targetId];
-
-      if (sourceColumn && targetColumn) {
-        sourceColumn.status.isLoading = false;
-        targetColumn.status.isLoading = false;
+    removeColumnsFromDragging(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
       }
+      state.dragging = state.dragging.filter(
+        (columnId) => !ids.includes(columnId)
+      );
+    },
+    setHoveredColumns(state, action) {
+      const columnIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.hovered = columnIds;
+    },
+    appendToHoveredColumns(state, action) {
+      const columnIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.hovered = [...state.hovered, ...columnIds];
+    },
+    removeFromHoveredColumns(state, action) {
+      const columnIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.hovered = state.hovered.filter(
+        (column) => !columnIds.includes(column)
+      );
+    },
+    clearHoveredColumns(state) {
+      state.hovered = initialState.hovered;
+    },
+    setValueCounts(state, action) {
+      const { values, counts, columnId } = action.payload;
+      if (values.length !== counts.length) {
+        throw new Error("The number of values must match the number of counts");
+      }
+      const column = state.data[columnId];
+      if (!column) {
+        throw new Error(`Column with id ${columnId} not found`);
+      }
+      values.forEach((valueId, i) => {
+        const count = counts[i];
+        column.values[valueId] = count; // Update count if value already exists
+      });
+    },
+
+    swapColumns(state, action) {
+      let { sourceId, targetId } = action.payload;
+      const sourceColumn = state.data[sourceId];
+      const targetColumn = state.data[targetId];
+
+      const sourceTable = sourceColumn.tableId;
+      const targetTable = targetColumn.tableId;
+
+      const sourceIndex = state.idsByTable[sourceTable].indexOf(sourceId);
+      const targetIndex = state.idsByTable[targetTable].indexOf(targetId);
+
+      // Swap the index property
+      const tempIndex = sourceColumn.index;
+      sourceColumn.index = targetColumn.index;
+      targetColumn.index = tempIndex;
+
+      // Swap the ids in idsByTable
+      state.idsByTable[sourceTable][sourceIndex] = targetId;
+      state.idsByTable[targetTable][targetIndex] = sourceId;
+    },
+    setColumnType(state, action) {
+      let { ids, columnTypes } = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      if (!Array.isArray(columnTypes)) {
+        columnTypes = [columnTypes];
+      }
+      if (ids.length !== columnTypes.length) {
+        throw new Error(
+          "The number of ids must match the number of columnTypes"
+        );
+      }
+      for (let columnType of columnTypes) {
+        if (!COLUMN_TYPES.includes(columnType)) {
+          throw new InvalidColumnTypeError(columnType);
+        }
+      }
+
+      ids.forEach((id, i) => {
+        const column = state.data[id];
+        const columnType = columnTypes[i];
+        if (column) {
+          column.columnType = columnType;
+        } else {
+          throw new Error(`Column with id ${id} not found`);
+        }
+      });
+    },
+    setSelectedColumns(state, action) {
+      if (!Array.isArray(action.payload)) {
+        throw new Error("setSelectedColumns: payload must be an array");
+      }
+      state.selected = action.payload;
+    },
+    appendToSelectedColumns(state, action) {
+      const columnIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.selected = [...state.selected, ...columnIds];
+    },
+    clearSelectedColumns(state) {
+      state.selected = initialState.selected;
+    },
+    removeFromSelectedColumns(state, action) {
+      state.selectedColumns = state.selectedColumns.filter(
+        (column) => column !== action.payload
+      );
     },
     fetchValuesRequest(state, action) {
       const { id } = action.payload;
       const column = state.data[id];
-      if (column) {
-        column.status.isLoading = true;
-        column.status.error = null;
-      }
     },
     fetchValuesSuccess(state, action) {
       const { id, valueCounts } = action.payload;
@@ -323,8 +272,6 @@ const columnsSlice = createSlice({
             column.values[value] = column.values[value].concat(indicesArray);
           }
         });
-        column.status.isLoading = false;
-        column.status.error = null;
       } else {
         throw new Error(`Column with id ${id} not found`);
       }
@@ -332,10 +279,35 @@ const columnsSlice = createSlice({
     fetchValuesFailure(state, action) {
       const { id, error } = action.payload;
       const column = state.data[id];
-      if (column) {
-        column.status.isLoading = false;
-        column.status.error = error;
+    },
+
+    addColumnsToLoading(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
       }
+      ids.forEach((id) => {
+        if (!state.loading.includes(id)) {
+          state.loading.push(id);
+        }
+      });
+    },
+    removeColumnsFromLoading(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      state.loading = state.loading.filter(
+        (columnId) => !ids.includes(columnId)
+      );
+    },
+    setErrorForColumn(state, action) {
+      const { id, error } = action.payload;
+      state.errors[id] = error;
+    },
+    removeErrorForColumn(state, action) {
+      const { id } = action.payload;
+      delete state.errors[id];
     },
   }, // end reducers
 });
@@ -343,22 +315,28 @@ const columnsSlice = createSlice({
 export default columnsSlice.reducer;
 
 export const {
-  fetchSourceTableColumnsRequest,
-  fetchSourceTableColumnsSuccess,
-  fetchSourceTableColumnsFailure,
-  addColumnsFromOpenRefine,
-  renameColumnRequest,
-  renameColumnSuccess,
-  renameColumnFailure,
-  removeColumnRequest,
-  removeColumnSuccess,
-  removeColumnFailure,
-  setColumnDragStatus,
-  setColumnVisibleStatus,
-  swapColumnsRequest,
-  swapColumnsSuccess,
-  swapColumnsFailure,
   fetchValuesRequest,
   fetchValuesSuccess,
   fetchValuesFailure,
+
+  addColumnsFromOpenRefine,
+  swapColumns,
+  renameColumns,
+  removeColumns,
+  addColumnsToLoading,
+  removeColumnsFromLoading,
+  setErrorForColumn,
+  removeErrorForColumn,
+  addColumnsToDragging,
+  removeColumnsFromDragging,
+  setHoveredColumns,
+  appendToHoveredColumns,
+  removeFromHoveredColumns,
+  clearHoveredColumns,
+  setColumnType,
+  setSelectedColumns,
+  appendToSelectedColumns,
+  clearSelectedColumns,
+  removeFromSelectedColumns,
+  setValueCounts,
 } = columnsSlice.actions;

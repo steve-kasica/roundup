@@ -1,16 +1,50 @@
-import { takeEvery, put, all } from "redux-saga/effects";
-import { removeColumnRequest } from "../slices/columnsSlice";
+import { put, call, select, takeEvery, fork, all } from "redux-saga/effects";
+import {
+  removeColumns,
+  addColumnsToLoading,
+  removeColumnsFromLoading,
+  setErrorForColumn,
+  selectColumnById,
+} from "../slices/columnsSlice";
+import OpenRefine from "../../services/open-refine";
+import { decrementColumnCount } from "../slices/sourceTablesSlice";
 import { createAction } from "@reduxjs/toolkit";
 
-export const removeColumns = createAction("columns/removeMultipleColumns");
+export const removeColumnsAction = createAction("columns/removeColumn");
 
 export default function* removeColumnsSaga() {
-  yield takeEvery(removeColumns.type, removeColumnsSagaWorker);
+  yield takeEvery(removeColumnsAction.type, function* (action) {
+    // Accepts either a single id or an array of ids
+    let ids = action.payload;
+    if (!Array.isArray(ids)) ids = [ids];
+    // Run a child saga for each id in parallel
+    yield all(ids.map((id) => fork(removeColumnsSagaWorker, { payload: id })));
+  });
 }
 
 function* removeColumnsSagaWorker(action) {
-  const columnIds = action.payload;
+  const id = action.payload;
 
-  // Dispatch removeColumnRequest for each columnId in parallel
-  yield all(columnIds.map((id) => put(removeColumnRequest(id))));
+  const { tableId: projectId, name } = yield select((state) =>
+    selectColumnById(state, id)
+  );
+  const csrf_token = "csrf_token"; // TODO: get this from the OpenRefine API
+
+  yield put(addColumnsToLoading(id));
+
+  try {
+    // Call the OpenRefine API
+    yield call(OpenRefine.removeColumn, projectId, name, csrf_token);
+  } catch (error) {
+    yield put(setErrorForColumn({ id, error }));
+  }
+
+  // Remove column from source columns slice
+  yield put(removeColumns(id));
+
+  // If successful, remove loading state for the column
+  yield put(removeColumnsFromLoading(id));
+
+  // Update column count of associated table
+  yield put(decrementColumnCount({ projectId }));
 }

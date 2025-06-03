@@ -2,79 +2,94 @@ import { describe, it, expect } from "vitest";
 import {
   selectColumnIdsByTableId,
   selectColumnById,
-  selectColumnLoadingStatus,
-  selectColumnsByTable,
-  selectColumnError,
-  selectLoadingColumnsByTable,
-  selectColumnIdsByIndex,
+  selectSelectedColumns,
+  selectHoveredColumns,
+  selectLoadingColumns,
+  selectDraggingColumns,
+  selectColumnsByIndex,
+  selectColumnValues,
 } from "./columnSelectors";
 
-describe("columnSelectors", () => {
-  const mockState = {
-    columns: {
-      idsByTable: {
-        table1: ["col1", "col2"],
-        table2: ["col3"],
-      },
-      data: {
-        col1: { id: "col1", name: "Column 1", loading: false, error: null },
-        col2: { id: "col2", name: "Column 2", loading: true, error: "Error" },
-        col3: { id: "col3", name: "Column 3", loading: false, error: null },
-      },
+const mockState = {
+  columns: {
+    idsByTable: {
+      table1: ["col1", "col2"],
+      table2: ["col3"],
     },
-  };
+    data: {
+      col1: { id: "col1", name: "A", values: [1, 2] },
+      col2: { id: "col2", name: "B", values: [3, 4] },
+      col3: { id: "col3", name: "C", values: [5, 6] },
+    },
+    selected: ["col1"],
+    hovered: ["col2"],
+    loading: ["col3"],
+    dragging: ["col2"],
+  },
+};
 
-  it("selectColumnIdsByTableId should return column IDs for a specific table", () => {
-    expect(selectColumnIdsByTableId(mockState, "table1")).toEqual([
-      "col1",
-      "col2",
-    ]);
+describe("columnSelectors", () => {
+  it("selectColumnIdsByTableId returns column IDs for a table", () => {
+    expect(selectColumnIdsByTableId(mockState, "table1")).toEqual(["col1", "col2"]);
     expect(selectColumnIdsByTableId(mockState, "table2")).toEqual(["col3"]);
-    expect(selectColumnIdsByTableId(mockState, "table3")).toBeUndefined();
   });
 
-  it("selectColumnById should return a specific column by its ID", () => {
-    expect(selectColumnById(mockState, "col1")).toEqual({
-      id: "col1",
-      name: "Column 1",
-      loading: false,
-      error: null,
-    });
-    expect(selectColumnById(mockState, "col4")).toBeUndefined();
+  it("selectColumnIdsByTableId returns [] for missing table", () => {
+    expect(selectColumnIdsByTableId(mockState, "tableX")).toEqual([]);
   });
 
-  it("selectColumnLoadingStatus should return the loading status of a column", () => {
-    expect(selectColumnLoadingStatus(mockState, "col1")).toBe(false);
-    expect(selectColumnLoadingStatus(mockState, "col2")).toBe(true);
-    expect(selectColumnLoadingStatus(mockState, "col4")).toBe(false);
+  it("selectColumnById returns the correct column object", () => {
+    expect(selectColumnById(mockState, "col1")).toEqual({ id: "col1", name: "A", values: [1, 2] });
+    expect(selectColumnById(mockState, "col3")).toEqual({ id: "col3", name: "C", values: [5, 6] });
   });
 
-  it("selectColumnsByTable should return all columns for a specific table", () => {
-    expect(selectColumnsByTable(mockState, "table1")).toEqual([
-      { id: "col1", name: "Column 1", loading: false, error: null },
-      { id: "col2", name: "Column 2", loading: true, error: "Error" },
+  it("selectColumnById returns null for missing column", () => {
+    expect(selectColumnById(mockState, "colX")).toBeNull();
+  });
+
+  it("selectSelectedColumns returns selected column IDs", () => {
+    expect(selectSelectedColumns(mockState)).toEqual(["col1"]);
+  });
+
+  it("selectHoveredColumns returns hovered column IDs", () => {
+    expect(selectHoveredColumns(mockState)).toEqual(["col2"]);
+  });
+
+  it("selectLoadingColumns returns loading column IDs", () => {
+    expect(selectLoadingColumns(mockState)).toEqual(["col3"]);
+  });
+
+  it("selectDraggingColumns returns dragging column IDs", () => {
+    expect(selectDraggingColumns(mockState)).toEqual(["col2"]);
+  });
+
+  it("selectColumnsByIndex returns columns at given index for each table", () => {
+    // index 0 for table1 and table2
+    const result = selectColumnsByIndex(mockState, 0, ["table1", "table2"]);
+    expect(result).toEqual([
+      { id: "col1", name: "A", values: [1, 2] },
+      { id: "col3", name: "C", values: [5, 6] },
     ]);
-    expect(selectColumnsByTable(mockState, "table2")).toEqual([
-      { id: "col3", name: "Column 3", loading: false, error: null },
+    // index 1 for table1 and table2 (table2 only has one column)
+    const result2 = selectColumnsByIndex(mockState, 1, ["table1", "table2"]);
+    expect(result2).toEqual([
+      { id: "col2", name: "B", values: [3, 4] },
+      null,
     ]);
   });
 
-  it("selectColumnError should return the error message of a column", () => {
-    expect(selectColumnError(mockState, "col1")).toBe(null);
-    expect(selectColumnError(mockState, "col2")).toBe("Error");
-    expect(selectColumnError(mockState, "col4")).toBe(null);
+  it("selectColumnValues returns values for given column IDs", () => {
+    expect(selectColumnValues(mockState, ["col1", "col3"]))
+      .toEqual({ col1: [1, 2], col3: [5, 6] });
   });
 
-  it("selectLoadingColumnsByTable should return all loading columns for a specific table", () => {
-    expect(selectLoadingColumnsByTable(mockState, "table1")).toEqual([
-      { id: "col2", name: "Column 2", loading: true, error: "Error" },
-    ]);
-    expect(selectLoadingColumnsByTable(mockState, "table2")).toEqual([]);
+  it("selectColumnValues omits missing columns", () => {
+    expect(selectColumnValues(mockState, ["col1", "colX"]))
+      .toEqual({ col1: [1, 2] });
   });
 
-  it("selectColumnIdsByIndex should return column IDs at a specific index across all tables", () => {
-    expect(selectColumnIdsByIndex(mockState, 0)).toEqual(["col1", "col3"]);
-    expect(selectColumnIdsByIndex(mockState, 1)).toEqual(["col2", null]);
-    expect(selectColumnIdsByIndex(mockState, 2)).toEqual([null, null]);
+  it("selectColumnValues returns empty object for empty input", () => {
+    expect(selectColumnValues(mockState, [])).toEqual({});
+    expect(selectColumnValues(mockState, null)).toEqual({});
   });
 });

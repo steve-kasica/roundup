@@ -17,7 +17,7 @@ import OperationDetail from "./components/OperationDetail";
 import OperationsList from "./components/OperationsList";
 import CustomDragLayer from "./CustomDragLayer";
 import { useSelector } from "react-redux";
-import { selectSelectedColumnIds } from "./data/slices/columnsSlice";
+import { selectSelectedColumns } from "./data/slices/columnsSlice";
 
 function App() {
   return (

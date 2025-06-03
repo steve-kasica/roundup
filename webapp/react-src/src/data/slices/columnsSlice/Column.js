@@ -1,3 +1,42 @@
+/*
+ * Column.js
+ *
+ * This module defines the structure and utilities for handling column metadata within a table data context.
+ * It provides a serializable factory function for creating columns, constants for column types, a type-checking utility,
+ * and a custom error class for invalid column types.
+ *
+ * Exports:
+ *
+ * - DATA_TYPE: Identifies the data type as "COLUMN".
+ * - COLUMN_TYPE_CATEGORICAL: String constant "CATEGORICAL" for categorical columns.
+ * - COLUMN_TYPE_NUMERICAL: String constant "NUMERICAL" for numerical columns.
+ * - COLUMN_TYPES: Array of valid column types (["NUMERICAL", "CATEGORICAL"]).
+ *
+ * - Column(tableId, index, name, columnType):
+ *     Factory function to create a new column object with a unique ID, associated table ID, name, index, type,
+ *     and an empty values object. Throws an error if required parameters are missing or if columnType is invalid.
+ *
+ * - isColumn(obj):
+ *     Checks if a given object matches the structure of a column created by the factory function.
+ *     Returns true if the object is a valid column, otherwise false.
+ *
+ * - InvalidColumnTypeError:
+ *     Custom error class for handling invalid column type assignments. Extends the standard Error class and
+ *     provides a descriptive error message.
+ *
+ * Usage:
+ *
+ * - Use the Column function to create new serializable column objects for storing data in Redux.
+ * - Use isColumn to verify if an object is a valid column.
+ * - Use the constants to ensure type safety and consistency across the codebase.
+ * - Catch InvalidColumnTypeError to handle invalid column type errors specifically.
+ */
+
+/**
+ * Counter used to generate unique IDs for columns.
+ * @type {number}
+ * @private
+ */
 let idCounter = 0;
 
 /**
@@ -7,69 +46,47 @@ let idCounter = 0;
  */
 export const DATA_TYPE = "COLUMN";
 
+export const COLUMN_TYPE_CATEGORICAL = "CATEGORICAL";
+export const COLUMN_TYPE_NUMERICAL = "NUMERICAL";
 /**
- * @constant {string} COLUMN_STATUS_VISABLE
- * Represents the default visible state of a column.
- */
-export const COLUMN_STATUS_VISABLE = "visable";
-
-/**
- * @constant {string} COLUMN_STATUS_REMOVED
- * Represents a column that has been removed.
- */
-export const COLUMN_STATUS_REMOVED = "removed";
-
-/**
- * @constant {string} COLUMN_STATUS_NULLED
- * Represents a column that has been nulled or reset.
- */
-export const COLUMN_STATUS_NULLED = "nulled";
-
-/**
- * @constant {string} COLUMN_STATUS_LOADING
- * Represents a column that is in the process of loading.
- */
-export const COLUMN_STATUS_LOADING = "loading";
-
-/**
- * Factory function to create a Column object.
+ * An array containing the supported column types.
  *
- * @function
- * @param {string} tableId - The ID of the parent object to which the column belongs. Required.
- * @param {number} index - The index of the column. Required.
- * @param {string} [name] - The name of the column.
- * @param {string} [columnType] - The type of the column.
- * @param {string} [status=COLUMN_STATUS_VISABLE] - The status of the column. Defaults to `COLUMN_STATUS_VISABLE`.
- * @throws {Error} Throws an error if `tableId` is undefined.
- * @throws {Error} Throws an error if `index` is undefined.
- * @returns {Object} A column object with the following properties:
- * - `id` {string}: A unique identifier for the column.
- * - `tableId` {string}: The ID of the parent table object.
- * - `name` {string}: The name of the column.
- * - `index` {number}: The index of the column.
- * - `columnType` {string}: The type of the column.
- * - `status` {string}: The status of the column.
- * - `error` {null}: Initially set to `null`.
+ * @constant
+ * @type {Array<string>}
+ * @see COLUMN_TYPE_NUMERICAL
+ * @see COLUMN_TYPE_CATEGORICAL
  *
  * @example
- * import { Column, COLUMN_STATUS_LOADING } from './Column';
+ * // Check if a type is supported
+ * if (COLUMN_TYPES.includes(type)) {
+ *   // handle supported type
+ * }
+ */
+export const COLUMN_TYPES = [COLUMN_TYPE_NUMERICAL, COLUMN_TYPE_CATEGORICAL];
+
+/**
+ * Creates a new column metadata object.
  *
- * const newColumn = Column('parent-1', 0, 'Column Name', 'text', COLUMN_STATUS_LOADING);
- * // {
- * //   id: 'c-0',
- * //   tableId: 'parent-1',
- * //   name: 'Column Name',
- * //   index: 0,
- * //   columnType: 'text',
- * //   status: 'loading',
- * //   error: null
- * // }
+ * @param {string|number} tableId - The unique identifier of the table this column belongs to.
+ * @param {number} index - The index/position of the column in the table.
+ * @param {string} name - The display name of the column.
+ * @param {string} columnType - The type of the column. Must be one of the values in COLUMN_TYPES.
+ * @throws {Error} If any required parameter is undefined or if columnType is invalid.
+ * @returns {Object} The newly created column object with properties: id, tableId, name, index, columnType, and values.
  */
 export default function Column(tableId, index, name, columnType) {
   if (tableId === undefined) {
     throw new Error("Param undefined `tableId`");
   } else if (index === undefined) {
     throw new Error("Param undefined, `index`");
+  } else if (columnType === undefined) {
+    throw new Error("Param undefined, `columnType`");
+  } else if (!COLUMN_TYPES.includes(columnType)) {
+    throw new Error(
+      `Invalid columnType: ${columnType}. Must be one of ${COLUMN_TYPES.join(
+        ", "
+      )}`
+    );
   }
 
   return {
@@ -78,24 +95,7 @@ export default function Column(tableId, index, name, columnType) {
     name,
     index,
     columnType,
-    error: null,
     values: {},
-    status: {
-      isLoading: true, // Initially set to true to indicate loading state,
-      isDragging: false,
-      error: null,
-    },
-  };
-}
-
-export function ColumnValue(value, label = null, rowIndices = []) {
-  if (value === undefined) {
-    throw new Error("Param undefined `value`");
-  }
-  return {
-    value,
-    label,
-    rowIndices,
   };
 }
 
@@ -112,14 +112,35 @@ export function isColumn(obj) {
   return (
     obj &&
     typeof obj === "object" &&
+    "id" in obj &&
     typeof obj.id === "string" &&
     obj.id.startsWith("c-") &&
-    typeof obj.tableId === "string" &&
-    typeof obj.index === "number" &&
+    "tableId" in obj &&
     "name" in obj &&
-    "columnType" in obj &&
-    typeof obj.status === "string" &&
-    obj.error === null &&
-    typeof obj.isSelected === "boolean"
+    "index" in obj &&
+    "columnType" in obj
   );
+}
+
+/**
+ * Error thrown when an invalid column type is provided.
+ * There is no built-in JavaScript Error class specifically for invalid enum/type cases like this.
+ * I define my own InvalidColumnTypeError to distinguish this error type in the codebase.
+ *
+ * @class
+ * @extends Error
+ * @param {string} columnType - The invalid column type that was provided.
+ * @property {string} name - The name of the error ("InvalidColumnTypeError").
+ * @example
+ * throw new InvalidColumnTypeError('foo');
+ */
+export class InvalidColumnTypeError extends Error {
+  constructor(columnType) {
+    super(
+      `Invalid columnType: ${columnType}. Must be one of ${COLUMN_TYPES.join(
+        ", "
+      )}`
+    );
+    this.name = "InvalidColumnTypeError";
+  }
 }

@@ -1,9 +1,9 @@
 import { useSelector } from "react-redux";
-import { selectSelectedColumnIds } from "../../data/slices/uiSlice";
+import { selectSelectedColumns } from "../../data/slices/columnsSlice";
 import ColumnValueMatrix from "./ColumnValueMatrix";
 
 export default function SelectedColumns() {
-  const selectedColumnIds = useSelector(selectSelectedColumnIds);
+  const selectedColumnIds = useSelector(selectSelectedColumns);
   console.log("Selected column IDs:", selectedColumnIds);
   return <ColumnValueMatrix columnIds={selectedColumnIds} />;
 }

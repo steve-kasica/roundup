@@ -6,15 +6,15 @@ import StackDetailToolbar from "./StackDetailToolbar";
 
 import "./StackDetail.scss";
 import { useEffect } from "react";
-import {
-  selectColumnIdsByTableIds,
-  setColumnVisibleStatus,
-} from "../../../data/slices/columnsSlice";
+import { selectColumnIdsByTableId } from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
 import { selectTables } from "../../../data/slices/sourceTablesSlice/tablesSelector";
+import { useMemo } from "react";
 import {
   setHoveredTable,
   clearHoveredTable,
+  addToOpsDetailVisableColumns,
+  removeFromOpsDetailVisableColumns,
 } from "../../../data/slices/uiSlice";
 
 const yAxisLabel = "table name";
@@ -23,15 +23,26 @@ const cellSize = 50; // height and width of cells (in pixels)
 
 export default function StackDetailView({ tableIds }) {
   const dispatch = useDispatch();
+  console.log("StackDetailView", tableIds);
 
   const tables = useSelector(
     (state) => selectTables(state, tableIds) // Selector is memoized
   );
-  const columnIdsByTable = useSelector(
-    (state) => selectColumnIdsByTableIds(state, tableIds) // Selector is memoized
+
+  // TODO: this wouldn't be necessary if columnIds were stored in the table object
+  // This is al ot just to get the max column count in a table
+  const columnIdsByTable = useSelector((state) =>
+    tableIds.map((id) => selectColumnIdsByTableId(state, id))
+  );
+  // Memoize to avoid returning a new array unless tableIds or columnIdsByTable change
+  const memoizedColumnIdsByTable = useMemo(
+    () => columnIdsByTable,
+    [JSON.stringify(columnIdsByTable)]
+  );
+  const maxColumnCount = Math.max(
+    ...memoizedColumnIdsByTable.map((c) => c.length)
   );
 
-  const maxColumnCount = Math.max(...columnIdsByTable.map((c) => c.length));
   const width = maxColumnCount * cellSize;
   const xScale = scaleBand(
     Array.from({ length: maxColumnCount }, (_, i) => i),
@@ -53,7 +64,11 @@ export default function StackDetailView({ tableIds }) {
             .getAttribute("data-columnids")
             .split(",");
           const isVisible = entry.isIntersecting;
-          dispatch(setColumnVisibleStatus({ ids: columnIds, isVisible }));
+          if (isVisible) {
+            dispatch(addToOpsDetailVisableColumns(columnIds));
+          } else {
+            dispatch(removeFromOpsDetailVisableColumns(columnIds));
+          }
         });
       },
       {

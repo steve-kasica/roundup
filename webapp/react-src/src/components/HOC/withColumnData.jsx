@@ -1,26 +1,28 @@
 import { useSelector, useDispatch } from "react-redux";
-import {
-  selectColumnById,
-  selectColumnIdsByTableId,
-} from "../../data/slices/columnsSlice/columnSelectors";
+
 import {
   DATA_TYPE as COLUMN,
-  removeColumnRequest,
-  renameColumnRequest,
-  setColumnDragStatus,
-  swapColumnsRequest,
-} from "../../data/slices/columnsSlice";
-import {
-  clearSelectedColumns,
-  appendToSelectedColumns,
-  removeFromSelectedColumns,
-  isColumnSelected,
-  selectFirstSelectedColumn,
-  setSelectedColumns,
+  selectColumnById,
+  selectColumnIdsByTableId,
+  swapColumns,
+  addColumnsToDragging,
+  removeColumnsFromDragging,
   setHoveredColumns,
   removeFromHoveredColumns,
   selectHoveredColumns,
-} from "../../data/slices/uiSlice";
+  selectLoadingColumns,
+  setSelectedColumns,
+  clearSelectedColumns,
+  appendToSelectedColumns,
+  removeFromSelectedColumns,
+  selectSelectedColumns,
+} from "../../data/slices/columnsSlice";
+
+import { renameColumnsAction } from "../../data/sagas/renameColumnsSaga";
+import { removeColumnsAction } from "../../data/sagas/removeColumnsSaga";
+
+import { selectFirstSelectedColumn } from "../../data/slices/uiSlice";
+
 import { useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
@@ -34,6 +36,8 @@ export default function withColumnData(WrappedComponent) {
     );
     const firstSelectedColumnId = useSelector(selectFirstSelectedColumn);
     const hoveredColumns = useSelector(selectHoveredColumns);
+    const loadingColumns = useSelector(selectLoadingColumns);
+    const selectedColumns = useSelector(selectSelectedColumns);
 
     const name = column?.name;
     const tableId = column?.tableId;
@@ -41,7 +45,7 @@ export default function withColumnData(WrappedComponent) {
     const columnType = column?.columnType;
     const values = column?.values;
     const isNull = !column;
-    const isSelected = useSelector((state) => isColumnSelected(state, id));
+    const isSelected = selectedColumns.includes(id);
     const error = column?.error;
 
     const [{ isDragging }, dragRef, previewRef] = useDrag({
@@ -61,7 +65,11 @@ export default function withColumnData(WrappedComponent) {
     });
 
     useEffect(() => {
-      dispatch(setColumnDragStatus({ id, isDragging }));
+      if (isDragging) {
+        dispatch(addColumnsToDragging(id));
+      } else {
+        dispatch(removeColumnsFromDragging(id));
+      }
     }, [isDragging, id, dispatch]);
 
     const [{ isOver }, dropRef] = useDrop({
@@ -70,7 +78,7 @@ export default function withColumnData(WrappedComponent) {
         // In this context `droppedItem.id` === `id` in useDrag
 
         if (droppedItem.tableId === tableId && !isNull) {
-          swapColumnWithinTable(droppedItem.id, id);
+          dispatch(swapColumns({ sourceId: droppedItem.id, targetId: id }));
         }
         unDragColumn();
         dispatch(clearSelectedColumns());
@@ -98,33 +106,27 @@ export default function withColumnData(WrappedComponent) {
         values={values}
         isNull={isNull}
         isSelected={isSelected}
-        isLoading={column?.status.isLoading}
+        isLoading={loadingColumns.includes(id)}
         isHovered={hoveredColumns.includes(id)}
         isDragging={isDragging}
         isOver={isOver}
         error={error}
         hoverColumn={hoverColumn}
         unHoverColumn={unHoverColumn}
-        renameColumn={() => {
-          if (!isNull) {
+        renameColumn={(newName) => {
+          if (!isNull)
             dispatch(
-              // TODO: de-OpenRefine this action,
-              // actions should be agnostic at this layer
-              // and not depend on OpenRefine's data model
-              renameColumnRequest({
-                projectId: tableId,
-                oldColumnName: name,
-                newColumnName: newName,
+              renameColumnsAction({
                 id,
+                newColumnName: newName,
               })
             );
-          }
         }}
         unfocusColumn={unfocusColumn}
-        dragColumn={dragColumn}
+        dragColumn={() => (!isNull ? dispatch(addColumnsToDragging(id)) : null)}
         unDragColumn={unDragColumn}
         removeColumn={() => {
-          if (!isNull) dispatch(removeColumnRequest(id));
+          if (!isNull) dispatch(removeColumnsAction(id));
         }}
         addColumnToSelection={() => {
           if (!isNull) dispatch(appendToSelectedColumns(id));
@@ -151,17 +153,8 @@ export default function withColumnData(WrappedComponent) {
       />
     );
 
-    function swapColumnWithinTable(sourceId, targetId) {
-      dispatch(swapColumnsRequest({ sourceId, targetId }));
-    }
-
-    function dragColumn() {
-      if (!isNull) {
-        dispatch(setColumnDragStatus({ id, isDragging: true }));
-      }
-    }
     function unDragColumn() {
-      dispatch(setColumnDragStatus({ id, isDragging: false }));
+      if (!isNull) dispatch(removeColumnsFromDragging(id));
     }
 
     function unfocusColumn() {

@@ -1,21 +1,22 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { selectColumnsByIndex } from "../../data/slices/columnsSlice/columnSelectors";
 import { useEffect, useMemo } from "react";
-import { setColumnDragStatus } from "../../data/slices/columnsSlice";
 import {
+  addColumnsToDragging,
+  selectColumnsByIndex,
+  removeColumnsFromDragging,
   setHoveredColumns,
   removeFromHoveredColumns,
+  setSelectedColumns,
   clearHoveredColumns,
-} from "../../data/slices/uiSlice";
+  selectSelectedColumns,
+} from "../../data/slices/columnsSlice";
+
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-import { swapColumnIndices } from "../../data/sagas/swapColumnIndicesSaga";
-import {
-  setDrawerContents,
-  setSelectedColumns,
-} from "../../data/slices/uiSlice";
+import { setDrawerContents } from "../../data/slices/uiSlice";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnValueMatrix";
+import { swapColumnsAction } from "../../data/sagas/swapColumnsSaga";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
 
@@ -38,6 +39,8 @@ export default function withColumnVectorData(WrappedComponent) {
       return columns.map((col) => col?.id).filter(Boolean); // columns may be null
     }, [columns]);
 
+    const selectedColumnIds = useSelector(selectSelectedColumns);
+
     const [{ isDragging }, dragRef, previewRef] = useDrag({
       type: COLUMN_INDEX,
       item: () => {
@@ -47,19 +50,23 @@ export default function withColumnVectorData(WrappedComponent) {
         isDragging: monitor.isDragging(),
       }),
       end: () => {
-        // This is called when the drag operation ends
-        columnIds.forEach((id) => {
-          dispatch(setColumnDragStatus({ id, isDragging: false }));
-          dispatch(removeFromHoveredColumns(id));
-        });
+        // Dispatch certain actions when the drag operation ends,
+        // regardless of whether or it reached a drop target
+        dispatch(removeColumnsFromDragging(columnIds));
+        dispatch(removeFromHoveredColumns(columnIds));
       },
     });
 
-    useEffect(() => {
-      columnIds.forEach((id) => {
-        dispatch(setColumnDragStatus({ id, isDragging }));
-      });
-    }, [isDragging, columnIds, dispatch]);
+    // This useEffect is to make the isDragging state available globally
+    // TODO: causing an infinite loop
+    // useEffect(() => {
+    //   console.log("Column vector drag state changed:", isDragging, columnIds);
+    //   if (isDragging) {
+    //     // dispatch(addColumnsToDragging(columnIds));
+    //   } else {
+    //     // dispatch(removeFromHoveredColumns(columnIds));
+    //   }
+    // }, [isDragging, columnIds, dispatch]);
 
     const [{ isHovered }, dropRef] = useDrop({
       accept: COLUMN_INDEX,
@@ -67,9 +74,9 @@ export default function withColumnVectorData(WrappedComponent) {
         // Remember, in this context `droppedItem.columnIds` === `columnIds` in useDrag
         if (droppedItem.index !== index) {
           dispatch(
-            swapColumnIndices({
-              sourceColumnIds: droppedItem.columnIds,
-              targetColumnIds: columnIds,
+            swapColumnsAction({
+              sourceIds: droppedItem.columnIds,
+              targetIds: columnIds,
             })
           );
         }
@@ -90,7 +97,9 @@ export default function withColumnVectorData(WrappedComponent) {
         index={index}
         columnIds={columnIds}
         columnNames={columns.map((col) => col?.name || "")}
-        hasSelected={columns.some((col) => col?.status.isSelected)}
+        hasSelected={
+          new Set(columnIds).intersection(new Set(selectedColumnIds)).size > 0
+        }
         dragRef={dragRef}
         dropRef={dropRef}
         isDragging={isDragging}

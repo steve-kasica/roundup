@@ -7,10 +7,8 @@ import Typography from "@mui/material/Typography";
 import Drawer from "@mui/material/Drawer";
 import { selectDrawerContents } from "../data/slices/uiSlice/uiSliceSelectors";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  clearSelectedColumns,
-  setDrawerContents,
-} from "../data/slices/uiSlice/uiSlice";
+import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
+import { clearSelectedColumns } from "../data/slices/columnsSlice";
 import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TableView/SelectedTableView";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnValueMatrix";
 import { Button, IconButton } from "@mui/material";
