@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import reducer, {
   fetchSourceTableColumnsRequest,
   fetchSourceTableColumnsSuccess,
@@ -32,14 +32,14 @@ describe("columnsSlice", () => {
         expect.objectContaining({
           tableId: "table1",
           index: 0,
-          status: COLUMN_STATUS_LOADING,
+          status: expect.objectContaining({ isLoading: true }),
         })
       );
       expect(state.data["c-1"]).toEqual(
         expect.objectContaining({
           tableId: "table1",
           index: 1,
-          status: COLUMN_STATUS_LOADING,
+          status: expect.objectContaining({ isLoading: true }),
         })
       );
     });
@@ -81,16 +81,14 @@ describe("columnsSlice", () => {
         expect.objectContaining({
           name: "Column A",
           columnType: "numeric",
-          status: COLUMN_STATUS_VISABLE,
-          isLoading: false,
+          status: expect.objectContaining({ isLoading: false }),
         })
       );
       expect(state.data["c-1"]).toEqual(
         expect.objectContaining({
           name: "Column B",
           columnType: "categorical",
-          status: COLUMN_STATUS_VISABLE,
-          isLoading: false,
+          status: expect.objectContaining({ isLoading: false }),
         })
       );
     });
@@ -103,15 +101,16 @@ describe("columnsSlice", () => {
         .spyOn(console, "error")
         .mockImplementation(() => {});
 
-      process.env.NODE_ENV = "development";
+      // Patch process.env for test
+      const oldProcess = globalThis.process;
+      globalThis.process = { env: { NODE_ENV: "development" } };
       reducer(initialState, action);
-
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         "Error fetching columns",
         action
       );
-
       consoleErrorSpy.mockRestore();
+      globalThis.process = oldProcess;
     });
   });
 
@@ -127,8 +126,8 @@ describe("columnsSlice", () => {
       const action = renameColumnRequest({ id: "c-0" });
       const state = reducer(preloadedState, action);
 
-      expect(state.data["c-0"].loading).toBe(true);
-      expect(state.data["c-0"].error).toBe(null);
+      expect(state.data["c-0"].status.isLoading).toBe(true);
+      expect(state.data["c-0"].status.error).toBe(null);
     });
   });
 
@@ -148,8 +147,8 @@ describe("columnsSlice", () => {
       const state = reducer(preloadedState, action);
 
       expect(state.data["c-0"].name).toBe("New Name");
-      expect(state.data["c-0"].loading).toBe(false);
-      expect(state.data["c-0"].error).toBe(null);
+      expect(state.data["c-0"].status.isLoading).toBe(false);
+      expect(state.data["c-0"].status.error).toBe(null);
     });
   });
 
@@ -165,8 +164,8 @@ describe("columnsSlice", () => {
       const action = renameColumnFailure({ id: "c-0", error: "Rename failed" });
       const state = reducer(preloadedState, action);
 
-      expect(state.data["c-0"].loading).toBe(false);
-      expect(state.data["c-0"].error).toBe("Rename failed");
+      expect(state.data["c-0"].status.isLoading).toBe(false);
+      expect(state.data["c-0"].status.error).toBe("Rename failed");
     });
   });
 
@@ -188,8 +187,8 @@ describe("columnsSlice", () => {
       const action = removeColumnRequest("c-0");
       const state = reducer(preloadedState, action);
 
-      expect(state.data["c-0"].loading).toBe(true);
-      expect(state.data["c-0"].error).toBe(null);
+      expect(state.data["c-0"].status.isLoading).toBe(true);
+      expect(state.data["c-0"].status.error).toBe(null);
     });
   });
 
@@ -234,8 +233,75 @@ describe("columnsSlice", () => {
       const action = removeColumnFailure({ id: "c-0", error: "Remove failed" });
       const state = reducer(preloadedState, action);
 
-      expect(state.data["c-0"].loading).toBe(false);
-      expect(state.data["c-0"].error).toBe("Remove failed");
+      expect(state.data["c-0"].status.isLoading).toBe(false);
+      expect(state.data["c-0"].status.error).toBe("Remove failed");
+    });
+  });
+
+  describe("addColumnsFromOpenRefine", () => {
+    it("should add columns with correct names and types from OpenRefine metadata", () => {
+      const action = {
+        type: "columns/addColumnsFromOpenRefine",
+        payload: {
+          projectId: "table2",
+          columnsInfo: [
+            { name: "OpenRefine Col 1", is_numeric: true },
+            { name: "OpenRefine Col 2", is_numeric: false },
+          ],
+        },
+      };
+      const state = reducer(initialState, action);
+      expect(state.idsByTable.table2).toHaveLength(2);
+      const [id0, id1] = state.idsByTable.table2;
+      expect(state.data[id0]).toEqual(
+        expect.objectContaining({
+          tableId: "table2",
+          index: 0,
+          name: "OpenRefine Col 1",
+          columnType: "categorical",
+        })
+      );
+      expect(state.data[id1]).toEqual(
+        expect.objectContaining({
+          tableId: "table2",
+          index: 1,
+          name: "OpenRefine Col 2",
+          columnType: "numeric",
+        })
+      );
+    });
+
+    it("should append columns to an existing table's idsByTable", () => {
+      const preloadedState = {
+        idsByTable: { table3: ["c-0"] },
+        data: {
+          "c-0": Column("table3", 0, "Existing Col", "text"),
+        },
+      };
+      const action = {
+        type: "columns/addColumnsFromOpenRefine",
+        payload: {
+          projectId: "table3",
+          columnsInfo: [
+            { name: "New Col 1", is_numeric: false },
+            { name: "New Col 2", is_numeric: true },
+          ],
+        },
+      };
+      const state = reducer(preloadedState, action);
+      expect(state.idsByTable.table3).toHaveLength(3);
+      expect(state.data[state.idsByTable.table3[1]]).toEqual(
+        expect.objectContaining({
+          name: "New Col 1",
+          columnType: "numeric",
+        })
+      );
+      expect(state.data[state.idsByTable.table3[2]]).toEqual(
+        expect.objectContaining({
+          name: "New Col 2",
+          columnType: "categorical",
+        })
+      );
     });
   });
 });

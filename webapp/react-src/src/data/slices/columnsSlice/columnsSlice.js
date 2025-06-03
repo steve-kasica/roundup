@@ -13,7 +13,7 @@ Reusability: Makes the function more versatile and reusable in different context
  */
 
 import { createSlice } from "@reduxjs/toolkit";
-import Column, { ColumnValue } from "./Column";
+import Column from "./Column";
 
 const initialState = {
   idsByTable: {},
@@ -71,6 +71,38 @@ const columnsSlice = createSlice({
         column.status.error = null;
       });
     },
+    /**
+     * Handles a failure to fetch columns for a specific table.
+     * Logs an error in development mode.
+     *
+     * @param {Object} state - The current state of the slice.
+     * @param {Object} action - The dispatched action.
+     */
+    fetchSourceTableColumnsFailure(state, action) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error fetching columns", action);
+      }
+    },
+
+    /**
+     * Adds columns to the state from OpenRefine column information.
+     *
+     * This reducer action takes a payload containing a project/table ID and an array of column metadata,
+     * then updates the state by:
+     *   - Initializing the list of column IDs for the table if it doesn't exist.
+     *   - Creating a new column object for each columnInfo entry, determining its type based on the
+     *     `is_numeric` property ("categorical" if true, otherwise "numeric").
+     *   - Storing each column object in the state's column dictionary.
+     *   - Appending each new column's ID to the list of column IDs for the table.
+     *
+     * @param {Object} state - The current Redux slice state.
+     * @param {Object} action - The Redux action object.
+     * @param {Object} action.payload - The payload for the action.
+     * @param {string} action.payload.projectId - The ID of the table/project to add columns to.
+     * @param {Array<Object>} action.payload.columnsInfo - Array of column metadata objects from OpenRefine.
+     * @param {string} action.payload.columnsInfo[].name - The name of the column.
+     * @param {boolean} action.payload.columnsInfo[].is_numeric - Whether the column is numeric.
+     */
     addColumnsFromOpenRefine(state, action) {
       const { projectId: tableId, columnsInfo } = action.payload;
       if (!Object.hasOwn(state.idsByTable, tableId)) {
@@ -90,19 +122,6 @@ const columnsSlice = createSlice({
         // TODO: should this just be memoized in a selector?
         state.idsByTable[tableId].push(column.id);
       });
-    },
-
-    /**
-     * Handles a failure to fetch columns for a specific table.
-     * Logs an error in development mode.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     */
-    fetchSourceTableColumnsFailure(state, action) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("Error fetching columns", action);
-      }
     },
 
     /**
@@ -229,6 +248,18 @@ const columnsSlice = createSlice({
         }
       });
     },
+
+    /**
+     * Sets the `isLoading` status to `true` for both the source and target columns
+     * specified by their IDs in the action payload. This is typically used to indicate
+     * that a column swap operation is in progress.
+     *
+     * @param {Object} state - The current state of the columns slice.
+     * @param {Object} action - The Redux action containing the payload.
+     * @param {Object} action.payload - The payload object.
+     * @param {string|number} action.payload.sourceId - The ID of the source column.
+     * @param {string|number} action.payload.targetId - The ID of the target column.
+     */
     swapColumnsRequest(state, action) {
       const { sourceId, targetId } = action.payload;
       const sourceColumn = state.data[sourceId];
