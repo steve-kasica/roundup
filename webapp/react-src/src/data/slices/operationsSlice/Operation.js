@@ -1,5 +1,5 @@
 import { sum } from "d3";
-import { isTable } from "../sourceTablesSlice";
+import { isTable } from "../tablesSlice";
 
 export const OPERATION_TYPE_STACK = "stack";
 export const OPERATION_TYPE_PACK = "pack";
@@ -24,6 +24,7 @@ export default function Operation(operationType, tableIds) {
     id: `o-${++idCounter}`, // Each operation has a unique ID
     operationType,
     tableIds,
+    children: tableIds,
     status: {
       isHovered: false,
       isSelected: false,

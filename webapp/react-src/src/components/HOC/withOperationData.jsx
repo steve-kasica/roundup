@@ -6,7 +6,6 @@ import {
   selectOperationImmediateChildId,
   setOperationHoverStatus,
 } from "../../data/slices/operationsSlice";
-import { selectOperationColumnCount } from "../../data/selectors";
 import { useDispatch } from "react-redux";
 
 export default function withOperationData(WrappedComponent) {
@@ -14,9 +13,10 @@ export default function withOperationData(WrappedComponent) {
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperation(state, id));
     const depth = useSelector((state) => selectOperationDepth(state, id));
-    const columnCount = useSelector((state) =>
-      selectOperationColumnCount(state, id)
-    );
+    // const columnCount = useSelector((state) =>
+    //   selectOperationColumnCount(state, id)
+    // );
+    const columnCount = -1; // TODO: Implement column count logic
     const focusedOperationId = useSelector(selectFocusedOperationId);
 
     const childOperationId = useSelector((state) =>

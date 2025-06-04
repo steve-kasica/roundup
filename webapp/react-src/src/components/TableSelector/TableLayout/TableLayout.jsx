@@ -26,7 +26,7 @@ export const LAYOUT_ID = "table";
 
 export default function TableLayout({
   searchString,
-  sourceTables,
+  tables,
   tableSelection,
   setTableSelection,
   loading,
@@ -35,7 +35,7 @@ export default function TableLayout({
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
 
-  const tableIds = sourceTables
+  const tableIds = tables
     .toSorted((a, b) =>
       isAscending
         ? ascending(a[sortAttribute], b[sortAttribute])

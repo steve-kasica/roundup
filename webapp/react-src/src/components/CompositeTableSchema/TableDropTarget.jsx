@@ -6,7 +6,7 @@
  *    only operationTypes are defined in this component
  */
 import { useDrop } from "react-dnd";
-import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
+import { dataType as SourceTable } from "../../data/slices/tablesSlice";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,

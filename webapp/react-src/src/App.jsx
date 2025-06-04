@@ -11,13 +11,11 @@ import theme from "./themes/theme-default";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DashboardGrid } from "./layouts";
-import SourceTables from "./components/SourceTables";
+import TableSelector from "./components/TableSelector";
 import CompositeTableSchema from "./components/CompositeTableSchema";
 import OperationDetail from "./components/OperationDetail";
 import OperationsList from "./components/OperationsList";
 import CustomDragLayer from "./CustomDragLayer";
-import { useSelector } from "react-redux";
-import { selectSelectedColumns } from "./data/slices/columnsSlice";
 
 function App() {
   return (
@@ -26,7 +24,7 @@ function App() {
         <CustomDragLayer />
         <DashboardGrid
           components={[
-            SourceTables,
+            TableSelector,
             CompositeTableSchema,
             OperationsList,
             OperationDetail,

@@ -3,7 +3,7 @@ import { selectColumnById } from "../columnsSlice";
 
 export const selectTables = createSelector(
   // Input selectors
-  (state) => state.sourceTables.data,
+  (state) => state.tables.data,
   (_, tableIds) => tableIds,
 
   // Result function
@@ -16,9 +16,9 @@ export const selectTables = createSelector(
 
 export const selectTableById = (state, tableIds) => {
   if (Array.isArray(tableIds)) {
-    return tableIds.map((id) => state.sourceTables.data[id]);
+    return tableIds.map((id) => state.tables.data[id]);
   }
-  return state.sourceTables.data[tableIds];
+  return state.tables.data[tableIds];
 };
 
 export const selectTableByColumnId = createSelector(
@@ -35,4 +35,14 @@ export const selectTableByColumnId = createSelector(
       tableIds.length === 1 ? tableIds[0] : tableIds
     );
   }
+);
+
+export const getTableById = (state, tableId) => {
+  const table = state.tables.data[tableId];
+  return table;
+};
+
+export const getAllTables = createSelector(
+  [(state) => state.tables.data],
+  (data) => Object.values(data)
 );

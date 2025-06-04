@@ -1,5 +1,5 @@
 /**
- * @name sourceTablesSlice
+ * @name tablesSlice
  */
 import { createSlice } from "@reduxjs/toolkit";
 import { Table } from "./Table";
@@ -12,7 +12,7 @@ const initialState = {
 };
 
 const slice = createSlice({
-  name: "sourceTables",
+  name: "tables",
   initialState,
   reducers: {
     // Action to trigger the saga,

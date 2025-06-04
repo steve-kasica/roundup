@@ -102,3 +102,56 @@ export function selectOperationChildrenIds(state, operationId) {
   });
   return operationIds;
 }
+
+export const getTablesByOperationId = createSelector(
+  // Input selectors
+  (state) => state,
+  (_, operationId) => operationId,
+
+  // Results function
+  (state, operationId) => {
+    const operation = selectOperation(state, operationId);
+    return operation.tableIds.map((tableId) => {
+      const table = getSourceTableById(state, tableId);
+      return table;
+    });
+  }
+);
+
+/**
+ * // Obviously a good candidate for memoization
+// Recursive function
+export function selectOperationColumnCount(state, id) {
+  let columnCount = 0,
+    operation;
+  try {
+    operation = selectOperation(state, id);
+  } catch {
+    return columnCount;
+  }
+  operation.tableIds.forEach((tableId) => {
+    const columns = selectColumnIdsByTableId(state, tableId);
+    updateCount(columns.length);
+  });
+  const childOperationId = selectOperationImmediateChildId(state, id);
+  if (childOperationId !== null) {
+    updateCount(selectOperationColumnCount(state, childOperationId));
+  }
+
+  return columnCount;
+
+  function updateCount(count) {
+    switch (operation.operationType) {
+      case OPERATION_TYPE_NO_OP:
+      case OPERATION_TYPE_PACK:
+        columnCount += count;
+        break;
+      case OPERATION_TYPE_STACK:
+        columnCount = Math.max(columnCount, count);
+        break;
+      default:
+        throw new Error("Invalid operation type");
+    }
+  }
+}
+ */

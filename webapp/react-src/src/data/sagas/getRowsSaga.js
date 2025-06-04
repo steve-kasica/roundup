@@ -11,7 +11,7 @@ import {
   fetchValuesSuccess,
   selectColumnIdsByTableId,
 } from "../slices/columnsSlice";
-import { incrementRowsExplored } from "../slices/sourceTablesSlice";
+import { incrementRowsExplored } from "../slices/tablesSlice";
 import { addTableToSchema } from "./addTableToSchemaSaga";
 
 export const fetchRows = createAction("fetchRows");
@@ -39,9 +39,7 @@ function* getRowsSagaWorker(action) {
     selectColumnIdsByTableId(state, tableId)
   );
 
-  const { rowsExplored } = yield select(
-    (state) => state.sourceTables.data[tableId]
-  );
+  const { rowsExplored } = yield select((state) => state.tables.data[tableId]);
 
   if (start < rowsExplored) {
     // These rows have already been fetched, so we don't need to fetch them again

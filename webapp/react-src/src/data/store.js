@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import uiReducer from "./slices/uiSlice";
-import sourceTablesReducer from "./slices/sourceTablesSlice";
+import tablesReducer from "./slices/tablesSlice";
 import columnsReducer from "./slices/columnsSlice";
 import operationsReducer from "./slices/operationsSlice";
 import valuesReducer from "./slices/valuesSlices";
@@ -15,7 +15,7 @@ const store = configureStore({
   reducer: {
     ui: uiReducer,
     operations: operationsReducer,
-    sourceTables: sourceTablesReducer,
+    tables: tablesReducer,
     columns: columnsReducer,
     values: valuesReducer,
   },

@@ -1,6 +1,5 @@
 import { Children, cloneElement } from "react";
 import { useSelector } from "react-redux";
-import { selectOperationColumnCount } from "../../data/selectors";
 import {
   selectOperation,
   selectOperationDepth,
@@ -13,11 +12,10 @@ export function OperationContainer({ id, onClick, children, style }) {
   const dispatch = useDispatch();
   const operation = useSelector((state) => selectOperation(state, id));
   const depth = useSelector((state) => selectOperationDepth(state, id));
-  const columnCount = useSelector((state) =>
-    selectOperationColumnCount(state, id)
-  );
 
   const focusedOperationId = useSelector(selectFocusedOperationId);
+
+  const columnCount = -1; // TODO
 
   const isFocused = operation.id === focusedOperationId;
   const isHovered = operation.status.isHovered;

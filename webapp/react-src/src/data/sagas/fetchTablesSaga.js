@@ -5,7 +5,7 @@ import {
   // fetchTablesFailure,
   // fetchTablesRequest,
   // fetchTablesSuccess,
-} from "../slices/sourceTablesSlice";
+} from "../slices/tablesSlice";
 import { createAction } from "@reduxjs/toolkit";
 import { fetchColumnMetadataRequest } from "./fetchColumnMetadataSaga";
 import { fetchColumnMetadataSuccess } from "./fetchColumnMetadataSaga";

@@ -6,14 +6,14 @@ import {
   selectOperationByTableId,
   removeTableFromOperation,
 } from "../../data/slices/operationsSlice";
-import { getTableById } from "../../data/selectors";
+import { getTableById } from "../../data/slices/tablesSlice";
 import {
   setHoveredTable,
   clearHoveredTable,
   selectHoveredTable,
 } from "../../data/slices/uiSlice";
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
-import { dataType as SourceTable } from "../../data/slices/sourceTablesSlice";
+import { dataType as SourceTable } from "../../data/slices/tablesSlice";
 import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
 import { peekTableAction } from "../../data/sagas/peekTableSaga";
 import {

@@ -8,7 +8,7 @@ import "./StackDetail.scss";
 import { useEffect } from "react";
 import { selectColumnIdsByTableId } from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
-import { selectTables } from "../../../data/slices/sourceTablesSlice/tablesSelector";
+import { selectTables } from "../../../data/slices/tablesSlice/tableSelectors";
 import { useMemo } from "react";
 import {
   setHoveredTable,

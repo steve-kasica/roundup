@@ -10,12 +10,7 @@ import TableListItemView from "./TableListItemView";
 
 export const LAYOUT_ID = "list";
 
-export default function ListLayout({
-  searchString,
-  sourceTables,
-  loading,
-  error,
-}) {
+export default function ListLayout({ searchString, tables, loading, error }) {
   return (
     <List
       className="list-layout"
@@ -25,7 +20,7 @@ export default function ListLayout({
         overflowY: "auto",
       }}
     >
-      {sourceTables
+      {tables
         .toSorted((tableA, tableB) => {
           const [a, b] = [
             tableA.name.includes(searchString),

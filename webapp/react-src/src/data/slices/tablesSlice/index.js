@@ -1,5 +1,6 @@
-import slice from "./sourceTablesSlice";
+import slice from "./tablesSlice";
 export * from "./Table";
+export * from "./tableSelectors";
 export const {
   fetchTablesRequest,
   fetchTablesFailure,

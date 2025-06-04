@@ -24,12 +24,7 @@ import {
   styled,
   TextField,
 } from "@mui/material";
-
-import {
-  getAllSourceTables,
-  getSourceTablesError,
-  getSourceTablesLoadingStatus,
-} from "../../data/selectors";
+import { getAllTables } from "../../data/slices/tablesSlice";
 
 import "./SourceTables.scss";
 
@@ -109,15 +104,15 @@ export default function SourceTables() {
   const { firstPaneWidth } = useSelector(({ ui }) => ui);
   const [layout, setLayout] = useState(tableLayout);
 
-  const sourceTables = useSelector(getAllSourceTables);
-  const isLoading = useSelector(getSourceTablesLoadingStatus);
-  const error = useSelector(getSourceTablesError);
+  const tables = useSelector(getAllTables);
+  const isLoading = false; // TODO:
+  const error = false; // TODO:
 
   useEffect(() => {
     dispatch(fetchTablesRequest({ source: "openrefine" }));
   }, [dispatch]);
 
-  const filteredTables = sourceTables
+  const filteredTables = tables
     .filter((table) => table.name.includes(searchString))
     .filter(
       (table) => selectedTag.length === 0 || table.tags.includes(selectedTag)
@@ -125,9 +120,7 @@ export default function SourceTables() {
 
   const tags = Array.from(
     new Set(
-      !(isLoading && error)
-        ? sourceTables.map((table) => table.tags).flat()
-        : []
+      !(isLoading && error) ? tables.map((table) => table.tags).flat() : []
     )
   );
 
@@ -218,14 +211,14 @@ export default function SourceTables() {
       {layout === listLayout ? (
         <ListLayout
           searchString={searchString}
-          sourceTables={filteredTables}
+          tables={filteredTables}
           loading={isLoading}
           error={error}
         />
       ) : (
         <TableLayout
           searchString={searchString}
-          sourceTables={filteredTables}
+          tables={filteredTables}
           tableSelection={tableSelection}
           setTableSelection={setTableSelection}
           loading={isLoading}

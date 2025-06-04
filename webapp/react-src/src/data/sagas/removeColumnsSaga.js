@@ -7,7 +7,7 @@ import {
   selectColumnById,
 } from "../slices/columnsSlice";
 import OpenRefine from "../../services/open-refine";
-import { decrementColumnCount } from "../slices/sourceTablesSlice";
+import { decrementColumnCount } from "../slices/tablesSlice";
 import { createAction } from "@reduxjs/toolkit";
 
 export const removeColumnsAction = createAction("columns/removeColumn");

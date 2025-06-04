@@ -11,7 +11,7 @@ const mockStore = configureStore([]);
 // Minimal mock state for SourceTables
 const initialState = {
   ui: { firstPaneWidth: 300 },
-  sourceTables: {
+  tables: {
     data: {
       1: {
         id: "1",
@@ -42,11 +42,46 @@ const initialState = {
       2: ["2_col_0", "2_col_1", "2_col_2"],
     },
     data: {
-      "1_col_0": { id: "1_col_0", tableId: "1", name: "A", index: 0, status: {}, values: {} },
-      "1_col_1": { id: "1_col_1", tableId: "1", name: "B", index: 1, status: {}, values: {} },
-      "2_col_0": { id: "2_col_0", tableId: "2", name: "X", index: 0, status: {}, values: {} },
-      "2_col_1": { id: "2_col_1", tableId: "2", name: "Y", index: 1, status: {}, values: {} },
-      "2_col_2": { id: "2_col_2", tableId: "2", name: "Z", index: 2, status: {}, values: {} },
+      "1_col_0": {
+        id: "1_col_0",
+        tableId: "1",
+        name: "A",
+        index: 0,
+        status: {},
+        values: {},
+      },
+      "1_col_1": {
+        id: "1_col_1",
+        tableId: "1",
+        name: "B",
+        index: 1,
+        status: {},
+        values: {},
+      },
+      "2_col_0": {
+        id: "2_col_0",
+        tableId: "2",
+        name: "X",
+        index: 0,
+        status: {},
+        values: {},
+      },
+      "2_col_1": {
+        id: "2_col_1",
+        tableId: "2",
+        name: "Y",
+        index: 1,
+        status: {},
+        values: {},
+      },
+      "2_col_2": {
+        id: "2_col_2",
+        tableId: "2",
+        name: "Z",
+        index: 2,
+        status: {},
+        values: {},
+      },
     },
     selected: [],
   },

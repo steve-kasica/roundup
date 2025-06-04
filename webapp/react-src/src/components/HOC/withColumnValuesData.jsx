@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { selectColumnValues } from "../../data/slices/columnsSlice/columnSelectors";
-import { selectTableByColumnId } from "../../data/slices/sourceTablesSlice/tablesSelector";
+import { selectTableByColumnId } from "../../data/slices/tablesSlice/tableSelectors";
 
 // HOC to provide column values for given columnIds
 const withColumnValuesData = (WrappedComponent) => {
