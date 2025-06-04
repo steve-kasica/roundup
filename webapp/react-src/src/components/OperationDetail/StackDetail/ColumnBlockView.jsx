@@ -44,6 +44,7 @@ function ColumnBlockView({
   selectSingleColumn,
   addColumnToSelection,
   unselectColumn,
+  onCellClick,
 }) {
   // Additional variables derived from props
   const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table
@@ -147,15 +148,17 @@ function ColumnBlockView({
       data-column-index={index}
       onClick={(event) => {
         if (!isPopoverOpen) {
-          if (event.shiftKey) {
-            spanSelectionToColumn();
-          } else if (event.metaKey) {
-            // Command/Windows key
-            addColumnToSelection();
-          } else {
-            // Regular click
-            selectSingleColumn();
-          }
+          onCellClick(event, id);
+          // TODO: old code for handling column selection
+          // if (event.shiftKey) {
+          //   spanSelectionToColumn();
+          // } else if (event.metaKey) {
+          //   // Command/Windows key
+          //   addColumnToSelection();
+          // } else {
+          //   // Regular click
+          //   selectSingleColumn();
+          // }
         }
       }}
       onContextMenu={(event) => {

@@ -19,6 +19,7 @@ function ColumnIndex({
   unhoverColumnVector,
   selectColumnVector,
   compareVectorValues,
+  onCellClick,
 }) {
   // Variables derived from props
   const maxColumnNameLength = Math.max(
@@ -147,7 +148,12 @@ function ColumnIndex({
       </Box>
       {/* TODO: not sure why this has to be reversed */}
       {[...columnIds].reverse().map((columnId) => (
-        <ColumnBlockView key={columnId} isDraggable={true} id={columnId} />
+        <ColumnBlockView
+          key={columnId}
+          isDraggable={true}
+          id={columnId}
+          onCellClick={onCellClick}
+        />
       ))}
     </form>
   );

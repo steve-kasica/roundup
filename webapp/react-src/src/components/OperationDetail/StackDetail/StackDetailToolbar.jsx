@@ -11,7 +11,10 @@ import {
 } from "../../../data/slices/columnsSlice";
 import { removeColumnsAction } from "../../../data/sagas/removeColumnsSaga";
 
-export default function StackDetailToolbar() {
+export default function StackDetailToolbar({
+  setSelectionAnchorCell,
+  setSelectionExtentCell,
+}) {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const selectedColumnIds = useSelector(selectSelectedColumns);
@@ -33,6 +36,8 @@ export default function StackDetailToolbar() {
       label: "Clear column selection",
       icon: <ClearIcon />,
       action: () => {
+        setSelectionAnchorCell(null);
+        setSelectionExtentCell(null);
         dispatch(clearSelectedColumns());
         handleMenuClose();
       },

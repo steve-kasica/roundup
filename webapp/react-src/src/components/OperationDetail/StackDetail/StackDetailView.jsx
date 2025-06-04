@@ -1,12 +1,16 @@
-import { scaleBand } from "d3";
+import { scaleBand, transpose } from "d3";
 import { useDispatch, useSelector } from "react-redux";
 
 import ColumnIndex from "./ColumnIndex";
 import StackDetailToolbar from "./StackDetailToolbar";
+import { getValuesInRange, getIndexOfValue } from "./selectionUtils";
 
 import "./StackDetail.scss";
-import { useEffect } from "react";
-import { selectColumnIdsByTableId } from "../../../data/slices/columnsSlice";
+import { useEffect, useState } from "react";
+import {
+  selectColumnIdsByTableId,
+  setSelectedColumns,
+} from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
 import { selectTables } from "../../../data/slices/tablesSlice/tableSelectors";
 import { useMemo } from "react";
@@ -23,11 +27,13 @@ const cellSize = 50; // height and width of cells (in pixels)
 
 export default function StackDetailView({ tableIds }) {
   const dispatch = useDispatch();
-  console.log("StackDetailView", tableIds);
 
   const tables = useSelector(
     (state) => selectTables(state, tableIds) // Selector is memoized
   );
+
+  const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
+  const [selectionExtentCell, setSelectionExtentCell] = useState(null);
 
   // TODO: this wouldn't be necessary if columnIds were stored in the table object
   // This is al ot just to get the max column count in a table
@@ -42,6 +48,7 @@ export default function StackDetailView({ tableIds }) {
   const maxColumnCount = Math.max(
     ...memoizedColumnIdsByTable.map((c) => c.length)
   );
+  const columnIdMatrix = memoizedColumnIdsByTable;
 
   const width = maxColumnCount * cellSize;
   const xScale = scaleBand(
@@ -85,7 +92,11 @@ export default function StackDetailView({ tableIds }) {
 
   return (
     <div>
-      <StackDetailToolbar />
+      <StackDetailToolbar
+        selectionAnchorCell={selectionAnchorCell}
+        setSelectionAnchorCell={setSelectionAnchorCell}
+        setSelectionExtentCell={setSelectionExtentCell}
+      />
       <div className="StackDetail">
         <div className="left-panel">
           <div className="label">
@@ -121,6 +132,7 @@ export default function StackDetailView({ tableIds }) {
                 key={j}
                 index={j}
                 tableIds={tables.map(({ id }) => id)}
+                onCellClick={onCellClick}
               />
             ))}
           </div>
@@ -128,4 +140,30 @@ export default function StackDetailView({ tableIds }) {
       </div>
     </div>
   );
+
+  function onCellClick(event, columnId) {
+    let anchorIndex, extentIndex;
+    if (event.shiftKey && selectionAnchorCell) {
+      // Shift+Click: select range from anchor to extent
+      extentIndex = getIndexOfValue(columnIdMatrix, columnId);
+      anchorIndex = selectionAnchorCell;
+      dispatch(
+        setSelectedColumns(
+          getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
+        )
+      );
+    } else if (event.metaKey || event.ctrlKey) {
+      // Cmd/Ctrl+Click: toggle selection
+      // TODO: decide if we want to toggle selection
+      // It kind of makes sense to just work on contiguous selections
+      // in this context, so we might not need this
+    } else {
+      // Single click: select only this column, also handles initial shift clicks
+      anchorIndex = getIndexOfValue(columnIdMatrix, columnId);
+      extentIndex = anchorIndex;
+      dispatch(setSelectedColumns(columnId));
+    }
+    setSelectionExtentCell(extentIndex);
+    setSelectionAnchorCell(anchorIndex);
+  }
 }
