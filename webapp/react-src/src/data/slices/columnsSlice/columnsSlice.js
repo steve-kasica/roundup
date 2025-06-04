@@ -238,10 +238,10 @@ const columnsSlice = createSlice({
       });
     },
     setSelectedColumns(state, action) {
-      if (!Array.isArray(action.payload)) {
-        throw new Error("setSelectedColumns: payload must be an array");
-      }
-      state.selected = action.payload;
+      const columnIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.selected = columnIds;
     },
     appendToSelectedColumns(state, action) {
       const columnIds = Array.isArray(action.payload)
