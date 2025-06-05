@@ -4,7 +4,8 @@ import { useDrag } from "react-dnd";
 import {
   selectOperationDepth,
   selectOperationByTableId,
-  removeTableFromOperation,
+  removeChildFromOperation,
+  selectOperation,
 } from "../../data/slices/operationsSlice";
 import { getTableById } from "../../data/slices/tablesSlice";
 import {
@@ -24,6 +25,9 @@ import {
 
 export default function withTableData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
+    let parentOperationId,
+      parentOperation,
+      depth = 0; // These two variables can be null if the table is not part of any operation
     const dispatch = useDispatch();
 
     const table = useSelector((state) => getTableById(state, id));
@@ -31,14 +35,23 @@ export default function withTableData(WrappedComponent) {
       selectColumnIdsByTableId(state, id)
     );
     const selectedTables = useSelector(selectSelectedTables);
-    const parentOperation = useSelector((state) =>
+
+    parentOperationId = useSelector((state) =>
       selectOperationByTableId(state, id)
     );
-    const depth = useSelector((state) =>
-      selectOperationDepth(state, parentOperation?.id)
+
+    parentOperation = useSelector((state) =>
+      selectOperation(state, parentOperationId)
+    );
+
+    depth = useSelector((state) =>
+      selectOperationDepth(state, parentOperationId)
     );
 
     const hoveredTable = useSelector(selectHoveredTable);
+
+    const isInSchema =
+      parentOperationId !== null && parentOperationId !== undefined;
 
     const [isPressed, setIsPressed] = useState(false);
 
@@ -87,14 +100,16 @@ export default function withTableData(WrappedComponent) {
         dragRef={dragRef}
         onHover={() => dispatch(setHoveredTable(id))}
         onUnhover={() => dispatch(clearHoveredTable())}
-        removeTableFromSchema={() =>
-          dispatch(
-            removeTableFromOperation({
-              operationId: parentOperation.id,
-              tableId: id,
-            })
-          )
-        }
+        removeTableFromSchema={() => {
+          if (isInSchema) {
+            dispatch(
+              removeChildFromOperation({
+                operationId: parentOperation.id,
+                tableId: id,
+              })
+            );
+          }
+        }}
         selectTable={(type, ids) => {
           switch (type) {
             case "single":

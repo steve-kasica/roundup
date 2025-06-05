@@ -1,157 +1,148 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { isOperationId } from "./Operation";
 
-export const selectOperation = createSelector(
-  // Input selectors
-  (state) => state.operations.data, // Extract the operations data from the state
-  (_, operationId) => operationId, // Extract the operationId argument
+/**
+ * Selects an operation by its ID from the Redux state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {string|number} operationId - The unique identifier of the operation to select.
+ * @returns {Object} The operation object corresponding to the given ID.
+ * @throws {Error} Throws an error if the operation is not found in the state.
+ */
+export function selectOperation(state, operationId) {
+  const operation = state.operations.data[operationId];
+  return operation;
+}
 
-  // Result function
-  (data, operationId) => {
-    const operation = data[operationId];
-    if (operation === undefined) {
-      throw new Error("Operation not found");
-    }
-    return operation;
-  }
-);
-
+/**
+ * Selector to retrieve all operation IDs from the state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @returns {Array<string|number>} An array of operation IDs.
+ */
 export function selectAllOperationIds(state) {
   return state.operations.ids;
 }
 
-export function selectOperationsCount(state) {
-  return state.operations.ids.length;
-}
-
-// Start with operations.ids instead of Object.values on the
-// data property to ensure propering ordering of operations
-export function selectAllOperations(state) {
-  return state.operations.ids.map((operationId) => {
-    const operation = state.operations.data[operationId];
-    if (operation === undefined) {
-      throw new Error("Operation not found");
-    }
-    return operation;
-  });
-}
-
-export const selectOperationByTableId = (state, tableId) => {
-  const operation = Object.values(state.operations.data).find((operation) =>
-    operation.tableIds.includes(tableId)
-  );
-  return operation;
-};
-
-export function selectOperationDepth(state, operationId) {
-  const ids = state.operations.ids;
-  const index = ids.indexOf(operationId);
-  if (index === -1) {
-    return null; // Operation not found
-  }
-  return ids.length - index;
-}
-
-export function selectMaxOperationDepth(state) {
-  return state.operations.ids.length;
-}
-
-export function selectRootOperationId(state) {
-  if (state.operations.ids.length === 0) {
-    return null;
-  }
-  // The root operation is the last one in the list
-  const rootOperationId = state.operations.ids.slice(-1)[0];
-  return rootOperationId;
-}
-
-export function selectRootOperation(state) {
-  const rootOperationId = selectRootOperationId(state);
-  if (rootOperationId === null) {
-    return null;
-  }
-  return state.operations.data[rootOperationId];
-}
-
-export function selectOperationChildren(state, operationId) {
-  const operationIndex = state.operations.ids.indexOf(operationId);
-  if (operationIndex === -1) {
-    throw new Error("Operation not found");
-  }
-  return state.operations.ids.slice(0, operationIndex);
-}
-
-export function selectOperationImmediateChildId(state, operationId) {
-  const index = state.operations.ids.indexOf(operationId);
-  if (index === -1) {
-    throw new Error("Operation not found");
-  } else if (index === 0) {
-    return null; // No child operation
-  } else {
-    return state.operations.ids[index - 1];
-  }
-}
-
-export function selectFocusedOperationId(state) {
-  return state.operations.focused;
-}
-
-export function selectOperationChildrenIds(state, operationId) {
-  const operationIds = state.operations.ids.filter((id) => {
-    const operation = state.operations.data[id];
-    return operation.parentId === operationId;
-  });
-  return operationIds;
-}
-
-export const getTablesByOperationId = createSelector(
-  // Input selectors
-  (state) => state,
-  (_, operationId) => operationId,
-
-  // Results function
-  (state, operationId) => {
-    const operation = selectOperation(state, operationId);
-    return operation.tableIds.map((tableId) => {
-      const table = getSourceTableById(state, tableId);
-      return table;
-    });
+/**
+ * Memoized selector to find the operation that contains the given table ID.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {string|number} tableId - The unique identifier of the table.
+ * @returns {Object|undefined} The operation object containing the table, or undefined if not found.
+ */
+export const selectOperationByTableId = createSelector(
+  (state) => state.operations.data,
+  (_, tableId) => tableId,
+  (data, tableId) => {
+    return Object.values(data).find((operation) =>
+      operation.children.includes(tableId)
+    );
   }
 );
 
 /**
- * // Obviously a good candidate for memoization
-// Recursive function
-export function selectOperationColumnCount(state, id) {
-  let columnCount = 0,
-    operation;
-  try {
-    operation = selectOperation(state, id);
-  } catch {
-    return columnCount;
-  }
-  operation.tableIds.forEach((tableId) => {
-    const columns = selectColumnIdsByTableId(state, tableId);
-    updateCount(columns.length);
-  });
-  const childOperationId = selectOperationImmediateChildId(state, id);
-  if (childOperationId !== null) {
-    updateCount(selectOperationColumnCount(state, childOperationId));
-  }
-
-  return columnCount;
-
-  function updateCount(count) {
-    switch (operation.operationType) {
-      case OPERATION_TYPE_NO_OP:
-      case OPERATION_TYPE_PACK:
-        columnCount += count;
-        break;
-      case OPERATION_TYPE_STACK:
-        columnCount = Math.max(columnCount, count);
-        break;
-      default:
-        throw new Error("Invalid operation type");
-    }
-  }
-}
+ * Memoized selector to compute the depth of an operation in the operation tree.
+ *
+ * The depth is defined as the number of edges from the root operation to the target operation.
+ * Returns null if the operation or root is not found.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {string|number} operationId - The unique identifier of the operation.
+ * @returns {number|null} The depth of the operation, or null if not found.
  */
+
+export const selectOperationDepth = createSelector(
+  [(state) => state.operations, (_, operationId) => operationId],
+  (operations, operationId) => {
+    const { ids, data } = operations;
+    if (!ids.length || !operations.root) return null;
+
+    // Start from the root (last in ids or explicit root)
+    let currentId = operations.root;
+    let depth = 0;
+
+    function findDepth(nodeId, currentDepth) {
+      if (nodeId === operationId) return currentDepth;
+      const node = data[nodeId];
+      if (!node || !node.children || node.children.length === 0) return null;
+      for (const childId of node.children) {
+        // Remove isOperationId check to allow all children to be traversed
+        const result = findDepth(childId, currentDepth + 1);
+        if (result !== null) return result;
+      }
+      return null;
+    }
+
+    return findDepth(currentId, depth);
+  }
+);
+
+/**
+ * Selects the maximum depth of the operation tree from the Redux state.
+ *
+ * Traverses the operations tree starting from the root node and calculates the maximum depth
+ * by recursively visiting all child nodes.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {Object} state.operations - The operations slice of the state.
+ * @param {string} state.operations.root - The ID of the root operation node.
+ * @param {Object.<string, {children: string[]}>} state.operations.data - A mapping of operation node IDs to node objects.
+ * @returns {number} The maximum depth of the operation tree. Returns 0 if the root or its data is missing.
+ */
+export function selectMaxOperationDepth(state) {
+  const { root, data, ids } = state.operations;
+  if (!root || !data[root]) return undefined;
+
+  return Math.max(...ids.map((id) => selectOperationDepth(state, id)));
+}
+
+/**
+ * Selects the root operation ID from the operations slice of the state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @returns {(string|null)} The root operation ID if present, otherwise null.
+ */
+export function selectRootOperation(state) {
+  return state.operations.root || null;
+}
+
+/**
+ * Selector to retrieve the currently focused operation ID from the state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @returns {string|number|undefined} The ID of the focused operation, or undefined if not set.
+ */
+export function selectFocusedOperationId(state) {
+  return state.operations.focused;
+}
+
+/**
+ * Selector to retrieve the currently hovered operation from the state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @returns {*} The hovered operation from the operations slice of the state.
+ */
+export const selectHoveredOperation = (state) => {
+  return state.operations.hovered;
+};
+
+/**
+ * Memoized selector to find the parent operation ID of a given operation.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {string|number} operationId - The unique identifier of the operation whose parent is to be found.
+ * @returns {(string|number|null)} The ID of the parent operation if found, otherwise null.
+ */
+export const selectParentOperation = createSelector(
+  (state) => state.operations.data,
+  (_, operationId) => operationId,
+  (operationsData, operationId) => {
+    for (const operation of Object.values(operationsData)) {
+      if (operation.children && operation.children.includes(operationId)) {
+        return operation.id;
+      }
+    }
+    return null;
+  }
+);

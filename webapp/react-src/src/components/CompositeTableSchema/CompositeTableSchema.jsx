@@ -12,7 +12,7 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectMaxOperationDepth,
-  selectRootOperationId,
+  selectRootOperation,
 } from "../../data/slices/operationsSlice";
 
 import TableDropTarget from "./TableDropTarget";
@@ -25,7 +25,7 @@ const gridColumns = 12;
 const gridWidth = gridColumns - 2;
 
 export default function CompositeTableSchema() {
-  const rootOperationId = useSelector(selectRootOperationId);
+  const rootOperationId = useSelector(selectRootOperation);
   const maxOperationDepth = useSelector(selectMaxOperationDepth);
 
   return (

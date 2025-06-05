@@ -8,9 +8,9 @@ export const LAYOUT_ID = "operationListItem";
 function OperationListItemView({
   id,
   operationType,
-  tableIds,
+  childrenIds,
   columnCount,
-
+  rowCount,
   index,
 }) {
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ function OperationListItemView({
     <ListItemButton onClick={() => dispatch(setFocusedOperation({ id }))}>
       <ListItemText
         primary={`${position}. ${label} (${columnCount})`}
-        secondary={tableIds.join(", ")}
+        secondary={childrenIds.join(", ")}
       />
     </ListItemButton>
   );

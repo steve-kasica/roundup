@@ -44,24 +44,24 @@
       background-color: $no-op-color;
     }
     &.pack {
-      &.depth-1 {
+      &.depth-0 {
         background-color: $pack-1-color;
       }
-      &.depth-2 {
+      &.depth-1 {
         background-color: $pack-2-color;
       }
-      &.depth-3 {
+      &.depth-2 {
         background-color: $pack-3-color;
       }
     }
     &.stack {
-      &.depth-1 {
+      &.depth-0 {
         background-color: $stack-1-color;
       }
-      &.depth-2 {
+      &.depth-1 {
         background-color: $stack-2-color;
       }
-      &.depth-3 {
+      &.depth-2 {
         background-color: $stack-3-color;
       }
     }

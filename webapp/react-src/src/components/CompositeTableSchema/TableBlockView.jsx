@@ -12,19 +12,27 @@ import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice/Operatio
 import withTableData from "../HOC/withTableData.jsx";
 
 function TableBlockView({
+  // props via withTableData
   id,
   name,
+  rowCount,
+  tags,
+  rowsExplored,
+  dateCreated,
+  dateLastModified,
   columnIds,
   parentOperation,
   depth,
+  isHovered,
+  isSelected,
   isDragging,
   isPressed,
-  isHovered,
   isFocused,
   dragRef,
+
+  // props passed via OperationBlockView
   parentOperationType,
   parentColumnCount,
-  table,
 }) {
   const columnCount = columnIds.length;
   const dispatch = useDispatch();

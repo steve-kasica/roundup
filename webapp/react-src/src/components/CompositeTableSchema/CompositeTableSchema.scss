@@ -195,13 +195,13 @@ $null-column-border-color: $null-column-background;
     &.stack {
       flex-direction: column; // newly added tables go to bottom
 
-      &.depth-1 {
+      &.depth-0 {
         @include background-color($stack-1-color, #fff);
       }
-      &.depth-2 {
+      &.depth-1 {
         @include background-color($stack-2-color, $pack-1-color);
       }
-      &.depth-3 {
+      &.depth-2 {
         @include background-color($stack-3-color, $pack-2-color);
       }
 
@@ -220,13 +220,13 @@ $null-column-border-color: $null-column-background;
     // -----------------------------------------------------------
     &.pack {
       flex-direction: row; // newly added tables go to right side
-      &.depth-1 {
+      &.depth-0 {
         @include background-color($pack-1-color, #fff);
       }
-      &.depth-2 {
+      &.depth-1 {
         @include background-color($pack-2-color, $stack-1-color);
       }
-      &.depth-3 {
+      &.depth-2 {
         @include background-color($pack-3-color, $stack-2-color);
       }
 

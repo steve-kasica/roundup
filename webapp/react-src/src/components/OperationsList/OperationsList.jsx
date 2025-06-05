@@ -1,7 +1,6 @@
 import { List } from "@mui/material";
 import { useSelector } from "react-redux";
 import { selectAllOperationIds } from "../../data/slices/operationsSlice";
-import { OperationContainer } from "../Containers";
 
 import "./OperationsList.scss";
 import OperationListItemView from "./OperationListItemView";

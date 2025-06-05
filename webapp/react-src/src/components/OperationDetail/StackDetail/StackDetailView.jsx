@@ -20,12 +20,14 @@ import {
   addToOpsDetailVisableColumns,
   removeFromOpsDetailVisableColumns,
 } from "../../../data/slices/uiSlice";
+import { isOperationId } from "../../../data/slices/operationsSlice";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
-export default function StackDetailView({ tableIds }) {
+export default function StackDetailView({ childrenIds }) {
+  const tableIds = childrenIds.filter((childId) => !isOperationId(childId)); // TODO: Make Open Roundup use internal table IDs
   const dispatch = useDispatch();
 
   const tables = useSelector(

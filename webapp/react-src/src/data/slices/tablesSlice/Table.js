@@ -1,3 +1,5 @@
+import { isOperationId } from "../operationsSlice";
+
 export const ID_ATTR = "id";
 export const dataType = "SourceTable";
 
@@ -57,3 +59,5 @@ export const isTable = (obj) =>
   Object.hasOwn(obj, "dateCreated") &&
   Object.hasOwn(obj, "dateLastModified") &&
   Object.hasOwn(obj, "tags");
+
+export const isTableId = (id) => !isOperationId(id); // TODO: this is a temporary solution to distinguish between table and operation IDs

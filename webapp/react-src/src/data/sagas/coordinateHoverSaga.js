@@ -1,7 +1,7 @@
 import { takeEvery, put, all, call, select } from "redux-saga/effects";
 import { setHoveredTable } from "../slices/uiSlice";
 import { selectOperationByTableId } from "../slices/operationsSlice/operationsSelectors";
-import { setOperationHoverStatus } from "../slices/operationsSlice/operationsSlice";
+import { setHoveredOperation } from "../slices/operationsSlice/operationsSlice";
 
 export default function* coordinateHoverSagaWatcher() {
   yield all([call(watchTableHover)]);
@@ -19,7 +19,7 @@ function* triggerHoverTableOperation(action) {
       selectOperationByTableId(state, tableId)
     );
 
-    yield put(setOperationHoverStatus({ operationId, isHovered }));
+    yield put(setHoveredOperation(operationId));
   } catch {
     // If the operationId is not found, we can ignore the error
     // since it means that the table is not part of any operation

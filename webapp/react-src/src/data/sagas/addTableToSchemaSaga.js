@@ -1,11 +1,11 @@
 import { createAction } from "@reduxjs/toolkit";
 import { select, takeEvery, put } from "redux-saga/effects";
 import {
-  addTableToOperation,
-  appendOperation,
-  appendOperationPostInitialization,
-  initializeOperations,
+  addChildToOperation,
+  addOperation,
+  changeOperationType,
   OPERATION_TYPE_NO_OP,
+  selectOperation,
   selectRootOperation,
 } from "../slices/operationsSlice";
 
@@ -25,20 +25,38 @@ export default function* addTableToSchemaSagaWatcher() {
 function* addTableToSchemaSagaWorker(action) {
   const { tableId, operationType } = action.payload;
 
-  const { rootOperation } = yield select((state) => {
-    return {
-      // columnCount: table ? table.columnCount : 0,
-      rootOperation: selectRootOperation(state),
-    };
-  });
+  const rootOperationId = yield select(selectRootOperation);
 
-  if (!rootOperation) {
-    yield put(initializeOperations({ tableId }));
-  } else if (rootOperation.operationType === OPERATION_TYPE_NO_OP) {
-    yield put(appendOperationPostInitialization({ operationType, tableId }));
-  } else if (rootOperation.operationType === operationType) {
-    yield put(addTableToOperation({ operationId: rootOperation.id, tableId }));
+  if (!rootOperationId) {
+    // Initialize
+    yield put(
+      addOperation({ operationType: OPERATION_TYPE_NO_OP, childId: tableId })
+    );
   } else {
-    yield put(appendOperation({ operationType, tableId }));
+    const rootOperation = yield select((state) =>
+      selectOperation(state, rootOperationId)
+    );
+    if (rootOperation.operationType === OPERATION_TYPE_NO_OP) {
+      // Second table added, change root operation type
+      yield put(
+        changeOperationType({
+          operationId: rootOperation.id,
+          operationType,
+        })
+      );
+      yield put(
+        addChildToOperation({
+          operationId: rootOperation.id,
+          childId: tableId,
+        })
+      );
+    } else if (rootOperation.operationType === operationType) {
+      yield put(
+        addChildToOperation({ operationId: rootOperation.id, tableId })
+      );
+    } else {
+      // Different operation type, create a new operation, add it as the new root operation
+      yield put(addOperation({ operationType, tableId }));
+    }
   }
 }

@@ -10,20 +10,28 @@
 
 import TableBlockView from "./TableBlockView";
 import withOperationData from "../HOC/withOperationData";
+import { isOperationId } from "../../data/slices/operationsSlice";
+import { isTableId } from "../../data/slices/tablesSlice";
 
 function OperationBlockView({
-  parentColumnCount,
+  // props via withOperationData
   id,
   depth,
   columnCount,
+  rowCount,
   isFocused,
   isHovered,
   operationType,
-  tableIds = [],
-  childOperationId,
+  childrenIds,
   onHover,
   onUnhover,
+
+  // Props passed recusrively via parent operation
+  parentColumnCount = 0,
 }) {
+  const childOperationIds = childrenIds.filter(isOperationId);
+  const childTableIds = childrenIds.filter(isTableId);
+
   const className = [
     "operation",
     operationType,
@@ -37,21 +45,26 @@ function OperationBlockView({
       className={className.join(" ")}
       style={{ flexBasis: `${(columnCount / parentColumnCount) * 100}%` }}
     >
-      {childOperationId ? (
-        <EnhancedOperationBlockView
-          id={childOperationId}
-          parentColumnCount={columnCount}
-        />
-      ) : null}
-      {tableIds.map((tableId) => (
-        <TableBlockView
-          key={tableId}
-          id={tableId}
-          isDraggable={false}
-          parentOperationType={operationType}
-          parentColumnCount={columnCount}
-        />
-      ))}
+      {childOperationIds.length > 0
+        ? childOperationIds.map((childOperationId) => (
+            <EnhancedOperationBlockView
+              key={childOperationId}
+              id={childOperationId}
+              parentColumnCount={columnCount}
+            />
+          ))
+        : null}
+      {childTableIds.length > 0
+        ? childTableIds.map((tableId) => (
+            <TableBlockView
+              key={tableId}
+              id={tableId}
+              isDraggable={false}
+              parentOperationType={operationType}
+              parentColumnCount={columnCount}
+            />
+          ))
+        : null}
     </div>
   );
 }
