@@ -146,21 +146,7 @@ function ColumnBlockView({
       }}
       data-table-id={tableId}
       data-column-index={index}
-      onClick={(event) => {
-        if (!isPopoverOpen) {
-          onCellClick(event, id);
-          // TODO: old code for handling column selection
-          // if (event.shiftKey) {
-          //   spanSelectionToColumn();
-          // } else if (event.metaKey) {
-          //   // Command/Windows key
-          //   addColumnToSelection();
-          // } else {
-          //   // Regular click
-          //   selectSingleColumn();
-          // }
-        }
-      }}
+      onClick={(event) => (!isPopoverOpen ? onCellClick(event, id) : null)}
       onContextMenu={(event) => {
         event.preventDefault();
         setAnchorEl(event.currentTarget);
