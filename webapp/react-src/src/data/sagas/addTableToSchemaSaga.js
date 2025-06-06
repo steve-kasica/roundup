@@ -57,7 +57,8 @@ export default function* addTableToSchemaSagaWatcher() {
  * @param {Object} action - The action object
  * @param {string} action.payload.tableId - The ID of the table to add
  */
-function* addTableToSchemaSagaWorker(action) {
+// Export the worker for testing
+export function* addTableToSchemaSagaWorker(action) {
   const { tableId, operationType } = action.payload;
 
   const rootOperationId = yield select(selectRootOperation);
