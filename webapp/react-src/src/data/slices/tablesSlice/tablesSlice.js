@@ -158,6 +158,23 @@ const slice = createSlice({
       ];
       table.columnIds = columnIds;
     },
+    removeTableColumnId(state, action) {
+      const { tableId, columnId } = action.payload;
+      // Check if the table exists
+      if (!state.data[tableId]) {
+        throw new Error(`Table with ID ${tableId} does not exist`);
+      }
+      const table = state.data[tableId];
+      // Support single or multiple column IDs
+      let columnIdsToRemove = columnId;
+      if (!Array.isArray(columnIdsToRemove)) {
+        columnIdsToRemove = [columnIdsToRemove];
+      }
+      // Remove the specified column IDs from the table's columnIds
+      table.columnIds = table.columnIds.filter(
+        (id) => !columnIdsToRemove.includes(id)
+      );
+    },
   },
 });
 
@@ -170,6 +187,7 @@ export const {
   incrementRowsExplored,
   setTableColumnIds,
   swapTableColumnIds,
+  removeTableColumnId,
 } = slice.actions;
 
 export default slice;

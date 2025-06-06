@@ -8,8 +8,19 @@ import {
 } from "../slices/columnsSlice";
 import OpenRefine from "../../services/open-refine";
 import { createAction } from "@reduxjs/toolkit";
+import { selectTablesById } from "../slices/tablesSlice/tableSelectors";
+import { removeTableColumnId } from "../slices/tablesSlice/tablesSlice";
 
-export const removeColumnsAction = createAction("columns/removeColumn");
+/**
+ * Action creator for removing columns.
+ *
+ * This action is dispatched to trigger the removal of columns from the state.
+ * The payload should contain information about which columns to remove.
+ *
+ * @function
+ * @returns {Object} Redux action with type "sagas/removeColumn" and payload.
+ */
+export const removeColumnsAction = createAction("sagas/removeColumn");
 
 export default function* removeColumnsSaga() {
   yield takeEvery(removeColumnsAction.type, function* (action) {
@@ -24,9 +35,13 @@ export default function* removeColumnsSaga() {
 function* removeColumnsSagaWorker(action) {
   const id = action.payload;
 
-  const { tableId: projectId, name } = yield select((state) =>
+  const { tableId, name } = yield select((state) =>
     selectColumnById(state, id)
   );
+  const { remoteId: projectId } = yield select((state) =>
+    selectTablesById(state, tableId)
+  );
+
   const csrf_token = "csrf_token"; // TODO: get this from the OpenRefine API
 
   yield put(addColumnsToLoading(id));
@@ -43,4 +58,7 @@ function* removeColumnsSagaWorker(action) {
 
   // If successful, remove loading state for the column
   yield put(removeColumnsFromLoading(id));
+
+  // Remove column id from the table's columnIds
+  yield put(removeTableColumnId({ tableId, columnId: id }));
 }

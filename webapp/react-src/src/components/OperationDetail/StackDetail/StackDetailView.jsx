@@ -20,14 +20,14 @@ import {
   addToOpsDetailVisableColumns,
   removeFromOpsDetailVisableColumns,
 } from "../../../data/slices/uiSlice";
-import { isOperationId } from "../../../data/slices/operationsSlice";
+import { isTableId } from "../../../data/slices/tablesSlice/Table";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
 export default function StackDetailView({ childrenIds }) {
-  const tableIds = childrenIds.filter((childId) => !isOperationId(childId)); // TODO: Make Open Roundup use internal table IDs
+  const tableIds = childrenIds.filter((childId) => isTableId(childId));
   const dispatch = useDispatch();
 
   const tables = useSelector((state) =>
@@ -39,18 +39,10 @@ export default function StackDetailView({ childrenIds }) {
 
   // TODO: this wouldn't be necessary if columnIds were stored in the table object
   // This is al ot just to get the max column count in a table
-  const columnIdsByTable = useSelector((state) =>
-    tableIds.map((id) => selectColumnIdsByTableId(state, id))
-  );
-  // Memoize to avoid returning a new array unless tableIds or columnIdsByTable change
-  const memoizedColumnIdsByTable = useMemo(
-    () => columnIdsByTable,
-    [JSON.stringify(columnIdsByTable)]
-  );
-  const maxColumnCount = Math.max(
-    ...memoizedColumnIdsByTable.map((c) => c.length)
-  );
-  const columnIdMatrix = memoizedColumnIdsByTable;
+  const columnIdsByTable = tables.map((table) => table.columnIds);
+
+  const maxColumnCount = Math.max(...columnIdsByTable.map((c) => c.length));
+  const columnIdMatrix = columnIdsByTable;
 
   const width = maxColumnCount * cellSize;
   const xScale = scaleBand(
