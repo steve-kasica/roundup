@@ -16,6 +16,7 @@ import {
   TABLE_SOURCE_OPEN_REFINE,
 } from "../slices/tablesSlice";
 import { addTableToSchema } from "./addTableToSchemaSaga";
+import { peekTableAction } from "./peekTableSaga";
 
 /**
  * Action creator for initiating the fetch of column metadata.
@@ -45,6 +46,9 @@ export const fetchColumnMetadataFailure = createAction(
  *    to handle fetching column metadata.
  * 2. `addTableToSchema.type`: When a table is added to the schema, dispatches a `fetchColumnMetadataRequest`
  *    action to fetch metadata for the newly added table, using both remote and local table IDs.
+ * 3. `peekTableAction.type`: When a table is peeked at, dispatches a `fetchColumnMetadataRequest`
+ *    this mechanism provides some opportunistic data fetching b/c we assume that peeking a table
+ *    means the user is interested in combining it in Open Roundup.
  *
  * @generator
  * @yields {ForkEffect} Triggers worker sagas in response to specific actions.
@@ -53,6 +57,14 @@ export default function* fetchColumnMetadataWatcher() {
   yield all([
     takeEvery(fetchColumnMetadataRequest.type, fetchColumnMetadataWorker),
     takeEvery(addTableToSchema.type, function* (action) {
+      const { tableId } = action.payload;
+      yield put(
+        fetchColumnMetadataRequest({
+          localTableIds: [tableId],
+        })
+      );
+    }),
+    takeEvery(peekTableAction.type, function* (action) {
       const { tableId } = action.payload;
       yield put(
         fetchColumnMetadataRequest({
@@ -125,6 +137,11 @@ function* fetchColumnMetadataFromOpenRefine(tableId, projectId) {
   );
   const columnCount = columnIds.length;
 
+  if (columnIds.every((id) => id !== null)) {
+    // If all column IDs are already set, we can skip fetching metadata
+    yield put(fetchColumnMetadataSuccess());
+    return;
+  }
   const columns = Array.from({ length: columnCount }, (_, i) =>
     // Create "empty" columns with some values, tableId, and index
     Column(tableId, i, null, null)
