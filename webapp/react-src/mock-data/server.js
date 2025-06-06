@@ -100,9 +100,10 @@ export default function makeServer() {
 
       this.post(getRowsEndpoint, (schema, request) => {
         const projectId = request.queryParams["project"];
-        const start = request.queryParams["start"] || 0;
-        const limit = request.queryParams["limit"] || 1000;
-        const data = getRowsData[projectId];
+        const start = Number(request.queryParams["start"]) || 0;
+        const limit = Number(request.queryParams["limit"]) || 1000;
+        // Clone the data so we don't mutate the original
+        const data = JSON.parse(JSON.stringify(getRowsData[projectId]));
         data.rows = data.rows.slice(start, start + limit);
         return data;
       });
