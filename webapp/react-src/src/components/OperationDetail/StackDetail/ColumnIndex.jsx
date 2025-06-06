@@ -20,6 +20,7 @@ function ColumnIndex({
   selectColumnVector,
   compareVectorValues,
   onCellClick,
+  onColumnClick,
 }) {
   // Variables derived from props
   const maxColumnNameLength = Math.max(
@@ -37,9 +38,12 @@ function ColumnIndex({
 
   const menuItems = [
     {
-      // TODO
-      // label: "Select all columns to the right",
-      // action: () => dispatch(setColumnSelectedStatusAfterIndex({ index })),
+      label: "Select columns at index",
+      action: () => onColumnClick({ shiftKey: false }, index),
+    },
+    {
+      label: "Select all columns to the right",
+      action: () => onColumnClick({ shiftKey: false }, index, true),
     },
     {
       label: "Compare unique values",
@@ -81,10 +85,10 @@ function ColumnIndex({
           setIsMenuIconVisible(false);
           unhoverColumnVector();
         }}
-        onClick={() => {
+        onClick={(event) => {
           // Select column vector on header click
           if (!isMenuOpen) {
-            selectColumnVector();
+            onColumnClick(event, index);
           }
         }}
       >

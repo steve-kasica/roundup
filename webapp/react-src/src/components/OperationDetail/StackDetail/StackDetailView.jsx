@@ -127,6 +127,7 @@ export default function StackDetailView({ childrenIds }) {
                 index={j}
                 tableIds={tables.map(({ id }) => id)}
                 onCellClick={onCellClick}
+                onColumnClick={onColumnClick}
               />
             ))}
           </div>
@@ -134,6 +135,44 @@ export default function StackDetailView({ childrenIds }) {
       </div>
     </div>
   );
+
+  function onColumnClick(event, index, afterIndex = false) {
+    if (event.shiftKey && selectionAnchorCell !== null) {
+      // Shift+Click: select range from anchor to extent
+      const anchorIndex = selectionAnchorCell;
+      const extentIndex = [columnIdMatrix.length - 1, index];
+      dispatch(
+        setSelectedColumns(
+          getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
+        )
+      );
+    } else if (afterIndex) {
+      // Click after a column: select range from anchor to this column
+      const anchorIndex = [0, index];
+      const extentIndex = [
+        columnIdMatrix.length - 1,
+        columnIdMatrix[columnIdMatrix.length - 1].length - 1,
+      ];
+      dispatch(
+        setSelectedColumns(
+          getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
+        )
+      );
+      setSelectionExtentCell(extentIndex);
+      setSelectionAnchorCell(anchorIndex);
+    } else {
+      // Single click: select only this column, also handles initial shift clicks
+      const anchorIndex = [0, index];
+      const extentIndex = [columnIdMatrix.length - 1, index];
+      dispatch(
+        setSelectedColumns(
+          getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
+        )
+      );
+      setSelectionExtentCell(extentIndex);
+      setSelectionAnchorCell(anchorIndex);
+    }
+  }
 
   function onCellClick(event, columnId) {
     let anchorIndex, extentIndex;
