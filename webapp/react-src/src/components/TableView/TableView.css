@@ -1,0 +1,26 @@
+.table-view {
+  font-family: Arial, sans-serif;
+  color: #333;
+  margin: 20px;
+  max-height: 300px; /* Adjust as needed */
+}
+.table-container {
+  overflow-y: auto;
+  border: 1px solid #ddd;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  position: sticky;
+  top: 0;
+  background: #f9f9f9;
+  z-index: 2;
+  border-bottom: 2px solid #ccc;
+}
+td,
+th {
+  padding: 8px 12px;
+  border: 1px solid #eee;
+}

@@ -4,7 +4,6 @@ import {
   DATA_TYPE as COLUMN,
   selectColumnById,
   selectColumnIdsByTableId,
-  swapColumns,
   addColumnsToDragging,
   removeColumnsFromDragging,
   setHoveredColumns,
@@ -20,6 +19,7 @@ import {
 
 import { renameColumnsAction } from "../../data/sagas/renameColumnsSaga";
 import { removeColumnsAction } from "../../data/sagas/removeColumnsSaga";
+import { swapColumnsAction } from "../../data/sagas/swapColumnsSaga";
 
 import { selectFirstSelectedColumn } from "../../data/slices/uiSlice";
 
@@ -78,7 +78,9 @@ export default function withColumnData(WrappedComponent) {
         // In this context `droppedItem.id` === `id` in useDrag
 
         if (droppedItem.tableId === tableId && !isNull) {
-          dispatch(swapColumns({ sourceId: droppedItem.id, targetId: id }));
+          dispatch(
+            swapColumnsAction({ sourceIds: droppedItem.id, targetIds: id })
+          );
         }
         unDragColumn();
         dispatch(clearSelectedColumns());

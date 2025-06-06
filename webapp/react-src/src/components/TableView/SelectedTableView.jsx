@@ -6,7 +6,6 @@ export const COMPONENT_ID = "FOCUSED_TABLE_VIEW";
 
 export default function SelectedTableView() {
   const selectedTables = useSelector(selectSelectedTables);
-  console.log("SelectedTableView", selectedTables);
   if (!selectedTables || selectedTables.length !== 1) {
     return <pre>ERROR</pre>;
   }

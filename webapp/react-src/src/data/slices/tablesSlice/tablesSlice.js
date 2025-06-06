@@ -143,6 +143,21 @@ const slice = createSlice({
         state.data[tableId].columnIds = columnIds;
       }
     },
+    swapTableColumnIds(state, action) {
+      const { tableId, sourceIndex, targetIndex } = action.payload;
+      // Check if the table exists
+      if (!state.data[tableId]) {
+        throw new Error(`Table with ID ${tableId} does not exist`);
+      }
+      const table = state.data[tableId];
+      // Swap the column IDs at the specified indices
+      const columnIds = [...table.columnIds];
+      [columnIds[sourceIndex], columnIds[targetIndex]] = [
+        columnIds[targetIndex],
+        columnIds[sourceIndex],
+      ];
+      table.columnIds = columnIds;
+    },
   },
 });
 
@@ -154,6 +169,7 @@ export const {
   changeTableName,
   incrementRowsExplored,
   setTableColumnIds,
+  swapTableColumnIds,
 } = slice.actions;
 
 export default slice;

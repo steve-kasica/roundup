@@ -35,7 +35,6 @@ function TableBlockView({
   parentColumnCount,
 }) {
   const columnCount = columnIds.length;
-  console.log(columnCount, parentColumnCount);
   const dispatch = useDispatch();
   const [contextMenu, setContextMenu] = useState(null);
   const tableRef = useRef();

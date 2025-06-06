@@ -7,6 +7,7 @@ import tablesSlice, {
   changeTableName,
   incrementRowsExplored,
   setTableColumnIds,
+  swapTableColumnIds,
 } from "./tablesSlice";
 
 const getInitialState = () => ({
@@ -180,5 +181,59 @@ describe("tablesSlice reducers", () => {
         setTableColumnIds({ tableId: "not-exist", columnIds: ["x"] })
       )
     ).toThrow();
+  });
+
+  it("swapTableColumnIds: swaps two column IDs by index", () => {
+    const state = {
+      ...getInitialState(),
+      ids: ["1"],
+      data: {
+        1: {
+          id: "1",
+          name: "Table 1",
+          rowsExplored: 0,
+          columnIds: ["colA", "colB", "colC"],
+        },
+      },
+    };
+    const nextState = tablesSlice.reducer(
+      state,
+      swapTableColumnIds({ tableId: "1", sourceIndex: 0, targetIndex: 2 })
+    );
+    expect(nextState.data["1"].columnIds).toEqual(["colC", "colB", "colA"]);
+  });
+
+  it("swapTableColumnIds: throws if table does not exist", () => {
+    const state = getInitialState();
+    expect(() =>
+      tablesSlice.reducer(
+        state,
+        swapTableColumnIds({
+          tableId: "not-exist",
+          sourceIndex: 0,
+          targetIndex: 1,
+        })
+      )
+    ).toThrow();
+  });
+
+  it("swapTableColumnIds: swaps adjacent columns", () => {
+    const state = {
+      ...getInitialState(),
+      ids: ["1"],
+      data: {
+        1: {
+          id: "1",
+          name: "Table 1",
+          rowsExplored: 0,
+          columnIds: ["colA", "colB", "colC"],
+        },
+      },
+    };
+    const nextState = tablesSlice.reducer(
+      state,
+      swapTableColumnIds({ tableId: "1", sourceIndex: 1, targetIndex: 2 })
+    );
+    expect(nextState.data["1"].columnIds).toEqual(["colA", "colC", "colB"]);
   });
 });

@@ -1,15 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import {
-  addColumnsToDragging,
-  selectColumnsByIndex,
   removeColumnsFromDragging,
   setHoveredColumns,
   removeFromHoveredColumns,
   setSelectedColumns,
   clearHoveredColumns,
   selectSelectedColumns,
+  selectColumnById,
 } from "../../data/slices/columnsSlice";
 
 import { useDrag, useDrop } from "react-dnd";
@@ -17,6 +16,7 @@ import { getEmptyImage } from "react-dnd-html5-backend";
 import { setDrawerContents } from "../../data/slices/uiSlice";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnValueMatrix";
 import { swapColumnsAction } from "../../data/sagas/swapColumnsSaga";
+import { selectTablesById } from "../../data/slices/tablesSlice/tableSelectors";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
 
@@ -29,16 +29,13 @@ export default function withColumnVectorData(WrappedComponent) {
   function EnhancedComponent({ index, tableIds, ...props }) {
     const dispatch = useDispatch();
 
-    // Default: get all tableIds from state if not provided
-    // Get column IDs at the given index for each table
-    const columns = useSelector((state) =>
-      selectColumnsByIndex(state, index, tableIds)
+    const tables = useSelector((state) =>
+      tableIds.map((tableId) => selectTablesById(state, tableId))
     );
-
-    const columnIds = useMemo(() => {
-      return columns.map((col) => col?.id).filter(Boolean); // columns may be null
-    }, [columns]);
-
+    const columnIds = tables.map((table) => table.columnIds.at(index));
+    const columns = useSelector((state) =>
+      columnIds.map((columnId) => selectColumnById(state, columnId))
+    );
     const selectedColumnIds = useSelector(selectSelectedColumns);
 
     const [{ isDragging }, dragRef, previewRef] = useDrag({
@@ -96,7 +93,7 @@ export default function withColumnVectorData(WrappedComponent) {
         {...props}
         index={index}
         columnIds={columnIds}
-        columnNames={columns.map((col) => col?.name || "")}
+        columnNames={columns.map((col) => col?.name || "")} // TODO: just pass the max name length
         hasSelected={
           new Set(columnIds).intersection(new Set(selectedColumnIds)).size > 0
         }

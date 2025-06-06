@@ -90,7 +90,6 @@ export default function* fetchColumnMetadataWatcher() {
  */
 function* fetchColumnMetadataWorker(action) {
   const { localTableIds } = action.payload;
-  console.log("fetchColumnMetadataWorker", localTableIds);
 
   const tables = yield select((state) =>
     localTableIds.map((id) => selectTablesById(state, id))

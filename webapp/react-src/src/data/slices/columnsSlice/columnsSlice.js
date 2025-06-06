@@ -231,26 +231,36 @@ const columnsSlice = createSlice({
         column.values[valueId] = count; // Update count if value already exists
       });
     },
-
-    swapColumns(state, action) {
-      let { sourceId, targetId } = action.payload;
-      const sourceColumn = state.data[sourceId];
-      const targetColumn = state.data[targetId];
-
-      const sourceTable = sourceColumn.tableId;
-      const targetTable = targetColumn.tableId;
-
-      const sourceIndex = state.idsByTable[sourceTable].indexOf(sourceId);
-      const targetIndex = state.idsByTable[targetTable].indexOf(targetId);
-
-      // Swap the index property
-      const tempIndex = sourceColumn.index;
-      sourceColumn.index = targetColumn.index;
-      targetColumn.index = tempIndex;
-
-      // Swap the ids in idsByTable
-      state.idsByTable[sourceTable][sourceIndex] = targetId;
-      state.idsByTable[targetTable][targetIndex] = sourceId;
+    /**
+     * Updates the `index` property of one or more columns in the state.
+     * This reducer is used when swapping columns around
+     *
+     * @param {Object} state - The current state of the columns slice.
+     * @param {Object} action - The dispatched action containing payload.
+     * @param {string|string[]} action.payload.ids - The column id or array of column ids to update.
+     * @param {number|number[]} action.payload.indices - The new index or array of indices corresponding to the column ids.
+     * @throws {Error} If the number of ids does not match the number of indices.
+     * @throws {Error} If a column with a specified id is not found in the state.
+     */
+    setColumnsIndex(state, action) {
+      let { ids, indices } = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      if (!Array.isArray(indices)) {
+        indices = [indices];
+      }
+      if (ids.length !== indices.length) {
+        throw new Error("The number of ids must match the number of indices");
+      }
+      ids.forEach((id, i) => {
+        const column = state.data[id];
+        if (column) {
+          column.index = indices[i];
+        } else {
+          throw new Error(`Column with id ${id} not found`);
+        }
+      });
     },
     setColumnType(state, action) {
       let { ids, columnTypes } = action.payload;
@@ -366,9 +376,9 @@ export const {
   addColumnsFromOpenRefine,
   addColumns,
   updateColumns,
-  swapColumns,
   renameColumns,
   removeColumns,
+  setColumnsIndex,
   addColumnsToLoading,
   removeColumnsFromLoading,
   setErrorForColumn,

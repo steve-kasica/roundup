@@ -15,7 +15,10 @@ import {
 } from "../../data/slices/uiSlice";
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 import { dataType as SourceTable } from "../../data/slices/tablesSlice";
-import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
+import {
+  selectColumnById,
+  selectColumnIdsByTableId,
+} from "../../data/slices/columnsSlice";
 import { peekTableAction } from "../../data/sagas/peekTableSaga";
 import {
   appendToSelectedTables,
@@ -31,6 +34,10 @@ export default function withTableData(WrappedComponent) {
     const dispatch = useDispatch();
 
     const table = useSelector((state) => selectTablesById(state, id));
+    const columns = useSelector((state) =>
+      table.columnIds.map((columnId) => selectColumnById(state, columnId))
+    );
+    const columnNames = columns.filter(Boolean).map((col) => col.name);
     const selectedTables = useSelector(selectSelectedTables);
 
     parentOperationId = useSelector((state) =>
@@ -80,7 +87,9 @@ export default function withTableData(WrappedComponent) {
       <WrappedComponent
         {...props}
         id={id}
+        remoteId={table.remoteId}
         name={table.name}
+        source={table.source}
         rowCount={table.rowCount}
         tags={table.tags}
         rowsExplored={table.rowsExplored}
@@ -88,6 +97,7 @@ export default function withTableData(WrappedComponent) {
         dateLastModified={table.dateLastModified}
         columnCount={table.columnCount}
         columnIds={table.columnIds}
+        columnNames={columns.filter(Boolean).map((col) => col.name)}
         parentOperation={parentOperation}
         depth={depth}
         isHovered={hoveredTable === id}
