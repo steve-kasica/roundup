@@ -24,7 +24,7 @@ import {
   styled,
   TextField,
 } from "@mui/material";
-import { getAllTables } from "../../data/slices/tablesSlice";
+import { selectAllTablesData } from "../../data/slices/tablesSlice";
 
 import "./SourceTables.scss";
 
@@ -104,7 +104,7 @@ export default function SourceTables() {
   const { firstPaneWidth } = useSelector(({ ui }) => ui);
   const [layout, setLayout] = useState(tableLayout);
 
-  const tables = useSelector(getAllTables);
+  const tables = useSelector(selectAllTablesData);
   const isLoading = false; // TODO:
   const error = false; // TODO:
 

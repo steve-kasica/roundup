@@ -7,7 +7,7 @@ import {
   removeChildFromOperation,
   selectOperation,
 } from "../../data/slices/operationsSlice";
-import { getTableById } from "../../data/slices/tablesSlice";
+import { selectTablesById } from "../../data/slices/tablesSlice";
 import {
   setHoveredTable,
   clearHoveredTable,
@@ -30,10 +30,7 @@ export default function withTableData(WrappedComponent) {
       depth = 0; // These two variables can be null if the table is not part of any operation
     const dispatch = useDispatch();
 
-    const table = useSelector((state) => getTableById(state, id));
-    const columnIds = useSelector((state) =>
-      selectColumnIdsByTableId(state, id)
-    );
+    const table = useSelector((state) => selectTablesById(state, id));
     const selectedTables = useSelector(selectSelectedTables);
 
     parentOperationId = useSelector((state) =>
@@ -89,7 +86,8 @@ export default function withTableData(WrappedComponent) {
         rowsExplored={table.rowsExplored}
         dateCreated={table.dateCreated}
         dateLastModified={table.dateLastModified}
-        columnIds={columnIds}
+        columnCount={table.columnCount}
+        columnIds={table.columnIds}
         parentOperation={parentOperation}
         depth={depth}
         isHovered={hoveredTable === id}

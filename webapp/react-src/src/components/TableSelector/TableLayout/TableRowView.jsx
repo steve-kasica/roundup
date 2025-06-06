@@ -15,6 +15,7 @@ function TableRowView({
   // props from withTableData
   id,
   name,
+  columnCount,
   rowCount,
   columnIds,
   dateCreated,
@@ -38,7 +39,6 @@ function TableRowView({
   searchString = "",
   updateTableSelection,
 }) {
-  const columnCount = columnIds.length;
   const isInSchema = parentOperation !== undefined;
   const [anchorEl, setAnchorEl] = useState(null);
   const trRef = useRef(null);

@@ -1,10 +1,9 @@
-import { put, takeLatest, call, all, take } from "redux-saga/effects";
-import OpenRefine from "../../services/open-refine";
+import { put, takeLatest, call, take, all } from "redux-saga/effects";
+import OpenRefineAPI from "../../services/open-refine";
 import {
-  addOpenRefineProjects,
-  // fetchTablesFailure,
-  // fetchTablesRequest,
-  // fetchTablesSuccess,
+  addTables,
+  Table,
+  TABLE_SOURCE_OPEN_REFINE,
 } from "../slices/tablesSlice";
 import { createAction } from "@reduxjs/toolkit";
 import { fetchColumnMetadataRequest } from "./fetchColumnMetadataSaga";
@@ -25,22 +24,30 @@ function* fetchTablesSagaWorker(action) {
   let response;
 
   try {
-    if (source === "openrefine") {
+    if (source === TABLE_SOURCE_OPEN_REFINE) {
       // Call the OpenRefine API
-      response = yield call(OpenRefine.getAllProjectMetadata);
-      yield put(
-        fetchColumnMetadataRequest({
-          source: "openrefine",
-          remoteTableIds: Object.keys(response.projects),
-        })
+      response = yield call(OpenRefineAPI.getAllProjectMetadata);
+      // Fetch columns info for each project ID in parallel
+      const projectIds = Object.keys(response.projects);
+      const columnsInfo = yield all(
+        projectIds.map((id) => call(OpenRefineAPI.getColumnsInfo, id))
       );
 
-      // Wait for the fetchColumnMetadata to finish
-      // This is a blocking call, so the saga will wait here until
-      // the action is dispatched
-      yield take(fetchColumnMetadataSuccess.type);
+      // Process project requests from OpenRefine as Open Roundup tables
+      const tables = Object.entries(response.projects).map(([id, project], i) =>
+        Table(
+          id,
+          TABLE_SOURCE_OPEN_REFINE,
+          project.name,
+          columnsInfo[i].length,
+          Number(project.rowCount),
+          project.created,
+          project.modified,
+          project.tags
+        )
+      );
 
-      yield put(addOpenRefineProjects({ projects: response.projects }));
+      yield put(addTables(tables));
     }
     // if source contains openrefine, wait for fetchColumnMetadata to finish
     // TODO: SIGNAL FETCH TABLES SUCCESS

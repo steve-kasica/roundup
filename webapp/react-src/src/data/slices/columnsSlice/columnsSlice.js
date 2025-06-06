@@ -2,14 +2,14 @@
  * Redux slice for managing columns in a data table.
  * This slice handles fetching, renaming, removing, and selecting columns,
  * as well as managing their loading and visibility states.
- * 
+ *
  * Input normalization is a programming concept where inputs to a function or method are transformed into a consistent format before processing. This ensures that the function can handle various input types or structures in a predictable and uniform way, reducing complexity and potential errors in the implementation.
-
-Why Normalize Inputs?
-- Flexibility: Allows the function to accept multiple input formats (e.g., a single value or an array).
-Simplified Logic: By converting inputs into a standard format, the function's core logic can focus on processing the data without worrying about input variations.
-Error Reduction: Reduces the likelihood of bugs caused by unexpected input types or structures.
-Reusability: Makes the function more versatile and reusable in different contexts.
+ *
+ * Why Normalize Inputs?
+ *  - Flexibility: Allows the function to accept multiple input formats (e.g., a single value or an array).
+ *    Simplified Logic: By converting inputs into a standard format, the function's core logic can focus on processing the data without worrying about input variations.
+ *  - Error Reduction: Reduces the likelihood of bugs caused by unexpected input types or structures.
+ *  - Reusability: Makes the function more versatile and reusable in different contexts.
  */
 
 import { createSlice } from "@reduxjs/toolkit";
@@ -73,6 +73,50 @@ const columnsSlice = createSlice({
         // Update list of column IDs for the table
         // TODO: should this just be memoized in a selector?
         state.idsByTable[tableId].push(column.id);
+      });
+    },
+
+    addColumns(state, action) {
+      let columns = action.payload;
+      if (!Array.isArray(columns)) {
+        columns = [columns];
+      }
+      columns.forEach((column) => {
+        if (state.data[column.id]) {
+          throw new Error(`Column with id ${column.id} already exists`);
+        }
+        // Add the column to the data object
+        state.data[column.id] = column;
+
+        // Add the column ID to the idsByTable mapping
+        if (!state.idsByTable[column.tableId]) {
+          state.idsByTable[column.tableId] = [];
+        }
+        state.idsByTable[column.tableId].push(column.id);
+      });
+    },
+
+    updateColumns(state, action) {
+      let columns = action.payload;
+      if (!Array.isArray(columns)) {
+        columns = [columns];
+      }
+      columns.forEach((column) => {
+        if (!state.data[column.id]) {
+          throw new Error(`Column with id ${column.id} does not exist`);
+        }
+        // Update the column in the data object
+        // TODO: should have some kind of validation here
+        // to ensure that the column object has the correct structure
+        // and required properties
+        // This is a shallow merge, so it will overwrite existing properties
+        // with the new values from the column object
+        // This is useful for updating properties like name, columnType, etc.
+        // If you want to ensure that certain properties are always present,
+        state.data[column.id] = {
+          ...state.data[column.id],
+          ...column,
+        };
       });
     },
 
@@ -320,6 +364,8 @@ export const {
   fetchValuesFailure,
 
   addColumnsFromOpenRefine,
+  addColumns,
+  updateColumns,
   swapColumns,
   renameColumns,
   removeColumns,

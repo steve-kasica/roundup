@@ -27,10 +27,11 @@ const gridWidth = gridColumns - 2;
 export default function CompositeTableSchema() {
   const rootOperationId = useSelector(selectRootOperation);
   const maxOperationDepth = useSelector(selectMaxOperationDepth);
+  console.log(maxOperationDepth);
 
   return (
     <div className="CompositeTableSchema">
-      {maxOperationDepth > 0 ? (
+      {maxOperationDepth >= 0 ? (
         <Grid container spacing={0}>
           <Grid size={gridWidth}>
             <OperationBlockView id={rootOperationId} />

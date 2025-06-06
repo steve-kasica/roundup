@@ -11,7 +11,7 @@ import {
   OPERATION_TYPE_NO_OP,
 } from "../../data/slices/operationsSlice";
 import { useDispatch } from "react-redux";
-import { selectTableById } from "../../data/slices/tablesSlice";
+import { selectTablesById } from "../../data/slices/tablesSlice";
 import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
 
 const isTableId = (id) => !isOperationId(id); // Interim
@@ -27,10 +27,10 @@ export default function withOperationData(WrappedComponent) {
     const focusedOperationId = useSelector(selectFocusedOperationId);
     const hoveredOperationId = useSelector(selectHoveredOperation);
 
-    const tableColumnCounts = useSelector((state) =>
+    const tables = useSelector((state) =>
       operation.children
         .filter(isTableId)
-        .map((tableId) => selectColumnIdsByTableId(state, tableId).length)
+        .map((tableId) => selectTablesById(state, tableId))
     );
 
     let operationColumnCount = 0;
@@ -38,12 +38,14 @@ export default function withOperationData(WrappedComponent) {
       operation.operationType === OPERATION_TYPE_STACK ||
       operation.operationType === OPERATION_TYPE_NO_OP
     ) {
-      operationColumnCount = Math.max(...tableColumnCounts);
-    } else if (operation.operationType === OPERATION_TYPE_PACK) {
-      operationColumnCount = tableColumnCounts.reduce(
-        (acc, tableColumnCount) => acc + tableColumnCount,
+      operationColumnCount = Math.max(
+        ...tables.map((table) => table.columnCount),
         0
       );
+    } else if (operation.operationType === OPERATION_TYPE_PACK) {
+      operationColumnCount = tables
+        .map((table) => table.columnCount)
+        .reduce((acc, tableColumnCount) => acc + tableColumnCount, 0);
     } else {
       // Handle other operation types if necessary
       operationColumnCount = 0; // Default to 0 for unsupported types

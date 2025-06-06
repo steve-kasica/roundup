@@ -22,7 +22,7 @@ export default function* rootSaga() {
     call(removeColumnsSaga),
     call(swapColumnsSaga),
     call(coordinateHoverSaga),
-    call(getRowsSagaWatcher),
+    // call(getRowsSagaWatcher),
     call(peekTableSagaWatcher),
     call(getValuesSaga),
   ]);

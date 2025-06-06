@@ -1,26 +1,32 @@
 import { createSelector } from "reselect";
 import { selectColumnById } from "../columnsSlice";
 
-export const selectTables = createSelector(
-  // Input selectors
-  (state) => state.tables.data,
-  (_, tableIds) => tableIds,
-
-  // Result function
-  (data, tableIds) => {
-    return Object.entries(data)
-      .filter(([tableId, table]) => tableIds.includes(tableId))
-      .map(([tableId, table]) => table);
+/**
+ * Memoized selector to retrieve table data by ID or an array of IDs from the Redux state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {string|string[]} tableIds - A single table ID or an array of table IDs.
+ * @returns {Object|Object[]} The table data object if a single ID is provided, or an array of table data objects if an array of IDs is provided.
+ */
+export const selectTablesById = createSelector(
+  [(state) => state.tables.data, (state, tableIds) => tableIds],
+  (tablesData, tableIds) => {
+    if (Array.isArray(tableIds)) {
+      return tableIds.map((id) => tablesData[id]);
+    }
+    return tablesData[tableIds];
   }
 );
 
-export const selectTableById = (state, tableIds) => {
-  if (Array.isArray(tableIds)) {
-    return tableIds.map((id) => state.tables.data[id]);
-  }
-  return state.tables.data[tableIds];
-};
-
+/**
+ * Selector to retrieve table(s) associated with the given column ID(s).
+ *
+ * @function
+ * @param {Object} state - The Redux state.
+ * @param {string|string[]} columnIds - A single column ID or an array of column IDs.
+ * @returns {Object|Object[]} The table object(s) corresponding to the provided column ID(s).
+ *
+ */
 export const selectTableByColumnId = createSelector(
   // Input selectors
   (state, columnIds) => (Array.isArray(columnIds) ? columnIds : [columnIds]),
@@ -30,19 +36,21 @@ export const selectTableByColumnId = createSelector(
     const tableIds = columnIds.map(
       (columnId) => selectColumnById(state, columnId).tableId
     );
-    return selectTableById(
+    return selectTablesById(
       state,
       tableIds.length === 1 ? tableIds[0] : tableIds
     );
   }
 );
 
-export const getTableById = (state, tableId) => {
-  const table = state.tables.data[tableId];
-  return table;
-};
-
-export const getAllTables = createSelector(
+/**
+ * Selector to retrieve all table data as an array.
+ *
+ * @function
+ * @param {Object} state - The Redux state object.
+ * @returns {Array<Object>} An array containing all table data objects.
+ */
+export const selectAllTablesData = createSelector(
   [(state) => state.tables.data],
   (data) => Object.values(data)
 );

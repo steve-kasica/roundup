@@ -15,12 +15,12 @@ function TableBlockView({
   // props via withTableData
   id,
   name,
+  columnIds,
   rowCount,
   tags,
   rowsExplored,
   dateCreated,
   dateLastModified,
-  columnIds,
   parentOperation,
   depth,
   isHovered,
@@ -35,6 +35,7 @@ function TableBlockView({
   parentColumnCount,
 }) {
   const columnCount = columnIds.length;
+  console.log(columnCount, parentColumnCount);
   const dispatch = useDispatch();
   const [contextMenu, setContextMenu] = useState(null);
   const tableRef = useRef();
@@ -63,7 +64,8 @@ function TableBlockView({
       ? parentColumnCount
       : columnCount;
 
-  const state = [
+  const className = [
+    "table",
     isFocused ? "focused" : "",
     isHovered ? "hover" : "",
     isDragging ? "dragging" : "",
@@ -72,13 +74,17 @@ function TableBlockView({
 
   return (
     <div
-      className={["table", ...state].join(" ")}
+      className={className.join(" ")}
       style={{ flexBasis: `${(columnCount / parentColumnCount) * 100}%` }}
     >
       <div className="label">
         {name} <span className="column-count">({columnCount})</span>
       </div>
-      <ColumnTicksContainer tableId={id} ticksCount={ticksCount} />
+      <ColumnTicksContainer
+        tableId={id}
+        columnIds={columnIds}
+        ticksCount={ticksCount}
+      />
       {/* <Menu
                 open={contextMenu !== null}
                 onClose={closeMenu}

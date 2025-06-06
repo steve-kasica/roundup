@@ -79,23 +79,30 @@ export const selectOperationDepth = createSelector(
 );
 
 /**
- * Selects the maximum depth of the operation tree from the Redux state.
+ * Memoized selector to compute the maximum depth of all operations in the operation tree.
  *
- * Traverses the operations tree starting from the root node and calculates the maximum depth
- * by recursively visiting all child nodes.
+ * The maximum depth is defined as the largest number of edges from the root operation to any operation node.
+ * Returns undefined if the root operation is not present.
  *
  * @param {Object} state - The Redux state object.
- * @param {Object} state.operations - The operations slice of the state.
- * @param {string} state.operations.root - The ID of the root operation node.
- * @param {Object.<string, {children: string[]}>} state.operations.data - A mapping of operation node IDs to node objects.
- * @returns {number} The maximum depth of the operation tree. Returns 0 if the root or its data is missing.
+ * @returns {number|undefined} The maximum depth of the operation tree, or undefined if root is missing.
  */
-export function selectMaxOperationDepth(state) {
-  const { root, data, ids } = state.operations;
-  if (!root || !data[root]) return undefined;
+export const selectMaxOperationDepth = createSelector(
+  (state) => state.operations,
+  (operations) => {
+    const { root, data, ids } = operations;
+    if (!root || !data[root]) return undefined;
 
-  return Math.max(...ids.map((id) => selectOperationDepth(state, id)));
-}
+    let maxDepth = -Infinity;
+    for (const id of ids) {
+      const depth = selectOperationDepth.resultFunc(operations, id);
+      if (typeof depth === "number" && depth > maxDepth) {
+        maxDepth = depth;
+      }
+    }
+    return maxDepth === -Infinity ? undefined : maxDepth;
+  }
+);
 
 /**
  * Selects the root operation ID from the operations slice of the state.

@@ -12,7 +12,7 @@ import {
   setSelectedColumns,
 } from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
-import { selectTables } from "../../../data/slices/tablesSlice/tableSelectors";
+import { selectTablesById } from "../../../data/slices/tablesSlice/tableSelectors";
 import { useMemo } from "react";
 import {
   setHoveredTable,
@@ -30,8 +30,8 @@ export default function StackDetailView({ childrenIds }) {
   const tableIds = childrenIds.filter((childId) => !isOperationId(childId)); // TODO: Make Open Roundup use internal table IDs
   const dispatch = useDispatch();
 
-  const tables = useSelector(
-    (state) => selectTables(state, tableIds) // Selector is memoized
+  const tables = useSelector((state) =>
+    tableIds.map((tableId) => selectTablesById(state, tableId))
   );
 
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);

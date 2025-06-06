@@ -5,12 +5,10 @@ import withColumnData from "../HOC/withColumnData";
 
 const ColumnTicksContainer = memo(function ColumnTicksContainer({
   tableId,
+  columnIds,
   ticksCount,
 }) {
-  const columnIds = useSelector((state) =>
-    selectColumnIdsByTableId(state, tableId)
-  );
-
+  // TODO: verify that if a table state changes, this does not cause unnecessary re-renders
   const ticks = Array.from({ length: ticksCount }, (_, i) =>
     i < columnIds.length ? columnIds[i] : null
   );

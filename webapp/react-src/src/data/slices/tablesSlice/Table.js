@@ -1,7 +1,9 @@
-import { isOperationId } from "../operationsSlice";
-
 export const ID_ATTR = "id";
 export const dataType = "SourceTable";
+
+export const TABLE_SOURCE_OPEN_REFINE = "openrefine";
+
+let idCounter = 0;
 
 /**
  *
@@ -14,15 +16,17 @@ export const dataType = "SourceTable";
  * @returns
  */
 export function Table(
-  id,
+  remoteId,
+  source,
   name,
+  columnCount,
   rowCount,
   dateCreated,
   dateLastModified,
   tags = []
 ) {
-  if (!id) {
-    throw new Error("`id` is undefined");
+  if (!remoteId) {
+    throw new Error("`remoteId` is undefined");
   } else if (!Number.isInteger(rowCount)) {
     throw new Error("`rowCount` must be an integer", rowCount);
   } else if (dateCreated instanceof Date) {
@@ -36,28 +40,30 @@ export function Table(
   }
 
   return {
-    id,
+    id: `t-${++idCounter}`,
+    remoteId,
+    source,
     name,
+    columnCount, // deprecated, use `columnIds.length` instead
+    columnIds: new Array(columnCount).fill(null), // Placeholder for column IDs
     rowCount,
     rowsExplored: 0,
     dateCreated,
     dateLastModified,
     tags,
-    // TODO: remove from data object
-    status: {
-      isSelected: false,
-      isHovered: false,
-    },
   };
 }
 
 export const isTable = (obj) =>
   Object.hasOwn(obj, "id") &&
+  Object.hasOwn(obj, "remoteId") &&
+  Object.hasOwn(obj, "source") &&
   Object.hasOwn(obj, "name") &&
   Object.hasOwn(obj, "rowCount") &&
+  Object.hasOwn(obj, "columnCount") &&
   Object.hasOwn(obj, "rowsExplored") &&
   Object.hasOwn(obj, "dateCreated") &&
   Object.hasOwn(obj, "dateLastModified") &&
   Object.hasOwn(obj, "tags");
 
-export const isTableId = (id) => !isOperationId(id); // TODO: this is a temporary solution to distinguish between table and operation IDs
+export const isTableId = (id) => typeof id === "string" && id.startsWith("t-");

@@ -7,7 +7,6 @@ import {
   selectColumnById,
 } from "../slices/columnsSlice";
 import OpenRefine from "../../services/open-refine";
-import { decrementColumnCount } from "../slices/tablesSlice";
 import { createAction } from "@reduxjs/toolkit";
 
 export const removeColumnsAction = createAction("columns/removeColumn");
@@ -44,7 +43,4 @@ function* removeColumnsSagaWorker(action) {
 
   // If successful, remove loading state for the column
   yield put(removeColumnsFromLoading(id));
-
-  // Update column count of associated table
-  yield put(decrementColumnCount({ projectId }));
 }

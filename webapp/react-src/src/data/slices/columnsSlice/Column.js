@@ -62,7 +62,11 @@ export const COLUMN_TYPE_NUMERICAL = "NUMERICAL";
  *   // handle supported type
  * }
  */
-export const COLUMN_TYPES = [COLUMN_TYPE_NUMERICAL, COLUMN_TYPE_CATEGORICAL];
+export const COLUMN_TYPES = [
+  COLUMN_TYPE_NUMERICAL,
+  COLUMN_TYPE_CATEGORICAL,
+  null, // null is used to represent an "empty" column type, e.g. when the column is not yet defined
+];
 
 /**
  * Creates a new column metadata object.
