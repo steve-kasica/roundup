@@ -5,25 +5,18 @@ import {
   selectFocusedOperationId,
   setHoveredOperation,
   selectHoveredOperation,
-  isOperationId,
   OPERATION_TYPE_STACK,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_NO_OP,
 } from "../../data/slices/operationsSlice";
 import { useDispatch } from "react-redux";
-import { selectTablesById } from "../../data/slices/tablesSlice";
-import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
-
-const isTableId = (id) => !isOperationId(id); // Interim
+import { selectTablesById, isTableId } from "../../data/slices/tablesSlice";
 
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperation(state, id));
     const depth = useSelector((state) => selectOperationDepth(state, id));
-    // const columnCount = useSelector((state) =>
-    //   selectOperationColumnCount(state, id)
-    // );
     const focusedOperationId = useSelector(selectFocusedOperationId);
     const hoveredOperationId = useSelector(selectHoveredOperation);
 
@@ -39,12 +32,12 @@ export default function withOperationData(WrappedComponent) {
       operation.operationType === OPERATION_TYPE_NO_OP
     ) {
       operationColumnCount = Math.max(
-        ...tables.map((table) => table.columnCount),
+        ...tables.map((table) => table.columnIds.length),
         0
       );
     } else if (operation.operationType === OPERATION_TYPE_PACK) {
       operationColumnCount = tables
-        .map((table) => table.columnCount)
+        .map((table) => table.columnIds.length)
         .reduce((acc, tableColumnCount) => acc + tableColumnCount, 0);
     } else {
       // Handle other operation types if necessary

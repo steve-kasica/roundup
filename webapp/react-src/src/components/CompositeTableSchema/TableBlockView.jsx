@@ -62,7 +62,6 @@ function TableBlockView({
     parentOperationType === OPERATION_TYPE_STACK
       ? parentColumnCount
       : columnCount;
-
   const className = [
     "table",
     isFocused ? "focused" : "",
