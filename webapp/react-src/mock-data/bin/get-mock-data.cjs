@@ -177,10 +177,126 @@ export default {
   console.log(`Exported all rows info to ${path.join(outputDir, "index.js")}`);
 }
 
+function fetchAndSaveFacetsSync(projectIds) {
+  if (!Array.isArray(projectIds)) return;
+  const endpoint = "command/core/compute-facets";
+  const outputDir = path.join(__dirname, "../" + endpoint);
+  const columnsInfoDir = path.join(
+    __dirname,
+    "../command/core/get-columns-info"
+  );
+
+  // Fetch CSRF token
+  let csrfToken = null;
+  try {
+    const csrfData = execSync(
+      `curl -s http://127.0.0.1:3333/command/core/get-csrf-token`,
+      { encoding: "utf8" }
+    );
+    const csrfJson = JSON.parse(csrfData);
+    csrfToken = csrfJson.token;
+  } catch (e) {
+    console.error("Could not fetch CSRF token:", e.message);
+    return;
+  }
+
+  // Ensure output directory exists
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  let imports = [];
+  let exportsObj = [];
+
+  projectIds.forEach((projectId) => {
+    const outputPath = path.join(outputDir, `${projectId}.json`);
+    const varName = `project${projectId}`;
+    imports.push(`import ${varName} from "./${path.basename(outputPath)}"`);
+    exportsObj.push(`${projectId}: ${varName}`);
+
+    // Return early if file already exists
+    if (fs.existsSync(outputPath)) {
+      console.log(`File already exists, skipping: ${outputPath}`);
+      return;
+    }
+
+    // Read columns info for this project
+    const columnsInfoPath = path.join(columnsInfoDir, `${projectId}.json`);
+    let columnsInfo;
+    try {
+      columnsInfo = JSON.parse(fs.readFileSync(columnsInfoPath, "utf8"));
+    } catch (e) {
+      console.error(
+        `Could not read columns info for project ${projectId}:`,
+        e.message
+      );
+      return;
+    }
+
+    // Extract column names (assuming columnsInfo is an array of objects with a 'name' property)
+    const columnNames = Array.isArray(columnsInfo)
+      ? columnsInfo.map((col) => col.name)
+      : [];
+    if (columnNames.length === 0) {
+      console.warn(
+        `No columns found for project ${projectId}, skipping facets fetch.`
+      );
+      return;
+    }
+
+    // Build facets POST body (simple text facets for each column)
+    const facets = columnNames.map((name) => ({
+      type: "list",
+      name: name,
+      expression: `value`,
+      columnName: name,
+      omitBlank: false,
+      omitError: false,
+      selection: [],
+    }));
+
+    // Prepare form data for OpenRefine (engine and csrf_token)
+    const engineStr = JSON.stringify({ facets });
+    const url = `http://127.0.0.1:3333/${endpoint}?project=${projectId}`;
+    let data;
+    try {
+      data = execSync(
+        `curl -s -X POST --data-urlencode 'engine=${engineStr}' --data-urlencode 'csrf_token=${csrfToken}' "${url}"`,
+        {
+          encoding: "utf8",
+          maxBuffer: 1024 * 1024 * 10,
+        }
+      );
+      const json = JSON.parse(data);
+      if (json.code === "error") {
+        throw new Error(json.message);
+      }
+      fs.writeFileSync(outputPath, JSON.stringify(json, null, 2));
+      console.log(`Facets for ${projectId} saved to ${outputPath}`);
+    } catch (e) {
+      console.error(
+        `Error fetching/saving facets for ${projectId}:`,
+        e.message
+      );
+    }
+  });
+
+  const contents = `${imports.join("\n")}
+export default {
+  ${exportsObj.join(",\n  ")}
+}
+`;
+  fs.writeFileSync(path.join(outputDir, "index.js"), contents);
+  console.log(
+    `Exported all facets info to ${path.join(outputDir, "index.js")}`
+  );
+}
+
 function main() {
   const projectIds = fetchAndSaveProjectMetadataSync();
   fetchAndSaveColumnInfoSync(projectIds);
   fetchAndSaveRowsSync(projectIds);
+  fetchAndSaveFacetsSync(projectIds);
 }
 
 main();

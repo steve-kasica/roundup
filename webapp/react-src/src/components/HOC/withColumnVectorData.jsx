@@ -17,6 +17,7 @@ import { setDrawerContents } from "../../data/slices/uiSlice";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnValueMatrix";
 import { swapColumnsAction } from "../../data/sagas/swapColumnsSaga";
 import { selectTablesById } from "../../data/slices/tablesSlice/tableSelectors";
+import { getValuesAction } from "../../data/sagas/getValuesSaga";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
 
@@ -103,12 +104,11 @@ export default function withColumnVectorData(WrappedComponent) {
         isHovered={isHovered}
         hoverColumnVector={() => dispatch(setHoveredColumns(columnIds))}
         unhoverColumnVector={() => dispatch(clearHoveredColumns())}
-        selectColumnVector={() => {
-          dispatch(setSelectedColumns(columnIds));
-        }}
+        selectColumnVector={() => dispatch(setSelectedColumns(columnIds))}
         compareVectorValues={() =>
           dispatch(setDrawerContents(COLUMN_INDEX_VALUES_COMPONENT))
         }
+        fetchColumnValues={() => dispatch(getValuesAction(columnIds))}
       />
     );
   }

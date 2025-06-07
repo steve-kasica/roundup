@@ -11,7 +11,7 @@ import addTableToSchemaSaga from "./addTableToSchemaSaga";
 import coordinateHoverSaga from "./coordinateHoverSaga";
 import getRowsSagaWatcher from "./getRowsSaga";
 import peekTableSagaWatcher from "./peekTableSaga";
-import getValuesSaga from "./getValuesSaga";
+import getValuesSagaWatcher from "./getValuesSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -24,6 +24,6 @@ export default function* rootSaga() {
     call(coordinateHoverSaga),
     // call(getRowsSagaWatcher),
     call(peekTableSagaWatcher),
-    call(getValuesSaga),
+    call(getValuesSagaWatcher),
   ]);
 }

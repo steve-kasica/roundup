@@ -2,16 +2,8 @@ export const endpoint = "command/core/compute-facets";
 
 export default async function computeFacets(
   projectId,
-  columnName,
+  facets,
   csrf_token,
-  type = "list",
-  expression = "value",
-  omitBlank = false,
-  omitError = false,
-  selection = [],
-  selectBlank = false,
-  selectError = false,
-  invert = false,
   mode = "row-based"
 ) {
   const params = new URLSearchParams({
@@ -25,20 +17,7 @@ export default async function computeFacets(
     },
     body: JSON.stringify({
       engine: {
-        facets: [
-          {
-            type,
-            name: columnName,
-            columnName,
-            expression,
-            omitBlank,
-            omitError,
-            selection,
-            selectBlank,
-            selectError,
-            invert,
-          },
-        ],
+        facets,
         mode,
       },
       csrf_token,

@@ -677,6 +677,47 @@
       ],
       "customMetadata": {}
     },
+    "1904258560441": {
+      "created": "2025-06-06T20:00:14.958450Z",
+      "modified": "2025-06-06T20:01:25.760167Z",
+      "name": "foo",
+      "tags": [],
+      "creator": "",
+      "contributors": "",
+      "subject": "",
+      "description": "",
+      "rowCount": 206944,
+      "title": "",
+      "version": "",
+      "license": "",
+      "homepage": "",
+      "image": "",
+      "importOptionMetadata": [
+        {
+          "encoding": "US-ASCII",
+          "separator": ",",
+          "ignoreLines": -1,
+          "headerLines": 1,
+          "skipDataLines": 0,
+          "limit": -1,
+          "storeBlankRows": true,
+          "storeBlankColumns": true,
+          "guessCellValueTypes": false,
+          "processQuotes": true,
+          "quoteCharacter": "\"",
+          "storeBlankCellsAsNulls": true,
+          "includeFileSources": false,
+          "includeArchiveFileName": false,
+          "trimStrings": false,
+          "disableAutoPreview": false,
+          "projectName": "foo",
+          "projectTags": [],
+          "fileSource": "PA.csv",
+          "archiveFileName": null
+        }
+      ],
+      "customMetadata": {}
+    },
     "1909433239682": {
       "created": "2025-05-21T19:14:59.428556Z",
       "modified": "2025-05-21T19:14:59.800711Z",

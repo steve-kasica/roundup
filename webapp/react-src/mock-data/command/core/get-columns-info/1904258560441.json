@@ -1,0 +1,10 @@
+[
+  {
+    "name": "ABBR",
+    "is_numeric": false,
+    "numeric_row_count": 0,
+    "non_numeric_row_count": 206944,
+    "error_row_count": 0,
+    "blank_row_count": 0
+  }
+]

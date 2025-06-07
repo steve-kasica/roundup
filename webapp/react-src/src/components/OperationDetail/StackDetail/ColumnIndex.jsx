@@ -21,6 +21,7 @@ function ColumnIndex({
   compareVectorValues,
   onCellClick,
   onColumnClick,
+  fetchColumnValues,
 }) {
   // Variables derived from props
   const maxColumnNameLength = Math.max(
@@ -106,8 +107,12 @@ function ColumnIndex({
             onClick={(event) => {
               // Prevent paraent onClick event from firing (column selection)
               event.stopPropagation();
+
               // Open the menu on icon button click
               setMenuAnchorEl(event.currentTarget);
+
+              // Dispatch request for column values
+              fetchColumnValues();
             }}
           >
             <ChevronDownIcon />
@@ -178,6 +183,7 @@ ColumnIndex.propTypes = {
   compareVectorValues: PropTypes.func.isRequired,
   onCellClick: PropTypes.func.isRequired,
   onColumnClick: PropTypes.func.isRequired,
+  fetchColumnValues: PropTypes.func.isRequired,
 };
 
 const EnhancedColumnIndex = withColumnVectorData(ColumnIndex);

@@ -1,7 +1,7 @@
 import { createServer } from "miragejs";
 import allProjectMetadata from "./command/core/get-all-project-metadata.json";
 import getColumnInfo from "./command/core/get-columns-info";
-import computFacetsData from "./command/core/compute-facets";
+import computeFacetsData from "./command/core/compute-facets";
 import uniqColumnValueData from "./command/open-roundup/get-unique-column-values";
 import getRowsData from "./command/core/get-rows";
 
@@ -85,8 +85,13 @@ export default function makeServer() {
       this.post(computeFacetsEndpoint, (schema, request) => {
         const projectId = request.queryParams["project"];
         const requestBody = JSON.parse(request.requestBody);
-        const columnName = requestBody.engine.facets[0].columnName;
-        return computFacetsData[projectId][columnName.toLowerCase()];
+        const columnNames = requestBody.engine.facets.map(
+          (facet) => facet.columnName
+        );
+        const facets = computeFacetsData[projectId].facets.filter((facet) =>
+          columnNames.includes(facet.columnName)
+        );
+        return { facets };
       });
 
       this.get(getUniqueColumnValuesEndpoint, (schema, request) => {

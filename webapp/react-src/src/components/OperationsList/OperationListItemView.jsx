@@ -11,7 +11,6 @@ function OperationListItemView({
   operationType,
   childrenIds,
   columnCount,
-  rowCount,
   index,
 }) {
   const dispatch = useDispatch();
@@ -36,7 +35,6 @@ OperationListItemView.propTypes = {
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
   columnCount: PropTypes.number.isRequired,
-  rowCount: PropTypes.number.isRequired,
   index: PropTypes.number.isRequired,
 };
 
