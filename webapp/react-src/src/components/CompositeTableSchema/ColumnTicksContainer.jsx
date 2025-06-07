@@ -16,7 +16,11 @@ const ColumnTicksContainer = memo(function ColumnTicksContainer({
   return (
     <>
       {ticks.map((id, i) => (
-        <EnhancedColumnTickView key={id} id={id} isDraggable={false} />
+        <EnhancedColumnTickView
+          key={`${i}-${id}`} // id === "null" for all empty (null) ticks
+          id={id}
+          isDraggable={false}
+        />
       ))}
     </>
   );
