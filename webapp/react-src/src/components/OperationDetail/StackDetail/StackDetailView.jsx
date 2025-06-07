@@ -1,4 +1,4 @@
-import { scaleBand, transpose } from "d3";
+import { scaleBand } from "d3";
 import { useDispatch, useSelector } from "react-redux";
 
 import ColumnIndex from "./ColumnIndex";
@@ -7,13 +7,9 @@ import { getValuesInRange, getIndexOfValue } from "./selectionUtils";
 
 import "./StackDetail.scss";
 import { useEffect, useState } from "react";
-import {
-  selectColumnIdsByTableId,
-  setSelectedColumns,
-} from "../../../data/slices/columnsSlice";
+import { setSelectedColumns } from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
 import { selectTablesById } from "../../../data/slices/tablesSlice/tableSelectors";
-import { useMemo } from "react";
 import {
   setHoveredTable,
   clearHoveredTable,
@@ -37,16 +33,15 @@ export default function StackDetailView({ childrenIds }) {
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
   const [selectionExtentCell, setSelectionExtentCell] = useState(null);
 
-  // TODO: this wouldn't be necessary if columnIds were stored in the table object
-  // This is al ot just to get the max column count in a table
-  const columnIdsByTable = tables.map((table) => table.columnIds);
+  const columnIdMatrix = tables.map((table) => table.columnIds);
+  const [m, n] = [
+    Math.max(...columnIdMatrix.map((c) => c.length)),
+    tables.length,
+  ];
 
-  const maxColumnCount = Math.max(...columnIdsByTable.map((c) => c.length));
-  const columnIdMatrix = columnIdsByTable;
-
-  const width = maxColumnCount * cellSize;
+  const width = m * cellSize;
   const xScale = scaleBand(
-    Array.from({ length: maxColumnCount }, (_, i) => i),
+    Array.from({ length: m }, (_, i) => i),
     [0, width]
   );
 
@@ -140,7 +135,7 @@ export default function StackDetailView({ childrenIds }) {
     if (event.shiftKey && selectionAnchorCell !== null) {
       // Shift+Click: select range from anchor to extent
       const anchorIndex = selectionAnchorCell;
-      const extentIndex = [columnIdMatrix.length - 1, index];
+      const extentIndex = [n, index];
       dispatch(
         setSelectedColumns(
           getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
@@ -149,10 +144,7 @@ export default function StackDetailView({ childrenIds }) {
     } else if (afterIndex) {
       // Click after a column: select range from anchor to this column
       const anchorIndex = [0, index];
-      const extentIndex = [
-        columnIdMatrix.length - 1,
-        columnIdMatrix[columnIdMatrix.length - 1].length - 1,
-      ];
+      const extentIndex = [n, m];
       dispatch(
         setSelectedColumns(
           getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
@@ -163,7 +155,7 @@ export default function StackDetailView({ childrenIds }) {
     } else {
       // Single click: select only this column, also handles initial shift clicks
       const anchorIndex = [0, index];
-      const extentIndex = [columnIdMatrix.length - 1, index];
+      const extentIndex = [n, index];
       dispatch(
         setSelectedColumns(
           getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
