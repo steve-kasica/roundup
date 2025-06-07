@@ -169,6 +169,9 @@ const columnsSlice = createSlice({
 
           // Remove the column ID from the loading array if it exists
           state.loading = state.loading.filter((cid) => cid !== id);
+
+          // Remove the column ID from the selected array if it exists
+          state.selected = state.selected.filter((cid) => cid !== id);
         } else {
           throw new Error(`Column with id ${id} not found`);
         }

@@ -119,6 +119,21 @@ describe("columnsSlice reducers", () => {
       expect(nextState.data[column.id]).toBeUndefined();
       expect(nextState.idsByTable["t1"]).not.toContain(column.id);
     });
+    it("removes a column and also removes it from selected", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col1.id]: col1, [col2.id]: col2 },
+        idsByTable: { t1: [col1.id, col2.id] },
+        selected: [col1.id, col2.id],
+      };
+      const nextState = columnsSlice(state, removeColumns(col1.id));
+      expect(nextState.data[col1.id]).toBeUndefined();
+      expect(nextState.idsByTable["t1"]).not.toContain(col1.id);
+      expect(nextState.selected).not.toContain(col1.id);
+      expect(nextState.selected).toContain(col2.id);
+    });
   });
 
   describe("renameColumns", () => {
