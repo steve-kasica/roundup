@@ -93,8 +93,7 @@ export default function StackDetailView({ childrenIds }) {
             <span>{yAxisLabel}</span>
           </div>
           <div className="column-group">
-            {/* TODO: not sure why `tables` has to be reversed */}
-            {[...tables].reverse().map((child) => (
+            {tables.map((child) => (
               // TODO: what if child is an operation?
               <div
                 key={child.id}
@@ -107,7 +106,7 @@ export default function StackDetailView({ childrenIds }) {
             ))}
           </div>
           <div className="column-group">
-            {[...tables].reverse().map((child) => (
+            {tables.map((child) => (
               <div className="cell" key={child.id}>
                 {child.rowsExplored} / {child.rowCount}
               </div>

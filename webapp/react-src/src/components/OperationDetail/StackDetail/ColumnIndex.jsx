@@ -150,8 +150,7 @@ function ColumnIndex({
           </List>
         </Popover>
       </Box>
-      {/* TODO: not sure why this has to be reversed */}
-      {[...columnIds].reverse().map((columnId, i) => (
+      {columnIds.map((columnId, i) => (
         <ColumnBlockView
           key={`${i}-${columnId}`} // columnId === null for all empty (null) columns
           isDraggable={true}
