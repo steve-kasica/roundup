@@ -1,11 +1,7 @@
-import { useSelector } from "react-redux";
-import { selectColumnById } from "../../data/slices/columnsSlice";
-import { ascending, descending, intersection, union } from "d3";
-import AnimatedEllipsis from "../ui/AnimatedElipse";
 import { useRef } from "react";
 import withColumnValuesData from "../HOC/withColumnValuesData";
-import Button from "@mui/material/Button";
 import { Box, Typography } from "@mui/material";
+import PropTypes from "prop-types";
 
 export const COMPONENT_ID = "./ColumnValueMatrix";
 
@@ -16,7 +12,6 @@ function ColumnValueMatrix({
   allValues,
   valueCountMatrix,
   columnTableMap,
-  isLoading,
 }) {
   const totalColumnCount = columnIds.length;
   const totalValueCount = allValues.length;
@@ -376,6 +371,19 @@ function CircleMark({ isFilled }) {
     ></Box>
   );
 }
+
+ColumnValueMatrix.propTypes = {
+  columnIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+  allValues: PropTypes.array.isRequired,
+  valueCountMatrix: PropTypes.arrayOf(PropTypes.array).isRequired,
+  columnTableMap: PropTypes.instanceOf(Map).isRequired,
+};
+
+CircleMark.propTypes = {
+  isFilled: PropTypes.bool.isRequired,
+};
 
 const EnhancedComponent = withColumnValuesData(ColumnValueMatrix);
 export default EnhancedComponent;

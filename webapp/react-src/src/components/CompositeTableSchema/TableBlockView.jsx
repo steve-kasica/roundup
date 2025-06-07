@@ -10,25 +10,17 @@ import { isMouseOverElement } from "../../lib/utilities/dom.js";
 import ColumnTicksContainer from "./ColumnTicksContainer.jsx";
 import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice/Operation.js";
 import withTableData from "../HOC/withTableData.jsx";
+import PropTypes from "prop-types";
 
 function TableBlockView({
   // props via withTableData
   id,
   name,
   columnIds,
-  rowCount,
-  tags,
-  rowsExplored,
-  dateCreated,
-  dateLastModified,
-  parentOperation,
-  depth,
   isHovered,
-  isSelected,
   isDragging,
   isPressed,
   isFocused,
-  dragRef,
 
   // props passed via OperationBlockView
   parentOperationType,
@@ -132,6 +124,20 @@ function TableBlockView({
     );
   }
 }
+
+TableBlockView.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  name: PropTypes.string.isRequired,
+  columnIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+  isHovered: PropTypes.bool,
+  isDragging: PropTypes.bool,
+  isPressed: PropTypes.bool,
+  isFocused: PropTypes.bool,
+  parentOperationType: PropTypes.string,
+  parentColumnCount: PropTypes.number.isRequired,
+};
 
 const EnhancedTableBlockView = withTableData(TableBlockView);
 export default EnhancedTableBlockView;

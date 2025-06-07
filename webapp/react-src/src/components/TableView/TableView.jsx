@@ -6,18 +6,9 @@ import withTableData from "../../components/HOC/withTableData";
 import OpenRefineAPI from "../../services/open-refine";
 import ColumnHeader from "./ColumnHeader";
 import "./TableView.css";
+import PropTypes from "prop-types";
 
-function TableView({
-  id,
-  remoteId,
-  name,
-  source,
-  rowCount,
-  columnIds,
-  tags,
-  dateCreated,
-  dateLastModified,
-}) {
+function TableView({ id, remoteId, name, rowCount, columnIds }) {
   const columnCount = columnIds.length;
   const [rows, setRows] = useState([]);
   const rowsExplored = rows.length;
@@ -124,6 +115,16 @@ function TableView({
     </div>
   );
 }
+
+TableView.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  remoteId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  name: PropTypes.string,
+  rowCount: PropTypes.number,
+  columnIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ),
+};
 
 const EnahncedTableView = withTableData(TableView);
 export default EnahncedTableView;

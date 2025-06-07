@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 import { Box, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -96,3 +97,8 @@ export default function StackDetailToolbar({
     </Box>
   );
 }
+
+StackDetailToolbar.propTypes = {
+  setSelectionAnchorCell: PropTypes.func.isRequired,
+  setSelectionExtentCell: PropTypes.func.isRequired,
+};

@@ -5,6 +5,7 @@ import { useRef } from "react";
 import ColumnBlockView from "./ColumnBlockView";
 import { isPointInBoundingBox } from "../../../lib/utilities";
 import withColumnVectorData from "../../HOC/withColumnVectorData";
+import PropTypes from "prop-types";
 
 function ColumnIndex({
   index,
@@ -17,7 +18,6 @@ function ColumnIndex({
   hasSelected,
   hoverColumnVector,
   unhoverColumnVector,
-  selectColumnVector,
   compareVectorValues,
   onCellClick,
   onColumnClick,
@@ -162,6 +162,24 @@ function ColumnIndex({
     </form>
   );
 }
+
+ColumnIndex.propTypes = {
+  index: PropTypes.number.isRequired,
+  columnIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+  columnNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+  isDragging: PropTypes.bool,
+  isHovered: PropTypes.bool,
+  dropRef: PropTypes.func.isRequired,
+  dragRef: PropTypes.func.isRequired,
+  hasSelected: PropTypes.bool,
+  hoverColumnVector: PropTypes.func.isRequired,
+  unhoverColumnVector: PropTypes.func.isRequired,
+  compareVectorValues: PropTypes.func.isRequired,
+  onCellClick: PropTypes.func.isRequired,
+  onColumnClick: PropTypes.func.isRequired,
+};
 
 const EnhancedColumnIndex = withColumnVectorData(ColumnIndex);
 export default EnhancedColumnIndex;

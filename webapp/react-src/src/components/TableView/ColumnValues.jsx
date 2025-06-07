@@ -1,4 +1,5 @@
 import withColumnData from "../HOC/withColumnData";
+import PropTypes from "prop-types";
 
 function ColumnVector({ values, isLoading, rowsExplored }) {
   const columnCells = new Array(rowsExplored).fill(null);
@@ -24,6 +25,12 @@ function ColumnVector({ values, isLoading, rowsExplored }) {
     </div>
   );
 }
+
+ColumnVector.propTypes = {
+  values: PropTypes.object.isRequired,
+  isLoading: PropTypes.bool,
+  rowsExplored: PropTypes.number.isRequired,
+};
 
 const EnhancedColumnVector = withColumnData(ColumnVector);
 

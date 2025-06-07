@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import {
   selectColumnIdsByTableId,
   selectColumnById,
@@ -27,3 +28,11 @@ export default function withColumnMatrixData(WrappedComponent) {
     );
   };
 }
+
+withColumnMatrixData.propTypes = {
+  WrappedComponent: PropTypes.elementType,
+};
+
+withColumnMatrixData.WithColumnMatrixDataPropTypes = {
+  tableId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+};

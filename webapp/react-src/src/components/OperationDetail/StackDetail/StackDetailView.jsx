@@ -1,5 +1,6 @@
 import { scaleBand } from "d3";
 import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
 
 import ColumnIndex from "./ColumnIndex";
 import StackDetailToolbar from "./StackDetailToolbar";
@@ -192,3 +193,9 @@ export default function StackDetailView({ childrenIds }) {
     setSelectionAnchorCell(anchorIndex);
   }
 }
+
+StackDetailView.propTypes = {
+  childrenIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+};

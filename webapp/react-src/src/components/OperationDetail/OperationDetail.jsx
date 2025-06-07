@@ -8,6 +8,7 @@ import {
 } from "../../data/slices/operationsSlice";
 import PackDetailView from "./PackDetailView";
 import withOperationData from "../HOC/withOperationData";
+import PropTypes from "prop-types";
 
 export default function OperationDetail() {
   const focusedOperationId = useSelector(selectFocusedOperationId);
@@ -32,3 +33,7 @@ function OperationDetailView(props) {
       return <div>Unknown operation type</div>;
   }
 }
+
+OperationDetailView.propTypes = {
+  operationType: PropTypes.string.isRequired,
+};

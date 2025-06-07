@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
 const AnimatedEllipsis = ({
   speed = 250, // in ms
@@ -24,6 +25,11 @@ const AnimatedEllipsis = ({
       {dots}
     </span>
   );
+};
+
+AnimatedEllipsis.propTypes = {
+  speed: PropTypes.number,
+  elipseLength: PropTypes.number,
 };
 
 export default AnimatedEllipsis;

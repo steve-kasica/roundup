@@ -11,6 +11,7 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../data/slices/operationsSlice";
+import PropTypes from "prop-types";
 
 export const DROP_TARGET_EVENT_INITIALIZE = "initialize";
 export const DROP_TARGET_EVENT_STACK = OPERATION_TYPE_STACK;
@@ -47,3 +48,8 @@ export default function TableDropTarget({ operationType, children }) {
     </div>
   );
 }
+
+TableDropTarget.propTypes = {
+  operationType: PropTypes.string.isRequired,
+  children: PropTypes.node,
+};

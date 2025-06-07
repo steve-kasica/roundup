@@ -12,6 +12,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Popover, List, ListItemButton } from "@mui/material";
+import PropTypes from "prop-types";
 
 import "./ColumnBlockView.scss";
 import withColumnData from "../../HOC/withColumnData";
@@ -26,7 +27,6 @@ function ColumnBlockView({
   name,
   index,
   columnType,
-  values,
   isNull,
   isSelected,
   isLoading,
@@ -39,16 +39,10 @@ function ColumnBlockView({
   nullColumn,
   removeColumn,
   renameColumn,
-  toggleColumnSelected,
-  spanSelectionToColumn,
-  selectSingleColumn,
-  addColumnToSelection,
-  unselectColumn,
   onCellClick,
 }) {
   // Additional variables derived from props
   const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table
-  const position = index + 1; // 1-indexed column indexes for user
 
   // Context menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -192,6 +186,29 @@ function ColumnBlockView({
     </div>
   );
 }
+
+ColumnBlockView.propTypes = {
+  dragRef: PropTypes.func.isRequired,
+  dropRef: PropTypes.func.isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  tableId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  name: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
+  columnType: PropTypes.string,
+  isNull: PropTypes.bool,
+  isSelected: PropTypes.bool,
+  isLoading: PropTypes.bool,
+  isHovered: PropTypes.bool,
+  isDragging: PropTypes.bool,
+  isOver: PropTypes.bool,
+  error: PropTypes.any,
+  hoverColumn: PropTypes.func.isRequired,
+  unHoverColumn: PropTypes.func.isRequired,
+  nullColumn: PropTypes.func.isRequired,
+  removeColumn: PropTypes.func.isRequired,
+  renameColumn: PropTypes.func.isRequired,
+  onCellClick: PropTypes.func.isRequired,
+};
 
 /**
  * getPercentOverlap

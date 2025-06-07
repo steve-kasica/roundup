@@ -1,4 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
+import PropTypes from "prop-types";
 
 import {
   DATA_TYPE as COLUMN,
@@ -178,3 +179,13 @@ export default function withColumnData(WrappedComponent) {
     }
   };
 }
+
+withColumnData.propTypes = {
+  WrappedComponent: PropTypes.elementType,
+};
+
+// Add prop types for the EnhancedComponent returned by withColumnData
+withColumnData.EnhancedComponentPropTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  isDraggable: PropTypes.bool,
+};

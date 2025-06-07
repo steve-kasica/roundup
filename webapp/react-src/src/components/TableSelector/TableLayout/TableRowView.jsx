@@ -10,6 +10,7 @@ import {
 } from "../../../lib/utilities";
 import withTableData from "../../HOC/withTableData";
 import { isPointInBoundingBox } from "../../../lib/utilities/dom";
+import PropTypes from "prop-types";
 
 function TableRowView({
   // props from withTableData
@@ -17,7 +18,6 @@ function TableRowView({
   name,
   columnCount,
   rowCount,
-  columnIds,
   dateCreated,
   dateLastModified,
   tags,
@@ -28,8 +28,6 @@ function TableRowView({
   peekTable,
   hoverTable,
   unhoverTable,
-  selectTable,
-  unselectTable,
   setTableSelection,
   removeTableFromSchema,
 
@@ -37,7 +35,6 @@ function TableRowView({
   isDisabled = false,
   isSelectedRow,
   searchString = "",
-  updateTableSelection,
 }) {
   const isInSchema = parentOperation !== undefined;
   const [anchorEl, setAnchorEl] = useState(null);
@@ -213,6 +210,41 @@ function TableRowView({
     </tr>
   );
 }
+
+TableRowView.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  name: PropTypes.string.isRequired,
+  columnCount: PropTypes.number.isRequired,
+  rowCount: PropTypes.number.isRequired,
+  dateCreated: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.instanceOf(Date),
+  ]),
+  dateLastModified: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.instanceOf(Date),
+  ]),
+  tags: PropTypes.arrayOf(PropTypes.string),
+  isHovered: PropTypes.bool,
+  depth: PropTypes.number,
+  parentOperation: PropTypes.shape({
+    operationType: PropTypes.string,
+  }),
+  dragRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.any }),
+  ]),
+  peekTable: PropTypes.func.isRequired,
+  hoverTable: PropTypes.func.isRequired,
+  unhoverTable: PropTypes.func.isRequired,
+  setTableSelection: PropTypes.func.isRequired,
+  removeTableFromSchema: PropTypes.func.isRequired,
+  isDisabled: PropTypes.bool,
+  isSelectedRow: PropTypes.bool,
+  searchString: PropTypes.string,
+};
 
 const EnhancedTableRowView = withTableData(TableRowView);
 export default EnhancedTableRowView;

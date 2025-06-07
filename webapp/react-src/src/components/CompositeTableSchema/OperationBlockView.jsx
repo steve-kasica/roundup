@@ -12,19 +12,16 @@ import TableBlockView from "./TableBlockView";
 import withOperationData from "../HOC/withOperationData";
 import { isOperationId } from "../../data/slices/operationsSlice";
 import { isTableId } from "../../data/slices/tablesSlice";
+import PropTypes from "prop-types";
 
 function OperationBlockView({
   // props via withOperationData
-  id,
   depth,
   columnCount,
-  rowCount,
   isFocused,
   isHovered,
   operationType,
   childrenIds,
-  onHover,
-  onUnhover,
 
   // Props passed recusrively via parent operation
   parentColumnCount = 0,
@@ -70,4 +67,17 @@ function OperationBlockView({
 }
 
 const EnhancedOperationBlockView = withOperationData(OperationBlockView);
+
+OperationBlockView.propTypes = {
+  depth: PropTypes.number,
+  columnCount: PropTypes.number.isRequired,
+  isFocused: PropTypes.bool,
+  isHovered: PropTypes.bool,
+  operationType: PropTypes.string.isRequired,
+  childrenIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+  parentColumnCount: PropTypes.number,
+};
+
 export default EnhancedOperationBlockView;

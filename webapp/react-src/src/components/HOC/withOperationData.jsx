@@ -11,6 +11,7 @@ import {
 } from "../../data/slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import { selectTablesById, isTableId } from "../../data/slices/tablesSlice";
+import PropTypes from "prop-types";
 
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
@@ -63,3 +64,12 @@ export default function withOperationData(WrappedComponent) {
     );
   };
 }
+
+withOperationData.propTypes = {
+  WrappedComponent: PropTypes.elementType,
+};
+
+// Add prop types for the EnhancedComponent returned by withOperationData
+withOperationData.EnhancedComponentPropTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+};

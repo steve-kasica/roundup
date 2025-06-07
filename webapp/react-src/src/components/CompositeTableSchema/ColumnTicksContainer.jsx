@@ -1,10 +1,8 @@
 import { memo } from "react";
-import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
-import { useSelector } from "react-redux";
 import withColumnData from "../HOC/withColumnData";
+import PropTypes from "prop-types";
 
 const ColumnTicksContainer = memo(function ColumnTicksContainer({
-  tableId,
   columnIds,
   ticksCount,
 }) {
@@ -25,6 +23,13 @@ const ColumnTicksContainer = memo(function ColumnTicksContainer({
     </>
   );
 });
+
+ColumnTicksContainer.propTypes = {
+  columnIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+  ticksCount: PropTypes.number.isRequired,
+};
 
 function ColumnTickView({
   isNull,
@@ -49,6 +54,16 @@ function ColumnTickView({
     .join(" ");
   return <div className={className}></div>;
 }
+
+ColumnTickView.propTypes = {
+  isNull: PropTypes.bool,
+  isSelected: PropTypes.bool,
+  isLoading: PropTypes.bool,
+  isHovered: PropTypes.bool,
+  isDragging: PropTypes.bool,
+  isOver: PropTypes.bool,
+  error: PropTypes.any,
+};
 
 const EnhancedColumnTickView = withColumnData(ColumnTickView);
 

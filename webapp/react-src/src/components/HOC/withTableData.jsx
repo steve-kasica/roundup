@@ -25,6 +25,7 @@ import {
   removeFromSelectedTables,
   selectSelectedTables,
 } from "../../data/slices/uiSlice";
+import PropTypes from "prop-types";
 
 export default function withTableData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
@@ -142,3 +143,13 @@ export default function withTableData(WrappedComponent) {
     );
   };
 }
+
+withTableData.propTypes = {
+  WrappedComponent: PropTypes.elementType,
+};
+
+// Add prop types for the EnhancedComponent returned by withTableData
+withTableData.EnhancedComponentPropTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  isDraggable: PropTypes.bool,
+};

@@ -16,6 +16,7 @@ import { useState } from "react";
 import { ascending, descending } from "d3";
 import TableRowView from "./TableRowView";
 import "./TableLayout.scss";
+import PropTypes from "prop-types";
 
 // TODO: move this to SourceColumn Type
 const COLUMN_TYPE_CATEGORICAL = "categorical";
@@ -24,8 +25,38 @@ const COLUMN_TYPE_DATE = "date";
 
 export const LAYOUT_ID = "table";
 
+// Move SortIcon outside TableLayout for proper prop validation
+function SortIcon({ attr, isSort, attrType, isAscending }) {
+  const iconProps = { strokeWidth: 1, size: 18 };
+
+  let AscIcon, DescIcon;
+  if (attrType === COLUMN_TYPE_CATEGORICAL) {
+    [AscIcon, DescIcon] = [ArrowDownAZ, ArrowUpZA];
+  } else if (attrType === COLUMN_TYPE_NUMERIC) {
+    [AscIcon, DescIcon] = [ArrowDown01, ArrowUp10];
+  } else {
+    [AscIcon, DescIcon] = [ArrowDownNarrowWide, ArrowUpWideNarrow];
+  }
+
+  return isSort ? (
+    isAscending ? (
+      <AscIcon {...iconProps} />
+    ) : (
+      <DescIcon {...iconProps} />
+    )
+  ) : (
+    <ArrowUpDown {...iconProps} />
+  );
+}
+
+SortIcon.propTypes = {
+  attr: PropTypes.string,
+  isSort: PropTypes.bool,
+  attrType: PropTypes.string,
+  isAscending: PropTypes.bool.isRequired,
+};
+
 export default function TableLayout({
-  searchString,
   tables,
   tableSelection,
   setTableSelection,
@@ -101,8 +132,10 @@ export default function TableLayout({
                   {/* </Tooltip> */}
                   &nbsp;
                   <SortIcon
+                    attr={header.attr}
                     isSort={header.attr === sortAttribute}
                     attrType={header.attrType}
+                    isAscending={isAscending}
                   />
                 </Button>
               </th>
@@ -116,67 +149,29 @@ export default function TableLayout({
               <td>Loading/error</td>
             </tr>
           ) : (
-            tableIds.map((id, i) => (
+            tableIds.map((id) => (
               <TableRowView
                 key={id}
                 id={id}
                 isDraggable={true}
                 setTableSelection={setTableSelection}
-                isSelectedRow={tableSelection.includes(id)} // avoids name collision with isSelected
-                // updateTableSelection={updateTableSelection}
+                isSelectedRow={tableSelection.includes(id)}
               />
             ))
           )}
         </tbody>
       </table>
     </div>
-  ); // end return statement
-
-  function SortIcon({ attr, isSort, attrType }) {
-    const iconProps = { strokeWidth: 1, size: 18 };
-
-    let AscIcon, DescIcon;
-    if (attrType === COLUMN_TYPE_CATEGORICAL) {
-      [AscIcon, DescIcon] = [ArrowDownAZ, ArrowUpZA];
-    } else if (attrType === COLUMN_TYPE_NUMERIC) {
-      [AscIcon, DescIcon] = [ArrowDown01, ArrowUp10];
-    } else {
-      [AscIcon, DescIcon] = [ArrowDownNarrowWide, ArrowUpWideNarrow];
-    }
-
-    return isSort ? (
-      isAscending ? (
-        <AscIcon {...iconProps} />
-      ) : (
-        <DescIcon {...iconProps} />
-      )
-    ) : (
-      <ArrowUpDown {...iconProps} />
-    );
-  }
-
-  function getTrueRange(arr) {
-    let maxStart = -1,
-      maxEnd = -1,
-      maxLen = 0;
-    let currStart = -1,
-      currLen = 0;
-
-    arr.forEach((val, i) => {
-      if (val) {
-        if (currStart === -1) currStart = i;
-        currLen++;
-        if (currLen > maxLen) {
-          maxLen = currLen;
-          maxStart = currStart;
-          maxEnd = i;
-        }
-      } else {
-        currStart = -1;
-        currLen = 0;
-      }
-    });
-
-    return maxLen > 0 ? [maxStart, maxEnd] : null;
-  }
+  );
 }
+
+TableLayout.propTypes = {
+  searchString: PropTypes.string,
+  tables: PropTypes.arrayOf(PropTypes.object).isRequired,
+  tableSelection: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+  setTableSelection: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  error: PropTypes.any,
+};
