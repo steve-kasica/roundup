@@ -1,6 +1,6 @@
 export * from "./valuesSlice.js"; // exports all actions
 export * from "./Value.js";
-// export * from "./valuesSelector.js";
+export * from "./valueSelectors.js";
 import Value from "./Value.js";
 import reducer from "./valuesSlice.js";
 
