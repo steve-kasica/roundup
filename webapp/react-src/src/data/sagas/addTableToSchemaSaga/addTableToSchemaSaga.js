@@ -27,7 +27,7 @@ import {
   OPERATION_TYPE_NO_OP,
   selectOperation,
   selectRootOperation,
-} from "../slices/operationsSlice";
+} from "../../slices/operationsSlice";
 
 /**
  * Action creator for adding a table to a schema.

@@ -85,12 +85,6 @@ export default function Column(tableId, index, name, columnType) {
     throw new Error("Param undefined, `index`");
   } else if (columnType === undefined) {
     throw new Error("Param undefined, `columnType`");
-  } else if (!COLUMN_TYPES.includes(columnType)) {
-    throw new Error(
-      `Invalid columnType: ${columnType}. Must be one of ${COLUMN_TYPES.join(
-        ", "
-      )}`
-    );
   }
 
   return {

@@ -25,6 +25,7 @@ import {
   TextField,
 } from "@mui/material";
 import { selectAllTablesData } from "../../data/slices/tablesSlice";
+import DuckDBFileUpload from "./DuckDBFileUpload";
 
 import "./SourceTables.scss";
 
@@ -108,9 +109,9 @@ export default function SourceTables() {
   const isLoading = false; // TODO:
   const error = false; // TODO:
 
-  useEffect(() => {
-    dispatch(fetchTablesRequest({ source: "openrefine" }));
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchTablesRequest({ source: "openrefine" }));
+  // }, [dispatch]);
 
   const filteredTables = tables
     .filter((table) => table.name.includes(searchString))
@@ -126,6 +127,7 @@ export default function SourceTables() {
 
   return (
     <div className="SourceTables">
+      <DuckDBFileUpload />
       <Grid container spacing={1} sx={{ marginBottom: "10px" }}>
         <Grid size={5}>
           <TextField
