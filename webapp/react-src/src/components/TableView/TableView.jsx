@@ -3,12 +3,12 @@ import { useSelector } from "react-redux";
 import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
 import ColumnValues from "./ColumnValues";
 import withTableData from "../../components/HOC/withTableData";
-import OpenRefineAPI from "../../services/open-refine";
 import ColumnHeader from "./ColumnHeader";
 import "./TableView.css";
 import PropTypes from "prop-types";
+import { getTableRows } from "../../lib/duckdb";
 
-function TableView({ id, remoteId, name, rowCount, columnIds }) {
+function TableView({ id, name, rowCount, columnIds }) {
   const columnCount = columnIds.length;
   const [rows, setRows] = useState([]);
   const rowsExplored = rows.length;
@@ -23,15 +23,14 @@ function TableView({ id, remoteId, name, rowCount, columnIds }) {
     async (pageNum) => {
       setLoading(true);
       const offset = pageNum * pageSize;
-      const data = await OpenRefineAPI.getRows(remoteId, offset, pageSize);
-      const newRows = data.rows.map((row) => row.cells.map(({ v }) => v));
+      const newRows = await getTableRows(name, pageSize, offset);
       setRows((prevRows) => {
         const updatedRows = pageNum === 0 ? newRows : [...prevRows, ...newRows];
         return updatedRows;
       });
       setLoading(false);
     },
-    [remoteId, pageSize, rowCount]
+    [name, pageSize, rowCount]
   );
 
   // Initial fetch or when id changes
