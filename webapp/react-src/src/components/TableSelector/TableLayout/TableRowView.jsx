@@ -11,16 +11,16 @@ import {
 import withTableData from "../../HOC/withTableData";
 import { isPointInBoundingBox } from "../../../lib/utilities/dom";
 import PropTypes from "prop-types";
+import {
+  COLUMN_TYPE_CATEGORICAL,
+  COLUMN_TYPE_NUMERICAL,
+  COLUMN_TYPE_DATE,
+} from "../../../data/slices/columnsSlice";
 
 function TableRowView({
   // props from withTableData
   id,
-  name,
-  columnCount,
-  rowCount,
-  dateCreated,
-  dateLastModified,
-  tags,
+  table,
   isHovered,
   depth,
   parentOperation,
@@ -35,6 +35,7 @@ function TableRowView({
   isDisabled = false,
   isSelectedRow,
   searchString = "",
+  headers,
 }) {
   const isInSchema = parentOperation !== undefined;
   const [anchorEl, setAnchorEl] = useState(null);
@@ -72,10 +73,10 @@ function TableRowView({
       isDisabled: isSelectedRow || isDisabled || isInSchema,
       onClick: (event) => {
         setTableSelection((prev) => {
-          if (prev.includes(id)) {
-            return prev.filter((tableId) => tableId !== id);
+          if (prev.includes(table.id)) {
+            return prev.filter((tableId) => tableId !== table.id);
           } else {
-            return [...prev, id];
+            return [...prev, table.id];
           }
         });
         handleMenuClose(event);
@@ -104,7 +105,7 @@ function TableRowView({
     <tr
       ref={trRef}
       className={className.join(" ")}
-      data-tableid={id}
+      data-tableid={table.id}
       onMouseEnter={hoverTable}
       onMouseLeave={unhoverTable}
       onClick={(event) => {
@@ -113,7 +114,7 @@ function TableRowView({
             const tr = event.currentTarget;
             const rows = Array.from(tr.parentNode.children);
             const ids = rows.map((row) => row.getAttribute("data-tableid"));
-            const clickedIndex = ids.indexOf(id);
+            const clickedIndex = ids.indexOf(table.id);
             // Find indices of selected rows in DOM order
             const selectedIndices = prev
               .map((tableId) => ids.indexOf(tableId))
@@ -121,7 +122,7 @@ function TableRowView({
 
             if (selectedIndices.length === 0) {
               // No selection yet, just select clicked
-              return [id];
+              return [table.id];
             }
 
             const min = Math.min(...selectedIndices);
@@ -134,14 +135,14 @@ function TableRowView({
               range = [max, clickedIndex];
             } else {
               // Clicked inside the range, select only that row
-              return [id];
+              return [table.id];
             }
 
             // Return the table IDs in the selected range
             return ids.slice(range[0], range[1] + 1);
           } else {
             // Single select
-            return [id];
+            return [table.id];
           }
         });
       }}
@@ -149,36 +150,19 @@ function TableRowView({
       <td className="drag-handle" ref={dragRef}>
         <DragIndicator />
       </td>
-      <td>
-        <Typography color={isDisabled ? "textDisabled" : "normal"}>
-          <HighlightText pattern={searchString} text={name} />
-        </Typography>
-      </td>
-      <td>
-        {tags.map((tag) => (
-          <Chip key={tag} label={tag} size="small" />
-        ))}
-      </td>
-      <td>
-        <Typography color={isDisabled ? "textDisabled" : "normal"}>
-          {formatNumber(rowCount)}
-        </Typography>
-      </td>
-      <td>
-        <Typography color={isDisabled ? "textDisabled" : "normal"}>
-          {formatNumber(columnCount)}
-        </Typography>
-      </td>
-      <td>
-        <Typography color={isDisabled ? "textDisabled" : "normal"}>
-          {formatDate(parseOpenRefineDate(dateCreated))}
-        </Typography>
-      </td>
-      <td>
-        <Typography color={isDisabled ? "textDisabled" : "normal"}>
-          {formatDate(parseOpenRefineDate(dateLastModified))}
-        </Typography>
-      </td>
+      {headers.map(({ attr, attrType }) => (
+        <td key={attr}>
+          <Typography color={isDisabled ? "textDisabled" : "normal"}>
+            {attrType === COLUMN_TYPE_CATEGORICAL ? (
+              <HighlightText pattern={searchString} text={table[attr]} />
+            ) : attrType === COLUMN_TYPE_NUMERICAL ? (
+              formatNumber(table[attr])
+            ) : attrType === COLUMN_TYPE_DATE ? (
+              formatDate(new Date(table[attr]))
+            ) : null}
+          </Typography>
+        </td>
+      ))}
       <td className="more-options">
         <IconButton onClick={handleMenuOpen}>
           <MoreVert />
@@ -211,40 +195,33 @@ function TableRowView({
   );
 }
 
-TableRowView.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  name: PropTypes.string.isRequired,
-  columnCount: PropTypes.number.isRequired,
-  rowCount: PropTypes.number.isRequired,
-  dateCreated: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-    PropTypes.instanceOf(Date),
-  ]),
-  dateLastModified: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-    PropTypes.instanceOf(Date),
-  ]),
-  tags: PropTypes.arrayOf(PropTypes.string),
-  isHovered: PropTypes.bool,
-  depth: PropTypes.number,
-  parentOperation: PropTypes.shape({
-    operationType: PropTypes.string,
-  }),
-  dragRef: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.any }),
-  ]),
-  peekTable: PropTypes.func.isRequired,
-  hoverTable: PropTypes.func.isRequired,
-  unhoverTable: PropTypes.func.isRequired,
-  setTableSelection: PropTypes.func.isRequired,
-  removeTableFromSchema: PropTypes.func.isRequired,
-  isDisabled: PropTypes.bool,
-  isSelectedRow: PropTypes.bool,
-  searchString: PropTypes.string,
-};
+// TableRowView.propTypes = {
+//   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+
+//   isHovered: PropTypes.bool,
+//   depth: PropTypes.number,
+//   parentOperation: PropTypes.shape({
+//     operationType: PropTypes.string,
+//   }),
+//   dragRef: PropTypes.oneOfType([
+//     PropTypes.func,
+//     PropTypes.shape({ current: PropTypes.any }),
+//   ]),
+//   peekTable: PropTypes.func.isRequired,
+//   hoverTable: PropTypes.func.isRequired,
+//   unhoverTable: PropTypes.func.isRequired,
+//   setTableSelection: PropTypes.func.isRequired,
+//   removeTableFromSchema: PropTypes.func.isRequired,
+//   isDisabled: PropTypes.bool,
+//   isSelectedRow: PropTypes.bool,
+//   searchString: PropTypes.string,
+//   headers: PropTypes.arrayOf(
+//     PropTypes.shape({
+//       attr: PropTypes.string.isRequired,
+//       attrType: PropTypes.string.isRequired,
+//     })
+//   ).isRequired,
+// };
 
 const EnhancedTableRowView = withTableData(TableRowView);
 export default EnhancedTableRowView;

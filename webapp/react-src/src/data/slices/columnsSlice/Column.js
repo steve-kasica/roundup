@@ -48,6 +48,7 @@ export const DATA_TYPE = "COLUMN";
 
 export const COLUMN_TYPE_CATEGORICAL = "CATEGORICAL";
 export const COLUMN_TYPE_NUMERICAL = "NUMERICAL";
+export const COLUMN_TYPE_DATE = "DATE";
 /**
  * An array containing the supported column types.
  *

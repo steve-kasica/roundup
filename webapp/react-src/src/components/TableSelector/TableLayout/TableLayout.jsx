@@ -17,11 +17,13 @@ import { ascending, descending } from "d3";
 import TableRowView from "./TableRowView";
 import "./TableLayout.scss";
 import PropTypes from "prop-types";
+import {
+  COLUMN_TYPE_NUMERICAL,
+  COLUMN_TYPE_DATE,
+  COLUMN_TYPE_CATEGORICAL,
+} from "../../../data/slices/columnsSlice";
 
 // TODO: move this to SourceColumn Type
-const COLUMN_TYPE_CATEGORICAL = "categorical";
-const COLUMN_TYPE_NUMERIC = "numeric";
-const COLUMN_TYPE_DATE = "date";
 
 export const LAYOUT_ID = "table";
 
@@ -32,7 +34,7 @@ function SortIcon({ attr, isSort, attrType, isAscending }) {
   let AscIcon, DescIcon;
   if (attrType === COLUMN_TYPE_CATEGORICAL) {
     [AscIcon, DescIcon] = [ArrowDownAZ, ArrowUpZA];
-  } else if (attrType === COLUMN_TYPE_NUMERIC) {
+  } else if (attrType === COLUMN_TYPE_NUMERICAL) {
     [AscIcon, DescIcon] = [ArrowDown01, ArrowUp10];
   } else {
     [AscIcon, DescIcon] = [ArrowDownNarrowWide, ArrowUpWideNarrow];
@@ -81,24 +83,29 @@ export default function TableLayout({
       tooltip: "Sort by selected tables",
       attrType: COLUMN_TYPE_CATEGORICAL,
     },
-    { attr: "tags", label: "Tags", tooltip: "" },
+    {
+      attr: "size",
+      label: "Size",
+      tooltip: "Sort by file size",
+      attrType: COLUMN_TYPE_NUMERICAL,
+    },
+    {
+      attr: "mimeType",
+      label: "Type",
+      tooltip: "Sort by file type",
+      attrType: COLUMN_TYPE_CATEGORICAL,
+    },
     {
       attr: "rowCount",
       label: "Rows",
       tooltip: "Sort by total rows",
-      attrType: COLUMN_TYPE_NUMERIC,
+      attrType: COLUMN_TYPE_NUMERICAL,
     },
     {
       attr: "columnCount",
       label: "Columns",
       tooltip: "Sort by total columns",
-      attrType: COLUMN_TYPE_NUMERIC,
-    },
-    {
-      attr: "dateCreated",
-      label: "Created",
-      tooltip: "Sort by date created",
-      attrType: COLUMN_TYPE_DATE,
+      attrType: COLUMN_TYPE_NUMERICAL,
     },
     {
       attr: "dateLastModified",
@@ -156,6 +163,7 @@ export default function TableLayout({
                 isDraggable={true}
                 setTableSelection={setTableSelection}
                 isSelectedRow={tableSelection.includes(id)}
+                headers={headers}
               />
             ))
           )}

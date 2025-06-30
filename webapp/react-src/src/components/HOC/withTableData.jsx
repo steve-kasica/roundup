@@ -15,10 +15,7 @@ import {
 } from "../../data/slices/uiSlice";
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 import { dataType as SourceTable } from "../../data/slices/tablesSlice";
-import {
-  selectColumnById,
-  selectColumnIdsByTableId,
-} from "../../data/slices/columnsSlice";
+import { selectColumnById } from "../../data/slices/columnsSlice";
 import { peekTableAction } from "../../data/sagas/peekTableSaga";
 import {
   appendToSelectedTables,
@@ -38,6 +35,7 @@ export default function withTableData(WrappedComponent) {
     const columns = useSelector((state) =>
       table.columnIds.map((columnId) => selectColumnById(state, columnId))
     );
+    // TODO: memoize
     const columnNames = columns.filter(Boolean).map((col) => col.name);
     const selectedTables = useSelector(selectSelectedTables);
 
@@ -87,25 +85,30 @@ export default function withTableData(WrappedComponent) {
     return (
       <WrappedComponent
         {...props}
-        id={id}
-        remoteId={table.remoteId}
-        name={table.name}
+        // Table properties
+        table={table}
+        id={table.id}
         source={table.source}
-        rowCount={table.rowCount}
-        tags={table.tags}
-        rowsExplored={table.rowsExplored}
-        dateCreated={table.dateCreated}
-        dateLastModified={table.dateLastModified}
-        columnCount={table.columnCount}
+        name={table.name}
+        extension={table.extension}
+        size={table.size}
+        mimeType={table.mimeType}
+        columnCount={table.columnIds.length}
         columnIds={table.columnIds}
-        columnNames={columns.filter(Boolean).map((col) => col.name)}
+        rowCount={table.rowCount}
+        rowsExplored={table.rowsExplored}
+        dateLastModified={table.dateLastModified}
+        // Other related objects
+        columnNames={columnNames}
         parentOperation={parentOperation}
         depth={depth}
+        // Interaction state
         isHovered={hoveredTable === id}
         isSelected={selectedTables.includes(id)}
         isDragging={isDragging}
         isPressed={isPressed}
         isFocused={parentOperation ? true : false}
+        // Interaction handlers
         dragRef={dragRef}
         onHover={() => dispatch(setHoveredTable(id))}
         onUnhover={() => dispatch(clearHoveredTable())}

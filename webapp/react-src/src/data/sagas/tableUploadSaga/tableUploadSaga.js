@@ -11,7 +11,8 @@ export default function* tableUploadWatcher() {
 }
 
 export function* tableUploadWorker(action) {
-  const { tableName } = action.payload;
+  const { source, tableName, extension, size, mimeType, lastModified } =
+    action.payload;
   const db = yield call(getDuckDB);
   const conn = yield call([db, db.connect]);
 
@@ -32,14 +33,14 @@ export function* tableUploadWorker(action) {
   const rowCount = Number(rowCountQuery.toArray()[0].count);
 
   const table = Table(
-    "foo",
-    "openrefine",
+    source,
     tableName,
+    extension,
+    size,
+    mimeType,
     columns.length, // TODO: remove this
     rowCount,
-    new Date().toISOString(),
-    new Date().toISOString(),
-    []
+    lastModified
   );
 
   columns.forEach((column) => {
