@@ -6,24 +6,26 @@ export async function getValuesCountMatrix(columnNames, tableNames) {
   const conn = await db.connect();
   const query = `
     SELECT
-        COLUMN_VALUE,
+        VAL,
         ${tableNames
           .map(
             (name) =>
-              `CAST(SUM((SOURCE_TABLE = '${name}')::INTEGER) AS INTEGER) AS COUNT_IN_${name}`
+              `CAST(SUM((SOURCE_TABLE = '${name}')::INTEGER) AS INTEGER) AS ${name}`
           )
           .join(",\n        ")}
         FROM (
             ${tableNames
               .map(
                 (name, i) =>
-                  `SELECT ${columnNames[i]} AS COLUMN_VALUE, '${name}' AS SOURCE_TABLE FROM ${name}`
+                  `SELECT ${columnNames[i]} AS VAL, '${name}' AS SOURCE_TABLE FROM ${name}`
               )
               .join("\n            UNION ALL\n            ")}
         ) AS combined
-    GROUP BY COLUMN_VALUE
+    GROUP BY VAL
   `;
   const result = await conn.query(query);
   await conn.close();
-  return result.toArray();
+
+  const matrix = result.toArray().map((row) => Object.values(row)); // array of arrays (matrix)
+  return matrix;
 }

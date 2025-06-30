@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import withColumnValuesData from "../HOC/withColumnValuesData";
+import { useEffect, useRef, useState } from "react";
+import withColumnValuesData from "../HOC/withValuesMatrixData";
 import { Box, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 
@@ -7,21 +7,47 @@ export const COMPONENT_ID = "./ColumnValueMatrix";
 
 const ROW_HEIGHT = 32; // px, adjust as needed
 
+const Y_AXIS_WIDTH = 33.333; // a fixed percentage width for the Y-axis column (value names)
+
 function ColumnValueMatrix({
   columnIds,
-  allValues,
-  valueCountMatrix,
-  columnTableMap,
+  columnNames,
+  tableNames,
+  valueCountMatrixPromise,
 }) {
+  // Derive additional data from props
   const totalColumnCount = columnIds.length;
-  const totalValueCount = allValues.length;
-  const yAxisWidth = 33.333; // a fixed percentage width for the Y-axis column (value names)
-  const colWidth = `${(100 - yAxisWidth) / totalColumnCount}%`;
+  const colWidth = `${(100 - Y_AXIS_WIDTH) / totalColumnCount}%`;
+
+  const [matrix, setMatrix] = useState(null);
+  const [uniqueValues, setUniqueValues] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    valueCountMatrixPromise.then((result) => {
+      if (isMounted) {
+        setMatrix(result.map((row) => row.slice(1))); // Exclude the first column which is the value itself
+        setUniqueValues(result.map((row) => row[0])); // first column is the value
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [valueCountMatrixPromise]);
+
+  // Refs for each value row
+  const valueRowRefs = useRef({});
+  const bodyRef = useRef(null);
+
+  if (!matrix) return null; // or some loading indicator
+
+  // Derive data from resolved promise
+  const totalValueCount = uniqueValues.length;
 
   // Sort allValues and valueCountMatrix by degree (descending),
   // and for equal degree, group by the set of columns (tables) where the value appears
-  const valueDegreeEntries = allValues.map((value, i) => {
-    const row = valueCountMatrix[i];
+  const valueDegreeEntries = uniqueValues.map((value, i) => {
+    const row = matrix[i];
     const degree = row.filter((c) => c > 0).length;
     // Create a signature: a string of indices of columns with nonzero count, joined by '-'
     const signature = row
@@ -37,6 +63,7 @@ function ColumnValueMatrix({
     if (a.signature > b.signature) return 1;
     return 0;
   });
+
   const sortedAllValues = valueDegreeEntries.map((entry) => entry.value);
   const sortedValueCountMatrix = valueDegreeEntries.map((entry) => entry.row);
 
@@ -76,10 +103,6 @@ function ColumnValueMatrix({
       categories[degreeCategory].firstValue = value;
     }
   });
-
-  // Refs for each value row
-  const valueRowRefs = useRef({});
-  const bodyRef = useRef(null);
 
   // Scroll to the first row with the selected degree
   const scrollToDegree = (value) => {
@@ -260,14 +283,14 @@ function ColumnValueMatrix({
             >
               <Box
                 sx={{
-                  width: yAxisWidth + "%",
+                  width: Y_AXIS_WIDTH + "%",
                   padding: "4px",
                   textAlign: "right",
                   borderRight: "1px solid #ccc",
                   boxSizing: "border-box",
                 }}
               ></Box>
-              {columnIds.map((columnId) => (
+              {columnIds.map((columnId, i) => (
                 <Box
                   key={columnId}
                   sx={{
@@ -280,7 +303,8 @@ function ColumnValueMatrix({
                   }}
                 >
                   <Box sx={{ transform: "rotate(-45deg)", wordWrap: "unset" }}>
-                    {columnTableMap.get(columnId)?.name}
+                    {/* {columnTableMap.get(columnId)?.name} */}
+                    {tableNames[i]}
                   </Box>
                 </Box>
               ))}
@@ -310,7 +334,7 @@ function ColumnValueMatrix({
                   (valueRowRefs.current[sortedAllValues[rowIndex]] = el)
                 }
                 sx={{
-                  width: yAxisWidth + "%",
+                  width: Y_AXIS_WIDTH + "%",
                   padding: "4px",
                   textAlign: "right",
                   borderRight: "1px solid #ccc",
@@ -347,6 +371,7 @@ function ColumnValueMatrix({
     if (degree === totalColumnCount) return "all";
     if (degree > 1) return "some";
     if (degree === 1) return "one";
+    if (degree === 0) return "none";
   }
 }
 
@@ -376,9 +401,9 @@ ColumnValueMatrix.propTypes = {
   columnIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
-  allValues: PropTypes.array.isRequired,
-  valueCountMatrix: PropTypes.arrayOf(PropTypes.array).isRequired,
-  columnTableMap: PropTypes.instanceOf(Map).isRequired,
+  columnNames: PropTypes.array, // add if used
+  tableNames: PropTypes.array, // add if used
+  valueCountMatrixPromise: PropTypes.instanceOf(Promise).isRequired,
 };
 
 CircleMark.propTypes = {
