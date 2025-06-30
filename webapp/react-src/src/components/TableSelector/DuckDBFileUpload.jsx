@@ -11,28 +11,26 @@ export default function DuckDBFileUpload({ onTableLoaded }) {
   async function handleFileChange(e) {
     setError(null);
     setLoading(true);
-    const file = e.target.files[0];
-    const tableName = file.name
-      .replace(/\.[^/.]+$/, "")
-      .replace(/[^a-zA-Z0-9_]/g, "_");
-
-    const fileExtension = file.name.split(".").pop().toLowerCase();
-
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
     try {
       const db = await getDuckDB();
       const conn = await db.connect();
-
-      // Register the file in DuckDB's virtual FS
-      const text = await file.text();
-      await db.registerFileText(file.name, text);
-
-      // Ingest the CSV into a DuckDB table
-      await conn.query(
-        `CREATE TABLE "${tableName}" AS SELECT * FROM read_csv_auto('${file.name}', AUTO_DETECT=TRUE, all_varchar=true)`
-      );
-
-      dispatch(tableUploadSuccess({ tableName, fileExtension }));
+      for (const file of files) {
+        const tableName = file.name
+          .replace(/\.[^/.]+$/, "")
+          .replace(/[^a-zA-Z0-9_]/g, "_");
+        const fileExtension = file.name.split(".").pop().toLowerCase();
+        // Register the file in DuckDB's virtual FS
+        const text = await file.text();
+        await db.registerFileText(file.name, text);
+        // Ingest the CSV into a DuckDB table
+        await conn.query(
+          `CREATE TABLE "${tableName}" AS SELECT * FROM read_csv_auto('${file.name}', AUTO_DETECT=TRUE, all_varchar=true)`
+        );
+        dispatch(tableUploadSuccess({ tableName, fileExtension }));
+        if (onTableLoaded) onTableLoaded(tableName);
+      }
       await conn.close();
     } catch (err) {
       setError(err.message);
@@ -48,6 +46,7 @@ export default function DuckDBFileUpload({ onTableLoaded }) {
         accept=".csv,.parquet"
         onChange={handleFileChange}
         disabled={loading}
+        multiple
       />
       {loading && <span>Loading...</span>}
       {error && <span style={{ color: "red" }}>{error}</span>}
