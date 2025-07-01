@@ -3,52 +3,63 @@ import { Table, isTable, isTableId } from "./Table";
 
 // Helper to create valid table args
 const validArgs = [
-  "remote-1", // remoteId
-  "openrefine", // source
+  "user upload", // source
   "Test Table", // name
+  "csv", // extension
+  1024, // size in bytes
+  "text/csv", // mimeType
   6, // columnCount
   10, // rowCount
-  "2024-01-01T00:00:00Z", // dateCreated (string, not Date)
   "2024-01-02T00:00:00Z", // dateLastModified (string, not Date)
-  ["tag1", "tag2"], // tags
 ];
 
 describe("Table factory", () => {
   it("creates a valid table object", () => {
     const table = Table(...validArgs);
     expect(table).toHaveProperty("id");
-    expect(table.remoteId).toBe(validArgs[0]);
-    expect(table.source).toBe(validArgs[1]);
-    expect(table.name).toBe(validArgs[2]);
-    expect(table.columnCount).toBe(validArgs[3]);
-    expect(table.rowCount).toBe(validArgs[4]);
-    expect(table.dateCreated).toBe(validArgs[5]);
-    expect(table.dateLastModified).toBe(validArgs[6]);
-    expect(table.tags).toEqual(validArgs[7]);
+    expect(table.source).toBe(validArgs[0]);
+    expect(table.name).toBe(validArgs[1]);
+    expect(table.extension).toBe(validArgs[2]);
+    expect(table.size).toBe(validArgs[3]);
+    expect(table.mimeType).toBe(validArgs[4]);
+    expect(table.columnCount).toBe(validArgs[5]);
+    expect(table.rowCount).toBe(validArgs[6]);
+    expect(table.dateLastModified).toBe(validArgs[7]);
     expect(table.rowsExplored).toBe(0);
-  });
-
-  it("throws if remoteId is missing", () => {
-    expect(() => Table(undefined, ...validArgs.slice(1))).toThrow(
-      "`remoteId` is undefined"
-    );
+    expect(Array.isArray(table.columnIds)).toBe(true);
+    expect(table.columnIds.length).toBe(validArgs[5]);
+    expect(Array.isArray(table.originalColumnIds)).toBe(true);
+    expect(table.originalColumnIds.length).toBe(validArgs[5]);
+    expect(table.alias).toBe(validArgs[1]);
   });
 
   it("throws if rowCount is not integer", () => {
     expect(() =>
-      Table("remote-2", "openrefine", "Name", 6, "not-an-int", "2024", "2024")
+      Table(
+        "user upload",
+        "Test Table",
+        "csv",
+        1024,
+        "text/csv",
+        6,
+        "not-an-int",
+        "2024-01-02T00:00:00Z"
+      )
     ).toThrow("`rowCount` must be an integer");
-  });
-
-  it("throws if dateCreated is a Date instance", () => {
-    expect(() =>
-      Table("remote-3", "openrefine", "Name", 6, 1, new Date(), "2024")
-    ).toThrow("`dateCreated` cannot be a Date instance for serializability");
   });
 
   it("throws if dateLastModified is a Date instance", () => {
     expect(() =>
-      Table("remote-4", "openrefine", "Name", 6, 1, "2024", new Date())
+      Table(
+        "user upload",
+        "Test Table",
+        "csv",
+        1024,
+        "text/csv",
+        6,
+        10,
+        new Date()
+      )
     ).toThrow(
       "`dateLastCreated` cannot be a Date instance for serializability"
     );

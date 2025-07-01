@@ -78,7 +78,7 @@ export default function TableLayout({
 
   const headers = [
     {
-      attr: "name",
+      attr: "alias",
       label: "Name",
       tooltip: "Sort by selected tables",
       attrType: COLUMN_TYPE_CATEGORICAL,

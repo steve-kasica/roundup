@@ -37,7 +37,8 @@ export function Table(
   return {
     id: `t-${++idCounter}`,
     source,
-    name,
+    name, // name is immutable, so it can lookup columns in a table by name
+    alias: name, // alias is mutable, so it can be changed by the user
     extension,
     size,
     mimeType,
@@ -54,10 +55,13 @@ export const isTable = (obj) =>
   Object.hasOwn(obj, "id") &&
   Object.hasOwn(obj, "source") &&
   Object.hasOwn(obj, "name") &&
-  Object.hasOwn(obj, "rowCount") &&
+  Object.hasOwn(obj, "alias") &&
+  Object.hasOwn(obj, "extension") &&
+  Object.hasOwn(obj, "size") &&
+  Object.hasOwn(obj, "mimeType") &&
   Object.hasOwn(obj, "columnCount") &&
+  Object.hasOwn(obj, "rowCount") &&
   Object.hasOwn(obj, "rowsExplored") &&
-  Object.hasOwn(obj, "dateLastModified") &&
-  Object.hasOwn(obj, "tags");
+  Object.hasOwn(obj, "dateLastModified");
 
 export const isTableId = (id) => typeof id === "string" && id.startsWith("t-");

@@ -7,7 +7,10 @@ import {
   removeChildFromOperation,
   selectOperation,
 } from "../../data/slices/operationsSlice";
-import { selectTablesById } from "../../data/slices/tablesSlice";
+import {
+  changeTablesName,
+  selectTablesById,
+} from "../../data/slices/tablesSlice";
 import {
   setHoveredTable,
   clearHoveredTable,
@@ -89,7 +92,7 @@ export default function withTableData(WrappedComponent) {
         table={table}
         id={table.id}
         source={table.source}
-        name={table.name}
+        name={table.alias || table.name}
         extension={table.extension}
         size={table.size}
         mimeType={table.mimeType}
@@ -142,6 +145,9 @@ export default function withTableData(WrappedComponent) {
         hoverTable={() => dispatch(setHoveredTable(id))}
         unhoverTable={() => dispatch(clearHoveredTable())}
         peekTable={() => dispatch(peekTableAction({ tableId: id }))}
+        setTableAlias={(aliases) =>
+          dispatch(changeTablesName({ ids: id, aliases }))
+        }
       />
     );
   };

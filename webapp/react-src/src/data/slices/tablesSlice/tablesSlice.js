@@ -109,18 +109,31 @@ const slice = createSlice({
      * @param {Object} state - The current state of the tables slice.
      * @param {Object} action - The dispatched action containing payload.
      * @param {Object} action.payload - The payload object.
-     * @param {string|number} action.payload.tableId - The unique identifier of the table to rename.
-     * @param {string} action.payload.newName - The new name to assign to the table.
+     * @param {string|array} action.payload.tableId - The unique identifier of the table to rename.
+     * @param {string|array} action.payload.newName - The new name to assign to the table.
      * @throws {Error} Throws an error if the table with the specified ID does not exist.
      */
-    changeTableName(state, action) {
-      const { tableId, newName } = action.payload;
-      // Check if the table exists
-      if (!state.data[tableId]) {
-        throw new Error(`Table with ID ${tableId} does not exist`);
+    changeTablesName(state, action) {
+      let { ids, aliases } = action.payload;
+      // Ensure tableIds is an array
+      ids = Array.isArray(ids) ? ids : [ids];
+      aliases = Array.isArray(aliases) ? aliases : [aliases];
+
+      // Check if the number of tableIds matches the number of aliases
+      if (ids.length !== aliases.length) {
+        throw new Error("Number of table IDs must match the number of aliases");
       }
-      // Update the table name
-      state.data[tableId].name = newName;
+      // Iterate over each table ID and update its alias
+      ids.forEach((id, index) => {
+        const alias = aliases[index].trim();
+
+        // Check if the table exists
+        if (!state.data[id]) {
+          throw new Error(`Table with ID ${id} does not exist`);
+        }
+        // Update the table name
+        state.data[id].alias = alias;
+      });
     },
 
     incrementRowsExplored: (state, action) => {
@@ -183,7 +196,7 @@ export const {
   removeTables,
   addTablesToLoading,
   removeTablesFromLoading,
-  changeTableName,
+  changeTablesName,
   incrementRowsExplored,
   setTableColumnIds,
   swapTableColumnIds,

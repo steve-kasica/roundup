@@ -30,6 +30,7 @@ function TableRowView({
   unhoverTable,
   setTableSelection,
   removeTableFromSchema,
+  setTableAlias,
 
   // props from parent component
   isDisabled = false,
@@ -37,6 +38,8 @@ function TableRowView({
   searchString = "",
   headers,
 }) {
+  const { name, alias } = table;
+  const isPressed = false; // Placeholder, replace with actual
   const isInSchema = parentOperation !== undefined;
   const [anchorEl, setAnchorEl] = useState(null);
   const trRef = useRef(null);
@@ -60,6 +63,17 @@ function TableRowView({
   };
 
   const menuItems = [
+    {
+      label: "Rename table",
+      isDisabled: false,
+      onClick: (event) => {
+        const newName = prompt("Enter new table name:", alias || name);
+        if (newName && newName.trim() !== "") {
+          setTableAlias(newName);
+        }
+        handleMenuClose(event);
+      },
+    },
     {
       label: "Peek at table",
       isDisabled: false,
