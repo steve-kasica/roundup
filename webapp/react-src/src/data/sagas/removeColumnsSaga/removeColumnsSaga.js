@@ -28,10 +28,7 @@ export function* removeColumnsSagaWorker(action) {
 
   yield put(addColumnsToLoading(columnIds));
 
+  // Remove from selected columns from all attributes
+  // of the columns slice, including loading array
   yield put(removeColumns(columnIds));
-
-  // Remove these ids from interaction state arrays for columns,
-  // e.g. selected columns and loading columns. Keeps other components in sync.
-  yield put(removeFromSelectedColumns(columnIds));
-  yield put(removeColumnsFromLoading(columnIds));
 }

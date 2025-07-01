@@ -108,18 +108,7 @@ describe("columnsSlice reducers", () => {
   });
 
   describe("removeColumns", () => {
-    it("removes a column", () => {
-      const column = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
-      const state = {
-        ...getInitialState(),
-        data: { [column.id]: column },
-        idsByTable: { t1: [column.id] },
-      };
-      const nextState = columnsSlice(state, removeColumns(column.id));
-      expect(nextState.data[column.id].isRemoved).toBeTruthy();
-      expect(nextState.idsByTable["t1"]).not.toContain(column.id);
-    });
-    it("removes a column and also removes it from selected", () => {
+    it("removes sets the `isRemoved` attribute in `.data` to truthy", () => {
       const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
       const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
       const state = {
@@ -127,10 +116,75 @@ describe("columnsSlice reducers", () => {
         data: { [col1.id]: col1, [col2.id]: col2 },
         idsByTable: { t1: [col1.id, col2.id] },
         selected: [col1.id, col2.id],
+        hovered: [col1.id, col2.id],
       };
       const nextState = columnsSlice(state, removeColumns(col1.id));
       expect(nextState.data[col1.id].isRemoved).toBeTruthy();
-      expect(nextState.idsByTable["t1"]).not.toContain(col1.id);
+    });
+    it("removes the columnID from selected array", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col1.id]: col1, [col2.id]: col2 },
+        idsByTable: { t1: [col1.id, col2.id] },
+        selected: [col1.id, col2.id],
+        hovered: [col1.id, col2.id],
+      };
+      const nextState = columnsSlice(state, removeColumns(col1.id));
+      expect(nextState.selected).not.toContain(col1.id);
+      expect(nextState.selected).toContain(col2.id);
+    });
+    it("removes the columnID from hovered array", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col1.id]: col1, [col2.id]: col2 },
+        idsByTable: { t1: [col1.id, col2.id] },
+        hovered: [col1.id, col2.id],
+      };
+      const nextState = columnsSlice(state, removeColumns(col1.id));
+      expect(nextState.hovered).not.toContain(col1.id);
+      expect(nextState.hovered).toContain(col2.id);
+    });
+    it("removes the columnID from dragging array", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col1.id]: col1, [col2.id]: col2 },
+        idsByTable: { t1: [col1.id, col2.id] },
+        selected: [col1.id, col2.id],
+        hovered: [col1.id, col2.id],
+        dragging: [col1.id, col2.id],
+      };
+      const nextState = columnsSlice(state, removeColumns(col1.id));
+      expect(nextState.dragging).not.toContain(col1.id);
+      expect(nextState.dragging).toContain(col2.id);
+    });
+    it("removes the columnID from loading array", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col1.id]: col1, [col2.id]: col2 },
+        idsByTable: { t1: [col1.id, col2.id] },
+        loading: [col1.id, col2.id],
+      };
+      const nextState = columnsSlice(state, removeColumns(col1.id));
+      expect(nextState.loading).not.toContain(col1.id);
+      expect(nextState.loading).toContain(col2.id);
+    });
+    it("removes the table from idsByTable if all columns are removed", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col1.id]: col1 },
+        idsByTable: { t1: [col1.id] },
+      };
+      const nextState = columnsSlice(state, removeColumns(col1.id));
+      expect(nextState.idsByTable["t1"]).toBeUndefined();
     });
   });
 

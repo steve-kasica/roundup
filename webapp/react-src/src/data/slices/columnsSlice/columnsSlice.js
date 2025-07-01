@@ -204,13 +204,29 @@ const columnsSlice = createSlice({
       ids.forEach((id) => {
         const column = state.data[id];
         if (column) {
-          // Remove the column from the data object
+          // Mark column as removed in data dictionary
           state.data[id].isRemoved = true; // Mark as removed
 
           // Remove the column ID from the idsByTable mapping
           state.idsByTable[column.tableId] = state.idsByTable[
             column.tableId
           ].filter((cid) => cid !== id);
+          if (state.idsByTable[column.tableId].length === 0) {
+            // If there are no columns left in the table, delete the entry
+            delete state.idsByTable[column.tableId];
+          }
+
+          // Remove the column from the selected columns if it is selected
+          state.selected = state.selected.filter((cid) => cid !== id);
+
+          // Remove the column from the hovered columns if it is hovered
+          state.hovered = state.hovered.filter((cid) => cid !== id);
+
+          // Remove the column from the loading state if it is loading
+          state.loading = state.loading.filter((cid) => cid !== id);
+
+          // Remove the column from the dragging state
+          state.dragging = state.dragging.filter((cid) => cid !== id);
         } else {
           throw new Error(`Column with id ${id} not found`);
         }
