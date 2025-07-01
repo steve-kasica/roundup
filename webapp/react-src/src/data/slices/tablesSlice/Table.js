@@ -48,7 +48,7 @@ export function Table(
     rowCount,
     rowsExplored: 0, // TODO: remove this
     dateLastModified,
-    parentId: null, // Parent operation ID if this table is derived from an operation
+    operationId: null, // Parent operation ID if this table is derived from an operation
   };
 }
 
@@ -66,7 +66,7 @@ const attributes = [
   "rowCount",
   "rowsExplored",
   "dateLastModified",
-  "parentId",
+  "operationId",
 ];
 
 export const isTable = (obj) =>

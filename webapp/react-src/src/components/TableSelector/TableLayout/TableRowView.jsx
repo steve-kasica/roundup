@@ -31,6 +31,7 @@ function TableRowView({
   setTableSelection,
   removeTableFromSchema,
   setTableAlias,
+  dropTable,
 
   // props from parent component
   isDisabled = false,
@@ -97,10 +98,18 @@ function TableRowView({
       },
     },
     {
-      label: `Remove`,
+      label: `Remove from schema`,
       isDisabled: !isInSchema,
       onClick: (event) => {
         removeTableFromSchema();
+        handleMenuClose(event);
+      },
+    },
+    {
+      label: "Delete table",
+      isDisabled: false,
+      onClick: (event) => {
+        dropTable();
         handleMenuClose(event);
       },
     },

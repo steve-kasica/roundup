@@ -28,7 +28,8 @@ describe("operationsSlice reducers", () => {
   });
 
   it("addOperation adds a new operation and sets it as root", () => {
-    const action = addOperation({ operationType: "stack", childId: "child1" });
+    const op = Operation("stack", ["child1"]);
+    const action = addOperation(op);
     const state = reducer(initialState, action);
     expect(state.ids.length).toBe(1);
     expect(state.root).toBe(state.ids[0]);
@@ -38,25 +39,19 @@ describe("operationsSlice reducers", () => {
 
   it("addOperation with existing root nests previous root as child", () => {
     // Add first op
-    let state = reducer(
-      initialState,
-      addOperation({ operationType: "stack", childId: "c1" })
-    );
+    const op1 = Operation("stack", ["c1"]);
+    let state = reducer(initialState, addOperation(op1));
     const prevRoot = state.root;
     // Add second op
-    state = reducer(
-      state,
-      addOperation({ operationType: "pack", childId: "c2" })
-    );
+    const op2 = Operation("pack", ["c2"]);
+    state = reducer(state, addOperation(op2));
     expect(state.ids.length).toBe(2);
     expect(state.data[state.root].children).toEqual(["c2", prevRoot]);
   });
 
   it("changeOperationType updates the operation type", () => {
-    let state = reducer(
-      initialState,
-      addOperation({ operationType: "stack", childId: "c1" })
-    );
+    const op = Operation("stack", ["c1"]);
+    let state = reducer(initialState, addOperation(op));
     const opId = state.root;
     state = reducer(
       state,
@@ -66,10 +61,8 @@ describe("operationsSlice reducers", () => {
   });
 
   it("addChildToOperation adds a child to operation", () => {
-    let state = reducer(
-      initialState,
-      addOperation({ operationType: "stack", childId: "c1" })
-    );
+    const op = Operation("stack", ["c1"]);
+    let state = reducer(initialState, addOperation(op));
     const opId = state.root;
     state = reducer(
       state,
@@ -79,10 +72,8 @@ describe("operationsSlice reducers", () => {
   });
 
   it("removeChildFromOperation removes child and operation if no children left", () => {
-    let state = reducer(
-      initialState,
-      addOperation({ operationType: "stack", childId: "c1" })
-    );
+    const op = Operation("stack", ["c1"]);
+    let state = reducer(initialState, addOperation(op));
     const opId = state.root;
     state = reducer(
       state,

@@ -9,6 +9,7 @@ import tablesSlice, {
   setTableColumnIds,
   swapTableColumnIds,
   removeTableColumnId,
+  setTablesAttribute,
 } from "./tablesSlice";
 
 const getInitialState = () => ({
@@ -316,5 +317,45 @@ describe("tablesSlice reducers", () => {
         )
       ).toThrow();
     });
+  });
+
+  it("setTablesAttribute: sets an attribute for one table", () => {
+    const state = {
+      ...getInitialState(),
+      ids: ["1"],
+      data: { 1: { id: "1", name: "Table 1", foo: "bar" } },
+    };
+    const nextState = tablesSlice.reducer(
+      state,
+      setTablesAttribute({ ids: "1", attribute: "foo", value: "baz" })
+    );
+    expect(nextState.data["1"].foo).toBe("baz");
+  });
+
+  it("setTablesAttribute: sets an attribute for multiple tables", () => {
+    const state = {
+      ...getInitialState(),
+      ids: ["1", "2"],
+      data: {
+        1: { id: "1", name: "Table 1", foo: "bar" },
+        2: { id: "2", name: "Table 2", foo: "bar" },
+      },
+    };
+    const nextState = tablesSlice.reducer(
+      state,
+      setTablesAttribute({ ids: ["1", "2"], attribute: "foo", value: "baz" })
+    );
+    expect(nextState.data["1"].foo).toBe("baz");
+    expect(nextState.data["2"].foo).toBe("baz");
+  });
+
+  it("setTablesAttribute: throws if table does not exist", () => {
+    const state = getInitialState();
+    expect(() =>
+      tablesSlice.reducer(
+        state,
+        setTablesAttribute({ ids: "not-exist", attribute: "foo", value: "baz" })
+      )
+    ).toThrow();
   });
 });

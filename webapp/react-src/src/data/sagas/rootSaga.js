@@ -13,6 +13,7 @@ import coordinateHoverSaga from "./coordinateHoverSaga";
 import peekTableSagaWatcher from "./peekTableSaga";
 import getValuesSagaWatcher from "./getValuesSaga";
 import tableUploadWatcher from "./tableUploadSaga";
+import dropTablesSagaWatcher from "./dropTablesSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -27,5 +28,6 @@ export default function* rootSaga() {
     call(peekTableSagaWatcher),
     call(getValuesSagaWatcher),
     call(tableUploadWatcher),
+    call(dropTablesSagaWatcher),
   ]);
 }

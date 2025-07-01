@@ -28,6 +28,8 @@ import {
   selectOperation,
   selectRootOperation,
 } from "../../slices/operationsSlice";
+import Operation from "../../slices/operationsSlice/Operation";
+import { setTablesAttribute } from "../../slices/tablesSlice";
 
 /**
  * Action creator for adding a table to a schema.
@@ -57,7 +59,6 @@ export default function* addTableToSchemaSagaWatcher() {
  * @param {Object} action - The action object
  * @param {string} action.payload.tableId - The ID of the table to add
  */
-// Export the worker for testing
 export function* addTableToSchemaSagaWorker(action) {
   const { tableId, operationType } = action.payload;
 
@@ -65,8 +66,14 @@ export function* addTableToSchemaSagaWorker(action) {
 
   if (!rootOperationId) {
     // Initialize
+    const operation = Operation(OPERATION_TYPE_NO_OP, [tableId]);
+    yield put(addOperation(operation));
     yield put(
-      addOperation({ operationType: OPERATION_TYPE_NO_OP, childId: tableId })
+      setTablesAttribute({
+        ids: tableId,
+        attribute: "operationId",
+        value: operation.id,
+      })
     );
   } else {
     const rootOperation = yield select((state) =>
@@ -86,13 +93,35 @@ export function* addTableToSchemaSagaWorker(action) {
           childId: tableId,
         })
       );
+      yield put(
+        setTablesAttribute({
+          ids: tableId,
+          attribute: "operationId",
+          value: rootOperation.id,
+        })
+      );
     } else if (rootOperation.operationType === operationType) {
       yield put(
         addChildToOperation({ operationId: rootOperation.id, tableId })
       );
+      yield put(
+        setTablesAttribute({
+          ids: tableId,
+          attribute: "operationId",
+          value: rootOperation.id,
+        })
+      );
     } else {
       // Different operation type, create a new operation, add it as the new root operation
-      yield put(addOperation({ operationType, tableId }));
+      const operation = Operation(operationType, [tableId]);
+      yield put(addOperation(operation));
+      yield put(
+        setTablesAttribute({
+          ids: tableId,
+          attribute: "operationId",
+          value: operation.id,
+        })
+      );
     }
   }
 }

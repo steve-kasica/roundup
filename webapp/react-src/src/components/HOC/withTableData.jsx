@@ -26,6 +26,7 @@ import {
   selectSelectedTables,
 } from "../../data/slices/uiSlice";
 import PropTypes from "prop-types";
+import { dropTablesAction } from "../../data/sagas/dropTablesSaga";
 
 export default function withTableData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
@@ -148,6 +149,7 @@ export default function withTableData(WrappedComponent) {
         setTableAlias={(aliases) =>
           dispatch(changeTablesName({ ids: id, aliases }))
         }
+        dropTable={() => dispatch(dropTablesAction(id))}
       />
     );
   };

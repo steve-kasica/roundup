@@ -36,11 +36,12 @@ const operationsSlice = createSlice({
      * of operations from the bottom up.
      */
     addOperation(state, action) {
-      const { operationType, childId } = action.payload;
-      const children = state.root ? [childId, state.root] : [childId];
-      const operation = Operation(operationType, children);
+      const operation = action.payload;
       if (state.data[operation.id]) {
         throw new Error(`Operation with ID ${operation.id} already exists`);
+      }
+      if (state.root) {
+        operation.children = [...operation.children, state.root];
       }
       state.data[operation.id] = operation;
       state.ids.push(operation.id);
@@ -133,6 +134,10 @@ const operationsSlice = createSlice({
       // If no tables remain, remove the operation itself
       if (operation.children.length === 0) {
         removeOperationFromState(state, operationId);
+        // If the removed operation was the root, set root to null
+        if (state.root === operationId) {
+          state.root = null;
+        }
       }
     },
 
@@ -193,4 +198,6 @@ function removeOperationFromState(state, operationId) {
 
   delete state.data[operationId];
   state.ids = state.ids.filter((id) => id !== operationId);
+  state.hovered = state.hovered === operationId ? null : state.hovered;
+  state.focused = state.focused === operationId ? null : state.focused;
 }
