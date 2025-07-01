@@ -62,7 +62,10 @@ export default function withColumnVectorData(WrappedComponent) {
         }
         swapColumnVectors={(targetColumnIds) =>
           dispatch(
-            swapColumnsAction({ source: columnIds, target: targetColumnIds })
+            swapColumnsAction({
+              sourceIds: columnIds,
+              targetIds: targetColumnIds,
+            })
           )
         }
       />

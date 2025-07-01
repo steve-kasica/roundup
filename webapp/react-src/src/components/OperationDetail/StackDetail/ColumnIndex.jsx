@@ -81,7 +81,7 @@ function ColumnIndex({
     drop: (droppedItem) => {
       // Remember, in this context `droppedItem.columnIds` === `columnIds` in useDrag
       if (droppedItem.index !== index) {
-        swapColumnVectors(columnIds);
+        swapColumnVectors(droppedItem.columnIds);
       }
     },
     collect: (monitor) => ({

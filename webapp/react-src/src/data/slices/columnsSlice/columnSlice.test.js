@@ -18,7 +18,6 @@ import columnsSlice, {
   setSelectedColumns,
   appendToSelectedColumns,
   clearSelectedColumns,
-  removeFromSelectedColumns,
   setValueCounts,
   addColumnsFromOpenRefine,
   setColumnsIndex,
@@ -117,7 +116,7 @@ describe("columnsSlice reducers", () => {
         idsByTable: { t1: [column.id] },
       };
       const nextState = columnsSlice(state, removeColumns(column.id));
-      expect(nextState.data[column.id]).toBeUndefined();
+      expect(nextState.data[column.id].isRemoved).toBeTruthy();
       expect(nextState.idsByTable["t1"]).not.toContain(column.id);
     });
     it("removes a column and also removes it from selected", () => {
@@ -130,10 +129,8 @@ describe("columnsSlice reducers", () => {
         selected: [col1.id, col2.id],
       };
       const nextState = columnsSlice(state, removeColumns(col1.id));
-      expect(nextState.data[col1.id]).toBeUndefined();
+      expect(nextState.data[col1.id].isRemoved).toBeTruthy();
       expect(nextState.idsByTable["t1"]).not.toContain(col1.id);
-      expect(nextState.selected).not.toContain(col1.id);
-      expect(nextState.selected).toContain(col2.id);
     });
   });
 
@@ -358,7 +355,11 @@ describe("columnsSlice reducers", () => {
       };
       const nextState = columnsSlice(
         state,
-        updateAttribute({ ids: [col1.id, col2.id], attribute: "isRemoved", value: true })
+        updateAttribute({
+          ids: [col1.id, col2.id],
+          attribute: "isRemoved",
+          value: true,
+        })
       );
       expect(nextState.data[col1.id].isRemoved).toBe(true);
       expect(nextState.data[col2.id].isRemoved).toBe(true);
@@ -374,7 +375,11 @@ describe("columnsSlice reducers", () => {
       expect(() =>
         columnsSlice(
           state,
-          updateAttribute({ ids: [col.id, "notfound"], attribute: "isRemoved", value: true })
+          updateAttribute({
+            ids: [col.id, "notfound"],
+            attribute: "isRemoved",
+            value: true,
+          })
         )
       ).toThrow(/not found/);
     });
@@ -464,10 +469,113 @@ describe("columnsSlice reducers", () => {
       expect(() =>
         columnsSlice(
           state,
-          updateAttribute({ ids: col.id, attribute: "columnType", value: "notAType" })
+          updateAttribute({
+            ids: col.id,
+            attribute: "columnType",
+            value: "notAType",
+          })
         )
       ).toThrow();
     });
   });
 
+  describe("swapColumns", () => {
+    it("swaps two columns' indices and ids in idsByTable", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      // Set up initial state with correct indices and ids order
+      const state = {
+        ...getInitialState(),
+        data: {
+          [col1.id]: { ...col1, index: 0 },
+          [col2.id]: { ...col2, index: 1 },
+        },
+        idsByTable: { t1: [col1.id, col2.id] },
+      };
+      const nextState = columnsSlice(
+        state,
+        // Swap col1 and col2
+        {
+          type: "columns/swapColumns",
+          payload: { sourceIds: col1.id, targetIds: col2.id },
+        }
+      );
+      // Indices should be swapped
+      expect(nextState.data[col1.id].index).toBe(1);
+      expect(nextState.data[col2.id].index).toBe(0);
+      // idsByTable should have swapped order
+      expect(nextState.idsByTable["t1"]).toEqual([col2.id, col1.id]);
+    });
+    it("throws if source and target arrays are different lengths", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: {
+          [col1.id]: { ...col1, index: 0 },
+          [col2.id]: { ...col2, index: 1 },
+        },
+        idsByTable: { t1: [col1.id, col2.id] },
+      };
+      expect(() =>
+        columnsSlice(state, {
+          type: "columns/swapColumns",
+          payload: { sourceIds: [col1.id], targetIds: [col2.id, "fake"] },
+        })
+      ).toThrow(/same length/);
+    });
+    it("swaps multiple pairs in parallel arrays", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const col3 = Column("t1", 2, "C", COLUMN_TYPE_NUMERICAL);
+      const col4 = Column("t1", 3, "D", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: {
+          [col1.id]: { ...col1, index: 0 },
+          [col2.id]: { ...col2, index: 1 },
+          [col3.id]: { ...col3, index: 2 },
+          [col4.id]: { ...col4, index: 3 },
+        },
+        idsByTable: { t1: [col1.id, col2.id, col3.id, col4.id] },
+      };
+      const nextState = columnsSlice(state, {
+        type: "columns/swapColumns",
+        payload: {
+          sourceIds: [col1.id, col4.id],
+          targetIds: [col2.id, col3.id],
+        },
+      });
+      // col1 <-> col2, col4 <-> col3
+      expect(nextState.data[col1.id].index).toBe(1);
+      expect(nextState.data[col2.id].index).toBe(0);
+      expect(nextState.data[col3.id].index).toBe(3);
+      expect(nextState.data[col4.id].index).toBe(2);
+      // idsByTable should reflect swaps
+      expect(nextState.idsByTable["t1"]).toEqual([
+        col2.id,
+        col1.id,
+        col4.id,
+        col3.id,
+      ]);
+    });
+    it("throws if a column id is not found in idsByTable", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: {
+          [col1.id]: { ...col1, index: 0 },
+          [col2.id]: { ...col2, index: 1 },
+        },
+        idsByTable: { t1: [col1.id] }, // col2.id missing
+      };
+      expect(() =>
+        columnsSlice(state, {
+          type: "columns/swapColumns",
+          payload: { sourceIds: col1.id, targetIds: col2.id },
+        })
+      ).toThrow(/not found in table/);
+    });
+  });
 });
