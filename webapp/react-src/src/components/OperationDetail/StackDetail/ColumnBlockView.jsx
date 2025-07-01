@@ -25,6 +25,7 @@ function ColumnBlockView({
   id,
   tableId,
   name,
+  alias,
   index,
   columnType,
   isNull,
@@ -62,7 +63,7 @@ function ColumnBlockView({
   const inputRef = useRef(null);
 
   // Debounce input when modifying column attributes in the DOM
-  const [value, setValue] = useState(name);
+  const [value, setValue] = useState(alias || name);
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (name !== value) {
@@ -74,7 +75,7 @@ function ColumnBlockView({
 
   const menuItems = [
     {
-      label: `Remove ${name}`,
+      label: `Remove ${alias || name}`,
       disabled: isNull,
       onClick: () => {
         removeColumn();
@@ -193,6 +194,7 @@ ColumnBlockView.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   tableId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   name: PropTypes.string.isRequired,
+  alias: PropTypes.string || null,
   index: PropTypes.number.isRequired,
   columnType: PropTypes.string,
   isNull: PropTypes.bool,

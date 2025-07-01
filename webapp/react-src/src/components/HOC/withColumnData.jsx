@@ -104,6 +104,7 @@ export default function withColumnData(WrappedComponent) {
         id={id}
         tableId={tableId}
         name={name}
+        alias={column.alias}
         index={index}
         columnType={columnType}
         values={values}
@@ -116,12 +117,12 @@ export default function withColumnData(WrappedComponent) {
         error={error}
         hoverColumn={hoverColumn}
         unHoverColumn={unHoverColumn}
-        renameColumn={(newName) => {
+        renameColumn={(alias) => {
           if (!isNull)
             dispatch(
               renameColumnsAction({
-                id,
-                newColumnName: newName,
+                ids: id,
+                aliases: alias,
               })
             );
         }}

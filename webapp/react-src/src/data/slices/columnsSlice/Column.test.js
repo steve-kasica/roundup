@@ -3,7 +3,6 @@ import Column, {
   isColumn,
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_CATEGORICAL,
-  setColumnAttribute,
 } from "./Column";
 
 describe("Column Factory Function", () => {
@@ -14,6 +13,7 @@ describe("Column Factory Function", () => {
       id: expect.stringMatching(/^c-\d+$/), // ID should start with "c-" and have a unique number
       tableId: "table-1",
       name: "Column Name",
+      alias: null, // Default value for alias
       index: 0,
       columnType: COLUMN_TYPE_NUMERICAL,
       isRemoved: false, // Default value for isRemoved

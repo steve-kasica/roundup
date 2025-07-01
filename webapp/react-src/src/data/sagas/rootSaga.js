@@ -4,7 +4,7 @@
 import { all, call } from "redux-saga/effects";
 import fetchTablesSaga from "./fetchTablesSaga";
 // import fetchColumnMetadataSaga from "./fetchColumnMetadataSaga";
-import renameColumnSaga from "./renameColumnsSaga";
+import renameColumnSagaWatcher from "./renameColumnsSaga";
 import removeColumnsSagaWatcher from "./removeColumnsSaga";
 import swapColumnsSaga from "./swapColumnsSaga";
 import addTableToSchemaWatcher from "./addTableToSchemaSaga";
@@ -19,7 +19,7 @@ export default function* rootSaga() {
     call(fetchTablesSaga),
     // call(fetchColumnMetadataSaga),
     call(addTableToSchemaWatcher),
-    call(renameColumnSaga),
+    call(renameColumnSagaWatcher),
     call(removeColumnsSagaWatcher),
     call(swapColumnsSaga),
     call(coordinateHoverSaga),

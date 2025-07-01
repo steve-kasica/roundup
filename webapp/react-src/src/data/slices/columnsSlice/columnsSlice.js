@@ -167,18 +167,26 @@ const columnsSlice = createSlice({
      * @param {string} action.payload.newColumnName - The new name of the column(s).
      */
     renameColumns(state, action) {
-      let ids = action.payload.id;
-      const { newColumnName } = action.payload;
+      let { ids, aliases } = action.payload;
       if (!Array.isArray(ids)) {
         ids = [ids];
       }
-      ids.forEach((id) => {
+      if (!Array.isArray(aliases)) {
+        aliases = [aliases];
+      }
+      if (ids.length !== aliases.length) {
+        throw new Error(
+          "renameColumns: ids and aliases must have the same length"
+        );
+      }
+
+      ids.forEach((id, i) => {
         const column = state.data[id];
-        if (column) {
-          column.name = newColumnName;
-        } else {
+        if (!column) {
           throw new Error(`Column with id ${id} not found`);
         }
+        const alias = aliases[i];
+        column.alias = alias;
       });
     },
     /**

@@ -95,13 +95,25 @@ export default function Column(tableId, index, name, columnType) {
   return {
     id: `c-${idCounter++}`,
     tableId,
-    name,
+    name, // Name is immutable, used for lookups in database
+    alias: null, // Alias is mutable and can be changed by the user
     index,
     columnType,
     isRemoved: false, // Indicates if the column has been removed from the table
     values: {},
   };
 }
+
+const attributes = [
+  "id",
+  "tableId",
+  "name",
+  "alias",
+  "index",
+  "columnType",
+  "isRemoved",
+  "values",
+];
 
 /**
  * Checks if an object was created by the Column factory function.
@@ -113,18 +125,7 @@ export function isColumn(obj) {
   if (obj === null || obj === undefined) {
     return false;
   }
-  return (
-    obj &&
-    typeof obj === "object" &&
-    "id" in obj &&
-    typeof obj.id === "string" &&
-    obj.id.startsWith("c-") &&
-    "tableId" in obj &&
-    "name" in obj &&
-    "index" in obj &&
-    "columnType" in obj &&
-    "isRemoved" in obj
-  );
+  return attributes.every((attr) => attr in obj);
 }
 
 /**
