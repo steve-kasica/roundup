@@ -48,20 +48,28 @@ export function Table(
     rowCount,
     rowsExplored: 0, // TODO: remove this
     dateLastModified,
+    parentId: null, // Parent operation ID if this table is derived from an operation
   };
 }
 
+const attributes = [
+  "id",
+  "source",
+  "name",
+  "alias",
+  "extension",
+  "size",
+  "mimeType",
+  "columnCount",
+  "originalColumnIds",
+  "columnIds",
+  "rowCount",
+  "rowsExplored",
+  "dateLastModified",
+  "parentId",
+];
+
 export const isTable = (obj) =>
-  Object.hasOwn(obj, "id") &&
-  Object.hasOwn(obj, "source") &&
-  Object.hasOwn(obj, "name") &&
-  Object.hasOwn(obj, "alias") &&
-  Object.hasOwn(obj, "extension") &&
-  Object.hasOwn(obj, "size") &&
-  Object.hasOwn(obj, "mimeType") &&
-  Object.hasOwn(obj, "columnCount") &&
-  Object.hasOwn(obj, "rowCount") &&
-  Object.hasOwn(obj, "rowsExplored") &&
-  Object.hasOwn(obj, "dateLastModified");
+  attributes.every((attr) => Object.hasOwn(obj, attr));
 
 export const isTableId = (id) => typeof id === "string" && id.startsWith("t-");

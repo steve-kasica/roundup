@@ -2,7 +2,6 @@
  * @name tablesSlice
  */
 import { createSlice } from "@reduxjs/toolkit";
-import { Table } from "./Table";
 
 const initialState = {
   ids: [],
@@ -52,7 +51,7 @@ const slice = createSlice({
      * - Removes the specified table IDs from the `ids` array.
      * - Deletes the corresponding entries from the `data` object.
      */
-    removeTables(state, action) {
+    dropTables(state, action) {
       let tableIds = action.payload;
       if (!Array.isArray(tableIds)) {
         tableIds = [tableIds];
@@ -64,6 +63,10 @@ const slice = createSlice({
         }
         // Remove the table from the list of IDs
         state.ids = state.ids.filter((id) => id !== tableId);
+
+        // Remove the table from the loading state if it is there
+        state.loading = state.loading.filter((id) => id !== tableId);
+
         // Remove the table from the data object
         delete state.data[tableId];
       });
@@ -193,7 +196,7 @@ const slice = createSlice({
 
 export const {
   addTables,
-  removeTables,
+  dropTables,
   addTablesToLoading,
   removeTablesFromLoading,
   changeTablesName,

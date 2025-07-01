@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import tablesSlice, {
   addTables,
-  removeTables,
+  dropTables,
   addTablesToLoading,
   removeTablesFromLoading,
-  changeTableName,
+  changeTablesName,
   incrementRowsExplored,
   setTableColumnIds,
   swapTableColumnIds,
@@ -49,18 +49,18 @@ describe("tablesSlice reducers", () => {
     expect(() => tablesSlice.reducer(state, addTables(table))).toThrow();
   });
 
-  it("removeTables: removes a single table", () => {
+  it("dropTables: removes a single table", () => {
     const state = {
       ...getInitialState(),
       ids: ["1"],
       data: { 1: { id: "1", name: "Table 1", rowsExplored: 0 } },
     };
-    const nextState = tablesSlice.reducer(state, removeTables("1"));
+    const nextState = tablesSlice.reducer(state, dropTables("1"));
     expect(nextState.ids).toEqual([]);
     expect(nextState.data["1"]).toBeUndefined();
   });
 
-  it("removeTables: removes multiple tables", () => {
+  it("dropTables: removes multiple tables", () => {
     const state = {
       ...getInitialState(),
       ids: ["1", "2"],
@@ -69,7 +69,7 @@ describe("tablesSlice reducers", () => {
         2: { id: "2", name: "Table 2", rowsExplored: 0 },
       },
     };
-    const nextState = tablesSlice.reducer(state, removeTables(["1", "2"]));
+    const nextState = tablesSlice.reducer(state, dropTables(["1", "2"]));
     expect(nextState.ids).toEqual([]);
     expect(nextState.data["1"]).toBeUndefined();
     expect(nextState.data["2"]).toBeUndefined();
@@ -106,9 +106,9 @@ describe("tablesSlice reducers", () => {
     };
     const nextState = tablesSlice.reducer(
       state,
-      changeTableName({ tableId: "1", newName: "New Name" })
+      changeTablesName({ ids: "1", aliases: "New Name" })
     );
-    expect(nextState.data["1"].name).toBe("New Name");
+    expect(nextState.data["1"].alias).toBe("New Name");
   });
 
   it("changeTableName: throws if table does not exist", () => {
@@ -116,7 +116,7 @@ describe("tablesSlice reducers", () => {
     expect(() =>
       tablesSlice.reducer(
         state,
-        changeTableName({ tableId: "x", newName: "Name" })
+        changeTablesName({ tableId: "x", newName: "Name" })
       )
     ).toThrow();
   });
