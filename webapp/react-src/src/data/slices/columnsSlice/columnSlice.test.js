@@ -200,7 +200,7 @@ describe("columnsSlice reducers", () => {
         state,
         renameColumns({ id: col.id, newColumnName: "Renamed" })
       );
-      expect(nextState.data[col.id].name).toBe("Renamed");
+      expect(nextState.data[col.id].alias).toBe("Renamed");
     });
   });
 
@@ -630,6 +630,75 @@ describe("columnsSlice reducers", () => {
           payload: { sourceIds: col1.id, targetIds: col2.id },
         })
       ).toThrow(/not found in table/);
+    });
+  });
+
+  describe("dropColumns", () => {
+    it("removes a single column from all state arrays and data", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col1.id]: col1, [col2.id]: col2 },
+        idsByTable: { t1: [col1.id, col2.id] },
+        selected: [col1.id, col2.id],
+        hovered: [col1.id, col2.id],
+        loading: [col1.id, col2.id],
+        dragging: [col1.id, col2.id],
+      };
+      const nextState = columnsSlice(state, {
+        type: "columns/dropColumns",
+        payload: col1.id,
+      });
+      expect(nextState.data[col1.id]).toBeUndefined();
+      expect(nextState.idsByTable["t1"]).toEqual([col2.id]);
+      expect(nextState.selected).not.toContain(col1.id);
+      expect(nextState.hovered).not.toContain(col1.id);
+      expect(nextState.loading).not.toContain(col1.id);
+      expect(nextState.dragging).not.toContain(col1.id);
+      // col2 should remain
+      expect(nextState.data[col2.id]).toBeDefined();
+    });
+
+    it("removes multiple columns and cleans up table if empty", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col1.id]: col1, [col2.id]: col2 },
+        idsByTable: { t1: [col1.id, col2.id] },
+        selected: [col1.id, col2.id],
+        hovered: [col1.id, col2.id],
+        loading: [col1.id, col2.id],
+        dragging: [col1.id, col2.id],
+      };
+      const nextState = columnsSlice(state, {
+        type: "columns/dropColumns",
+        payload: [col1.id, col2.id],
+      });
+      expect(nextState.data[col1.id]).toBeUndefined();
+      expect(nextState.data[col2.id]).toBeUndefined();
+      expect(nextState.idsByTable["t1"]).toBeUndefined();
+      expect(nextState.selected).not.toContain(col1.id);
+      expect(nextState.selected).not.toContain(col2.id);
+      expect(nextState.hovered).not.toContain(col1.id);
+      expect(nextState.hovered).not.toContain(col2.id);
+      expect(nextState.loading).not.toContain(col1.id);
+      expect(nextState.loading).not.toContain(col2.id);
+      expect(nextState.dragging).not.toContain(col1.id);
+      expect(nextState.dragging).not.toContain(col2.id);
+    });
+
+    it("throws if column does not exist", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: {},
+        idsByTable: {},
+      };
+      expect(() =>
+        columnsSlice(state, { type: "columns/dropColumns", payload: col1.id })
+      ).toThrow(/not found/);
     });
   });
 });

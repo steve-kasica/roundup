@@ -167,26 +167,36 @@ const columnsSlice = createSlice({
      * @param {string} action.payload.newColumnName - The new name of the column(s).
      */
     renameColumns(state, action) {
-      let { ids, aliases } = action.payload;
-      if (!Array.isArray(ids)) {
-        ids = [ids];
+      // Support both legacy and new payloads for backward compatibility
+      let ids, aliases;
+      if (
+        Array.isArray(action.payload?.ids) ||
+        typeof action.payload?.ids === "string"
+      ) {
+        ids = action.payload.ids;
+        aliases = action.payload.aliases;
+      } else if (
+        action.payload?.id !== undefined &&
+        action.payload?.newColumnName !== undefined
+      ) {
+        ids = [action.payload.id];
+        aliases = [action.payload.newColumnName];
+      } else {
+        throw new Error("Invalid payload for renameColumns");
       }
-      if (!Array.isArray(aliases)) {
-        aliases = [aliases];
-      }
+      if (!Array.isArray(ids)) ids = [ids];
+      if (!Array.isArray(aliases)) aliases = [aliases];
       if (ids.length !== aliases.length) {
         throw new Error(
           "renameColumns: ids and aliases must have the same length"
         );
       }
-
       ids.forEach((id, i) => {
         const column = state.data[id];
         if (!column) {
           throw new Error(`Column with id ${id} not found`);
         }
-        const alias = aliases[i];
-        column.alias = alias;
+        column.alias = aliases[i];
       });
     },
     /**
@@ -206,6 +216,41 @@ const columnsSlice = createSlice({
         if (column) {
           // Mark column as removed in data dictionary
           state.data[id].isRemoved = true; // Mark as removed
+
+          // Remove the column ID from the idsByTable mapping
+          state.idsByTable[column.tableId] = state.idsByTable[
+            column.tableId
+          ].filter((cid) => cid !== id);
+          if (state.idsByTable[column.tableId].length === 0) {
+            // If there are no columns left in the table, delete the entry
+            delete state.idsByTable[column.tableId];
+          }
+
+          // Remove the column from the selected columns if it is selected
+          state.selected = state.selected.filter((cid) => cid !== id);
+
+          // Remove the column from the hovered columns if it is hovered
+          state.hovered = state.hovered.filter((cid) => cid !== id);
+
+          // Remove the column from the loading state if it is loading
+          state.loading = state.loading.filter((cid) => cid !== id);
+
+          // Remove the column from the dragging state
+          state.dragging = state.dragging.filter((cid) => cid !== id);
+        } else {
+          throw new Error(`Column with id ${id} not found`);
+        }
+      });
+    },
+    dropColumns(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      ids.forEach((id) => {
+        const column = state.data[id];
+        if (column) {
+          delete state.data[id]; // Remove the column from the data object
 
           // Remove the column ID from the idsByTable mapping
           state.idsByTable[column.tableId] = state.idsByTable[
@@ -473,6 +518,7 @@ export const {
 
   updateAttribute,
   swapColumns,
+  dropColumns,
 
   addColumnsFromOpenRefine,
   addColumns,
