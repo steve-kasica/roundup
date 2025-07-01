@@ -22,6 +22,7 @@ import columnsSlice, {
   setValueCounts,
   addColumnsFromOpenRefine,
   setColumnsIndex,
+  updateAttribute,
 } from "./columnsSlice";
 import Column, {
   COLUMN_TYPE_NUMERICAL,
@@ -328,4 +329,145 @@ describe("columnsSlice reducers", () => {
       ).toThrow(/not found/);
     });
   });
+
+  describe("updateAttribute", () => {
+    it("updates a single attribute for a column", () => {
+      const col = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col.id]: { ...col, isRemoved: false } },
+        idsByTable: { t1: [col.id] },
+      };
+      const nextState = columnsSlice(
+        state,
+        updateAttribute({ ids: col.id, attribute: "isRemoved", value: true })
+      );
+      expect(nextState.data[col.id].isRemoved).toBe(true);
+    });
+
+    it("updates an attribute for multiple columns", () => {
+      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
+      const state = {
+        ...getInitialState(),
+        data: {
+          [col1.id]: { ...col1, isRemoved: false },
+          [col2.id]: { ...col2, isRemoved: false },
+        },
+        idsByTable: { t1: [col1.id, col2.id] },
+      };
+      const nextState = columnsSlice(
+        state,
+        updateAttribute({ ids: [col1.id, col2.id], attribute: "isRemoved", value: true })
+      );
+      expect(nextState.data[col1.id].isRemoved).toBe(true);
+      expect(nextState.data[col2.id].isRemoved).toBe(true);
+    });
+
+    it("throws if column id not found", () => {
+      const col = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col.id]: { ...col, isRemoved: false } },
+        idsByTable: { t1: [col.id] },
+      };
+      expect(() =>
+        columnsSlice(
+          state,
+          updateAttribute({ ids: [col.id, "notfound"], attribute: "isRemoved", value: true })
+        )
+      ).toThrow(/not found/);
+    });
+
+    it("throws if attribute is not present on column", () => {
+      const col = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col.id]: { ...col, isRemoved: false } },
+        idsByTable: { t1: [col.id] },
+      };
+      expect(() =>
+        columnsSlice(
+          state,
+          updateAttribute({ ids: col.id, attribute: "notAProp", value: 123 })
+        )
+      ).toThrow(/attribute 'notAProp'/);
+    });
+
+    it("throws if trying to update immutable attribute 'id'", () => {
+      const col = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col.id]: { ...col, isRemoved: false } },
+        idsByTable: { t1: [col.id] },
+      };
+      expect(() =>
+        columnsSlice(
+          state,
+          updateAttribute({ ids: col.id, attribute: "id", value: "newid" })
+        )
+      ).toThrow(/immutable/);
+    });
+
+    it("throws if trying to update immutable attribute 'tableId'", () => {
+      const col = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col.id]: { ...col, isRemoved: false } },
+        idsByTable: { t1: [col.id] },
+      };
+      expect(() =>
+        columnsSlice(
+          state,
+          updateAttribute({ ids: col.id, attribute: "tableId", value: "t2" })
+        )
+      ).toThrow(/immutable/);
+    });
+
+    it("throws if trying to update immutable attribute 'name'", () => {
+      const col = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col.id]: { ...col, isRemoved: false } },
+        idsByTable: { t1: [col.id] },
+      };
+      expect(() =>
+        columnsSlice(
+          state,
+          updateAttribute({ ids: col.id, attribute: "name", value: "newName" })
+        )
+      ).toThrow(/immutable/);
+    });
+
+    it("throws if trying to set isRemoved to non-boolean", () => {
+      const col = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col.id]: { ...col, isRemoved: false } },
+        idsByTable: { t1: [col.id] },
+      };
+      expect(() =>
+        columnsSlice(
+          state,
+          updateAttribute({ ids: col.id, attribute: "isRemoved", value: "yes" })
+        )
+      ).toThrow(/must be a boolean/);
+    });
+
+    it("throws if trying to set columnType to invalid value", () => {
+      const col = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
+      const state = {
+        ...getInitialState(),
+        data: { [col.id]: { ...col, isRemoved: false } },
+        idsByTable: { t1: [col.id] },
+      };
+      expect(() =>
+        columnsSlice(
+          state,
+          updateAttribute({ ids: col.id, attribute: "columnType", value: "notAType" })
+        )
+      ).toThrow();
+    });
+  });
+
 });

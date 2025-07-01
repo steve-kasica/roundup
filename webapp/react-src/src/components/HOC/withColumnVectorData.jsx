@@ -1,120 +1,76 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { useEffect } from "react";
 import {
-  removeColumnsFromDragging,
   setHoveredColumns,
-  removeFromHoveredColumns,
   setSelectedColumns,
-  clearHoveredColumns,
   selectSelectedColumns,
   selectColumnById,
+  removeFromHoveredColumns,
+  removeColumnsFromDragging,
 } from "../../data/slices/columnsSlice";
 
-import { useDrag, useDrop } from "react-dnd";
-import { getEmptyImage } from "react-dnd-html5-backend";
 import { setDrawerContents } from "../../data/slices/uiSlice";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnValueMatrix";
 import { swapColumnsAction } from "../../data/sagas/swapColumnsSaga";
-import { selectTablesById } from "../../data/slices/tablesSlice/tableSelectors";
 import { getValuesAction } from "../../data/sagas/getValuesSaga";
 
-export const COLUMN_INDEX = "COLUMN_INDEX";
-
 /**
- * HOC to provide all column data objects at a given index across multiple tables.
+ * This HOC takes an array of columnIds are passes on some relevalent metadata about this
+ * particular group of columns without passing along metadata about individual columns.
+ * I call this a column vector, as opposed to a column group, because the order of the
+ * column ids matters.
  * @param {React.ComponentType} WrappedComponent
  * @returns {React.FC<{ index: number, tableIds: string[] }>}
  */
 export default function withColumnVectorData(WrappedComponent) {
-  function EnhancedComponent({ index, tableIds, ...props }) {
+  function EnhancedComponent({ columnIds, ...props }) {
     const dispatch = useDispatch();
 
-    const tables = useSelector((state) =>
-      tableIds.map((tableId) => selectTablesById(state, tableId))
-    );
-    const columnIds = tables.map((table) => table.columnIds.at(index));
     const columns = useSelector((state) =>
       columnIds.map((columnId) => selectColumnById(state, columnId))
     );
     const selectedColumnIds = useSelector(selectSelectedColumns);
 
-    const [{ isDragging }, dragRef, previewRef] = useDrag({
-      type: COLUMN_INDEX,
-      item: () => {
-        return { columnIds, index };
-      },
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-      end: () => {
-        // Dispatch certain actions when the drag operation ends,
-        // regardless of whether or it reached a drop target
-        dispatch(removeColumnsFromDragging(columnIds));
-        dispatch(removeFromHoveredColumns(columnIds));
-      },
-    });
+    const columnNames = columns.map((col) => col?.name || "");
 
-    // This useEffect is to make the isDragging state available globally
-    // TODO: causing an infinite loop
-    // useEffect(() => {
-    //   console.log("Column vector drag state changed:", isDragging, columnIds);
-    //   if (isDragging) {
-    //     // dispatch(addColumnsToDragging(columnIds));
-    //   } else {
-    //     // dispatch(removeFromHoveredColumns(columnIds));
-    //   }
-    // }, [isDragging, columnIds, dispatch]);
-
-    const [{ isHovered }, dropRef] = useDrop({
-      accept: COLUMN_INDEX,
-      drop: (droppedItem) => {
-        // Remember, in this context `droppedItem.columnIds` === `columnIds` in useDrag
-        if (droppedItem.index !== index) {
-          dispatch(
-            swapColumnsAction({
-              sourceIds: droppedItem.columnIds,
-              targetIds: columnIds,
-            })
-          );
-        }
-      },
-      collect: (monitor) => ({
-        isHovered: monitor.isOver(),
-      }),
-    });
-
-    // Disable the default drag preview
-    useEffect(() => {
-      previewRef(getEmptyImage(), { captureDraggingState: true });
-    }, []);
+    const hasSelected =
+      new Set(columnIds).intersection(new Set(selectedColumnIds)).size > 0;
+    const maxColumnNameLength = Math.max(
+      ...columnNames.map((name) => name.length),
+      0
+    );
 
     return (
       <WrappedComponent
         {...props}
-        index={index}
         columnIds={columnIds}
-        columnNames={columns.map((col) => col?.name || "")} // TODO: just pass the max name length
-        hasSelected={
-          new Set(columnIds).intersection(new Set(selectedColumnIds)).size > 0
-        }
-        dragRef={dragRef}
-        dropRef={dropRef}
-        isDragging={isDragging}
-        isHovered={isHovered}
+        // Derive properties from columnIds
+        maxColumnNameLength={maxColumnNameLength}
+        hasSelected={hasSelected}
+        // Dispatchable actions
         hoverColumnVector={() => dispatch(setHoveredColumns(columnIds))}
-        unhoverColumnVector={() => dispatch(clearHoveredColumns())}
+        unhoverColumnVector={() =>
+          dispatch(removeFromHoveredColumns(columnIds))
+        }
         selectColumnVector={() => dispatch(setSelectedColumns(columnIds))}
         compareVectorValues={() =>
           dispatch(setDrawerContents(COLUMN_INDEX_VALUES_COMPONENT))
         }
         fetchColumnValues={() => dispatch(getValuesAction(columnIds))}
+        undragColumnVector={() =>
+          dispatch(removeColumnsFromDragging(columnIds))
+        }
+        swapColumnVectors={(targetColumnIds) =>
+          dispatch(
+            swapColumnsAction({ source: columnIds, target: targetColumnIds })
+          )
+        }
       />
     );
   }
   EnhancedComponent.propTypes = {
     index: PropTypes.number.isRequired,
-    tableIds: PropTypes.arrayOf(PropTypes.string),
+    columnIds: PropTypes.arrayOf(PropTypes.string),
   };
   return EnhancedComponent;
 }

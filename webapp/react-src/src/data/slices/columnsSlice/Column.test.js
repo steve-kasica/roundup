@@ -3,6 +3,7 @@ import Column, {
   isColumn,
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_CATEGORICAL,
+  setColumnAttribute,
 } from "./Column";
 
 describe("Column Factory Function", () => {
@@ -15,6 +16,7 @@ describe("Column Factory Function", () => {
       name: "Column Name",
       index: 0,
       columnType: COLUMN_TYPE_NUMERICAL,
+      isRemoved: false, // Default value for isRemoved
       values: {},
     });
   });

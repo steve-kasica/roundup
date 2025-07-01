@@ -42,6 +42,7 @@ export function Table(
     size,
     mimeType,
     columnCount, // deprecated, use `columnIds.length` instead
+    originalColumnIds: new Array(columnCount).fill(null), // Placeholder for original column IDs
     columnIds: new Array(columnCount).fill(null), // Placeholder for column IDs
     rowCount,
     rowsExplored: 0, // TODO: remove this

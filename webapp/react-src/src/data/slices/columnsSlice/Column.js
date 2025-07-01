@@ -49,6 +49,7 @@ export const DATA_TYPE = "COLUMN";
 export const COLUMN_TYPE_CATEGORICAL = "CATEGORICAL";
 export const COLUMN_TYPE_NUMERICAL = "NUMERICAL";
 export const COLUMN_TYPE_DATE = "DATE";
+export const COLUMN_TYPE_VARCHAR = "VARCHAR";
 /**
  * An array containing the supported column types.
  *
@@ -66,6 +67,7 @@ export const COLUMN_TYPE_DATE = "DATE";
 export const COLUMN_TYPES = [
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_CATEGORICAL,
+  COLUMN_TYPE_VARCHAR,
   null, // null is used to represent an "empty" column type, e.g. when the column is not yet defined
 ];
 
@@ -86,6 +88,8 @@ export default function Column(tableId, index, name, columnType) {
     throw new Error("Param undefined, `index`");
   } else if (columnType === undefined) {
     throw new Error("Param undefined, `columnType`");
+  } else if (!COLUMN_TYPES.includes(columnType)) {
+    throw new InvalidColumnTypeError(columnType);
   }
 
   return {
@@ -94,6 +98,7 @@ export default function Column(tableId, index, name, columnType) {
     name,
     index,
     columnType,
+    isRemoved: false, // Indicates if the column has been removed from the table
     values: {},
   };
 }
@@ -117,7 +122,8 @@ export function isColumn(obj) {
     "tableId" in obj &&
     "name" in obj &&
     "index" in obj &&
-    "columnType" in obj
+    "columnType" in obj &&
+    "isRemoved" in obj
   );
 }
 

@@ -1,20 +1,20 @@
 import { Box, IconButton, List, ListItemButton, Popover } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
 import { useRef } from "react";
 import ColumnBlockView from "./ColumnBlockView";
 import { isPointInBoundingBox } from "../../../lib/utilities";
 import withColumnVectorData from "../../HOC/withColumnVectorData";
 import PropTypes from "prop-types";
+import { useDrag, useDrop } from "react-dnd";
+import { getEmptyImage } from "react-dnd-html5-backend";
+
+export const COLUMN_INDEX = "COLUMN_INDEX";
 
 function ColumnIndex({
   index,
   columnIds,
-  columnNames,
-  isDragging,
-  isHovered,
-  dropRef,
-  dragRef,
+  maxColumnNameLength,
   hasSelected,
   hoverColumnVector,
   unhoverColumnVector,
@@ -22,12 +22,9 @@ function ColumnIndex({
   onCellClick,
   onColumnClick,
   fetchColumnValues,
+  undragColumnVector,
+  swapColumnVectors,
 }) {
-  // Variables derived from props
-  const maxColumnNameLength = Math.max(
-    ...columnNames.map((name) => name.length),
-    0
-  );
   const index1 = index + 1;
 
   // UI state and refs
@@ -51,6 +48,51 @@ function ColumnIndex({
       action: compareVectorValues,
     },
   ];
+
+  const [{ isDragging }, dragRef, previewRef] = useDrag({
+    type: COLUMN_INDEX,
+    item: () => {
+      return { columnIds, index };
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+    end: () => {
+      // Dispatch certain actions when the drag operation ends,
+      // regardless of whether or it reached a drop target
+      undragColumnVector();
+      unhoverColumnVector();
+    },
+  });
+
+  // This useEffect is to make the isDragging state available globally
+  // TODO: causing an infinite loop
+  // useEffect(() => {
+  //   console.log("Column vector drag state changed:", isDragging, columnIds);
+  //   if (isDragging) {
+  //     // dispatch(addColumnsToDragging(columnIds));
+  //   } else {
+  //     // dispatch(removeFromHoveredColumns(columnIds));
+  //   }
+  // }, [isDragging, columnIds, dispatch]);
+
+  const [{ isHovered }, dropRef] = useDrop({
+    accept: COLUMN_INDEX,
+    drop: (droppedItem) => {
+      // Remember, in this context `droppedItem.columnIds` === `columnIds` in useDrag
+      if (droppedItem.index !== index) {
+        swapColumnVectors(columnIds);
+      }
+    },
+    collect: (monitor) => ({
+      isHovered: monitor.isOver(),
+    }),
+  });
+
+  // Disable the default drag preview
+  useEffect(() => {
+    previewRef(getEmptyImage(), { captureDraggingState: true });
+  }, []);
 
   const defaultFormWidth = 10;
   const headerRef = useRef(null);
@@ -172,18 +214,16 @@ ColumnIndex.propTypes = {
   columnIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
-  columnNames: PropTypes.arrayOf(PropTypes.string).isRequired,
-  isDragging: PropTypes.bool,
-  isHovered: PropTypes.bool,
-  dropRef: PropTypes.func.isRequired,
-  dragRef: PropTypes.func.isRequired,
-  hasSelected: PropTypes.bool,
+  hasSelected: PropTypes.bool.isRequired,
   hoverColumnVector: PropTypes.func.isRequired,
   unhoverColumnVector: PropTypes.func.isRequired,
   compareVectorValues: PropTypes.func.isRequired,
   onCellClick: PropTypes.func.isRequired,
   onColumnClick: PropTypes.func.isRequired,
   fetchColumnValues: PropTypes.func.isRequired,
+  undragColumnVector: PropTypes.func.isRequired,
+  swapColumnVectors: PropTypes.func.isRequired,
+  maxColumnNameLength: PropTypes.number.isRequired,
 };
 
 const EnhancedColumnIndex = withColumnVectorData(ColumnIndex);

@@ -5,40 +5,29 @@ import PropTypes from "prop-types";
 import ColumnIndex from "./ColumnIndex";
 import StackDetailToolbar from "./StackDetailToolbar";
 import { getValuesInRange, getIndexOfValue } from "./selectionUtils";
+import withColumnMatrixData from "../../HOC/withColumnMatrixData";
 
 import "./StackDetail.scss";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { setSelectedColumns } from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
 import { selectTablesById } from "../../../data/slices/tablesSlice/tableSelectors";
-import {
-  setHoveredTable,
-  clearHoveredTable,
-  addToOpsDetailVisableColumns,
-  removeFromOpsDetailVisableColumns,
-} from "../../../data/slices/uiSlice";
-import { isTableId } from "../../../data/slices/tablesSlice/Table";
+import TableRowLabel from "./TableRowLabel";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
-export default function StackDetailView({ childrenIds }) {
-  const tableIds = childrenIds.filter((childId) => isTableId(childId));
+function StackDetailView({ tableIds, columnIdMatrix, m, n }) {
   const dispatch = useDispatch();
+
+  const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
+  // TODO is this necessary?
+  const [selectionExtentCell, setSelectionExtentCell] = useState(null);
 
   const tables = useSelector((state) =>
     tableIds.map((tableId) => selectTablesById(state, tableId))
   );
-
-  const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
-  const [selectionExtentCell, setSelectionExtentCell] = useState(null);
-
-  const columnIdMatrix = tables.map((table) => table.columnIds);
-  const [m, n] = [
-    Math.max(...columnIdMatrix.map((c) => c.length)),
-    tables.length,
-  ];
 
   const width = m * cellSize;
   const xScale = scaleBand(
@@ -49,36 +38,37 @@ export default function StackDetailView({ childrenIds }) {
   // Use a ref to track the grid container
   const gridContainerRef = useRef();
 
-  useEffect(() => {
-    const gridContainer = gridContainerRef.current;
-    const columnElements = gridContainer.querySelectorAll(".ColumnIndex");
+  // useEffect(() => {
+  //   const gridContainer = gridContainerRef.current;
+  //   const columnElements = gridContainer.querySelectorAll(".ColumnIndex");
 
-    // Create an IntersectionObserver
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const columnIds = entry.target
-            .getAttribute("data-columnids")
-            .split(",");
-          const isVisible = entry.isIntersecting;
-          if (isVisible) {
-            dispatch(addToOpsDetailVisableColumns(columnIds));
-          } else {
-            dispatch(removeFromOpsDetailVisableColumns(columnIds));
-          }
-        });
-      },
-      {
-        root: gridContainer,
-        threshold: 0.1, // Trigger when 10% of the element is visible
-      }
-    );
+  // TODO: sync visable columns with the store
+  //   // Create an IntersectionObserver
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       entries.forEach((entry) => {
+  //         const columnIds = entry.target
+  //           .getAttribute("data-columnids")
+  //           .split(",");
+  //         const isVisible = entry.isIntersecting;
+  //         if (isVisible) {
+  //           dispatch(addToOpsDetailVisableColumns(columnIds));
+  //         } else {
+  //           dispatch(removeFromOpsDetailVisableColumns(columnIds));
+  //         }
+  //       });
+  //     },
+  //     {
+  //       root: gridContainer,
+  //       threshold: 0.1, // Trigger when 10% of the element is visible
+  //     }
+  //   );
 
-    columnElements.forEach((columnElement) => {
-      observer.observe(columnElement);
-    });
-    return () => observer.disconnect();
-  }, [dispatch]);
+  //   columnElements.forEach((columnElement) => {
+  //     observer.observe(columnElement);
+  //   });
+  //   return () => observer.disconnect();
+  // }, [dispatch]);
 
   return (
     <div>
@@ -93,23 +83,8 @@ export default function StackDetailView({ childrenIds }) {
             <span>{yAxisLabel}</span>
           </div>
           <div className="column-group">
-            {tables.map((child) => (
-              // TODO: what if child is an operation?
-              <div
-                key={child.id}
-                className="cell"
-                onMouseEnter={() => dispatch(setHoveredTable(child.id))}
-                onMouseLeave={() => dispatch(clearHoveredTable())}
-              >
-                {child.name}
-              </div>
-            ))}
-          </div>
-          <div className="column-group">
-            {tables.map((child) => (
-              <div className="cell" key={child.id}>
-                {child.rowsExplored} / {child.rowCount}
-              </div>
+            {tableIds.map((tableId) => (
+              <TableRowLabel key={tableId} id={tableId} />
             ))}
           </div>
         </div>
@@ -120,7 +95,8 @@ export default function StackDetailView({ childrenIds }) {
               <ColumnIndex
                 key={j}
                 index={j}
-                tableIds={tables.map(({ id }) => id)}
+                columnIds={columnIdMatrix.map((row) => row[j])}
+                tableIds={tables.map(({ id }) => id)} // TODO: do I need this?
                 onCellClick={onCellClick}
                 onColumnClick={onColumnClick}
               />
@@ -194,7 +170,15 @@ export default function StackDetailView({ childrenIds }) {
 }
 
 StackDetailView.propTypes = {
-  childrenIds: PropTypes.arrayOf(
+  tableIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
+  columnIdMatrix: PropTypes.arrayOf(
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number]))
+  ).isRequired,
+  m: PropTypes.number.isRequired,
+  n: PropTypes.number.isRequired,
 };
+
+const StackDetailViewWithData = withColumnMatrixData(StackDetailView);
+export default StackDetailViewWithData;

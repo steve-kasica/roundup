@@ -119,6 +119,43 @@ const columnsSlice = createSlice({
         };
       });
     },
+    /**
+     *
+     * @param {*} state
+     * @param {*} action
+     */
+    updateAttribute(state, action) {
+      let { ids, attribute, value } = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+
+      if (attribute === "id") {
+        throw new Error("`id` attribute is immutable and cannot be changed");
+      } else if (attribute === "tableId") {
+        throw new Error(
+          "`tableId` attribute is immutable and cannot be changed"
+        );
+      } else if (attribute === "columnType" && !COLUMN_TYPES.includes(value)) {
+        throw new InvalidColumnTypeError(value);
+      } else if (attribute === "isRemoved" && typeof value !== "boolean") {
+        throw new Error("`isRemoved` must be a boolean");
+      } else if (attribute === "name") {
+        throw new Error("`name` attribute is immutable");
+      }
+
+      ids
+        .map((id) => {
+          const column = state.data[id];
+          if (!column) {
+            throw new Error(`Column with id ${id} not found`);
+          } else if (column[attribute] === undefined) {
+            throw new Error(`Column does not have attribute '${attribute}'`);
+          }
+          return column;
+        })
+        .forEach((column) => (column[attribute] = value));
+    },
 
     /**
      * Updates the column name after a successful rename operation.
@@ -160,18 +197,12 @@ const columnsSlice = createSlice({
         const column = state.data[id];
         if (column) {
           // Remove the column from the data object
-          delete state.data[id];
+          state.data[id].isRemoved = true; // Mark as removed
 
           // Remove the column ID from the idsByTable mapping
           state.idsByTable[column.tableId] = state.idsByTable[
             column.tableId
           ].filter((cid) => cid !== id);
-
-          // Remove the column ID from the loading array if it exists
-          state.loading = state.loading.filter((cid) => cid !== id);
-
-          // Remove the column ID from the selected array if it exists
-          state.selected = state.selected.filter((cid) => cid !== id);
         } else {
           throw new Error(`Column with id ${id} not found`);
         }
@@ -310,8 +341,11 @@ const columnsSlice = createSlice({
       state.selected = initialState.selected;
     },
     removeFromSelectedColumns(state, action) {
-      state.selectedColumns = state.selectedColumns.filter(
-        (column) => column !== action.payload
+      const columnIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.selected = state.selected.filter(
+        (column) => !columnIds.includes(column)
       );
     },
     fetchValuesRequest(state, action) {
@@ -375,6 +409,8 @@ export const {
   fetchValuesRequest,
   fetchValuesSuccess,
   fetchValuesFailure,
+
+  updateAttribute,
 
   addColumnsFromOpenRefine,
   addColumns,
