@@ -4,11 +4,10 @@
  * A component for displaying and interacting with the set of source tables.
  */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import TableLayout from "./TableLayout";
 import ListLayout from "./ListLayout";
-import { fetchTablesRequest } from "../../data/sagas/fetchTablesSaga";
 import {
   Button,
   Chip,
@@ -98,7 +97,7 @@ const LayoutSwitch = styled(Switch)(({ theme }) => ({
 
 export default function SourceTables() {
   const dispatch = useDispatch();
-  const [selectedTag, setSelectedTag] = useState("");
+  const [selectedTableType, setSelectedTableType] = useState("");
   const [searchString, setSearchString] = useState("");
   const [tableSelection, setTableSelection] = useState([]);
 
@@ -109,19 +108,17 @@ export default function SourceTables() {
   const isLoading = false; // TODO:
   const error = false; // TODO:
 
-  // useEffect(() => {
-  //   dispatch(fetchTablesRequest({ source: "openrefine" }));
-  // }, [dispatch]);
-
   const filteredTables = tables
     .filter((table) => table.name.includes(searchString))
     .filter(
-      (table) => selectedTag.length === 0 || table.tags.includes(selectedTag)
+      (table) =>
+        selectedTableType.length === 0 ||
+        table.mimeType.includes(selectedTableType)
     );
 
-  const tags = Array.from(
+  const tableTypes = Array.from(
     new Set(
-      !(isLoading && error) ? tables.map((table) => table.tags).flat() : []
+      !(isLoading && error) ? tables.map((table) => table.mimeType).flat() : []
     )
   );
 
@@ -149,7 +146,7 @@ export default function SourceTables() {
                 paddingRight: "5px",
               }}
             >
-              Filter by tag
+              Filter by type
             </InputLabel>
             <Select
               labelId="tag-filter-label"
@@ -157,18 +154,18 @@ export default function SourceTables() {
               id="tag-filter-select"
               fullWidth
               size="small"
-              value={selectedTag}
-              onChange={(event) => setSelectedTag(event.target.value)}
+              value={selectedTableType}
+              onChange={(event) => setSelectedTableType(event.target.value)}
               input={<OutlinedInput id="select-multiple-chip" label="Tags" />}
               renderValue={(tag) => <Chip label={tag} />}
               MenuProps={MenuProps}
             >
               <MenuItem value="">
-                <em>None</em>
+                <em>All</em>
               </MenuItem>
-              {tags.map((tag) => (
-                <MenuItem key={tag} value={tag}>
-                  {tag}
+              {tableTypes.map((tableType) => (
+                <MenuItem key={tableType} value={tableType}>
+                  {tableType}
                 </MenuItem>
               ))}
             </Select>
@@ -181,14 +178,14 @@ export default function SourceTables() {
             disableElevation
             disabled={
               searchString === "" &&
-              selectedTag.length === 0 &&
+              selectedTableType.length === 0 &&
               tableSelection.length === 0
             }
             fullWidth
             sx={{ height: "100%" }}
             onClick={() => {
               setSearchString("");
-              setSelectedTag("");
+              setSelectedTableType("");
               dispatch(setTableSelection([]));
             }}
           >
