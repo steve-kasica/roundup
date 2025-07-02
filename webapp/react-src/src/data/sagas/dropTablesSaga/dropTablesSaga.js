@@ -18,7 +18,7 @@ import { removeChildFromOperation } from "../../slices/operationsSlice";
  * @function
  * @returns {Object} Redux action with type "sagas/deleteTables" and payload.
  */
-export const dropTablesAction = createAction("sagas/deleteTables");
+export const dropTablesAction = createAction("sagas/dropTables");
 
 export default function* dropTablesSagaWatcher() {
   yield takeEvery(dropTablesAction.type, dropTablesSagaWorker);
@@ -46,10 +46,10 @@ export function* dropTablesSagaWorker(action) {
           childId: table.id,
         })
       );
-
-      // Remove all columns belonging to this table
-      yield put(dropColumns(table.columnIds));
     }
+
+    // Remove all columns belonging to this table
+    yield put(dropColumns(table.columnIds));
 
     // Remove table from DuckDB
     dropTable(table.name);
