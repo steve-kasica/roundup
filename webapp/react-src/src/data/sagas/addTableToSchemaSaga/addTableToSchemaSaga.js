@@ -55,7 +55,9 @@ export default function* addTableToSchemaSagaWatcher() {
 }
 
 /**
- * Saga worker to add a table to the schema
+ * Saga worker to handle the logic of when a user adds a table to the schema.
+ * It should handle initialization of the operation tree if it does not exist,
+ * and manage the addition of the table to the appropriate operation based on its type.
  * @param {Object} action - The action object
  * @param {string} action.payload.tableId - The ID of the table to add
  */
@@ -63,9 +65,12 @@ export function* addTableToSchemaSagaWorker(action) {
   const { tableId, operationType } = action.payload;
 
   const rootOperationId = yield select(selectRootOperation);
+  const rootOperation = yield select((state) =>
+    rootOperationId ? selectOperation(state, rootOperationId) : null
+  );
 
   if (!rootOperationId) {
-    // Initialize
+    // Case: initialization
     const operation = Operation(OPERATION_TYPE_NO_OP, [tableId]);
     yield put(addOperation(operation));
     yield put(
@@ -75,53 +80,55 @@ export function* addTableToSchemaSagaWorker(action) {
         value: operation.id,
       })
     );
-  } else {
-    const rootOperation = yield select((state) =>
-      selectOperation(state, rootOperationId)
+  } else if (rootOperation.operationType === OPERATION_TYPE_NO_OP) {
+    // Case: table added after initialization
+
+    // Change root operation type from NO_OP to the specified operation type
+    yield put(
+      changeOperationType({
+        operationId: rootOperation.id,
+        operationType,
+      })
     );
-    if (rootOperation.operationType === OPERATION_TYPE_NO_OP) {
-      // Second table added, change root operation type from NO_OP to the specified operation type
-      yield put(
-        changeOperationType({
-          operationId: rootOperation.id,
-          operationType,
-        })
-      );
-      yield put(
-        addChildToOperation({
-          operationId: rootOperation.id,
-          childId: tableId,
-        })
-      );
-      yield put(
-        setTablesAttribute({
-          ids: tableId,
-          attribute: "operationId",
-          value: rootOperation.id,
-        })
-      );
-    } else if (rootOperation.operationType === operationType) {
-      yield put(
-        addChildToOperation({ operationId: rootOperation.id, tableId })
-      );
-      yield put(
-        setTablesAttribute({
-          ids: tableId,
-          attribute: "operationId",
-          value: rootOperation.id,
-        })
-      );
-    } else {
-      // Different operation type, create a new operation, add it as the new root operation
-      const operation = Operation(operationType, [tableId]);
-      yield put(addOperation(operation));
-      yield put(
-        setTablesAttribute({
-          ids: tableId,
-          attribute: "operationId",
-          value: operation.id,
-        })
-      );
-    }
+    yield put(
+      addChildToOperation({
+        operationId: rootOperation.id,
+        childId: tableId,
+      })
+    );
+    yield put(
+      setTablesAttribute({
+        ids: tableId,
+        attribute: "operationId",
+        value: rootOperation.id,
+      })
+    );
+  } else if (rootOperation.operationType === operationType) {
+    // Case: table added to an existing operation of the same type
+
+    // Add the table as a child of the existing operation
+    yield put(
+      addChildToOperation({ operationId: rootOperation.id, childId: tableId })
+    );
+    yield put(
+      setTablesAttribute({
+        ids: tableId,
+        attribute: "operationId",
+        value: rootOperation.id,
+      })
+    );
+  } else {
+    // Case: table added to an existing operation of a different type
+
+    // Create a new root operation
+    const operation = Operation(operationType, [tableId]);
+    yield put(addOperation(operation));
+    yield put(
+      setTablesAttribute({
+        ids: tableId,
+        attribute: "operationId",
+        value: operation.id,
+      })
+    );
   }
 }
