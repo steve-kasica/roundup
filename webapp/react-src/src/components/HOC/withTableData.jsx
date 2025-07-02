@@ -30,38 +30,39 @@ import { dropTablesAction } from "../../data/sagas/dropTablesSaga";
 
 export default function withTableData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
-    let parentOperationId,
-      parentOperation,
-      depth = 0; // These two variables can be null if the table is not part of any operation
     const dispatch = useDispatch();
 
+    // Get table data from the Redux store
     const table = useSelector((state) => selectTablesById(state, id));
+    const selectedTables = useSelector(selectSelectedTables);
+    const hoveredTable = useSelector(selectHoveredTable);
+
+    // Get column data from the Redux store
+    const selectedColumnIds = useSelector(
+      (state) => state.columns.idsByTable[table.id]
+    );
     const columns = useSelector((state) =>
       table.columnIds.map((columnId) => selectColumnById(state, columnId))
     );
-    // TODO: memoize
+
+    // Get related operation data from the Redux store, if any
+    const parentOperation = useSelector((state) =>
+      table.operationId ? selectOperation(state, table.operationId) : null
+    );
+    const depth = useSelector((state) =>
+      table.operationId ? selectOperationDepth(state, table.operationId) : null
+    );
+
+    const isInSchema = table.operationId !== null;
+    const isHovered = hoveredTable === id;
+    const isSelected = selectedTables.includes(id);
+
+    // TODO: should not be here
     const columnNames = columns.filter(Boolean).map((col) => col.name);
-    const selectedTables = useSelector(selectSelectedTables);
-
-    parentOperationId = useSelector((state) =>
-      selectOperationByTableId(state, id)
-    );
-
-    parentOperation = useSelector((state) =>
-      selectOperation(state, parentOperationId)
-    );
-
-    depth = useSelector((state) =>
-      selectOperationDepth(state, parentOperationId)
-    );
-
-    const hoveredTable = useSelector(selectHoveredTable);
-
-    const isInSchema =
-      parentOperationId !== null && parentOperationId !== undefined;
 
     const [isPressed, setIsPressed] = useState(false);
 
+    // TODO: this should be in the view
     const [{ isDragging }, dragRef] = useDrag(
       () => ({
         type: SourceTable,
@@ -91,7 +92,7 @@ export default function withTableData(WrappedComponent) {
         {...props}
         // Table properties
         table={table}
-        id={table.id}
+        id={table.id} //
         source={table.source}
         name={table.alias || table.name}
         extension={table.extension}
@@ -103,19 +104,22 @@ export default function withTableData(WrappedComponent) {
         rowsExplored={table.rowsExplored}
         dateLastModified={table.dateLastModified}
         // Other related objects
-        columnNames={columnNames}
-        parentOperation={parentOperation}
+        columnNames={columnNames} // TODO: remove this, should only pass Ids
+        selectedColumnIds={selectedColumnIds}
+        parentOperation={parentOperation} // TODO: should only pass Ids
         depth={depth}
         // Interaction state
-        isHovered={hoveredTable === id}
-        isSelected={selectedTables.includes(id)}
+        isHovered={isHovered}
+        isSelected={isSelected}
         isDragging={isDragging}
         isPressed={isPressed}
         isFocused={parentOperation ? true : false}
         // Interaction handlers
         dragRef={dragRef}
-        onHover={() => dispatch(setHoveredTable(id))}
-        onUnhover={() => dispatch(clearHoveredTable())}
+        onHover={() => dispatch(setHoveredTable(id))} // TODO: remove
+        onUnhover={() => dispatch(clearHoveredTable())} // TODO: remove
+        hoverTable={() => dispatch(setHoveredTable(id))}
+        unhoverTable={() => dispatch(clearHoveredTable())}
         removeTableFromSchema={() => {
           if (isInSchema) {
             dispatch(
@@ -143,8 +147,6 @@ export default function withTableData(WrappedComponent) {
               break;
           }
         }}
-        hoverTable={() => dispatch(setHoveredTable(id))}
-        unhoverTable={() => dispatch(clearHoveredTable())}
         peekTable={() => dispatch(peekTableAction({ tableId: id }))}
         setTableAlias={(aliases) =>
           dispatch(changeTablesName({ ids: id, aliases }))

@@ -31,23 +31,30 @@ import { getEmptyImage } from "react-dnd-html5-backend";
 export default function withColumnData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
     const dispatch = useDispatch();
-    const column = useSelector((state) => selectColumnById(state, id));
+    const isNull = id === null;
+    let column = useSelector((state) =>
+      !isNull ? selectColumnById(state, id) : null
+    );
     const tableColumnIds = useSelector((state) =>
-      selectColumnIdsByTableId(state, column?.tableId)
+      column !== null ? selectColumnIdsByTableId(state, column.tableId) : []
     );
     const firstSelectedColumnId = useSelector(selectFirstSelectedColumn);
+    const selectedColumns = useSelector(selectSelectedColumns);
     const hoveredColumns = useSelector(selectHoveredColumns);
     const loadingColumns = useSelector(selectLoadingColumns);
-    const selectedColumns = useSelector(selectSelectedColumns);
+
+    // Column interaction state properties
+    const isSelected = !isNull && selectedColumns.includes(id);
+    const isLoading = !isNull && loadingColumns.includes(id);
+    const isHovered = !isNull && hoveredColumns.includes(id);
 
     const name = column?.name;
     const tableId = column?.tableId;
     const index = column?.index;
     const columnType = column?.columnType;
     const values = column?.values;
-    const isNull = !column;
-    const isSelected = selectedColumns.includes(id);
     const error = column?.error;
+    const alias = column?.alias;
 
     const [{ isDragging }, dragRef, previewRef] = useDrag({
       type: COLUMN,
@@ -99,22 +106,25 @@ export default function withColumnData(WrappedComponent) {
     return (
       <WrappedComponent
         {...props}
+        column={column}
         dragRef={dragRef}
         dropRef={dropRef}
         id={id}
         tableId={tableId}
         name={name}
-        alias={column.alias}
+        alias={alias}
         index={index}
         columnType={columnType}
         values={values}
         isNull={isNull}
+        // Interaction state props
         isSelected={isSelected}
-        isLoading={loadingColumns.includes(id)}
-        isHovered={hoveredColumns.includes(id)}
+        isLoading={isLoading}
+        isHovered={isHovered}
         isDragging={isDragging}
         isOver={isOver}
         error={error}
+        // Actions handlers
         hoverColumn={hoverColumn}
         unHoverColumn={unHoverColumn}
         renameColumn={(alias) => {

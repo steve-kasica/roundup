@@ -19,7 +19,7 @@ import TableDropTarget from "./TableDropTarget";
 import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
-import OperationBlockView from "./OperationBlockView";
+import OperationView from "./OperationView";
 
 const gridColumns = 12;
 const gridWidth = gridColumns - 2;
@@ -33,7 +33,7 @@ export default function CompositeTableSchema() {
       {maxOperationDepth >= 0 ? (
         <Grid container spacing={0}>
           <Grid size={gridWidth}>
-            <OperationBlockView id={rootOperationId} />
+            <OperationView id={rootOperationId} />
           </Grid>
           <Grid size={gridColumns - gridWidth}>
             <TableDropTarget operationType={OPERATION_TYPE_PACK}>

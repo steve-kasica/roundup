@@ -16,15 +16,18 @@ import PropTypes from "prop-types";
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
     const dispatch = useDispatch();
+
     const operation = useSelector((state) => selectOperation(state, id));
     const depth = useSelector((state) => selectOperationDepth(state, id));
     const focusedOperationId = useSelector(selectFocusedOperationId);
     const hoveredOperationId = useSelector(selectHoveredOperation);
-
     const tables = useSelector((state) =>
       operation.children
         .filter(isTableId)
         .map((tableId) => selectTablesById(state, tableId))
+    );
+    const tableColumnCounts = useSelector((state) =>
+      tables.map(({ id }) => state.columns.idsByTable[id].length)
     );
 
     let operationColumnCount = 0;
@@ -32,14 +35,12 @@ export default function withOperationData(WrappedComponent) {
       operation.operationType === OPERATION_TYPE_STACK ||
       operation.operationType === OPERATION_TYPE_NO_OP
     ) {
-      operationColumnCount = Math.max(
-        ...tables.map((table) => table.columnIds.length),
+      operationColumnCount = Math.max(...tableColumnCounts, 0);
+    } else if (operation.operationType === OPERATION_TYPE_PACK) {
+      operationColumnCount = tableColumnCounts.reduce(
+        (acc, tableColumnCount) => acc + tableColumnCount,
         0
       );
-    } else if (operation.operationType === OPERATION_TYPE_PACK) {
-      operationColumnCount = tables
-        .map((table) => table.columnIds.length)
-        .reduce((acc, tableColumnCount) => acc + tableColumnCount, 0);
     } else {
       // Handle other operation types if necessary
       operationColumnCount = 0; // Default to 0 for unsupported types

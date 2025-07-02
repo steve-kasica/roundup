@@ -8,13 +8,13 @@
  * **Table Tree**, by design.
  */
 
-import TableBlockView from "./TableBlockView";
+import TableView from "./TableView";
 import withOperationData from "../HOC/withOperationData";
 import { isOperationId } from "../../data/slices/operationsSlice";
 import { isTableId } from "../../data/slices/tablesSlice";
 import PropTypes from "prop-types";
 
-function OperationBlockView({
+function OperationView({
   // props via withOperationData
   depth,
   columnCount,
@@ -44,7 +44,7 @@ function OperationBlockView({
     >
       {childOperationIds.length > 0
         ? childOperationIds.map((childOperationId) => (
-            <EnhancedOperationBlockView
+            <EnhancedOperationView
               key={childOperationId}
               id={childOperationId}
               parentColumnCount={columnCount}
@@ -53,7 +53,7 @@ function OperationBlockView({
         : null}
       {childTableIds.length > 0
         ? childTableIds.map((tableId) => (
-            <TableBlockView
+            <TableView
               key={tableId}
               id={tableId}
               isDraggable={false}
@@ -66,9 +66,7 @@ function OperationBlockView({
   );
 }
 
-const EnhancedOperationBlockView = withOperationData(OperationBlockView);
-
-OperationBlockView.propTypes = {
+OperationView.propTypes = {
   depth: PropTypes.number,
   columnCount: PropTypes.number.isRequired,
   isFocused: PropTypes.bool,
@@ -80,4 +78,6 @@ OperationBlockView.propTypes = {
   parentColumnCount: PropTypes.number,
 };
 
-export default EnhancedOperationBlockView;
+const EnhancedOperationView = withOperationData(OperationView);
+
+export default EnhancedOperationView;
