@@ -16,6 +16,7 @@ import CompositeTableSchema from "./components/CompositeTableSchema";
 import OperationDetail from "./components/OperationDetail";
 import OperationsList from "./components/OperationsList";
 import CustomDragLayer from "./CustomDragLayer";
+import SelectedTableView from "./components/TablePeek/TablePeek";
 
 function App() {
   return (
@@ -28,12 +29,14 @@ function App() {
             CompositeTableSchema,
             OperationsList,
             OperationDetail,
+            SelectedTableView,
           ]}
           titles={[
             "Source Tables",
             "Composite Table Schema",
             "Operations List",
             "Operations Detail",
+            "Table Peek",
           ]}
           dashboardTitle="Open Roundup"
         />

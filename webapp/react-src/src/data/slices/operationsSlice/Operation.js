@@ -22,7 +22,7 @@ export default function Operation(operationType, children) {
   if (!validOperationTypes.includes(operationType)) {
     throw new Error("Invalid operation type");
   }
-  const id = `o_${++idCounter}`; // Each operation has a unique ID
+  const id = `o${++idCounter}`; // Each operation has a unique ID
 
   return {
     id, // ID is immutable and unique
@@ -49,7 +49,7 @@ export const isOperation = (obj) =>
 export function isOperationId(id) {
   return (
     typeof id === "string" &&
-    id.startsWith("o_") &&
+    id.startsWith("o") &&
     !isNaN(parseInt(id.slice(2), 10)) // Check if the rest of the ID is a number
   );
 }

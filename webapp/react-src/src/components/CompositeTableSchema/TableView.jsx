@@ -70,7 +70,7 @@ TableView.propTypes = {
   isPressed: PropTypes.bool,
   isFocused: PropTypes.bool,
   parentOperationType: PropTypes.string,
-  parentColumnCount: PropTypes.number.isRequired,
+  parentColumnCount: PropTypes.number,
 };
 
 const EnhancedTableView = withTableData(TableView);

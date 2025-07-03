@@ -9,6 +9,7 @@ import { addTableToSchemaSuccess } from "../addTableToSchemaSaga/addTableToSchem
 import { createStackView } from "../../../lib/duckdb/createStackView";
 import { selectColumnById } from "../../slices/columnsSlice";
 import { removeColumnsSuccessAction } from "../removeColumnsSaga";
+import { getTableDimensions } from "../../../lib/duckdb";
 
 // Actions
 export const createOperationView = createAction(
@@ -45,14 +46,9 @@ function* handleCreateOperationView(operationId) {
     selectQueryData(state, operationId)
   );
 
-  // createStackView execute a view creation/update query and returns
-  // the results of a query that calculates its dimensions.
-  const dimensionsProxy = yield call(createStackView, queryData);
-  const dimensions = JSON.parse(
-    JSON.stringify(dimensionsProxy, (key, value) =>
-      typeof value === "bigint" ? Number(value) : value
-    )
-  )[0];
+  // createStackView execute a view creation/update query
+  yield call(createStackView, queryData);
+  const dimensions = yield call(getTableDimensions, operationId);
 
   yield put(
     setOperationAttributes({ id: operationId, attributes: dimensions })
@@ -61,22 +57,22 @@ function* handleCreateOperationView(operationId) {
 
 // TODO: this would be like a serialize operation query selector in the operations slice
 const selectQueryData = (state, operationId) => {
-  const parent = { name: null, children: [] };
+  const parent = { id: null, children: [] };
 
   const operation = selectOperation(state, operationId);
-  parent.name = operation.name;
+  parent.id = operation.id;
   parent.children = operation.children.map((id) => {
     let child = { tableName: null, columnNames: [] };
     if (isTableId(id)) {
       const table = selectTablesById(state, id);
-      child.tableName = table.name;
+      child.id = table.id;
       child.columnNames = state.columns.idsByTable[id].map((columnId) => {
         const column = selectColumnById(state, columnId);
         return column.name;
       });
     } else {
       const operation = selectOperation(state, id);
-      child = operation.name;
+      child.id = operation.id;
       child.columnNames = ["*"];
     }
     return child;

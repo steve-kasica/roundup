@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useSelector } from "react-redux";
 import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
 import ColumnValues from "./ColumnValues";
-import withTableData from "../../components/HOC/withTableData";
+import withTableData from "../HOC/withTableData";
 import ColumnHeader from "./ColumnHeader";
 import "./TableView.css";
 import PropTypes from "prop-types";
-import { getTableRows } from "../../lib/duckdb";
+import { getTableRows, summarizeTable } from "../../lib/duckdb";
 
-function TableView({ id, name, rowCount, columnIds }) {
-  const columnCount = columnIds.length;
+export default function DBTableView({ id, name, rowCount, columnCount }) {
+  const [columns, setColumns] = useState([]);
+
   const [rows, setRows] = useState([]);
   const rowsExplored = rows.length;
   const [page, setPage] = useState(0);
@@ -18,12 +18,17 @@ function TableView({ id, name, rowCount, columnIds }) {
   const pageSize = 25;
   const tableContainerRef = useRef(null);
 
+  const fetchColumns = useCallback(async () => {
+    const columns = await summarizeTable(id);
+    setColumns(columns);
+  }, [id]);
+
   // Fetch rows for a given page
   const fetchRows = useCallback(
     async (pageNum) => {
       setLoading(true);
       const offset = pageNum * pageSize;
-      const newRows = await getTableRows(name, pageSize, offset);
+      const newRows = await getTableRows(id, pageSize, offset);
       setRows((prevRows) => {
         const updatedRows = pageNum === 0 ? newRows : [...prevRows, ...newRows];
         return updatedRows;
@@ -32,6 +37,11 @@ function TableView({ id, name, rowCount, columnIds }) {
     },
     [name, pageSize, rowCount]
   );
+
+  useEffect(() => {
+    // Fetch columns when component mounts or name changes
+    fetchColumns();
+  }, [name, fetchColumns]);
 
   // Initial fetch or when id changes
   useEffect(() => {
@@ -69,6 +79,8 @@ function TableView({ id, name, rowCount, columnIds }) {
     };
   }, [loading, hasMore]);
 
+  console.log(columns);
+
   return (
     <div className="table-view">
       <h2>
@@ -90,8 +102,8 @@ function TableView({ id, name, rowCount, columnIds }) {
           <thead>
             <tr>
               <th></th>
-              {columnIds.map((columnId) => (
-                <ColumnHeader key={columnId} id={columnId} />
+              {Array.from({ length: columnCount }, (_, i) => (
+                <ColumnHeader key={i} column={columns[i]} />
               ))}
             </tr>
           </thead>
@@ -115,7 +127,7 @@ function TableView({ id, name, rowCount, columnIds }) {
   );
 }
 
-TableView.propTypes = {
+DBTableView.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   remoteId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   name: PropTypes.string,
@@ -124,6 +136,3 @@ TableView.propTypes = {
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ),
 };
-
-const EnahncedTableView = withTableData(TableView);
-export default EnahncedTableView;

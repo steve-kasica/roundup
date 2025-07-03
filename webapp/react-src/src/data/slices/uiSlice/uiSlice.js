@@ -8,6 +8,7 @@ export const initialState = {
   drawerContents: null,
   selectedTables: [],
   hoveredTable: null,
+  peekedTable: null,
 
   // Used to coordinate the visibility of columns
   // in Operations Detail with the Composite Table Schema
@@ -20,6 +21,12 @@ export const uiSlice = createSlice({
   reducers: {
     setDrawerContents(state, action) {
       state.drawerContents = action.payload;
+    },
+    setPeekedTable(state, action) {
+      state.peekedTable = action.payload;
+    },
+    clearPeekedTable(state) {
+      state.peekedTable = initialState.peekedTable;
     },
 
     setSelectedTables(state, action) {
@@ -73,6 +80,9 @@ export const uiSlice = createSlice({
 // Action
 export const {
   setDrawerContents,
+
+  setPeekedTable,
+  clearPeekedTable,
 
   setSelectedTables,
   appendToSelectedTables,

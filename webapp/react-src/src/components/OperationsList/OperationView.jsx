@@ -15,7 +15,7 @@ import React from "react";
 
 export const LAYOUT_ID = "operationListItem";
 
-function OperationListItemView({ operation, childrenIds, index, peekView }) {
+function OperationListItemView({ operation, childrenIds, index, peekTable }) {
   const { id, name, columnCount, operationType } = operation;
   const dispatch = useDispatch();
 
@@ -49,7 +49,7 @@ function OperationListItemView({ operation, childrenIds, index, peekView }) {
           >
             <MenuItem
               onClick={(event) => {
-                peekView();
+                peekTable();
                 handleMenuClose(event);
               }}
             >
@@ -76,7 +76,7 @@ OperationListItemView.propTypes = {
   operation: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     name: PropTypes.string.isRequired,
-    columnCount: PropTypes.number.isRequired,
+    columnCount: PropTypes.number,
     operationType: PropTypes.string.isRequired,
   }).isRequired,
   childrenIds: PropTypes.arrayOf(

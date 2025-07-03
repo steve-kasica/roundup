@@ -12,6 +12,7 @@ import {
 import { useDispatch } from "react-redux";
 import { selectTablesById, isTableId } from "../../data/slices/tablesSlice";
 import PropTypes from "prop-types";
+import { setPeekedTable } from "../../data/slices/uiSlice";
 
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
@@ -44,7 +45,7 @@ export default function withOperationData(WrappedComponent) {
         childrenIds={operation.children}
         onHover={() => dispatch(setHoveredOperation(id))}
         onUnhover={() => dispatch(setHoveredOperation(null))}
-        peekView={() => dispatch()}
+        peekTable={() => dispatch(setPeekedTable(id))}
       />
     );
   };

@@ -15,6 +15,7 @@ import {
   setHoveredTable,
   clearHoveredTable,
   selectHoveredTable,
+  setPeekedTable,
 } from "../../data/slices/uiSlice";
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 import { dataType as SourceTable } from "../../data/slices/tablesSlice";
@@ -147,7 +148,7 @@ export default function withTableData(WrappedComponent) {
               break;
           }
         }}
-        peekTable={() => dispatch(peekTableAction({ tableId: id }))}
+        peekTable={() => dispatch(setPeekedTable(id))}
         setTableAlias={(aliases) =>
           dispatch(changeTablesName({ ids: id, aliases }))
         }

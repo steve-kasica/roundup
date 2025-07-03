@@ -1,23 +1,20 @@
 import { getDuckDB } from "../duckdbClient";
-import { getTableDimensions } from "../getTableDimensions";
-// With these UNION ALL query, the view will take on the column names of the first child.
 
-export async function createStackView(queryData) {
+// With these UNION ALL query, the view will take on the column names of the first child.
+export async function createStackView(opData) {
   const db = await getDuckDB();
   const conn = await db.connect();
-  const query = formQuery(queryData);
-  await conn.query(query);
-  const dimensions = await getTableDimensions(queryData.name);
+  const query = formQuery(opData);
+  const response = await conn.query(query);
   await conn.close();
-  return dimensions;
+  return response;
 }
 
 export function formQuery(op) {
-  return `CREATE OR REPLACE VIEW ${op.name} AS SELECT * FROM (
+  return `CREATE OR REPLACE VIEW ${op.id} AS SELECT * FROM (
     ${op.children
       .map(
-        (child) =>
-          `\nSELECT ${child.columnNames.join(", ")} FROM ${child.tableName}\n`
+        (child) => `\nSELECT ${child.columnNames.join(", ")} FROM ${child.id}\n`
       )
       .join(" UNION ALL ")}
   )`;

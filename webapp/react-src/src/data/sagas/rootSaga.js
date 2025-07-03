@@ -12,7 +12,7 @@ import coordinateHoverSaga from "./coordinateHoverSaga";
 // import getRowsSagaWatcher from "./getRowsSaga";
 import peekTableSagaWatcher from "./peekTableSaga";
 import getValuesSagaWatcher from "./getValuesSaga";
-import tableUploadWatcher from "./tableUploadSaga";
+import uploadTablesSagaWatcher from "./uploadTablesSaga";
 import dropTablesSagaWatcher from "./dropTablesSaga";
 import createOperationViewSagaWatcher from "./createOperationViewSaga";
 
@@ -28,7 +28,7 @@ export default function* rootSaga() {
     // call(getRowsSagaWatcher),
     call(peekTableSagaWatcher),
     call(getValuesSagaWatcher),
-    call(tableUploadWatcher),
+    call(uploadTablesSagaWatcher),
     call(dropTablesSagaWatcher),
     call(createOperationViewSagaWatcher),
   ]);

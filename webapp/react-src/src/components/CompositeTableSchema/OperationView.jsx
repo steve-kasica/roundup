@@ -68,7 +68,7 @@ function OperationView({
 
 OperationView.propTypes = {
   depth: PropTypes.number,
-  columnCount: PropTypes.number.isRequired,
+  columnCount: PropTypes.number,
   isFocused: PropTypes.bool,
   isHovered: PropTypes.bool,
   operationType: PropTypes.string.isRequired,

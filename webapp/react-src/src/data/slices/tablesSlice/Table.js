@@ -34,11 +34,13 @@ export function Table(
     );
   }
 
+  const id = `t${++idCounter}`;
+
   return {
-    id: `t-${++idCounter}`,
+    id, // This unique identifier for table objects in Redux store corresponds to the name of the table in DuckDB
     source,
-    name, // name is immutable, so it can lookup columns in a table by name
-    alias: name, // alias is mutable, so it can be changed by the user
+    name, // name is mutable
+    alias: name, // depricated
     extension,
     size,
     mimeType,
@@ -72,4 +74,4 @@ const attributes = [
 export const isTable = (obj) =>
   attributes.every((attr) => Object.hasOwn(obj, attr));
 
-export const isTableId = (id) => typeof id === "string" && id.startsWith("t-");
+export const isTableId = (id) => typeof id === "string" && id.startsWith("t");

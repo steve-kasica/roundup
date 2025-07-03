@@ -29,3 +29,5 @@ export const selectSelectedColumns = (state) => state.ui.selectedColumns;
 export const selectSelectedTables = (state) => state.ui.selectedTables;
 
 export const selectHoveredTable = (state) => state.ui.hoveredTable;
+
+export const selectPeekedTable = (state) => state.ui.peekedTable;

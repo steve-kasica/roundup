@@ -9,7 +9,7 @@ import { selectDrawerContents } from "../data/slices/uiSlice/uiSliceSelectors";
 import { useDispatch, useSelector } from "react-redux";
 import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
 import { clearSelectedColumns } from "../data/slices/columnsSlice";
-import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TableView/SelectedTableView";
+import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TablePeek/TablePeek";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnValueMatrix";
 import { Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -24,7 +24,7 @@ drawerComponentMap[COLUMN_INDEX_VALUES_COMPONENT] = {
 };
 
 drawerComponentMap[FOCUSED_TABLE_VIEW] = {
-  component: lazy(() => import("./../components/TableView/SelectedTableView")),
+  component: lazy(() => import("../components/TablePeek/TablePeek")),
   anchor: "bottom",
   label: "Table Peek",
 };
