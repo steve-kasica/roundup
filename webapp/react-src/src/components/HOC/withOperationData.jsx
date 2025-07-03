@@ -30,37 +30,21 @@ export default function withOperationData(WrappedComponent) {
       tables.map(({ id }) => state.columns.idsByTable[id].length)
     );
 
-    let operationColumnCount = 0;
-    if (
-      operation.operationType === OPERATION_TYPE_STACK ||
-      operation.operationType === OPERATION_TYPE_NO_OP
-    ) {
-      operationColumnCount = Math.max(...tableColumnCounts, 0);
-    } else if (operation.operationType === OPERATION_TYPE_PACK) {
-      operationColumnCount = tableColumnCounts.reduce(
-        (acc, tableColumnCount) => acc + tableColumnCount,
-        0
-      );
-    } else {
-      // Handle other operation types if necessary
-      operationColumnCount = 0; // Default to 0 for unsupported types
-    }
-
-    const rowCount = -1; // TODO: Implement row count logic
-
     return (
       <WrappedComponent
         {...props}
+        operation={operation}
         id={id}
         depth={depth}
-        columnCount={operationColumnCount}
-        rowCount={rowCount}
+        columnCount={operation.columnCount}
+        rowCount={operation.rowCount}
         isFocused={operation.id === focusedOperationId}
         isHovered={operation.id === hoveredOperationId}
         operationType={operation.operationType}
         childrenIds={operation.children}
         onHover={() => dispatch(setHoveredOperation(id))}
         onUnhover={() => dispatch(setHoveredOperation(null))}
+        peekView={() => dispatch()}
       />
     );
   };

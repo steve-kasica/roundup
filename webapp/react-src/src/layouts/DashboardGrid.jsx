@@ -46,14 +46,14 @@ const DashboardGrid = ({
   spacing = 2,
   cardElevation = 1,
 }) => {
-  let drawer;
-  const dispatch = useDispatch();
+  // let drawer;
+  // const dispatch = useDispatch();
 
-  const drawerContents = useSelector(selectDrawerContents);
+  // const drawerContents = useSelector(selectDrawerContents);
   // Check if drawerContents is in the componentMap
-  if (drawerContents) {
-    drawer = drawerComponentMap[drawerContents];
-  }
+  // if (drawerContents) {
+  //   drawer = drawerComponentMap[drawerContents];
+  // }
 
   // Use provided titles or generate placeholders
   const gridTitles = [...titles];
@@ -70,7 +70,7 @@ const DashboardGrid = ({
         position: "relative",
       }}
     >
-      <Drawer
+      {/* <Drawer
         anchor={drawer ? drawer.anchor : undefined}
         open={Boolean(drawerContents)}
         onClose={() => dispatch(setDrawerContents(null))}
@@ -111,7 +111,7 @@ const DashboardGrid = ({
             {drawer && <drawer.component />}
           </Suspense>
         </Box>
-      </Drawer>
+      </Drawer> */}
 
       <Grid container spacing={spacing}>
         {components.map((Component, index) => (

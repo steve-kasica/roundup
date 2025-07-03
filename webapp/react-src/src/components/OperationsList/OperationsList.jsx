@@ -1,9 +1,9 @@
 import { List } from "@mui/material";
 import { useSelector } from "react-redux";
 import { selectAllOperationIds } from "../../data/slices/operationsSlice";
+import OperationView from "./OperationView";
 
 import "./OperationsList.scss";
-import OperationListItemView from "./OperationListItemView";
 
 export default function OperationsList() {
   const operationIds = useSelector(selectAllOperationIds);
@@ -14,7 +14,7 @@ export default function OperationsList() {
         .slice()
         .reverse()
         .map((operationId, i) => (
-          <OperationListItemView key={operationId} id={operationId} index={i} />
+          <OperationView key={operationId} id={operationId} index={i} />
         ))}
     </List>
   );
