@@ -22,27 +22,34 @@ export default function Operation(operationType, children) {
   if (!validOperationTypes.includes(operationType)) {
     throw new Error("Invalid operation type");
   }
+  const id = `o_${++idCounter}`; // Each operation has a unique ID
 
   return {
-    id: `o-${++idCounter}`, // Each operation has a unique ID
+    id, // ID is immutable and unique
+    name: id, // Name is the same as ID by default, can be changed later
+    rowCount: null,
+    columnCount: null,
     operationType,
     children,
   };
 }
 
-export function isOperation(obj) {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    typeof obj.id === "string" &&
-    typeof obj.operationType === "string"
-  );
-}
+const attributes = [
+  "id",
+  "name",
+  "operationType",
+  "children",
+  "rowCount",
+  "columnCount",
+];
+
+export const isOperation = (obj) =>
+  Object.keys(obj).every((key) => attributes.includes(key));
 
 export function isOperationId(id) {
   return (
     typeof id === "string" &&
-    id.startsWith("o-") &&
+    id.startsWith("o_") &&
     !isNaN(parseInt(id.slice(2), 10)) // Check if the rest of the ID is a number
   );
 }

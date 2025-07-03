@@ -1,11 +1,5 @@
 import { put, takeEvery } from "redux-saga/effects";
-import {
-  addColumnsToLoading,
-  removeColumns,
-  removeColumnsFromLoading,
-  removeFromSelectedColumns,
-  updateAttribute,
-} from "../../slices/columnsSlice";
+import { addColumnsToLoading, removeColumns } from "../../slices/columnsSlice";
 import { createAction } from "@reduxjs/toolkit";
 
 /**
@@ -19,6 +13,10 @@ import { createAction } from "@reduxjs/toolkit";
  */
 export const removeColumnsAction = createAction("sagas/removeColumn");
 
+export const removeColumnsSuccessAction = createAction(
+  "sagas/removeColumnSuccess"
+);
+
 export default function* removeColumnsSaga() {
   yield takeEvery(removeColumnsAction.type, removeColumnsSagaWorker);
 }
@@ -31,4 +29,6 @@ export function* removeColumnsSagaWorker(action) {
   // Remove from selected columns from all attributes
   // of the columns slice, including loading array
   yield put(removeColumns(columnIds));
+
+  yield put(removeColumnsSuccessAction(action.payload));
 }

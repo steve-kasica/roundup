@@ -29,7 +29,11 @@ import {
   selectRootOperation,
 } from "../../slices/operationsSlice";
 import Operation from "../../slices/operationsSlice/Operation";
-import { setTablesAttribute } from "../../slices/tablesSlice";
+import {
+  isTableId,
+  selectTablesById,
+  setTablesAttribute,
+} from "../../slices/tablesSlice";
 
 /**
  * Action creator for adding a table to a schema.
@@ -43,6 +47,10 @@ import { setTablesAttribute } from "../../slices/tablesSlice";
  * @returns {Object} Redux action with type "sagas/addTableToSchema"
  */
 export const addTableToSchema = createAction("sagas/addTableToSchema");
+
+export const addTableToSchemaSuccess = createAction(
+  "sagas/addTableToSchemaSuccess"
+);
 
 /**
  * Saga watcher that listens for the `addTableToSchema` action and triggers the corresponding worker saga.
@@ -131,4 +139,7 @@ export function* addTableToSchemaSagaWorker(action) {
       })
     );
   }
+
+  console.log("hey");
+  yield put(addTableToSchemaSuccess(action.payload));
 }

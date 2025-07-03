@@ -93,6 +93,17 @@ const operationsSlice = createSlice({
       operation.operationType = operationType;
     },
 
+    setOperationAttributes(state, action) {
+      const { id, attributes } = action.payload;
+      const operation = state.data[id];
+
+      if (!operation) {
+        throw new Error(`Operation with ID ${id} does not exist`);
+      }
+      // TODO: need some armor to validate here
+      state.data[id] = { ...operation, ...attributes };
+    },
+
     /**
      * Adds a child ID to the specified operation's children array.
      *
@@ -170,6 +181,7 @@ const operationsSlice = createSlice({
 export const {
   addOperation,
   removeOperation,
+  setOperationAttributes,
   changeOperationType,
   addChildToOperation,
   removeChildFromOperation,

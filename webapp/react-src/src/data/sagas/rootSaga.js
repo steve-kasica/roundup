@@ -14,6 +14,7 @@ import peekTableSagaWatcher from "./peekTableSaga";
 import getValuesSagaWatcher from "./getValuesSaga";
 import tableUploadWatcher from "./tableUploadSaga";
 import dropTablesSagaWatcher from "./dropTablesSaga";
+import createOperationViewSagaWatcher from "./createOperationViewSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -29,5 +30,6 @@ export default function* rootSaga() {
     call(getValuesSagaWatcher),
     call(tableUploadWatcher),
     call(dropTablesSagaWatcher),
+    call(createOperationViewSagaWatcher),
   ]);
 }
