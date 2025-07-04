@@ -1,116 +1,71 @@
-import { useEffect, useRef, useState } from "react";
-import withColumnValuesData from "../HOC/withValuesMatrixData";
+import { useRef } from "react";
+import withValuesCountMatrixData from "./withValuesMatrixData";
 import { Box, Typography } from "@mui/material";
 import PropTypes from "prop-types";
+import TableView from "./TableView";
+import SimilaritySummary from "./SimilaritySummary";
 
-export const COMPONENT_ID = "./ColumnValueMatrix";
+export const COMPONENT_ID = "./ColumnIndexDetails";
 
 const ROW_HEIGHT = 32; // px, adjust as needed
 
 const Y_AXIS_WIDTH = 33.333; // a fixed percentage width for the Y-axis column (value names)
 
-function ColumnValueMatrix({
+function ColumnIndexDetails({
+  data,
+  tableIds,
+  uniqueValues,
+  valueDegrees, // degrees of each value
+  error,
+  loading,
   columnIds,
-  columnNames,
-  tableNames,
-  valueCountMatrixPromise,
 }) {
-  // Derive additional data from props
-  const totalColumnCount = columnIds.length;
-  const colWidth = `${(100 - Y_AXIS_WIDTH) / totalColumnCount}%`;
-
-  const [matrix, setMatrix] = useState(null);
-  const [uniqueValues, setUniqueValues] = useState(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    valueCountMatrixPromise.then((result) => {
-      if (isMounted) {
-        setMatrix(result.map((row) => row.slice(1))); // Exclude the first column which is the value itself
-        setUniqueValues(result.map((row) => row[0])); // first column is the value
-      }
-    });
-    return () => {
-      isMounted = false;
-    };
-  }, [valueCountMatrixPromise]);
-
   // Refs for each value row
-  const valueRowRefs = useRef({});
+  const valueRowRefs = useRef([]);
   const bodyRef = useRef(null);
 
-  if (!matrix) return null; // or some loading indicator
+  if (loading) return <pre>Loading...</pre>;
+  if (error) return <pre>Error: {error.message}</pre>;
 
-  // Derive data from resolved promise
-  const totalValueCount = uniqueValues.length;
+  const columnCount = columnIds.length;
+  const colWidth = `${(100 - Y_AXIS_WIDTH) / columnCount}%`;
 
-  // Sort allValues and valueCountMatrix by degree (descending),
-  // and for equal degree, group by the set of columns (tables) where the value appears
-  const valueDegreeEntries = uniqueValues.map((value, i) => {
-    const row = matrix[i];
-    const degree = row.filter((c) => c > 0).length;
-    // Create a signature: a string of indices of columns with nonzero count, joined by '-'
-    const signature = row
-      .map((c, idx) => (c > 0 ? idx : null))
-      .filter((x) => x !== null)
-      .join("-");
-    return { value, row, degree, signature };
-  });
-  valueDegreeEntries.sort((a, b) => {
-    if (b.degree !== a.degree) return b.degree - a.degree;
-    // For equal degree, group by signature (lexicographically)
-    if (a.signature < b.signature) return -1;
-    if (a.signature > b.signature) return 1;
-    return 0;
-  });
-
-  const sortedAllValues = valueDegreeEntries.map((entry) => entry.value);
-  const sortedValueCountMatrix = valueDegreeEntries.map((entry) => entry.row);
+  const valueCount = uniqueValues.length;
 
   // Calculate value distribution across columns
   const categories = {
     all: {
       label: "all columns",
-      count: valueDegreeEntries.filter(
-        ({ degree }) => degree === totalColumnCount
-      ).length,
-      firstValue: null, // will be set later
+      count: valueDegrees.filter((degree) => degree === columnCount).length,
+      firstIndex: valueDegrees.findIndex((degree) => degree === columnCount), // will be set later
     },
     some: {
       label: "some columns",
-      count: valueDegreeEntries.filter(
-        ({ degree }) => degree < totalColumnCount && degree > 1
-      ).length,
-      firstValue: null, // will be set later
+      count: valueDegrees.filter((degree) => degree < columnCount && degree > 1)
+        .length,
+      firstIndex: valueDegrees.findIndex(
+        (degree) => degree < columnCount && degree > 1
+      ),
     },
     one: {
       label: "one column",
-      count: valueDegreeEntries.filter(({ degree }) => degree === 1).length,
-      firstValue: null, // will be set later
+      count: valueDegrees.filter(
+        (degree) => degree === 1 && 1 !== columnCount // prevents counting "all" as "one"
+      ).length,
+      firstIndex: valueDegrees.findIndex(
+        (degree) => degree === 1 && 1 !== columnCount
+      ),
     },
   };
 
-  const jaccardIndex = categories.all.count / totalValueCount;
-
-  const valueDegree = new Map();
-  sortedAllValues.forEach((value, rowIndex) => {
-    const row = sortedValueCountMatrix[rowIndex];
-    const degree = row.filter((c) => c > 0).length;
-    valueDegree.set(value, degree);
-    // Map degree category to first value with that degree
-    const degreeCategory = categorizeDegree(degree);
-    if (categories[degreeCategory].firstValue === null) {
-      categories[degreeCategory].firstValue = value;
-    }
-  });
-
   // Scroll to the first row with the selected degree
-  const scrollToDegree = (value) => {
-    const rowEl = value && valueRowRefs.current[value];
+  const scrollToDegree = (index) => {
+    const rowEl = valueRowRefs.current[index];
     const container = bodyRef.current;
     if (rowEl && container) {
       // Calculate offset relative to the scrollable container
       const rowTop = rowEl.offsetTop;
+      console.log(rowTop);
       // Optionally, center the row:
       const scroll =
         rowTop -
@@ -135,15 +90,7 @@ function ColumnValueMatrix({
       }}
     >
       <Box sx={{ mt: 2 }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Summary
-        </Typography>
-        <Typography variant="body2">
-          {totalValueCount} unique value{totalValueCount > 1 ? "s" : ""} with{" "}
-          <em>{categorizeJaccardIndex(jaccardIndex)}</em> overlap between all{" "}
-          {totalColumnCount} columns (Jaccard Index = {jaccardIndex.toFixed(2)}
-          ).
-        </Typography>
+        <SimilaritySummary data={data} />
       </Box>
 
       <Box
@@ -166,7 +113,7 @@ function ColumnValueMatrix({
           }}
         >
           {Object.entries(categories).map(
-            ([key, { label, count, firstValue }]) => (
+            ([key, { label, count, firstIndex }]) => (
               <Box
                 key={key}
                 sx={{
@@ -185,7 +132,10 @@ function ColumnValueMatrix({
               >
                 <Box
                   className="label"
-                  onClick={() => scrollToDegree(firstValue)}
+                  onClick={() => {
+                    // Scroll to the first index of this category
+                    scrollToDegree(firstIndex);
+                  }}
                   sx={{
                     width: "100px",
                     textAlign: "right",
@@ -225,7 +175,7 @@ function ColumnValueMatrix({
                     className="bar"
                     sx={{
                       background: "#e0e0e0",
-                      width: `${(count / totalValueCount) * 100}%`,
+                      width: `${(count / valueCount) * 100}%`,
                       minWidth: "1px",
                       textAlign: "right",
                     }}
@@ -290,23 +240,8 @@ function ColumnValueMatrix({
                   boxSizing: "border-box",
                 }}
               ></Box>
-              {columnIds.map((columnId, i) => (
-                <Box
-                  key={columnId}
-                  sx={{
-                    width: colWidth,
-                    padding: "4px",
-                    textAlign: "center",
-                    borderLeft: "1px solid #ccc",
-                    boxSizing: "border-box",
-                    overflow: "visible",
-                  }}
-                >
-                  <Box sx={{ transform: "rotate(-45deg)", wordWrap: "unset" }}>
-                    {/* {columnTableMap.get(columnId)?.name} */}
-                    {tableNames[i]}
-                  </Box>
-                </Box>
+              {tableIds.map((tableId) => (
+                <TableView key={tableId} id={tableId} colWidth={colWidth} />
               ))}
             </Box>
           </Box>
@@ -318,9 +253,9 @@ function ColumnValueMatrix({
             maxHeight: "400px",
           }}
         >
-          {sortedValueCountMatrix.map((row, rowIndex) => (
+          {data.map((row, i) => (
             <Box
-              key={rowIndex}
+              key={i}
               sx={{
                 display: "flex",
                 flexDirection: "row",
@@ -330,9 +265,7 @@ function ColumnValueMatrix({
               }}
             >
               <Box
-                ref={(el) =>
-                  (valueRowRefs.current[sortedAllValues[rowIndex]] = el)
-                }
+                ref={(el) => (valueRowRefs.current[i] = el)}
                 sx={{
                   width: Y_AXIS_WIDTH + "%",
                   padding: "4px",
@@ -344,7 +277,7 @@ function ColumnValueMatrix({
                   textOverflow: "ellipsis",
                 }}
               >
-                {sortedAllValues[rowIndex]}
+                {uniqueValues[i]}
               </Box>
               {row.map((count, colIndex) => (
                 <Box
@@ -366,19 +299,6 @@ function ColumnValueMatrix({
       </Box>
     </Box>
   );
-
-  function categorizeDegree(degree) {
-    if (degree === totalColumnCount) return "all";
-    if (degree > 1) return "some";
-    if (degree === 1) return "one";
-    if (degree === 0) return "none";
-  }
-}
-
-function categorizeJaccardIndex(score) {
-  if (score === 0) return "no";
-  if (score < 1) return "partial"; // (0, 1)
-  if (score === 1) return "complete";
 }
 
 function CircleMark({ isFilled }) {
@@ -397,18 +317,25 @@ function CircleMark({ isFilled }) {
   );
 }
 
-ColumnValueMatrix.propTypes = {
+ColumnIndexDetails.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+  tableIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ),
+  uniqueValues: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ),
+  valueDegrees: PropTypes.arrayOf(PropTypes.number),
+  error: PropTypes.object,
+  loading: PropTypes.bool,
   columnIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ).isRequired,
-  columnNames: PropTypes.array, // add if used
-  tableNames: PropTypes.array, // add if used
-  valueCountMatrixPromise: PropTypes.instanceOf(Promise).isRequired,
+  ),
 };
 
 CircleMark.propTypes = {
   isFilled: PropTypes.bool.isRequired,
 };
 
-const EnhancedComponent = withColumnValuesData(ColumnValueMatrix);
+const EnhancedComponent = withValuesCountMatrixData(ColumnIndexDetails);
 export default EnhancedComponent;

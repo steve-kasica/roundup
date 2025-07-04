@@ -37,7 +37,10 @@ export const selectColumnById = createSelector(
  * @param {Object} state - The Redux state.
  * @returns {Array<string>} - An array of column IDs that are currently selected.
  */
-export const selectSelectedColumns = (state) => state.columns.selected;
+export const selectSelectedColumns = createSelector(
+  [(state) => state.columns.selected],
+  (selected) => selected
+);
 
 /**
  * Selects the hovered column IDs.
@@ -103,3 +106,16 @@ export const selectColumnValues = (state, columnIds) => {
   });
   return columnValues;
 };
+
+/**
+ * Selector that retrieves an array of table IDs corresponding to the given array of column IDs.
+ *
+ * @function
+ * @param {Object} state - The Redux state.
+ * @param {Array<string>} columnIds - An array of column IDs to look up.
+ * @returns {Array<string|undefined>} An array of table IDs associated with the provided column IDs. If a column is not found, its entry will be undefined.
+ */
+export const selectTableIdsByColumnIds = createSelector(
+  [(state) => state.columns.data, (_, columnIds) => columnIds],
+  (data, columnIds) => columnIds.map((columnId) => data[columnId].tableId)
+);

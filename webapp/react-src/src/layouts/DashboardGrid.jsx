@@ -4,30 +4,30 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import Drawer from "@mui/material/Drawer";
-import { selectDrawerContents } from "../data/slices/uiSlice/uiSliceSelectors";
-import { useDispatch, useSelector } from "react-redux";
-import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
-import { clearSelectedColumns } from "../data/slices/columnsSlice";
-import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TablePeek/TablePeek";
-import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnValueMatrix";
-import { Button, IconButton } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+// import Drawer from "@mui/material/Drawer";
+// import { selectDrawerContents } from "../data/slices/uiSlice/uiSliceSelectors";
+// import { useDispatch, useSelector } from "react-redux";
+// import { setDrawerContents } from "../data/slices/uiSlice/uiSlice";
+// import { clearSelectedColumns } from "../data/slices/columnsSlice";
+// import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TablePeek/TablePeek";
+// import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnIndexDetails";
+// import { Button, IconButton } from "@mui/material";
+// import CloseIcon from "@mui/icons-material/Close";
 
-const drawerComponentMap = {};
-drawerComponentMap[COLUMN_INDEX_VALUES_COMPONENT] = {
-  component: lazy(() =>
-    import("../components/ColumnValueMatrix/SelectedColumns")
-  ),
-  anchor: "right",
-  label: "Compare Values",
-};
+// const drawerComponentMap = {};
+// drawerComponentMap[COLUMN_INDEX_VALUES_COMPONENT] = {
+//   component: lazy(() =>
+//     import("../components/ColumnValueMatrix/SelectedColumns")
+//   ),
+//   anchor: "right",
+//   label: "Compare Values",
+// };
 
-drawerComponentMap[FOCUSED_TABLE_VIEW] = {
-  component: lazy(() => import("../components/TablePeek/TablePeek")),
-  anchor: "bottom",
-  label: "Table Peek",
-};
+// drawerComponentMap[FOCUSED_TABLE_VIEW] = {
+//   component: lazy(() => import("../components/TablePeek/TablePeek")),
+//   anchor: "bottom",
+//   label: "Table Peek",
+// };
 
 /**
  * DashboardGrid component that arranges components in a responsive grid

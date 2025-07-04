@@ -25,7 +25,14 @@ export async function getValuesCountMatrix(columnIds, tableIds) {
             (tableId) =>
               `CASE WHEN SUM((SOURCE_TABLE = '${tableId}')::INTEGER) > 0 THEN 1 ELSE 0 END`
           )
-          .join(" + ")}) AS DEGREE
+          .join(" + ")}) AS DEGREE,
+        --- Create a signature string for sorting
+        (${tableIds
+          .map(
+            (tableId) =>
+              `CASE WHEN SUM((SOURCE_TABLE = '${tableId}')::INTEGER) > 0 THEN '1' ELSE '0' END`
+          )
+          .join(" || ")}) AS SIGNATURE
         FROM (
             ${tableIds
               .map(
@@ -35,9 +42,8 @@ export async function getValuesCountMatrix(columnIds, tableIds) {
               .join("\n            UNION ALL\n            ")}
         ) AS combined
     GROUP BY VAL
-    ORDER BY DEGREE DESC, VAL
+    ORDER BY DEGREE DESC, SIGNATURE, VAL
   `;
-  console.log("Executing query:", query);
   const result = await conn.query(query);
   await conn.close();
 

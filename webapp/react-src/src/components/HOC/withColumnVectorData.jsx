@@ -10,7 +10,7 @@ import {
 } from "../../data/slices/columnsSlice";
 
 import { setDrawerContents } from "../../data/slices/uiSlice";
-import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnValueMatrix";
+import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnIndexDetails";
 import { swapColumnsAction } from "../../data/sagas/swapColumnsSaga";
 import { getValuesAction } from "../../data/sagas/getValuesSaga";
 
