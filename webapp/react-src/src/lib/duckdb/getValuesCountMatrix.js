@@ -2,6 +2,12 @@
 import { getDuckDB } from "./duckdbClient";
 
 export async function getValuesCountMatrix(columnIds, tableIds) {
+  if (!Array.isArray(columnIds) || !Array.isArray(tableIds)) {
+    throw new Error("Both columnIds and tableIds must be arrays");
+  } else if (columnIds.length !== tableIds.length) {
+    throw new Error("columnIds and tableIds must have the same length");
+  }
+
   const db = await getDuckDB();
   const conn = await db.connect();
   const query = `
@@ -12,7 +18,7 @@ export async function getValuesCountMatrix(columnIds, tableIds) {
             (tableId) =>
               `CAST(SUM((SOURCE_TABLE = '${tableId}')::INTEGER) AS INTEGER) AS ${tableId}`
           )
-          .join(",\n        ")}
+          .join(",\n        ")},
         -- Calculate degree as the sum of nonzero columns
         (${tableIds
           .map(
@@ -31,6 +37,7 @@ export async function getValuesCountMatrix(columnIds, tableIds) {
     GROUP BY VAL
     ORDER BY DEGREE DESC, VAL
   `;
+  console.log("Executing query:", query);
   const result = await conn.query(query);
   await conn.close();
 
