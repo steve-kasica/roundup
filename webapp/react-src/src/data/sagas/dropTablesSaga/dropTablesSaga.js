@@ -52,7 +52,7 @@ export function* dropTablesSagaWorker(action) {
     yield put(dropColumns(table.columnIds));
 
     // Remove table from DuckDB
-    dropTable(table.name);
+    dropTable(table.id);
   }
 
   // Remove from tables state
