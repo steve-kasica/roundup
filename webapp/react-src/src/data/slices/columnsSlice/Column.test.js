@@ -10,7 +10,7 @@ describe("Column Factory Function", () => {
     const column = Column("table-1", 0, "Column Name", COLUMN_TYPE_NUMERICAL);
 
     expect(column).toEqual({
-      id: expect.stringMatching(/^c-\d+$/), // ID should start with "c-" and have a unique number
+      id: expect.stringMatching(/^c\d+$/), // ID should start with "c-" and have a unique number
       tableId: "table-1",
       name: "Column Name",
       alias: null, // Default value for alias
@@ -64,7 +64,7 @@ describe("isColumn Function", () => {
 
   it("should return false for objects that are not columns", () => {
     const invalidColumn = {
-      id: "c-1",
+      id: "c1",
       tableId: "table-1",
       index: 0,
       columnType: COLUMN_TYPE_NUMERICAL,

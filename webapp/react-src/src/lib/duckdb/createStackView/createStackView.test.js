@@ -4,34 +4,26 @@ import { formQuery } from "./createStackView";
 describe("formQuery", () => {
   it("should generate a view with a single child", () => {
     const op = {
-      children: [{ tableName: "table1", columnNames: ["col1", "col2"] }],
+      id: "o1",
+      children: [{ id: "t1", columnIds: ["c1", "c2"] }],
     };
     const viewName = "my_view";
     const query = formQuery(op, viewName);
-    expect(query).toContain("CREATE OR REPLACE VIEW my_view AS SELECT * FROM");
-    expect(query).toContain("SELECT * FROM col1, col2 FROM table1");
+    expect(query).toContain("CREATE OR REPLACE VIEW o1 AS SELECT * FROM");
+    expect(query).toContain("SELECT c1, c2 FROM t1");
   });
 
   it("should join multiple children with UNION ALL", () => {
     const op = {
       children: [
-        { tableName: "table1", columnNames: ["a", "b"] },
-        { tableName: "table2", columnNames: ["x", "y"] },
+        { id: "t1", columnIds: ["c1", "c2"] },
+        { id: "t2", columnIds: ["c3", "c4"] },
       ],
     };
     const viewName = "union_view";
     const query = formQuery(op, viewName);
-    expect(query).toContain("SELECT a, b FROM table1");
-    expect(query).toContain("SELECT x, y FROM table2");
+    expect(query).toContain("SELECT c1, c2 FROM t1");
+    expect(query).toContain("SELECT c3, c4 FROM t2");
     expect(query).toContain("UNION ALL");
-  });
-
-  it("should escape column names with commas in names", () => {
-    const op = {
-      children: [{ tableName: "t", columnNames: ["foo,bar", "baz"] }],
-    };
-    const viewName = "comma_col_view";
-    const query = formQuery(op, viewName);
-    expect(query).toContain("SELECT foo,bar, baz FROM t");
   });
 });

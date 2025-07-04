@@ -123,12 +123,11 @@ const attributes = [
  * @param {Object} obj - The object to check.
  * @returns {boolean} True if the object matches the structure of a Column, false otherwise.
  */
-export function isColumn(obj) {
-  if (obj === null || obj === undefined) {
-    return false;
-  }
-  return attributes.every((attr) => attr in obj);
-}
+export const isColumn = (obj) =>
+  obj !== null &&
+  typeof obj === "object" &&
+  Object.keys(obj).length > 0 &&
+  attributes.every((key) => key in obj);
 
 /**
  * Error thrown when an invalid column type is provided.

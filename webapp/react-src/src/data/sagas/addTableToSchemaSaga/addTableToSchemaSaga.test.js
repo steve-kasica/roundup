@@ -138,7 +138,7 @@ describe("addTableToSchemaSagaWorker", () => {
 
     expect(addChildToOperation).toHaveBeenCalledWith({
       operationId: rootOperationId,
-      tableId,
+      childId: tableId,
     });
     expect(setTablesAttribute).toHaveBeenCalledWith({
       ids: tableId,

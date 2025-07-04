@@ -1,10 +1,14 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { runSaga } from "redux-saga";
-import { removeColumnsSagaWorker } from "./removeColumnsSaga";
+import {
+  removeColumnsSagaWorker,
+  removeColumnsSuccessAction,
+} from "./removeColumnsSaga";
 import {
   addColumnsToLoading,
   updateAttribute,
   removeColumnsFromLoading,
+  removeColumns,
 } from "../../slices/columnsSlice";
 
 describe("removeColumnsSagaWorker", () => {
@@ -15,7 +19,7 @@ describe("removeColumnsSagaWorker", () => {
   });
 
   it("dispatches correct actions for a single column id", async () => {
-    const columnId = "col1";
+    const columnId = "c1";
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action),
@@ -25,14 +29,14 @@ describe("removeColumnsSagaWorker", () => {
     ).toPromise();
 
     expect(dispatched).toEqual([
-      addColumnsToLoading([columnId]),
-      updateAttribute({ ids: [columnId], attribute: "isRemoved", value: true }),
-      removeColumnsFromLoading([columnId]),
+      addColumnsToLoading(columnId),
+      removeColumns(columnId),
+      removeColumnsSuccessAction(columnId),
     ]);
   });
 
   it("dispatches correct actions for multiple column ids", async () => {
-    const columnIds = ["col1", "col2"];
+    const columnIds = ["c1", "c2"];
     await runSaga(
       {
         dispatch: (action) => dispatched.push(action),
@@ -43,8 +47,8 @@ describe("removeColumnsSagaWorker", () => {
 
     expect(dispatched).toEqual([
       addColumnsToLoading(columnIds),
-      updateAttribute({ ids: columnIds, attribute: "isRemoved", value: true }),
-      removeColumnsFromLoading(columnIds),
+      removeColumns(columnIds),
+      removeColumnsSuccessAction(columnIds),
     ]);
   });
 });

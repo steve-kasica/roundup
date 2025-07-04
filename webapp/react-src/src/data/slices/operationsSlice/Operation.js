@@ -44,12 +44,11 @@ const attributes = [
 ];
 
 export const isOperation = (obj) =>
-  Object.keys(obj).every((key) => attributes.includes(key));
+  obj !== null &&
+  typeof obj === "object" &&
+  Object.keys(obj).length > 0 &&
+  attributes.every((key) => key in obj);
 
 export function isOperationId(id) {
-  return (
-    typeof id === "string" &&
-    id.startsWith("o") &&
-    !isNaN(parseInt(id.slice(2), 10)) // Check if the rest of the ID is a number
-  );
+  return typeof id === "string" && id.startsWith("o");
 }

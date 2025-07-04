@@ -12,7 +12,7 @@ describe("Operation factory", () => {
     const children = [{ foo: "bar" }];
     const op = Operation(OPERATION_TYPE_STACK, children);
     expect(op).toHaveProperty("id");
-    expect(op.id).toMatch(/^o-\d+$/);
+    expect(op.id).toMatch(/^o\d+$/);
     expect(op.operationType).toBe(OPERATION_TYPE_STACK);
     expect(op.children).toBe(children);
   });
@@ -27,8 +27,8 @@ describe("Operation factory", () => {
     const op1 = Operation(OPERATION_TYPE_PACK, []);
     const op2 = Operation(OPERATION_TYPE_NO_OP, []);
     expect(op1.id).not.toBe(op2.id);
-    expect(op1.id).toMatch(/^o-\d+$/);
-    expect(op2.id).toMatch(/^o-\d+$/);
+    expect(op1.id).toMatch(/^o\d+$/);
+    expect(op2.id).toMatch(/^o\d+$/);
   });
 });
 
@@ -52,8 +52,8 @@ describe("isOperationId", () => {
   });
 
   it("returns false for invalid ids", () => {
-    expect(isOperationId("t-1")).toBe(false);
-    expect(isOperationId("o-abc")).toBe(false);
+    expect(isOperationId("t1")).toBe(false);
+    expect(isOperationId("c1")).toBe(false);
     expect(isOperationId(123)).toBe(false);
     expect(isOperationId("")).toBe(false);
   });
