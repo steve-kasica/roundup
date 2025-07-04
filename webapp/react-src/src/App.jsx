@@ -17,6 +17,7 @@ import OperationDetail from "./components/OperationDetail";
 import OperationsList from "./components/OperationsList";
 import CustomDragLayer from "./CustomDragLayer";
 import SelectedTableView from "./components/TablePeek/TablePeek";
+import ColumnValueMatrix from "./components/ColumnValueMatrix/SelectedColumns";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             OperationsList,
             OperationDetail,
             SelectedTableView,
+            ColumnValueMatrix,
           ]}
           titles={[
             "Source Tables",
@@ -37,6 +39,7 @@ function App() {
             "Operations List",
             "Operations Detail",
             "Table Peek",
+            "Column Values",
           ]}
           dashboardTitle="Open Roundup"
         />
