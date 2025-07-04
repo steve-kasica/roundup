@@ -140,6 +140,5 @@ export function* addTableToSchemaSagaWorker(action) {
     );
   }
 
-  console.log("hey");
   yield put(addTableToSchemaSuccess(action.payload));
 }

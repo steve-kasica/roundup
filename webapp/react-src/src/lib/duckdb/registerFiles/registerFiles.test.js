@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerFile, registerFiles } from "./registerFiles/registerFiles";
-import { getDuckDB } from "./duckdbClient";
+import { registerFile, registerFiles } from "./registerFiles";
+import { getDuckDB } from "../duckdbClient";
 
 // Mock getDuckDB and db.registerFileText
 vi.mock("./duckdbClient", () => {

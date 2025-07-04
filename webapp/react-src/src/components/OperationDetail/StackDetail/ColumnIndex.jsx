@@ -2,7 +2,7 @@ import { Box, IconButton, List, ListItemButton, Popover } from "@mui/material";
 import { useState, useEffect } from "react";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
 import { useRef } from "react";
-import ColumnBlockView from "./ColumnBlockView";
+import ColumnView from "./ColumnView";
 import { isPointInBoundingBox } from "../../../lib/utilities";
 import withColumnVectorData from "../../HOC/withColumnVectorData";
 import PropTypes from "prop-types";
@@ -198,7 +198,7 @@ function ColumnIndex({
         </Popover>
       </Box>
       {columnIds.map((columnId, i) => (
-        <ColumnBlockView
+        <ColumnView
           key={`${i}-${columnId}`} // columnId === null for all empty (null) columns
           isDraggable={true}
           id={columnId}

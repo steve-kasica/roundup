@@ -164,6 +164,11 @@ export default function withColumnData(WrappedComponent) {
             dispatch(setSelectedColumns(selectedColumns));
           }
         }}
+        nullColumn={() => {
+          if (!isNull) {
+            // TODO: implement logic to nullify column
+          }
+        }}
       />
     );
 

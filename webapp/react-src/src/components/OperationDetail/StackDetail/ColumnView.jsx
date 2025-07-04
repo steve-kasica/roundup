@@ -19,15 +19,12 @@ import withColumnData from "../../HOC/withColumnData";
 
 const delay = 500; // in ms for input changes
 
-function ColumnBlockView({
+function ColumnView({
   dragRef,
   dropRef,
-  id,
-  tableId,
-  name,
-  alias,
-  index,
-  columnType,
+  column,
+
+  // Props for column interaction state
   isNull,
   isSelected,
   isLoading,
@@ -35,6 +32,8 @@ function ColumnBlockView({
   isDragging,
   isOver,
   error,
+
+  // Functions for dispatching actions
   hoverColumn,
   unHoverColumn,
   nullColumn,
@@ -63,10 +62,10 @@ function ColumnBlockView({
   const inputRef = useRef(null);
 
   // Debounce input when modifying column attributes in the DOM
-  const [value, setValue] = useState(alias || name);
+  const [value, setValue] = useState(column.name);
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (name !== value) {
+      if (column.name !== value) {
         renameColumn(value);
       }
     }, delay);
@@ -75,7 +74,7 @@ function ColumnBlockView({
 
   const menuItems = [
     {
-      label: `Remove ${alias || name}`,
+      label: `Remove ${column.name}`,
       disabled: isNull,
       onClick: () => {
         removeColumn();
@@ -115,13 +114,12 @@ function ColumnBlockView({
   const className = [
     "cell",
     isLoading ? "loading" : undefined,
-    isNull ? "null" : undefined,
+    isNull ? "null" : `type-${column.columnType}`,
     isSelected ? "selected" : undefined,
     isHovered ? "hover" : undefined,
     isDragging ? "dragged" : undefined,
     isOver ? "over" : undefined,
     error ? "error" : undefined,
-    columnType ? `type-${columnType}` : undefined,
   ]
     .filter(Boolean)
     .join(" ");
@@ -139,9 +137,11 @@ function ColumnBlockView({
         dragRef(node);
         dropRef(node);
       }}
-      data-table-id={tableId}
-      data-column-index={index}
-      onClick={(event) => (!isPopoverOpen ? onCellClick(event, id) : null)}
+      data-table-id={column.tableId}
+      data-column-index={column.index}
+      onClick={(event) =>
+        !isPopoverOpen ? onCellClick(event, column.id) : null
+      }
       onContextMenu={(event) => {
         event.preventDefault();
         setAnchorEl(event.currentTarget);
@@ -188,15 +188,10 @@ function ColumnBlockView({
   );
 }
 
-ColumnBlockView.propTypes = {
+ColumnView.propTypes = {
   dragRef: PropTypes.func.isRequired,
   dropRef: PropTypes.func.isRequired,
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  tableId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  name: PropTypes.string.isRequired,
-  alias: PropTypes.string || null,
-  index: PropTypes.number.isRequired,
-  columnType: PropTypes.string,
+  column: PropTypes.oneOfType([PropTypes.object, PropTypes.oneOf([null])]),
   isNull: PropTypes.bool,
   isSelected: PropTypes.bool,
   isLoading: PropTypes.bool,
@@ -229,5 +224,5 @@ function getPercentOverlap(a, b) {
   return Math.max(0, overlap);
 }
 
-const EnhancedColumnBlockView = withColumnData(ColumnBlockView);
+const EnhancedColumnBlockView = withColumnData(ColumnView);
 export default EnhancedColumnBlockView;

@@ -12,7 +12,7 @@ import { useState } from "react";
 import { setSelectedColumns } from "../../../data/slices/columnsSlice";
 import { useRef } from "react";
 import { selectTablesById } from "../../../data/slices/tablesSlice/tableSelectors";
-import TableRowLabel from "./TableRowLabel";
+import TableView from "./TableView";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
@@ -84,7 +84,7 @@ function StackDetailView({ tableIds, columnIdMatrix, m, n }) {
           </div>
           <div className="column-group">
             {tableIds.map((tableId) => (
-              <TableRowLabel key={tableId} id={tableId} />
+              <TableView key={tableId} id={tableId} />
             ))}
           </div>
         </div>
