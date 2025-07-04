@@ -13,25 +13,27 @@ export default function DuckDBFileUpload() {
     setLoading(true);
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    try {
-      await registerFiles(files);
-      dispatch(
-        uploadTablesAction({
-          filesInfo: files.map((f) => ({
-            name: f.name,
-            size: f.size,
-            type: f.type,
-            lastModified: f.lastModified,
-          })),
-          source: "duckdb",
-        })
-      );
-    } catch (err) {
-      alert("Error uploading files: " + err.message);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    registerFiles(files)
+      .then(() => {
+        dispatch(
+          uploadTablesAction({
+            filesInfo: files.map((f) => ({
+              name: f.name,
+              size: f.size,
+              type: f.type,
+              lastModified: f.lastModified,
+            })),
+            source: "duckdb",
+          })
+        );
+      })
+      .catch((error) => {
+        alert("Error uploading files: " + error.message);
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   return (
