@@ -111,6 +111,7 @@ export default function withTableData(WrappedComponent) {
         depth={depth}
         // Interaction state
         isHovered={isHovered}
+        isInSchema={isInSchema}
         isSelected={isSelected}
         isDragging={isDragging}
         isPressed={isPressed}
