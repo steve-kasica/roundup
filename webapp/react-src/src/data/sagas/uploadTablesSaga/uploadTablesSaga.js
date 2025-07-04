@@ -5,6 +5,7 @@ import { addColumns, Column } from "../../slices/columnsSlice";
 import {
   createTables as createDBTables,
   getTableDimensions,
+  renameColumns,
   summarizeTable,
 } from "../../../lib/duckdb";
 
@@ -59,16 +60,30 @@ export function* uploadTablesSagaWorker(action) {
   );
 
   // Wait for all columns to be created
-  const columns = yield columnsArrays;
+  // This will be an array of arrays, where each inner array corresponds to a table's columns
+  // e.g. [[Column1, Column2], [Column3, Column4]]
+  const tableColumns = yield columnsArrays;
+
+  // Rename DB table columns to match the column IDs
+  const renamePromises = tables.map((table, i) =>
+    renameColumns(
+      table.id,
+      tableColumns[i].map((column) => column.name), // old names
+      tableColumns[i].map((column) => column.id) // new names
+    )
+  );
+
+  // Wait for all columns to be renamed
+  yield Promise.all(renamePromises);
 
   // TODO: do I even need this anymore?
   tables.map((table, i) => {
-    table.columnIds = columns[i].map(({ id }) => id);
+    table.columnIds = tableColumns[i].map(({ id }) => id);
   });
 
   // Register tables and columns in the store
   // Order of tables vs columns doesn't matter here
   // TODO: dispatch at once in parallel?
   yield put(addTables(tables));
-  yield put(addColumns(columns.flat()));
+  yield put(addColumns(tableColumns.flat()));
 }

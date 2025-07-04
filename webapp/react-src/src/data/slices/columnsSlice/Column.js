@@ -92,8 +92,10 @@ export default function Column(tableId, index, name, columnType) {
     throw new InvalidColumnTypeError(columnType);
   }
 
+  const id = `c${++idCounter}`;
+
   return {
-    id: `c-${idCounter++}`,
+    id,
     tableId,
     name, // Name is immutable, used for lookups in database
     alias: null, // Alias is mutable and can be changed by the user

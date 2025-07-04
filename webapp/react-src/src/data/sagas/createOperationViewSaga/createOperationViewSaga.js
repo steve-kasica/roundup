@@ -62,18 +62,15 @@ const selectQueryData = (state, operationId) => {
   const operation = selectOperation(state, operationId);
   parent.id = operation.id;
   parent.children = operation.children.map((id) => {
-    let child = { tableName: null, columnNames: [] };
+    let child = { tableName: null, columnIds: [] };
     if (isTableId(id)) {
       const table = selectTablesById(state, id);
       child.id = table.id;
-      child.columnNames = state.columns.idsByTable[id].map((columnId) => {
-        const column = selectColumnById(state, columnId);
-        return column.name;
-      });
+      child.columnIds = state.columns.idsByTable[id];
     } else {
       const operation = selectOperation(state, id);
       child.id = operation.id;
-      child.columnNames = ["*"];
+      child.columnIds = ["*"];
     }
     return child;
   });
