@@ -20,7 +20,6 @@ import {
 import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
 import { dataType as SourceTable } from "../../data/slices/tablesSlice";
 import { selectColumnById } from "../../data/slices/columnsSlice";
-import { peekTableAction } from "../../data/sagas/peekTableSaga";
 import {
   appendToSelectedTables,
   removeFromSelectedTables,
@@ -28,6 +27,7 @@ import {
 } from "../../data/slices/uiSlice";
 import PropTypes from "prop-types";
 import { dropTablesAction } from "../../data/sagas/dropTablesSaga";
+import { removeTablesAction } from "../../data/sagas/removeTablesSaga";
 
 export default function withTableData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
@@ -124,9 +124,9 @@ export default function withTableData(WrappedComponent) {
         removeTableFromSchema={() => {
           if (isInSchema) {
             dispatch(
-              removeChildFromOperation({
-                operationId: parentOperation.id,
-                tableId: id,
+              removeTablesAction({
+                operationIds: [table.operationId],
+                tableIds: [id],
               })
             );
           }

@@ -1,10 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import Operation, { isOperationId, OPERATION_TYPE_NO_OP } from "./Operation";
-import {
-  selectOperation,
-  selectParentOperation,
-  selectRootOperation,
-} from "./operationsSelectors";
+import { isOperationId } from "./Operation";
+import { selectOperation, selectParentOperation } from "./operationsSelectors";
 
 const initialState = {
   data: {}, // Normalized operations stored by ID
@@ -124,6 +120,7 @@ const operationsSlice = createSlice({
 
     /**
      * Removes a child (operation or table) from the specified operation.
+     * It does not remove a table from Roundup entirely, but rather disassociates it from the operation.
      * If the child is itself an operation, it is also removed from the state.
      * If the operation has no remaining children after removal, the operation itself is removed from the state.
      *
@@ -134,7 +131,7 @@ const operationsSlice = createSlice({
      */
     removeChildFromOperation(state, action) {
       const { operationId, childId } = action.payload;
-      const operation = selectOperation({ operations: state }, operationId);
+      const operation = state.data[operationId];
       operation.children = operation.children.filter((id) => id !== childId);
 
       if (isOperationId(childId)) {

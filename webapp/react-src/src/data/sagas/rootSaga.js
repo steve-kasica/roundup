@@ -15,21 +15,21 @@ import getValuesSagaWatcher from "./getValuesSaga";
 import uploadTablesSagaWatcher from "./uploadTablesSaga";
 import dropTablesSagaWatcher from "./dropTablesSaga";
 import createOperationViewSagaWatcher from "./createOperationViewSaga";
+import removeTablesSagaWatcher from "./removeTablesSaga";
 
 export default function* rootSaga() {
   yield all([
     call(fetchTablesSaga),
-    // call(fetchColumnMetadataSaga),
     call(addTableToSchemaWatcher),
     call(renameColumnSagaWatcher),
     call(removeColumnsSagaWatcher),
     call(swapColumnsSaga),
     call(coordinateHoverSaga),
-    // call(getRowsSagaWatcher),
     call(peekTableSagaWatcher),
     call(getValuesSagaWatcher),
     call(uploadTablesSagaWatcher),
     call(dropTablesSagaWatcher),
     call(createOperationViewSagaWatcher),
+    call(removeTablesSagaWatcher),
   ]);
 }
