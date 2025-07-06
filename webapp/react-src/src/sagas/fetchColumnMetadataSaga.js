@@ -1,6 +1,6 @@
 import { createAction } from "@reduxjs/toolkit";
 import { takeEvery, put, call, all, select } from "redux-saga/effects";
-import OpenRefineAPI from "../../services/open-refine";
+import OpenRefineAPI from "../services/open-refine";
 import {
   addColumns,
   addColumnsToLoading,
@@ -9,12 +9,12 @@ import {
   COLUMN_TYPE_NUMERICAL,
   removeColumnsFromLoading,
   updateColumns,
-} from "../slices/columnsSlice";
+} from "../data/slices/columnsSlice";
 import {
   selectTablesById,
   setTableColumnIds,
   TABLE_SOURCE_OPEN_REFINE,
-} from "../slices/tablesSlice";
+} from "../data/slices/tablesSlice";
 import { addTableToSchema } from "./addTableToSchemaSaga";
 import { peekTableAction } from "./peekTableSaga";
 

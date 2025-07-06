@@ -1,11 +1,11 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { put, takeLatest } from "redux-saga/effects";
 import { createAction } from "@reduxjs/toolkit";
-import { removeChildFromOperation } from "../../slices/operationsSlice";
+import { removeChildFromOperation } from "../../data/slices/operationsSlice";
 import {
   addTablesToLoading,
   removeTablesFromLoading,
   setTablesAttribute,
-} from "../../slices/tablesSlice";
+} from "../../data/slices/tablesSlice";
 
 /**
  *     removeChildFromOperation(state, action) {

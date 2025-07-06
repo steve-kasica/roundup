@@ -4,14 +4,14 @@
 
 // import { createAction } from "@reduxjs/toolkit";
 // import { all, put, select, takeEvery } from "redux-saga/effects";
-// import OpenRefine from "../../services/open-refine";
+// import OpenRefine from "../services/open-refine";
 // import {
 //   fetchValuesFailure,
 //   fetchValuesRequest,
 //   fetchValuesSuccess,
 //   selectColumnIdsByTableId,
-// } from "../slices/columnsSlice";
-// import { incrementRowsExplored } from "../slices/tablesSlice";
+// } from "../data/slices/columnsSlice";
+// import { incrementRowsExplored } from "../data/slices/tablesSlice";
 // // import { addTableToSchema } from "./addTableToSchemaSaga";
 
 // export const fetchRows = createAction("fetchRows");

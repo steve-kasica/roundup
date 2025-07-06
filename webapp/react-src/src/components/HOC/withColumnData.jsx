@@ -18,9 +18,9 @@ import {
   selectSelectedColumns,
 } from "../../data/slices/columnsSlice";
 
-import { renameColumnsAction } from "../../data/sagas/renameColumnsSaga";
-import { removeColumnsAction } from "../../data/sagas/removeColumnsSaga";
-import { swapColumnsAction } from "../../data/sagas/swapColumnsSaga";
+import { renameColumnsAction } from "../../sagas/renameColumnsSaga";
+import { removeColumnsAction } from "../../sagas/removeColumnsSaga";
+import { swapColumnsAction } from "../../sagas/swapColumnsSaga";
 
 import { selectFirstSelectedColumn } from "../../data/slices/uiSlice";
 

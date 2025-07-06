@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { uploadTablesAction } from "../../data/sagas/uploadTablesSaga";
+import { uploadTablesAction } from "../../sagas/uploadTablesSaga";
 import { registerFiles } from "../../lib/duckdb";
 
 export default function DuckDBFileUpload() {

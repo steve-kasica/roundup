@@ -10,7 +10,7 @@ import {
   clearSelectedColumns,
   selectSelectedColumns,
 } from "../../../data/slices/columnsSlice";
-import { removeColumnsAction } from "../../../data/sagas/removeColumnsSaga";
+import { removeColumnsAction } from "../../../sagas/removeColumnsSaga";
 
 export default function StackDetailToolbar({
   setSelectionAnchorCell,

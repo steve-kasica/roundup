@@ -3,13 +3,13 @@ import { takeEvery, call, put, select } from "redux-saga/effects";
 import {
   selectOperation,
   setOperationAttributes,
-} from "../../slices/operationsSlice";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+} from "../../data/slices/operationsSlice";
+import { isTableId, selectTablesById } from "../../data/slices/tablesSlice";
 import { addTableToSchemaSuccess } from "../addTableToSchemaSaga/addTableToSchemaSaga";
-import { createStackView } from "../../../lib/duckdb/createStackView";
-import { selectColumnById } from "../../slices/columnsSlice";
+import { createStackView } from "../../lib/duckdb/createStackView";
+import { selectColumnById } from "../../data/slices/columnsSlice";
 import { removeColumnsSuccessAction } from "../removeColumnsSaga";
-import { getTableDimensions } from "../../../lib/duckdb";
+import { getTableDimensions } from "../../lib/duckdb";
 
 // Actions
 export const createOperationView = createAction(

@@ -17,7 +17,7 @@ import {
   selectHoveredTable,
   setPeekedTable,
 } from "../../data/slices/uiSlice";
-import { addTableToSchema } from "../../data/sagas/addTableToSchemaSaga";
+import { addTableToSchema } from "../../sagas/addTableToSchemaSaga";
 import { dataType as SourceTable } from "../../data/slices/tablesSlice";
 import { selectColumnById } from "../../data/slices/columnsSlice";
 import {
@@ -26,8 +26,8 @@ import {
   selectSelectedTables,
 } from "../../data/slices/uiSlice";
 import PropTypes from "prop-types";
-import { dropTablesAction } from "../../data/sagas/dropTablesSaga";
-import { removeTablesAction } from "../../data/sagas/removeTablesSaga";
+import { dropTablesAction } from "../../sagas/dropTablesSaga";
+import { removeTablesAction } from "../../sagas/removeTablesSaga";
 
 export default function withTableData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {

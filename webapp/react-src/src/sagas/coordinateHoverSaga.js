@@ -1,7 +1,7 @@
 import { takeEvery, put, all, call, select } from "redux-saga/effects";
-import { setHoveredTable } from "../slices/uiSlice";
-import { selectOperationByTableId } from "../slices/operationsSlice/operationsSelectors";
-import { setHoveredOperation } from "../slices/operationsSlice/operationsSlice";
+import { setHoveredTable } from "../data/slices/uiSlice";
+import { selectOperationByTableId } from "../data/slices/operationsSlice/operationsSelectors";
+import { setHoveredOperation } from "../data/slices/operationsSlice/operationsSlice";
 
 export default function* coordinateHoverSagaWatcher() {
   yield all([call(watchTableHover)]);

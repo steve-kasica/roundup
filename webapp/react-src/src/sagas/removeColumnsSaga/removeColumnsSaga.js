@@ -1,5 +1,8 @@
 import { put, takeEvery } from "redux-saga/effects";
-import { addColumnsToLoading, removeColumns } from "../../slices/columnsSlice";
+import {
+  addColumnsToLoading,
+  removeColumns,
+} from "../../data/slices/columnsSlice";
 import { createAction } from "@reduxjs/toolkit";
 
 /**

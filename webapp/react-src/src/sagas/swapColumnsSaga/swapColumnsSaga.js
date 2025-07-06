@@ -5,7 +5,7 @@ import {
   removeColumnsFromLoading,
   clearSelectedColumns,
   swapColumns,
-} from "../../slices/columnsSlice";
+} from "../../data/slices/columnsSlice";
 
 /**
  * Action creator for swapping two columns in the columns state.

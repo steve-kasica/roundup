@@ -1,8 +1,8 @@
 import { createAction } from "@reduxjs/toolkit";
 import { takeLatest } from "redux-saga/effects";
-import { setDrawerContents, setSelectedTables } from "../slices/uiSlice";
+import { setDrawerContents, setSelectedTables } from "../data/slices/uiSlice";
 import { put } from "redux-saga/effects";
-import { COMPONENT_ID as SELECTED_TABLE_VIEW } from "../../components/TablePeek/TablePeek";
+import { COMPONENT_ID as SELECTED_TABLE_VIEW } from "../components/TablePeek/TablePeek";
 
 /**
  * Action creator for initiating the peek table saga.

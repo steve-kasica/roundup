@@ -1,10 +1,10 @@
 import { put, takeLatest, call, take, all } from "redux-saga/effects";
-import OpenRefineAPI from "../../services/open-refine";
+import OpenRefineAPI from "../services/open-refine";
 import {
   addTables,
   Table,
   TABLE_SOURCE_OPEN_REFINE,
-} from "../slices/tablesSlice";
+} from "../data/slices/tablesSlice";
 import { createAction } from "@reduxjs/toolkit";
 import { fetchColumnMetadataRequest } from "./fetchColumnMetadataSaga";
 import { fetchColumnMetadataSuccess } from "./fetchColumnMetadataSaga";

@@ -1,11 +1,10 @@
 import { call, select, takeLatest } from "redux-saga/effects";
 import { createAction } from "@reduxjs/toolkit";
-import { selectColumnById } from "../../slices/columnsSlice";
+import { selectColumnById } from "../../data/slices/columnsSlice";
 import {
   selectTablesById,
   TABLE_SOURCE_OPEN_REFINE,
-} from "../../slices/tablesSlice";
-import { fetchOpenRefineValues } from "./fetchOpenRefineValues";
+} from "../../data/slices/tablesSlice";
 import { group } from "d3";
 
 /**

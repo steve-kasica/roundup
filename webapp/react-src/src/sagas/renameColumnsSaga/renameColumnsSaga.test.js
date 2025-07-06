@@ -5,7 +5,7 @@ import {
   addColumnsToLoading,
   removeColumnsFromLoading,
   clearSelectedColumns,
-} from "../../slices/columnsSlice";
+} from "../../data/slices/columnsSlice";
 import { renameColumnsAction } from "./renameColumnsSaga";
 import renameColumnSaga, { renameColumnsSagaWorker } from "./renameColumnsSaga";
 

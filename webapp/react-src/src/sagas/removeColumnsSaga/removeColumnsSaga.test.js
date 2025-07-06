@@ -9,7 +9,7 @@ import {
   updateAttribute,
   removeColumnsFromLoading,
   removeColumns,
-} from "../../slices/columnsSlice";
+} from "../../data/slices/columnsSlice";
 
 describe("removeColumnsSagaWorker", () => {
   let dispatched;

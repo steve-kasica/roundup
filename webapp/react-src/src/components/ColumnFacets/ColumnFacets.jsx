@@ -2,7 +2,7 @@
 // import { selectColumnById } from "../../data/slices/columnsSlice";
 // import { hsl, InternMap, rollup, scaleLinear } from "d3";
 // import { useEffect } from "react";
-// import { requestColumnFacets } from "../../data/sagas/requestColumnFacets";
+// import { requestColumnFacets } from "../../sagas/requestColumnFacets";
 // import Chip from "@mui/material/Chip";
 
 // export default function ColumnDetail({ columnIds }) {

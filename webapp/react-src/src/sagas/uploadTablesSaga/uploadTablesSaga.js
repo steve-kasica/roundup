@@ -1,13 +1,13 @@
 import { createAction } from "@reduxjs/toolkit";
 import { put, takeEvery } from "redux-saga/effects";
-import { addTables, Table } from "../../slices/tablesSlice";
-import { addColumns, Column } from "../../slices/columnsSlice";
+import { addTables, Table } from "../../data/slices/tablesSlice";
+import { addColumns, Column } from "../../data/slices/columnsSlice";
 import {
   createTables as createDBTables,
   getTableDimensions,
   renameColumns,
   summarizeTable,
-} from "../../../lib/duckdb";
+} from "../../lib/duckdb";
 
 export const uploadTablesAction = createAction("sagas/uploadTables");
 

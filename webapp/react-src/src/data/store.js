@@ -7,7 +7,7 @@ import operationsReducer from "./slices/operationsSlice";
 import valuesReducer from "./slices/valuesSlices";
 
 import createSagaMiddleware from "redux-saga";
-import rootSaga from "./sagas";
+import rootSaga from "./../sagas";
 
 const sagaMidddleware = createSagaMiddleware();
 
