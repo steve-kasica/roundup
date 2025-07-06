@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import uiReducer from "../slices/uiSlice";
-import tablesReducer from "../slices/tablesSlice";
-import columnsReducer from "../slices/columnsSlice";
-import operationsReducer from "../slices/operationsSlice";
-import valuesReducer from "../slices/valuesSlices";
+import uiReducer from "./slices/uiSlice";
+import tablesReducer from "./slices/tablesSlice";
+import columnsReducer from "./slices/columnsSlice";
+import operationsReducer from "./slices/operationsSlice";
+import valuesReducer from "./slices/valuesSlices";
 
 import createSagaMiddleware from "redux-saga";
-import rootSaga from "./../sagas";
+import rootSaga from "./sagas";
 
 const sagaMidddleware = createSagaMiddleware();
 
