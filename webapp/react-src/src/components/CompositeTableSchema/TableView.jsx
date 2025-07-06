@@ -5,7 +5,7 @@
  * **Table Tree**.
  */
 import ColumnView from "./ColumnView.jsx";
-import { OPERATION_TYPE_STACK } from "../../data/slices/operationsSlice/Operation.js";
+import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
 import withTableData from "../HOC/withTableData.jsx";
 import PropTypes from "prop-types";
 

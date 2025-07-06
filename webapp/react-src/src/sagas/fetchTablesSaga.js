@@ -4,7 +4,7 @@ import {
   addTables,
   Table,
   TABLE_SOURCE_OPEN_REFINE,
-} from "../data/slices/tablesSlice";
+} from "../slices/tablesSlice";
 import { createAction } from "@reduxjs/toolkit";
 import { fetchColumnMetadataRequest } from "./fetchColumnMetadataSaga";
 import { fetchColumnMetadataSuccess } from "./fetchColumnMetadataSaga";

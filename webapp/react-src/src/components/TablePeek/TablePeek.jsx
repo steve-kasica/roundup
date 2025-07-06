@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
-import { selectPeekedTable } from "../../data/slices/uiSlice";
+import { selectPeekedTable } from "../../slices/uiSlice";
 import DBTableView from "./DBTableView";
-import { isTableId } from "../../data/slices/tablesSlice";
+import { isTableId } from "../../slices/tablesSlice";
 import withTableData from "../HOC/withTableData";
 import withOperationData from "../HOC/withOperationData";
 

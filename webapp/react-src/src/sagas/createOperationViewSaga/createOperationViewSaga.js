@@ -3,11 +3,11 @@ import { takeEvery, call, put, select } from "redux-saga/effects";
 import {
   selectOperation,
   setOperationAttributes,
-} from "../../data/slices/operationsSlice";
-import { isTableId, selectTablesById } from "../../data/slices/tablesSlice";
+} from "../../slices/operationsSlice";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { addTableToSchemaSuccess } from "../addTableToSchemaSaga/addTableToSchemaSaga";
 import { createStackView } from "../../lib/duckdb/createStackView";
-import { selectColumnById } from "../../data/slices/columnsSlice";
+import { selectColumnById } from "../../slices/columnsSlice";
 import { removeColumnsSuccessAction } from "../removeColumnsSaga";
 import { getTableDimensions } from "../../lib/duckdb";
 

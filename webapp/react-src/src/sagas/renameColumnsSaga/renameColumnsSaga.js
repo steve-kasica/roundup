@@ -3,9 +3,9 @@ import {
   renameColumns,
   addColumnsToLoading,
   removeColumnsFromLoading,
-} from "../../data/slices/columnsSlice";
+} from "../../slices/columnsSlice";
 import { createAction } from "@reduxjs/toolkit";
-import { clearSelectedColumns } from "../../data/slices/columnsSlice";
+import { clearSelectedColumns } from "../../slices/columnsSlice";
 
 export const renameColumnsAction = createAction("columns/renameColumn");
 

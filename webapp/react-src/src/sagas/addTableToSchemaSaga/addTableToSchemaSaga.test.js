@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { runSaga } from "redux-saga";
-import * as operationsSlice from "../../data/slices/operationsSlice";
-import * as tablesSlice from "../../data/slices/tablesSlice";
+import * as operationsSlice from "../../slices/operationsSlice";
+import * as tablesSlice from "../../slices/tablesSlice";
 import { addTableToSchemaSagaWorker } from "./addTableToSchemaSaga";
 
 const tableId = "table-1";
@@ -10,7 +10,7 @@ const rootOperationId = "op-root";
 const newOperationId = "op-new";
 
 // Mock the default import for Operation
-vi.mock("../../data/slices/operationsSlice/Operation", () => ({
+vi.mock("../../slices/operationsSlice/Operation", () => ({
   default: (type, children) => ({
     id: newOperationId,
     operationType: type,

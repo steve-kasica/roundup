@@ -9,12 +9,12 @@ import {
   COLUMN_TYPE_NUMERICAL,
   removeColumnsFromLoading,
   updateColumns,
-} from "../data/slices/columnsSlice";
+} from "../slices/columnsSlice";
 import {
   selectTablesById,
   setTableColumnIds,
   TABLE_SOURCE_OPEN_REFINE,
-} from "../data/slices/tablesSlice";
+} from "../slices/tablesSlice";
 import { addTableToSchema } from "./addTableToSchemaSaga";
 import { peekTableAction } from "./peekTableSaga";
 

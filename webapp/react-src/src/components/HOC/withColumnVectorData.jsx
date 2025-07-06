@@ -7,9 +7,9 @@ import {
   selectColumnById,
   removeFromHoveredColumns,
   removeColumnsFromDragging,
-} from "../../data/slices/columnsSlice";
+} from "../../slices/columnsSlice";
 
-import { setDrawerContents } from "../../data/slices/uiSlice";
+import { setDrawerContents } from "../../slices/uiSlice";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnIndexDetails";
 import { swapColumnsAction } from "../../sagas/swapColumnsSaga";
 import { getValuesAction } from "../../sagas/getValuesSaga";

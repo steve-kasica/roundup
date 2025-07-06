@@ -1,5 +1,5 @@
 import { useDragLayer } from "react-dnd";
-import { DATA_TYPE as COLUMN } from "./data/slices/columnsSlice";
+import { DATA_TYPE as COLUMN } from "./slices/columnsSlice";
 import { COLUMN_INDEX } from "./components/OperationDetail/StackDetail/ColumnIndex";
 
 export default function CustomDragLayer() {

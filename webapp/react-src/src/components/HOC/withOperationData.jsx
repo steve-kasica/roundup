@@ -8,11 +8,11 @@ import {
   OPERATION_TYPE_STACK,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_NO_OP,
-} from "../../data/slices/operationsSlice";
+} from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
-import { selectTablesById, isTableId } from "../../data/slices/tablesSlice";
+import { selectTablesById, isTableId } from "../../slices/tablesSlice";
 import PropTypes from "prop-types";
-import { setPeekedTable } from "../../data/slices/uiSlice";
+import { setPeekedTable } from "../../slices/uiSlice";
 
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {

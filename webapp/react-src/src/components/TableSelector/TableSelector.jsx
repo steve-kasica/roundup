@@ -23,7 +23,7 @@ import {
   styled,
   TextField,
 } from "@mui/material";
-import { selectAllTablesData } from "../../data/slices/tablesSlice";
+import { selectAllTablesData } from "../../slices/tablesSlice";
 import DuckDBFileUpload from "./DuckDBFileUpload";
 
 import "./SourceTables.scss";

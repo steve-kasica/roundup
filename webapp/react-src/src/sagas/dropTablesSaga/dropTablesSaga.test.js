@@ -6,19 +6,19 @@ import {
   dropTables,
   removeTablesFromLoading,
   Table,
-} from "../../data/slices/tablesSlice";
+} from "../../slices/tablesSlice";
 import {
   Column,
   COLUMN_TYPE_CATEGORICAL,
   dropColumns,
-} from "../../data/slices/columnsSlice";
-import { removeFromSelectedTables } from "../../data/slices/uiSlice/uiSlice";
-import { removeChildFromOperation } from "../../data/slices/operationsSlice/operationsSlice";
+} from "../../slices/columnsSlice";
+import { removeFromSelectedTables } from "../../slices/uiSlice/uiSlice";
+import { removeChildFromOperation } from "../../slices/operationsSlice/operationsSlice";
 import { vi } from "vitest";
 import { mock } from "node:test";
 import Operation, {
   OPERATION_TYPE_STACK,
-} from "../../data/slices/operationsSlice/Operation";
+} from "../../slices/operationsSlice/Operation";
 
 // Mock the DuckDB dropTable function to prevent Worker errors in tests
 vi.mock("../../lib/duckdb", () => ({

@@ -5,7 +5,7 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectFocusedOperationId,
-} from "../../data/slices/operationsSlice";
+} from "../../slices/operationsSlice";
 import PackDetailView from "./PackDetailView";
 import withOperationData from "../HOC/withOperationData";
 import PropTypes from "prop-types";

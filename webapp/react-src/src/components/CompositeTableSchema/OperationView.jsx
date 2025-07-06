@@ -10,8 +10,8 @@
 
 import TableView from "./TableView";
 import withOperationData from "../HOC/withOperationData";
-import { isOperationId } from "../../data/slices/operationsSlice";
-import { isTableId } from "../../data/slices/tablesSlice";
+import { isOperationId } from "../../slices/operationsSlice";
+import { isTableId } from "../../slices/tablesSlice";
 import PropTypes from "prop-types";
 
 function OperationView({

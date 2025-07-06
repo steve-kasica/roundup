@@ -1,5 +1,5 @@
 // import { useDispatch, useSelector } from "react-redux";
-// import { selectColumnById } from "../../data/slices/columnsSlice";
+// import { selectColumnById } from "../../slices/columnsSlice";
 // import { hsl, InternMap, rollup, scaleLinear } from "d3";
 // import { useEffect } from "react";
 // import { requestColumnFacets } from "../../sagas/requestColumnFacets";

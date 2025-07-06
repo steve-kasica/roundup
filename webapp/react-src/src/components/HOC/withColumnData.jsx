@@ -16,13 +16,13 @@ import {
   appendToSelectedColumns,
   removeFromSelectedColumns,
   selectSelectedColumns,
-} from "../../data/slices/columnsSlice";
+} from "../../slices/columnsSlice";
 
 import { renameColumnsAction } from "../../sagas/renameColumnsSaga";
 import { removeColumnsAction } from "../../sagas/removeColumnsSaga";
 import { swapColumnsAction } from "../../sagas/swapColumnsSaga";
 
-import { selectFirstSelectedColumn } from "../../data/slices/uiSlice";
+import { selectFirstSelectedColumn } from "../../slices/uiSlice";
 
 import { useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";

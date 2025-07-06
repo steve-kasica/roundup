@@ -4,10 +4,10 @@ import {
   addTablesToLoading,
   dropTables,
   selectTablesById,
-} from "../../data/slices/tablesSlice";
-import { dropColumns } from "../../data/slices/columnsSlice";
+} from "../../slices/tablesSlice";
+import { dropColumns } from "../../slices/columnsSlice";
 import { dropTable } from "../../lib/duckdb";
-import { removeChildFromOperation } from "../../data/slices/operationsSlice";
+import { removeChildFromOperation } from "../../slices/operationsSlice";
 
 /**
  * Action creator for removing tables.

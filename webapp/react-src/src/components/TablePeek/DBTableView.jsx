@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { selectColumnIdsByTableId } from "../../data/slices/columnsSlice";
+import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
 import ColumnValues from "./ColumnValues";
 import withTableData from "../HOC/withTableData";
 import ColumnHeader from "./ColumnHeader";

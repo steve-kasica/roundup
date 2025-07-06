@@ -7,7 +7,7 @@ import {
   removeColumnsFromLoading,
   clearSelectedColumns,
   swapColumns,
-} from "../../data/slices/columnsSlice";
+} from "../../slices/columnsSlice";
 import { takeEvery, put } from "redux-saga/effects";
 
 function recordSaga(saga, initialAction) {

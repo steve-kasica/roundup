@@ -21,7 +21,7 @@ import {
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_DATE,
   COLUMN_TYPE_CATEGORICAL,
-} from "../../../data/slices/columnsSlice";
+} from "../../../slices/columnsSlice";
 
 // TODO: move this to SourceColumn Type
 

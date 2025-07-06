@@ -13,7 +13,7 @@ import {
   OPERATION_TYPE_STACK,
   selectMaxOperationDepth,
   selectRootOperation,
-} from "../../data/slices/operationsSlice";
+} from "../../slices/operationsSlice";
 
 import TableDropTarget from "./TableDropTarget";
 import { Typography } from "@mui/material";

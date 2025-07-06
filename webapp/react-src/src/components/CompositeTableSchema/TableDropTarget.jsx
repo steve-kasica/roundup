@@ -6,11 +6,11 @@
  *    only operationTypes are defined in this component
  */
 import { useDrop } from "react-dnd";
-import { dataType as SourceTable } from "../../data/slices/tablesSlice";
+import { dataType as SourceTable } from "../../slices/tablesSlice";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-} from "../../data/slices/operationsSlice";
+} from "../../slices/operationsSlice";
 import PropTypes from "prop-types";
 
 export const DROP_TARGET_EVENT_INITIALIZE = "initialize";

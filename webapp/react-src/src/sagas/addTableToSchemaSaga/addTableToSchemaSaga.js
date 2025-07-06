@@ -27,13 +27,13 @@ import {
   OPERATION_TYPE_NO_OP,
   selectOperation,
   selectRootOperation,
-} from "../../data/slices/operationsSlice";
-import Operation from "../../data/slices/operationsSlice/Operation";
+} from "../../slices/operationsSlice";
+import Operation from "../../slices/operationsSlice/Operation";
 import {
   isTableId,
   selectTablesById,
   setTablesAttribute,
-} from "../../data/slices/tablesSlice";
+} from "../../slices/tablesSlice";
 
 /**
  * Action creator for adding a table to a schema.

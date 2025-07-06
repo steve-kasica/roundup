@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { getValuesCountMatrix } from "../../lib/duckdb";
 import { useEffect, useState } from "react";
-import { selectTableIdsByColumnIds } from "../../data/slices/columnsSlice";
+import { selectTableIdsByColumnIds } from "../../slices/columnsSlice";
 
 // HOC to provide column values for given columnIds
 export default function withValuesCountMatrixData(WrappedComponent) {

@@ -15,7 +15,7 @@ import {
   COLUMN_TYPE_CATEGORICAL,
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_DATE,
-} from "../../../data/slices/columnsSlice";
+} from "../../../slices/columnsSlice";
 
 function TableRowView({
   // props from withTableData

@@ -10,8 +10,8 @@
 //   fetchValuesRequest,
 //   fetchValuesSuccess,
 //   selectColumnIdsByTableId,
-// } from "../data/slices/columnsSlice";
-// import { incrementRowsExplored } from "../data/slices/tablesSlice";
+// } from "../slices/columnsSlice";
+// import { incrementRowsExplored } from "../slices/tablesSlice";
 // // import { addTableToSchema } from "./addTableToSchemaSaga";
 
 // export const fetchRows = createAction("fetchRows");

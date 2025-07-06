@@ -9,9 +9,9 @@ import withColumnMatrixData from "../../HOC/withColumnMatrixData";
 
 import "./StackDetail.scss";
 import { useState } from "react";
-import { setSelectedColumns } from "../../../data/slices/columnsSlice";
+import { setSelectedColumns } from "../../../slices/columnsSlice";
 import { useRef } from "react";
-import { selectTablesById } from "../../../data/slices/tablesSlice/tableSelectors";
+import { selectTablesById } from "../../../slices/tablesSlice/tableSelectors";
 import TableView from "./TableView";
 
 const yAxisLabel = "table name";

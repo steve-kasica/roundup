@@ -6,25 +6,22 @@ import {
   selectOperationByTableId,
   removeChildFromOperation,
   selectOperation,
-} from "../../data/slices/operationsSlice";
-import {
-  changeTablesName,
-  selectTablesById,
-} from "../../data/slices/tablesSlice";
+} from "../../slices/operationsSlice";
+import { changeTablesName, selectTablesById } from "../../slices/tablesSlice";
 import {
   setHoveredTable,
   clearHoveredTable,
   selectHoveredTable,
   setPeekedTable,
-} from "../../data/slices/uiSlice";
+} from "../../slices/uiSlice";
 import { addTableToSchema } from "../../sagas/addTableToSchemaSaga";
-import { dataType as SourceTable } from "../../data/slices/tablesSlice";
-import { selectColumnById } from "../../data/slices/columnsSlice";
+import { dataType as SourceTable } from "../../slices/tablesSlice";
+import { selectColumnById } from "../../slices/columnsSlice";
 import {
   appendToSelectedTables,
   removeFromSelectedTables,
   selectSelectedTables,
-} from "../../data/slices/uiSlice";
+} from "../../slices/uiSlice";
 import PropTypes from "prop-types";
 import { dropTablesAction } from "../../sagas/dropTablesSaga";
 import { removeTablesAction } from "../../sagas/removeTablesSaga";

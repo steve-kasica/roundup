@@ -6,7 +6,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { setFocusedOperation } from "../../data/slices/operationsSlice";
+import { setFocusedOperation } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import withOperationData from "../HOC/withOperationData";
 import PropTypes from "prop-types";

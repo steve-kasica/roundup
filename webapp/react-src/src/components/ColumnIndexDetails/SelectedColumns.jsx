@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { selectSelectedColumns } from "../../data/slices/columnsSlice";
+import { selectSelectedColumns } from "../../slices/columnsSlice";
 import ColumnIndexDetails from "./ColumnIndexDetails";
 
 export default function SelectedColumns() {
