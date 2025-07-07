@@ -19,6 +19,7 @@ export default function StackDetailToolbar({
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const selectedColumnIds = useSelector(selectSelectedColumns);
+  console.log("selectedColumnIds", selectedColumnIds);
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -28,6 +29,7 @@ export default function StackDetailToolbar({
     {
       label: "Remove selected columns",
       icon: <DeleteIcon />,
+      disabled: selectedColumnIds.length === 0,
       action: () => {
         dispatch(removeColumnsAction(selectedColumnIds));
         handleMenuClose();
@@ -36,6 +38,7 @@ export default function StackDetailToolbar({
     {
       label: "Clear column selection",
       icon: <ClearIcon />,
+      disabled: selectedColumnIds.length === 0,
       action: () => {
         setSelectionAnchorCell(null);
         setSelectionExtentCell(null);
@@ -62,7 +65,7 @@ export default function StackDetailToolbar({
         <Tooltip key={index} title={item.label} arrow placement="top">
           <span>
             <IconButton
-              disabled={selectedColumnIds.length === 0}
+              disabled={item.disabled}
               aria-label={item.label}
               variant="outlined"
               size="small"
@@ -88,7 +91,7 @@ export default function StackDetailToolbar({
         onClose={handleMenuClose}
       >
         {menuItems.map((item, index) => (
-          <MenuItem key={index} onClick={item.action}>
+          <MenuItem key={index} onClick={item.action} disabled={item.disabled}>
             {item.icon}
             {item.label}
           </MenuItem>
