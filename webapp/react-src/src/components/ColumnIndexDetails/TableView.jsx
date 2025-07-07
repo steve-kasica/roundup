@@ -13,7 +13,18 @@ function TableView({ name, colWidth }) {
         overflow: "visible",
       }}
     >
-      <Box sx={{ transform: "rotate(-45deg)", wordWrap: "unset" }}>{name}</Box>
+      <Box
+        sx={{
+          transform: "rotate(-45deg)",
+          wordWrap: "unset",
+          position: "relative",
+          top: "-27px",
+          left: "27px",
+          textAlign: "left",
+        }}
+      >
+        {name}
+      </Box>
     </Box>
   );
 }
