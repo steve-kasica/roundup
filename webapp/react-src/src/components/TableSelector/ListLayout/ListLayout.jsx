@@ -6,11 +6,12 @@
  */
 import { List } from "@mui/material";
 // import { TableContainer } from "../../Containers";
-import TableListItemView from "./TableListItemView";
+import TableView from "./TableListItemView";
+import withAllTablesData from "../../HOC/withAllTablesData";
 
 export const LAYOUT_ID = "list";
 
-export default function ListLayout({ searchString, tables, loading, error }) {
+function ListLayout({ searchString, tables, loading, error }) {
   return (
     <List
       className="list-layout"
@@ -23,18 +24,22 @@ export default function ListLayout({ searchString, tables, loading, error }) {
       {tables
         .toSorted((tableA, tableB) => {
           const [a, b] = [
-            tableA.name.includes(searchString),
-            tableB.name.includes(searchString),
+            tableA.name.toLowerCase().includes(searchString),
+            tableB.name.toLowerCase().includes(searchString),
           ];
           return a === b ? 0 : a < b ? 1 : -1;
         })
         .map((sourceTable) => (
-          <TableListItemView
+          <TableView
             key={sourceTable.id}
             id={sourceTable.id}
             isDraggable={true}
+            searchString={searchString}
           />
         ))}
     </List>
   );
 } // end ListLayout()
+
+const EnhancedListLayout = withAllTablesData(ListLayout);
+export default EnhancedListLayout;

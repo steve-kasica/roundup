@@ -1,6 +1,5 @@
 import { DragIndicator } from "@mui/icons-material";
 import {
-  Chip,
   ListItem,
   ListItemIcon,
   ListItemText,
@@ -8,13 +7,9 @@ import {
 } from "@mui/material";
 import HighlightText from "../../ui/HighlightText";
 import { formatNumber } from "../../../lib/utilities/formaters";
+import withTableData from "../../HOC/withTableData";
 
-export default function TableListItemView({
-  table,
-  isDisabled = false,
-  searchString = "",
-}) {
-  const { name, rowCount, columnCount, tags } = table;
+function TableView({ table, isDisabled, searchString }) {
   return (
     <ListItem
       // TODO: add context menu
@@ -27,20 +22,23 @@ export default function TableListItemView({
       <ListItemText
         primary={
           <Typography color={isDisabled ? "textDisabled" : "normal"}>
-            <HighlightText pattern={searchString} text={name} />
+            <HighlightText pattern={searchString} text={table.name} />
             <small style={{ paddingLeft: "10px" }}>
-              {formatNumber(rowCount)} x {formatNumber(columnCount)}
+              {formatNumber(table.rowCount)} x {formatNumber(table.columnCount)}
             </small>
           </Typography>
         }
-        secondary={
-          <Typography color={isDisabled ? "textDisabled" : "normal"}>
-            {tags.map((tag) => (
-              <Chip key={tag} label={tag} size="small" />
-            ))}
-          </Typography>
-        }
+        // secondary={
+        // <Typography color={isDisabled ? "textDisabled" : "normal"}>
+        //   {tags.map((tag) => (
+        //     <Chip key={tag} label={tag} size="small" />
+        //   ))}
+        // </Typography>
+        // }
       />
     </ListItem>
   );
 }
+
+const EnhancedTableView = withTableData(TableView);
+export default EnhancedTableView;

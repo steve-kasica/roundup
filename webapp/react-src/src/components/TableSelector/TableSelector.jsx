@@ -104,12 +104,10 @@ function TableSelector({
 }) {
   const [selectedTableType, setSelectedTableType] = useState("");
   const [searchString, setSearchString] = useState("");
-  const [layout, setLayout] = useState(tableLayout);
+  const [layout, setLayout] = useState(listLayout);
 
   const filteredTables = tables
-    .filter((table) =>
-      table.name.toLowerCase().includes(searchString.trim().toLowerCase())
-    )
+    .filter((table) => table.name.toLowerCase().includes(searchString))
     .filter(
       (table) =>
         selectedTableType.length === 0 ||
@@ -133,7 +131,9 @@ function TableSelector({
             size="small"
             fullWidth
             value={searchString}
-            onChange={(event) => setSearchString(event.target.value)}
+            onChange={(event) =>
+              setSearchString(event.target.value.trim().toLowerCase())
+            }
           />
         </Grid>
         <Grid size={3}>
