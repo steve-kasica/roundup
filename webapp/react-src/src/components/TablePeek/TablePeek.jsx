@@ -4,10 +4,13 @@ import DBTableView from "./DBTableView";
 import { isTableId } from "../../slices/tablesSlice";
 import withTableData from "../HOC/withTableData";
 import withOperationData from "../HOC/withOperationData";
+import { useDispatch } from "react-redux";
+import { clearPeekedTable } from "../../slices/uiSlice";
 
 export const COMPONENT_ID = "FOCUSED_TABLE_VIEW";
 
 export default function TablePeek() {
+  const dispatch = useDispatch();
   let EnhancedDBTableView;
   const id = useSelector(selectPeekedTable);
   if (!id) {
@@ -19,5 +22,12 @@ export default function TablePeek() {
     EnhancedDBTableView = withOperationData(DBTableView);
   }
 
-  return <EnhancedDBTableView id={id} />;
+  return (
+    <EnhancedDBTableView
+      id={id}
+      onClose={() => {
+        dispatch(clearPeekedTable());
+      }}
+    />
+  );
 }

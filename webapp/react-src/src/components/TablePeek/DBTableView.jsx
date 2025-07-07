@@ -6,8 +6,10 @@ import ColumnHeader from "./ColumnHeader";
 import "./TableView.css";
 import PropTypes from "prop-types";
 import { getTableRows, summarizeTable } from "../../lib/duckdb";
+import { IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
-export default function DBTableView({ id, name, rowCount, columnCount }) {
+export default function DBTableView({ id, name, rowCount, columnCount, onClose }) {
   const [columns, setColumns] = useState([]);
 
   const [rows, setRows] = useState([]);
@@ -82,7 +84,15 @@ export default function DBTableView({ id, name, rowCount, columnCount }) {
   console.log(columns);
 
   return (
-    <div className="table-view">
+    <div className="table-view" style={{ position: "relative" }}>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        style={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}
+        size="small"
+      >
+        <CloseIcon />
+      </IconButton>
       <h2>
         {name}{" "}
         <small>
@@ -135,4 +145,6 @@ DBTableView.propTypes = {
   columnIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ),
+  columnCount: PropTypes.number,
+  onClose: PropTypes.func.isRequired,
 };
