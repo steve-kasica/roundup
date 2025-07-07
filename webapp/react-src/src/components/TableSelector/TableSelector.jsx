@@ -5,7 +5,7 @@
  */
 
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import PropTypes from "prop-types";
 import TableLayout from "./TableLayout";
 import ListLayout from "./ListLayout";
 import {
@@ -23,17 +23,14 @@ import {
   styled,
   TextField,
 } from "@mui/material";
-import {
-  selectAllTablesData,
-  clearSelectedTables,
-} from "../../slices/tablesSlice";
+
 import DuckDBFileUpload from "./DuckDBFileUpload";
+import withAllTablesData from "../HOC/withAllTablesData";
 
 import "./SourceTables.scss";
 
 const tableLayout = "table";
 const listLayout = "list";
-// const FIRST_PANE_THRESHOLD = 30;
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
@@ -98,23 +95,21 @@ const LayoutSwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
-export default function SourceTables() {
-  const dispatch = useDispatch();
+function TableSelector({
+  tables,
+  selectedTables,
+  isLoading,
+  error,
+  unselectAllTables,
+}) {
   const [selectedTableType, setSelectedTableType] = useState("");
   const [searchString, setSearchString] = useState("");
-  const [tableSelection, setTableSelection] = useState([]);
-
-  const selectedTables = useSelector((state) => state.tables.selected);
-
-  const { firstPaneWidth } = useSelector(({ ui }) => ui);
   const [layout, setLayout] = useState(tableLayout);
 
-  const tables = useSelector(selectAllTablesData);
-  const isLoading = false; // TODO:
-  const error = false; // TODO:
-
   const filteredTables = tables
-    .filter((table) => table.name.includes(searchString))
+    .filter((table) =>
+      table.name.toLowerCase().includes(searchString.trim().toLowerCase())
+    )
     .filter(
       (table) =>
         selectedTableType.length === 0 ||
@@ -138,7 +133,7 @@ export default function SourceTables() {
             size="small"
             fullWidth
             value={searchString}
-            onChange={(event) => dispatch(setSearchString(event.target.value))}
+            onChange={(event) => setSearchString(event.target.value)}
           />
         </Grid>
         <Grid size={3}>
@@ -191,9 +186,7 @@ export default function SourceTables() {
             onClick={() => {
               setSearchString("");
               setSelectedTableType("");
-              // TODO: clear table selection
-              dispatch(clearSelectedTables());
-              // dispatch(setTableSelection([]));
+              unselectAllTables();
             }}
           >
             Clear
@@ -232,3 +225,19 @@ export default function SourceTables() {
     </div>
   );
 }
+
+TableSelector.propTypes = {
+  tables: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      mimeType: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  selectedTables: PropTypes.array.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  error: PropTypes.any,
+  unselectAllTables: PropTypes.func.isRequired,
+};
+
+const EnhancedTableSelector = withAllTablesData(TableSelector);
+export default EnhancedTableSelector;

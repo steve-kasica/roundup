@@ -33,7 +33,7 @@ function TableRowView({
 
   // props from parent component
   isDisabled = false,
-  searchString = "",
+  searchString,
   headers,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);

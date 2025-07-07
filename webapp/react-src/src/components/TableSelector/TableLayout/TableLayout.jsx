@@ -27,38 +27,46 @@ import {
 
 export const LAYOUT_ID = "table";
 
-// Move SortIcon outside TableLayout for proper prop validation
-function SortIcon({ attr, isSort, attrType, isAscending }) {
-  const iconProps = { strokeWidth: 1, size: 18 };
+const headers = [
+  {
+    attr: "name",
+    label: "Name",
+    tooltip: "Sort by selected tables",
+    attrType: COLUMN_TYPE_CATEGORICAL,
+  },
+  {
+    attr: "size",
+    label: "Size",
+    tooltip: "Sort by file size",
+    attrType: COLUMN_TYPE_NUMERICAL,
+  },
+  {
+    attr: "mimeType",
+    label: "Type",
+    tooltip: "Sort by file type",
+    attrType: COLUMN_TYPE_CATEGORICAL,
+  },
+  {
+    attr: "rowCount",
+    label: "Rows",
+    tooltip: "Sort by total rows",
+    attrType: COLUMN_TYPE_NUMERICAL,
+  },
+  {
+    attr: "columnCount",
+    label: "Columns",
+    tooltip: "Sort by total columns",
+    attrType: COLUMN_TYPE_NUMERICAL,
+  },
+  {
+    attr: "dateLastModified",
+    label: "Modified",
+    tooltip: "Sort by date last modified",
+    attrType: COLUMN_TYPE_DATE,
+  },
+];
 
-  let AscIcon, DescIcon;
-  if (attrType === COLUMN_TYPE_CATEGORICAL) {
-    [AscIcon, DescIcon] = [ArrowDownAZ, ArrowUpZA];
-  } else if (attrType === COLUMN_TYPE_NUMERICAL) {
-    [AscIcon, DescIcon] = [ArrowDown01, ArrowUp10];
-  } else {
-    [AscIcon, DescIcon] = [ArrowDownNarrowWide, ArrowUpWideNarrow];
-  }
-
-  return isSort ? (
-    isAscending ? (
-      <AscIcon {...iconProps} />
-    ) : (
-      <DescIcon {...iconProps} />
-    )
-  ) : (
-    <ArrowUpDown {...iconProps} />
-  );
-}
-
-SortIcon.propTypes = {
-  attr: PropTypes.string,
-  isSort: PropTypes.bool,
-  attrType: PropTypes.string,
-  isAscending: PropTypes.bool.isRequired,
-};
-
-export default function TableLayout({ tables, loading, error }) {
+export default function TableLayout({ searchString, tables, loading, error }) {
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
 
@@ -69,45 +77,6 @@ export default function TableLayout({ tables, loading, error }) {
         : descending(a[sortAttribute], b[sortAttribute])
     )
     .map((table) => table.id);
-
-  const headers = [
-    {
-      attr: "alias",
-      label: "Name",
-      tooltip: "Sort by selected tables",
-      attrType: COLUMN_TYPE_CATEGORICAL,
-    },
-    {
-      attr: "size",
-      label: "Size",
-      tooltip: "Sort by file size",
-      attrType: COLUMN_TYPE_NUMERICAL,
-    },
-    {
-      attr: "mimeType",
-      label: "Type",
-      tooltip: "Sort by file type",
-      attrType: COLUMN_TYPE_CATEGORICAL,
-    },
-    {
-      attr: "rowCount",
-      label: "Rows",
-      tooltip: "Sort by total rows",
-      attrType: COLUMN_TYPE_NUMERICAL,
-    },
-    {
-      attr: "columnCount",
-      label: "Columns",
-      tooltip: "Sort by total columns",
-      attrType: COLUMN_TYPE_NUMERICAL,
-    },
-    {
-      attr: "dateLastModified",
-      label: "Modified",
-      tooltip: "Sort by date last modified",
-      attrType: COLUMN_TYPE_DATE,
-    },
-  ];
 
   return (
     <div className="TableLayout">
@@ -156,6 +125,7 @@ export default function TableLayout({ tables, loading, error }) {
                 id={id}
                 isDraggable={true}
                 headers={headers}
+                searchString={searchString}
               />
             ))
           )}
@@ -170,4 +140,34 @@ TableLayout.propTypes = {
   tables: PropTypes.arrayOf(PropTypes.object).isRequired,
   loading: PropTypes.bool,
   error: PropTypes.any,
+};
+
+function SortIcon({ attr, isSort, attrType, isAscending }) {
+  const iconProps = { strokeWidth: 1, size: 18 };
+
+  let AscIcon, DescIcon;
+  if (attrType === COLUMN_TYPE_CATEGORICAL) {
+    [AscIcon, DescIcon] = [ArrowDownAZ, ArrowUpZA];
+  } else if (attrType === COLUMN_TYPE_NUMERICAL) {
+    [AscIcon, DescIcon] = [ArrowDown01, ArrowUp10];
+  } else {
+    [AscIcon, DescIcon] = [ArrowDownNarrowWide, ArrowUpWideNarrow];
+  }
+
+  return isSort ? (
+    isAscending ? (
+      <AscIcon {...iconProps} />
+    ) : (
+      <DescIcon {...iconProps} />
+    )
+  ) : (
+    <ArrowUpDown {...iconProps} />
+  );
+}
+
+SortIcon.propTypes = {
+  attr: PropTypes.string,
+  isSort: PropTypes.bool,
+  attrType: PropTypes.string,
+  isAscending: PropTypes.bool.isRequired,
 };
