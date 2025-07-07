@@ -3,7 +3,7 @@ import HighlightText from "../../ui/HighlightText";
 import { IconButton, Typography } from "@mui/material";
 import { useRef, useState } from "react";
 import { Menu, MenuItem } from "@mui/material";
-import { formatDate, formatNumber } from "../../../lib/utilities";
+import { formatDate, formatNumber, formatBytes } from "../../../lib/utilities";
 import withTableData from "../../HOC/withTableData";
 import { isPointInBoundingBox } from "../../../lib/utilities/dom";
 import PropTypes from "prop-types";
@@ -161,7 +161,9 @@ function TableRowView({
       {headers.map(({ attr, attrType }) => (
         <td key={attr}>
           <Typography color={isDisabled ? "textDisabled" : "normal"}>
-            {attrType === COLUMN_TYPE_CATEGORICAL ? (
+            {attr === "size" ? (
+              formatBytes(table[attr])
+            ) : attrType === COLUMN_TYPE_CATEGORICAL ? (
               <HighlightText pattern={searchString} text={table[attr]} />
             ) : attrType === COLUMN_TYPE_NUMERICAL ? (
               formatNumber(table[attr])

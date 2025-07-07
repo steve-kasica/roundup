@@ -104,7 +104,7 @@ function TableSelector({
 }) {
   const [selectedTableType, setSelectedTableType] = useState("");
   const [searchString, setSearchString] = useState("");
-  const [layout, setLayout] = useState(listLayout);
+  const [layout, setLayout] = useState(tableLayout);
 
   const filteredTables = tables
     .filter((table) => table.name.toLowerCase().includes(searchString))
