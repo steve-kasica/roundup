@@ -9,7 +9,13 @@ import { getTableRows, summarizeTable } from "../../lib/duckdb";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-export default function DBTableView({ id, name, rowCount, columnCount, onClose }) {
+export default function DBTableView({
+  id,
+  name,
+  rowCount,
+  columnCount,
+  onClose,
+}) {
   const [columns, setColumns] = useState([]);
 
   const [rows, setRows] = useState([]);
@@ -81,8 +87,6 @@ export default function DBTableView({ id, name, rowCount, columnCount, onClose }
     };
   }, [loading, hasMore]);
 
-  console.log(columns);
-
   return (
     <div className="table-view" style={{ position: "relative" }}>
       <IconButton
@@ -113,7 +117,7 @@ export default function DBTableView({ id, name, rowCount, columnCount, onClose }
             <tr>
               <th></th>
               {Array.from({ length: columnCount }, (_, i) => (
-                <ColumnHeader key={i} column={columns[i]} />
+                <ColumnHeader key={i} id={columns[i]?.column_name} />
               ))}
             </tr>
           </thead>

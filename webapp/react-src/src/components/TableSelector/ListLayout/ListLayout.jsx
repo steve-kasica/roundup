@@ -5,8 +5,7 @@
  * a specific width.
  */
 import { List } from "@mui/material";
-// import { TableContainer } from "../../Containers";
-import TableView from "./TableListItemView";
+import TableView from "./TableView";
 import withAllTablesData from "../../HOC/withAllTablesData";
 
 export const LAYOUT_ID = "list";

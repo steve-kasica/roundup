@@ -1,20 +1,22 @@
 import PropTypes from "prop-types";
+import withColumnData from "../HOC/withColumnData";
 
 function ColumnHeader({ column }) {
   const isLoading = !column || Object.keys(column).length === 0;
   if (isLoading) {
     return <th className="column-header loading">...</th>;
   } else {
-    const { column_name: name } = column;
-    return <th className="column-header">{name}</th>;
+    return <th className="column-header">{column.name}</th>;
   }
 }
 
 ColumnHeader.propTypes = {
   column: PropTypes.shape({
-    column_name: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
   }).isRequired,
   isLoading: PropTypes.bool,
 };
 
-export default ColumnHeader;
+const EnhancedColumnHeader = withColumnData(ColumnHeader);
+
+export default EnhancedColumnHeader;
