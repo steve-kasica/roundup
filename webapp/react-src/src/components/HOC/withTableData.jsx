@@ -91,7 +91,7 @@ export default function withTableData(WrappedComponent) {
         table={table}
         id={table.id} //
         source={table.source}
-        name={table.alias || table.name}
+        name={table.name}
         extension={table.extension}
         size={table.size}
         mimeType={table.mimeType}
@@ -136,11 +136,8 @@ export default function withTableData(WrappedComponent) {
         }}
         unselectTable={() => dispatch(removeFromSelectedTables(id))}
         peekTable={() => dispatch(setPeekedTable(id))}
-        setTableAlias={
-          (aliases) => dispatch(changeTablesName({ ids: id, aliases })) // Depricated function TODO: remove
-        }
-        renameTable={(newName) =>
-          dispatch(changeTablesName({ ids: id, aliases: newName }))
+        renameTable={(newNames) =>
+          dispatch(changeTablesName({ ids: id, newNames }))
         }
         dropTable={() => dispatch(dropTablesAction(id))}
       />

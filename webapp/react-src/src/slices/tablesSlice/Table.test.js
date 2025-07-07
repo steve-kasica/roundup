@@ -30,7 +30,6 @@ describe("Table factory", () => {
     expect(table.columnIds.length).toBe(validArgs[5]);
     expect(Array.isArray(table.originalColumnIds)).toBe(true);
     expect(table.originalColumnIds.length).toBe(validArgs[5]);
-    expect(table.alias).toBe(validArgs[1]);
   });
 
   it("throws if rowCount is not integer", () => {

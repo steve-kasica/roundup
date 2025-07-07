@@ -40,7 +40,6 @@ export function Table(
     id, // This unique identifier for table objects in Redux store corresponds to the name of the table in DuckDB
     source,
     name, // name is mutable
-    alias: name, // depricated
     extension,
     size,
     mimeType,
@@ -58,7 +57,6 @@ const attributes = [
   "id",
   "source",
   "name",
-  "alias",
   "extension",
   "size",
   "mimeType",

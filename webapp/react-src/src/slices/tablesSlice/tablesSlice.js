@@ -119,25 +119,27 @@ const slice = createSlice({
      * @throws {Error} Throws an error if the table with the specified ID does not exist.
      */
     changeTablesName(state, action) {
-      let { ids, aliases } = action.payload;
+      let { ids, newNames } = action.payload;
       // Ensure tableIds is an array
       ids = Array.isArray(ids) ? ids : [ids];
-      aliases = Array.isArray(aliases) ? aliases : [aliases];
+      newNames = Array.isArray(newNames) ? newNames : [newNames];
 
-      // Check if the number of tableIds matches the number of aliases
-      if (ids.length !== aliases.length) {
-        throw new Error("Number of table IDs must match the number of aliases");
+      // Check if the number of tableIds matches the number of new names
+      if (ids.length !== newNames.length) {
+        throw new Error(
+          "Number of table IDs must match the number of new names"
+        );
       }
-      // Iterate over each table ID and update its alias
+      // Iterate over each table ID and update its new name
       ids.forEach((id, index) => {
-        const alias = aliases[index].trim();
+        const newName = newNames[index].trim();
 
         // Check if the table exists
         if (!state.data[id]) {
           throw new Error(`Table with ID ${id} does not exist`);
         }
         // Update the table name
-        state.data[id].alias = alias;
+        state.data[id].name = newName;
       });
     },
     setTablesAttribute(state, action) {

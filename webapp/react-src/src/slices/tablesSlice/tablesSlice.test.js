@@ -107,9 +107,9 @@ describe("tablesSlice reducers", () => {
     };
     const nextState = tablesSlice.reducer(
       state,
-      changeTablesName({ ids: "1", aliases: "New Name" })
+      changeTablesName({ ids: "1", newNames: "New Name" })
     );
-    expect(nextState.data["1"].alias).toBe("New Name");
+    expect(nextState.data["1"].name).toBe("New Name");
   });
 
   it("changeTableName: throws if table does not exist", () => {
