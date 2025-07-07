@@ -58,13 +58,7 @@ SortIcon.propTypes = {
   isAscending: PropTypes.bool.isRequired,
 };
 
-export default function TableLayout({
-  tables,
-  tableSelection,
-  setTableSelection,
-  loading,
-  error,
-}) {
+export default function TableLayout({ tables, loading, error }) {
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
 
@@ -161,8 +155,6 @@ export default function TableLayout({
                 key={id}
                 id={id}
                 isDraggable={true}
-                setTableSelection={setTableSelection}
-                isSelectedRow={tableSelection.includes(id)}
                 headers={headers}
               />
             ))
@@ -176,10 +168,6 @@ export default function TableLayout({
 TableLayout.propTypes = {
   searchString: PropTypes.string,
   tables: PropTypes.arrayOf(PropTypes.object).isRequired,
-  tableSelection: PropTypes.arrayOf(
-    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ).isRequired,
-  setTableSelection: PropTypes.func.isRequired,
   loading: PropTypes.bool,
   error: PropTypes.any,
 };

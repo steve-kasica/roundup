@@ -1,38 +1,37 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrag } from "react-dnd";
+import PropTypes from "prop-types";
+
 import {
   selectOperationDepth,
-  selectOperationByTableId,
-  removeChildFromOperation,
   selectOperation,
 } from "../../slices/operationsSlice";
-import { changeTablesName, selectTablesById } from "../../slices/tablesSlice";
-import {
-  setHoveredTable,
-  clearHoveredTable,
-  selectHoveredTable,
-  setPeekedTable,
-} from "../../slices/uiSlice";
-import { addTableToSchema } from "../../sagas/addTableToSchemaSaga";
-import { dataType as SourceTable } from "../../slices/tablesSlice";
+import { setPeekedTable } from "../../slices/uiSlice";
 import { selectColumnById } from "../../slices/columnsSlice";
 import {
-  appendToSelectedTables,
   removeFromSelectedTables,
+  selectHoveredTable,
+  clearHoveredTable,
+  setHoveredTable,
   selectSelectedTables,
-} from "../../slices/uiSlice";
-import PropTypes from "prop-types";
+  changeTablesName,
+  selectTablesById,
+  setSelectedTables,
+  dataType as SourceTable,
+} from "../../slices/tablesSlice";
+
 import { dropTablesAction } from "../../sagas/dropTablesSaga";
 import { removeTablesAction } from "../../sagas/removeTablesSaga";
+import { addTableToSchema } from "../../sagas/addTableToSchemaSaga";
 
 export default function withTableData(WrappedComponent) {
-  return function EnhancedComponent({ id, isDraggable = false, ...props }) {
+  function EnhancedComponent({ id, isDraggable = false, ...props }) {
     const dispatch = useDispatch();
 
     // Get table data from the Redux store
     const table = useSelector((state) => selectTablesById(state, id));
-    const selectedTables = useSelector(selectSelectedTables);
+    const selectedTables = useSelector(selectSelectedTables) || [];
     const hoveredTable = useSelector(selectHoveredTable);
 
     // Get column data from the Redux store
@@ -129,39 +128,39 @@ export default function withTableData(WrappedComponent) {
             );
           }
         }}
-        selectTable={(type, ids) => {
-          switch (type) {
-            case "single":
-              dispatch(appendToSelectedTables(id));
-              break;
-            case "multi":
-              dispatch(appendToSelectedTables(ids));
-              break;
+        setTableSelection={(ids) => {
+          if (ids === undefined) {
+            ids = id;
           }
+          dispatch(setSelectedTables(ids));
         }}
-        unselectTable={(type) => {
-          switch (type) {
-            case "single":
-              dispatch(removeFromSelectedTables(id));
-              break;
-          }
-        }}
+        unselectTable={() => dispatch(removeFromSelectedTables(id))}
         peekTable={() => dispatch(setPeekedTable(id))}
-        setTableAlias={(aliases) =>
-          dispatch(changeTablesName({ ids: id, aliases }))
+        setTableAlias={
+          (aliases) => dispatch(changeTablesName({ ids: id, aliases })) // Depricated function TODO: remove
+        }
+        renameTable={(newName) =>
+          dispatch(changeTablesName({ ids: id, aliases: newName }))
         }
         dropTable={() => dispatch(dropTablesAction(id))}
       />
     );
+  }
+
+  EnhancedComponent.propTypes = {
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    isDraggable: PropTypes.bool,
   };
+
+  return EnhancedComponent;
 }
 
 withTableData.propTypes = {
-  WrappedComponent: PropTypes.elementType,
+  WrappedComponent: PropTypes.elementType.isRequired,
 };
 
-// Add prop types for the EnhancedComponent returned by withTableData
-withTableData.EnhancedComponentPropTypes = {
+// EnhancedComponent prop types
+export const EnhancedComponentPropTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   isDraggable: PropTypes.bool,
 };

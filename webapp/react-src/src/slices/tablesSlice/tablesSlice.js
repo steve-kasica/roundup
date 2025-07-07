@@ -7,6 +7,8 @@ const initialState = {
   ids: [],
   data: {},
   loading: [],
+  hovered: null, // ID of the table currently hovered over
+  selected: [],
   error: null,
 };
 
@@ -205,7 +207,40 @@ const slice = createSlice({
         (id) => !columnIdsToRemove.includes(id)
       );
     },
-  },
+    setSelectedTables(state, action) {
+      const tableIds = action.payload;
+      // Ensure tableIds is an array
+      state.selected = Array.isArray(tableIds) ? tableIds : [tableIds];
+    },
+    appendToSelectedTables(state, action) {
+      const tableId = action.payload;
+      // Ensure tableId is an array
+      if (state.selected.includes(tableId)) {
+        throw new Error(`Table with ID ${tableId} is already selected`);
+      }
+      state.selected.push(tableId);
+    },
+    removeFromSelectedTables(state, action) {
+      let tableIds = action.payload;
+      // Normalize to array
+      tableIds = Array.isArray(tableIds) ? tableIds : [tableIds];
+      // Ensure tableIds is an array
+      state.selected = state.selected.filter((id) => !tableIds.includes(id));
+    },
+    clearSelectedTables(state) {
+      // Clear the selected tables
+      state.selected = initialState.selected;
+    },
+    setHoveredTable(state, action) {
+      const tableId = action.payload;
+      // Set the hovered table ID
+      state.hovered = tableId;
+    },
+    clearHoveredTable(state) {
+      // Clear the hovered table ID
+      state.hovered = null;
+    },
+  }, // end reducers
 });
 
 export const {
@@ -219,6 +254,14 @@ export const {
   setTableColumnIds,
   swapTableColumnIds,
   removeTableColumnId,
+
+  setSelectedTables,
+  appendToSelectedTables,
+  removeFromSelectedTables,
+  clearSelectedTables,
+
+  setHoveredTable,
+  clearHoveredTable,
 } = slice.actions;
 
 export default slice;

@@ -1,13 +1,9 @@
 import { DragIndicator, MoreVert } from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
-import { Chip, IconButton, Typography } from "@mui/material";
+import { IconButton, Typography } from "@mui/material";
 import { useRef, useState } from "react";
 import { Menu, MenuItem } from "@mui/material";
-import {
-  formatDate,
-  formatNumber,
-  parseOpenRefineDate,
-} from "../../../lib/utilities";
+import { formatDate, formatNumber } from "../../../lib/utilities";
 import withTableData from "../../HOC/withTableData";
 import { isPointInBoundingBox } from "../../../lib/utilities/dom";
 import PropTypes from "prop-types";
@@ -19,28 +15,27 @@ import {
 
 function TableRowView({
   // props from withTableData
-  id,
   table,
   isHovered,
   depth,
   parentOperation,
   dragRef,
+  // functions to dispatch actions
   peekTable,
   hoverTable,
   unhoverTable,
   setTableSelection,
   removeTableFromSchema,
-  setTableAlias,
+  renameTable,
   dropTable,
   isInSchema,
+  isSelected,
 
   // props from parent component
   isDisabled = false,
-  isSelectedRow,
   searchString = "",
   headers,
 }) {
-  const isPressed = false; // Placeholder, replace with actual
   const [anchorEl, setAnchorEl] = useState(null);
   const trRef = useRef(null);
   const open = Boolean(anchorEl);
@@ -69,7 +64,7 @@ function TableRowView({
       onClick: (event) => {
         const newName = prompt("Enter new table name:", table.name);
         if (newName && newName.trim() !== "") {
-          setTableAlias(newName);
+          renameTable(newName);
         }
         handleMenuClose(event);
       },
@@ -84,15 +79,9 @@ function TableRowView({
     },
     {
       label: "Add to selection",
-      isDisabled: isSelectedRow || isDisabled || isInSchema,
+      isDisabled: isSelected || isDisabled || isInSchema,
       onClick: (event) => {
-        setTableSelection((prev) => {
-          if (prev.includes(table.id)) {
-            return prev.filter((tableId) => tableId !== table.id);
-          } else {
-            return [...prev, table.id];
-          }
-        });
+        setTableSelection();
         handleMenuClose(event);
       },
     },
@@ -116,7 +105,7 @@ function TableRowView({
 
   const className = [
     "TableRowView",
-    isSelectedRow ? "selected" : "",
+    isSelected ? "selected" : "",
     isDisabled ? "disabled" : "",
     isHovered ? "hovered" : "",
     parentOperation ? parentOperation.operationType : "",
@@ -131,42 +120,39 @@ function TableRowView({
       onMouseEnter={hoverTable}
       onMouseLeave={unhoverTable}
       onClick={(event) => {
-        setTableSelection((prev) => {
-          if (event.shiftKey) {
-            const tr = event.currentTarget;
-            const rows = Array.from(tr.parentNode.children);
-            const ids = rows.map((row) => row.getAttribute("data-tableid"));
-            const clickedIndex = ids.indexOf(table.id);
-            // Find indices of selected rows in DOM order
-            const selectedIndices = prev
-              .map((tableId) => ids.indexOf(tableId))
-              .filter((i) => i !== -1);
+        event.stopPropagation();
 
-            if (selectedIndices.length === 0) {
-              // No selection yet, just select clicked
-              return [table.id];
-            }
+        if (event.shiftKey) {
+          const tr = event.currentTarget;
+          const rows = Array.from(tr.parentNode.children);
+          const ids = rows.map((row) => row.getAttribute("data-tableid"));
+          const clickedIndex = ids.indexOf(table.id);
+          // Find all selected rows in DOM order
+          const selectedRows = rows.filter((row) =>
+            row.classList.contains("selected")
+          );
+          const selectedIndices = selectedRows.map((row) =>
+            ids.indexOf(row.getAttribute("data-tableid"))
+          );
 
-            const min = Math.min(...selectedIndices);
-            const max = Math.max(...selectedIndices);
-
-            let range;
-            if (clickedIndex < min) {
-              range = [clickedIndex, min];
-            } else if (clickedIndex > max) {
-              range = [max, clickedIndex];
-            } else {
-              // Clicked inside the range, select only that row
-              return [table.id];
-            }
-
-            // Return the table IDs in the selected range
-            return ids.slice(range[0], range[1] + 1);
+          let anchorIndex;
+          if (selectedIndices.length > 0) {
+            // Use the last selected row as the anchor
+            anchorIndex = selectedIndices[selectedIndices.length - 1];
           } else {
-            // Single select
-            return [table.id];
+            anchorIndex = clickedIndex;
           }
-        });
+
+          const [start, end] = [
+            Math.min(anchorIndex, clickedIndex),
+            Math.max(anchorIndex, clickedIndex),
+          ];
+
+          const rangeIds = ids.slice(start, end + 1);
+          setTableSelection(rangeIds);
+        } else {
+          setTableSelection(table.id);
+        }
       }}
     >
       <td className="drag-handle" ref={dragRef}>
@@ -217,33 +203,36 @@ function TableRowView({
   );
 }
 
-// TableRowView.propTypes = {
-//   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-
-//   isHovered: PropTypes.bool,
-//   depth: PropTypes.number,
-//   parentOperation: PropTypes.shape({
-//     operationType: PropTypes.string,
-//   }),
-//   dragRef: PropTypes.oneOfType([
-//     PropTypes.func,
-//     PropTypes.shape({ current: PropTypes.any }),
-//   ]),
-//   peekTable: PropTypes.func.isRequired,
-//   hoverTable: PropTypes.func.isRequired,
-//   unhoverTable: PropTypes.func.isRequired,
-//   setTableSelection: PropTypes.func.isRequired,
-//   removeTableFromSchema: PropTypes.func.isRequired,
-//   isDisabled: PropTypes.bool,
-//   isSelectedRow: PropTypes.bool,
-//   searchString: PropTypes.string,
-//   headers: PropTypes.arrayOf(
-//     PropTypes.shape({
-//       attr: PropTypes.string.isRequired,
-//       attrType: PropTypes.string.isRequired,
-//     })
-//   ).isRequired,
-// };
+TableRowView.propTypes = {
+  table: PropTypes.object.isRequired,
+  isHovered: PropTypes.bool,
+  depth: PropTypes.number,
+  parentOperation: PropTypes.oneOfType([
+    PropTypes.shape({ operationType: PropTypes.string }),
+    PropTypes.oneOf([null]),
+  ]),
+  dragRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.any }),
+  ]),
+  peekTable: PropTypes.func.isRequired,
+  hoverTable: PropTypes.func.isRequired,
+  unhoverTable: PropTypes.func.isRequired,
+  setTableSelection: PropTypes.func.isRequired,
+  removeTableFromSchema: PropTypes.func.isRequired,
+  renameTable: PropTypes.func.isRequired,
+  dropTable: PropTypes.func.isRequired,
+  isInSchema: PropTypes.bool,
+  isSelected: PropTypes.bool,
+  isDisabled: PropTypes.bool,
+  searchString: PropTypes.string,
+  headers: PropTypes.arrayOf(
+    PropTypes.shape({
+      attr: PropTypes.string.isRequired,
+      attrType: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+};
 
 const EnhancedTableRowView = withTableData(TableRowView);
 export default EnhancedTableRowView;

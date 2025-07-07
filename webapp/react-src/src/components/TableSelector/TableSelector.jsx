@@ -23,7 +23,10 @@ import {
   styled,
   TextField,
 } from "@mui/material";
-import { selectAllTablesData } from "../../slices/tablesSlice";
+import {
+  selectAllTablesData,
+  clearSelectedTables,
+} from "../../slices/tablesSlice";
 import DuckDBFileUpload from "./DuckDBFileUpload";
 
 import "./SourceTables.scss";
@@ -100,6 +103,8 @@ export default function SourceTables() {
   const [selectedTableType, setSelectedTableType] = useState("");
   const [searchString, setSearchString] = useState("");
   const [tableSelection, setTableSelection] = useState([]);
+
+  const selectedTables = useSelector((state) => state.tables.selected);
 
   const { firstPaneWidth } = useSelector(({ ui }) => ui);
   const [layout, setLayout] = useState(tableLayout);
@@ -179,14 +184,16 @@ export default function SourceTables() {
             disabled={
               searchString === "" &&
               selectedTableType.length === 0 &&
-              tableSelection.length === 0
+              selectedTables.length === 0
             }
             fullWidth
             sx={{ height: "100%" }}
             onClick={() => {
               setSearchString("");
               setSelectedTableType("");
-              dispatch(setTableSelection([]));
+              // TODO: clear table selection
+              dispatch(clearSelectedTables());
+              // dispatch(setTableSelection([]));
             }}
           >
             Clear
@@ -218,8 +225,6 @@ export default function SourceTables() {
         <TableLayout
           searchString={searchString}
           tables={filteredTables}
-          tableSelection={tableSelection}
-          setTableSelection={setTableSelection}
           loading={isLoading}
           error={error}
         />
