@@ -1,6 +1,6 @@
 @use "sass:math";
 
-@import "../../../styles/variables.scss";
+@use "../../../styles/variables.scss" as *;
 $horizontalGutterWidth: 10px;
 $enabledCellOutlineColor: #aaa;
 $table-border-style: solid;
