@@ -109,7 +109,7 @@ function TableRowView({
     isDisabled ? "disabled" : "",
     isHovered ? "hovered" : "",
     parentOperation ? parentOperation.operationType : "",
-    depth ? `depth-${depth}` : "",
+    depth !== undefined ? `depth-${depth}` : "",
   ].filter(Boolean);
 
   return (
