@@ -22,14 +22,6 @@ export default function withOperationData(WrappedComponent) {
     const depth = useSelector((state) => selectOperationDepth(state, id));
     const focusedOperationId = useSelector(selectFocusedOperationId);
     const hoveredOperationId = useSelector(selectHoveredOperation);
-    const tables = useSelector((state) =>
-      operation.children
-        .filter(isTableId)
-        .map((tableId) => selectTablesById(state, tableId))
-    );
-    const tableColumnCounts = useSelector((state) =>
-      tables.map(({ id }) => state.columns.idsByTable[id].length)
-    );
 
     return (
       <WrappedComponent
@@ -37,12 +29,12 @@ export default function withOperationData(WrappedComponent) {
         operation={operation}
         id={id}
         depth={depth}
-        columnCount={operation.columnCount}
-        rowCount={operation.rowCount}
-        isFocused={operation.id === focusedOperationId}
-        isHovered={operation.id === hoveredOperationId}
-        operationType={operation.operationType}
-        childrenIds={operation.children}
+        columnCount={operation?.columnCount}
+        rowCount={operation?.rowCount}
+        isFocused={operation?.id === focusedOperationId}
+        isHovered={operation?.id === hoveredOperationId}
+        operationType={operation?.operationType}
+        childrenIds={operation?.children || []}
         onHover={() => dispatch(setHoveredOperation(id))}
         onUnhover={() => dispatch(setHoveredOperation(null))}
         peekTable={() => dispatch(setPeekedTable(id))}

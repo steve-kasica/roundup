@@ -23,6 +23,7 @@ import OperationView from "./OperationView";
 import ExportCompositeTable from "../ExportCompositeTable/ExportCompositeTable";
 import { useState } from "react";
 import Button from "@mui/material/Button";
+import { ExportButton } from "../ExportCompositeTable/ExportButton";
 
 const gridColumns = 12;
 const gridWidth = gridColumns - 2;
@@ -49,6 +50,7 @@ export default function CompositeTableSchema() {
     <div className="CompositeTableSchema">
       <Button
         variant="outlined"
+        disabled={rootOperationId === null}
         sx={{ mb: 2 }}
         onClick={() => setExportOpen(true)}
         data-testid="export-table-btn"
@@ -57,6 +59,7 @@ export default function CompositeTableSchema() {
       </Button>
       <ExportCompositeTable
         open={exportOpen}
+        id={rootOperationId}
         onClose={() => setExportOpen(false)}
         onExport={handleExport}
         tableName={tableName}

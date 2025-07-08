@@ -14,6 +14,9 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { ExportButton } from "./ExportButton";
+import { useSelector } from "react-redux";
+import withOperationData from "../HOC/withOperationData";
 
 /**
  * ExportCompositeTable
@@ -24,25 +27,17 @@ import CloseIcon from "@mui/icons-material/Close";
  *   onExport: function - called with export options when export is confirmed
  *   tableName: string - name of the table to export
  */
-export default function ExportCompositeTable({
-  open,
-  onClose,
-  onExport,
-  tableName,
-}) {
+
+function ExportCompositeTable({ operation, open, onClose }) {
   const [format, setFormat] = useState("csv");
   const [includeHeaders, setIncludeHeaders] = useState(true);
-  const [fileName, setFileName] = useState(
-    tableName ? `${tableName}.csv` : "export.csv"
+  const [exportName, setExportName] = useState(
+    `${operation?.name || "export"}.${format}`
   );
 
-  useEffect(() => {
-    if (tableName) setFileName(`${tableName}.${format}`);
-  }, [tableName, format]);
-
-  const handleExport = () => {
-    onExport && onExport({ format, includeHeaders, fileName });
-  };
+  // const handleExport = () => {
+  //   onExport && onExport({ format, includeHeaders, fileName });
+  // };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
@@ -60,13 +55,21 @@ export default function ExportCompositeTable({
       </DialogTitle>
       <DialogContent>
         <Typography gutterBottom>
-          Export <b>{tableName || "table"}</b> as:
+          Export as{" "}
+          <b>
+            {exportName || `table`}.{format.toLowerCase()}
+          </b>
+          :
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             label="File Name"
-            value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
+            value={exportName}
+            onChange={(e) =>
+              setExportName(
+                e.target.value.replace(/\.[^/.]+$/, "").toLowerCase()
+              )
+            }
             fullWidth
             size="small"
             sx={{ mb: 1 }}
@@ -81,7 +84,6 @@ export default function ExportCompositeTable({
             size="small"
           >
             <option value="csv">CSV</option>
-            <option value="json">JSON</option>
           </TextField>
           <FormControlLabel
             control={
@@ -97,9 +99,12 @@ export default function ExportCompositeTable({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleExport} variant="contained" color="primary">
-          Export
-        </Button>
+        <ExportButton
+          operationId={operation?.id}
+          exportName={exportName}
+          format={format}
+          includeHeaders={includeHeaders}
+        />
       </DialogActions>
     </Dialog>
   );
@@ -111,3 +116,6 @@ ExportCompositeTable.propTypes = {
   onExport: PropTypes.func,
   tableName: PropTypes.string,
 };
+
+const EnhancedExportCompositeTable = withOperationData(ExportCompositeTable);
+export default EnhancedExportCompositeTable;
