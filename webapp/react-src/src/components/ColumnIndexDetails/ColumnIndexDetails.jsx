@@ -4,6 +4,7 @@ import { Box, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import TableView from "./TableView";
 import SimilaritySummary from "./SimilaritySummary";
+import { extent } from "d3-array";
 
 export const COMPONENT_ID = "./ColumnIndexDetails";
 
@@ -16,6 +17,7 @@ function ColumnIndexDetails({
   tableIds,
   uniqueValues,
   valueDegrees, // degrees of each value
+  signature, // signature of each value
   error,
   loading,
   columnIds,
@@ -79,6 +81,18 @@ function ColumnIndexDetails({
       });
     }
   };
+
+  const signatureExtent = signature.map((sig) =>
+    extent(
+      sig
+        .split("")
+        .map((v, i) => [Number(v), i])
+        .filter(([b]) => b)
+        .map(([b, i]) => i)
+    )
+  );
+
+  console.log("Signature extent:", signatureExtent);
 
   return (
     <Box
@@ -279,15 +293,38 @@ function ColumnIndexDetails({
               >
                 {uniqueValues[i]}
               </Box>
-              {row.map((count, colIndex) => (
+              {row.map((count, j) => (
                 <Box
-                  key={colIndex}
+                  key={j}
                   sx={{
                     width: colWidth,
                     padding: "4px",
                     textAlign: "center",
-                    borderLeft: "1px solid #eee",
+                    borderLeft: "none",
                     boxSizing: "border-box",
+                    position: "relative",
+                    "&::after":
+                      valueDegrees[i] > 1
+                        ? {
+                            content: '""',
+                            position: "absolute",
+                            top: "45%",
+                            left:
+                              j > signatureExtent[i][0] &&
+                              j <= signatureExtent[i][1]
+                                ? "0"
+                                : "50%",
+                            right:
+                              j >= signatureExtent[i][0] &&
+                              j < signatureExtent[i][1]
+                                ? "0"
+                                : "50%",
+                            height: "2px",
+                            backgroundColor: "black",
+                            // transform: "translateY(-50%)",
+                            zIndex: 1,
+                          }
+                        : {},
                   }}
                 >
                   <CircleMark isFilled={count > 0} />
@@ -306,10 +343,9 @@ function CircleMark({ isFilled }) {
     <Box
       sx={{
         borderRadius: "50%",
-        width: "12px",
-        height: "12px",
-        backgroundColor: isFilled ? "black" : "transparent",
-        border: "1px solid black",
+        width: "13px",
+        height: "13px",
+        backgroundColor: isFilled ? "black" : "#ddd",
         display: "inline-block",
         margin: "0 auto",
       }}
