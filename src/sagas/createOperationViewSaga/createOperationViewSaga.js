@@ -1,15 +1,16 @@
 import { createAction } from "@reduxjs/toolkit";
 import { takeEvery, call, put, select } from "redux-saga/effects";
 import {
+  clearOperationError,
   selectOperation,
   setOperationAttributes,
+  setOperationError,
 } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { addTableToSchemaSuccess } from "../addTableToSchemaSaga/addTableToSchemaSaga";
-import { createStackView } from "../../lib/duckdb/createStackView";
 import { selectColumnById } from "../../slices/columnsSlice";
 import { removeColumnsSuccessAction } from "../removeColumnsSaga";
-import { getTableDimensions } from "../../lib/duckdb";
+import { getTableDimensions, createStackView } from "../../lib/duckdb";
 
 // Actions
 export const createOperationView = createAction(
@@ -40,19 +41,40 @@ export default function* createOperationViewSaga() {
 }
 
 // Worker Saga
-// TODO: catch errors and handle them gracefully
 function* handleCreateOperationView(operationId) {
-  const queryData = yield select((state) =>
-    selectQueryData(state, operationId)
-  );
+  try {
+    const operation = yield select((state) =>
+      selectOperation(state, operationId)
+    );
+    const queryData = yield select((state) =>
+      selectQueryData(state, operationId)
+    );
 
-  // createStackView execute a view creation/update query
-  yield call(createStackView, queryData);
-  const dimensions = yield call(getTableDimensions, operationId);
+    // createStackView execute a view creation/update query
+    yield call(createStackView, queryData);
+    const dimensions = yield call(getTableDimensions, operationId);
 
-  yield put(
-    setOperationAttributes({ id: operationId, attributes: dimensions })
-  );
+    yield put(
+      setOperationAttributes({ id: operationId, attributes: dimensions })
+    );
+
+    if (operation.error) {
+      // Clear any previous error if the operation was successful
+      yield put(clearOperationError({ operationId }));
+    }
+  } catch (error) {
+    console.error("Error creating operation view:", error);
+    if (error.message.includes("Binder Error")) {
+      yield put(
+        setOperationError({
+          operationId,
+          error: JSON.stringify(error, Object.getOwnPropertyNames(error)), // Serialize the error
+        })
+      );
+    } else {
+      throw error; // Re-throw for global error handling
+    }
+  }
 }
 
 // TODO: this would be like a serialize operation query selector in the operations slice

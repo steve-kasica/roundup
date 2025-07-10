@@ -5,6 +5,8 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Tooltip,
+  styled,
 } from "@mui/material";
 import { setFocusedOperation } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
@@ -15,7 +17,17 @@ import React from "react";
 
 export const LAYOUT_ID = "operationListItem";
 
-function OperationListItemView({ operation, childrenIds, index, peekTable }) {
+const StyledListItem = styled(ListItem)(({ theme, hasError }) => ({
+  ...(hasError && {
+    backgroundColor: theme.palette.error.main,
+    borderLeft: `4px solid ${theme.palette.error.dark}`,
+    "& .MuiListItemText-primary, .MuiListItemText-secondary": {
+      color: theme.palette.error.contrastText,
+    },
+  }),
+}));
+
+function OperationView({ operation, childrenIds, index, peekTable }) {
   const { id, name, columnCount, operationType } = operation;
   const dispatch = useDispatch();
 
@@ -33,8 +45,25 @@ function OperationListItemView({ operation, childrenIds, index, peekTable }) {
     setAnchorEl(null);
   };
 
-  return (
-    <ListItem
+  // Parse error message if it's a JSON string
+  const getErrorMessage = () => {
+    if (!operation.error) return "";
+
+    if (typeof operation.error === "string") {
+      try {
+        const parsedError = JSON.parse(operation.error);
+        return parsedError.message || operation.error;
+      } catch {
+        return operation.error;
+      }
+    }
+
+    return operation.error.message || "An error occurred";
+  };
+
+  const listItemContent = (
+    <StyledListItem
+      hasError={Boolean(operation.error)}
       secondaryAction={
         <>
           <IconButton edge="end" aria-label="menu" onClick={handleMenuOpen}>
@@ -68,22 +97,32 @@ function OperationListItemView({ operation, childrenIds, index, peekTable }) {
           secondary={`${label}: ${childrenIds.join(", ")}`}
         />
       </ListItemButton>
-    </ListItem>
+    </StyledListItem>
+  );
+
+  return operation.error ? (
+    <Tooltip title={getErrorMessage()} arrow placement="right">
+      {listItemContent}
+    </Tooltip>
+  ) : (
+    listItemContent
   );
 }
 
-OperationListItemView.propTypes = {
+OperationView.propTypes = {
   operation: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     name: PropTypes.string.isRequired,
     columnCount: PropTypes.number,
     operationType: PropTypes.string.isRequired,
+    error: PropTypes.oneOfType([PropTypes.object, PropTypes.string, PropTypes.bool]),
   }).isRequired,
   childrenIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
   index: PropTypes.number.isRequired,
+  peekTable: PropTypes.func.isRequired,
 };
 
-const EnhancedOperationListItemView = withOperationData(OperationListItemView);
-export default EnhancedOperationListItemView;
+const EnhancedOperationView = withOperationData(OperationView);
+export default EnhancedOperationView;

@@ -13,14 +13,23 @@ import withOperationData from "../HOC/withOperationData";
 import { isOperationId } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
 import PropTypes from "prop-types";
+import { Box, Tooltip, styled } from "@mui/material";
+
+// TODO: when addressing this layout, consider using
+// styled components, but module SCSS will overwrite
+const StyledBox = styled(Box)(({ theme, hasError }) => ({
+  ...(hasError && {
+    backgroundColor: theme.palette.error.main,
+    borderLeft: `4px solid ${theme.palette.error.dark}`,
+  }),
+}));
 
 function OperationView({
   // props via withOperationData
+  operation,
   depth,
-  columnCount,
   isFocused,
   isHovered,
-  operationType,
   childrenIds,
 
   // Props passed recusrively via parent operation
@@ -31,23 +40,43 @@ function OperationView({
 
   const className = [
     "operation",
-    operationType,
+    operation.operationType || "no-op",
     `depth-${depth}`,
     isFocused ? "focused" : "",
     isHovered ? "hover" : "",
+    operation.error ? "error" : "",
   ].filter(Boolean);
 
-  return (
-    <div
+  // Parse error message if it's a JSON string
+  const getErrorMessage = () => {
+    if (!operation.error) return "";
+
+    if (typeof operation.error === "string") {
+      try {
+        const parsedError = JSON.parse(operation.error);
+        return parsedError.message || operation.error;
+      } catch {
+        return operation.error;
+      }
+    }
+
+    return operation.error.message || "An error occurred";
+  };
+
+  const operationContent = (
+    <StyledBox
+      hasError={Boolean(operation.error)}
       className={className.join(" ")}
-      style={{ flexBasis: `${(columnCount / parentColumnCount) * 100}%` }}
+      sx={{
+        flexBasis: `${(operation.columnCount / parentColumnCount) * 100}%`,
+      }}
     >
       {childOperationIds.length > 0
         ? childOperationIds.map((childOperationId) => (
             <EnhancedOperationView
               key={childOperationId}
               id={childOperationId}
-              parentColumnCount={columnCount}
+              parentColumnCount={operation.columnCount}
             />
           ))
         : null}
@@ -57,24 +86,42 @@ function OperationView({
               key={tableId}
               id={tableId}
               isDraggable={false}
-              parentOperationType={operationType}
-              parentColumnCount={columnCount}
+              parentOperationType={operation.operationType}
+              parentColumnCount={operation.columnCount}
             />
           ))
         : null}
-    </div>
+    </StyledBox>
+  );
+
+  return operation.error ? (
+    <Tooltip title={getErrorMessage()} arrow placement="top">
+      {operationContent}
+    </Tooltip>
+  ) : (
+    operationContent
   );
 }
 
 OperationView.propTypes = {
+  // Props via withOperationData HOC
+  operation: PropTypes.shape({
+    operationType: PropTypes.string,
+    columnCount: PropTypes.number,
+    error: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.string,
+      PropTypes.bool,
+    ]),
+  }).isRequired,
   depth: PropTypes.number,
-  columnCount: PropTypes.number,
   isFocused: PropTypes.bool,
   isHovered: PropTypes.bool,
-  operationType: PropTypes.string.isRequired,
   childrenIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
+
+  // Props passed recursively via parent operation
   parentColumnCount: PropTypes.number,
 };
 

@@ -89,9 +89,24 @@ const operationsSlice = createSlice({
       operation.operationType = operationType;
     },
 
+    setOperationError(state, action) {
+      const { operationId, error } = action.payload;
+      const operation = selectOperation({ operations: state }, operationId);
+      operation.error = error;
+    },
+
+    clearOperationError(state, action) {
+      const { operationId } = action.payload;
+      const operation = selectOperation({ operations: state }, operationId);
+      if (!operation) {
+        throw new Error(`Operation with ID ${operationId} does not exist`);
+      }
+      operation.error = null;
+    },
+
     setOperationAttributes(state, action) {
       const { id, attributes } = action.payload;
-      const operation = state.data[id];
+      const operation = selectOperation({ operations: state }, id);
 
       if (!operation) {
         throw new Error(`Operation with ID ${id} does not exist`);
@@ -184,6 +199,8 @@ export const {
   removeChildFromOperation,
   setFocusedOperation,
   setHoveredOperation,
+  setOperationError,
+  clearOperationError,
 } = operationsSlice.actions;
 
 export default operationsSlice.reducer;

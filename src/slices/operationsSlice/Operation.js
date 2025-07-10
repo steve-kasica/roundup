@@ -31,6 +31,7 @@ export default function Operation(operationType, children) {
     columnCount: null,
     operationType,
     children,
+    error: null, // Error state for the operation
   };
 }
 
@@ -41,6 +42,7 @@ const attributes = [
   "children",
   "rowCount",
   "columnCount",
+  "error",
 ];
 
 export const isOperation = (obj) =>
