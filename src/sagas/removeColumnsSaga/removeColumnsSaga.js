@@ -23,12 +23,14 @@ export default function* removeColumnsSaga() {
 
 export function* removeColumnsSagaWorker(action) {
   let columnIds = action.payload;
+  console.log(`Removing columns with IDs: ${columnIds.join(", ")}`);
 
   yield put(addColumnsToLoading(columnIds));
 
   // Remove from selected columns from all attributes
   // of the columns slice, including loading array
   yield put(removeColumns(columnIds));
+  console.log(`Removing columns with IDs: ${columnIds.join(", ")}`);
 
   yield put(removeColumnsSuccessAction(action.payload));
 }

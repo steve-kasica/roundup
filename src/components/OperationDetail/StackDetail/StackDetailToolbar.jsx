@@ -19,7 +19,6 @@ export default function StackDetailToolbar({
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const selectedColumnIds = useSelector(selectSelectedColumns);
-  console.log("selectedColumnIds", selectedColumnIds);
 
   const handleMenuClose = () => {
     setAnchorEl(null);

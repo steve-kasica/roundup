@@ -28,7 +28,7 @@ export default function* createOperationViewSaga() {
 
   // After columns are removed, update the operation view if the table has one
   yield takeEvery(removeColumnsSuccessAction.type, function* (action) {
-    const { columnIds } = action.payload;
+    const columnIds = action.payload;
     const table = yield select((state) => {
       const column = selectColumnById(state, columnIds[0]);
       return selectTablesById(state, column.tableId);
@@ -65,6 +65,12 @@ function* handleCreateOperationView(operationId) {
   } catch (error) {
     console.error("Error creating operation view:", error);
     if (error.message.includes("Binder Error")) {
+      // const issue = GenericIssue(
+      //   error.message,
+      //   [operationId],
+      //   createOperationView.type,
+      //   [removeColumnsSuccessAction.type]
+      // );
       yield put(
         setOperationError({
           operationId,
