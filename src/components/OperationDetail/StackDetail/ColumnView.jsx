@@ -62,10 +62,10 @@ function ColumnView({
   const inputRef = useRef(null);
 
   // Debounce input when modifying column attributes in the DOM
-  const [value, setValue] = useState(column.name);
+  const [value, setValue] = useState(column?.name);
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (column.name !== value) {
+      if (column?.name !== value) {
         renameColumn(value);
       }
     }, delay);
@@ -74,7 +74,7 @@ function ColumnView({
 
   const menuItems = [
     {
-      label: `Remove ${column.name}`,
+      label: `Remove ${column?.name}`,
       disabled: isNull,
       onClick: () => {
         removeColumn();
@@ -114,7 +114,7 @@ function ColumnView({
   const className = [
     "cell",
     isLoading ? "loading" : undefined,
-    isNull ? "null" : `type-${column.columnType}`,
+    isNull ? "null" : `type-${column?.columnType}`,
     isSelected ? "selected" : undefined,
     isHovered ? "hover" : undefined,
     isDragging ? "dragged" : undefined,
@@ -137,10 +137,10 @@ function ColumnView({
         dragRef(node);
         dropRef(node);
       }}
-      data-table-id={column.tableId}
-      data-column-index={column.index}
+      data-table-id={column?.tableId}
+      data-column-index={column?.index}
       onClick={(event) =>
-        !isPopoverOpen ? onCellClick(event, column.id) : null
+        !isPopoverOpen ? onCellClick(event, column?.id) : null
       }
       onContextMenu={(event) => {
         event.preventDefault();
