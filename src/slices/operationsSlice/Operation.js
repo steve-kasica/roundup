@@ -14,6 +14,13 @@ const validOperationTypes = [
   OPERATION_TYPE_NO_OP,
 ];
 
+export const JOIN_TYPES = { INNER: "INNER", LEFT: "LEFT", RIGHT: "RIGHT" };
+export const JOIN_SPEC_SCHEMA = {
+  joinType: JOIN_TYPES.INNER,
+  joinKey1: null,
+  joinKey2: null,
+};
+
 let idCounter = 0; // each node gets a unique ID, regardless if it's a table vs operation node
 
 export default function Operation(operationType, children) {
@@ -32,6 +39,13 @@ export default function Operation(operationType, children) {
     operationType,
     children,
     error: null, // Error state for the operation
+
+    // TODO: should there be different factors for stack and pack operations
+    // since they have similar but different schema?
+    // Maybe they can "inherit" from a generic operation factory
+    // It's like inheritance in functional programming.
+    joinSpec:
+      operationType === OPERATION_TYPE_PACK ? JOIN_SPEC_SCHEMA : undefined,
   };
 }
 

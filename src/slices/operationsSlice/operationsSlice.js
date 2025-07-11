@@ -1,5 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { isOperationId } from "./Operation";
+import {
+  isOperationId,
+  JOIN_SPEC_SCHEMA,
+  OPERATION_TYPE_PACK,
+} from "./Operation";
 import { selectOperation, selectParentOperation } from "./operationsSelectors";
 
 const initialState = {
@@ -87,6 +91,9 @@ const operationsSlice = createSlice({
       const { operationId, operationType } = action.payload;
       const operation = selectOperation({ operations: state }, operationId);
       operation.operationType = operationType;
+      if (operationType === OPERATION_TYPE_PACK) {
+        operation.joinSpec = JOIN_SPEC_SCHEMA; // only PACK operations have a joinSpec schema
+      }
     },
 
     setOperationError(state, action) {
@@ -102,6 +109,12 @@ const operationsSlice = createSlice({
         throw new Error(`Operation with ID ${operationId} does not exist`);
       }
       operation.error = null;
+    },
+
+    updateOperationJoinSpec(state, action) {
+      const { id, attributes } = action.payload;
+      const operation = selectOperation({ operations: state }, id);
+      operation.joinSpec = { ...operation.joinSpec, ...attributes };
     },
 
     setOperationAttributes(state, action) {
@@ -196,6 +209,7 @@ export const {
   setOperationAttributes,
   changeOperationType,
   addChildToOperation,
+  updateOperationJoinSpec,
   removeChildFromOperation,
   setFocusedOperation,
   setHoveredOperation,

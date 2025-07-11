@@ -6,7 +6,7 @@ import {
   OPERATION_TYPE_STACK,
   selectFocusedOperationId,
 } from "../../slices/operationsSlice";
-import PackDetailView from "./PackDetailView";
+import PackDetailView from "./PackDetail";
 import withOperationData from "../HOC/withOperationData";
 import PropTypes from "prop-types";
 

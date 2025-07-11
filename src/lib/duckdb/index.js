@@ -7,3 +7,5 @@ export * from "./summarizeTable";
 export * from "./createTables";
 export * from "./registerFiles";
 export * from "./renameColumns";
+export * from "./createPackView";
+export * from "./getValueCounts";

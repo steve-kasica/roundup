@@ -2,15 +2,22 @@ import { createAction } from "@reduxjs/toolkit";
 import { takeEvery, call, put, select } from "redux-saga/effects";
 import {
   clearOperationError,
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
   selectOperation,
   setOperationAttributes,
   setOperationError,
+  updateOperationJoinSpec,
 } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { addTableToSchemaSuccess } from "../addTableToSchemaSaga/addTableToSchemaSaga";
 import { selectColumnById } from "../../slices/columnsSlice";
 import { removeColumnsSuccessAction } from "../removeColumnsSaga";
-import { getTableDimensions, createStackView } from "../../lib/duckdb";
+import {
+  getTableDimensions,
+  createStackView,
+  createPackView,
+} from "../../lib/duckdb";
 
 // Actions
 export const createOperationView = createAction(
@@ -38,6 +45,13 @@ export default function* createOperationViewSaga() {
       yield handleCreateOperationView(table.operationId);
     }
   });
+
+  // If the specification of an PACK operation is updated, create or update the operation view
+  // in DuckDB
+  yield takeEvery(updateOperationJoinSpec.type, function* (action) {
+    const { id } = action.payload;
+    yield handleCreateOperationView(id);
+  });
 }
 
 // Worker Saga
@@ -51,8 +65,25 @@ function* handleCreateOperationView(operationId) {
     );
 
     // createStackView execute a view creation/update query
-    yield call(createStackView, queryData);
+    if (operation.operationType === OPERATION_TYPE_PACK) {
+      yield call(createPackView, queryData);
+    } else {
+      // includes stack and NO_OP
+      // TODO: why does it do NO_OP and how does it not break?
+      yield call(createStackView, queryData);
+    }
+
     const dimensions = yield call(getTableDimensions, operationId);
+
+    if (dimensions.rowCount === 0) {
+      throw new Error(
+        `Operation ${operationId} has no rows. Please check the operation query.`
+      );
+    } else if (dimensions.columnCount === 0) {
+      throw new Error(
+        `Operation ${operationId} has no columns. Please check the operation query.`
+      );
+    }
 
     yield put(
       setOperationAttributes({ id: operationId, attributes: dimensions })
@@ -64,40 +95,24 @@ function* handleCreateOperationView(operationId) {
     }
   } catch (error) {
     console.error("Error creating operation view:", error);
-    if (error.message.includes("Binder Error")) {
-      // const issue = GenericIssue(
-      //   error.message,
-      //   [operationId],
-      //   createOperationView.type,
-      //   [removeColumnsSuccessAction.type]
-      // );
-      yield put(
-        setOperationError({
-          operationId,
-          error: JSON.stringify(error, Object.getOwnPropertyNames(error)), // Serialize the error
-        })
-      );
-    } else {
-      throw error; // Re-throw for global error handling
-    }
+    yield put(
+      setOperationError({
+        operationId,
+        error: JSON.stringify(error, Object.getOwnPropertyNames(error)), // Serialize the error
+      })
+    );
   }
 }
 
 // TODO: this would be like a serialize operation query selector in the operations slice
 const selectQueryData = (state, operationId) => {
-  const parent = { id: null, children: [] };
-
   const operation = selectOperation(state, operationId);
-  parent.id = operation.id;
+  const parent = { ...operation };
   parent.children = operation.children.map((id) => {
-    let child = { tableName: null, columnIds: [] };
+    let child = { id, columnIds: [] };
     if (isTableId(id)) {
-      const table = selectTablesById(state, id);
-      child.id = table.id;
       child.columnIds = state.columns.idsByTable[id];
     } else {
-      const operation = selectOperation(state, id);
-      child.id = operation.id;
       child.columnIds = ["*"];
     }
     return child;
