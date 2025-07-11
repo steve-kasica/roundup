@@ -14,9 +14,22 @@ const validOperationTypes = [
   OPERATION_TYPE_NO_OP,
 ];
 
-export const JOIN_TYPES = { INNER: "INNER", LEFT: "LEFT", RIGHT: "RIGHT" };
+export const JOIN_TYPES = {
+  INNER: "INNER",
+  LEFT: "LEFT",
+  RIGHT: "RIGHT",
+};
+
+export const JOIN_PREDICATES = {
+  EQUALS: "EQUALS",
+  CONTAINS: "CONTAINS",
+  STARTS_WITH: "STARTS_WITH",
+  ENDS_WITH: "ENDS_WITH",
+};
+
 export const JOIN_SPEC_SCHEMA = {
   joinType: JOIN_TYPES.INNER,
+  joinPredicate: JOIN_PREDICATES.EQUALS,
   joinKey1: null,
   joinKey2: null,
 };

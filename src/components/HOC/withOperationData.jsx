@@ -64,6 +64,14 @@ export default function withOperationData(WrappedComponent) {
             })
           );
         }}
+        setJoinPredicate={(joinPredicate) => {
+          dispatch(
+            updateOperationJoinSpec({
+              id,
+              attributes: { joinPredicate },
+            })
+          );
+        }}
       />
     );
   };
