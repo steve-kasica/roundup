@@ -64,7 +64,8 @@ export function ExportButton({
 }
 
 ExportButton.propTypes = {
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string,
+  exportName: PropTypes.string.isRequired,
+  operationId: PropTypes.string,
   format: PropTypes.string.isRequired,
+  includeHeaders: PropTypes.bool,
 };
