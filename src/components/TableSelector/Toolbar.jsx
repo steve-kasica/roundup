@@ -104,7 +104,11 @@ export default function Toolbar({
           }}
         >
           <StyledToggleButtonGroup size="small">
-            <ToggleButton onClick={onSelectAll} aria-label="select all">
+            <ToggleButton
+              onClick={onSelectAll}
+              aria-label="select all"
+              value="select-all"
+            >
               <Tooltip title="Select all">
                 <SelectAllIcon />
               </Tooltip>
@@ -114,6 +118,7 @@ export default function Toolbar({
               disabled={selectedTables.length === 0}
               onClick={onDeleteAll}
               aria-label="delete all"
+              value="delete-all"
             >
               <Tooltip title="Delete all">
                 <DeleteIcon />
@@ -127,6 +132,7 @@ export default function Toolbar({
                   onClick={onClearSelection}
                   disabled={selectedTables.length === 0}
                   aria-label="clear selection"
+                  value="clear-selection"
                 >
                   <ClearIcon />
                 </ToggleButton>
@@ -138,6 +144,7 @@ export default function Toolbar({
                 document.getElementById("file-upload-input")?.click()
               }
               aria-label="file upload"
+              value="file-upload"
             >
               <Tooltip title="Upload more files">
                 <UploadIcon />
