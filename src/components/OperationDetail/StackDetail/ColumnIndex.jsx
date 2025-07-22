@@ -1,4 +1,12 @@
-import { Box, IconButton, List, ListItemButton, Popover } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Input,
+  List,
+  ListItemButton,
+  OutlinedInput,
+  Popover,
+} from "@mui/material";
 import { useState, useEffect } from "react";
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
 import { useRef } from "react";
@@ -8,8 +16,11 @@ import withColumnVectorData from "../../HOC/withColumnVectorData";
 import PropTypes from "prop-types";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
+import TextField from "@mui/material/TextField";
 
 export const COLUMN_INDEX = "COLUMN_INDEX";
+
+export const WIDTH = 12; // in ch
 
 function ColumnIndex({
   index,
@@ -25,16 +36,41 @@ function ColumnIndex({
   undragColumnVector,
   swapColumnVectors,
 }) {
-  const index1 = index + 1;
+  const [indexValue, setIndexValue] = useState(index + 1);
+
+  // Update state when index prop changes
+  useEffect(() => {
+    setIndexValue(index + 1);
+  }, [index]);
 
   // UI state and refs
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isMenuIconVisable, setIsMenuIconVisible] = useState(false);
+  const [isHeaderEditable, setIsHeaderEditable] = useState(false); // Add this state back
 
   const formRef = useRef(null);
+  const inputRef = useRef(null); // Add this ref for the Input
+
+  // Add useEffect to handle focus when isHeaderEditable changes
+  useEffect(() => {
+    if (isHeaderEditable && inputRef.current) {
+      // For MUI Input, we need to focus the actual input element
+      const inputElement =
+        inputRef.current.querySelector("input") || inputRef.current;
+      inputElement.focus();
+      inputElement.select();
+    }
+  }, [isHeaderEditable]);
 
   const menuItems = [
+    {
+      label: "Rename column",
+      action: () => {
+        setIsHeaderEditable(true);
+        setIsMenuIconVisible(false);
+      },
+    },
     {
       label: "Select columns at index",
       action: () => onColumnClick({ shiftKey: false }, index),
@@ -94,7 +130,6 @@ function ColumnIndex({
     previewRef(getEmptyImage(), { captureDraggingState: true });
   }, []);
 
-  const defaultFormWidth = 10;
   const headerRef = useRef(null);
   const className = [
     "ColumnIndex",
@@ -109,9 +144,9 @@ function ColumnIndex({
       data-columnids={columnIds.join(",")}
       style={{
         width:
-          hasSelected & (maxColumnNameLength > defaultFormWidth)
+          hasSelected & (maxColumnNameLength > WIDTH)
             ? `${maxColumnNameLength + 5}ch`
-            : `${defaultFormWidth}ch`,
+            : `${WIDTH}ch`,
         transition: "width 0.3s ease-in-out",
       }}
     >
@@ -136,29 +171,53 @@ function ColumnIndex({
         }}
       >
         <div ref={headerRef}>
-          <label>{index1}</label>
-          <IconButton
-            size="small"
-            sx={{
-              position: "absolute",
-              right: 0,
-              padding: 0,
-              top: 4,
-              opacity: isMenuIconVisable ? 1 : 0,
+          <Input
+            ref={inputRef}
+            value={indexValue}
+            readOnly={!isHeaderEditable}
+            onChange={(e) => setIndexValue(e.target.value)}
+            onBlur={() => setIsHeaderEditable(false)}
+            endAdornment={
+              isMenuIconVisable && (
+                <IconButton
+                  size="small"
+                  sx={{ position: "absolute", right: 0 }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setMenuAnchorEl(event.currentTarget);
+                    fetchColumnValues();
+                  }}
+                >
+                  <ChevronDownIcon />
+                </IconButton>
+              )
+            }
+            fullWidth
+            margin="dense"
+            slotProps={{
+              input: {
+                sx: {
+                  color: "#555",
+                  fontFamily: "sans-serif",
+                  fontSize: "0.875rem",
+                  fontWeight: "500",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  width: `${indexValue.length + 4}ch`,
+                },
+              },
             }}
-            onClick={(event) => {
-              // Prevent paraent onClick event from firing (column selection)
-              event.stopPropagation();
-
-              // Open the menu on icon button click
-              setMenuAnchorEl(event.currentTarget);
-
-              // Dispatch request for column values
-              fetchColumnValues();
-            }}
-          >
-            <ChevronDownIcon />
-          </IconButton>
+            // sx={{
+            //   textAlign: "center",
+            //   "& input": {
+            //     textAlign: "center",
+            //   },
+            // }}
+            type="text"
+          />
         </div>
         <Popover
           open={isMenuOpen}

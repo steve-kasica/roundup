@@ -9,3 +9,4 @@ export * from "./registerFiles";
 export * from "./renameColumns";
 export * from "./createPackView";
 export * from "./getValueCounts";
+export * from "./getColumnNames";

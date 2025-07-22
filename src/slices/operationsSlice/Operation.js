@@ -49,6 +49,7 @@ export default function Operation(operationType, children) {
     name: id, // Name is the same as ID by default, can be changed later
     rowCount: null,
     columnCount: null,
+    columnNames: [], // Column names are not known at this point
     operationType,
     children,
     error: null, // Error state for the operation

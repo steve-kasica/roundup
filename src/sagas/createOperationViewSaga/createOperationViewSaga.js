@@ -17,6 +17,7 @@ import {
   getTableDimensions,
   createStackView,
   createPackView,
+  getColumnNames,
 } from "../../lib/duckdb";
 
 // Actions
@@ -85,8 +86,13 @@ function* handleCreateOperationView(operationId) {
       );
     }
 
+    // const columnNames = yield call(getColumnNames, operationId);
+
     yield put(
-      setOperationAttributes({ id: operationId, attributes: dimensions })
+      setOperationAttributes({
+        id: operationId,
+        attributes: { ...dimensions },
+      })
     );
 
     if (operation.error) {
