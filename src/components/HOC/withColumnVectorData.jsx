@@ -56,7 +56,9 @@ export default function withColumnVectorData(WrappedComponent) {
         compareVectorValues={() =>
           dispatch(setDrawerContents(COLUMN_INDEX_VALUES_COMPONENT))
         }
-        fetchColumnValues={() => dispatch(getValuesAction(columnIds))}
+        fetchColumnValues={() => {
+          dispatch(getValuesAction(columnIds.filter(Boolean)));
+        }}
         undragColumnVector={() =>
           dispatch(removeColumnsFromDragging(columnIds))
         }
