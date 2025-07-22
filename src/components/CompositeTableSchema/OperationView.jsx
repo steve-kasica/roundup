@@ -17,7 +17,9 @@ import { Box, Tooltip, styled } from "@mui/material";
 
 // TODO: when addressing this layout, consider using
 // styled components, but module SCSS will overwrite
-const StyledBox = styled(Box)(({ theme, hasError }) => ({
+const StyledBox = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "hasError",
+})(({ theme, hasError }) => ({
   ...(hasError && {
     backgroundColor: theme.palette.error.main,
     borderLeft: `4px solid ${theme.palette.error.dark}`,

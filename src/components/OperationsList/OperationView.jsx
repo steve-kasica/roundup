@@ -17,7 +17,9 @@ import React from "react";
 
 export const LAYOUT_ID = "operationListItem";
 
-const StyledListItem = styled(ListItem)(({ theme, hasError }) => ({
+const StyledListItem = styled(ListItem, {
+  shouldForwardProp: (prop) => prop !== "hasError",
+})(({ theme, hasError }) => ({
   ...(hasError && {
     backgroundColor: theme.palette.error.main,
     borderLeft: `4px solid ${theme.palette.error.dark}`,
@@ -115,7 +117,11 @@ OperationView.propTypes = {
     name: PropTypes.string.isRequired,
     columnCount: PropTypes.number,
     operationType: PropTypes.string.isRequired,
-    error: PropTypes.oneOfType([PropTypes.object, PropTypes.string, PropTypes.bool]),
+    error: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.string,
+      PropTypes.bool,
+    ]),
   }).isRequired,
   childrenIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])

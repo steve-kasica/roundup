@@ -1,9 +1,4 @@
-import {
-  CloudUpload,
-  InsertDriveFile,
-  Delete,
-  CheckCircle,
-} from "@mui/icons-material";
+import { CloudUpload } from "@mui/icons-material";
 import { useState } from "react";
 import PropTypes from "prop-types";
 import {
@@ -13,14 +8,11 @@ import {
   Box,
   LinearProgress,
   Alert,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  IconButton,
 } from "@mui/material";
 
-const FileUploadZone = styled(Paper)(({ theme, isDragActive, hasError }) => ({
+const FileUploadZone = styled(Paper, {
+  shouldForwardProp: (prop) => prop !== "isDragActive" && prop !== "hasError",
+})(({ theme, isDragActive, hasError }) => ({
   border: `2px dashed ${
     hasError
       ? theme.palette.error.main
