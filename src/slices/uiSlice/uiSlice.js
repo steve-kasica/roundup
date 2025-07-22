@@ -9,6 +9,7 @@ export const initialState = {
   selectedTables: [],
   hoveredTable: null,
   peekedTable: null,
+  showColumnIndexDetails: false,
 
   // Used to coordinate the visibility of columns
   // in Operations Detail with the Composite Table Schema
@@ -19,6 +20,14 @@ export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    setShowColumnIndexDetails(state, action) {
+      // action.payload should be a boolean
+      if (typeof action.payload !== "boolean") {
+        console.error("setShowColumnIndexDetails: payload must be a boolean");
+        return;
+      }
+      state.showColumnIndexDetails = action.payload;
+    },
     setDrawerContents(state, action) {
       state.drawerContents = action.payload;
     },
@@ -94,6 +103,7 @@ export const {
   addToOpsDetailVisableColumns,
   removeFromOpsDetailVisableColumns,
   clearOpsDetailVisableColumns,
+  setShowColumnIndexDetails,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

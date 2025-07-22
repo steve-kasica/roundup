@@ -11,7 +11,7 @@ import { createAction } from "@reduxjs/toolkit";
  * @function
  * @returns {Object} Redux action with type "sagas/removeColumn" and payload.
  */
-export const removeColumnsAction = createAction("sagas/removeColumn");
+export const removeColumnsAction = createAction("sagas/removeColumns");
 
 export const removeColumnsSuccessAction = createAction(
   "sagas/removeColumnSuccess"

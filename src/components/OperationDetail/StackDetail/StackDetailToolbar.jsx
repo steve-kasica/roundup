@@ -5,12 +5,14 @@ import { Box, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ClearIcon from "@mui/icons-material/Clear";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import CompareIcon from "@mui/icons-material/Compare";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearSelectedColumns,
   selectSelectedColumns,
 } from "../../../slices/columnsSlice";
 import { removeColumnsAction } from "../../../sagas/removeColumnsSaga";
+import { setShowColumnIndexDetails } from "../../../slices/uiSlice";
 
 export default function StackDetailToolbar({
   setSelectionAnchorCell,
@@ -25,6 +27,15 @@ export default function StackDetailToolbar({
   };
 
   const menuItems = [
+    {
+      label: "Compare column values",
+      icon: <CompareIcon />,
+      disabled: selectedColumnIds.length < 2,
+      action: () => {
+        dispatch(setShowColumnIndexDetails(true));
+        handleMenuClose();
+      },
+    },
     {
       label: "Remove selected columns",
       icon: <DeleteIcon />,
@@ -42,6 +53,7 @@ export default function StackDetailToolbar({
         setSelectionAnchorCell(null);
         setSelectionExtentCell(null);
         dispatch(clearSelectedColumns());
+        dispatch(setShowColumnIndexDetails(false));
         handleMenuClose();
       },
     },
