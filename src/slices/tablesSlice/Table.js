@@ -46,6 +46,7 @@ export function Table(
     columnCount, // deprecated, use `columnIds.length` instead
     originalColumnIds: new Array(columnCount).fill(null), // Placeholder for original column IDs
     columnIds: new Array(columnCount).fill(null), // Placeholder for column IDs
+    keyColumnId: null, // The column ID that is used as the key for this table
     rowCount,
     rowsExplored: 0, // TODO: remove this
     dateLastModified,
@@ -63,6 +64,7 @@ const attributes = [
   "columnCount",
   "originalColumnIds",
   "columnIds",
+  "keyColumnId",
   "rowCount",
   "rowsExplored",
   "dateLastModified",

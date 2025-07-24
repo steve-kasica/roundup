@@ -27,6 +27,7 @@ import { selectFirstSelectedColumn } from "../../slices/uiSlice";
 import { useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
+import { selectTablesById, setTablesAttribute } from "../../slices/tablesSlice";
 
 export default function withColumnData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
@@ -42,11 +43,15 @@ export default function withColumnData(WrappedComponent) {
     const selectedColumns = useSelector(selectSelectedColumns);
     const hoveredColumns = useSelector(selectHoveredColumns);
     const loadingColumns = useSelector(selectLoadingColumns);
+    const table = useSelector((state) =>
+      selectTablesById(state, column?.tableId)
+    );
 
     // Column interaction state properties
     const isSelected = !isNull && selectedColumns.includes(id);
     const isLoading = !isNull && loadingColumns.includes(id);
     const isHovered = !isNull && hoveredColumns.includes(id);
+    const isKey = !isNull && table?.keyColumnId === id;
 
     const name = column?.name;
     const tableId = column?.tableId;
@@ -121,6 +126,7 @@ export default function withColumnData(WrappedComponent) {
         isSelected={isSelected}
         isLoading={isLoading}
         isHovered={isHovered}
+        isKey={isKey}
         isDragging={isDragging}
         isOver={isOver}
         error={error}
@@ -167,6 +173,18 @@ export default function withColumnData(WrappedComponent) {
         nullColumn={() => {
           if (!isNull) {
             // TODO: implement logic to nullify column
+          }
+        }}
+        assignAsTableKey={() => {
+          console.log("Assigning as key column", id);
+          if (!isNull) {
+            dispatch(
+              setTablesAttribute({
+                ids: tableId,
+                attribute: "keyColumnId",
+                value: id,
+              })
+            );
           }
         }}
       />

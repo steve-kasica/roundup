@@ -44,6 +44,7 @@ export default function withColumnVectorData(WrappedComponent) {
       <WrappedComponent
         {...props}
         columnIds={columnIds}
+        columns={columns}
         // Derive properties from columnIds
         maxColumnNameLength={maxColumnNameLength}
         hasSelected={hasSelected}

@@ -1,7 +1,20 @@
 import { useState } from "react";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemButton,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import withTableData from "../../HOC/withTableData";
 import ColumnView from "./ColumnView";
+import withColumnVectorData from "../../HOC/withColumnVectorData";
+import { descending } from "d3";
+import { useSelector } from "react-redux";
+import { selectColumnById } from "../../../slices/columnsSlice";
 
 function TableView({ table, columnIds, onChange }) {
   const [selectedColumnId, setSelectedColumnId] = useState(columnIds[0] || "");
@@ -12,24 +25,30 @@ function TableView({ table, columnIds, onChange }) {
   };
 
   return (
-    <FormControl fullWidth variant="outlined" sx={{ minWidth: 120 }}>
-      <InputLabel id={`${table.id}-view-label`}>{table.name}</InputLabel>
-      <Select
-        labelId={`${table.id}-view-label`}
-        id={table.id}
-        value={selectedColumnId}
-        label={table.name}
-        onChange={handleChange}
-      >
-        {columnIds.map((columnId) => (
-          <MenuItem key={columnId} value={columnId}>
-            <ColumnView id={columnId} />
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <>
+      <Typography variant="h6" gutterBottom>
+        {table.name}
+      </Typography>
+      <ColumnsList columnIds={columnIds} />
+    </>
   );
 }
+
+const ColumnsList = ({ columnIds }) => {
+  const columns = useSelector((state) =>
+    columnIds.map((id) => selectColumnById(state, id))
+  );
+  const sortedColumns = [...columns].sort((a, b) =>
+    descending(a.uniqueValues, b.uniqueValues)
+  );
+  return (
+    <List dense>
+      {sortedColumns.map((column) => (
+        <ColumnView key={column.id} id={column.id} />
+      ))}
+    </List>
+  );
+};
 
 const EnhancedTableView = withTableData(TableView);
 export default EnhancedTableView;
