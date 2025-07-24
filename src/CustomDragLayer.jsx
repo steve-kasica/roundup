@@ -1,6 +1,10 @@
 import { useDragLayer } from "react-dnd";
 import { DATA_TYPE as COLUMN } from "./slices/columnsSlice";
-import { COLUMN_INDEX } from "./components/OperationDetail/StackDetail/ColumnIndex";
+import {
+  MODULE_NAME as COLUMN_INDEX,
+  ColumnIndex,
+} from "./components/OperationDetail/StackDetail/ColumnIndex";
+import { Paper } from "@mui/material";
 
 export default function CustomDragLayer() {
   const {
@@ -22,22 +26,44 @@ export default function CustomDragLayer() {
   if (!isDragging || !currentOffset) {
     return null;
   }
-
-  const blockWidth = 84.9; // Assuming this is the width of a block
-  let { x: dx, y: dy } = deltaOffset;
-  let [x, y] = [stepX(), initialOffset.y];
-
-  function stepX() {
-    const absDX = Math.abs(dx);
-    const a = Math.round(absDX / blockWidth);
-    if (absDX < blockWidth / 2) {
-      return initialOffset.x;
-    } else {
-      return initialOffset.x + Math.sign(dx) * a * blockWidth;
+  function x() {
+    switch (itemType) {
+      case COLUMN:
+      case COLUMN_INDEX:
+        // For COLUMN_INDEX, we want to center the drag preview
+        return currentOffset.x - item.width / 2;
+      default:
+        return currentOffset.x;
     }
   }
 
+  function y() {
+    switch (itemType) {
+      case COLUMN:
+      case COLUMN_INDEX:
+        return initialOffset.y; // Don't allow ghost to move vertically
+      default:
+        return currentOffset.y - 1;
+    }
+  }
+
+  // console.log(itemType, item);
+  // let { x: xOffset, y: yOffset } = currentOffset;
+  // let { x: dx, y: dy } = deltaOffset;
+  // let [x, y] = [stepX(), initialOffset.y];
+
+  // function stepX() {
+  //   const absDX = Math.abs(dx);
+  //   const a = Math.round(absDX / blockWidth);
+  //   if (absDX < blockWidth / 2) {
+  //     return initialOffset.x;
+  //   } else {
+  //     return initialOffset.x + Math.sign(dx) * a * blockWidth;
+  //   }
+  // }
+
   // Render different effects based on the item type
+  console.log(item.maxColumnNameLength);
   const renderDragPreview = () => {
     switch (itemType) {
       case COLUMN:
@@ -45,7 +71,7 @@ export default function CustomDragLayer() {
           <div
             style={{
               backgroundColor: "lightblue",
-              width: `${blockWidth}px`,
+              width: `${item.width || 100}px`,
               height: "37px",
               opacity: 0.5,
             }}
@@ -53,17 +79,32 @@ export default function CustomDragLayer() {
         );
       case COLUMN_INDEX:
         return (
+          <ColumnIndex
+            index={item.index}
+            columnIds={item.columnIds}
+            columnName={item.columnName || `Column ${item.index + 1}`}
+            maxColumnNameLength={item.maxColumnNameLength}
+            hasSelected={item.hasSelected}
+            hoverColumnVector={() => {}} // No-op
+            unhoverColumnVector={() => {}} // No-op
+            onCellClick={() => {}} // No-op
+            onColumnClick={() => {}} // No-op
+            undragColumnVector={() => {}} // No-op
+            swapColumnVectors={() => {}} // No-op
+            onHeaderChange={() => {}} // No-op
+          />
+        );
+      default:
+        return (
           <div
             style={{
-              backgroundColor: "lightblue",
-              width: `${blockWidth}px`,
-              height: "20px",
+              backgroundColor: "lightgray",
+              width: `${item.width || 100}px`,
+              height: "100px",
               opacity: 0.5,
             }}
           ></div>
         );
-      default:
-        return null;
     }
   };
 
@@ -79,18 +120,16 @@ export default function CustomDragLayer() {
         zIndex: 100,
       }}
     >
-      <div
-        style={{
-          transform: `translate(${x}px, ${y}px)`,
-          WebkitTransform: `translate(${x}px, ${y}px)`,
+      <Paper
+        elevation={3}
+        sx={{
+          transform: `translate(${x()}px, ${y()}px)`,
+          WebkitTransform: `translate(${x()}px, ${y()}px)`,
+          width: `${item.width || 100}px`,
         }}
       >
         {renderDragPreview()}
-      </div>
+      </Paper>
     </div>
   );
-}
-
-function step(x) {
-  return Math.round(x / 75) * 75;
 }

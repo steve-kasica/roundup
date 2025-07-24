@@ -4,16 +4,15 @@ import { useRef } from "react";
 import ColumnView from "./ColumnView";
 import withColumnVectorData from "../../../HOC/withColumnVectorData";
 import PropTypes from "prop-types";
-import { useDrag, useDrop } from "react-dnd";
+import { useDrag, useDragLayer, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import IndexHeader from "./IndexHeader";
 import { DragHandleOutlined, DragIndicator } from "@mui/icons-material";
-
-export const COLUMN_INDEX = "COLUMN_INDEX";
+import { MODULE_NAME } from ".";
 
 export const WIDTH = 20; // in ch
 
-function ColumnIndex({
+export function ColumnIndex({
   index,
   columnIds,
   columnName,
@@ -21,34 +20,37 @@ function ColumnIndex({
   hasSelected,
   hoverColumnVector,
   unhoverColumnVector,
-  compareVectorValues,
   onCellClick,
   onColumnClick,
-  fetchColumnValues,
   undragColumnVector,
   swapColumnVectors,
   onHeaderChange,
 }) {
-  // const [operationColumnName, setOperationColumnName] = useState(
-  //   columnName || `Column ${index + 1}`
-  // );
-
-  // // Update state when index prop changes
-  // useEffect(() => {
-  //   setOperationColumnName(columnName || `Column ${index + 1}`);
-  // }, [columnName, index]);
-
-  const formRef = useRef(null);
-  const inputRef = useRef(null); // Add this ref for the Input
+  // Use useDragLayer to monitor global drag state
+  const boxRef = useRef(null);
+  const { isDraggingColumnIndex } = useDragLayer((monitor) => ({
+    isDraggingColumnIndex:
+      monitor.isDragging() && monitor.getItemType() === MODULE_NAME,
+  }));
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
-    type: COLUMN_INDEX,
+    type: MODULE_NAME,
     item: () => {
-      return { columnIds, index };
+      const width = boxRef.current?.getBoundingClientRect().width || WIDTH;
+      return {
+        columnIds,
+        index,
+        columnName,
+        maxColumnNameLength,
+        hasSelected,
+        width,
+      };
     },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
+    collect: (monitor) => {
+      return {
+        isDragging: monitor.isDragging(),
+      };
+    },
     end: () => {
       // Dispatch certain actions when the drag operation ends,
       // regardless of whether or it reached a drop target
@@ -69,7 +71,7 @@ function ColumnIndex({
   // }, [isDragging, columnIds, dispatch]);
 
   const [{ isHovered }, dropRef] = useDrop({
-    accept: COLUMN_INDEX,
+    accept: MODULE_NAME,
     drop: (droppedItem) => {
       // Remember, in this context `droppedItem.columnIds` === `columnIds` in useDrag
       if (droppedItem.index !== index) {
@@ -92,12 +94,14 @@ function ColumnIndex({
     isHovered ? "hovered" : "",
   ].filter(Boolean);
 
+  const isPotentialDropZone = isDraggingColumnIndex && !isDragging;
+
   return (
     <Box
-      //   ref={(node) => {
-      //     dragRef(dropRef(node));
-      //   }}
-      ref={formRef}
+      ref={(node) => {
+        dropRef(node); // Drop target for the column index
+        boxRef.current = node; // Reference to the box for width calculation
+      }} // Drop target on the container
       className={className.join(" ")}
       data-columnids={columnIds.join(",")}
       sx={{
@@ -107,11 +111,56 @@ function ColumnIndex({
             : `${WIDTH}ch`,
         transition: "width 0.3s ease-in-out",
         margin: "0 0.05rem",
+        // Apply well style when this specific column is being dragged
+        ...(isDragging && {
+          backgroundColor: "#f5f5f5",
+          border: "2px inset #ddd",
+          borderRadius: "8px",
+          opacity: 0.7,
+          "& > *": { opacity: 0 }, // Hide all chidren while dragging
+        }),
+        // Apply drop zone styles when any other column is being dragged
+        ...(isPotentialDropZone && {
+          border: "2px dashed #3f51b5",
+          backgroundColor: "rgba(63, 81, 181, 0.1)",
+        }),
+        // Apply hover styles when being hovered over during drag
+        ...(isHovered &&
+          !isDragging && {
+            border: "2px solid #3f51b5",
+            backgroundColor: "rgba(63, 81, 181, 0.15)",
+          }),
+        // Default border when not in any drag state
+        ...(!isDragging &&
+          !isPotentialDropZone &&
+          !isHovered && {
+            border: "2px dashed #fff",
+            backgroundColor: "transparent",
+          }),
+        textAlign: "center",
+        lineHeight: "normal",
+        fontSize: "0.75rem",
+        userSelect: "none",
       }}
       onMouseEnter={hoverColumnVector}
       onMouseLeave={unhoverColumnVector}
     >
-      <DragIndicator sx={{ transform: "rotate(90deg)", cursor: "grab" }} />
+      <div
+        ref={dragRef} // Wrap the icon in a div for proper ref forwarding
+        style={{
+          display: "inline-block",
+          cursor: isDragging ? "grabbing" : "grab",
+        }}
+      >
+        <DragIndicator
+          sx={{
+            transform: "rotate(90deg)",
+            "&:hover": {
+              color: "primary.main",
+            },
+          }}
+        />
+      </div>
       <IndexHeader
         title={columnName}
         index={index}
@@ -121,7 +170,7 @@ function ColumnIndex({
 
       {columnIds.map((columnId, i) => (
         <Paper
-          key={`${i}-${columnId}`} // columnId === null for all empty (null) columns
+          key={`${i}-${columnId}`}
           elevation={1}
           sx={{
             margin: "0.25rem",
@@ -156,6 +205,7 @@ ColumnIndex.propTypes = {
   undragColumnVector: PropTypes.func.isRequired,
   swapColumnVectors: PropTypes.func.isRequired,
   maxColumnNameLength: PropTypes.number.isRequired,
+  onHeaderChange: PropTypes.func.isRequired,
 };
 
 const EnhancedColumnIndex = withColumnVectorData(ColumnIndex);

@@ -56,36 +56,31 @@ $cell-border-color: $table-border-color;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  line-height: normal;
-  font-size: 0.75rem;
-  user-select: none;
   border: 1px solid #aaa;
-
-  text-align: center;
 
   .x-axis.label {
     height: $cellHeight;
   }
 
-  > div {
-    height: 100%;
-  }
+  // > div {
+  //   height: 100%;
+  // }
 
   .cell {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: $cellHeight;
-    width: inherit;
-    border-left: none;
-    border-right: none;
-    cursor: context-menu;
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: center;
+    // height: $cellHeight;
+    // width: inherit;
+    // border-left: none;
+    // border-right: none;
+    // cursor: context-menu;
 
-    &.hover {
-      background-color: $hover-color;
-    }
+    // &.hover {
+    //   background-color: $hover-color;
+    // }
     &.null {
-      background-color: $null-color;
+      // background-color: $null-color;
       input {
         font-style: italic;
         text-transform: uppercase;

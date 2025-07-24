@@ -134,6 +134,20 @@ function ColumnView({
   return (
     <div
       className={className}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        height: "30px", // cellHeight
+        width: "inherit",
+        borderLeft: "none",
+        borderRight: "none",
+        cursor: "pointer",
+        backgroundColor: isNull ? "#f5f5f5" : "inherit",
+        "&:hover": {
+          backgroundColor: "#f0f0f0", // hover color
+        },
+      }}
       ref={(node) => {
         dragRef(node);
         dropRef(node);

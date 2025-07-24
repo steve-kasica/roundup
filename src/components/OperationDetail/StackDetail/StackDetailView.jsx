@@ -13,6 +13,7 @@ import { setSelectedColumns } from "../../../slices/columnsSlice";
 import { useRef } from "react";
 import { selectTablesById } from "../../../slices/tablesSlice/tableSelectors";
 import TableView from "./TableView";
+import { Box, Typography } from "@mui/material";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
@@ -86,7 +87,7 @@ function StackDetailView({
       />
       <div className="StackDetail">
         <div className="left-panel">
-          <div className="label">
+          <div className="label" style={{ textAlign: "center" }}>
             <span>{yAxisLabel}</span>
           </div>
           <div className="column-group">
@@ -96,7 +97,9 @@ function StackDetailView({
           </div>
         </div>
         <div className="right-panel">
-          <div className="x-axis label">{xAxisLabel}</div>
+          <Box style={{ textAlign: "center" }}>
+            <Typography variant="subtitle1">{xAxisLabel}</Typography>
+          </Box>
           <div ref={gridContainerRef} className="grid-container">
             {xScale.domain().map((j) => (
               <ColumnIndex
