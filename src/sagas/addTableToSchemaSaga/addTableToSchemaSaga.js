@@ -46,10 +46,10 @@ import {
  * @function
  * @returns {Object} Redux action with type "sagas/addTableToSchema"
  */
-export const addTableToSchema = createAction("sagas/addTableToSchema");
+export const addTableToSchema = createAction("sagas/addTableToSchema/request");
 
 export const addTableToSchemaSuccess = createAction(
-  "sagas/addTableToSchemaSuccess"
+  "sagas/addTableToSchema/success"
 );
 
 /**

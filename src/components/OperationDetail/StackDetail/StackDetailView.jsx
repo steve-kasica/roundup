@@ -90,7 +90,18 @@ function StackDetailView({
           <div className="label" style={{ textAlign: "center" }}>
             <span>{yAxisLabel}</span>
           </div>
-          <div className="column-group">
+          <div
+            className="column-group"
+            style={{
+              display: "grid",
+              gridTemplateRows: `repeat(${tableIds.length + 1}, 1fr)`,
+              gap: "0.25rem", // Match the margin from ColumnView Papers
+              alignItems: "center",
+            }}
+          >
+            {/* Add spacer to account for x-axis header */}
+            <div style={{ height: "2rem" }}></div>{" "}
+            {/* Match the height of Typography variant="subtitle1" */}
             {tableIds.map((tableId) => (
               <TableView key={tableId} id={tableId} />
             ))}
@@ -107,7 +118,7 @@ function StackDetailView({
                 index={j}
                 columnIds={columnIdMatrix.map((row) => row[j])}
                 columnName={columnNames[j]}
-                tableIds={tables.map(({ id }) => id)} // TODO: do I need this?
+                tableIds={tables.map(({ id }) => id)}
                 onCellClick={onCellClick}
                 onColumnClick={onColumnClick}
                 onHeaderChange={renameOperationColumn}

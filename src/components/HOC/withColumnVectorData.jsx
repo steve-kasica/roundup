@@ -12,7 +12,7 @@ import {
 import { setDrawerContents } from "../../slices/uiSlice";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnIndexDetails";
 import { swapColumnsAction } from "../../sagas/swapColumnsSaga";
-import { getValuesAction } from "../../sagas/getValuesSaga";
+// import { getValuesAction } from "../../sagas/getValuesSaga";
 
 /**
  * This HOC takes an array of columnIds are passes on some relevalent metadata about this
@@ -57,7 +57,7 @@ export default function withColumnVectorData(WrappedComponent) {
           dispatch(setDrawerContents(COLUMN_INDEX_VALUES_COMPONENT))
         }
         fetchColumnValues={() => {
-          dispatch(getValuesAction(columnIds.filter(Boolean)));
+          // dispatch(getValuesAction(columnIds.filter(Boolean)));
         }}
         undragColumnVector={() =>
           dispatch(removeColumnsFromDragging(columnIds))

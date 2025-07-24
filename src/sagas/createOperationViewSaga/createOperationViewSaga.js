@@ -25,6 +25,10 @@ export const createOperationView = createAction(
   "sagas/createOperationView/request"
 );
 
+export const createOperationViewSuccess = createAction(
+  "sagas/createOperationView/success"
+);
+
 // Watcher Saga
 export default function* createOperationViewSaga() {
   // After a table is added to the schema, create or update an operation view
@@ -119,6 +123,13 @@ function* handleCreateOperationView(operationId) {
       // Clear any previous error if the operation was successful
       yield put(clearOperationError({ operationId }));
     }
+
+    yield put(
+      createOperationViewSuccess({
+        operationId,
+        operationType: operation.operationType,
+      })
+    );
   } catch (error) {
     console.warn("Error creating operation view:", error);
     yield put(
