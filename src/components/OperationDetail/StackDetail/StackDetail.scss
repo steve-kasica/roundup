@@ -71,26 +71,12 @@ $cell-border-color: $table-border-color;
     height: 100%;
   }
 
-  .index-label {
-    height: $cellHeight;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    position: relative;
-    border: 1px solid #000;
-    border-left: none;
-    border-right: none;
-  }
-
   .cell {
     display: flex;
     flex-direction: column;
     justify-content: center;
     height: $cellHeight;
     width: inherit;
-    border: 1px solid #aaa;
     border-left: none;
     border-right: none;
     cursor: context-menu;
@@ -118,16 +104,6 @@ $cell-border-color: $table-border-color;
     }
 
     input {
-      width: auto;
-      overflow: hidden;
-      background: inherit;
-      border: none;
-      field-sizing: content;
-      white-space: nowrap;
-      text-align: center;
-      text-overflow: ellipsis;
-      pointer-events: none;
-
       &:focus-visible {
         outline: none;
       }
@@ -171,8 +147,8 @@ $cell-border-color: $table-border-color;
       height: 100%;
 
       form {
-        border-left: 1px solid #aaa;
-        border-right: 1px solid #aaa;
+        // border-left: 1px solid #aaa;
+        // border-right: 1px solid #aaa;
         font-family: sans-serif;
 
         &:first-child .ColumnView > .screen {
@@ -183,17 +159,6 @@ $cell-border-color: $table-border-color;
 
         &:last-child .ColumnView > .screen {
           border-right-style: $table-border-style;
-        }
-
-        label {
-          height: $xAxisTickHeight;
-          line-height: $xAxisTickHeight;
-        }
-
-        input,
-        label {
-          color: $enabledCellColor;
-          font-weight: $enabledCellFontWeight;
         }
 
         .ColumnView {

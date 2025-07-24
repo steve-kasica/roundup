@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import ColumnIndex from "./ColumnIndex";
 import StackDetailToolbar from "./StackDetailToolbar";
 import { getValuesInRange, getIndexOfValue } from "./selectionUtils";
-import withColumnMatrixData from "../../HOC/withColumnMatrixData";
+import withStackOperationData from "./withStackOperationData";
 
 import "./StackDetail.scss";
 import { useState } from "react";
@@ -18,8 +18,15 @@ const yAxisLabel = "table name";
 const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
-function StackDetailView({ tableIds, columnIdMatrix, m, n }) {
-  const dispatch = useDispatch();
+function StackDetailView({
+  tableIds,
+  columnIdMatrix,
+  m,
+  n,
+  columnNames,
+  renameOperationColumn,
+}) {
+  const dispatch = useDispatch(); // TODO: remove redux from View
 
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
   // TODO is this necessary?
@@ -96,9 +103,11 @@ function StackDetailView({ tableIds, columnIdMatrix, m, n }) {
                 key={j}
                 index={j}
                 columnIds={columnIdMatrix.map((row) => row[j])}
+                columnName={columnNames[j]}
                 tableIds={tables.map(({ id }) => id)} // TODO: do I need this?
                 onCellClick={onCellClick}
                 onColumnClick={onColumnClick}
+                onHeaderChange={renameOperationColumn}
               />
             ))}
           </div>
@@ -178,7 +187,8 @@ StackDetailView.propTypes = {
   ).isRequired,
   m: PropTypes.number.isRequired,
   n: PropTypes.number.isRequired,
+  columnNames: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-const StackDetailViewWithData = withColumnMatrixData(StackDetailView);
+const StackDetailViewWithData = withStackOperationData(StackDetailView);
 export default StackDetailViewWithData;

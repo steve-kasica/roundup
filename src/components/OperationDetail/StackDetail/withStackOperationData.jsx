@@ -1,6 +1,9 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { selectOperation } from "../../slices/operationsSlice";
+import {
+  selectOperation,
+  setOperationColumnName,
+} from "../../../slices/operationsSlice";
 
 // TODO: how to handlethe case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -22,8 +25,10 @@ import { selectOperation } from "../../slices/operationsSlice";
  * @param {*} WrappedComponent
  * @returns
  */
-export default function withColumnMatrixData(WrappedComponent) {
+export default function withStackOperationData(WrappedComponent) {
   function EnhancedComponent({ operation, ...props }) {
+    const dispatch = useDispatch();
+
     const columnIdMatrix = useSelector((state) => {
       // TODO: what if the childId is not a table?
       const rawColumnIds = operation.children.map(
@@ -40,7 +45,7 @@ export default function withColumnMatrixData(WrappedComponent) {
 
     const m = Math.max(...columnIdMatrix.map((c) => c.length));
     const n = columnIdMatrix.length;
-    const columnNames = operation.columnNames;
+    const columnNames = operation.columnNames || Array(m).fill("");
 
     return (
       <WrappedComponent
@@ -50,6 +55,15 @@ export default function withColumnMatrixData(WrappedComponent) {
         m={m}
         n={n}
         columnNames={columnNames}
+        renameOperationColumn={(index, newName) =>
+          dispatch(
+            setOperationColumnName({
+              operationId: operation.id,
+              index,
+              newName,
+            })
+          )
+        }
       />
     );
   }

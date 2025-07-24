@@ -11,11 +11,12 @@
  */
 
 import { useState, useRef, useEffect } from "react";
-import { Popover, List, ListItemButton } from "@mui/material";
+import { Popover, List, ListItemButton, Paper } from "@mui/material";
 import PropTypes from "prop-types";
 
 import "./ColumnBlockView.scss";
-import withColumnData from "../../HOC/withColumnData";
+import withColumnData from "../../../HOC/withColumnData";
+import { Box } from "lucide-react";
 
 const delay = 500; // in ms for input changes
 
@@ -44,7 +45,7 @@ function ColumnView({
   // Additional variables derived from props
   const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table
 
-  // Context menu
+  // // Context menu
   const [anchorEl, setAnchorEl] = useState(null);
   const isPopoverOpen = Boolean(anchorEl);
   const hoverTimeoutRef = useRef(null);
@@ -162,6 +163,17 @@ function ColumnView({
         // onBlur={() => dispatch(removeFromSelectedColumnIds(id))}
         // onFocus={selectColumn}
         minLength={1}
+        style={{
+          width: "auto",
+          overflow: "hidden",
+          background: "inherit",
+          border: "none",
+          fieldSizing: "content",
+          whiteSpace: "nowrap",
+          textAlign: "center",
+          textOverflow: "ellipsis",
+          pointerEvents: "none",
+        }}
       />
       <Popover
         open={isPopoverOpen}

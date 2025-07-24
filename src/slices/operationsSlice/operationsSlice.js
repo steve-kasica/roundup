@@ -128,6 +128,12 @@ const operationsSlice = createSlice({
       state.data[id] = { ...operation, ...attributes };
     },
 
+    setOperationColumnName(state, action) {
+      const { operationId, index, newName } = action.payload;
+      const operation = selectOperation({ operations: state }, operationId);
+      operation.columnNames[index] = newName;
+    },
+
     /**
      * Adds a child ID to the specified operation's children array.
      *
@@ -207,6 +213,7 @@ export const {
   addOperation,
   removeOperation,
   setOperationAttributes,
+  setOperationColumnName,
   changeOperationType,
   addChildToOperation,
   updateOperationJoinSpec,

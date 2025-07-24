@@ -55,6 +55,21 @@ export default function* createOperationViewSaga() {
   });
 }
 
+// Helper function to validate operation dimensions
+function validateOperationDimensions(operationId, dimensions) {
+  if (dimensions.rowCount === 0) {
+    throw new Error(
+      `Operation ${operationId} has no rows. Please check the operation query.`
+    );
+  }
+
+  if (dimensions.columnCount === 0) {
+    throw new Error(
+      `Operation ${operationId} has no columns. Please check the operation query.`
+    );
+  }
+}
+
 // Worker Saga
 function* handleCreateOperationView(operationId) {
   try {
@@ -74,20 +89,10 @@ function* handleCreateOperationView(operationId) {
       yield call(createStackView, queryData);
     }
 
+    // Get dimensions of the operation view
+    // This will throw an error if the operation has no rows or columns
     const dimensions = yield call(getTableDimensions, operationId);
-
-    if (dimensions.rowCount === 0) {
-      throw new Error(
-        `Operation ${operationId} has no rows. Please check the operation query.`
-      );
-    } else if (dimensions.columnCount === 0) {
-      throw new Error(
-        `Operation ${operationId} has no columns. Please check the operation query.`
-      );
-    }
-
-    // const columnNames = yield call(getColumnNames, operationId);
-
+    validateOperationDimensions(operationId, dimensions);
     yield put(
       setOperationAttributes({
         id: operationId,
@@ -95,12 +100,27 @@ function* handleCreateOperationView(operationId) {
       })
     );
 
+    // Get column names for the operation view if they are not already set
+    if (operation.columnNames.length === 0) {
+      // If the operation has no column names, fetch them from the DuckDB view
+      const columnIds = yield call(getColumnNames, operationId);
+      const columnNames = yield select((state) =>
+        columnIds.map((id) => selectColumnById(state, id).name)
+      );
+      yield put(
+        setOperationAttributes({
+          id: operationId,
+          attributes: { columnNames },
+        })
+      );
+    }
+
     if (operation.error) {
       // Clear any previous error if the operation was successful
       yield put(clearOperationError({ operationId }));
     }
   } catch (error) {
-    console.error("Error creating operation view:", error);
+    console.warn("Error creating operation view:", error);
     yield put(
       setOperationError({
         operationId,
