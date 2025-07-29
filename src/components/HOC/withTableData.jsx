@@ -19,6 +19,7 @@ import {
   selectTablesById,
   setSelectedTables,
   dataType as SourceTable,
+  setTablesAttribute,
 } from "../../slices/tablesSlice";
 
 import { dropTablesAction } from "../../sagas/dropTablesSaga";
@@ -140,6 +141,15 @@ export default function withTableData(WrappedComponent) {
           dispatch(changeTablesName({ ids: id, newNames }))
         }
         dropTable={() => dispatch(dropTablesAction(id))}
+        setKeyColumn={(columnId) =>
+          dispatch(
+            setTablesAttribute({
+              ids: id,
+              attribute: "keyColumnId",
+              value: columnId,
+            })
+          )
+        }
       />
     );
   }

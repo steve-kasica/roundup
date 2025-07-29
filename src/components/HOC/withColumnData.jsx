@@ -61,6 +61,7 @@ export default function withColumnData(WrappedComponent) {
     const error = column?.error;
     const alias = column?.alias;
 
+    // TODO: remove drag logic from this HOC
     const [{ isDragging }, dragRef, previewRef] = useDrag({
       type: COLUMN,
       canDrag: isDraggable,
@@ -173,18 +174,6 @@ export default function withColumnData(WrappedComponent) {
         nullColumn={() => {
           if (!isNull) {
             // TODO: implement logic to nullify column
-          }
-        }}
-        assignAsTableKey={() => {
-          console.log("Assigning as key column", id);
-          if (!isNull) {
-            dispatch(
-              setTablesAttribute({
-                ids: tableId,
-                attribute: "keyColumnId",
-                value: id,
-              })
-            );
           }
         }}
       />

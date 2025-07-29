@@ -8,7 +8,7 @@ import { getDuckDB } from "./duckdbClient";
  * @param {number} limit - Maximum number of results to return (optional)
  * @returns {Promise<Object>} Object with values as keys and counts as values
  */
-export async function getValueCounts(tableId, columnId, limit = 100) {
+export async function getValueCounts(tableId, columnId, limit = 1000) {
   const db = await getDuckDB();
   const conn = await db.connect();
   const query = `
