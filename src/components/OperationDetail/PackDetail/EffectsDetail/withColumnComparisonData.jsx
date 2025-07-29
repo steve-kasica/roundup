@@ -74,63 +74,6 @@ export default function withColumnComparisonData(WrappedComponent) {
       }
     });
 
-    const manyMatches = matchGroups.get("Many") || [];
-
-    // Calculate how many values in column1 correspond with only one value in column2
-    const column1ValuesWithSingleColumn2Match = new Set(
-      [...column1Values].filter((value1) => {
-        // Count how many values in column2 match this value1
-        const matchingColumn2Values = [...column2Values].filter((value2) =>
-          comparisonFunction(value1, value2)
-        );
-        return matchingColumn2Values.length === 1;
-      })
-    );
-
-    // Calculate how many values in column1 are not present in column2
-    const column1ValuesNotInColumn2 = new Set(
-      [...column1Values].filter((value1) => {
-        // Count how many values in column2 match this value1
-        const matchingColumn2Values = [...column2Values].filter((value2) =>
-          comparisonFunction(value1, value2)
-        );
-        return matchingColumn2Values.length === 0;
-      })
-    );
-
-    // Calculate how many values in column2 are not present in column1
-    const column2ValuesNotInColumn1 = new Set(
-      [...column2Values].filter((value1) => {
-        // Count how many values in column2 match this value1
-        const matchingColumn1Values = [...column2Values].filter((value2) =>
-          comparisonFunction(value2, value1)
-        );
-        return matchingColumn1Values.length === 0;
-      })
-    );
-
-    // Calculate how many values in column1 have more than one match in column2
-    const column1ValuesWithMultipleColumn2Matches = new Set(
-      [...column1Values].filter((value1) => {
-        // Count how many values in column2 match this value1
-        const matchingColumn2Values = [...column2Values].filter((value2) =>
-          comparisonFunction(value1, value2)
-        );
-        return matchingColumn2Values.length > 1;
-      })
-    );
-
-    // Calculate how many values in column2 have more than one match in column1
-    const column2ValuesWithMultipleColumn1Matches = new Set(
-      [...column2Values].filter((value2) => {
-        // Count how many values in column1 match this value2
-        const matchingColumn1Values = [...column1Values].filter((value1) =>
-          comparisonFunction(value2, value1)
-        );
-        return matchingColumn1Values.length > 1;
-      })
-    );
-
     return (
       <WrappedComponent
         {...props}
