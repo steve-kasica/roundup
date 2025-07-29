@@ -11,7 +11,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  Divider,
+  Tooltip,
 } from "@mui/material";
 import withTableData from "../../HOC/withTableData";
 import { descending } from "d3";
@@ -84,6 +84,17 @@ function OperationKeyColumnSelect({
     return values.slice(0, 20); // Limit to first 20 values for display
   };
 
+  // Get random sample of values for tooltip
+  const getRandomValues = (column, count = 5) => {
+    if (!column || !column.values) {
+      return [];
+    }
+
+    const allValues = Object.keys(column.values);
+    const shuffled = [...allValues].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, Math.min(count, allValues.length));
+  };
+
   const columnValues = getColumnValues();
 
   return (
@@ -102,16 +113,31 @@ function OperationKeyColumnSelect({
           <MenuItem value="">
             <em>No key column</em>
           </MenuItem>
-          {sortedColumns.map((column) => (
-            <MenuItem key={column.id} value={column.id}>
-              <Box
-                sx={{ display: "flex", alignItems: "center", width: "100%" }}
+          {sortedColumns.map((column) => {
+            const randomValues = getRandomValues(column, 5);
+            const tooltipContent =
+              randomValues.length > 0
+                ? `Sample values: ${randomValues.join(", ")}`
+                : "No sample values available";
+
+            return (
+              <Tooltip
+                key={column.id}
+                title={tooltipContent}
+                arrow
+                placement="right"
               >
-                <Typography sx={{ flexGrow: 1 }}>{column.name}</Typography>
-                {getUniquenessBadge(column)}
-              </Box>
-            </MenuItem>
-          ))}
+                <MenuItem value={column.id}>
+                  <Box
+                    sx={{ display: "flex", alignItems: "center", width: "100%" }}
+                  >
+                    <Typography sx={{ flexGrow: 1 }}>{column.name}</Typography>
+                    {getUniquenessBadge(column)}
+                  </Box>
+                </MenuItem>
+              </Tooltip>
+            );
+          })}
         </Select>
       </FormControl>
 
