@@ -7,11 +7,11 @@ import {
   IconButton,
 } from "@mui/material";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
-import withOperationData from "../../HOC/withOperationData";
 import { useState, useEffect } from "react";
 import { JOIN_PREDICATES } from "../../../slices/operationsSlice";
 import OperationKeyColumnSelect from "./OperationKeyColumnSelect";
 import CompareColumns from "./EffectsDetail/CompareColumns";
+import withPackOperationData from "./withPackOperationData";
 
 const PackDetail = ({
   operation,
@@ -118,18 +118,11 @@ const PackDetail = ({
           <SwapHorizIcon />
         </IconButton>
       </Box>
-      {/* <VennDiagram
-        leftLabel={operation.children[0]}
-        rightLabel={operation.children[1]}
-        onJoinTypeChange={setJoinType}
-        selectedJoinType={selectedOption}
-      /> */}
 
       <div
         style={{ padding: "16px", backgroundColor: "#f9f9f9", width: "100%" }}
       >
         <h2>Effects Detail</h2>
-        {/* <pre>{JSON.stringify(intersectionStats, null, 2)}</pre> */}
         <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
           <div style={{ flex: "1" }}>
             <OperationKeyColumnSelect
@@ -176,5 +169,5 @@ const PackDetail = ({
   );
 };
 
-const EnhancedPackDetail = withOperationData(PackDetail);
+const EnhancedPackDetail = withPackOperationData(PackDetail);
 export default EnhancedPackDetail;

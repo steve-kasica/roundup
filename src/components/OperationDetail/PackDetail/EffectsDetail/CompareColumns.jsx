@@ -177,7 +177,7 @@ function CompareColumns({
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+      {/* <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
         <div style={{ flex: 1 }}>
           <h3>
             {table1?.name} - {column1?.name}
@@ -218,7 +218,7 @@ function CompareColumns({
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

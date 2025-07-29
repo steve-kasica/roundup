@@ -5,14 +5,9 @@ import {
   selectFocusedOperationId,
   setHoveredOperation,
   selectHoveredOperation,
-  OPERATION_TYPE_STACK,
-  OPERATION_TYPE_PACK,
-  OPERATION_TYPE_NO_OP,
-  setOperationAttributes,
   updateOperationJoinSpec,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
-import { selectTablesById, isTableId } from "../../slices/tablesSlice";
 import PropTypes from "prop-types";
 import { setPeekedTable } from "../../slices/uiSlice";
 
@@ -40,38 +35,6 @@ export default function withOperationData(WrappedComponent) {
         onHover={() => dispatch(setHoveredOperation(id))}
         onUnhover={() => dispatch(setHoveredOperation(null))}
         peekTable={() => dispatch(setPeekedTable(id))}
-        setJoinType={(joinType) => {
-          dispatch(
-            updateOperationJoinSpec({
-              id,
-              attributes: { joinType },
-            })
-          );
-        }}
-        setJoinKey1={(joinKey1) => {
-          dispatch(
-            updateOperationJoinSpec({
-              id,
-              attributes: { joinKey1 },
-            })
-          );
-        }}
-        setJoinKey2={(joinKey2) => {
-          dispatch(
-            updateOperationJoinSpec({
-              id,
-              attributes: { joinKey2 },
-            })
-          );
-        }}
-        setJoinPredicate={(joinPredicate) => {
-          dispatch(
-            updateOperationJoinSpec({
-              id,
-              attributes: { joinPredicate },
-            })
-          );
-        }}
       />
     );
   };
