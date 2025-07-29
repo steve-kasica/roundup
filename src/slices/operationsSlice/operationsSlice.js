@@ -117,6 +117,40 @@ const operationsSlice = createSlice({
       operation.joinSpec = { ...operation.joinSpec, ...attributes };
     },
 
+    /**
+     * Updates one or more operations in the state with new attributes.
+     *
+     * @param {Object} state - The current state of the operations slice.
+     * @param {Object} action - The dispatched action containing payload.
+     * @param {Object|Array} action.payload - The payload can be in one of three formats:
+     *   1. Array of operation objects: [operation1, operation2, ...]
+     *   2. Object with operations array: { operations: [operation1, operation2, ...] }
+     *   3. Single operation object: operation
+     *
+     * @throws {Error} If any operation with the specified ID does not exist in the state.
+     *
+     * @description
+     * Updates existing operations by merging the provided attributes with the current state.
+     * Each operation in the input must have an 'id' property that matches an existing operation.
+     * The function normalizes different input formats to always process an array of operations.
+     */
+    updateOperations(state, action) {
+      // Normalize input to always be an array
+      const operations = Array.isArray(action.payload)
+        ? action.payload
+        : action.payload.operations || [action.payload];
+
+      operations.forEach((operation) => {
+        if (!state.data[operation.id]) {
+          throw new Error(`Operation with ID ${operation.id} does not exist`);
+        }
+        state.data[operation.id] = {
+          ...state.data[operation.id],
+          ...operation,
+        };
+      });
+    },
+
     setOperationAttributes(state, action) {
       const { id, attributes } = action.payload;
       const operation = selectOperation({ operations: state }, id);
@@ -217,6 +251,7 @@ export const {
   changeOperationType,
   addChildToOperation,
   updateOperationJoinSpec,
+  updateOperations,
   removeChildFromOperation,
   setFocusedOperation,
   setHoveredOperation,

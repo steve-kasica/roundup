@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { JOIN_PREDICATES } from "../../../slices/operationsSlice";
 import OperationKeyColumnSelect from "./OperationKeyColumnSelect";
 import CompareColumns from "./EffectsDetail/CompareColumns";
@@ -18,7 +19,7 @@ const PackDetail = ({
   setJoinPredicate,
   setJoinKey1,
   setJoinKey2,
-  swapTables,
+  swapTablePositions,
 }) => {
   const [selectedPredicate, setSelectedPredicate] = useState(
     operation.joinSpec?.joinPredicate || ""
@@ -84,12 +85,6 @@ const PackDetail = ({
     setJoinPredicate(event.target.value);
   };
 
-  const handleSwapTables = () => {
-    if (swapTables) {
-      swapTables();
-    }
-  };
-
   const handleLeftKeyChange = (columnId) => {
     setJoinKey1(columnId);
   };
@@ -110,7 +105,7 @@ const PackDetail = ({
       >
         <h1 style={{ margin: 0 }}>{operation.name}</h1>
         <IconButton
-          onClick={handleSwapTables}
+          onClick={() => swapTablePositions()}
           color="primary"
           title="Swap table positions"
           sx={{ ml: 2 }}
@@ -167,6 +162,24 @@ const PackDetail = ({
       </div>
     </Box>
   );
+};
+
+PackDetail.propTypes = {
+  operation: PropTypes.shape({
+    name: PropTypes.string,
+    children: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    ),
+    joinSpec: PropTypes.shape({
+      joinPredicate: PropTypes.string,
+      joinKey1: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      joinKey2: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    }),
+  }).isRequired,
+  setJoinPredicate: PropTypes.func.isRequired,
+  setJoinKey1: PropTypes.func.isRequired,
+  setJoinKey2: PropTypes.func.isRequired,
+  swapTables: PropTypes.func,
 };
 
 const EnhancedPackDetail = withPackOperationData(PackDetail);

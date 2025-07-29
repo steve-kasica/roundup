@@ -3,6 +3,7 @@ import {
   selectOperation,
   OPERATION_TYPE_PACK,
   updateOperationJoinSpec,
+  updateOperations,
 } from "../../../slices/operationsSlice";
 import PropTypes from "prop-types";
 import withOperationData from "../../HOC/withOperationData";
@@ -19,52 +20,6 @@ export default function withPackOperationData(WrappedComponent) {
     const joinSpec = operation?.joinSpec;
     const isPack = operation?.operationType === OPERATION_TYPE_PACK;
 
-    // Pack-specific join handlers
-    const setJoinType = (joinType) => {
-      dispatch(
-        updateOperationJoinSpec({
-          id,
-          attributes: { joinType },
-        })
-      );
-    };
-
-    const setJoinKey1 = (joinKey1) => {
-      dispatch(
-        updateOperationJoinSpec({
-          id,
-          attributes: { joinKey1 },
-        })
-      );
-    };
-
-    const setJoinKey2 = (joinKey2) => {
-      dispatch(
-        updateOperationJoinSpec({
-          id,
-          attributes: { joinKey2 },
-        })
-      );
-    };
-
-    const setJoinPredicate = (joinPredicate) => {
-      dispatch(
-        updateOperationJoinSpec({
-          id,
-          attributes: { joinPredicate },
-        })
-      );
-    };
-
-    const updateJoinSpec = (attributes) => {
-      dispatch(
-        updateOperationJoinSpec({
-          id,
-          attributes,
-        })
-      );
-    };
-
     return (
       <ComponentWithOperationData
         {...props}
@@ -76,12 +31,40 @@ export default function withPackOperationData(WrappedComponent) {
         joinKey1={joinSpec?.joinKey1}
         joinKey2={joinSpec?.joinKey2}
         isPack={isPack}
-        // Pack-specific join handlers
-        setJoinType={setJoinType}
-        setJoinKey1={setJoinKey1}
-        setJoinKey2={setJoinKey2}
-        setJoinPredicate={setJoinPredicate}
-        updateJoinSpec={updateJoinSpec}
+        // Pack-specific join dispatchers
+        setJoinType={(joinType) =>
+          dispatch(updateOperationJoinSpec({ id, attributes: { joinType } }))
+        }
+        setJoinKey1={(joinKey1) =>
+          dispatch(updateOperationJoinSpec({ id, attributes: { joinKey1 } }))
+        }
+        setJoinKey2={(joinKey2) =>
+          dispatch(updateOperationJoinSpec({ id, attributes: { joinKey2 } }))
+        }
+        setJoinPredicate={(joinPredicate) =>
+          dispatch(
+            updateOperationJoinSpec({ id, attributes: { joinPredicate } })
+          )
+        }
+        updateJoinSpec={(attributes) =>
+          dispatch(updateOperationJoinSpec({ id, attributes }))
+        }
+        swapTablePositions={() =>
+          dispatch(
+            updateOperations({
+              id,
+              joinSpec: {
+                joinKey1: joinSpec.joinKey2,
+                joinKey2: joinSpec.joinKey1,
+                joinType: joinSpec.joinType, // NO-OP
+                joinPredicate: joinSpec.joinPredicate, // NO-OP
+              },
+              joinKey1: joinSpec.joinKey2,
+              joinKey2: joinSpec.joinKey1,
+              children: operation.children.slice().reverse(),
+            })
+          )
+        }
       />
     );
   }
