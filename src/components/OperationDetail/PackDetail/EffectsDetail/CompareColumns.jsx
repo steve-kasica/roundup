@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
+import { Chip } from "@mui/material";
 import withColumnComparisonData from "./withColumnComparisonData";
+import BarChart from "./BarChart";
 
 function CompareColumns({
   table1,
@@ -37,188 +39,207 @@ function CompareColumns({
       >
         <h4 style={{ margin: "0 0 8px 0" }}>Join Metrics</h4>
 
-        {/* Bar Chart */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            width: "100%",
-          }}
-        >
-          {/* Single Matches Bar */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div
-              style={{
-                minWidth: "60px",
-                fontSize: "12px",
-                fontWeight: "bold",
-                color: "#4CAF50",
-              }}
-            >
-              Single
-            </div>
-            <div
-              style={{
-                flex: 1,
-                backgroundColor: "#f0f0f0",
-                height: "20px",
-                overflow: "hidden",
-              }}
-            >
-              {oneMatch.length > 0 && (
-                <div
-                  style={{
-                    width: `${(oneMatch.length / values1.size) * 100}%`,
-                    height: "100%",
-                    backgroundColor: "#4CAF50",
-                  }}
-                />
-              )}
-            </div>
-            <div
-              style={{
-                minWidth: "30px",
-                fontSize: "12px",
-                fontWeight: "bold",
-                color: "#4CAF50",
-                textAlign: "right",
-              }}
-            >
-              {oneMatch.length}
-            </div>
-          </div>
-
-          {/* No Matches Bar */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div
-              style={{
-                minWidth: "60px",
-                fontSize: "12px",
-                fontWeight: "bold",
-                color: "#f44336",
-              }}
-            >
-              None
-            </div>
-            <div
-              style={{
-                flex: 1,
-                backgroundColor: "#f0f0f0",
-                height: "20px",
-                overflow: "hidden",
-              }}
-            >
-              {noMatches.length > 0 && (
-                <div
-                  style={{
-                    width: `${(noMatches.length / values1.size) * 100}%`,
-                    height: "100%",
-                    backgroundColor: "#f44336",
-                  }}
-                />
-              )}
-            </div>
-            <div
-              style={{
-                minWidth: "30px",
-                fontSize: "12px",
-                fontWeight: "bold",
-                color: "#f44336",
-                textAlign: "right",
-              }}
-            >
-              {noMatches.length}
-            </div>
-          </div>
-
-          {/* Many Matches Bar */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div
-              style={{
-                minWidth: "60px",
-                fontSize: "12px",
-                fontWeight: "bold",
-                color: "#FF9800",
-              }}
-            >
-              Many
-            </div>
-            <div
-              style={{
-                flex: 1,
-                backgroundColor: "#f0f0f0",
-                height: "20px",
-                overflow: "hidden",
-              }}
-            >
-              {manyMatches.length > 0 && (
-                <div
-                  style={{
-                    width: `${(manyMatches.length / values1.size) * 100}%`,
-                    height: "100%",
-                    backgroundColor: "#FF9800",
-                  }}
-                />
-              )}
-            </div>
-            <div
-              style={{
-                minWidth: "30px",
-                fontSize: "12px",
-                fontWeight: "bold",
-                color: "#FF9800",
-                textAlign: "right",
-              }}
-            >
-              {manyMatches.length}
-            </div>
-          </div>
-        </div>
+        <BarChart
+          data={[
+            {
+              label: "Single",
+              value: oneMatch.length,
+              color: "#4CAF50",
+            },
+            {
+              label: "None",
+              value: noMatches.length,
+              color: "#f44336",
+            },
+            {
+              label: "Many",
+              value: manyMatches.length,
+              color: "#FF9800",
+            },
+          ]}
+          total={values1.size}
+        />
       </div>
 
-      {/* <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-        <div style={{ flex: 1 }}>
-          <h3>
-            {table1?.name} - {column1?.name}
-          </h3>
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {[...values1].map((value) => (
-              <div
-                key={value}
-                style={{
-                  padding: "4px 8px",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  backgroundColor: "#fff",
-                }}
-              >
-                {value}
-              </div>
-            ))}
-          </div>
+      {/* <BipartiteGraph
+        values1={values1}
+        values2={values2}
+        noMatches={noMatches}
+        oneMatch={oneMatch}
+        manyMatches={manyMatches}
+        column1Name={column1?.name}
+        column2Name={column2?.name}
+      /> */}
+      {/* <svg
+        style={{
+          width: "100%",
+          height: "300px",
+          border: "1px solid #ddd",
+          backgroundColor: "#fff",
+        }}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 800 300"
+      > */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          textAlign: "center",
+          marginBottom: "16px",
+          padding: "8px 0",
+          borderBottom: "1px solid #ddd",
+        }}
+      >
+        <div style={{ flex: 1, fontWeight: "bold" }}>
+          {column1?.name || "Column 1"}
         </div>
-        <div style={{ flex: 1 }}>
-          <h3>
-            {table2?.name} - {column2?.name}
-          </h3>
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {[...values2].map((value) => (
-              <div
-                key={value}
-                style={{
-                  padding: "4px 8px",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  backgroundColor: "#fff",
-                }}
-              >
-                {value}
-              </div>
-            ))}
-          </div>
+        <div style={{ flex: 1, textAlign: "center" }}></div>
+        <div style={{ flex: 1, fontWeight: "bold" }}>
+          {column2?.name || "Column 2"}
         </div>
-      </div> */}
+      </div>
+      <h2>Single Matches</h2>
+      <div style={{ height: "300px", overflowY: "auto" }}>
+        {oneMatch.map(([value, matches]) => (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textAlign: "center",
+              marginBottom: "8px",
+              position: "relative",
+            }}
+            key={value}
+          >
+            <Chip
+              label={value}
+              variant="outlined"
+              sx={{
+                flex: 1,
+                position: "relative",
+              }}
+            />
+            <div
+              style={{
+                flex: 1,
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: "5px",
+                  backgroundColor: "#4CAF50",
+                  opacity: 0.6,
+                }}
+              />
+            </div>
+            <Chip label={matches[0]} variant="outlined" sx={{ flex: 1 }} />
+          </div>
+        ))}
+      </div>
+
+      <h2>No Matches</h2>
+      <div style={{ height: "300px", overflowY: "auto" }}>
+        {noMatches.map(([value]) => (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textAlign: "center",
+              marginBottom: "8px",
+              position: "relative",
+            }}
+            key={value}
+          >
+            <Chip
+              label={value}
+              variant="outlined"
+              sx={{
+                flex: 1,
+                position: "relative",
+              }}
+            />
+            <div
+              style={{
+                flex: 1,
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: "5px",
+                  backgroundColor: "#f44336",
+                  opacity: 0.6,
+                }}
+              />
+            </div>
+            <Chip
+              label={<em>no match</em>}
+              variant="outlined"
+              sx={{
+                flex: 1,
+                position: "relative",
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      <h2>Many Matches</h2>
+      <div style={{ height: "300px", overflowY: "auto" }}>
+        {manyMatches.map(([value, matches]) => (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textAlign: "center",
+              marginBottom: "8px",
+              position: "relative",
+            }}
+            key={value}
+          >
+            <Chip
+              label={value}
+              variant="outlined"
+              sx={{
+                flex: 1,
+                position: "relative",
+              }}
+            />
+            <div
+              style={{
+                flex: 1,
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: "5px",
+                  backgroundColor: "#FF9800",
+                  opacity: 0.6,
+                }}
+              />
+            </div>
+            <Chip
+              label={`${matches.length} matches`}
+              variant="outlined"
+              sx={{ flex: 1 }}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
