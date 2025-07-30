@@ -17,8 +17,8 @@ import withPackOperationData from "./withPackOperationData";
 const PackDetail = ({
   operation,
   setJoinPredicate,
-  setJoinKey1,
-  setJoinKey2,
+  setLeftTableJoinKey,
+  setRightTableJoinKey,
   swapTablePositions,
 }) => {
   const [selectedPredicate, setSelectedPredicate] = useState(
@@ -85,14 +85,6 @@ const PackDetail = ({
     setJoinPredicate(event.target.value);
   };
 
-  const handleLeftKeyChange = (columnId) => {
-    setJoinKey1(columnId);
-  };
-
-  const handleRightKeyChange = (columnId) => {
-    setJoinKey2(columnId);
-  };
-
   return (
     <Box sx={{ width: "500px", padding: 2 }}>
       <Box
@@ -123,7 +115,7 @@ const PackDetail = ({
             <OperationKeyColumnSelect
               id={operation.children[0]}
               currentValue={operation.joinSpec?.joinKey1}
-              onChange={handleLeftKeyChange}
+              onChange={(columnId) => setLeftTableJoinKey(columnId)}
             />
           </div>
           <div style={{ flex: "1" }}>
@@ -150,7 +142,7 @@ const PackDetail = ({
             <OperationKeyColumnSelect
               id={operation.children[1]}
               currentValue={operation.joinSpec?.joinKey2}
-              onChange={handleRightKeyChange}
+              onChange={(columnId) => setRightTableJoinKey(columnId)}
             />
           </div>
         </div>
@@ -177,8 +169,8 @@ PackDetail.propTypes = {
     }),
   }).isRequired,
   setJoinPredicate: PropTypes.func.isRequired,
-  setJoinKey1: PropTypes.func.isRequired,
-  setJoinKey2: PropTypes.func.isRequired,
+  setLeftTableJoinKey: PropTypes.func.isRequired,
+  setRightTableJoinKey: PropTypes.func.isRequired,
   swapTables: PropTypes.func,
 };
 

@@ -40,10 +40,6 @@ function OperationKeyColumnSelect({
     descending(a.uniqueValues, b.uniqueValues)
   );
 
-  const handleChange = (event) => {
-    onChange(event.target.value);
-  };
-
   const getUniquenessBadge = (column) => {
     const uniquenessRatio =
       column.uniqueValues && column.totalRows
@@ -108,7 +104,10 @@ function OperationKeyColumnSelect({
           id={`key-select-${table.id}`}
           value={currentValue || ""}
           label={table.name}
-          onChange={handleChange}
+          onChange={(event) => {
+            const columnId = event.target.value;
+            onChange(columnId);
+          }}
         >
           <MenuItem value="">
             <em>No key column</em>
@@ -121,21 +120,25 @@ function OperationKeyColumnSelect({
                 : "No sample values available";
 
             return (
-              <Tooltip
-                key={column.id}
-                title={tooltipContent}
-                arrow
-                placement="right"
-              >
-                <MenuItem value={column.id}>
+              <MenuItem key={column.id} value={column.id}>
+                <Tooltip
+                  title={tooltipContent}
+                  arrow
+                  placement="right"
+                  disableHoverListener={currentValue === column.id}
+                >
                   <Box
-                    sx={{ display: "flex", alignItems: "center", width: "100%" }}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
                   >
                     <Typography sx={{ flexGrow: 1 }}>{column.name}</Typography>
                     {getUniquenessBadge(column)}
                   </Box>
-                </MenuItem>
-              </Tooltip>
+                </Tooltip>
+              </MenuItem>
             );
           })}
         </Select>

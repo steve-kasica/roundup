@@ -26,12 +26,6 @@ export default function withColumnComparisonData(WrappedComponent) {
     ...props
   }) {
     const dispatch = useDispatch();
-    console.log(
-      "withColumnComparisonData: columnId1, columnId2, comparisonFunction",
-      columnId1,
-      columnId2,
-      comparisonFunction
-    );
 
     const column1 = useSelector((state) => selectColumnById(state, columnId1));
     const column2 = useSelector((state) => selectColumnById(state, columnId2));

@@ -35,11 +35,37 @@ export default function withPackOperationData(WrappedComponent) {
         setJoinType={(joinType) =>
           dispatch(updateOperationJoinSpec({ id, attributes: { joinType } }))
         }
-        setJoinKey1={(joinKey1) =>
-          dispatch(updateOperationJoinSpec({ id, attributes: { joinKey1 } }))
-        }
-        setJoinKey2={(joinKey2) =>
-          dispatch(updateOperationJoinSpec({ id, attributes: { joinKey2 } }))
+        setLeftTableJoinKey={(columnId) => {
+          console.log(
+            "Setting left table join key",
+            columnId,
+            "for operation",
+            id
+          );
+          dispatch(
+            updateOperations({
+              id,
+              joinSpec: {
+                joinKey1: columnId,
+                joinKey2: joinSpec.joinKey2, // NO-OP
+                joinType: joinSpec.joinType, // NO-OP
+                joinPredicate: joinSpec.joinPredicate, // NO-OP
+              },
+            })
+          );
+        }}
+        setRightTableJoinKey={(columnId) =>
+          dispatch(
+            updateOperations({
+              id,
+              joinSpec: {
+                joinKey1: joinSpec.joinKey1, // NO-OP
+                joinKey2: columnId,
+                joinType: joinSpec.joinType, // NO-OP
+                joinPredicate: joinSpec.joinPredicate, // NO-OP
+              },
+            })
+          )
         }
         setJoinPredicate={(joinPredicate) =>
           dispatch(
