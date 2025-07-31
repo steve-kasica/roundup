@@ -11,12 +11,6 @@ export default function EffectsDetail({ tableId1, tableId2 }) {
     (state) => selectTablesById(state, tableId2)?.keyColumnId
   );
 
-  console.log(
-    "Key columns for comparison:",
-    table1KeyColumnId,
-    table2KeyColumnId
-  );
-
   return (
     <CompareColumns
       columnId1={table1KeyColumnId}

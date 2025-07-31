@@ -11,12 +11,12 @@ import {
   List,
   ListItem,
   ListItemText,
-  Tooltip,
 } from "@mui/material";
 import withTableData from "../../HOC/withTableData";
 import { descending } from "d3";
 import { useSelector } from "react-redux";
 import { selectColumnById } from "../../../slices/columnsSlice";
+import { Icon, MoreVerticalIcon } from "lucide-react";
 
 const colors = ["#e6550d", "#fdae6b", "#fee6ce"]; // Colors for high, medium, low uniqueness
 const thresholds = [0.75, 0.5]; // Uniqueness ratio thresholds for color coding
@@ -47,6 +47,7 @@ function OperationKeyColumnSelect({
         : 0;
 
     const percentage = Math.round(uniquenessRatio * 100);
+    const label = column.uniqueValues;
 
     let color = colors[2]; // Default to low
     if (uniquenessRatio > thresholds[0]) {
@@ -57,7 +58,7 @@ function OperationKeyColumnSelect({
 
     return (
       <Chip
-        label={`${percentage}%`}
+        label={`${label}`}
         size="small"
         sx={{
           backgroundColor: color,
@@ -114,37 +115,48 @@ function OperationKeyColumnSelect({
           </MenuItem>
           {sortedColumns.map((column) => {
             const randomValues = getRandomValues(column, 5);
-            const tooltipContent =
-              randomValues.length > 0
-                ? `Sample values: ${randomValues.join(", ")}`
-                : "No sample values available";
 
             return (
               <MenuItem key={column.id} value={column.id}>
-                <Tooltip
-                  title={tooltipContent}
-                  arrow
-                  placement="right"
-                  disableHoverListener={currentValue === column.id}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
+                <ListItem secondaryAction={getUniquenessBadge(column)}>
+                  <ListItemText
+                    primary={
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
+                        <Typography>{column.name}</Typography>
+                      </Box>
+                    }
+                    secondary={
+                      randomValues.length > 0
+                        ? randomValues.join(", ") + "..."
+                        : "No sample values available"
+                    }
+                    slotProps={{
+                      secondary: {
+                        style: {
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          maxWidth: "300px",
+                          fontSize: "0.75rem",
+                        },
+                      },
                     }}
-                  >
-                    <Typography sx={{ flexGrow: 1 }}>{column.name}</Typography>
-                    {getUniquenessBadge(column)}
-                  </Box>
-                </Tooltip>
+                  />
+                </ListItem>
               </MenuItem>
             );
           })}
         </Select>
       </FormControl>
 
-      {/* Display values from the currently selected column */}
+      {/* Display values from the currently selected column
       {selectedColumn && (
         <Paper sx={{ mt: 2, p: 2, maxHeight: 300, overflow: "auto" }}>
           {columnValues.length > 0 ? (
@@ -193,7 +205,7 @@ function OperationKeyColumnSelect({
             </Typography>
           )}
         </Paper>
-      )}
+      )} */}
     </Box>
   );
 }

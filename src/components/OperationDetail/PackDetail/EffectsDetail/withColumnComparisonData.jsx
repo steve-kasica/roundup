@@ -25,8 +25,6 @@ export default function withColumnComparisonData(WrappedComponent) {
     comparisonFunction = equals, // Default to equals comparison
     ...props
   }) {
-    const dispatch = useDispatch();
-
     const column1 = useSelector((state) => selectColumnById(state, columnId1));
     const column2 = useSelector((state) => selectColumnById(state, columnId2));
 
@@ -49,15 +47,14 @@ export default function withColumnComparisonData(WrappedComponent) {
     const valuesIntersection = new Set(
       [...column1Values].filter((value) => column2Values.has(value))
     );
-
     const valueMatches = [...column1Values].map((value1) => {
-      const matches = [...column2Values].filter((value2) =>
-        comparisonFunction(value1, value2)
-      );
-      return [value1, matches];
+      const matches = [...column2Values]
+        .filter((value2) => comparisonFunction(value1, value2))
+        .map((value2) => ({ value: value2, count: column2.values[value2] }));
+      return [{ value: value1, count: column1.values[value1] }, matches];
     });
 
-    const matchGroups = group(valueMatches, ([value1, matches]) => {
+    const matchGroups = group(valueMatches, ([{ value, count }, matches]) => {
       switch (matches.length) {
         case 0:
           return NO_MATCHES;

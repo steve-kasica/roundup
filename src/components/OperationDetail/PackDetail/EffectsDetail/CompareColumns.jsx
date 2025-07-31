@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import withColumnComparisonData from "./withColumnComparisonData";
-import BarChart from "./BarChart";
 import MatchSection from "./MatchSection";
 
 function CompareColumns({
@@ -22,81 +21,37 @@ function CompareColumns({
     );
   }
 
-  const chipHeight = "32px";
+  const totalMatches = oneMatch.length + noMatches.length + manyMatches.length;
+
+  // Helper function to calculate percentage for bar chart
 
   return (
-    <div style={{ padding: "16px", backgroundColor: "#f9f9f9" }}>
-      {/* Metrics Section */}
-      <div
-        style={{
-          marginBottom: "16px",
-          padding: "12px",
-          backgroundColor: "#fff",
-          borderRadius: "4px",
-          border: "1px solid #ddd",
-        }}
-      >
-        <h4 style={{ margin: "0 0 8px 0" }}>Join Metrics</h4>
-
-        <BarChart
-          data={[
-            {
-              label: "Single",
-              value: oneMatch.length,
-              color: "#4CAF50",
-            },
-            {
-              label: "None",
-              value: noMatches.length,
-              color: "#f44336",
-            },
-            {
-              label: "Many",
-              value: manyMatches.length,
-              color: "#FF9800",
-            },
-          ]}
-          total={values1.size}
-        />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          textAlign: "center",
-          marginBottom: "16px",
-          padding: "8px 0",
-          borderBottom: "1px solid #ddd",
-        }}
-      >
-        <div style={{ flex: 1, fontWeight: "bold" }}>
-          {column1?.name || "Column 1"}
-        </div>
-        <div style={{ flex: 1, textAlign: "center" }}></div>
-        <div style={{ flex: 1, fontWeight: "bold" }}>
-          {column2?.name || "Column 2"}
-        </div>
-      </div>
-
+    <div>
       <MatchSection
-        title="Single Matches"
+        title="Single match"
+        leftTitle={column1.name}
+        rightTitle={column2.name}
         matches={oneMatch}
+        totalMatches={totalMatches}
         matchType="single"
-        chipHeight={chipHeight}
       />
 
       <MatchSection
-        title="No Matches"
+        title="No matches"
+        leftTitle={column1.name}
+        rightTitle={column2.name}
         matches={noMatches}
+        totalMatches={totalMatches}
         matchType="none"
-        chipHeight={chipHeight}
       />
 
       <MatchSection
-        title="Many Matches"
+        title="Many matches"
+        leftTitle={column1.name}
+        rightTitle={column2.name}
         matches={manyMatches}
+        totalMatches={totalMatches}
         matchType="many"
-        chipHeight={chipHeight}
       />
     </div>
   );
