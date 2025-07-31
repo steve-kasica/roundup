@@ -54,11 +54,13 @@ function* countColumnValuesSagaWorker(action) {
   // Normalize the payload to always be an array of column IDs
   columnIds = Array.isArray(columnIds) ? columnIds : [columnIds];
 
+  const limit = 1000; // Default limit for values
+
   // Get value counts for each column
   const columns = [];
   for (const id of columnIds) {
     try {
-      const values = yield call(getValueCounts, tableId, id);
+      const values = yield call(getValueCounts, tableId, id, limit);
       columns.push({ id, values });
     } catch (error) {
       console.error(`Failed to get value counts for column ${id}:`, error);

@@ -1,15 +1,12 @@
 import PropTypes from "prop-types";
-import { Chip } from "@mui/material";
 import withColumnComparisonData from "./withColumnComparisonData";
 import BarChart from "./BarChart";
+import MatchSection from "./MatchSection";
 
 function CompareColumns({
-  table1,
-  table2,
   column1,
   column2,
   values1,
-  values2,
   noMatches,
   oneMatch,
   manyMatches,
@@ -24,6 +21,8 @@ function CompareColumns({
       </div>
     );
   }
+
+  const chipHeight = "32px";
 
   return (
     <div style={{ padding: "16px", backgroundColor: "#f9f9f9" }}>
@@ -60,26 +59,6 @@ function CompareColumns({
           total={values1.size}
         />
       </div>
-
-      {/* <BipartiteGraph
-        values1={values1}
-        values2={values2}
-        noMatches={noMatches}
-        oneMatch={oneMatch}
-        manyMatches={manyMatches}
-        column1Name={column1?.name}
-        column2Name={column2?.name}
-      /> */}
-      {/* <svg
-        style={{
-          width: "100%",
-          height: "300px",
-          border: "1px solid #ddd",
-          backgroundColor: "#fff",
-        }}
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 800 300"
-      > */}
       <div
         style={{
           display: "flex",
@@ -98,148 +77,27 @@ function CompareColumns({
           {column2?.name || "Column 2"}
         </div>
       </div>
-      <h2>Single Matches</h2>
-      <div style={{ height: "300px", overflowY: "auto" }}>
-        {oneMatch.map(([value, matches]) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              textAlign: "center",
-              marginBottom: "8px",
-              position: "relative",
-            }}
-            key={value}
-          >
-            <Chip
-              label={value}
-              variant="outlined"
-              sx={{
-                flex: 1,
-                position: "relative",
-              }}
-            />
-            <div
-              style={{
-                flex: 1,
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  height: "5px",
-                  backgroundColor: "#4CAF50",
-                  opacity: 0.6,
-                }}
-              />
-            </div>
-            <Chip label={matches[0]} variant="outlined" sx={{ flex: 1 }} />
-          </div>
-        ))}
-      </div>
 
-      <h2>No Matches</h2>
-      <div style={{ height: "300px", overflowY: "auto" }}>
-        {noMatches.map(([value]) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              textAlign: "center",
-              marginBottom: "8px",
-              position: "relative",
-            }}
-            key={value}
-          >
-            <Chip
-              label={value}
-              variant="outlined"
-              sx={{
-                flex: 1,
-                position: "relative",
-              }}
-            />
-            <div
-              style={{
-                flex: 1,
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  height: "5px",
-                  backgroundColor: "#f44336",
-                  opacity: 0.6,
-                }}
-              />
-            </div>
-            <Chip
-              label={<em>no match</em>}
-              variant="outlined"
-              sx={{
-                flex: 1,
-                position: "relative",
-              }}
-            />
-          </div>
-        ))}
-      </div>
+      <MatchSection
+        title="Single Matches"
+        matches={oneMatch}
+        matchType="single"
+        chipHeight={chipHeight}
+      />
 
-      <h2>Many Matches</h2>
-      <div style={{ height: "300px", overflowY: "auto" }}>
-        {manyMatches.map(([value, matches]) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              textAlign: "center",
-              marginBottom: "8px",
-              position: "relative",
-            }}
-            key={value}
-          >
-            <Chip
-              label={value}
-              variant="outlined"
-              sx={{
-                flex: 1,
-                position: "relative",
-              }}
-            />
-            <div
-              style={{
-                flex: 1,
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  height: "5px",
-                  backgroundColor: "#FF9800",
-                  opacity: 0.6,
-                }}
-              />
-            </div>
-            <Chip
-              label={`${matches.length} matches`}
-              variant="outlined"
-              sx={{ flex: 1 }}
-            />
-          </div>
-        ))}
-      </div>
+      <MatchSection
+        title="No Matches"
+        matches={noMatches}
+        matchType="none"
+        chipHeight={chipHeight}
+      />
+
+      <MatchSection
+        title="Many Matches"
+        matches={manyMatches}
+        matchType="many"
+        chipHeight={chipHeight}
+      />
     </div>
   );
 }

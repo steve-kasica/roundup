@@ -8,18 +8,21 @@ import { getDuckDB } from "./duckdbClient";
  * @param {number} limit - Maximum number of results to return (optional)
  * @returns {Promise<Object>} Object with values as keys and counts as values
  */
-export async function getValueCounts(tableId, columnId, limit = 1000) {
+export async function getValueCounts(tableId, columnId, limit = null) {
   const db = await getDuckDB();
   const conn = await db.connect();
+
+  const limitClause = limit !== null ? `LIMIT ${limit}` : "";
+
   const query = `
       SELECT 
         "${columnId}" as value,
-        COUNT(*) as count,
+        COUNT(*) as count
       FROM "${tableId}" 
       WHERE "${columnId}" IS NOT NULL
       GROUP BY "${columnId}"
       ORDER BY count DESC
-      LIMIT ${limit}
+      ${limitClause}
     `;
   try {
     const result = await conn.query(query);
