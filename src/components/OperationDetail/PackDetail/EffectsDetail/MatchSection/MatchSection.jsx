@@ -173,7 +173,8 @@ function MatchSection({
                       alignItems: "center",
                       justifyContent: "center",
                       height:
-                        matchValues.length * 30 + 4 * (matchValues.length - 1),
+                        Math.max(1, matchValues.length) * 30 +
+                        4 * (Math.max(1, matchValues.length) - 1),
                       minWidth: "10px",
                     }}
                   >
