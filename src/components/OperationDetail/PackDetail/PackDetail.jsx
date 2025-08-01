@@ -106,11 +106,15 @@ const PackDetail = ({
         </IconButton>
       </Box>
 
-      <div
-        style={{ padding: "16px", backgroundColor: "#f9f9f9", width: "100%" }}
-      >
-        <h2>Effects Detail</h2>
-        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+      <div style={{ width: "100%" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+            flexWrap: "wrap",
+          }}
+        >
           <div style={{ flex: "1" }}>
             <OperationKeyColumnSelect
               id={operation.children[0]}
@@ -119,14 +123,14 @@ const PackDetail = ({
             />
           </div>
           <div style={{ flex: "1" }}>
-            <FormControl fullWidth sx={{ mb: 2 }}>
+            <FormControl variant="standard" fullWidth sx={{ mb: 2 }}>
               <InputLabel id="pack-predicate-select-label">
-                JOIN PREDICATE
+                Match condition
               </InputLabel>
               <Select
                 labelId="pack-predicate-select-label"
                 value={selectedPredicate}
-                label="JOIN PREDICATE"
+                label="MATCH CONDITION"
                 onChange={handlePredicateChange}
               >
                 <MenuItem value={JOIN_PREDICATES.EQUALS}>EQUALS</MenuItem>

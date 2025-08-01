@@ -11,6 +11,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  FormHelperText,
 } from "@mui/material";
 import withTableData from "../../HOC/withTableData";
 import { descending } from "d3";
@@ -96,9 +97,9 @@ function OperationKeyColumnSelect({
 
   return (
     <Box>
-      <FormControl fullWidth size="small">
+      <FormControl fullWidth size="small" variant="standard">
         <InputLabel id={`key-select-label-${table.id}`}>
-          {table.name}
+          {table.name} key
         </InputLabel>
         <Select
           labelId={`key-select-label-${table.id}`}
@@ -154,6 +155,9 @@ function OperationKeyColumnSelect({
             );
           })}
         </Select>
+        <FormHelperText>
+          Choose a key column for the {table.name} table
+        </FormHelperText>
       </FormControl>
 
       {/* Display values from the currently selected column

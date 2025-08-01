@@ -5,6 +5,7 @@ import {
   AccordionDetails,
   Box,
   Typography,
+  Checkbox,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { max, scaleLinear } from "d3";
@@ -73,15 +74,27 @@ function MatchSection({
   };
   const marginLeft = 0.3; // as a percentage of the width for the AccordionSummary
   const percentage = matches.length / totalMatches; // [0,1]
+  const isDisabled = matches.length === 0;
 
   return (
     <Accordion>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         color={getSectionColor()}
-        disabled={matches.length === 0}
+        disabled={isDisabled}
         hoverColor={getHoverColor()}
+        sx={{
+          "& .MuiAccordionSummary-content": {
+            alignItems: "center",
+          },
+        }}
       >
+        <Checkbox
+          size="small"
+          defaultChecked={!isDisabled}
+          sx={{ mr: 1 }}
+          onClick={(e) => e.stopPropagation()} // Prevent accordion toggle when clicking checkbox
+        />
         <Typography
           component="span"
           sx={{ width: `${marginLeft * 100}%`, flexShrink: 0 }}

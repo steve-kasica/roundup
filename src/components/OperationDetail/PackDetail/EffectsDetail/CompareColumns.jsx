@@ -10,18 +10,21 @@ function CompareColumns({
   oneMatch,
   manyMatches,
 }) {
-  if (!column1 || !column2) {
-    return (
-      <div style={{ padding: "16px", backgroundColor: "#f9f9f9" }}>
-        <h2>Effects Detail</h2>
-        <p>
-          Please select key columns for both tables to see the effects detail.
-        </p>
-      </div>
-    );
-  }
+  // if (!column1 || !column2) {
+  //   return (
+  //     <div style={{}}>
+  //       <h2>Effects Detail</h2>
+  //       <p>
+  //         Please select key columns for both tables to see the effects detail.
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
-  const totalMatches = oneMatch.length + noMatches.length + manyMatches.length;
+  const totalMatches =
+    !column1 || !column2
+      ? -1
+      : oneMatch.length + noMatches.length + manyMatches.length;
 
   // Helper function to calculate percentage for bar chart
 
@@ -29,8 +32,8 @@ function CompareColumns({
     <div>
       <MatchSection
         title="Single match"
-        leftTitle={column1.name}
-        rightTitle={column2.name}
+        leftTitle={column1?.name || "Column 1"}
+        rightTitle={column2?.name || "Column 2"}
         matches={oneMatch}
         totalMatches={totalMatches}
         matchType="single"
@@ -38,8 +41,8 @@ function CompareColumns({
 
       <MatchSection
         title="No matches"
-        leftTitle={column1.name}
-        rightTitle={column2.name}
+        leftTitle={column1?.name || "Column 1"}
+        rightTitle={column2?.name || "Column 2"}
         matches={noMatches}
         totalMatches={totalMatches}
         matchType="none"
@@ -47,8 +50,8 @@ function CompareColumns({
 
       <MatchSection
         title="Many matches"
-        leftTitle={column1.name}
-        rightTitle={column2.name}
+        leftTitle={column1?.name || "Column 1"}
+        rightTitle={column2?.name || "Column 2"}
         matches={manyMatches}
         totalMatches={totalMatches}
         matchType="many"
