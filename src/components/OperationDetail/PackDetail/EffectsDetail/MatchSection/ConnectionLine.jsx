@@ -4,16 +4,18 @@ function ConnectionLine({
   matchType,
   matchValues,
   getSectionColor,
-  strokeWidth = 5,
-  strokeOpacity = 0.6,
+  strokeWidth = 2,
+  strokeOpacity = 1,
+  itemHeight,
 }) {
   const renderConnection = (matches, index = 0) => {
     const color = getSectionColor();
 
     if (matchType === "many") {
-      const totalHeight = matches.length * 32 + (matches.length - 1) * 4;
-      const startY = (16 / totalHeight) * 100;
-      const endY = ((index + 0.5) / matches.length) * 100;
+      const totalHeight =
+        matches.length * itemHeight + (matches.length - 1) * 4;
+      const startY = (itemHeight / 2 / totalHeight) * 100; // Center of the left ValueView as percentage
+      const endY = ((index * (30 + 4) + 30 / 2) / totalHeight) * 100; // Center of each right ValueView with 4px gutter
       const controlPoint1X = 30;
       const controlPoint2X = 70;
 
@@ -25,6 +27,9 @@ function ConnectionLine({
           strokeWidth={strokeWidth}
           fill="none"
           opacity={strokeOpacity}
+          vectorEffect="non-scaling-stroke"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       );
     } else {
@@ -35,6 +40,9 @@ function ConnectionLine({
           strokeWidth={strokeWidth}
           fill="none"
           opacity={strokeOpacity}
+          vectorEffect="non-scaling-stroke"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       );
     }
@@ -66,6 +74,7 @@ ConnectionLine.propTypes = {
   getSectionColor: PropTypes.func.isRequired,
   strokeWidth: PropTypes.number,
   strokeOpacity: PropTypes.number,
+  itemHeight: PropTypes.number.isRequired,
 };
 
 export default ConnectionLine;

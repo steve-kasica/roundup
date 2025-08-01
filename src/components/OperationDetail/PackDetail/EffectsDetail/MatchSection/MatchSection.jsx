@@ -7,9 +7,13 @@ import {
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { extent, max, scaleLinear } from "d3";
+import { max, scaleLinear } from "d3";
 import ConnectionLine from "./ConnectionLine";
 import ValueView from "./ValueView";
+import Bar from "./Bar";
+
+const columnWidths = ["30%", "10%", "30%", "30%"];
+const itemHeight = 12; // in pixels
 
 function MatchSection({
   title = "Matches",
@@ -19,7 +23,6 @@ function MatchSection({
   totalMatches,
   matchType,
 }) {
-  const itemHeight = 59.93; // in pixels
   const getSectionColor = () => {
     switch (matchType) {
       case "single":
@@ -39,7 +42,8 @@ function MatchSection({
       max(
         matches,
         ([{ count }, matchValues]) =>
-          count * max(matchValues, ({ count }) => count)
+          count *
+          (matchValues.length > 0 ? max(matchValues, ({ count }) => count) : 1)
       ),
     ])
     .range([0, 1]);
@@ -124,15 +128,20 @@ function MatchSection({
               display: "flex",
               alignItems: "center",
               textAlign: "center",
+              fontWeight: "bold",
               marginBottom: "16px",
               padding: "8px 0",
               borderBottom: "1px solid #ddd",
             }}
           >
-            <div style={{ flex: 1, fontWeight: "bold" }}>{leftTitle}</div>
-            <div style={{ flex: 1, textAlign: "center" }}></div>
+            <div style={{ flex: 1, fontWeight: "bold", textAlign: "center" }}>
+              {leftTitle}
+            </div>
+            <div style={{ flex: 0.3, textAlign: "center" }}></div>
             <div style={{ flex: 1, fontWeight: "bold" }}>{rightTitle}</div>
-            <div style={{ flex: 1, fontWeight: "bold" }}>Row Count</div>
+            <div style={{ width: columnWidths[3], fontWeight: "bold" }}>
+              Row Count
+            </div>
           </div>
 
           <div style={{ height: "300px", overflowY: "auto" }}>
@@ -141,6 +150,7 @@ function MatchSection({
                 <div
                   style={{
                     display: "flex",
+                    flex: 1,
                     alignItems: getAlignItems(),
                     textAlign: "center",
                     marginBottom: "8px",
@@ -148,22 +158,30 @@ function MatchSection({
                   }}
                   key={leftValue}
                 >
-                  <ValueView value={leftValue} matchCount={leftCount} />
+                  <div style={{ flex: 1, maxWidth: "40%" }}>
+                    <ValueView
+                      value={leftValue}
+                      matchCount={leftCount}
+                      height={itemHeight}
+                    />
+                  </div>
                   <div
                     style={{
-                      flex: 0.3, // Reduced from flex: 1 to give less space
                       position: "relative",
                       display: "flex",
+                      flex: 0.3,
                       alignItems: "center",
                       justifyContent: "center",
-                      height: getContainerHeight(matchValues || []),
-                      minWidth: "10px", // Ensure minimum width for connections
+                      height:
+                        matchValues.length * 30 + 4 * (matchValues.length - 1),
+                      minWidth: "10px",
                     }}
                   >
                     <ConnectionLine
                       matchType={matchType}
                       matchValues={matchValues}
                       getSectionColor={getSectionColor}
+                      itemHeight={itemHeight + 2 * 8 + 2 * 1}
                     />
                   </div>
                   <div
@@ -174,39 +192,52 @@ function MatchSection({
                       gap: "4px",
                     }}
                   >
-                    {matchValues.map(
-                      ({ value: rightValue, count: rightCount }) => (
-                        <ValueView
-                          key={rightValue}
-                          value={rightValue}
-                          matchCount={rightCount}
-                        />
+                    {matchValues.length > 0 ? (
+                      matchValues.map(
+                        ({ value: rightValue, count: rightCount }) => (
+                          <ValueView
+                            key={rightValue}
+                            value={rightValue}
+                            matchCount={rightCount}
+                            height={itemHeight}
+                          />
+                        )
                       )
+                    ) : (
+                      <ValueView height={itemHeight} />
                     )}
                   </div>
                   <div
                     style={{
-                      flex: 1,
+                      width: columnWidths[3],
                       display: "flex",
                       flexDirection: "column",
+                      paddingLeft: "5px",
                       gap: "4px",
                     }}
                   >
-                    {matchValues.map(
-                      ({ value: rightValue, count: rightCount }) => (
-                        <Box
-                          key={rightValue}
-                          sx={{
-                            width: `${xScale(leftCount * rightCount) * 100}%`,
-                            height: itemHeight + "px",
-                            backgroundColor: getSectionColor(),
-                            opacity: 0.7,
-                            textAlign: "right",
-                          }}
-                        >
-                          {leftCount * rightCount}
-                        </Box>
+                    {matchValues.length > 0 ? (
+                      matchValues.map(
+                        ({ value: rightValue, count: rightCount }) => (
+                          <Bar
+                            key={rightValue}
+                            value={leftCount * rightCount}
+                            width={xScale(leftCount * rightCount) * 100}
+                            height={itemHeight + 8 * 2}
+                            barColor={getSectionColor()}
+                            opacity={0.7}
+                            textAlign="right"
+                          />
+                        )
                       )
+                    ) : (
+                      <Bar
+                        value={leftCount}
+                        width={xScale(leftCount) * 100}
+                        height={itemHeight + 8 * 2}
+                        barColor={getSectionColor()}
+                        opacity={0.7}
+                      />
                     )}
                   </div>
                 </div>
