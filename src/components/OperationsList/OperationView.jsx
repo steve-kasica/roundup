@@ -14,6 +14,7 @@ import withOperationData from "../HOC/withOperationData";
 import PropTypes from "prop-types";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import React from "react";
+import { rename } from "fs";
 
 export const LAYOUT_ID = "operationListItem";
 
@@ -29,7 +30,13 @@ const StyledListItem = styled(ListItem, {
   }),
 }));
 
-function OperationView({ operation, childrenIds, index, peekTable }) {
+function OperationView({
+  operation,
+  childrenIds,
+  index,
+  peekTable,
+  renameOperation,
+}) {
   const { id, name, columnCount, operationType } = operation;
   const dispatch = useDispatch();
 
@@ -86,6 +93,18 @@ function OperationView({ operation, childrenIds, index, peekTable }) {
             >
               Peek at table
             </MenuItem>
+            <MenuItem
+              onClick={() => {
+                const newName = prompt("Enter new operation name:", name);
+                if (newName && newName.trim() && newName.trim() !== name) {
+                  renameOperation(newName.trim());
+                }
+                handleMenuClose();
+              }}
+            >
+              Rename
+            </MenuItem>
+
             {/* TODO: delete operation from this menu */}
             {/* <MenuItem onClick={handleMenuClose}>Delete</MenuItem> */}
           </Menu>
@@ -128,6 +147,7 @@ OperationView.propTypes = {
   ).isRequired,
   index: PropTypes.number.isRequired,
   peekTable: PropTypes.func.isRequired,
+  renameOperation: PropTypes.func.isRequired,
 };
 
 const EnhancedOperationView = withOperationData(OperationView);
