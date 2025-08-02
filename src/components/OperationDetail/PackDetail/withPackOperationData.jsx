@@ -36,12 +36,6 @@ export default function withPackOperationData(WrappedComponent) {
           dispatch(updateOperationJoinSpec({ id, attributes: { joinType } }))
         }
         setLeftTableJoinKey={(columnId) => {
-          console.log(
-            "Setting left table join key",
-            columnId,
-            "for operation",
-            id
-          );
           dispatch(
             updateOperations({
               id,

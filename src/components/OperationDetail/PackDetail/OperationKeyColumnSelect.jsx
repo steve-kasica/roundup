@@ -119,7 +119,14 @@ function OperationKeyColumnSelect({
 
             return (
               <MenuItem key={column.id} value={column.id}>
-                <ListItem secondaryAction={getUniquenessBadge(column)}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
                   <ListItemText
                     primary={
                       <Box
@@ -150,7 +157,8 @@ function OperationKeyColumnSelect({
                       },
                     }}
                   />
-                </ListItem>
+                  {getUniquenessBadge(column)}
+                </Box>
               </MenuItem>
             );
           })}
@@ -159,57 +167,6 @@ function OperationKeyColumnSelect({
           Choose a key column for the {table.name} table
         </FormHelperText>
       </FormControl>
-
-      {/* Display values from the currently selected column
-      {selectedColumn && (
-        <Paper sx={{ mt: 2, p: 2, maxHeight: 300, overflow: "auto" }}>
-          {columnValues.length > 0 ? (
-            <List dense sx={{ py: 0 }}>
-              {columnValues.map(([value, count], index) => (
-                <ListItem key={index} sx={{ py: 0.25, px: 1 }}>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2" sx={{ fontSize: "0.85rem" }}>
-                        {value === null || value === undefined
-                          ? "(empty)"
-                          : String(value)}
-                      </Typography>
-                    }
-                    secondary={
-                      count !== undefined
-                        ? `Count: ${count}`
-                        : "No count available"
-                    }
-                  />
-                </ListItem>
-              ))}
-              {Object.keys(selectedColumn.values || {}).length > 20 && (
-                <ListItem sx={{ py: 0.25, px: 1 }}>
-                  <ListItemText
-                    primary={
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontSize: "0.85rem",
-                          fontStyle: "italic",
-                          color: "text.secondary",
-                        }}
-                      >
-                        ... and {Object.keys(selectedColumn.values).length - 20}{" "}
-                        more values
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-              )}
-            </List>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              No values available for this column
-            </Typography>
-          )}
-        </Paper>
-      )} */}
     </Box>
   );
 }

@@ -47,7 +47,6 @@ export default function CustomDragLayer() {
     }
   }
 
-  // console.log(itemType, item);
   // let { x: xOffset, y: yOffset } = currentOffset;
   // let { x: dx, y: dy } = deltaOffset;
   // let [x, y] = [stepX(), initialOffset.y];
@@ -63,7 +62,6 @@ export default function CustomDragLayer() {
   // }
 
   // Render different effects based on the item type
-  console.log(item.maxColumnNameLength);
   const renderDragPreview = () => {
     switch (itemType) {
       case COLUMN:

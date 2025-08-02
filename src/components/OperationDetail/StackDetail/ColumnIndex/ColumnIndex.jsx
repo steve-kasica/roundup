@@ -62,7 +62,6 @@ export function ColumnIndex({
   // This useEffect is to make the isDragging state available globally
   // TODO: causing an infinite loop
   // useEffect(() => {
-  //   console.log("Column vector drag state changed:", isDragging, columnIds);
   //   if (isDragging) {
   //     // dispatch(addColumnsToDragging(columnIds));
   //   } else {

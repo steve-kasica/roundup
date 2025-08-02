@@ -30,11 +30,6 @@ export function ExportButton({
           includeHeaders,
         }
       );
-
-      console.log(`Successfully exported ${result.rowsExported} rows`);
-      // } catch (error) {
-      //   console.error("Export failed:", error);
-      //   alert("Export failed: " + error.message);
     } finally {
       setIsExporting(false);
       setProgress(0);

@@ -82,7 +82,6 @@ function MatchSection({
         expandIcon={<ExpandMoreIcon />}
         color={getSectionColor()}
         disabled={isDisabled}
-        hoverColor={getHoverColor()}
         sx={{
           "& .MuiAccordionSummary-content": {
             alignItems: "center",

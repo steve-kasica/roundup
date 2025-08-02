@@ -12,6 +12,7 @@ import PropTypes from "prop-types";
 import { JOIN_PREDICATES } from "../../../slices/operationsSlice";
 import OperationKeyColumnSelect from "./OperationKeyColumnSelect";
 import CompareColumns from "./EffectsDetail/CompareColumns";
+import EditableText from "../../ui/EditableText";
 import withPackOperationData from "./withPackOperationData";
 
 const PackDetail = ({
@@ -20,6 +21,7 @@ const PackDetail = ({
   setLeftTableJoinKey,
   setRightTableJoinKey,
   swapTablePositions,
+  renameOperation,
 }) => {
   const [selectedPredicate, setSelectedPredicate] = useState(
     operation.joinSpec?.joinPredicate || ""
@@ -95,7 +97,11 @@ const PackDetail = ({
           mb: 2,
         }}
       >
-        <h1 style={{ margin: 0 }}>{operation.name}</h1>
+        <EditableText
+          initialValue={operation.name}
+          onChange={renameOperation}
+          placeholder="Operation name"
+        />
         <IconButton
           onClick={() => swapTablePositions()}
           color="primary"
@@ -175,7 +181,8 @@ PackDetail.propTypes = {
   setJoinPredicate: PropTypes.func.isRequired,
   setLeftTableJoinKey: PropTypes.func.isRequired,
   setRightTableJoinKey: PropTypes.func.isRequired,
-  swapTables: PropTypes.func,
+  swapTablePositions: PropTypes.func.isRequired,
+  renameOperation: PropTypes.func.isRequired,
 };
 
 const EnhancedPackDetail = withPackOperationData(PackDetail);

@@ -67,7 +67,7 @@ function ColumnIndexDetails({
     if (rowEl && container) {
       // Calculate offset relative to the scrollable container
       const rowTop = rowEl.offsetTop;
-      console.log(rowTop);
+
       // Optionally, center the row:
       const scroll =
         rowTop -
@@ -91,8 +91,6 @@ function ColumnIndexDetails({
         .map(([b, i]) => i)
     )
   );
-
-  console.log("Signature extent:", signatureExtent);
 
   return (
     <Box
