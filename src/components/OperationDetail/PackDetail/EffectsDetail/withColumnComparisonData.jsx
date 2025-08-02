@@ -43,10 +43,6 @@ export default function withColumnComparisonData(WrappedComponent) {
     const column2Values = new Set(
       column2?.values ? Object.keys(column2.values) : []
     );
-    const valuesUnion = new Set([...column1Values, ...column2Values]);
-    const valuesIntersection = new Set(
-      [...column1Values].filter((value) => column2Values.has(value))
-    );
     const valueMatches = [...column1Values].map((value1) => {
       const matches = [...column2Values]
         .filter((value2) => comparisonFunction(value1, value2))
@@ -54,7 +50,19 @@ export default function withColumnComparisonData(WrappedComponent) {
       return [{ value: value1, count: column1.values[value1] }, matches];
     });
 
-    const matchGroups = group(valueMatches, ([{ value, count }, matches]) => {
+    // Determine which values in column2Values are unmatched
+    const unmatchedValues = [...column2Values]
+      .filter((value2) => {
+        return ![...column1Values].some((value1) =>
+          comparisonFunction(value1, value2)
+        );
+      })
+      .map((value2) => [
+        { value: null, count: 0 },
+        [{ value: value2, count: column2.values[value2] }],
+      ]);
+
+    const matchGroups = group(valueMatches, ([, matches]) => {
       switch (matches.length) {
         case 0:
           return NO_MATCHES;
@@ -77,6 +85,7 @@ export default function withColumnComparisonData(WrappedComponent) {
         noMatches={matchGroups.get(NO_MATCHES) || []}
         oneMatch={matchGroups.get(ONE_MATCH) || []}
         manyMatches={matchGroups.get(MANY_MATCHES) || []}
+        unmatchedValues={unmatchedValues || []}
       />
     );
   }

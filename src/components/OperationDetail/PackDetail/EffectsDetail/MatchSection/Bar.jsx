@@ -54,7 +54,8 @@ Bar.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
-  backgroundColor: PropTypes.string.isRequired,
+  barColor: PropTypes.string,
+  backgroundColor: PropTypes.string,
   opacity: PropTypes.number,
 };
 

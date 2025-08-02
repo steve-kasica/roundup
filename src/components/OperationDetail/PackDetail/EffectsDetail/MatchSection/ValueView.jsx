@@ -89,7 +89,7 @@ function ValueView({ value = null, matchCount, height = "100%" }) {
 }
 
 ValueView.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   matchCount: PropTypes.number,
 };
 

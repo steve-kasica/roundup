@@ -37,41 +37,26 @@ function MatchSection({
     }
   };
 
+  // leftCount is zero in the unmatched case, so we use Math.max(1, leftCount)
+  // to ensure the bar is calculated correctly, i.e. > 0
   const xScale = scaleLinear()
     .domain([
       0,
       max(
         matches,
-        ([{ count }, matchValues]) =>
-          count *
-          (matchValues.length > 0 ? max(matchValues, ({ count }) => count) : 1)
+        ([{ count: leftCount }, matchValues]) =>
+          Math.max(1, leftCount) *
+          (matchValues.length > 0
+            ? max(matchValues, ({ count: rightCount }) => rightCount)
+            : 1)
       ),
     ])
     .range([0, 1]);
-
-  const getContainerHeight = (matches) => {
-    if (matchType === "many") {
-      return `${matches.length * itemHeight + (matches.length - 1) * 4}px`;
-    }
-    return itemHeight + "px";
-  };
 
   const getAlignItems = () => {
     return matchType === "many" ? "flex-start" : "center";
   };
 
-  const getHoverColor = () => {
-    switch (matchType) {
-      case "single":
-        return "#45a049";
-      case "none":
-        return "#d32f2f";
-      case "many":
-        return "#f57c00";
-      default:
-        return "#333";
-    }
-  };
   const marginLeft = 0.3; // as a percentage of the width for the AccordionSummary
   const percentage = matches.length / totalMatches; // [0,1]
   const isDisabled = matches.length === 0;
@@ -234,8 +219,11 @@ function MatchSection({
                         ({ value: rightValue, count: rightCount }) => (
                           <Bar
                             key={rightValue}
-                            value={leftCount * rightCount}
-                            width={xScale(leftCount * rightCount) * 100}
+                            // leftCount equals zero in the unmatched case, so we use Math.max(1, leftCount)
+                            value={Math.max(1, leftCount) * rightCount}
+                            width={
+                              xScale(Math.max(1, leftCount) * rightCount) * 100
+                            }
                             height={itemHeight + 8 * 2}
                             barColor={getSectionColor()}
                             opacity={0.7}
@@ -269,7 +257,8 @@ MatchSection.propTypes = {
   rightTitle: PropTypes.string,
   matches: PropTypes.array.isRequired,
   totalMatches: PropTypes.number.isRequired,
-  matchType: PropTypes.oneOf(["single", "none", "many"]).isRequired,
+  matchType: PropTypes.oneOf(["single", "none", "many", "unmatched"])
+    .isRequired,
 };
 
 export default MatchSection;

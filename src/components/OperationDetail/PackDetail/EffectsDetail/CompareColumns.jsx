@@ -9,18 +9,8 @@ function CompareColumns({
   noMatches,
   oneMatch,
   manyMatches,
+  unmatchedValues,
 }) {
-  // if (!column1 || !column2) {
-  //   return (
-  //     <div style={{}}>
-  //       <h2>Effects Detail</h2>
-  //       <p>
-  //         Please select key columns for both tables to see the effects detail.
-  //       </p>
-  //     </div>
-  //   );
-  // }
-
   const totalMatches =
     !column1 || !column2
       ? -1
@@ -46,6 +36,14 @@ function CompareColumns({
         matches={noMatches}
         totalMatches={totalMatches}
         matchType="none"
+      />
+      <MatchSection
+        title="Unmatched values"
+        leftTitle={column1?.name || "Column 1"}
+        rightTitle={column2?.name || "Column 2"}
+        matches={unmatchedValues}
+        totalMatches={totalMatches}
+        matchType="unmatched"
       />
 
       <MatchSection
@@ -84,6 +82,7 @@ CompareColumns.propTypes = {
   noMatches: PropTypes.array,
   oneMatch: PropTypes.array,
   manyMatches: PropTypes.array,
+  unmatchedValues: PropTypes.array,
 };
 
 const EnhancedCompareColumns = withColumnComparisonData(CompareColumns);
