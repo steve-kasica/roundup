@@ -5,6 +5,8 @@ import MatchSection from "./MatchSection";
 function CompareColumns({
   column1,
   column2,
+  leftTableName,
+  rightTableName,
   leftValueCounts,
   rightValueCounts,
   noMatches,
@@ -22,15 +24,7 @@ function CompareColumns({
   return (
     <div>
       <MatchSection
-        title="Single match"
-        leftTitle={column1?.name || "Column 1"}
-        rightTitle={column2?.name || "Column 2"}
-        matches={oneMatch}
-        totalMatches={totalMatches}
-        matchType="single"
-      />
-      <MatchSection
-        title="No matches"
+        title={`Unmatches ${leftTableName}`}
         leftTitle={column1?.name || "Column 1"}
         rightTitle={column2?.name || "Column 2"}
         matches={noMatches}
@@ -38,7 +32,15 @@ function CompareColumns({
         matchType="none"
       />
       <MatchSection
-        title="Unmatched values"
+        title="Matches"
+        leftTitle={column1?.name || "Column 1"}
+        rightTitle={column2?.name || "Column 2"}
+        matches={oneMatch}
+        totalMatches={totalMatches}
+        matchType="single"
+      />
+      <MatchSection
+        title={`Unmatches ${rightTableName}`}
         leftTitle={column1?.name || "Column 1"}
         rightTitle={column2?.name || "Column 2"}
         matches={unmatchedValues}
@@ -79,6 +81,8 @@ CompareColumns.propTypes = {
   }),
   values1: PropTypes.instanceOf(Set),
   values2: PropTypes.instanceOf(Set),
+  leftTableName: PropTypes.string,
+  rightTableName: PropTypes.string,
   leftValueCounts: PropTypes.object,
   rightValueCounts: PropTypes.object,
   noMatches: PropTypes.array,

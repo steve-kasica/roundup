@@ -6,6 +6,7 @@ import {
   Box,
   Typography,
   Checkbox,
+  Stack,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { max, scaleLinear } from "d3";
@@ -21,22 +22,11 @@ function MatchSection({
   leftTitle = "Column 1",
   rightTitle = "Column 2",
   matches,
+  barColor = "gray",
+  fontSize = "12px",
   totalMatches,
   matchType,
 }) {
-  const getSectionColor = () => {
-    switch (matchType) {
-      case "single":
-        return "#4CAF50";
-      case "none":
-        return "#f44336";
-      case "many":
-        return "#FF9800";
-      default:
-        return "#000";
-    }
-  };
-
   // leftCount is zero in the unmatched case, so we use Math.max(1, leftCount)
   // to ensure the bar is calculated correctly, i.e. > 0
   const xScale = scaleLinear()
@@ -62,26 +52,37 @@ function MatchSection({
   const isDisabled = matches.length === 0;
 
   return (
-    <Accordion>
+    <Accordion
+      sx={{
+        boxShadow: "none",
+        "&:before": {
+          display: "none", // Removes the divider line
+        },
+      }}
+      disableGutters
+    >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
-        color={getSectionColor()}
+        color={barColor}
         disabled={isDisabled}
         sx={{
           "& .MuiAccordionSummary-content": {
             alignItems: "center",
+            margin: 0,
           },
+          padding: 0,
+          minHeight: "5px",
         }}
       >
-        <Checkbox
-          size="small"
-          defaultChecked={!isDisabled}
-          sx={{ mr: 1 }}
-          onClick={(e) => e.stopPropagation()} // Prevent accordion toggle when clicking checkbox
-        />
         <Typography
           component="span"
-          sx={{ width: `${marginLeft * 100}%`, flexShrink: 0 }}
+          sx={{
+            width: `${marginLeft * 100}%`,
+            flexShrink: 0,
+            textAlign: "right",
+            paddingRight: "8px",
+            fontSize,
+          }}
         >
           {title}
         </Typography>
@@ -93,7 +94,7 @@ function MatchSection({
         >
           <Box
             sx={{
-              background: getSectionColor(),
+              background: barColor,
               height: "100%",
               width: `${percentage * 100}%`,
               textAlign: "right",
@@ -101,7 +102,7 @@ function MatchSection({
               alignItems: "center",
               justifyContent: "flex-end",
               fontWeight: "bold",
-              fontSize: "12px",
+              fontSize,
               overflow: "visible",
             }}
           >
@@ -117,8 +118,23 @@ function MatchSection({
             </span>
           </Box>
         </Box>
+        <Checkbox
+          size="small"
+          defaultChecked={!isDisabled}
+          sx={{ margin: 0, padding: 0 }}
+          onClick={(e) => e.stopPropagation()} // Prevent accordion toggle when clicking checkbox
+        />
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails
+        sx={{
+          backgroundColor: "#f8f9fa",
+          border: "1px solid #dee2e6",
+          borderRadius: "4px",
+          boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.1)",
+          padding: "16px",
+          margin: "8px 0",
+        }}
+      >
         <>
           <div
             style={{
@@ -178,7 +194,7 @@ function MatchSection({
                     <ConnectionLine
                       matchType={matchType}
                       matchValues={matchValues}
-                      getSectionColor={getSectionColor}
+                      strokeColor={barColor}
                       itemHeight={itemHeight + 2 * 8 + 2 * 1}
                     />
                   </div>
@@ -225,7 +241,7 @@ function MatchSection({
                               xScale(Math.max(1, leftCount) * rightCount) * 100
                             }
                             height={itemHeight + 8 * 2}
-                            barColor={getSectionColor()}
+                            barColor={barColor}
                             opacity={0.7}
                             textAlign="right"
                           />
@@ -236,7 +252,7 @@ function MatchSection({
                         value={leftCount}
                         width={xScale(leftCount) * 100}
                         height={itemHeight + 8 * 2}
-                        barColor={getSectionColor()}
+                        barColor={barColor}
                         opacity={0.7}
                       />
                     )}
@@ -255,6 +271,8 @@ MatchSection.propTypes = {
   title: PropTypes.string,
   leftTitle: PropTypes.string,
   rightTitle: PropTypes.string,
+  barColor: PropTypes.string,
+  fontSize: PropTypes.string,
   matches: PropTypes.array.isRequired,
   totalMatches: PropTypes.number.isRequired,
   matchType: PropTypes.oneOf(["single", "none", "many", "unmatched"])

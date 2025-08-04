@@ -3,14 +3,12 @@ import PropTypes from "prop-types";
 function ConnectionLine({
   matchType,
   matchValues,
-  getSectionColor,
+  strokeColor = "gray",
   strokeWidth = 2,
   strokeOpacity = 1,
   itemHeight,
 }) {
   const renderConnection = (matches, index = 0) => {
-    const color = getSectionColor();
-
     if (matchType === "many") {
       const totalHeight =
         matches.length * itemHeight + (matches.length - 1) * 4;
@@ -23,7 +21,7 @@ function ConnectionLine({
         <path
           key={index}
           d={`M 0 ${startY} C ${controlPoint1X} ${startY}, ${controlPoint2X} ${endY}, 100 ${endY}`}
-          stroke={color}
+          stroke={strokeColor}
           strokeWidth={strokeWidth}
           fill="none"
           opacity={strokeOpacity}
@@ -36,7 +34,7 @@ function ConnectionLine({
       return (
         <path
           d="M 0 50 L 100 50"
-          stroke={color}
+          stroke={strokeColor}
           strokeWidth={strokeWidth}
           fill="none"
           opacity={strokeOpacity}
@@ -71,7 +69,7 @@ function ConnectionLine({
 ConnectionLine.propTypes = {
   matchType: PropTypes.oneOf(["single", "none", "many"]).isRequired,
   matchValues: PropTypes.array,
-  getSectionColor: PropTypes.func.isRequired,
+  strokeColor: PropTypes.string,
   strokeWidth: PropTypes.number,
   strokeOpacity: PropTypes.number,
   itemHeight: PropTypes.number.isRequired,

@@ -106,6 +106,8 @@ export default function withColumnComparisonData(WrappedComponent) {
         column2={column2}
         values1={leftValues}
         values2={rightValues}
+        leftTableName={table1?.name || "Table 1"}
+        rightTableName={table2?.name || "Table 2"}
         leftValueCounts={column1?.values}
         rightValueCounts={column2?.values}
         noMatches={matchGroups[UNMATCHED_LEFT] || []}
