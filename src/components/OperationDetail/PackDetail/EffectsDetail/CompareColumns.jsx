@@ -7,27 +7,28 @@ function CompareColumns({
   column2,
   leftTableName,
   rightTableName,
-  leftValueCounts,
-  rightValueCounts,
-  noMatches,
+  noMatchesLeft,
   oneMatch,
   manyMatches,
-  unmatchedValues,
+  noMatchesRight,
 }) {
   const totalMatches =
     !column1 || !column2
       ? -1
-      : oneMatch.length + noMatches.length + manyMatches.length;
+      : oneMatch.length +
+        noMatchesLeft.length +
+        manyMatches.length +
+        noMatchesRight.length;
 
   // Helper function to calculate percentage for bar chart
 
   return (
     <div>
       <MatchSection
-        title={`Unmatches ${leftTableName}`}
+        title={`${leftTableName} unmatched`}
         leftTitle={column1?.name || "Column 1"}
         rightTitle={column2?.name || "Column 2"}
-        matches={noMatches}
+        matches={noMatchesLeft}
         totalMatches={totalMatches}
         matchType="none"
       />
@@ -39,15 +40,6 @@ function CompareColumns({
         totalMatches={totalMatches}
         matchType="single"
       />
-      <MatchSection
-        title={`Unmatches ${rightTableName}`}
-        leftTitle={column1?.name || "Column 1"}
-        rightTitle={column2?.name || "Column 2"}
-        matches={unmatchedValues}
-        totalMatches={totalMatches}
-        matchType="unmatched"
-      />
-
       {/* <MatchSection
         title="Many matches"
         leftTitle={column1?.name || "Column 1"}
@@ -56,6 +48,14 @@ function CompareColumns({
         totalMatches={totalMatches}
         matchType="many"
       /> */}
+      <MatchSection
+        title={`${rightTableName} unmatched`}
+        leftTitle={column1?.name || "Column 1"}
+        rightTitle={column2?.name || "Column 2"}
+        matches={noMatchesRight}
+        totalMatches={totalMatches}
+        matchType="unmatched"
+      />
     </div>
   );
 }
@@ -86,9 +86,9 @@ CompareColumns.propTypes = {
   leftValueCounts: PropTypes.object,
   rightValueCounts: PropTypes.object,
   noMatches: PropTypes.array,
-  oneMatch: PropTypes.array,
+  oneMatchLeft: PropTypes.array,
   manyMatches: PropTypes.array,
-  unmatchedValues: PropTypes.array,
+  noMatchesRight: PropTypes.array,
 };
 
 const EnhancedCompareColumns = withColumnComparisonData(CompareColumns);

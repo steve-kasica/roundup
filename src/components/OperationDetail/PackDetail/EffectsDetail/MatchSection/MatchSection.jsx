@@ -49,6 +49,7 @@ function MatchSection({
 
   const marginLeft = 0.3; // as a percentage of the width for the AccordionSummary
   const percentage = matches.length / totalMatches; // [0,1]
+  console.log(percentage, "percentages");
   const isDisabled = matches.length === 0;
 
   return (
