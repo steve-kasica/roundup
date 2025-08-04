@@ -68,33 +68,39 @@ export default function withColumnComparisonData(WrappedComponent) {
         : sortMergeJoin(leftValues, rightValues, comparisonFunction);
 
     // Transform join results to existing format
+    // matchGroups[ONE_MATCH] = joinResult.oneToOneMatches.map(
+    //   ([leftValue, rightValue]) => [
+    //     { value: leftValue, count: column1.values[leftValue] },
+    //     [{ value: rightValue, count: column2.values[rightValue] }],
+    //   ]
+    // );
     matchGroups[ONE_MATCH] = joinResult.oneToOneMatches.map(
-      ([leftValue, rightValue]) => [
-        { value: leftValue, count: column1.values[leftValue] },
-        [{ value: rightValue, count: column2.values[rightValue] }],
-      ]
+      ([leftValue, rightValue]) => ({
+        left: { value: leftValue, count: column1.values[leftValue] },
+        right: { value: rightValue, count: column2.values[rightValue] },
+      })
     );
 
     // Transform many-to-many matches
-    matchGroups[MANY_MATCHES] = joinResult.oneToManyMatches.map(
-      ([leftValue, rightValue]) => [
-        { value: leftValue, count: column1.values[leftValue] },
-        [{ value: rightValue, count: column2.values[rightValue] }],
-      ]
-    );
+    // matchGroups[MANY_MATCHES] = joinResult.oneToManyMatches.map(
+    //   ([leftValue, rightValue]) => ({
+    //     left: { value: leftValue, count: column1.values[leftValue] },
+    //     right: { value: rightValue, count: column2.values[rightValue] },
+    //   })
+    // );
 
     // Calculate unmatched values in the left column
-    matchGroups[UNMATCHED_LEFT] = joinResult.unmatchedLeft.map((leftValue) => [
-      { value: leftValue, count: column1.values[leftValue] },
-      [],
-    ]);
+    matchGroups[UNMATCHED_LEFT] = joinResult.unmatchedLeft.map((leftValue) => ({
+      left: { value: leftValue, count: column1.values[leftValue] },
+      right: { value: null, count: 0 },
+    }));
 
     // Calculate unmatched values in the right column
     matchGroups[UNMATCHED_RIGHT] = joinResult.unmatchedRight.map(
-      (rightValue) => [
-        { value: null, count: 0 },
-        [{ value: rightValue, count: column2.values[rightValue] }],
-      ]
+      (rightValue) => ({
+        left: { value: null, count: 0 },
+        right: { value: rightValue, count: column2.values[rightValue] },
+      })
     );
 
     return (

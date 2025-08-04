@@ -6,16 +6,10 @@ import {
   Box,
   Typography,
   Checkbox,
-  Stack,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { max, scaleLinear } from "d3";
-import ConnectionLine from "./ConnectionLine";
-import ValueView from "./ValueView";
+import MatchDetails from "./MatchDetails";
 import Bar from "./Bar";
-
-const columnWidths = ["30%", "10%", "30%", "30%"];
-const itemHeight = 12; // in pixels
 
 function MatchSection({
   title = "Matches",
@@ -25,31 +19,9 @@ function MatchSection({
   barColor = "gray",
   fontSize = "12px",
   totalMatches,
-  matchType,
 }) {
-  // leftCount is zero in the unmatched case, so we use Math.max(1, leftCount)
-  // to ensure the bar is calculated correctly, i.e. > 0
-  const xScale = scaleLinear()
-    .domain([
-      0,
-      max(
-        matches,
-        ([{ count: leftCount }, matchValues]) =>
-          Math.max(1, leftCount) *
-          (matchValues.length > 0
-            ? max(matchValues, ({ count: rightCount }) => rightCount)
-            : 1)
-      ),
-    ])
-    .range([0, 1]);
-
-  const getAlignItems = () => {
-    return matchType === "many" ? "flex-start" : "center";
-  };
-
   const marginLeft = 0.3; // as a percentage of the width for the AccordionSummary
   const percentage = matches.length / totalMatches; // [0,1]
-  console.log(percentage, "percentages");
   const isDisabled = matches.length === 0;
 
   return (
@@ -93,31 +65,13 @@ function MatchSection({
             width: `${(1 - marginLeft) * 100}%`,
           }}
         >
-          <Box
-            sx={{
-              background: barColor,
-              height: "100%",
-              width: `${percentage * 100}%`,
-              textAlign: "right",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              fontWeight: "bold",
-              fontSize,
-              overflow: "visible",
-            }}
-          >
-            <span
-              style={{
-                position: "relative",
-                right: percentage < 0.5 ? "-2.5ch" : "0px",
-                color: percentage < 0.5 ? "black" : "white",
-                paddingRight: percentage < 0.5 ? "0px" : "1ch",
-              }}
-            >
-              {matches.length}
-            </span>
-          </Box>
+          <Bar
+            value={matches.length}
+            width={percentage * 100}
+            barColor={barColor}
+            backgroundColor="#ddd"
+            opacity={0.7}
+          />
         </Box>
         <Checkbox
           size="small"
@@ -134,135 +88,19 @@ function MatchSection({
           boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.1)",
           padding: "16px",
           margin: "8px 0",
+          maxHeight: "400px",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              textAlign: "center",
-              fontWeight: "bold",
-              marginBottom: "16px",
-              padding: "8px 0",
-              borderBottom: "1px solid #ddd",
-            }}
-          >
-            <div style={{ flex: 1, fontWeight: "bold", textAlign: "center" }}>
-              {leftTitle}
-            </div>
-            <div style={{ flex: 0.3, textAlign: "center" }}></div>
-            <div style={{ flex: 1, fontWeight: "bold" }}>{rightTitle}</div>
-            <div style={{ width: columnWidths[3], fontWeight: "bold" }}>
-              Row Count
-            </div>
-          </div>
-
-          <div style={{ height: "300px", overflowY: "auto" }}>
-            {matches.map(
-              ([{ value: leftValue, count: leftCount }, matchValues]) => (
-                <div
-                  style={{
-                    display: "flex",
-                    flex: 1,
-                    alignItems: getAlignItems(),
-                    textAlign: "center",
-                    marginBottom: "8px",
-                    position: "relative",
-                  }}
-                  key={leftValue}
-                >
-                  <div style={{ flex: 1, maxWidth: "40%" }}>
-                    <ValueView
-                      value={leftValue}
-                      matchCount={leftCount}
-                      height={itemHeight}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      position: "relative",
-                      display: "flex",
-                      flex: 0.3,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height:
-                        Math.max(1, matchValues.length) * 30 +
-                        4 * (Math.max(1, matchValues.length) - 1),
-                      minWidth: "10px",
-                    }}
-                  >
-                    <ConnectionLine
-                      matchType={matchType}
-                      matchValues={matchValues}
-                      strokeColor={barColor}
-                      itemHeight={itemHeight + 2 * 8 + 2 * 1}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "4px",
-                    }}
-                  >
-                    {matchValues.length > 0 ? (
-                      matchValues.map(
-                        ({ value: rightValue, count: rightCount }) => (
-                          <ValueView
-                            key={rightValue}
-                            value={rightValue}
-                            matchCount={rightCount}
-                            height={itemHeight}
-                          />
-                        )
-                      )
-                    ) : (
-                      <ValueView height={itemHeight} />
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      width: columnWidths[3],
-                      display: "flex",
-                      flexDirection: "column",
-                      paddingLeft: "5px",
-                      gap: "4px",
-                    }}
-                  >
-                    {matchValues.length > 0 ? (
-                      matchValues.map(
-                        ({ value: rightValue, count: rightCount }) => (
-                          <Bar
-                            key={rightValue}
-                            // leftCount equals zero in the unmatched case, so we use Math.max(1, leftCount)
-                            value={Math.max(1, leftCount) * rightCount}
-                            width={
-                              xScale(Math.max(1, leftCount) * rightCount) * 100
-                            }
-                            height={itemHeight + 8 * 2}
-                            barColor={barColor}
-                            opacity={0.7}
-                            textAlign="right"
-                          />
-                        )
-                      )
-                    ) : (
-                      <Bar
-                        value={leftCount}
-                        width={xScale(leftCount) * 100}
-                        height={itemHeight + 8 * 2}
-                        barColor={barColor}
-                        opacity={0.7}
-                      />
-                    )}
-                  </div>
-                </div>
-              )
-            )}
-          </div>
-        </>
+        <MatchDetails
+          matches={matches}
+          leftTitle={leftTitle}
+          rightTitle={rightTitle}
+          barColor={barColor}
+          fontSize={fontSize}
+          totalMatches={totalMatches}
+        />
       </AccordionDetails>
     </Accordion>
   );
@@ -276,8 +114,6 @@ MatchSection.propTypes = {
   fontSize: PropTypes.string,
   matches: PropTypes.array.isRequired,
   totalMatches: PropTypes.number.isRequired,
-  matchType: PropTypes.oneOf(["single", "none", "many", "unmatched"])
-    .isRequired,
 };
 
 export default MatchSection;
