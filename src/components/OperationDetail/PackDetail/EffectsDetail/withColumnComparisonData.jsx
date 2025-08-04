@@ -1,15 +1,20 @@
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
 import { selectColumnById } from "../../../../slices/columnsSlice";
 import { selectTablesById } from "../../../../slices/tablesSlice";
 
 import { equals } from "./comparisonFunctions";
-import { group } from "d3";
+import {
+  hashJoin,
+  sortMergeJoin,
+  chooseJoinAlgorithm,
+} from "../../../../lib/utilities/joinAlgorithms";
 
-const NO_MATCHES = "none";
+const UNMATCHED_LEFT = "none";
 const ONE_MATCH = "one";
 const MANY_MATCHES = "many";
+const UNMATCHED_RIGHT = "unmatched-right";
 
 /**
  * Higher-Order Component that provides column comparison data for two tables.
@@ -37,41 +42,60 @@ export default function withColumnComparisonData(WrappedComponent) {
     );
 
     // Derived properties (with null checks)
-    const column1Values = new Set(
-      column1?.values ? Object.keys(column1.values) : []
+    const leftValues = Array.from(
+      new Set(column1?.values ? Object.keys(column1.values) : [])
     );
-    const column2Values = new Set(
-      column2?.values ? Object.keys(column2.values) : []
+    const rightValues = Array.from(
+      new Set(column2?.values ? Object.keys(column2.values) : [])
     );
-    const valueMatches = [...column1Values].map((value1) => {
-      const matches = [...column2Values]
-        .filter((value2) => comparisonFunction(value1, value2))
-        .map((value2) => ({ value: value2, count: column2.values[value2] }));
-      return [{ value: value1, count: column1.values[value1] }, matches];
-    });
 
-    // Determine which values in column2Values are unmatched
-    const unmatchedValues = [...column2Values]
-      .filter((value2) => {
-        return ![...column1Values].some((value1) =>
-          comparisonFunction(value1, value2)
-        );
-      })
-      .map((value2) => [
+    const matchGroups = {};
+    matchGroups[UNMATCHED_LEFT] = [];
+    matchGroups[ONE_MATCH] = [];
+    matchGroups[MANY_MATCHES] = [];
+    matchGroups[UNMATCHED_RIGHT] = [];
+
+    // Choose and execute optimal join algorithm
+    const algorithm = chooseJoinAlgorithm(
+      leftValues.length,
+      rightValues.length,
+      comparisonFunction
+    );
+
+    const joinResult =
+      algorithm === "hash"
+        ? hashJoin(leftValues, rightValues, comparisonFunction)
+        : sortMergeJoin(leftValues, rightValues, comparisonFunction);
+
+    // Transform join results to existing format
+    matchGroups[ONE_MATCH] = joinResult.oneToOneMatches.map(
+      ([leftValue, rightValue]) => [
+        { value: leftValue, count: column1.values[leftValue] },
+        [{ value: rightValue, count: column2.values[rightValue] }],
+      ]
+    );
+
+    // Transform many-to-many matches
+    matchGroups[MANY_MATCHES] = joinResult.oneToManyMatches.map(
+      ([leftValue, rightValue]) => [
+        { value: leftValue, count: column1.values[leftValue] },
+        [{ value: rightValue, count: column2.values[rightValue] }],
+      ]
+    );
+
+    // Calculate unmatched values in the left column
+    matchGroups[UNMATCHED_LEFT] = joinResult.unmatchedLeft.map((leftValue) => [
+      { value: leftValue, count: column1.values[leftValue] },
+      [],
+    ]);
+
+    // Calculate unmatched values in the right column
+    matchGroups[UNMATCHED_RIGHT] = joinResult.unmatchedRight.map(
+      (rightValue) => [
         { value: null, count: 0 },
-        [{ value: value2, count: column2.values[value2] }],
-      ]);
-
-    const matchGroups = group(valueMatches, ([, matches]) => {
-      switch (matches.length) {
-        case 0:
-          return NO_MATCHES;
-        case 1:
-          return ONE_MATCH;
-        default:
-          return MANY_MATCHES;
-      }
-    });
+        [{ value: rightValue, count: column2.values[rightValue] }],
+      ]
+    );
 
     return (
       <WrappedComponent
@@ -80,12 +104,14 @@ export default function withColumnComparisonData(WrappedComponent) {
         table2={table2}
         column1={column1}
         column2={column2}
-        values1={column1Values}
-        values2={column2Values}
-        noMatches={matchGroups.get(NO_MATCHES) || []}
-        oneMatch={matchGroups.get(ONE_MATCH) || []}
-        manyMatches={matchGroups.get(MANY_MATCHES) || []}
-        unmatchedValues={unmatchedValues || []}
+        values1={leftValues}
+        values2={rightValues}
+        leftValueCounts={column1?.values}
+        rightValueCounts={column2?.values}
+        noMatches={matchGroups[UNMATCHED_LEFT] || []}
+        oneMatch={matchGroups[ONE_MATCH] || []}
+        manyMatches={matchGroups[MANY_MATCHES] || []}
+        unmatchedValues={matchGroups[UNMATCHED_RIGHT] || []}
       />
     );
   }

@@ -48,7 +48,7 @@ function OperationKeyColumnSelect({
         : 0;
 
     const percentage = Math.round(uniquenessRatio * 100);
-    const label = column.uniqueValues;
+    const label = Object.keys(column.values).length;
 
     let color = colors[2]; // Default to low
     if (uniquenessRatio > thresholds[0]) {

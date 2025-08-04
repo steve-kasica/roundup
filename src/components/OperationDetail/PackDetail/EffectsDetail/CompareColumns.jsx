@@ -5,7 +5,8 @@ import MatchSection from "./MatchSection";
 function CompareColumns({
   column1,
   column2,
-  values1,
+  leftValueCounts,
+  rightValueCounts,
   noMatches,
   oneMatch,
   manyMatches,
@@ -28,7 +29,6 @@ function CompareColumns({
         totalMatches={totalMatches}
         matchType="single"
       />
-
       <MatchSection
         title="No matches"
         leftTitle={column1?.name || "Column 1"}
@@ -46,14 +46,14 @@ function CompareColumns({
         matchType="unmatched"
       />
 
-      <MatchSection
+      {/* <MatchSection
         title="Many matches"
         leftTitle={column1?.name || "Column 1"}
         rightTitle={column2?.name || "Column 2"}
         matches={manyMatches}
         totalMatches={totalMatches}
         matchType="many"
-      />
+      /> */}
     </div>
   );
 }
@@ -79,6 +79,8 @@ CompareColumns.propTypes = {
   }),
   values1: PropTypes.instanceOf(Set),
   values2: PropTypes.instanceOf(Set),
+  leftValueCounts: PropTypes.object,
+  rightValueCounts: PropTypes.object,
   noMatches: PropTypes.array,
   oneMatch: PropTypes.array,
   manyMatches: PropTypes.array,
