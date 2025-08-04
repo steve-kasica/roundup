@@ -6,7 +6,7 @@ import {
   InputLabel,
   IconButton,
 } from "@mui/material";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import SwapIcon from "@mui/icons-material/SwapVert";
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { JOIN_PREDICATES } from "../../../slices/operationsSlice";
@@ -102,14 +102,6 @@ const PackDetail = ({
           onChange={renameOperation}
           placeholder="Operation name"
         />
-        <IconButton
-          onClick={() => swapTablePositions()}
-          color="primary"
-          title="Swap table positions"
-          sx={{ ml: 2 }}
-        >
-          <SwapHorizIcon />
-        </IconButton>
       </Box>
 
       <div style={{ width: "100%" }}>
@@ -129,24 +121,38 @@ const PackDetail = ({
             />
           </div>
           <div style={{ flex: "1" }}>
-            <FormControl variant="standard" fullWidth sx={{ mb: 2 }}>
-              <InputLabel id="pack-predicate-select-label">
-                Match condition
-              </InputLabel>
-              <Select
-                labelId="pack-predicate-select-label"
-                value={selectedPredicate}
-                label="MATCH CONDITION"
-                onChange={handlePredicateChange}
+            <Box
+              sx={{ display: "flex", alignItems: "flex-end", gap: 1, mb: 2 }}
+            >
+              <FormControl variant="standard" sx={{ flexGrow: 1 }}>
+                <InputLabel id="pack-predicate-select-label">
+                  Match condition
+                </InputLabel>
+                <Select
+                  labelId="pack-predicate-select-label"
+                  value={selectedPredicate}
+                  label="MATCH CONDITION"
+                  onChange={handlePredicateChange}
+                >
+                  <MenuItem value={JOIN_PREDICATES.EQUALS}>EQUALS</MenuItem>
+                  <MenuItem value={JOIN_PREDICATES.CONTAINS}>CONTAINS</MenuItem>
+                  <MenuItem value={JOIN_PREDICATES.STARTS_WITH}>
+                    STARTS WITH
+                  </MenuItem>
+                  <MenuItem value={JOIN_PREDICATES.ENDS_WITH}>
+                    ENDS WITH
+                  </MenuItem>
+                </Select>
+              </FormControl>
+              <IconButton
+                onClick={() => swapTablePositions()}
+                color="primary"
+                title="Swap table positions"
+                sx={{ mb: 0.5 }}
               >
-                <MenuItem value={JOIN_PREDICATES.EQUALS}>EQUALS</MenuItem>
-                <MenuItem value={JOIN_PREDICATES.CONTAINS}>CONTAINS</MenuItem>
-                <MenuItem value={JOIN_PREDICATES.STARTS_WITH}>
-                  STARTS WITH
-                </MenuItem>
-                <MenuItem value={JOIN_PREDICATES.ENDS_WITH}>ENDS WITH</MenuItem>
-              </Select>
-            </FormControl>
+                <SwapIcon />
+              </IconButton>
+            </Box>
           </div>
           <div style={{ flex: "1" }}>
             <OperationKeyColumnSelect
