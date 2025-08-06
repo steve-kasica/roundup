@@ -5,9 +5,8 @@ import Bar from "./Bar";
 import { max, scaleLinear } from "d3";
 import Edges from "./ConnectionLine";
 
-// const itemHeight = 12; // in pixels
-const rowHeight = 30; // in pixels
-const rowMargin = 8; // in pixels
+const rowMargin = 5; // in pixels, controls the gab between match groups
+const valueHeight = 38.02; // in pixels, height of each value row, including margin
 
 function MatchDetails({
   matches,
@@ -297,7 +296,6 @@ function MatchDetails({
                 alignItems: "flex-start",
                 textAlign: "center",
                 position: "relative",
-                //   height: rowHeight + "px",
                 paddingBottom: rowMargin + "px",
                 paddingTop: rowMargin + "px",
               }}
@@ -325,6 +323,7 @@ function MatchDetails({
                   leftValues={leftValues}
                   rightValues={rightValues}
                   matches={matches}
+                  itemHeight={valueHeight}
                 />
               </Box>
               <Box sx={{ width: "40%" }}>
@@ -341,6 +340,7 @@ function MatchDetails({
                   <Bar
                     key={`bar-${i}`}
                     value={value}
+                    height={valueHeight}
                     width={xScale(value)}
                     barColor={barColor}
                     backgroundColor="#f0f0f0"
