@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Box, Typography } from "@mui/material";
 import ValueView from "./ValueView";
 import Bar from "./Bar";
@@ -28,41 +28,13 @@ function MatchDetails({
     ])
     .range([0, 100]);
 
-  // Sort matches based on current sort settings
-  const sortedMatches = [...matches].sort((a, b) => {
-    if (!sortBy) return 0;
-
-    let aValue, bValue;
-
-    if (sortBy === "left") {
-      aValue = a.left.value;
-      bValue = b.left.value;
-    } else if (sortBy === "right") {
-      aValue = a.right.value;
-      bValue = b.right.value;
-    } else if (sortBy === "count") {
-      aValue = a.left.count * a.right.count;
-      bValue = b.left.count * b.right.count;
-    }
-
-    // Handle different data types
-    let comparison = 0;
-    if (typeof aValue === "string" && typeof bValue === "string") {
-      comparison = aValue.localeCompare(bValue);
-    } else {
-      comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    }
-
-    return sortOrder === "asc" ? comparison : -comparison;
-  });
-
-  // Group matches into connected components
-  const matchGroups = (() => {
+  // Compute match groups only when matches change (expensive operation)
+  const rawMatchGroups = useMemo(() => {
     const leftToRight = new Map();
     const rightToLeft = new Map();
 
     // Build bidirectional adjacency lists
-    sortedMatches.forEach(({ left, right }) => {
+    matches.forEach(({ left, right }) => {
       const leftVal = left.value;
       const rightVal = right.value;
 
@@ -105,7 +77,7 @@ function MatchDetails({
         dfs(leftVal, true, component);
 
         // Reconstruct matches for this component
-        sortedMatches.forEach((match) => {
+        matches.forEach((match) => {
           if (
             component.leftValues.has(match.left.value) &&
             component.rightValues.has(match.right.value)
@@ -141,7 +113,71 @@ function MatchDetails({
     }
 
     return components;
-  })();
+  }, [matches]);
+
+  // Sort components and their internal matches based on current sort settings (cheap operation)
+  const sortedMatchGroups = useMemo(() => {
+    return rawMatchGroups
+      .map((component) => {
+        // Sort matches within each component
+        const sortedMatches = [...component.matches].sort((a, b) => {
+          if (!sortBy) return 0;
+
+          let aValue, bValue;
+
+          if (sortBy === "left") {
+            aValue = a.left.value;
+            bValue = b.left.value;
+          } else if (sortBy === "right") {
+            aValue = a.right.value;
+            bValue = b.right.value;
+          } else if (sortBy === "count") {
+            aValue = a.left.count * a.right.count;
+            bValue = b.left.count * b.right.count;
+          }
+
+          let comparison = 0;
+          if (typeof aValue === "string" && typeof bValue === "string") {
+            comparison = aValue.localeCompare(bValue);
+          } else {
+            comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+          }
+
+          return sortOrder === "asc" ? comparison : -comparison;
+        });
+
+        return {
+          ...component,
+          matches: sortedMatches,
+        };
+      })
+      .sort((a, b) => {
+        // Sort components themselves
+        if (!sortBy) return 0;
+
+        let aValue, bValue;
+
+        if (sortBy === "left") {
+          aValue = a.leftValues.size;
+          bValue = b.leftValues.size;
+        } else if (sortBy === "right") {
+          aValue = a.rightValues.size;
+          bValue = b.rightValues.size;
+        } else if (sortBy === "count") {
+          aValue = Math.max(...a.rowCounts);
+          bValue = Math.max(...b.rowCounts);
+        }
+
+        let comparison = 0;
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          comparison = aValue.localeCompare(bValue);
+        } else {
+          comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+        }
+
+        return sortOrder === "asc" ? comparison : -comparison;
+      });
+  }, [rawMatchGroups, sortBy, sortOrder]);
 
   // Handle column header clicks
   const handleSort = (column) => {
@@ -241,7 +277,7 @@ function MatchDetails({
           position: "relative",
         }}
       >
-        {matchGroups.map(
+        {sortedMatchGroups.map(
           (
             {
               leftValues,
