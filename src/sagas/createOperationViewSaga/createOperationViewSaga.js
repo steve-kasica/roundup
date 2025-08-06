@@ -106,12 +106,16 @@ function* handleCreateOperationView(operationId) {
 
     // Get dimensions of the operation view
     // This will throw an error if the operation has no rows or columns
-    const dimensions = yield call(getTableDimensions, operationId);
-    validateOperationDimensions(operationId, dimensions);
+    const { rowCount, columnCount } = yield call(
+      getTableDimensions,
+      operationId
+    );
+    validateOperationDimensions(operationId, { rowCount, columnCount });
     yield put(
       updateOperations({
         id: operationId,
-        ...dimensions,
+        rowCount,
+        columnCount,
       })
     );
 
