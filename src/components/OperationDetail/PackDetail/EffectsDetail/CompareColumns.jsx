@@ -23,6 +23,14 @@ function CompareColumns({
         manyMatches.length +
         noMatchesRight.length;
 
+  const totalRows =
+    noMatchesLeft.length +
+    noMatchesRight.length +
+    oneMatch.reduce(
+      (acc, { left, right }) => acc + left.count * right.count,
+      0
+    );
+
   const calculateJoinType = useCallback((checkState) => {
     const checkSignature = checkState
       .map((checked) => (checked ? "1" : "0"))
@@ -52,7 +60,6 @@ function CompareColumns({
 
   useEffect(() => {
     const joinType = calculateJoinType(checkState);
-    console.log("Calculated join type:", joinType);
     setJoinType(joinType);
   }, [checkState, calculateJoinType, setJoinType]);
 
@@ -64,6 +71,7 @@ function CompareColumns({
         rightTitle={column2?.name || "Column 2"}
         matches={noMatchesLeft}
         totalMatches={totalMatches}
+        totalRows={totalRows}
         matchType="none"
         handleOnCheckboxClick={(checked) =>
           setCheckState((state) => [checked, state[1], state[2]])
@@ -75,6 +83,7 @@ function CompareColumns({
         rightTitle={column2?.name || "Column 2"}
         matches={oneMatch}
         totalMatches={totalMatches}
+        totalRows={totalRows}
         matchType="single"
         handleOnCheckboxClick={(checked) =>
           setCheckState((state) => [state[0], checked, state[2]])
@@ -86,6 +95,7 @@ function CompareColumns({
         rightTitle={column2?.name || "Column 2"}
         matches={noMatchesRight}
         totalMatches={totalMatches}
+        totalRows={totalRows}
         matchType="unmatched"
         handleOnCheckboxClick={(checked) =>
           setCheckState((state) => [state[0], state[1], checked])

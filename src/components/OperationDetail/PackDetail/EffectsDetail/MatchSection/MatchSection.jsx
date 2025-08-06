@@ -19,10 +19,22 @@ function MatchSection({
   barColor = "gray",
   fontSize = "12px",
   totalMatches,
+  totalRows,
   handleOnCheckboxClick,
 }) {
   const marginLeft = 0.3; // as a percentage of the width for the AccordionSummary
-  const percentage = matches.length / totalMatches; // [0,1]
+  const sectionRows = matches.reduce((acc, { left, right }) => {
+    return acc + Math.max(left.count * right.count, 1);
+  }, 0);
+  const percentage = sectionRows / totalRows; // [0,1]
+  console.log(
+    "Matches:",
+    matches,
+    "Percentage:",
+    percentage,
+    "Rows:",
+    sectionRows
+  );
   const isDisabled = matches.length === 0;
 
   return (
@@ -67,7 +79,7 @@ function MatchSection({
           }}
         >
           <Bar
-            value={matches.length}
+            value={sectionRows}
             width={percentage * 100}
             barColor={barColor}
             backgroundColor="#ddd"
