@@ -22,6 +22,7 @@ const PackDetail = ({
   setRightTableJoinKey,
   swapTablePositions,
   renameOperation,
+  setJoinType,
 }) => {
   const [selectedPredicate, setSelectedPredicate] = useState(
     operation.joinSpec?.joinPredicate || ""
@@ -166,6 +167,7 @@ const PackDetail = ({
           columnId1={operation.joinSpec?.joinKey1}
           columnId2={operation.joinSpec?.joinKey2}
           comparisonFunction={comparisonFunction}
+          setJoinType={setJoinType}
         />
       </div>
     </Box>
@@ -189,6 +191,7 @@ PackDetail.propTypes = {
   setRightTableJoinKey: PropTypes.func.isRequired,
   swapTablePositions: PropTypes.func.isRequired,
   renameOperation: PropTypes.func.isRequired,
+  setJoinType: PropTypes.func.isRequired,
 };
 
 const EnhancedPackDetail = withPackOperationData(PackDetail);

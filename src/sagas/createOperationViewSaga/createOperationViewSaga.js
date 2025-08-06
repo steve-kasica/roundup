@@ -8,6 +8,7 @@ import {
   setOperationAttributes,
   setOperationError,
   updateOperationJoinSpec,
+  updateOperations,
 } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { addTableToSchemaSuccess } from "../addTableToSchemaSaga/addTableToSchemaSaga";
@@ -48,6 +49,23 @@ export default function* createOperationViewSaga() {
 
     if (table.operationId) {
       yield handleCreateOperationView(table.operationId);
+    }
+  });
+
+  yield takeEvery(updateOperations.type, function* (action) {
+    const dependentProps = ["joinSpec"]; // TODO: expand this
+    const operations = Array.isArray(action.payload)
+      ? action.payload
+      : action.payload.operations || [action.payload];
+
+    for (const updatedOperationProps of operations) {
+      if (
+        Object.keys(updatedOperationProps).some((key) =>
+          dependentProps.includes(key)
+        )
+      ) {
+        yield handleCreateOperationView(updatedOperationProps.id);
+      }
     }
   });
 

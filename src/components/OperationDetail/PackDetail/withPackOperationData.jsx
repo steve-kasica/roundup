@@ -7,6 +7,7 @@ import {
 } from "../../../slices/operationsSlice";
 import PropTypes from "prop-types";
 import withOperationData from "../../HOC/withOperationData";
+import { useCallback } from "react";
 
 export default function withPackOperationData(WrappedComponent) {
   // First wrap with the base operation data HOC
@@ -20,6 +21,29 @@ export default function withPackOperationData(WrappedComponent) {
     const joinSpec = operation?.joinSpec;
     const isPack = operation?.operationType === OPERATION_TYPE_PACK;
 
+    const setJoinType = useCallback(
+      (joinType) => {
+        dispatch(
+          updateOperations({
+            id,
+            joinSpec: {
+              joinKey1: joinSpec.joinKey1, // NO-OP
+              joinKey2: joinSpec.joinKey2, // NO-OP
+              joinType, // Update join type
+              joinPredicate: joinSpec.joinPredicate, // NO-OP
+            },
+          })
+        );
+      },
+      [
+        dispatch,
+        id,
+        joinSpec?.joinKey1,
+        joinSpec?.joinKey2,
+        joinSpec?.joinPredicate,
+      ]
+    );
+
     return (
       <ComponentWithOperationData
         {...props}
@@ -32,9 +56,7 @@ export default function withPackOperationData(WrappedComponent) {
         joinKey2={joinSpec?.joinKey2}
         isPack={isPack}
         // Pack-specific join dispatchers
-        setJoinType={(joinType) =>
-          dispatch(updateOperationJoinSpec({ id, attributes: { joinType } }))
-        }
+        setJoinType={setJoinType}
         setLeftTableJoinKey={(columnId) => {
           dispatch(
             updateOperations({

@@ -61,7 +61,7 @@ function Bar({
 Bar.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
+  height: PropTypes.number,
   barColor: PropTypes.string,
   backgroundColor: PropTypes.string,
   opacity: PropTypes.number,

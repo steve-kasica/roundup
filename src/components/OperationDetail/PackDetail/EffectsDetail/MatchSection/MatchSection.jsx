@@ -19,6 +19,7 @@ function MatchSection({
   barColor = "gray",
   fontSize = "12px",
   totalMatches,
+  handleOnCheckboxClick,
 }) {
   const marginLeft = 0.3; // as a percentage of the width for the AccordionSummary
   const percentage = matches.length / totalMatches; // [0,1]
@@ -75,9 +76,12 @@ function MatchSection({
         </Box>
         <Checkbox
           size="small"
-          defaultChecked={!isDisabled}
+          defaultChecked
           sx={{ margin: 0, padding: 0 }}
-          onClick={(e) => e.stopPropagation()} // Prevent accordion toggle when clicking checkbox
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent accordion toggle when clicking checkbox
+            handleOnCheckboxClick(e.target.checked);
+          }}
         />
       </AccordionSummary>
       <AccordionDetails
@@ -114,6 +118,7 @@ MatchSection.propTypes = {
   fontSize: PropTypes.string,
   matches: PropTypes.array.isRequired,
   totalMatches: PropTypes.number.isRequired,
+  handleOnCheckboxClick: PropTypes.func.isRequired,
 };
 
 export default MatchSection;

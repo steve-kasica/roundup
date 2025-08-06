@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import withColumnComparisonData from "./withColumnComparisonData";
 import MatchSection from "./MatchSection";
+import { useEffect, useState, useCallback } from "react";
 
 function CompareColumns({
   column1,
@@ -11,7 +12,9 @@ function CompareColumns({
   oneMatch,
   manyMatches,
   noMatchesRight,
+  setJoinType,
 }) {
+  const [checkState, setCheckState] = useState([true, true, true]); // [left, match, right]
   const totalMatches =
     !column1 || !column2
       ? -1
@@ -20,7 +23,38 @@ function CompareColumns({
         manyMatches.length +
         noMatchesRight.length;
 
-  // Helper function to calculate percentage for bar chart
+  const calculateJoinType = useCallback((checkState) => {
+    const checkSignature = checkState
+      .map((checked) => (checked ? "1" : "0"))
+      .join("");
+
+    switch (checkSignature) {
+      case "111":
+        return "FULL";
+      case "110":
+        return "LEFT";
+      case "101":
+        return "FULL ANTI";
+      case "100":
+        return "LEFT ANTI";
+      case "011":
+        return "RIGHT";
+      case "010":
+        return "INNER";
+      case "001":
+        return "RIGHT ANTI";
+      case "000":
+        return "";
+      default:
+        return "";
+    }
+  }, []);
+
+  useEffect(() => {
+    const joinType = calculateJoinType(checkState);
+    console.log("Calculated join type:", joinType);
+    setJoinType(joinType);
+  }, [checkState, calculateJoinType, setJoinType]);
 
   return (
     <div>
@@ -31,6 +65,9 @@ function CompareColumns({
         matches={noMatchesLeft}
         totalMatches={totalMatches}
         matchType="none"
+        handleOnCheckboxClick={(checked) =>
+          setCheckState((state) => [checked, state[1], state[2]])
+        }
       />
       <MatchSection
         title="Matches"
@@ -39,15 +76,10 @@ function CompareColumns({
         matches={oneMatch}
         totalMatches={totalMatches}
         matchType="single"
+        handleOnCheckboxClick={(checked) =>
+          setCheckState((state) => [state[0], checked, state[2]])
+        }
       />
-      {/* <MatchSection
-        title="Many matches"
-        leftTitle={column1?.name || "Column 1"}
-        rightTitle={column2?.name || "Column 2"}
-        matches={manyMatches}
-        totalMatches={totalMatches}
-        matchType="many"
-      /> */}
       <MatchSection
         title={`${rightTableName} unmatched`}
         leftTitle={column1?.name || "Column 1"}
@@ -55,20 +87,15 @@ function CompareColumns({
         matches={noMatchesRight}
         totalMatches={totalMatches}
         matchType="unmatched"
+        handleOnCheckboxClick={(checked) =>
+          setCheckState((state) => [state[0], state[1], checked])
+        }
       />
     </div>
   );
 }
 
 CompareColumns.propTypes = {
-  table1: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string.isRequired,
-  }),
-  table2: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string.isRequired,
-  }),
   column1: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
@@ -79,16 +106,13 @@ CompareColumns.propTypes = {
     name: PropTypes.string.isRequired,
     values: PropTypes.object,
   }),
-  values1: PropTypes.instanceOf(Set),
-  values2: PropTypes.instanceOf(Set),
-  leftTableName: PropTypes.string,
-  rightTableName: PropTypes.string,
-  leftValueCounts: PropTypes.object,
-  rightValueCounts: PropTypes.object,
-  noMatches: PropTypes.array,
-  oneMatchLeft: PropTypes.array,
-  manyMatches: PropTypes.array,
-  noMatchesRight: PropTypes.array,
+  leftTableName: PropTypes.string.isRequired,
+  rightTableName: PropTypes.string.isRequired,
+  noMatchesLeft: PropTypes.array.isRequired,
+  oneMatch: PropTypes.array.isRequired,
+  manyMatches: PropTypes.array.isRequired,
+  noMatchesRight: PropTypes.array.isRequired,
+  setJoinType: PropTypes.func.isRequired,
 };
 
 const EnhancedCompareColumns = withColumnComparisonData(CompareColumns);
