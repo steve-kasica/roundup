@@ -5,13 +5,11 @@ import {
   selectFocusedOperationId,
   setHoveredOperation,
   selectHoveredOperation,
-  updateOperationJoinSpec,
   updateOperations,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { setPeekedTable } from "../../slices/uiSlice";
-import Operation from "../../slices/operationsSlice/Operation";
 
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {

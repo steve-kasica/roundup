@@ -25,7 +25,7 @@ const PackDetail = ({
   setJoinType,
 }) => {
   const [selectedPredicate, setSelectedPredicate] = useState(
-    operation.joinSpec?.joinPredicate || ""
+    operation.joinPredicate || ""
   );
   const [comparisonFunction, setComparisonFunction] = useState(null);
 
@@ -117,7 +117,7 @@ const PackDetail = ({
           <div style={{ flex: "1" }}>
             <OperationKeyColumnSelect
               id={operation.children[0]}
-              currentValue={operation.joinSpec?.joinKey1}
+              currentValue={operation.joinKey1}
               onChange={(columnId) => setLeftTableJoinKey(columnId)}
             />
           </div>
@@ -158,14 +158,14 @@ const PackDetail = ({
           <div style={{ flex: "1" }}>
             <OperationKeyColumnSelect
               id={operation.children[1]}
-              currentValue={operation.joinSpec?.joinKey2}
+              currentValue={operation.joinKey2}
               onChange={(columnId) => setRightTableJoinKey(columnId)}
             />
           </div>
         </div>
         <CompareColumns
-          columnId1={operation.joinSpec?.joinKey1}
-          columnId2={operation.joinSpec?.joinKey2}
+          columnId1={operation.joinKey1}
+          columnId2={operation.joinKey2}
           comparisonFunction={comparisonFunction}
           setJoinType={setJoinType}
         />
@@ -180,11 +180,9 @@ PackDetail.propTypes = {
     children: PropTypes.arrayOf(
       PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     ),
-    joinSpec: PropTypes.shape({
-      joinPredicate: PropTypes.string,
-      joinKey1: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      joinKey2: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    }),
+    joinPredicate: PropTypes.string,
+    joinKey1: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    joinKey2: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }).isRequired,
   setJoinPredicate: PropTypes.func.isRequired,
   setLeftTableJoinKey: PropTypes.func.isRequired,

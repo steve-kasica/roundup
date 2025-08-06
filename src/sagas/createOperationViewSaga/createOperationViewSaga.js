@@ -7,7 +7,6 @@ import {
   selectOperation,
   setOperationAttributes,
   setOperationError,
-  updateOperationJoinSpec,
   updateOperations,
 } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
@@ -53,7 +52,12 @@ export default function* createOperationViewSaga() {
   });
 
   yield takeEvery(updateOperations.type, function* (action) {
-    const dependentProps = ["joinSpec"]; // TODO: expand this
+    const dependentProps = [
+      "joinType",
+      "joinKey1", // TODO: rename this to "leftJoinKey"
+      "joinKey2", // TODO: rename this to "rightJoinKey"
+      "joinPredicate",
+    ];
     const operations = Array.isArray(action.payload)
       ? action.payload
       : action.payload.operations || [action.payload];
@@ -67,13 +71,6 @@ export default function* createOperationViewSaga() {
         yield handleCreateOperationView(updatedOperationProps.id);
       }
     }
-  });
-
-  // If the specification of an PACK operation is updated, create or update the operation view
-  // in DuckDB
-  yield takeEvery(updateOperationJoinSpec.type, function* (action) {
-    const { id } = action.payload;
-    yield handleCreateOperationView(id);
   });
 }
 

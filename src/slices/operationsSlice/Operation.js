@@ -27,13 +27,6 @@ export const JOIN_PREDICATES = {
   ENDS_WITH: "ENDS_WITH",
 };
 
-export const JOIN_SPEC_SCHEMA = {
-  joinType: JOIN_TYPES.INNER,
-  joinPredicate: JOIN_PREDICATES.EQUALS,
-  joinKey1: null,
-  joinKey2: null,
-};
-
 let idCounter = 0; // each node gets a unique ID, regardless if it's a table vs operation node
 
 export default function Operation(operationType, children) {
@@ -58,8 +51,10 @@ export default function Operation(operationType, children) {
     // since they have similar but different schema?
     // Maybe they can "inherit" from a generic operation factory
     // It's like inheritance in functional programming.
-    joinSpec:
-      operationType === OPERATION_TYPE_PACK ? JOIN_SPEC_SCHEMA : undefined,
+    joinType: OPERATION_TYPE_PACK ? JOIN_TYPES.INNER : undefined,
+    joinPredicate: OPERATION_TYPE_PACK ? JOIN_PREDICATES.EQUALS : undefined,
+    joinKey1: null,
+    joinKey2: null,
   };
 }
 

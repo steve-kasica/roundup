@@ -15,7 +15,7 @@ export async function createPackView(opData) {
 export function formQuery(op) {
   const table1 = op.children[0].id;
   const table2 = op.children[1].id;
-  const { joinType, joinKey1, joinKey2, joinPredicate } = op.joinSpec;
+  const { joinType, joinKey1, joinKey2, joinPredicate } = op;
 
   if (!joinType) {
     throw new Error("join type is unspecified");
