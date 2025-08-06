@@ -7,22 +7,22 @@ function ConnectionLine({
   strokeColor = "gray",
   strokeWidth = 2,
   strokeOpacity = 1,
-  itemHeight,
+  itemHeight = 38.02,
 }) {
-  const calcD = (match, leftValues, rightValues) => {
+  const leftCount = leftValues.size;
+  const rightCount = rightValues.size;
+  const maxCount = Math.max(leftCount, rightCount);
+
+  const calcD = ({ left, right }, leftValues, rightValues) => {
     // Find the position of this match's values in their respective arrays
-    const leftIndex = Array.from(leftValues).indexOf(match.left.value);
-    const rightIndex = Array.from(rightValues).indexOf(match.right.value);
+    const leftIndex = [...leftValues].indexOf(left.value) + 1;
+    const rightIndex = [...rightValues].indexOf(right.value) + 1;
 
-    // Calculate vertical positions based on array indices
-    const leftCount = leftValues.size;
-    const rightCount = rightValues.size;
-
-    const startY = leftCount > 1 ? (leftIndex / (leftCount - 1)) * 100 : 50;
-    const endY = rightCount > 1 ? (rightIndex / (rightCount - 1)) * 100 : 50;
+    const startY = (leftIndex / maxCount - 1 / maxCount / 2) * 100;
+    const endY = (rightIndex / maxCount - 1 / maxCount / 2) * 100;
 
     // Start from the right edge of left column, end at left edge of right column
-    const startX = 0; // This should be adjusted based on your layout
+    const startX = 0;
     const endX = 100;
 
     // Create control points for a smooth curve
@@ -36,7 +36,7 @@ function ConnectionLine({
     <svg
       style={{
         width: "100%",
-        height: "100%",
+        height: `${itemHeight * maxCount}px`,
         pointerEvents: "none",
       }}
       viewBox="0 0 100 100"

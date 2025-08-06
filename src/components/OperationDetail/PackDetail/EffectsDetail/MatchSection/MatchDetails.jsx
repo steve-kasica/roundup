@@ -294,7 +294,7 @@ function MatchDetails({
                 display: "flex",
                 flexDirection: "row",
                 flex: 1,
-                alignItems: "center",
+                alignItems: "flex-start",
                 textAlign: "center",
                 position: "relative",
                 //   height: rowHeight + "px",
