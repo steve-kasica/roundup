@@ -13,8 +13,7 @@ export function hashJoin(leftValues, rightValues, comparisonFn) {
     rightHash.get(val).push(val);
   });
 
-  const oneToOneMatches = [];
-  const oneToManyMatches = [];
+  const matches = [];
   const unmatchedLeft = [];
   const matchedRightValues = new Set();
 
@@ -40,13 +39,11 @@ export function hashJoin(leftValues, rightValues, comparisonFn) {
       }
     }
 
-    // Categorize matches by cardinality
+    // Add all matches to single category
     if (currentMatches.length === 0) {
       unmatchedLeft.push(leftVal);
-    } else if (currentMatches.length === 1) {
-      oneToOneMatches.push(...currentMatches);
     } else {
-      oneToManyMatches.push(...currentMatches);
+      matches.push(...currentMatches);
     }
   });
 
@@ -56,8 +53,7 @@ export function hashJoin(leftValues, rightValues, comparisonFn) {
   );
 
   return {
-    oneToOneMatches,
-    oneToManyMatches,
+    matches,
     unmatchedLeft,
     unmatchedRight,
   };
@@ -70,8 +66,7 @@ export function sortMergeJoin(leftValues, rightValues, comparisonFn) {
   const sortedLeft = [...leftValues].sort();
   const sortedRight = [...rightValues].sort();
 
-  const oneToOneMatches = [];
-  const oneToManyMatches = [];
+  const matches = [];
   const unmatchedLeft = [];
   const unmatchedRight = [];
   const matchedRightValues = new Set();
@@ -111,12 +106,8 @@ export function sortMergeJoin(leftValues, rightValues, comparisonFn) {
         nextLeft++;
       }
 
-      // Categorize matches by cardinality
-      if (currentMatches.length === 1) {
-        oneToOneMatches.push(...currentMatches);
-      } else {
-        oneToManyMatches.push(...currentMatches);
-      }
+      // Add all matches to single category
+      matches.push(...currentMatches);
 
       leftIndex++;
       rightIndex++;
@@ -141,8 +132,7 @@ export function sortMergeJoin(leftValues, rightValues, comparisonFn) {
   }
 
   return {
-    oneToOneMatches,
-    oneToManyMatches,
+    matches,
     unmatchedLeft,
     unmatchedRight,
   };

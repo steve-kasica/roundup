@@ -67,27 +67,12 @@ export default function withColumnComparisonData(WrappedComponent) {
         ? hashJoin(leftValues, rightValues, comparisonFunction)
         : sortMergeJoin(leftValues, rightValues, comparisonFunction);
 
-    // Transform join results to existing format
-    // matchGroups[ONE_MATCH] = joinResult.oneToOneMatches.map(
-    //   ([leftValue, rightValue]) => [
-    //     { value: leftValue, count: column1.values[leftValue] },
-    //     [{ value: rightValue, count: column2.values[rightValue] }],
-    //   ]
-    // );
-    matchGroups[ONE_MATCH] = joinResult.oneToOneMatches.map(
+    matchGroups[ONE_MATCH] = joinResult.matches.map(
       ([leftValue, rightValue]) => ({
         left: { value: leftValue, count: column1.values[leftValue] },
         right: { value: rightValue, count: column2.values[rightValue] },
       })
     );
-
-    // Transform many-to-many matches
-    // matchGroups[MANY_MATCHES] = joinResult.oneToManyMatches.map(
-    //   ([leftValue, rightValue]) => ({
-    //     left: { value: leftValue, count: column1.values[leftValue] },
-    //     right: { value: rightValue, count: column2.values[rightValue] },
-    //   })
-    // );
 
     // Calculate unmatched values in the left column
     matchGroups[UNMATCHED_LEFT] = joinResult.unmatchedLeft.map((leftValue) => ({

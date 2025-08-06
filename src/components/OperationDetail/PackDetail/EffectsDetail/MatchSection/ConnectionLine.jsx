@@ -1,57 +1,40 @@
 import PropTypes from "prop-types";
 
 function ConnectionLine({
-  matchType,
-  matchValues,
+  leftValues,
+  rightValues,
+  matches,
   strokeColor = "gray",
   strokeWidth = 2,
   strokeOpacity = 1,
   itemHeight,
 }) {
-  const renderConnection = (matches, index = 0) => {
-    if (matchType === "many") {
-      const totalHeight =
-        matches.length * itemHeight + (matches.length - 1) * 4;
-      const startY = (itemHeight / 2 / totalHeight) * 100; // Center of the left ValueView as percentage
-      const endY = ((index * (30 + 4) + 30 / 2) / totalHeight) * 100; // Center of each right ValueView with 4px gutter
-      const controlPoint1X = 30;
-      const controlPoint2X = 70;
+  const calcD = (match, leftValues, rightValues) => {
+    // Find the position of this match's values in their respective arrays
+    const leftIndex = Array.from(leftValues).indexOf(match.left.value);
+    const rightIndex = Array.from(rightValues).indexOf(match.right.value);
 
-      return (
-        <path
-          key={index}
-          d={`M 0 ${startY} C ${controlPoint1X} ${startY}, ${controlPoint2X} ${endY}, 100 ${endY}`}
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-          fill="none"
-          opacity={strokeOpacity}
-          vectorEffect="non-scaling-stroke"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      );
-    } else {
-      return (
-        <path
-          d="M 0 50 L 100 50"
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-          fill="none"
-          opacity={strokeOpacity}
-          vectorEffect="non-scaling-stroke"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      );
-    }
+    // Calculate vertical positions based on array indices
+    const leftCount = leftValues.size;
+    const rightCount = rightValues.size;
+
+    const startY = leftCount > 1 ? (leftIndex / (leftCount - 1)) * 100 : 50;
+    const endY = rightCount > 1 ? (rightIndex / (rightCount - 1)) * 100 : 50;
+
+    // Start from the right edge of left column, end at left edge of right column
+    const startX = 0; // This should be adjusted based on your layout
+    const endX = 100;
+
+    // Create control points for a smooth curve
+    const controlPoint1X = 30;
+    const controlPoint2X = 70;
+
+    return `M ${startX} ${startY} C ${controlPoint1X} ${startY} ${controlPoint2X} ${endY} ${endX} ${endY}`;
   };
 
   return (
     <svg
       style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
         width: "100%",
         height: "100%",
         pointerEvents: "none",
@@ -59,16 +42,29 @@ function ConnectionLine({
       viewBox="0 0 100 100"
       preserveAspectRatio="none"
     >
-      {matchType === "many"
-        ? matchValues.map((_, index) => renderConnection(matchValues, index))
-        : renderConnection()}
+      {matches.map((match, index) => (
+        <path
+          key={index}
+          d={calcD(match, leftValues, rightValues)}
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
+          fill="none"
+          opacity={strokeOpacity}
+          vectorEffect="non-scaling-stroke"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ))}
     </svg>
   );
 }
 
 ConnectionLine.propTypes = {
-  matchType: PropTypes.oneOf(["single", "none", "many"]).isRequired,
-  matchValues: PropTypes.array,
+  leftValues: PropTypes.array.isRequired,
+  rightValues: PropTypes.array.isRequired,
+  matches: PropTypes.array.isRequired,
+  // Optional props for styling
+  barColor: PropTypes.string,
   strokeColor: PropTypes.string,
   strokeWidth: PropTypes.number,
   strokeOpacity: PropTypes.number,

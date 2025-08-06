@@ -3,6 +3,7 @@ import { Box, Typography } from "@mui/material";
 import ValueView from "./ValueView";
 import Bar from "./Bar";
 import { max, scaleLinear } from "d3";
+import Edges from "./ConnectionLine";
 
 // const itemHeight = 12; // in pixels
 const rowHeight = 30; // in pixels
@@ -113,14 +114,34 @@ function MatchDetails({
           }
         });
 
+        // Calculate rowCounts for each right value in this component
+        component.rowCounts = [...component.rightValues].map((value, i) => {
+          const rowCount = component.matches.reduce(
+            (count, { left, right }) =>
+              right.value === value
+                ? count + Math.max(1, left.count * right.count)
+                : count,
+            0
+          );
+          return rowCount;
+        });
+
+        component.leftCounts = new Map(
+          component.matches.map((match) => [match.left.value, match.left.count])
+        );
+        component.rightCounts = new Map(
+          component.matches.map((match) => [
+            match.right.value,
+            match.right.count,
+          ])
+        );
+
         components.push(component);
       }
     }
 
     return components;
   })();
-
-  console.log("Match Groups:", matchGroups);
 
   // Handle column header clicks
   const handleSort = (column) => {
@@ -220,63 +241,80 @@ function MatchDetails({
           position: "relative",
         }}
       >
-        {sortedMatches.map(({ left, right }, i) => (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              flex: 1,
-              alignItems: "center",
-              textAlign: "center",
-              position: "relative",
-              height: rowHeight + "px",
-              paddingBottom: rowMargin + "px",
-              paddingTop: rowMargin + "px",
-            }}
-            key={`${left.value}-${right.value}-${i}`}
-          >
-            <Box sx={{ width: "40%" }}>
-              <ValueView value={left.value} matchCount={left.count} />
-            </Box>
-            <Box
-              sx={{
-                width: "10%",
-                paddingLeft: "0px",
+        {matchGroups.map(
+          (
+            {
+              leftValues,
+              rightValues,
+              matches,
+              rowCounts,
+              leftCounts,
+              rightCounts,
+            },
+            i
+          ) => (
+            <div
+              style={{
                 display: "flex",
+                flexDirection: "row",
+                flex: 1,
                 alignItems: "center",
-                justifyContent: "center",
+                textAlign: "center",
+                position: "relative",
+                //   height: rowHeight + "px",
+                paddingBottom: rowMargin + "px",
+                paddingTop: rowMargin + "px",
               }}
+              key={`${i}`}
             >
-              <svg
-                width="100%"
-                height={rowHeight + "px"}
-                style={{ overflow: "visible" }}
+              <Box sx={{ width: "40%" }}>
+                {[...leftValues].map((value, index) => (
+                  <ValueView
+                    key={`left-${index}`}
+                    value={value}
+                    matchCount={leftCounts.get(value)}
+                  />
+                ))}
+              </Box>
+              <Box
+                sx={{
+                  width: "10%",
+                  paddingLeft: "0px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
-                <line
-                  x1="0"
-                  y1={"50%"}
-                  x2="100%"
-                  y2={"50%"}
-                  stroke={barColor}
-                  strokeWidth="1"
-                  opacity="0.6"
+                <Edges
+                  leftValues={leftValues}
+                  rightValues={rightValues}
+                  matches={matches}
                 />
-              </svg>
-            </Box>
-            <Box sx={{ width: "40%" }}>
-              <ValueView value={right.value} matchCount={right.count} />
-            </Box>
-            <Box sx={{ width: "20%", paddingLeft: "8px", height: "inherit" }}>
-              <Bar
-                value={Math.max(left.count * right.count, 1)}
-                width={xScale(left.count * right.count)}
-                barColor={barColor}
-                backgroundColor="#f0f0f0"
-                opacity={0.7}
-              />
-            </Box>
-          </div>
-        ))}
+              </Box>
+              <Box sx={{ width: "40%" }}>
+                {[...rightValues].map((value, index) => (
+                  <ValueView
+                    key={`right-${index}`}
+                    value={value}
+                    matchCount={rightCounts.get(value)}
+                  />
+                ))}
+              </Box>
+              <Box sx={{ width: "20%", paddingLeft: "8px", height: "inherit" }}>
+                {rowCounts.map((value, i) => (
+                  <Bar
+                    key={`bar-${i}`}
+                    value={value}
+                    width={xScale(value)}
+                    barColor={barColor}
+                    backgroundColor="#f0f0f0"
+                    opacity={0.7}
+                  />
+                ))}
+              </Box>
+            </div>
+          )
+        )}
       </div>
     </>
   );
