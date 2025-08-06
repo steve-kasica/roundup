@@ -1,12 +1,8 @@
 import { createAction } from "@reduxjs/toolkit";
 import { takeEvery, call, put, select } from "redux-saga/effects";
 import {
-  clearOperationError,
   OPERATION_TYPE_PACK,
-  OPERATION_TYPE_STACK,
   selectOperation,
-  setOperationAttributes,
-  setOperationError,
   updateOperations,
 } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
@@ -113,9 +109,9 @@ function* handleCreateOperationView(operationId) {
     const dimensions = yield call(getTableDimensions, operationId);
     validateOperationDimensions(operationId, dimensions);
     yield put(
-      setOperationAttributes({
+      updateOperations({
         id: operationId,
-        attributes: { ...dimensions },
+        ...dimensions,
       })
     );
 
@@ -127,16 +123,16 @@ function* handleCreateOperationView(operationId) {
         columnIds.map((id) => selectColumnById(state, id).name)
       );
       yield put(
-        setOperationAttributes({
+        updateOperations({
           id: operationId,
-          attributes: { columnNames },
+          columnNames,
         })
       );
     }
 
     if (operation.error) {
       // Clear any previous error if the operation was successful
-      yield put(clearOperationError({ operationId }));
+      yield put(updateOperations({ id: operationId, error: null }));
     }
 
     yield put(
@@ -148,8 +144,8 @@ function* handleCreateOperationView(operationId) {
   } catch (error) {
     console.warn("Error creating operation view:", error);
     yield put(
-      setOperationError({
-        operationId,
+      updateOperations({
+        id: operationId,
         error: JSON.stringify(error, Object.getOwnPropertyNames(error)), // Serialize the error
       })
     );

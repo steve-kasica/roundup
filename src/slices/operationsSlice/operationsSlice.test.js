@@ -1,14 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import reducer, {
   addOperation,
-  removeOperation,
-  changeOperationType,
   addChildToOperation,
   removeChildFromOperation,
   setFocusedOperation,
   setHoveredOperation,
+  updateOperations,
 } from "./operationsSlice";
-import Operation, { OPERATION_TYPE_NO_OP } from "./Operation";
+import Operation from "./Operation";
 
 // Helper to create a minimal operation
 function makeOp(type = "TEST", children = []) {
@@ -49,13 +48,13 @@ describe("operationsSlice reducers", () => {
     expect(state.data[state.root].children).toEqual(["c2", prevRoot]);
   });
 
-  it("changeOperationType updates the operation type", () => {
+  it("updateOperations updates the operation type", () => {
     const op = Operation("stack", ["c1"]);
     let state = reducer(initialState, addOperation(op));
     const opId = state.root;
     state = reducer(
       state,
-      changeOperationType({ operationId: opId, operationType: "pack" })
+      updateOperations({ id: opId, operationType: "pack" })
     );
     expect(state.data[opId].operationType).toBe("pack");
   });

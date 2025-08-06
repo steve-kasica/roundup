@@ -69,10 +69,10 @@ describe("addTableToSchemaSagaWorker", () => {
       id: rootOperationId,
       operationType: operationsSlice.OPERATION_TYPE_NO_OP,
     }));
-    const changeOperationType = vi
-      .spyOn(operationsSlice, "changeOperationType")
+    const updateOperations = vi
+      .spyOn(operationsSlice, "updateOperations")
       .mockImplementation((payload) => ({
-        type: "changeOperationType",
+        type: "updateOperations",
         payload,
       }));
     const addChildToOperation = vi
@@ -94,8 +94,8 @@ describe("addTableToSchemaSagaWorker", () => {
       {}
     );
 
-    expect(changeOperationType).toHaveBeenCalledWith({
-      operationId: rootOperationId,
+    expect(updateOperations).toHaveBeenCalledWith({
+      id: rootOperationId,
       operationType,
     });
     expect(addChildToOperation).toHaveBeenCalledWith({

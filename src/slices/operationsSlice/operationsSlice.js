@@ -73,38 +73,6 @@ const operationsSlice = createSlice({
     },
 
     /**
-     * Reducer to change the type of a specific operation.
-     *
-     * @param {Object} state - The current state of the operations slice.
-     * @param {Object} action - The dispatched action containing payload.
-     * @param {Object} action.payload - The payload for the action.
-     * @param {string|number} action.payload.operationId - The unique identifier of the operation to update.
-     * @param {string} action.payload.operationType - The new type to assign to the operation.
-     *
-     * @returns {void}
-     */
-    changeOperationType(state, action) {
-      const { operationId, operationType } = action.payload;
-      const operation = selectOperation({ operations: state }, operationId);
-      operation.operationType = operationType;
-    },
-
-    setOperationError(state, action) {
-      const { operationId, error } = action.payload;
-      const operation = selectOperation({ operations: state }, operationId);
-      operation.error = error;
-    },
-
-    clearOperationError(state, action) {
-      const { operationId } = action.payload;
-      const operation = selectOperation({ operations: state }, operationId);
-      if (!operation) {
-        throw new Error(`Operation with ID ${operationId} does not exist`);
-      }
-      operation.error = null;
-    },
-
-    /**
      * Updates one or more operations in the state with new attributes.
      *
      * @param {Object} state - The current state of the operations slice.
@@ -136,23 +104,6 @@ const operationsSlice = createSlice({
           ...operation,
         };
       });
-    },
-
-    setOperationAttributes(state, action) {
-      const { id, attributes } = action.payload;
-      const operation = selectOperation({ operations: state }, id);
-
-      if (!operation) {
-        throw new Error(`Operation with ID ${id} does not exist`);
-      }
-      // TODO: need some armor to validate here
-      state.data[id] = { ...operation, ...attributes };
-    },
-
-    setOperationColumnName(state, action) {
-      const { operationId, index, newName } = action.payload;
-      const operation = selectOperation({ operations: state }, operationId);
-      operation.columnNames[index] = newName;
     },
 
     /**
@@ -233,16 +184,11 @@ const operationsSlice = createSlice({
 export const {
   addOperation,
   removeOperation,
-  setOperationAttributes,
-  setOperationColumnName,
-  changeOperationType,
   addChildToOperation,
   updateOperations,
   removeChildFromOperation,
   setFocusedOperation,
   setHoveredOperation,
-  setOperationError,
-  clearOperationError,
 } = operationsSlice.actions;
 
 export default operationsSlice.reducer;

@@ -23,7 +23,7 @@ import { select, takeEvery, put } from "redux-saga/effects";
 import {
   addChildToOperation,
   addOperation,
-  changeOperationType,
+  updateOperations,
   OPERATION_TYPE_NO_OP,
   selectOperation,
   selectRootOperation,
@@ -92,12 +92,7 @@ export function* addTableToSchemaSagaWorker(action) {
     // Case: table added after initialization
 
     // Change root operation type from NO_OP to the specified operation type
-    yield put(
-      changeOperationType({
-        operationId: rootOperation.id,
-        operationType,
-      })
-    );
+    yield put(updateOperations({ id: rootOperation.id, operationType }));
     yield put(
       addChildToOperation({
         operationId: rootOperation.id,

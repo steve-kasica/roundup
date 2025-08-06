@@ -1,9 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import {
-  selectOperation,
-  setOperationColumnName,
-} from "../../../slices/operationsSlice";
+import { updateOperations } from "../../../slices/operationsSlice";
 
 // TODO: how to handlethe case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -57,10 +54,11 @@ export default function withStackOperationData(WrappedComponent) {
         columnNames={columnNames}
         renameOperationColumn={(index, newName) =>
           dispatch(
-            setOperationColumnName({
-              operationId: operation.id,
-              index,
-              newName,
+            updateOperations({
+              id: operation.id,
+              columnNames: operation.columnNames.map((name, i) =>
+                i === index ? newName : name
+              ),
             })
           )
         }
