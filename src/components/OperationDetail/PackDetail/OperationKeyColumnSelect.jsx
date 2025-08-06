@@ -59,7 +59,7 @@ function OperationKeyColumnSelect({
 
     return (
       <Chip
-        label={`${label}`}
+        label={`${percentage}%`}
         size="small"
         sx={{
           backgroundColor: color,
