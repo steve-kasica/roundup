@@ -89,8 +89,19 @@ function ValueView({ value = null, matchCount, height = "100%" }) {
 }
 
 ValueView.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.oneOf([null, undefined]),
+  ]),
   matchCount: PropTypes.number,
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+ValueView.defaultProps = {
+  value: null,
+  matchCount: 0,
+  height: "100%",
 };
 
 export default ValueView;

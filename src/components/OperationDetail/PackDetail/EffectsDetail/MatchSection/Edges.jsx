@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-function ConnectionLine({
+export default function Edges({
   leftValues,
   rightValues,
   matches,
@@ -59,7 +59,7 @@ function ConnectionLine({
   );
 }
 
-ConnectionLine.propTypes = {
+Edges.propTypes = {
   leftValues: PropTypes.array.isRequired,
   rightValues: PropTypes.array.isRequired,
   matches: PropTypes.array.isRequired,
@@ -70,5 +70,3 @@ ConnectionLine.propTypes = {
   strokeOpacity: PropTypes.number,
   itemHeight: PropTypes.number.isRequired,
 };
-
-export default ConnectionLine;

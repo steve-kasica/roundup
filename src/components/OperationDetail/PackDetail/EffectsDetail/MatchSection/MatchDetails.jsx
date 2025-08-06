@@ -1,21 +1,15 @@
 import { useState, useMemo } from "react";
 import { Box, Typography } from "@mui/material";
+import PropTypes from "prop-types";
 import ValueView from "./ValueView";
 import Bar from "./Bar";
 import { max, scaleLinear } from "d3";
-import Edges from "./ConnectionLine";
+import Edges from "./Edges";
 
 const rowMargin = 5; // in pixels, controls the gab between match groups
 const valueHeight = 38.02; // in pixels, height of each value row, including margin
 
-function MatchDetails({
-  matches,
-  leftTitle,
-  rightTitle,
-  barColor,
-  fontSize,
-  totalMatches,
-}) {
+function MatchDetails({ matches, leftTitle, rightTitle, barColor, fontSize }) {
   // Sorting state
   const [sortBy, setSortBy] = useState(null); // 'left', 'right', or 'count'
   const [sortOrder, setSortOrder] = useState("asc"); // 'asc' or 'desc'
@@ -355,5 +349,27 @@ function MatchDetails({
     </>
   );
 }
+
+MatchDetails.propTypes = {
+  matches: PropTypes.arrayOf(
+    PropTypes.shape({
+      left: PropTypes.shape({
+        value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
+        count: PropTypes.number.isRequired,
+      }).isRequired,
+      right: PropTypes.shape({
+        value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
+        count: PropTypes.number.isRequired,
+      }).isRequired,
+    })
+  ).isRequired,
+  leftTitle: PropTypes.string.isRequired,
+  rightTitle: PropTypes.string.isRequired,
+  barColor: PropTypes.string.isRequired,
+  fontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+};
 
 export default MatchDetails;
