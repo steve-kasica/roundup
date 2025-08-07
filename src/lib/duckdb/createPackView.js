@@ -6,7 +6,6 @@ export async function createPackView(opData) {
   const conn = await db.connect();
   const joinType = "JOIN";
   const query = formQuery(opData, joinType);
-  console.log("Creating pack view with query:", query);
   const response = await conn.query(query);
   await conn.close();
   return response;
@@ -27,6 +26,7 @@ export function formQuery(op) {
     throw new Error("join predicate is unspecified");
   }
 
+  // TODO: refactor to util file for DRY
   const predicates = {
     EQUALS: `${table1}.${joinKey1} = ${table2}.${joinKey2}`,
     CONTAINS: `contains(${table1}.${joinKey1}, ${table2}.${joinKey2})`,

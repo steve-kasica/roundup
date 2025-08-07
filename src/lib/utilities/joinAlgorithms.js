@@ -1,4 +1,4 @@
-import { equals } from "../../components/OperationDetail/PackDetail/EffectsDetail/comparisonFunctions";
+import { equals } from "../../components/OperationDetail/PackDetail/PackOutputDetails/comparisonFunctions";
 
 /**
  * Hash join algorithm for finding matches between two value sets

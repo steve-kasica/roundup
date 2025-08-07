@@ -11,9 +11,9 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { JOIN_PREDICATES } from "../../../slices/operationsSlice";
 import OperationKeyColumnSelect from "./OperationKeyColumnSelect";
-import CompareColumns from "./EffectsDetail/CompareColumns";
 import EditableText from "../../ui/EditableText";
 import withPackOperationData from "./withPackOperationData";
+import PackOutputDetails from "./PackOutputDetails";
 
 const PackDetail = ({
   operation,
@@ -35,7 +35,9 @@ const PackDetail = ({
       if (!selectedPredicate) {
         // Default to equals if no predicate selected
         try {
-          const module = await import("./EffectsDetail/comparisonFunctions");
+          const module = await import(
+            "./PackOutputDetails/comparisonFunctions"
+          );
           setComparisonFunction(() => module.equals);
         } catch (error) {
           console.error("Failed to load default comparison function:", error);
@@ -44,7 +46,7 @@ const PackDetail = ({
       }
 
       try {
-        const module = await import("./EffectsDetail/comparisonFunctions");
+        const module = await import("./PackOutputDetails/comparisonFunctions");
 
         let functionName;
         switch (selectedPredicate) {
@@ -69,7 +71,9 @@ const PackDetail = ({
         console.error("Failed to load comparison function:", error);
         // Fallback to equals
         try {
-          const module = await import("./EffectsDetail/comparisonFunctions");
+          const module = await import(
+            "./PackOutputDetails/comparisonFunctions"
+          );
           setComparisonFunction(() => module.equals);
         } catch (fallbackError) {
           console.error(
@@ -163,10 +167,13 @@ const PackDetail = ({
             />
           </div>
         </div>
-        <CompareColumns
-          columnId1={operation.joinKey1}
-          columnId2={operation.joinKey2}
-          comparisonFunction={comparisonFunction}
+        <PackOutputDetails
+          leftTableId={operation.children[0]}
+          rightTableId={operation.children[1]}
+          leftColumnId={operation.joinKey1}
+          rightColumnId={operation.joinKey2}
+          joinType={operation.joinPredicate}
+          joinPredicate={operation.joinPredicate}
           setJoinType={setJoinType}
         />
       </div>
