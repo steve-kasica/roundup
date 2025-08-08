@@ -77,15 +77,15 @@ function PackOutputDetails({
 
     switch (checkSignature) {
       case "111":
-        return "FULL";
+        return "FULL OUTER";
       case "110":
-        return "LEFT";
+        return "LEFT OUTER";
       case "101":
         return "FULL ANTI";
       case "100":
         return "LEFT ANTI";
       case "011":
-        return "RIGHT";
+        return "RIGHT OUTER";
       case "010":
         return "INNER";
       case "001":

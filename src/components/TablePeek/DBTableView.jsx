@@ -88,7 +88,10 @@ export default function DBTableView({
   }, [loading, hasMore]);
 
   return (
-    <div className="table-view" style={{ position: "relative" }}>
+    <div
+      className="table-view"
+      style={{ position: "relative", height: "300px", paddingBottom: "50px" }}
+    >
       <IconButton
         aria-label="close"
         onClick={onClose}
@@ -110,7 +113,7 @@ export default function DBTableView({
       <div
         className="table-container"
         ref={tableContainerRef}
-        style={{ maxHeight: 500, overflowY: "auto" }}
+        style={{ overflowY: "auto" }}
       >
         <table>
           <thead>
