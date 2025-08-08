@@ -113,7 +113,7 @@ export default function DBTableView({
       <div
         className="table-container"
         ref={tableContainerRef}
-        style={{ overflowY: "auto" }}
+        style={{ overflowY: "auto", height: "inherit" }}
       >
         <table>
           <thead>

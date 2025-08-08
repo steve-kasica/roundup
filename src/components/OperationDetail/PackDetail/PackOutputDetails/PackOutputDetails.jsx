@@ -13,7 +13,7 @@ import {
   styled,
 } from "@mui/material";
 import Bar from "./MatchDetail/Bar";
-import TableView from "./TableView";
+import { JOIN_TYPES } from "../../../../slices/operationsSlice";
 import { MATCH_TYPES } from "./MatchDetail/withMatchDetailData";
 
 const marginLeft = 0.3; // as a percentage of the width for the AccordionSummary
@@ -77,23 +77,22 @@ function PackOutputDetails({
 
     switch (checkSignature) {
       case "111":
-        return "FULL OUTER";
+        return JOIN_TYPES.FULL_OUTER;
       case "110":
-        return "LEFT OUTER";
+        return JOIN_TYPES.LEFT_OUTER;
       case "101":
-        return "FULL ANTI";
+        return JOIN_TYPES.FULL_ANTI;
       case "100":
-        return "LEFT ANTI";
+        return JOIN_TYPES.LEFT_ANTI;
       case "011":
-        return "RIGHT OUTER";
+        return JOIN_TYPES.RIGHT_OUTER;
       case "010":
-        return "INNER";
+        return JOIN_TYPES.INNER;
       case "001":
-        return "RIGHT ANTI";
+        return JOIN_TYPES.RIGHT_ANTI;
       case "000":
-        return "";
       default:
-        return "";
+        return JOIN_TYPES.EMPTY;
     }
   }, []);
 

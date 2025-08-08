@@ -15,9 +15,14 @@ const validOperationTypes = [
 ];
 
 export const JOIN_TYPES = {
+  FULL_OUTER: "FULL OUTER",
+  LEFT_OUTER: "LEFT OUTER",
+  FULL_ANTI: "FULL ANTI",
+  LEFT_ANTI: "LEFT ANTI",
+  RIGHT_OUTER: "RIGHT OUTER",
   INNER: "INNER",
-  LEFT: "LEFT",
-  RIGHT: "RIGHT",
+  RIGHT_ANTI: "RIGHT ANTI",
+  EMPTY: "EMPTY",
 };
 
 export const JOIN_PREDICATES = {

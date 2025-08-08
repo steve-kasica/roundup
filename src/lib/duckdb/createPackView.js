@@ -1,3 +1,4 @@
+import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { getDuckDB } from "./duckdbClient";
 
 // With these UNION ALL query, the view will take on the column names of the first child.
@@ -34,13 +35,48 @@ export function formQuery(op) {
     ENDS_WITH: `ends_with(${table1}.${joinKey1}, ${table2}.${joinKey2})`,
   };
 
+  let definition = "";
+  if (joinType === JOIN_TYPES.LEFT_ANTI) {
+    definition = `
+      SELECT *
+      FROM ${table1} 
+      ANTI JOIN ${table2}
+      ON ${predicates[joinPredicate]}
+      `;
+  } else if (joinType === JOIN_TYPES.RIGHT_ANTI) {
+    // Right anti-join: return rows from right table that don't match left table
+    // Swap table order and use ANTI JOIN
+    const rightAntiPredicate = predicates[joinPredicate]
+      .replace(`${table1}.${joinKey1}`, `${table2}.${joinKey2}`)
+      .replace(`${table2}.${joinKey2}`, `${table1}.${joinKey1}`);
+    definition = `
+      SELECT *
+      FROM ${table2} 
+      ANTI JOIN ${table1}
+      ON ${rightAntiPredicate}
+    `;
+  } else if (joinType === JOIN_TYPES.FULL_ANTI) {
+    // Full anti-join: return rows from both tables that don't match
+    // Use FULL OUTER JOIN approach to get combined schema, then filter out matches
+    definition = `
+      SELECT ${table1}.*, ${table2}.*
+      FROM ${table1} 
+      FULL OUTER JOIN ${table2}
+      ON ${predicates[joinPredicate]}
+      WHERE ${table1}.${joinKey1} IS NULL OR ${table2}.${joinKey2} IS NULL
+    `;
+  } else {
+    // DuckDB offers native support for other supported join types
+    definition = `
+      SELECT *
+      FROM ${table1} 
+      ${joinType} JOIN ${table2}
+      ON ${predicates[joinPredicate]}
+    `;
+  }
+
   const query = `
-  CREATE OR REPLACE VIEW ${op.id} AS 
-    SELECT *
-    FROM ${table1} 
-    ${joinType} JOIN 
-    ${table2}
-    ON ${predicates[joinPredicate]}
-  `;
+    CREATE OR REPLACE VIEW ${op.id} AS
+    ${definition}`;
   return query;
 }
