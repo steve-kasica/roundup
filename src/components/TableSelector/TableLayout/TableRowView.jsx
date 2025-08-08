@@ -7,15 +7,11 @@ import { formatDate, formatNumber, formatBytes } from "../../../lib/utilities";
 import withTableData from "../../HOC/withTableData";
 import { isPointInBoundingBox } from "../../../lib/utilities/dom";
 import PropTypes from "prop-types";
-import {
-  COLUMN_TYPE_CATEGORICAL,
-  COLUMN_TYPE_NUMERICAL,
-  COLUMN_TYPE_DATE,
-} from "../../../slices/columnsSlice";
 
 function TableRowView({
   // props from withTableData
   table,
+  removedColumnIds,
   isHovered,
   depth,
   parentOperation,
@@ -34,7 +30,6 @@ function TableRowView({
   // props from parent component
   isDisabled = false,
   searchString,
-  headers,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const trRef = useRef(null);
@@ -158,21 +153,31 @@ function TableRowView({
       <td className="drag-handle" ref={dragRef}>
         <DragIndicator />
       </td>
-      {headers.map(({ attr, attrType }) => (
-        <td key={attr}>
-          <Typography color={isDisabled ? "textDisabled" : "normal"}>
-            {attr === "size" ? (
-              formatBytes(table[attr])
-            ) : attrType === COLUMN_TYPE_CATEGORICAL ? (
-              <HighlightText pattern={searchString} text={table[attr]} />
-            ) : attrType === COLUMN_TYPE_NUMERICAL ? (
-              formatNumber(table[attr])
-            ) : attrType === COLUMN_TYPE_DATE ? (
-              formatDate(new Date(table[attr]))
-            ) : null}
-          </Typography>
-        </td>
-      ))}
+      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+        <HighlightText pattern={searchString} text={table.name} />
+      </Typography>
+      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+        {formatBytes(table.size)}
+      </Typography>
+      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+        {table.fileType || "N/A"}
+      </Typography>
+      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+        {formatNumber(table.rowCount)}
+      </Typography>
+      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+        {/* this value doesn't change if rows are disabled */}
+        {/* TODO: add tooltip to signal rows have been removed */}
+        {`${formatNumber(table.columnIds.length)}`}
+        <sup
+          style={{ display: removedColumnIds.length > 0 ? "inline" : "none" }}
+        >
+          *
+        </sup>
+      </Typography>
+      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+        {formatDate(new Date(table.dateLastModified))}
+      </Typography>
       <td className="more-options">
         <IconButton onClick={handleMenuOpen}>
           <MoreVert />
@@ -217,6 +222,9 @@ TableRowView.propTypes = {
     PropTypes.func,
     PropTypes.shape({ current: PropTypes.any }),
   ]),
+  removedColumnIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
   peekTable: PropTypes.func.isRequired,
   hoverTable: PropTypes.func.isRequired,
   unhoverTable: PropTypes.func.isRequired,
@@ -228,12 +236,6 @@ TableRowView.propTypes = {
   isSelected: PropTypes.bool,
   isDisabled: PropTypes.bool,
   searchString: PropTypes.string,
-  headers: PropTypes.arrayOf(
-    PropTypes.shape({
-      attr: PropTypes.string.isRequired,
-      attrType: PropTypes.string.isRequired,
-    })
-  ).isRequired,
 };
 
 const EnhancedTableRowView = withTableData(TableRowView);

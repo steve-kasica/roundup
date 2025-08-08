@@ -18,17 +18,13 @@ let idCounter = 0;
 export function Table(
   source,
   name,
+  fileName, // fileName is the original name of the file uploaded
   extension,
   size,
   mimeType,
-  columnCount,
-  rowCount,
-  dateLastModified,
-  tags = []
+  dateLastModified
 ) {
-  if (!Number.isInteger(rowCount)) {
-    throw new Error("`rowCount` must be an integer", rowCount);
-  } else if (dateLastModified instanceof Date) {
+  if (dateLastModified instanceof Date) {
     throw new Error(
       "`dateLastCreated` cannot be a Date instance for serializability"
     );
@@ -40,15 +36,12 @@ export function Table(
     id, // This unique identifier for table objects in Redux store corresponds to the name of the table in DuckDB
     source,
     name, // name is mutable
+    fileName,
     extension,
     size,
     mimeType,
-    columnCount, // deprecated, use `columnIds.length` instead
-    originalColumnIds: new Array(columnCount).fill(null), // Placeholder for original column IDs
-    columnIds: new Array(columnCount).fill(null), // Placeholder for column IDs
-    keyColumnId: null, // The column ID that is used as the key for this table
-    rowCount,
-    rowsExplored: 0, // TODO: remove this
+    columnIds: [], // This will be populated later when columns are created
+    rowCount: null, // This will be set later when the table is created in DuckDB
     dateLastModified,
     operationId: null, // Parent operation ID if this table is derived from an operation
   };
@@ -61,12 +54,8 @@ const attributes = [
   "extension",
   "size",
   "mimeType",
-  "columnCount",
-  "originalColumnIds",
   "columnIds",
-  "keyColumnId",
   "rowCount",
-  "rowsExplored",
   "dateLastModified",
   "operationId",
 ];

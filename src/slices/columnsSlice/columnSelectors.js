@@ -120,20 +120,25 @@ export const selectTableIdsByColumnIds = createSelector(
   (data, columnIds) => columnIds.map((columnId) => data[columnId].tableId)
 );
 
-/**
- * Memoized selector to get removed column IDs for a specific table.
- * This selector properly memoizes the result to ensure components update
- * when columns are marked as removed.
- */
 export const selectRemovedColumnIdsByTableId = createSelector(
   [
-    (state) => state.columns.data,
-    (state, tableId) => selectColumnIdsByTableId(state, tableId),
+    (state, tableId) => state.columns.idsByTable[tableId] || [],
+    (state) => state.columns.dropped,
   ],
-  (columnsData, columnIds) => {
-    return columnIds
-      .map((columnId) => columnsData[columnId])
-      .filter((column) => column && column.isRemoved)
-      .map((column) => column.id);
+  (columnIds, droppedColumnIds) => {
+    return columnIds.filter((columnId) => droppedColumnIds.includes(columnId));
+  }
+);
+
+/**
+ * Give the total number of columns associated with this table, excluding removed columns.
+ */
+export const selectActiveColumnCountByTableId = createSelector(
+  [
+    (state, tableId) => state.columns.idsByTable[tableId] || [],
+    (state, tableId) => selectRemovedColumnIdsByTableId(state, tableId),
+  ],
+  (columnIds, removedColumnIds) => {
+    return columnIds.filter((id) => !removedColumnIds.includes(id)).length;
   }
 );

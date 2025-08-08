@@ -16,7 +16,6 @@ describe("Column Factory Function", () => {
       alias: null, // Default value for alias
       index: 0,
       columnType: COLUMN_TYPE_NUMERICAL,
-      isRemoved: false, // Default value for isRemoved
       values: {},
     });
   });

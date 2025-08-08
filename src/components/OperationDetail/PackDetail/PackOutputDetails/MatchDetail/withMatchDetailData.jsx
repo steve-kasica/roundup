@@ -51,7 +51,6 @@ export default function withMatchDetailData(WrappedComponent) {
         sortOrder
       )
         .then((result) => {
-          console.log("Match values:", result);
           setMatches(
             // Format results into the schema expected by the MatchDetails component
             // Also cast BigInt values to Numbers

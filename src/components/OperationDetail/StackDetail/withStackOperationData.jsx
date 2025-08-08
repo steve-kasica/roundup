@@ -26,10 +26,14 @@ export default function withStackOperationData(WrappedComponent) {
   function EnhancedComponent({ operation, ...props }) {
     const dispatch = useDispatch();
 
+    const droppedColumnIds = useSelector((state) => state.columns.dropped);
+
     const columnIdMatrix = useSelector((state) => {
       // TODO: what if the childId is not a table?
-      const rawColumnIds = operation.children.map(
-        (childId) => state.columns.idsByTable[childId] || []
+      const rawColumnIds = operation.children.map((childId) =>
+        (state.columns.idsByTable[childId] || []).filter(
+          (cid) => !droppedColumnIds.includes(cid)
+        )
       );
       const maxLength = Math.max(...rawColumnIds.map((row) => row.length));
       return rawColumnIds.map((row) => {

@@ -5,31 +5,26 @@ import PropTypes from "prop-types";
 import { getTableRows, summarizeTable } from "../../lib/duckdb";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { active } from "d3";
+import { formatNumber } from "../../lib/utilities";
+
+const pageSize = 25;
 
 export default function DBTableView({
   table,
   removedColumnIds,
   activeColumnIds,
-  id,
   name,
-  rowCount,
-  columnCount,
   onClose,
 }) {
+  const id = table.id;
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
   const rowsExplored = rows.length;
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const pageSize = 25;
   const tableContainerRef = useRef(null);
-
-  console.log(
-    "DBTableView rendered with columns:",
-    activeColumnIds,
-    removedColumnIds
-  );
 
   const fetchColumns = useCallback(async () => {
     const columns = await summarizeTable(id, activeColumnIds);
@@ -48,7 +43,7 @@ export default function DBTableView({
       });
       setLoading(false);
     },
-    [pageSize, activeColumnIds, id]
+    [id, activeColumnIds]
   );
 
   useEffect(() => {
@@ -108,12 +103,12 @@ export default function DBTableView({
       <h2>
         {name}{" "}
         <small>
-          ({columnCount} x {rowCount})
+          ({formatNumber(table.rowCount)} x {columns.length})
         </small>
       </h2>
       <p>
-        Rows explored: {rowsExplored} (
-        {Math.round((rowsExplored / rowCount) * 100)}%)
+        Rows explored: {formatNumber(rowsExplored)} (
+        {Math.round((rowsExplored / table.rowCount) * 100)}%)
       </p>
       <div
         className="table-container"
@@ -124,7 +119,7 @@ export default function DBTableView({
           <thead>
             <tr>
               <th></th>
-              {Array.from({ length: columnCount }, (_, i) => (
+              {Array.from({ length: columns.length }, (_, i) => (
                 <ColumnHeader key={i} id={columns[i]?.column_name} />
               ))}
             </tr>
@@ -150,13 +145,27 @@ export default function DBTableView({
 }
 
 DBTableView.propTypes = {
+  table: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    rowCount: PropTypes.number.isRequired,
+  }).isRequired,
+  removedColumnIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ),
+  activeColumnIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+  name: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
+
+DBTableView.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   remoteId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   name: PropTypes.string,
   rowCount: PropTypes.number,
-  columnIds: PropTypes.arrayOf(
+  activeColumnIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ),
-  columnCount: PropTypes.number,
+  ).isRequired,
   onClose: PropTypes.func.isRequired,
 };

@@ -101,7 +101,6 @@ export default function Column(tableId, index, name, columnType) {
     alias: null, // Alias is mutable and can be changed by the user
     index,
     columnType,
-    isRemoved: false, // Indicates if the column has been removed from the table
     uniqueValues: null, // Unique values in the column, can be null if not computed yet
     totalRows: null, // Total number of rows in the column, can be null if not computed yet
     nonNullValues: null, // Number of non-null values in the column, can be null if not computed yet
@@ -116,7 +115,6 @@ const attributes = [
   "alias",
   "index",
   "columnType",
-  "isRemoved",
   "uniqueValues",
   "totalRows",
   "nonNullValues",

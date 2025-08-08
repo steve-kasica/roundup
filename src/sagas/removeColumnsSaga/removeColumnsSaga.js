@@ -1,15 +1,13 @@
-import { put, select, takeEvery } from "redux-saga/effects";
+import { put, takeEvery } from "redux-saga/effects";
 import {
+  addColumnsToDropped,
   addColumnsToLoading,
-  removeColumns,
   removeColumnsFromDragging,
   removeColumnsFromLoading,
   removeFromSelectedColumns,
-  selectColumnById,
   updateColumns,
 } from "../../slices/columnsSlice";
 import { createAction } from "@reduxjs/toolkit";
-import { selectTablesById, updateTables } from "../../slices/tablesSlice";
 
 /**
  * Action creator for removing columns.
@@ -22,6 +20,7 @@ import { selectTablesById, updateTables } from "../../slices/tablesSlice";
  */
 export const removeColumnsRequest = createAction("sagas/removeColumns/request");
 
+// createOperationViewSaga listens for this action
 export const removeColumnsSuccessAction = createAction(
   "sagas/removeColumns/success"
 );
@@ -32,13 +31,17 @@ export default function* removeColumnsSaga() {
 
 export function* removeColumnsSagaWorker(action) {
   let columnIds = action.payload;
+  // Normalize input to ensure it's always an array
+  if (!Array.isArray(columnIds)) {
+    columnIds = [columnIds];
+  }
 
   yield put(addColumnsToLoading(columnIds));
-
-  yield put(updateColumns(columnIds.map((id) => ({ id, isRemoved: true }))));
+  yield put(addColumnsToDropped(columnIds));
   yield put(removeFromSelectedColumns(columnIds));
   yield put(removeColumnsFromDragging(columnIds));
   yield put(removeColumnsFromLoading(columnIds));
 
-  yield put(removeColumnsSuccessAction(action.payload));
+  // Signal to other sagas that columns have been successfully removed
+  yield put(removeColumnsSuccessAction(columnIds));
 }

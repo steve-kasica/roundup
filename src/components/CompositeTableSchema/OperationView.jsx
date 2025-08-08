@@ -29,6 +29,7 @@ const StyledBox = styled(Box, {
 function OperationView({
   // props via withOperationData
   operation,
+  columnCount,
   depth,
   isFocused,
   isHovered,
@@ -70,7 +71,7 @@ function OperationView({
       hasError={Boolean(operation.error)}
       className={className.join(" ")}
       sx={{
-        flexBasis: `${(operation.columnCount / parentColumnCount) * 100}%`,
+        flexBasis: `${(columnCount / parentColumnCount) * 100}%`,
       }}
     >
       {childOperationIds.length > 0
@@ -78,7 +79,7 @@ function OperationView({
             <EnhancedOperationView
               key={childOperationId}
               id={childOperationId}
-              parentColumnCount={operation.columnCount}
+              parentColumnCount={columnCount}
             />
           ))
         : null}
@@ -89,7 +90,7 @@ function OperationView({
               id={tableId}
               isDraggable={false}
               parentOperationType={operation.operationType}
-              parentColumnCount={operation.columnCount}
+              parentColumnCount={columnCount}
             />
           ))
         : null}
@@ -109,7 +110,6 @@ OperationView.propTypes = {
   // Props via withOperationData HOC
   operation: PropTypes.shape({
     operationType: PropTypes.string,
-    columnCount: PropTypes.number,
     error: PropTypes.oneOfType([
       PropTypes.object,
       PropTypes.string,
@@ -117,6 +117,7 @@ OperationView.propTypes = {
     ]),
   }).isRequired,
   depth: PropTypes.number,
+  columnCount: PropTypes.number.isRequired,
   isFocused: PropTypes.bool,
   isHovered: PropTypes.bool,
   childrenIds: PropTypes.arrayOf(

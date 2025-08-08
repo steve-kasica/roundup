@@ -8,7 +8,6 @@ const validArgs = [
   "csv", // extension
   1024, // size in bytes
   "text/csv", // mimeType
-  6, // columnCount
   10, // rowCount
   "2024-01-02T00:00:00Z", // dateLastModified (string, not Date)
 ];
@@ -22,14 +21,11 @@ describe("Table factory", () => {
     expect(table.extension).toBe(validArgs[2]);
     expect(table.size).toBe(validArgs[3]);
     expect(table.mimeType).toBe(validArgs[4]);
-    expect(table.columnCount).toBe(validArgs[5]);
     expect(table.rowCount).toBe(validArgs[6]);
     expect(table.dateLastModified).toBe(validArgs[7]);
     expect(table.rowsExplored).toBe(0);
     expect(Array.isArray(table.columnIds)).toBe(true);
     expect(table.columnIds.length).toBe(validArgs[5]);
-    expect(Array.isArray(table.originalColumnIds)).toBe(true);
-    expect(table.originalColumnIds.length).toBe(validArgs[5]);
   });
 
   it("throws if rowCount is not integer", () => {

@@ -43,13 +43,15 @@ export default function withTableData(WrappedComponent) {
     const removedColumnIds = useSelector((state) =>
       selectRemovedColumnIdsByTableId(state, id)
     );
+
     // Use useMemo to ensure activeColumnIds updates when table.columnIds or removedColumnIds change
-    const activeColumnIds = useMemo(() => {
-      if (!table || !table.columnIds) return [];
-      return table.columnIds.filter(
-        (columnId) => !removedColumnIds.includes(columnId)
-      );
-    }, [table, removedColumnIds]);
+    const activeColumnIds = useMemo(
+      () =>
+        table.columnIds.filter(
+          (columnId) => !removedColumnIds.includes(columnId)
+        ),
+      [table, removedColumnIds]
+    );
 
     // TODO: deprecate selectedColumnIds
     const selectedColumnIds = useSelector(
@@ -109,7 +111,6 @@ export default function withTableData(WrappedComponent) {
         table={table}
         removedColumnIds={removedColumnIds}
         activeColumnIds={activeColumnIds}
-        columnCount={activeColumnIds.length} // TODO: remove as property from Table object
         columnIds={activeColumnIds} // deprecate
         // Other related objects
         columnNames={columnNames} // TODO: remove this, should only pass Ids

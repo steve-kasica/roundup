@@ -10,7 +10,7 @@ import { formatNumber } from "../../../lib/utilities/formaters";
 import withTableData from "../../HOC/withTableData";
 import PropTypes from "prop-types";
 
-function TableView({ table, isDisabled, searchString }) {
+function TableView({ table, activeColumnIds, isDisabled, searchString }) {
   return (
     <ListItem
       // TODO: add context menu
@@ -25,7 +25,8 @@ function TableView({ table, isDisabled, searchString }) {
           <Typography color={isDisabled ? "textDisabled" : "normal"}>
             <HighlightText pattern={searchString} text={table.name} />
             <small style={{ paddingLeft: "10px" }}>
-              {formatNumber(table.rowCount)} x {formatNumber(table.columnCount)}
+              {formatNumber(table.rowCount)} x{" "}
+              {formatNumber(activeColumnIds.length)}
             </small>
           </Typography>
         }
@@ -38,8 +39,11 @@ TableView.propTypes = {
   table: PropTypes.shape({
     name: PropTypes.string.isRequired,
     rowCount: PropTypes.number.isRequired,
-    columnCount: PropTypes.number.isRequired,
   }).isRequired,
+  activeColumnIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ).isRequired,
+  // Optional props
   isDisabled: PropTypes.bool,
   searchString: PropTypes.string,
 };

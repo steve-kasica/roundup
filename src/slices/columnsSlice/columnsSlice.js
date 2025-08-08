@@ -27,6 +27,7 @@ const initialState = {
   hovered: [],
   loading: [],
   dragging: [],
+  dropped: [],
   errors: {},
 };
 
@@ -138,8 +139,6 @@ const columnsSlice = createSlice({
         );
       } else if (attribute === "columnType" && !COLUMN_TYPES.includes(value)) {
         throw new InvalidColumnTypeError(value);
-      } else if (attribute === "isRemoved" && typeof value !== "boolean") {
-        throw new Error("`isRemoved` must be a boolean");
       } else if (attribute === "name") {
         throw new Error("`name` attribute is immutable");
       }
@@ -197,49 +196,6 @@ const columnsSlice = createSlice({
           throw new Error(`Column with id ${id} not found`);
         }
         column.alias = aliases[i];
-      });
-    },
-    /**
-     * Removes a column from the state after a successful removal operation.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string} action.payload.id - The ID of the removed column.
-     */
-    removeColumns(state, action) {
-      let ids = action.payload;
-      if (!Array.isArray(ids)) {
-        ids = [ids];
-      }
-      ids.forEach((id) => {
-        const column = state.data[id];
-        if (column) {
-          // Mark column as removed in data dictionary
-          state.data[id].isRemoved = true; // Mark as removed
-
-          // Remove the column ID from the idsByTable mapping
-          state.idsByTable[column.tableId] = state.idsByTable[
-            column.tableId
-          ].filter((cid) => cid !== id);
-          if (state.idsByTable[column.tableId].length === 0) {
-            // If there are no columns left in the table, delete the entry
-            delete state.idsByTable[column.tableId];
-          }
-
-          // Remove the column from the selected columns if it is selected
-          state.selected = state.selected.filter((cid) => cid !== id);
-
-          // Remove the column from the hovered columns if it is hovered
-          state.hovered = state.hovered.filter((cid) => cid !== id);
-
-          // Remove the column from the loading state if it is loading
-          state.loading = state.loading.filter((cid) => cid !== id);
-
-          // Remove the column from the dragging state
-          state.dragging = state.dragging.filter((cid) => cid !== id);
-        } else {
-          throw new Error(`Column with id ${id} not found`);
-        }
       });
     },
     dropColumns(state, action) {
@@ -498,6 +454,33 @@ const columnsSlice = createSlice({
         (columnId) => !ids.includes(columnId)
       );
     },
+
+    /**
+     * Adds columns to the dropped list
+     * @param {*} state
+     * @param {*} action
+     */
+    addColumnsToDropped(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      ids.forEach((id) => {
+        if (!state.dropped.includes(id)) {
+          state.dropped.push(id);
+        }
+      });
+    },
+    removeColumnsFromDropped(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      state.dropped = state.dropped.filter(
+        (columnId) => !ids.includes(columnId)
+      );
+    },
+
     setErrorForColumn(state, action) {
       const { id, error } = action.payload;
       state.errors[id] = error;
@@ -524,7 +507,6 @@ export const {
   addColumns,
   updateColumns,
   renameColumns,
-  removeColumns,
   setColumnsIndex,
   addColumnsToLoading,
   removeColumnsFromLoading,
@@ -542,4 +524,8 @@ export const {
   clearSelectedColumns,
   removeFromSelectedColumns,
   setValueCounts,
+
+  // Dropping columns
+  addColumnsToDropped,
+  removeColumnsFromDropped,
 } = columnsSlice.actions;

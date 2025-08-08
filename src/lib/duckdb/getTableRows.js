@@ -8,9 +8,15 @@ export async function getTableRows(
 ) {
   const db = await getDuckDB();
   const conn = await db.connect();
-  const columnsClause = columnsList ? columnsList.join(", ") : "*";
+  const columnsClause =
+    columnsList !== null && columnsList.length > 0
+      ? columnsList.join(", ")
+      : "*";
   const result = await conn.query(
-    `SELECT ${columnsClause} FROM "${tableId}" LIMIT ${limit} OFFSET ${offset}`
+    `SELECT ${columnsClause} 
+      FROM ${tableId} 
+      LIMIT ${limit} 
+      OFFSET ${offset}`
   );
   await conn.close();
   return result.toArray().map((row) => Object.values(row));

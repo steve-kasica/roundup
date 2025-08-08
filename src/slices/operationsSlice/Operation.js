@@ -46,7 +46,6 @@ export default function Operation(operationType, children) {
     id, // ID is immutable and unique
     name: id, // Name is the same as ID by default, can be changed later
     rowCount: null,
-    columnCount: null,
     columnNames: [], // Column names are not known at this point
     operationType,
     children,
@@ -69,7 +68,6 @@ const attributes = [
   "operationType",
   "children",
   "rowCount",
-  "columnCount",
   "error",
 ];
 

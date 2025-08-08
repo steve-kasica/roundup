@@ -26,15 +26,12 @@ export function* uploadTablesSagaWorker(action) {
     const table = Table(
       source,
       tableName,
+      fileInfo.name, // fileName
       extension,
       fileInfo.size,
       fileInfo.type, // mimeType
-      0, // columnCount (to be set later)
-      0, // rowCount (to be set later)
       fileInfo.lastModified
     );
-    // TODO: add to constructor
-    table.fileName = fileInfo.name; // Store original file name
     return table;
   });
 
@@ -45,8 +42,7 @@ export function* uploadTablesSagaWorker(action) {
   // Calculate table metadata from DuckDB
   tables.forEach(async (table) => {
     const { rowCount, columnCount } = await getTableDimensions(table.id);
-    table.columnIds = [];
-    table.columnCount = columnCount;
+    table.columnIds = new Array(columnCount).fill(null); // Placeholder for column IDs
     table.rowCount = rowCount;
   });
 

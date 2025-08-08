@@ -73,7 +73,7 @@ function ColumnHeader({
     //   label: "Sort Ascending",
     //   action: () => {
     //     // TODO: Implement sort ascending functionality
-    //     console.log("Sort ascending", name || column?.name);
+    //
     //     setMenuAnchorEl(null);
     //   },
     // },
@@ -81,7 +81,7 @@ function ColumnHeader({
     //   label: "Sort Descending",
     //   action: () => {
     //     // TODO: Implement sort descending functionality
-    //     console.log("Sort descending", name || column?.name);
+    //
     //     setMenuAnchorEl(null);
     //   },
     // },
@@ -89,7 +89,7 @@ function ColumnHeader({
     //   label: "Filter",
     //   action: () => {
     //     // TODO: Implement filter functionality
-    //     console.log("Filter", name || column?.name);
+    //
     //     setMenuAnchorEl(null);
     //   },
     // },

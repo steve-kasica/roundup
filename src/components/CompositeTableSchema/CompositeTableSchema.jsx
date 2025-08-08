@@ -23,7 +23,6 @@ import OperationView from "./OperationView";
 import ExportCompositeTable from "../ExportCompositeTable/ExportCompositeTable";
 import { useState } from "react";
 import Button from "@mui/material/Button";
-import { ExportButton } from "../ExportCompositeTable/ExportButton";
 
 const gridColumns = 12;
 const gridWidth = gridColumns - 2;

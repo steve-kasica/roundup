@@ -108,19 +108,6 @@ describe("columnsSlice reducers", () => {
   });
 
   describe("removeColumns", () => {
-    it("removes sets the `isRemoved` attribute in `.data` to truthy", () => {
-      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
-      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
-      const state = {
-        ...getInitialState(),
-        data: { [col1.id]: col1, [col2.id]: col2 },
-        idsByTable: { t1: [col1.id, col2.id] },
-        selected: [col1.id, col2.id],
-        hovered: [col1.id, col2.id],
-      };
-      const nextState = columnsSlice(state, removeColumns(col1.id));
-      expect(nextState.data[col1.id].isRemoved).toBeTruthy();
-    });
     it("removes the columnID from selected array", () => {
       const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
       const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
