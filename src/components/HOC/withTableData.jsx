@@ -2,13 +2,17 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useDrag } from "react-dnd";
 import PropTypes from "prop-types";
+import { useMemo } from "react";
 
 import {
   selectOperationDepth,
   selectOperation,
 } from "../../slices/operationsSlice";
 import { setPeekedTable } from "../../slices/uiSlice";
-import { selectColumnById } from "../../slices/columnsSlice";
+import {
+  selectColumnById,
+  selectRemovedColumnIdsByTableId,
+} from "../../slices/columnsSlice";
 import {
   removeFromSelectedTables,
   selectHoveredTable,
@@ -35,13 +39,29 @@ export default function withTableData(WrappedComponent) {
     const selectedTables = useSelector(selectSelectedTables) || [];
     const hoveredTable = useSelector(selectHoveredTable);
 
-    // Get column data from the Redux store
+    // Get columnIds associated with this table, both active and "removed"
+    const removedColumnIds = useSelector((state) =>
+      selectRemovedColumnIdsByTableId(state, id)
+    );
+    // Use useMemo to ensure activeColumnIds updates when table.columnIds or removedColumnIds change
+    const activeColumnIds = useMemo(() => {
+      if (!table || !table.columnIds) return [];
+      return table.columnIds.filter(
+        (columnId) => !removedColumnIds.includes(columnId)
+      );
+    }, [table, removedColumnIds]);
+
+    // TODO: deprecate selectedColumnIds
     const selectedColumnIds = useSelector(
       (state) => state.columns.idsByTable[table.id]
     );
+
+    // TODO: deprecate columns
     const columns = useSelector((state) =>
-      table.columnIds.map((columnId) => selectColumnById(state, columnId))
+      activeColumnIds.map((columnId) => selectColumnById(state, columnId))
     );
+    // TODO: should not be here
+    const columnNames = columns.filter(Boolean).map((col) => col.name);
 
     // Get related operation data from the Redux store, if any
     const parentOperation = useSelector((state) =>
@@ -54,9 +74,6 @@ export default function withTableData(WrappedComponent) {
     const isInSchema = table.operationId !== null;
     const isHovered = hoveredTable === id;
     const isSelected = selectedTables.includes(id);
-
-    // TODO: should not be here
-    const columnNames = columns.filter(Boolean).map((col) => col.name);
 
     const [isPressed, setIsPressed] = useState(false);
 
@@ -90,17 +107,10 @@ export default function withTableData(WrappedComponent) {
         {...props}
         // Table properties
         table={table}
-        id={table.id} //
-        source={table.source}
-        name={table.name}
-        extension={table.extension}
-        size={table.size}
-        mimeType={table.mimeType}
-        columnCount={table.columnIds.length}
-        columnIds={table.columnIds}
-        rowCount={table.rowCount}
-        rowsExplored={table.rowsExplored}
-        dateLastModified={table.dateLastModified}
+        removedColumnIds={removedColumnIds}
+        activeColumnIds={activeColumnIds}
+        columnCount={activeColumnIds.length} // TODO: remove as property from Table object
+        columnIds={activeColumnIds} // deprecate
         // Other related objects
         columnNames={columnNames} // TODO: remove this, should only pass Ids
         selectedColumnIds={selectedColumnIds}

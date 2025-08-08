@@ -1,7 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
-import ColumnValues from "./ColumnValues";
-import withTableData from "../HOC/withTableData";
+import { useEffect, useState, useRef, useCallback, act } from "react";
 import ColumnHeader from "./ColumnHeader";
 import "./TableView.css";
 import PropTypes from "prop-types";
@@ -10,6 +7,9 @@ import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 export default function DBTableView({
+  table,
+  removedColumnIds,
+  activeColumnIds,
   id,
   name,
   rowCount,
@@ -17,7 +17,6 @@ export default function DBTableView({
   onClose,
 }) {
   const [columns, setColumns] = useState([]);
-
   const [rows, setRows] = useState([]);
   const rowsExplored = rows.length;
   const [page, setPage] = useState(0);
@@ -26,30 +25,36 @@ export default function DBTableView({
   const pageSize = 25;
   const tableContainerRef = useRef(null);
 
+  console.log(
+    "DBTableView rendered with columns:",
+    activeColumnIds,
+    removedColumnIds
+  );
+
   const fetchColumns = useCallback(async () => {
-    const columns = await summarizeTable(id);
+    const columns = await summarizeTable(id, activeColumnIds);
     setColumns(columns);
-  }, [id]);
+  }, [id, activeColumnIds]);
 
   // Fetch rows for a given page
   const fetchRows = useCallback(
     async (pageNum) => {
       setLoading(true);
       const offset = pageNum * pageSize;
-      const newRows = await getTableRows(id, pageSize, offset);
+      const newRows = await getTableRows(id, activeColumnIds, pageSize, offset);
       setRows((prevRows) => {
         const updatedRows = pageNum === 0 ? newRows : [...prevRows, ...newRows];
         return updatedRows;
       });
       setLoading(false);
     },
-    [name, pageSize, rowCount]
+    [pageSize, activeColumnIds, id]
   );
 
   useEffect(() => {
-    // Fetch columns when component mounts or name changes
+    // Fetch columns when component mounts
     fetchColumns();
-  }, [name, fetchColumns]);
+  }, [id, fetchColumns]);
 
   // Initial fetch or when id changes
   useEffect(() => {

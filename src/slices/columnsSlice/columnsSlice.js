@@ -506,7 +506,7 @@ const columnsSlice = createSlice({
       const { id } = action.payload;
       delete state.errors[id];
     },
-  }, // end reducers
+  },
 });
 
 export default columnsSlice.reducer;

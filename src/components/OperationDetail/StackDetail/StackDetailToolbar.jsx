@@ -11,7 +11,7 @@ import {
   clearSelectedColumns,
   selectSelectedColumns,
 } from "../../../slices/columnsSlice";
-import { removeColumnsAction } from "../../../sagas/removeColumnsSaga";
+import { removeColumnsRequest } from "../../../sagas/removeColumnsSaga";
 import { setShowColumnIndexDetails } from "../../../slices/uiSlice";
 
 export default function StackDetailToolbar({
@@ -41,7 +41,7 @@ export default function StackDetailToolbar({
       icon: <DeleteIcon />,
       disabled: selectedColumnIds.length === 0,
       action: () => {
-        dispatch(removeColumnsAction(selectedColumnIds));
+        dispatch(removeColumnsRequest(selectedColumnIds));
         handleMenuClose();
       },
     },

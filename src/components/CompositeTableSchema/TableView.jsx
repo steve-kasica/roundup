@@ -11,8 +11,8 @@ import PropTypes from "prop-types";
 
 function TableView({
   // props via withTableData
-  name,
-  selectedColumnIds,
+  table,
+  activeColumnIds,
   isHovered,
   isDragging,
   isPressed,
@@ -22,8 +22,7 @@ function TableView({
   parentOperationType,
   parentColumnCount,
 }) {
-  const columnCount = selectedColumnIds.length;
-
+  const columnCount = activeColumnIds.length;
   const ticks = Array.from(
     {
       length:
@@ -31,7 +30,7 @@ function TableView({
           ? parentColumnCount
           : columnCount,
     },
-    (_, i) => (i < selectedColumnIds.length ? selectedColumnIds[i] : null)
+    (_, i) => (i < columnCount ? activeColumnIds[i] : null)
   );
 
   const className = [
@@ -48,7 +47,7 @@ function TableView({
       style={{ flexBasis: `${(columnCount / parentColumnCount) * 100}%` }}
     >
       <div className="label">
-        {name} <span className="column-count">({columnCount})</span>
+        {table.name} <span className="column-count">({columnCount})</span>
       </div>
       {ticks.map((columnId, index) => (
         <ColumnView
@@ -61,8 +60,10 @@ function TableView({
 }
 
 TableView.propTypes = {
-  name: PropTypes.string.isRequired,
-  selectedColumnIds: PropTypes.arrayOf(
+  table: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  activeColumnIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
   isHovered: PropTypes.bool,

@@ -19,7 +19,7 @@ import {
 } from "../../slices/columnsSlice";
 
 import { renameColumnsAction } from "../../sagas/renameColumnsSaga";
-import { removeColumnsAction } from "../../sagas/removeColumnsSaga";
+import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
 import { swapColumnsAction } from "../../sagas/swapColumnsSaga";
 
 import { selectFirstSelectedColumn } from "../../slices/uiSlice";
@@ -147,7 +147,7 @@ export default function withColumnData(WrappedComponent) {
         dragColumn={() => (!isNull ? dispatch(addColumnsToDragging(id)) : null)}
         unDragColumn={unDragColumn}
         removeColumn={() => {
-          if (!isNull) dispatch(removeColumnsAction(id));
+          if (!isNull) dispatch(removeColumnsRequest(id));
         }}
         addColumnToSelection={() => {
           if (!isNull) dispatch(appendToSelectedColumns(id));

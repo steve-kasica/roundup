@@ -119,3 +119,21 @@ export const selectTableIdsByColumnIds = createSelector(
   [(state) => state.columns.data, (_, columnIds) => columnIds],
   (data, columnIds) => columnIds.map((columnId) => data[columnId].tableId)
 );
+
+/**
+ * Memoized selector to get removed column IDs for a specific table.
+ * This selector properly memoizes the result to ensure components update
+ * when columns are marked as removed.
+ */
+export const selectRemovedColumnIdsByTableId = createSelector(
+  [
+    (state) => state.columns.data,
+    (state, tableId) => selectColumnIdsByTableId(state, tableId),
+  ],
+  (columnsData, columnIds) => {
+    return columnIds
+      .map((columnId) => columnsData[columnId])
+      .filter((column) => column && column.isRemoved)
+      .map((column) => column.id);
+  }
+);

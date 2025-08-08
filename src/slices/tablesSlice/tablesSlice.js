@@ -142,6 +142,22 @@ const slice = createSlice({
         state.data[id].name = newName;
       });
     },
+    updateTables(state, action) {
+      // Normalize input to always be an array
+      const tables = Array.isArray(action.payload)
+        ? action.payload
+        : action.payload.tables || [action.payload];
+
+      tables.forEach((table) => {
+        if (!state.data[table.id]) {
+          throw new Error(`Table with ID ${table.id} does not exist`);
+        }
+        state.data[table.id] = {
+          ...state.data[table.id],
+          ...table,
+        };
+      });
+    },
     setTablesAttribute(state, action) {
       let { ids, attribute, value } = action.payload;
       // Ensure ids is an array
@@ -248,6 +264,7 @@ const slice = createSlice({
 export const {
   addTables,
   dropTables,
+  updateTables,
   setTablesAttribute,
   addTablesToLoading,
   removeTablesFromLoading,

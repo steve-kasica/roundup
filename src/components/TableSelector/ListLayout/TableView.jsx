@@ -8,6 +8,7 @@ import {
 import HighlightText from "../../ui/HighlightText";
 import { formatNumber } from "../../../lib/utilities/formaters";
 import withTableData from "../../HOC/withTableData";
+import PropTypes from "prop-types";
 
 function TableView({ table, isDisabled, searchString }) {
   return (
@@ -28,17 +29,20 @@ function TableView({ table, isDisabled, searchString }) {
             </small>
           </Typography>
         }
-        // secondary={
-        // <Typography color={isDisabled ? "textDisabled" : "normal"}>
-        //   {tags.map((tag) => (
-        //     <Chip key={tag} label={tag} size="small" />
-        //   ))}
-        // </Typography>
-        // }
       />
     </ListItem>
   );
 }
+
+TableView.propTypes = {
+  table: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    rowCount: PropTypes.number.isRequired,
+    columnCount: PropTypes.number.isRequired,
+  }).isRequired,
+  isDisabled: PropTypes.bool,
+  searchString: PropTypes.string,
+};
 
 const EnhancedTableView = withTableData(TableView);
 export default EnhancedTableView;

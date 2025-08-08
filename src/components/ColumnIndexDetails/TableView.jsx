@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import withTableData from "../HOC/withTableData";
 
-function TableView({ name, colWidth }) {
+function TableView({ table, colWidth }) {
   return (
     <Box
       sx={{
@@ -23,7 +23,7 @@ function TableView({ name, colWidth }) {
           textAlign: "left",
         }}
       >
-        {name}
+        {table.name}
       </Box>
     </Box>
   );
