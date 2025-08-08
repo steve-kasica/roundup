@@ -23,39 +23,68 @@ export async function getMatchValues(
     ENDS_WITH: `ends_with(${leftTableId}.${leftColumnId}, ${rightTableId}.${rightColumnId})`,
   };
 
-  const matchTypes = {};
-  matchTypes[
-    MATCH_TYPES.LEFT_UNJOINED
-  ] = `left_value IS NOT NULL AND right_value IS NULL`;
-  matchTypes[
-    MATCH_TYPES.RIGHT_UNJOINED
-  ] = `left_value IS NULL AND right_value IS NOT NULL`;
-  matchTypes[
-    MATCH_TYPES.MATCHES
-  ] = `left_value IS NOT NULL AND right_value IS NOT NULL`;
+  const ctePredicates = {
+    EQUALS: `l.left_value = r.right_value`,
+    CONTAINS: `contains(l.left_value, r.right_value)`,
+    STARTS_WITH: `starts_with(l.left_value, r.right_value)`,
+    ENDS_WITH: `ends_with(l.left_value, r.right_value)`,
+  };
 
-  // TODO: add pagination support
-  // TODO: should i group this to addresses predicate duplication?
-  const query = `
+  let query = "";
+  if (matchType === MATCH_TYPES.MATCHES) {
+    query = `
+      WITH left_counts AS (
+        SELECT 
+          ${leftColumnId} AS left_value,
+          COUNT(*) as left_count
+        FROM ${leftTableId}
+        GROUP BY ${leftColumnId}
+      ),
+      right_counts AS (
+        SELECT 
+          ${rightColumnId} AS right_value,
+          COUNT(*) as right_count
+        FROM ${rightTableId}
+        GROUP BY ${rightColumnId}
+      )
+      SELECT 
+        l.left_value,
+        r.right_value,
+        l.left_count,
+        r.right_count
+      FROM left_counts l
+      JOIN right_counts r ON ${ctePredicates[joinPredicate]}
+      ORDER BY l.left_count * r.right_count ${order_direction}
+      LIMIT ${limit};
+    `;
+  } else if (matchType === MATCH_TYPES.LEFT_UNJOINED) {
+    query = `
     SELECT 
-        ${leftTableId}.${leftColumnId} AS left_value,
-        ${rightTableId}.${rightColumnId} AS right_value,
-        CASE 
-            WHEN ${leftTableId}.${leftColumnId} IS NULL THEN 0
-            ELSE COUNT(*) OVER (PARTITION BY ${leftTableId}.${leftColumnId})
-        END as left_count,
-        CASE 
-            WHEN ${rightTableId}.${rightColumnId} IS NULL THEN 0
-            ELSE COUNT(*) OVER (PARTITION BY ${rightTableId}.${rightColumnId})
-        END as right_count,
-        left_count * right_count AS total_count
+      ${leftTableId}.${leftColumnId} AS left_value,
+      NULL AS right_value,
+      COUNT(DISTINCT ${leftTableId}.${leftColumnId}) AS left_count,
+      0 AS right_count
     FROM ${leftTableId}
-    FULL OUTER JOIN ${rightTableId}
-    ON ${predicates[joinPredicate]}
-    WHERE ${matchTypes[matchType]}
-    ORDER BY ${order} ${order_direction}
+    WHERE ${leftTableId}.${leftColumnId} NOT IN (SELECT DISTINCT ${rightTableId}.${rightColumnId} FROM ${rightTableId} WHERE ${rightTableId}.${rightColumnId} IS NOT NULL)
+    GROUP BY ${leftTableId}.${leftColumnId}
     LIMIT ${limit};
-`;
+    `;
+  } else if (matchType === MATCH_TYPES.RIGHT_UNJOINED) {
+    query = `
+    SELECT 
+      NULL AS left_value,
+      ${rightTableId}.${rightColumnId} AS right_value,
+      0 AS left_count,
+      COUNT(DISTINCT ${rightTableId}.${rightColumnId}) AS right_count
+    FROM ${rightTableId}
+    WHERE ${rightTableId}.${rightColumnId} NOT IN (SELECT DISTINCT ${leftTableId}.${leftColumnId} FROM ${leftTableId} WHERE ${leftTableId}.${leftColumnId} IS NOT NULL)
+    GROUP BY ${rightTableId}.${rightColumnId}
+    LIMIT ${limit};    
+    `;
+  } else {
+    throw new Error(`Unsupported match type: ${matchType}`);
+  }
+
   console.log("Executing query:", query);
   const response = await conn.query(query);
   await conn.close();

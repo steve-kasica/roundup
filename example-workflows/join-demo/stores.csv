@@ -1,0 +1,10 @@
+store_id,store_name,city,category,products,email_domain
+101,MegaMart,New York,Grocery,food beverages electronics,megamart.com
+102,TechHub,New York,Electronics,electronics computers music,techhub.com
+103,BookNook,New York,Books,books music magazines,booknook.com
+201,SunnyMart,Los Angeles,Grocery,food sports equipment,sunnymart.com
+202,GadgetWorld,Los Angeles,Electronics,electronics sports gadgets,gadgets.com
+301,WindyBooks,Chicago,Books,books electronics magazines,windybooks.com
+401,PhoenixMart,Phoenix,Grocery,food fitness equipment,phoenixmart.com
+402,DesertTech,Phoenix,Electronics,electronics fitness gadgets,desertech.com
+501,PortlandBooks,Portland,Books,books sports magazines,portlandbooks.com
