@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { updateOperations } from "../../../slices/operationsSlice";
+import { selectColumnIdsByTableId } from "../../../slices/columnsSlice";
 
 // TODO: how to handlethe case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -28,6 +29,10 @@ export default function withStackOperationData(WrappedComponent) {
 
     const droppedColumnIds = useSelector((state) => state.columns.dropped);
 
+    const operationColumnIds = useSelector((state) =>
+      selectColumnIdsByTableId(state, operation.id)
+    );
+
     const columnIdMatrix = useSelector((state) => {
       // TODO: what if the childId is not a table?
       const rawColumnIds = operation.children.map((childId) =>
@@ -46,26 +51,15 @@ export default function withStackOperationData(WrappedComponent) {
 
     const m = Math.max(...columnIdMatrix.map((c) => c.length));
     const n = columnIdMatrix.length;
-    const columnNames = operation.columnNames || Array(m).fill("");
 
     return (
       <WrappedComponent
         {...props}
-        tableIds={operation.children} // TODO: what if these are not all tables?
-        columnIdMatrix={columnIdMatrix}
+        columnIds={operationColumnIds} // this reflects to columnIds of the operation/view, not its children
+        childIds={operation.children} // TODO: what if these are not all tables?
+        columnIdMatrix={columnIdMatrix} // matrix of child column IDs
         m={m}
         n={n}
-        columnNames={columnNames}
-        renameOperationColumn={(index, newName) =>
-          dispatch(
-            updateOperations({
-              id: operation.id,
-              columnNames: operation.columnNames.map((name, i) =>
-                i === index ? newName : name
-              ),
-            })
-          )
-        }
       />
     );
   }

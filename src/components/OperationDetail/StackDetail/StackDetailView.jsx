@@ -20,11 +20,11 @@ const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
 function StackDetailView({
-  tableIds,
+  childIds,
   columnIdMatrix,
   m,
   n,
-  columnNames,
+  columnIds,
   renameOperationColumn,
 }) {
   const dispatch = useDispatch(); // TODO: remove redux from View
@@ -34,7 +34,7 @@ function StackDetailView({
   const [selectionExtentCell, setSelectionExtentCell] = useState(null);
 
   const tables = useSelector((state) =>
-    tableIds.map((tableId) => selectTablesById(state, tableId))
+    childIds.map((childId) => selectTablesById(state, childId))
   );
 
   const width = m * cellSize;
@@ -94,7 +94,7 @@ function StackDetailView({
             className="column-group"
             style={{
               display: "grid",
-              gridTemplateRows: `repeat(${tableIds.length + 1}, 1fr)`,
+              gridTemplateRows: `repeat(${childIds.length + 1}, 1fr)`,
               gap: "0.25rem", // Match the margin from ColumnView Papers
               alignItems: "center",
             }}
@@ -102,8 +102,8 @@ function StackDetailView({
             {/* Add spacer to account for x-axis header */}
             <div style={{ height: "2rem" }}></div>{" "}
             {/* Match the height of Typography variant="subtitle1" */}
-            {tableIds.map((tableId) => (
-              <TableView key={tableId} id={tableId} />
+            {childIds.map((childId) => (
+              <TableView key={childId} id={childId} />
             ))}
           </div>
         </div>
@@ -117,8 +117,8 @@ function StackDetailView({
                 key={j}
                 index={j}
                 columnIds={columnIdMatrix.map((row) => row[j])}
-                columnName={columnNames[j]}
-                tableIds={tables.map(({ id }) => id)}
+                headerId={columnIds[j]}
+                childIds={tables.map(({ id }) => id)}
                 onCellClick={onCellClick}
                 onColumnClick={onColumnClick}
                 onHeaderChange={renameOperationColumn}
@@ -193,7 +193,7 @@ function StackDetailView({
 }
 
 StackDetailView.propTypes = {
-  tableIds: PropTypes.arrayOf(
+  childIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
   columnIdMatrix: PropTypes.arrayOf(
@@ -201,7 +201,6 @@ StackDetailView.propTypes = {
   ).isRequired,
   m: PropTypes.number.isRequired,
   n: PropTypes.number.isRequired,
-  columnNames: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 const StackDetailViewWithData = withStackOperationData(StackDetailView);

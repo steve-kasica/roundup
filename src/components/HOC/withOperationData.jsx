@@ -12,7 +12,10 @@ import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { setPeekedTable } from "../../slices/uiSlice";
 import { isTableId } from "../../slices/tablesSlice";
-import { selectActiveColumnCountByTableId } from "../../slices/columnsSlice";
+import {
+  selectActiveColumnCountByTableId,
+  selectColumnIdsByTableId,
+} from "../../slices/columnsSlice";
 
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
@@ -22,25 +25,11 @@ export default function withOperationData(WrappedComponent) {
     const depth = useSelector((state) => selectOperationDepth(state, id));
     const focusedOperationId = useSelector(selectFocusedOperationId);
     const hoveredOperationId = useSelector(selectHoveredOperation);
+    const columnIds = useSelector((state) =>
+      selectColumnIdsByTableId(state, id)
+    );
 
-    const columnCount = useSelector((state) => {
-      if (!operation || !operation.children) {
-        return 0; // If operation or children are not defined, return 0
-        // TODO: who is calling this component on start up?
-      }
-      const childColumnCount = operation.children.map((childId) => {
-        if (isTableId(childId)) {
-          return selectActiveColumnCountByTableId(state, childId);
-        } else {
-          return 0;
-        }
-      });
-      if (operation.operationType === OPERATION_TYPE_PACK) {
-        return childColumnCount.reduce((a, b) => a + b, 0); // Sum of all child column counts
-      } else {
-        return Math.max(...childColumnCount); // Max of all child column counts
-      }
-    });
+    console.log(operation.name, columnIds);
 
     return (
       <WrappedComponent
@@ -48,7 +37,8 @@ export default function withOperationData(WrappedComponent) {
         operation={operation}
         id={id}
         depth={depth}
-        columnCount={columnCount}
+        columnCount={columnIds.length}
+        columnIds={columnIds}
         rowCount={operation?.rowCount}
         isFocused={operation?.id === focusedOperationId}
         isHovered={operation?.id === hoveredOperationId}

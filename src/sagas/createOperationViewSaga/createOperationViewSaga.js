@@ -7,7 +7,15 @@ import {
 } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { addTableToSchemaSuccess } from "../addTableToSchemaSaga/addTableToSchemaSaga";
-import { selectColumnById } from "../../slices/columnsSlice";
+import {
+  addColumns,
+  areColumnsEqual,
+  Column,
+  COLUMN_TYPE_CATEGORICAL,
+  selectColumnById,
+  selectColumnIdsByTableId,
+  updateColumns,
+} from "../../slices/columnsSlice";
 import { removeColumnsSuccessAction } from "../removeColumnsSaga";
 import {
   getTableDimensions,
@@ -115,24 +123,8 @@ function* handleCreateOperationView(operationId) {
       updateOperations({
         id: operationId,
         rowCount,
-        columnCount,
       })
     );
-
-    // Get column names for the operation view if they are not already set
-    if (operation.columnNames.length === 0) {
-      // If the operation has no column names, fetch them from the DuckDB view
-      const columnIds = yield call(getColumnNames, operationId);
-      const columnNames = yield select((state) =>
-        columnIds.map((id) => selectColumnById(state, id).name)
-      );
-      yield put(
-        updateOperations({
-          id: operationId,
-          columnNames,
-        })
-      );
-    }
 
     if (operation.error) {
       // Clear any previous error if the operation was successful
@@ -153,7 +145,76 @@ function* handleCreateOperationView(operationId) {
         error: JSON.stringify(error, Object.getOwnPropertyNames(error)), // Serialize the error
       })
     );
-  }
+  } finally {
+    // If an error occurs, we still need to update columns associated with this operation
+    // Create or update columns associated with this operation / view
+    const sliceColumns = yield select((state) =>
+      selectColumnIdsByTableId(state, operationId).map((columnId) =>
+        selectColumnById(state, columnId)
+      )
+    );
+    const dbColumns = yield* getDefaultColumns(operationId);
+
+    if (sliceColumns.length === 0 && dbColumns.length > 0) {
+      // If operation/view is being created, then no columns exist, create columns
+      yield put(addColumns(dbColumns));
+    } else if (sliceColumns.length > 0 && dbColumns.length === 0) {
+      console.log(
+        "WOAH! No columns in the database for operation",
+        operationId
+      );
+    } else if (sliceColumns.length === 0 && dbColumns.length === 0) {
+      console.log(
+        "WOAH! No columns in the slice or database for operation",
+        operationId
+      );
+    } else {
+      // We're updating an existing operation/view b/c there are columns in the slice
+      // and in the database, so we need to reconcile them
+      // This is a bit more complex, since we need to check if columns exist in both.
+      const columnsToAdd = [];
+      const columnsToRemove = [];
+      const columnsToUpdate = [];
+      for (
+        let i = 0;
+        i < Math.max(sliceColumns.length, dbColumns.length);
+        i++
+      ) {
+        const sliceColumn = sliceColumns[i];
+        const dbColumn = dbColumns[i];
+        if (sliceColumn && dbColumn) {
+          if (!areColumnsEqual(sliceColumn, dbColumn)) {
+            // If both slice and db columns exist but are not equal, reconcile by updating the slice column
+            columnsToUpdate.push({
+              id: sliceColumn.id,
+              name: sliceColumn.name, // priority to slice column name, since user may have renamed it
+              columnType: dbColumn.columnType, // keep the db column type
+              index: dbColumn.index, // keep the db column index
+            });
+          }
+        } else if (sliceColumn && !dbColumn) {
+          // If there's a slice column at this index but no db column, remove it
+          columnsToRemove.push(sliceColumn);
+        } else if (!sliceColumn && dbColumn) {
+          // If there's a db column at this index but no slice column, add it
+          columnsToAdd.push(dbColumn);
+        }
+      }
+      //      yield put(removeColumns(columnsToRemove));
+      yield put(addColumns(columnsToAdd));
+      yield put(updateColumns(columnsToUpdate));
+    } // end else block
+  } // end finally block
+}
+
+function* getDefaultColumns(parentId) {
+  const columnIds = yield call(getColumnNames, parentId);
+  const columnNames = yield select((state) =>
+    columnIds.map((id) => selectColumnById(state, id).name)
+  );
+  return columnNames.map((name, i) =>
+    Column(parentId, i, name, COLUMN_TYPE_CATEGORICAL)
+  );
 }
 
 // TODO: this would be like a serialize operation query selector in the operations slice

@@ -11,16 +11,15 @@
  */
 
 import { useState, useRef, useEffect } from "react";
-import { Popover, List, ListItemButton, Paper } from "@mui/material";
+import { Popover, List, ListItemButton } from "@mui/material";
 import PropTypes from "prop-types";
 
 import "./ColumnBlockView.scss";
 import withColumnData from "../../../HOC/withColumnData";
-import { Box } from "lucide-react";
 
 const delay = 500; // in ms for input changes
 
-function ColumnView({
+function Cell({
   dragRef,
   dropRef,
   column,
@@ -130,7 +129,7 @@ function ColumnView({
     style.width = `${value.length + 5}ch`;
   }
 
-  // Render ColumnView
+  // Render Cell
   return (
     <div
       className={className}
@@ -214,7 +213,7 @@ function ColumnView({
   );
 }
 
-ColumnView.propTypes = {
+Cell.propTypes = {
   dragRef: PropTypes.func.isRequired,
   dropRef: PropTypes.func.isRequired,
   column: PropTypes.oneOfType([PropTypes.object, PropTypes.oneOf([null])]),
@@ -250,5 +249,5 @@ function getPercentOverlap(a, b) {
   return Math.max(0, overlap);
 }
 
-const EnhancedColumnBlockView = withColumnData(ColumnView);
-export default EnhancedColumnBlockView;
+const EnhancedCell = withColumnData(Cell);
+export default EnhancedCell;

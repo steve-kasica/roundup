@@ -103,15 +103,15 @@ export default function Column(tableId, index, name, columnType) {
     uniqueValues: null, // Unique values in the column, can be null if not computed yet
     totalRows: null, // Total number of rows in the column, can be null if not computed yet
     nonNullValues: null, // Number of non-null values in the column, can be null if not computed yet
-    values: {},
+    values: {}, // TODO: remove
   };
 }
 
+// Don't include `id` in the attributes array
+// every objectin Roundup includes an `id`, so it's not discerning
 const attributes = [
-  "id",
-  "tableId",
   "name",
-  "alias",
+  "tableId",
   "index",
   "columnType",
   "uniqueValues",
@@ -131,6 +131,53 @@ export const isColumn = (obj) =>
   typeof obj === "object" &&
   Object.keys(obj).length > 0 &&
   attributes.every((key) => key in obj);
+
+/**
+ * Performs a shallow equality comparison between two Column instances.
+ * Compares all column attributes to determine if two columns are equal.
+ *
+ * @param {Object} column1 - The first column to compare.
+ * @param {Object} column2 - The second column to compare.
+ * @returns {boolean} True if both columns have the same values for all attributes, false otherwise.
+ * @example
+ * const col1 = Column('table1', 0, 'name', 'VARCHAR');
+ * const col2 = Column('table1', 0, 'name', 'VARCHAR');
+ * const areEqual = columnsEqual(col1, col2); // false (different IDs due to counter)
+ *
+ * const col3 = { ...col1 };
+ * const areEqual2 = columnsEqual(col1, col3); // true (same values)
+ */
+export const areColumnsEqual = (column1, column2) => {
+  // Check if both are valid column objects
+  if (!isColumn(column1) || !isColumn(column2)) {
+    return false;
+  }
+
+  // Compare all attributes
+  return attributes.every((key) => {
+    const val1 = column1[key];
+    const val2 = column2[key];
+
+    // Handle nested objects (like values object) with shallow comparison
+    if (
+      typeof val1 === "object" &&
+      typeof val2 === "object" &&
+      val1 !== null &&
+      val2 !== null
+    ) {
+      const keys1 = Object.keys(val1);
+      const keys2 = Object.keys(val2);
+
+      if (keys1.length !== keys2.length) {
+        return false;
+      }
+
+      return keys1.every((k) => val1[k] === val2[k]);
+    }
+
+    return val1 === val2;
+  });
+};
 
 /**
  * Error thrown when an invalid column type is provided.

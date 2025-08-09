@@ -1,32 +1,22 @@
 import {
-  Box,
-  Chip,
-  FormControl,
   IconButton,
   Input,
   InputAdornment,
-  InputLabel,
   List,
   ListItemButton,
-  OutlinedInput,
   Paper,
   Popover,
   Typography,
 } from "@mui/material";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useDispatch } from "react-redux";
-// import { updateOperationColumnName } from "../../../../slices/operationsSlice"; // Add your action import
 import ChevronDownIcon from "@mui/icons-material/ExpandMore";
-import { isPointInBoundingBox } from "../../../../lib/utilities";
+import withColumnData from "../../../HOC/withColumnData";
 
-export default function IndexHeader({
-  title,
-  onInputChange,
-  index = 0,
-  onColumnClick,
-}) {
+function Header({ column, title, onInputChange, index = 0, onColumnClick }) {
   // Context menu
-  const [inputValue, setInputValue] = useState(title || `Column ${index + 1}`);
+  const [inputValue, setInputValue] = useState(
+    column?.name || `Column ${index + 1}`
+  );
 
   const [anchorEl, setAnchorEl] = useState(null);
   const isPopoverOpen = Boolean(anchorEl);
@@ -218,3 +208,7 @@ export default function IndexHeader({
     </>
   );
 }
+
+const EnhancedHeader = withColumnData(Header);
+
+export default EnhancedHeader;

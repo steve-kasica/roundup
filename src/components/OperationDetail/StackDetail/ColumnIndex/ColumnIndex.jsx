@@ -1,13 +1,13 @@
 import { Box, Paper } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRef } from "react";
-import ColumnView from "./ColumnView";
+import ColumnView from "./Cell";
 import withColumnVectorData from "../../../HOC/withColumnVectorData";
 import PropTypes from "prop-types";
 import { useDrag, useDragLayer, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-import IndexHeader from "./IndexHeader";
-import { DragHandleOutlined, DragIndicator } from "@mui/icons-material";
+import Header from "./Header";
+import { DragIndicator } from "@mui/icons-material";
 import { MODULE_NAME } from ".";
 
 export const WIDTH = 20; // in ch
@@ -16,6 +16,7 @@ export function ColumnIndex({
   index,
   columnIds,
   columnName,
+  headerId,
   maxColumnNameLength,
   hasSelected,
   hoverColumnVector,
@@ -24,7 +25,6 @@ export function ColumnIndex({
   onColumnClick,
   undragColumnVector,
   swapColumnVectors,
-  onHeaderChange,
 }) {
   // Use useDragLayer to monitor global drag state
   const boxRef = useRef(null);
@@ -160,12 +160,7 @@ export function ColumnIndex({
           }}
         />
       </div>
-      <IndexHeader
-        title={columnName}
-        index={index}
-        onColumnClick={onColumnClick}
-        onInputChange={(newName) => onHeaderChange(index, newName)}
-      />
+      <Header id={headerId} index={index} onColumnClick={onColumnClick} />
 
       {columnIds.map((columnId, i) => (
         <Paper
@@ -204,7 +199,7 @@ ColumnIndex.propTypes = {
   undragColumnVector: PropTypes.func.isRequired,
   swapColumnVectors: PropTypes.func.isRequired,
   maxColumnNameLength: PropTypes.number.isRequired,
-  onHeaderChange: PropTypes.func.isRequired,
+  headerId: PropTypes.string.isRequired,
 };
 
 const EnhancedColumnIndex = withColumnVectorData(ColumnIndex);

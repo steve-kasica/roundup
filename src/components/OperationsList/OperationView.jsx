@@ -32,14 +32,16 @@ const StyledListItem = styled(ListItem, {
 function OperationView({
   operation,
   childrenIds,
+  columnCount,
   index,
   peekTable,
   renameOperation,
 }) {
-  const { id, name, columnCount, operationType } = operation;
   const dispatch = useDispatch();
 
-  const label = operationType.charAt(0).toUpperCase() + operationType.slice(1);
+  const label =
+    operation.operationType.charAt(0).toUpperCase() +
+    operation.operationType.slice(1);
   const position = index + 1;
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -94,8 +96,15 @@ function OperationView({
             </MenuItem>
             <MenuItem
               onClick={() => {
-                const newName = prompt("Enter new operation name:", name);
-                if (newName && newName.trim() && newName.trim() !== name) {
+                const newName = prompt(
+                  "Enter new operation name:",
+                  operation.name
+                );
+                if (
+                  newName &&
+                  newName.trim() &&
+                  newName.trim() !== operation.name
+                ) {
                   renameOperation(newName.trim());
                 }
                 handleMenuClose();
@@ -111,9 +120,11 @@ function OperationView({
       }
       disablePadding
     >
-      <ListItemButton onClick={() => dispatch(setFocusedOperation({ id }))}>
+      <ListItemButton
+        onClick={() => dispatch(setFocusedOperation({ id: operation.id }))}
+      >
         <ListItemText
-          primary={`${position}. ${name} (${columnCount})`}
+          primary={`${position}. ${operation.name} (${columnCount})`}
           secondary={`${label}: ${childrenIds.join(", ")}`}
         />
       </ListItemButton>
