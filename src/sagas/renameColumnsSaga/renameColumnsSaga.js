@@ -1,23 +1,30 @@
 import { takeLatest, put } from "redux-saga/effects";
 import {
-  renameColumns,
   addColumnsToLoading,
   removeColumnsFromLoading,
+  updateColumns,
 } from "../../slices/columnsSlice";
 import { createAction } from "@reduxjs/toolkit";
 import { clearSelectedColumns } from "../../slices/columnsSlice";
 
-export const renameColumnsAction = createAction("columns/renameColumn");
+export const renameColumnsRequest = createAction(
+  "columns/renameColumns/request"
+);
 
 export default function* renameColumnSaga() {
-  yield takeLatest(renameColumnsAction.type, renameColumnsSagaWorker);
+  yield takeLatest(renameColumnsRequest.type, renameColumnsSagaWorker);
 }
 
+// name is constant, used for renaming multiple columns
+// to the same name
 export function* renameColumnsSagaWorker(action) {
-  const { ids, aliases } = action.payload;
+  let { ids, name } = action.payload;
+
+  // Normalize ids to always be an array
+  ids = Array.isArray(ids) ? ids : [ids];
 
   yield put(addColumnsToLoading(ids));
-  yield put(renameColumns({ ids, aliases }));
-  yield put(removeColumnsFromLoading(ids));
+  yield put(updateColumns(ids.map((id) => ({ id, name }))));
   yield put(clearSelectedColumns());
+  yield put(removeColumnsFromLoading(ids));
 }

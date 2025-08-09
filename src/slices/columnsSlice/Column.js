@@ -95,10 +95,9 @@ export default function Column(tableId, index, name, columnType) {
   const id = `c${++idCounter}`;
 
   return {
-    id,
-    tableId,
-    name, // Name is immutable, used for lookups in database
-    alias: null, // Alias is mutable and can be changed by the user
+    id, // id is immutable and used as the unique identifier for table columns
+    name, // name is mutable and can be changed by the user
+    tableId, // tableId is immutable and used to identify the table the column belongs to
     index,
     columnType,
     uniqueValues: null, // Unique values in the column, can be null if not computed yet

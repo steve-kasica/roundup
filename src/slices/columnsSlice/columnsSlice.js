@@ -155,49 +155,6 @@ const columnsSlice = createSlice({
         })
         .forEach((column) => (column[attribute] = value));
     },
-
-    /**
-     * Updates the column name after a successful rename operation.
-     * Accepts either a single column ID or an array of IDs as payload.
-     *
-     * @param {Object} state - The current state of the slice.
-     * @param {Object} action - The dispatched action.
-     * @param {string|string[]} action.payload.id - The ID(s) of the renamed column(s).
-     * @param {string} action.payload.newColumnName - The new name of the column(s).
-     */
-    renameColumns(state, action) {
-      // Support both legacy and new payloads for backward compatibility
-      let ids, aliases;
-      if (
-        Array.isArray(action.payload?.ids) ||
-        typeof action.payload?.ids === "string"
-      ) {
-        ids = action.payload.ids;
-        aliases = action.payload.aliases;
-      } else if (
-        action.payload?.id !== undefined &&
-        action.payload?.newColumnName !== undefined
-      ) {
-        ids = [action.payload.id];
-        aliases = [action.payload.newColumnName];
-      } else {
-        throw new Error("Invalid payload for renameColumns");
-      }
-      if (!Array.isArray(ids)) ids = [ids];
-      if (!Array.isArray(aliases)) aliases = [aliases];
-      if (ids.length !== aliases.length) {
-        throw new Error(
-          "renameColumns: ids and aliases must have the same length"
-        );
-      }
-      ids.forEach((id, i) => {
-        const column = state.data[id];
-        if (!column) {
-          throw new Error(`Column with id ${id} not found`);
-        }
-        column.alias = aliases[i];
-      });
-    },
     dropColumns(state, action) {
       let ids = action.payload;
       if (!Array.isArray(ids)) {
@@ -506,7 +463,6 @@ export const {
   addColumnsFromOpenRefine,
   addColumns,
   updateColumns,
-  renameColumns,
   setColumnsIndex,
   addColumnsToLoading,
   removeColumnsFromLoading,

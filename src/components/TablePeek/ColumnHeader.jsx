@@ -111,16 +111,16 @@ function ColumnHeader({
     //     setMenuAnchorEl(null);
     //   },
     // },
-    // {
-    //   label: "Rename Column",
-    //   action: () => {
-    //     const newName = prompt("Enter new column name:", name || column?.name);
-    //     if (newName && newName.trim() !== "") {
-    //       renameColumn(newName);
-    //     }
-    //     setMenuAnchorEl(null);
-    //   },
-    // },
+    {
+      label: "Rename Column",
+      action: () => {
+        const newName = prompt("Enter new column name:", name || column?.name);
+        if (newName && newName.trim() !== "") {
+          renameColumn(newName);
+        }
+        setMenuAnchorEl(null);
+      },
+    },
     {
       label: "Remove Column",
       action: () => {

@@ -18,7 +18,7 @@ import {
   selectSelectedColumns,
 } from "../../slices/columnsSlice";
 
-import { renameColumnsAction } from "../../sagas/renameColumnsSaga";
+import { renameColumnsRequest } from "../../sagas/renameColumnsSaga";
 import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
 import { swapColumnsAction } from "../../sagas/swapColumnsSaga";
 
@@ -27,7 +27,7 @@ import { selectFirstSelectedColumn } from "../../slices/uiSlice";
 import { useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-import { selectTablesById, setTablesAttribute } from "../../slices/tablesSlice";
+import { selectTablesById } from "../../slices/tablesSlice";
 
 export default function withColumnData(WrappedComponent) {
   return function EnhancedComponent({ id, isDraggable = false, ...props }) {
@@ -134,14 +134,8 @@ export default function withColumnData(WrappedComponent) {
         // Actions handlers
         hoverColumn={hoverColumn}
         unHoverColumn={unHoverColumn}
-        renameColumn={(alias) => {
-          if (!isNull)
-            dispatch(
-              renameColumnsAction({
-                ids: id,
-                aliases: alias,
-              })
-            );
+        renameColumn={(name) => {
+          if (!isNull) dispatch(renameColumnsRequest({ ids: id, name }));
         }}
         unfocusColumn={unfocusColumn}
         dragColumn={() => (!isNull ? dispatch(addColumnsToDragging(id)) : null)}

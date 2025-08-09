@@ -116,9 +116,23 @@ export default function DBTableView({
         style={{ overflowY: "auto", height: "inherit" }}
       >
         <table>
-          <thead>
+          <thead
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 10,
+              backgroundColor: "white",
+            }}
+          >
             <tr>
-              <th></th>
+              <th
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  backgroundColor: "white",
+                  zIndex: 11,
+                }}
+              ></th>
               {Array.from({ length: columns.length }, (_, i) => (
                 <ColumnHeader key={i} id={columns[i]?.column_name} />
               ))}
