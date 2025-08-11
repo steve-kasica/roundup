@@ -1,13 +1,14 @@
 import { TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { debounce } from "redux-saga/effects";
 
 const EditableText = ({
   initialValue,
   onChange,
+  inputRef = null,
   debounceDelay = 300, // in milliseconds
   placeholder = "Operation name",
+  fontSize = "2rem",
 }) => {
   const [localValue, setLocalValue] = useState(initialValue || "");
 
@@ -35,19 +36,27 @@ const EditableText = ({
 
   return (
     <TextField
+      inputRef={inputRef}
       value={localValue}
       onChange={handleChange}
       onBlur={handleChange}
       variant="standard"
       slotProps={{
         input: {
-          style: {
-            fontSize: "2rem",
-            fontWeight: "bold",
+          inputProps: {
+            style: {
+              fontSize,
+              fontWeight: "bold",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              padding: 0,
+            },
           },
         },
       }}
       sx={{
+        // width: "100%",
         "& .MuiInput-underline:before": {
           borderBottomColor: "transparent",
         },
@@ -65,6 +74,9 @@ EditableText.propTypes = {
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   debounceDelay: PropTypes.number,
+  fontSize: PropTypes.string,
+  maxWidth: PropTypes.string,
+  inputRef: PropTypes.object,
 };
 
 export default EditableText;

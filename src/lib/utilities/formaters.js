@@ -21,3 +21,20 @@ export const formatBytes = (bytes, decimals = 2) => {
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 };
+
+/**
+ * Formats unique count values with appropriate rounding and suffix
+ * @param {number} value - The unique count to format
+ * @returns {string|number} Formatted count with appropriate suffix or the original number
+ */
+export const approxNumber = (value) => {
+  if (value >= 1000) {
+    return Math.floor(value / 1000) + "K+";
+  } else if (value >= 100) {
+    return Math.floor(value / 100) * 100 + "+";
+  } else if (value >= 10) {
+    return Math.floor(value / 10) * 10 + "+";
+  } else {
+    return value;
+  }
+};

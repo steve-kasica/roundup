@@ -111,7 +111,11 @@ function StackDetailView({
           <Box style={{ textAlign: "center" }}>
             <Typography variant="subtitle1">{xAxisLabel}</Typography>
           </Box>
-          <div ref={gridContainerRef} className="grid-container">
+          <div
+            ref={gridContainerRef}
+            className="grid-container"
+            style={{ backgroundColor: "#ddd", padding: "10px" }}
+          >
             {xScale.domain().map((j) => (
               <ColumnIndex
                 key={j}

@@ -29,8 +29,6 @@ export default function withOperationData(WrappedComponent) {
       selectColumnIdsByTableId(state, id)
     );
 
-    console.log(operation.name, columnIds);
-
     return (
       <WrappedComponent
         {...props}

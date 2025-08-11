@@ -10,14 +10,69 @@
  *
  */
 
-import { useState, useRef, useEffect } from "react";
-import { Popover, List, ListItemButton } from "@mui/material";
+import { useState, useRef } from "react";
+import {
+  Popover,
+  List,
+  ListItemButton,
+  Paper,
+  Typography,
+  IconButton,
+  styled,
+  Chip,
+  Stack,
+  Tooltip,
+  Divider,
+} from "@mui/material";
 import PropTypes from "prop-types";
 
-import "./ColumnBlockView.scss";
 import withColumnData from "../../../HOC/withColumnData";
+import EditableText from "../../../ui/EditableText";
+import ValuesSample from "./ValuesSample";
+import Box from "@mui/material/Box";
+import { DragIndicator, Key as KeyIcon } from "@mui/icons-material";
+import ColumnTypeIcon from "../../../ui/ColumnTypeIcon";
+import {
+  approxNumber,
+  formatNumber,
+} from "../../../../lib/utilities/formaters";
 
-const delay = 500; // in ms for input changes
+// Styled component for the cell Paper creates a clear state hierarchy:
+//
+// - Selected cells: Most prominent with blue theme and strong effects
+// - Hovered cells: Subtle feedback with light gray background and gentle shadow
+// - Null cells: Always gray background regardless of other states
+// - Normal cells: Default styling
+const StyledCellPaper = styled(Paper)(({ isNull, isSelected, isHovered }) => ({
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "left",
+  height: "auto",
+  margin: "5px 0px",
+  borderStyle: isNull ? "dashed" : "solid",
+  cursor: "context-menu",
+  backgroundColor: isNull
+    ? "#f5f5f5"
+    : isSelected
+    ? "#e3f2fd"
+    : isHovered
+    ? "#f5f5f5"
+    : "inherit",
+  borderColor: isSelected ? "#2196f3" : isHovered ? "#9e9e9e" : undefined,
+  // borderWidth: "2px",
+  boxShadow: isSelected
+    ? "0 2px 8px rgba(33, 150, 243, 0.3)"
+    : isHovered
+    ? "0 1px 4px rgba(0, 0, 0, 0.1)"
+    : undefined,
+  transform: isSelected
+    ? "scale(1.02)"
+    : isHovered
+    ? "scale(1.01)"
+    : "scale(1)",
+  transition: "all 0.2s ease-in-out",
+}));
 
 function Cell({
   dragRef,
@@ -42,35 +97,22 @@ function Cell({
   onCellClick,
 }) {
   // Additional variables derived from props
-  const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table
-
-  // // Context menu
+  const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table  // // Context menu
   const [anchorEl, setAnchorEl] = useState(null);
   const isPopoverOpen = Boolean(anchorEl);
   const hoverTimeoutRef = useRef(null);
+
   const closePopover = () => {
     setAnchorEl(null);
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
     }
-    // Determine if we should still be hovering based on mouse position
-    // This could be improved with a check if mouse is still over element
-    hoverTimeoutRef.current = setTimeout(unHoverColumn, 235);
+    // Unhover the column when the popover closes
+    unHoverColumn();
   };
 
   // Input reference is necessary to trigger focus on column
   const inputRef = useRef(null);
-
-  // Debounce input when modifying column attributes in the DOM
-  const [value, setValue] = useState(column?.name);
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (column?.name !== value) {
-        renameColumn(value);
-      }
-    }, delay);
-    return () => clearTimeout(timeoutId);
-  }, [value, delay]);
 
   const menuItems = [
     {
@@ -111,90 +153,145 @@ function Cell({
     },
   ];
 
-  const className = [
-    "cell",
-    isLoading ? "loading" : undefined,
-    isNull ? "null" : `type-${column?.columnType}`,
-    isSelected ? "selected" : undefined,
-    isHovered ? "hover" : undefined,
-    isDragging ? "dragged" : undefined,
-    isOver ? "over" : undefined,
-    error ? "error" : undefined,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const nullCount = column?.totalRows - column?.nonNullValues;
+  const uniqueCount = column?.uniqueValues;
 
-  const style = {};
-  if (isSelected && value.length > 10) {
-    style.width = `${value.length + 5}ch`;
+  if (isNull) {
+    return (
+      <StyledCellPaper
+        elevation={0}
+        variant="outlined"
+        isNull={isNull}
+        isSelected={isSelected}
+        isHovered={isHovered}
+      >
+        <Typography
+          variant="h5"
+          sx={{ color: "text.secondary", opacity: 0.5, fontStyle: "italic" }}
+        >
+          null
+        </Typography>
+      </StyledCellPaper>
+    );
   }
-
-  // Render Cell
   return (
-    <div
-      className={className}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        height: "30px", // cellHeight
-        width: "inherit",
-        borderLeft: "none",
-        borderRight: "none",
-        cursor: "pointer",
-        backgroundColor: isNull ? "#f5f5f5" : "inherit",
-        "&:hover": {
-          backgroundColor: "#f0f0f0", // hover color
-        },
-      }}
-      ref={(node) => {
-        dragRef(node);
-        dropRef(node);
-      }}
-      data-table-id={column?.tableId}
-      data-column-index={column?.index}
-      onClick={(event) =>
-        !isPopoverOpen ? onCellClick(event, column?.id) : null
-      }
-      onContextMenu={(event) => {
-        event.preventDefault();
-        setAnchorEl(event.currentTarget);
-      }}
-      onMouseEnter={hoverColumn}
-      onMouseLeave={() => {
-        if (!isPopoverOpen) {
-          unHoverColumn();
-        }
-      }}
-    >
-      <input
-        ref={inputRef}
-        type="text"
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        // TODO: implement logic to rename column
-        // onBlur={() => dispatch(removeFromSelectedColumnIds(id))}
-        // onFocus={selectColumn}
-        minLength={1}
-        style={{
-          width: "auto",
-          overflow: "hidden",
-          background: "inherit",
-          border: "none",
-          fieldSizing: "content",
-          whiteSpace: "nowrap",
-          textAlign: "center",
-          textOverflow: "ellipsis",
-          pointerEvents: "none",
+    <>
+      <StyledCellPaper
+        elevation={0}
+        variant="outlined"
+        isNull={isNull}
+        isSelected={isSelected}
+        isHovered={isHovered}
+        ref={(node) => {
+          dragRef(node);
+          dropRef(node);
         }}
-      />
+        data-table-id={column?.tableId}
+        data-column-index={column?.index}
+        onClick={(event) =>
+          !isPopoverOpen ? onCellClick(event, column?.id) : null
+        }
+        onContextMenu={(event) => {
+          event.preventDefault();
+          event.stopPropagation(); // Prevent event from bubbling up to parent
+          setAnchorEl(event.currentTarget);
+        }}
+        onMouseEnter={hoverColumn}
+        onMouseLeave={() => {
+          // Only unhover if the popover is not open
+          if (!isPopoverOpen) {
+            unHoverColumn();
+          }
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            background: "linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)",
+            borderRight: "1px solid #d0d0d0",
+            transition: "all 0.2s ease-in-out",
+            "&:hover": {
+              background: "linear-gradient(135deg, #e8e8e8 0%, #dcdcdc 100%)",
+              borderRight: "1px solid #bbb",
+              "& .MuiSvgIcon-root": {
+                opacity: 0.7,
+                transform: "scale(1.1)",
+              },
+            },
+            cursor: "grab",
+          }}
+        >
+          <DragIndicator sx={{ opacity: 0.5 }} />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+            alignItems: "flex-start",
+            padding: "2.5px 5px",
+            flexGrow: 1,
+            maxWidth: "100%",
+            width: "90%",
+            overflow: "hidden",
+          }}
+        >
+          <EditableText
+            ref={inputRef}
+            initialValue={column?.name}
+            placeholder={`Column ${column?.index + 1}`}
+            fontSize="1rem"
+            onChange={renameColumn}
+          />
+          <ValuesSample values={Object.keys(column?.values || {})} />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "50px",
+            borderRadius: "inherit",
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+          }}
+        >
+          <ColumnTypeIcon column={column} />
+        </Box>
+      </StyledCellPaper>
+
       <Popover
         open={isPopoverOpen}
         anchorEl={anchorEl}
         onClose={closePopover}
         anchorOrigin={{
-          vertical: "bottom",
+          vertical: "center",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "center",
           horizontal: "left",
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              overflow: "visible",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                width: 0,
+                height: 0,
+                borderTop: "8px solid transparent",
+                borderBottom: "8px solid transparent",
+                borderRight: "8px solid #fff",
+                transform: "translateX(-100%) translateY(-50%)",
+                filter: "drop-shadow(-1px 0px 1px rgba(0,0,0,0.1))",
+              },
+            },
+          },
         }}
       >
         <List>
@@ -209,7 +306,7 @@ function Cell({
           ))}
         </List>
       </Popover>
-    </div>
+    </>
   );
 }
 
