@@ -163,6 +163,7 @@ export function ColumnIndex({
           sx={{
             display: "flex",
             justifyContent: "space-between",
+            padding: "2px 5px",
           }}
         >
           <Header
@@ -171,38 +172,7 @@ export function ColumnIndex({
             onColumnClick={onColumnClick}
             operationColumnNameRef={operationColumnNameRef}
           />
-          <IconButton
-            disableRipple
-            sx={{
-              cursor: "grab",
-              padding: 0,
-              ":hover": {
-                color: "blue",
-              },
-            }}
-            size="small"
-            // onClick={(event) => setMenuAnchorEl(event.currentTarget)}
-          >
-            <DragIndicator />
-          </IconButton>
         </Box>
-
-        {/* <div
-        // ref={dragRef} // Wrap the icon in a div for proper ref forwarding
-        style={{
-          display: "inline-block",
-          // cursor: isDragging ? "grabbing" : "grab",
-        }}
-      >
-        <DragIndicator
-          sx={{
-            transform: "rotate(90deg)",
-            "&:hover": {
-              color: "primary.main",
-            },
-          }}
-        />
-      </div> */}
         {columnIds.map((columnId, i) => (
           <Cell
             key={`${i}-${columnId}`}
