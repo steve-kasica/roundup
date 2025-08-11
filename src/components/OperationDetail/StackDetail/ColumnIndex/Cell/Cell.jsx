@@ -17,25 +17,17 @@ import {
   ListItemButton,
   Paper,
   Typography,
-  IconButton,
   styled,
-  Chip,
-  Stack,
-  Tooltip,
-  Divider,
 } from "@mui/material";
 import PropTypes from "prop-types";
 
-import withColumnData from "../../../HOC/withColumnData";
-import EditableText from "../../../ui/EditableText";
+import withColumnData from "../../../../HOC/withColumnData";
+import EditableText from "../../../../ui/EditableText";
 import ValuesSample from "./ValuesSample";
 import Box from "@mui/material/Box";
-import { DragIndicator, Key as KeyIcon } from "@mui/icons-material";
-import ColumnTypeIcon from "../../../ui/ColumnTypeIcon";
-import {
-  approxNumber,
-  formatNumber,
-} from "../../../../lib/utilities/formaters";
+import { DragIndicator } from "@mui/icons-material";
+import ColumnTypeIcon from "../../../../ui/ColumnTypeIcon";
+import { useDragAndDrop } from "./DragLayer";
 
 // Styled component for the cell Paper creates a clear state hierarchy:
 //
@@ -43,51 +35,80 @@ import {
 // - Hovered cells: Subtle feedback with light gray background and gentle shadow
 // - Null cells: Always gray background regardless of other states
 // - Normal cells: Default styling
-const StyledCellPaper = styled(Paper)(({ isNull, isSelected, isHovered }) => ({
-  display: "flex",
-  flexDirection: "row",
-  justifyContent: "center",
-  alignItems: "left",
-  height: "auto",
-  margin: "5px 0px",
-  borderStyle: isNull ? "dashed" : "solid",
-  cursor: "context-menu",
-  backgroundColor: isNull
-    ? "#f5f5f5"
-    : isSelected
-    ? "#e3f2fd"
-    : isHovered
-    ? "#f5f5f5"
-    : "inherit",
-  borderColor: isSelected ? "#2196f3" : isHovered ? "#9e9e9e" : undefined,
-  // borderWidth: "2px",
-  boxShadow: isSelected
-    ? "0 2px 8px rgba(33, 150, 243, 0.3)"
-    : isHovered
-    ? "0 1px 4px rgba(0, 0, 0, 0.1)"
-    : undefined,
-  transform: isSelected
-    ? "scale(1.02)"
-    : isHovered
-    ? "scale(1.01)"
-    : "scale(1)",
-  transition: "all 0.2s ease-in-out",
-}));
+const StyledCellPaper = styled(Paper)(
+  ({ isNull, isSelected, isHovered, isDragging, isOver, isDropZone }) => ({
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "left",
+    height: "auto",
+    margin: "5px 0px",
+    borderStyle: isNull
+      ? "dashed"
+      : isOver
+      ? "dashed"
+      : isDropZone
+      ? "dashed"
+      : "solid",
+    borderWidth: isOver ? "2px" : isDropZone ? "1px" : "1px",
+    cursor: "context-menu",
+    backgroundColor: isNull
+      ? "#f5f5f5"
+      : isDragging
+      ? "#fff3e0"
+      : isOver
+      ? "#e8f5e8"
+      : isDropZone
+      ? "#f0f8f0"
+      : isSelected
+      ? "#e3f2fd"
+      : isHovered
+      ? "#f5f5f5"
+      : "inherit",
+    borderColor: isDragging
+      ? "#ff9800"
+      : isOver
+      ? "#4caf50"
+      : isDropZone
+      ? "#81c784"
+      : isSelected
+      ? "#2196f3"
+      : isHovered
+      ? "#9e9e9e"
+      : undefined,
+    boxShadow: isDragging
+      ? "0 8px 16px rgba(255, 152, 0, 0.4)"
+      : isOver
+      ? "0 4px 12px rgba(76, 175, 80, 0.3)"
+      : isDropZone
+      ? "0 2px 6px rgba(129, 199, 132, 0.2), inset 0 0 0 1px rgba(129, 199, 132, 0.3)"
+      : isSelected
+      ? "0 2px 8px rgba(33, 150, 243, 0.3)"
+      : isHovered
+      ? "0 1px 4px rgba(0, 0, 0, 0.1)"
+      : undefined,
+    transform: isDragging
+      ? "scale(1.05) rotate(2deg)"
+      : isOver
+      ? "scale(1.03)"
+      : isDropZone
+      ? "scale(1.01)"
+      : isSelected
+      ? "scale(1.02)"
+      : isHovered
+      ? "scale(1.01)"
+      : "scale(1)",
+    opacity: isDragging ? 0.8 : isDropZone ? 0.95 : 1,
+    transition: "all 0.2s ease-in-out",
+    zIndex: isDragging ? 1000 : isOver ? 100 : undefined,
+  })
+);
 
 function Cell({
-  dragRef,
-  dropRef,
   column,
-
-  // Props for column interaction state
   isNull,
   isSelected,
-  isLoading,
   isHovered,
-  isDragging,
-  isOver,
-  error,
-
   // Functions for dispatching actions
   hoverColumn,
   unHoverColumn,
@@ -95,7 +116,55 @@ function Cell({
   removeColumn,
   renameColumn,
   onCellClick,
+  swapColumnsWithinTable,
 }) {
+  // Separate drag and drop functionality
+  const dragType = `COLUMN-${column?.tableId}`; // Only drag and drop within the same table
+  const {
+    dropRef: dropReference,
+    isOver,
+    canDropHere,
+  } = useDragAndDrop({
+    dragType,
+    dropType: dragType,
+    canDrag: () => false, // Disable dragging on the main cell
+    canDrop: (draggedItem) => draggedItem.id !== column?.id,
+    onDrop: (draggedColumn) => {
+      const droppedColumn = column;
+      swapColumnsWithinTable(draggedColumn.id, droppedColumn.id);
+    },
+  });
+
+  // Drag functionality only for the drag handle
+  const {
+    dragRef: dragHandleRef,
+    isDragging,
+    dragPreviewRef,
+  } = useDragAndDrop({
+    dragType,
+    dropType: "", // Handle doesn't accept drops (DnD package needs it to be a string)
+    getDragItem: () => ({
+      id: column?.id,
+      name: column?.name,
+      index: column?.index,
+    }),
+    canDrag: () => true, // Enable dragging only on handle
+    canDrop: () => false, // Handle doesn't accept drops
+  });
+
+  // Ref to combine the drop target with the drag preview
+  const cellRef = useRef(null);
+
+  // Combine refs for the main cell (drop target + drag preview)
+  const setCellRef = (element) => {
+    cellRef.current = element;
+    dropReference(element);
+    dragPreviewRef(element);
+  };
+
+  // Check if this is a drop zone (something is being dragged but not over this element)
+  const isDropZone = canDropHere && !isOver && !isDragging;
+
   // Additional variables derived from props
   const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table  // // Context menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -153,9 +222,6 @@ function Cell({
     },
   ];
 
-  const nullCount = column?.totalRows - column?.nonNullValues;
-  const uniqueCount = column?.uniqueValues;
-
   if (isNull) {
     return (
       <StyledCellPaper
@@ -164,6 +230,9 @@ function Cell({
         isNull={isNull}
         isSelected={isSelected}
         isHovered={isHovered}
+        isDragging={isDragging}
+        isOver={isOver}
+        isDropZone={isDropZone}
       >
         <Typography
           variant="h5"
@@ -182,10 +251,10 @@ function Cell({
         isNull={isNull}
         isSelected={isSelected}
         isHovered={isHovered}
-        ref={(node) => {
-          dragRef(node);
-          dropRef(node);
-        }}
+        isDragging={isDragging}
+        isOver={isOver}
+        isDropZone={isDropZone}
+        ref={setCellRef}
         data-table-id={column?.tableId}
         data-column-index={column?.index}
         onClick={(event) =>
@@ -205,24 +274,66 @@ function Cell({
         }}
       >
         <Box
+          ref={dragHandleRef}
           sx={{
             display: "flex",
             alignItems: "center",
-            background: "linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)",
-            borderRight: "1px solid #d0d0d0",
+            background: isDragging
+              ? "linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%)"
+              : isOver
+              ? "linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%)"
+              : isDropZone
+              ? "linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%)"
+              : "linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)",
+            borderRight: isDragging
+              ? "2px solid #ff9800"
+              : isOver
+              ? "2px solid #4caf50"
+              : isDropZone
+              ? "1px solid #a5d6a7"
+              : "1px solid #d0d0d0",
             transition: "all 0.2s ease-in-out",
             "&:hover": {
-              background: "linear-gradient(135deg, #e8e8e8 0%, #dcdcdc 100%)",
-              borderRight: "1px solid #bbb",
+              background: isDragging
+                ? "linear-gradient(135deg, #ffb74d 0%, #ffa726 100%)"
+                : isOver
+                ? "linear-gradient(135deg, #a5d6a7 0%, #81c784 100%)"
+                : isDropZone
+                ? "linear-gradient(135deg, #e8f5e8 0%, #dcedc8 100%)"
+                : "linear-gradient(135deg, #e8e8e8 0%, #dcdcdc 100%)",
+              borderRight: isDragging
+                ? "2px solid #f57c00"
+                : isOver
+                ? "2px solid #388e3c"
+                : isDropZone
+                ? "1px solid #81c784"
+                : "1px solid #bbb",
               "& .MuiSvgIcon-root": {
                 opacity: 0.7,
                 transform: "scale(1.1)",
               },
             },
-            cursor: "grab",
+            cursor: isDragging ? "grabbing" : "grab",
           }}
         >
-          <DragIndicator sx={{ opacity: 0.5 }} />
+          <DragIndicator
+            sx={{
+              opacity: isDragging ? 1 : isOver ? 0.8 : isDropZone ? 0.6 : 0.5,
+              color: isDragging
+                ? "#ff6f00"
+                : isOver
+                ? "#2e7d32"
+                : isDropZone
+                ? "#66bb6a"
+                : undefined,
+              transform: isDragging
+                ? "scale(1.2)"
+                : isDropZone
+                ? "scale(1.05)"
+                : undefined,
+              transition: "all 0.2s ease-in-out",
+            }}
+          />
         </Box>
         <Box
           sx={{
@@ -311,8 +422,6 @@ function Cell({
 }
 
 Cell.propTypes = {
-  dragRef: PropTypes.func.isRequired,
-  dropRef: PropTypes.func.isRequired,
   column: PropTypes.oneOfType([PropTypes.object, PropTypes.oneOf([null])]),
   isNull: PropTypes.bool,
   isSelected: PropTypes.bool,
@@ -327,6 +436,7 @@ Cell.propTypes = {
   removeColumn: PropTypes.func.isRequired,
   renameColumn: PropTypes.func.isRequired,
   onCellClick: PropTypes.func.isRequired,
+  swapColumnsWithinTable: PropTypes.func.isRequired,
 };
 
 /**
@@ -339,9 +449,10 @@ Cell.propTypes = {
  *
  * Note that `right` and `left` are relative from the viewport, see [`getBoundingClientRect`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect)
  */
+// eslint-disable-next-line no-unused-vars
 function getPercentOverlap(a, b) {
-  const { right: aRight, left: aLeft, width } = a.getBoundingClientRect();
-  const { right: bRight, left: bLeft } = b.getBoundingClientRect();
+  const { right: aRight, width } = a.getBoundingClientRect();
+  const { right: bRight } = b.getBoundingClientRect();
   const overlap = 1 - Math.abs(aRight - bRight) / width;
   return Math.max(0, overlap);
 }

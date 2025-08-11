@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { runSaga } from "redux-saga";
-import { swapColumnsAction, swapColumnsSagaWorker } from "./swapColumnsSaga";
+import { swapColumnsRequest, swapColumnsSagaWorker } from "./swapColumnsSaga";
 import swapColumnsSaga from "./swapColumnsSaga";
 import {
   addColumnsToLoading,
@@ -25,11 +25,11 @@ function recordSaga(saga, initialAction) {
 }
 
 describe("swapColumnsSaga", () => {
-  it("should listen for swapColumnsAction and call swapColumnsSagaWorker", () => {
+  it("should listen for swapColumnsRequest and call swapColumnsSagaWorker", () => {
     const gen = swapColumnsSaga();
     const next = gen.next();
     expect(next.value).toEqual(
-      takeEvery(swapColumnsAction.type, expect.any(Function))
+      takeEvery(swapColumnsRequest.type, expect.any(Function))
     );
   });
 
@@ -37,7 +37,7 @@ describe("swapColumnsSaga", () => {
     const sourceIds = ["col1"];
     const targetIds = ["col2"];
     const allIds = [...sourceIds, ...targetIds];
-    const action = swapColumnsAction({ sourceIds, targetIds });
+    const action = swapColumnsRequest({ sourceIds, targetIds });
     const gen = swapColumnsSagaWorker(action);
     expect(gen.next().value).toEqual(put(addColumnsToLoading(allIds)));
     expect(gen.next().value).toEqual(

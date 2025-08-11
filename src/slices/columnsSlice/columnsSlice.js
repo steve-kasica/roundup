@@ -247,43 +247,6 @@ const columnsSlice = createSlice({
         column.values[valueId] = count; // Update count if value already exists
       });
     },
-    swapColumns(state, action) {
-      // Accepts either a single target and source id
-      // or parallel arrays of target and sources ids
-      let { targetIds, sourceIds } = action.payload;
-      if (!Array.isArray(targetIds)) targetIds = [targetIds];
-      if (!Array.isArray(sourceIds)) sourceIds = [sourceIds];
-      if (targetIds.length !== sourceIds.length) {
-        throw new Error(
-          "swapColumns: targetIds and sourceIds must have the same length"
-        );
-      }
-
-      sourceIds.forEach((sourceId, i) => {
-        const targetId = targetIds[i];
-        const sourceColumn = state.data[sourceId];
-        const targetColumn = state.data[targetId];
-
-        // Update column attributes reflecting index
-        const tempIndex = sourceColumn.index;
-        sourceColumn.index = targetColumn.index;
-        targetColumn.index = tempIndex;
-
-        // Swap column Id positions in the idsByTable mapping
-        const tableId = sourceColumn.tableId;
-        const columnIds = state.idsByTable[tableId];
-        const sourceIndex = columnIds.indexOf(sourceId);
-        const targetIndex = columnIds.indexOf(targetId);
-        if (sourceIndex === -1 || targetIndex === -1) {
-          throw new Error(
-            `Column with id ${sourceId} or ${targetId} not found in table ${tableId}`
-          );
-        }
-        // Swap the column IDs in the idsByTable mapping
-        columnIds[sourceIndex] = targetId;
-        columnIds[targetIndex] = sourceId;
-      });
-    },
     /**
      * Updates the `index` property of one or more columns in the state.
      * This reducer is used when swapping columns around
@@ -446,6 +409,13 @@ const columnsSlice = createSlice({
       const { id } = action.payload;
       delete state.errors[id];
     },
+    updateColumnsArray(state, action) {
+      const { tableId, columnIds } = action.payload;
+      if (!state.idsByTable[tableId]) {
+        state.idsByTable[tableId] = [];
+      }
+      state.idsByTable[tableId] = columnIds;
+    },
   },
 });
 
@@ -457,7 +427,6 @@ export const {
   fetchValuesFailure,
 
   updateAttribute,
-  swapColumns,
   dropColumns,
 
   addColumnsFromOpenRefine,
@@ -480,6 +449,7 @@ export const {
   clearSelectedColumns,
   removeFromSelectedColumns,
   setValueCounts,
+  updateColumnsArray,
 
   // Dropping columns
   addColumnsToDropped,

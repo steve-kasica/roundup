@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 // import { useEffect } from "react";
 // import { useRef } from "react";
-import Cell from "./Cell";
+import Cell from "./Cell/Cell";
 import withColumnVectorData from "../../../HOC/withColumnVectorData";
 import PropTypes from "prop-types";
 // import { useDrag, useDragLayer, useDrop } from "react-dnd";
@@ -206,7 +206,6 @@ export function ColumnIndex({
         {columnIds.map((columnId, i) => (
           <Cell
             key={`${i}-${columnId}`}
-            isDraggable={true}
             id={columnId}
             onCellClick={onCellClick}
           />

@@ -20,7 +20,7 @@ import {
 
 import { renameColumnsRequest } from "../../sagas/renameColumnsSaga";
 import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
-import { swapColumnsAction } from "../../sagas/swapColumnsSaga";
+import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
 
 import { selectFirstSelectedColumn } from "../../slices/uiSlice";
 
@@ -61,60 +61,60 @@ export default function withColumnData(WrappedComponent) {
     const error = column?.error;
     const alias = column?.alias;
 
-    // TODO: remove drag logic from this HOC
-    const [{ isDragging }, dragRef, previewRef] = useDrag({
-      type: COLUMN,
-      canDrag: isDraggable,
-      item: () => {
-        // In this context `id` is the dragging column. It's different from `id` in useDrop
-        return { id, name, tableId, isNull, index };
-      },
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-      end: () => {
-        unDragColumn();
-        unHoverColumn();
-      },
-    });
+    // // TODO: remove drag logic from this HOC
+    // const [{ isDragging }, dragRef, previewRef] = useDrag({
+    //   type: COLUMN,
+    //   canDrag: isDraggable,
+    //   item: () => {
+    //     // In this context `id` is the dragging column. It's different from `id` in useDrop
+    //     return { id, name, tableId, isNull, index };
+    //   },
+    //   collect: (monitor) => ({
+    //     isDragging: monitor.isDragging(),
+    //   }),
+    //   end: () => {
+    //     unDragColumn();
+    //     unHoverColumn();
+    //   },
+    // });
 
-    useEffect(() => {
-      if (isDragging) {
-        dispatch(addColumnsToDragging(id));
-      } else {
-        dispatch(removeColumnsFromDragging(id));
-      }
-    }, [isDragging, id, dispatch]);
+    // useEffect(() => {
+    //   if (isDragging) {
+    //     dispatch(addColumnsToDragging(id));
+    //   } else {
+    //     dispatch(removeColumnsFromDragging(id));
+    //   }
+    // }, [isDragging, id, dispatch]);
 
-    const [{ isOver }, dropRef] = useDrop({
-      accept: COLUMN,
-      drop: (droppedItem) => {
-        // In this context `droppedItem.id` === `id` in useDrag
+    // const [{ isOver }, dropRef] = useDrop({
+    //   accept: COLUMN,
+    //   drop: (droppedItem) => {
+    //     // In this context `droppedItem.id` === `id` in useDrag
 
-        if (droppedItem.tableId === tableId && !isNull) {
-          dispatch(
-            swapColumnsAction({ sourceIds: droppedItem.id, targetIds: id })
-          );
-        }
-        unDragColumn();
-        dispatch(clearSelectedColumns());
-      },
-      collect: (monitor) => ({
-        isOver: monitor.isOver(),
-      }),
-    });
+    //     if (droppedItem.tableId === tableId && !isNull) {
+    //       dispatch(
+    //         swapColumnsRequest({ sourceIds: droppedItem.id, targetIds: id })
+    //       );
+    //     }
+    //     unDragColumn();
+    //     dispatch(clearSelectedColumns());
+    //   },
+    //   collect: (monitor) => ({
+    //     isOver: monitor.isOver(),
+    //   }),
+    // });
 
     // Disable the default drag preview
-    useEffect(() => {
-      previewRef(getEmptyImage(), { captureDraggingState: true });
-    }, []);
+    // useEffect(() => {
+    //   previewRef(getEmptyImage(), { captureDraggingState: true });
+    // }, []);
 
     return (
       <WrappedComponent
         {...props}
         column={column}
-        dragRef={dragRef}
-        dropRef={dropRef}
+        // dragRef={dragRef}
+        // dropRef={dropRef}
         id={id}
         tableId={tableId}
         name={name}
@@ -128,8 +128,8 @@ export default function withColumnData(WrappedComponent) {
         isLoading={isLoading}
         isHovered={isHovered}
         isKey={isKey}
-        isDragging={isDragging}
-        isOver={isOver}
+        // isDragging={isDragging}
+        // isOver={isOver}
         error={error}
         // Actions handlers
         hoverColumn={hoverColumn}
@@ -170,6 +170,14 @@ export default function withColumnData(WrappedComponent) {
             // TODO: implement logic to nullify column
           }
         }}
+        swapColumnsWithinTable={(srcColumnId, targetColumnId) =>
+          dispatch(
+            swapColumnsRequest({
+              sourceIds: srcColumnId,
+              targetIds: targetColumnId,
+            })
+          )
+        }
       />
     );
 

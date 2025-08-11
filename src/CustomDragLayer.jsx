@@ -93,16 +93,15 @@ export default function CustomDragLayer() {
           />
         );
       default:
-        return (
-          <div
-            style={{
-              backgroundColor: "lightgray",
-              width: `${item.width || 100}px`,
-              height: "100px",
-              opacity: 0.5,
-            }}
-          ></div>
-        );
+        return null;
+        // <div
+        //   style={{
+        //     backgroundColor: "lightgray",
+        //     width: `${item.width || 100}px`,
+        //     height: "100px",
+        //     opacity: 0.5,
+        //   }}
+        // ></div>
     }
   };
 

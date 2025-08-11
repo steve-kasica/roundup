@@ -11,7 +11,7 @@ import {
 
 import { setDrawerContents } from "../../slices/uiSlice";
 import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnIndexDetails";
-import { swapColumnsAction } from "../../sagas/swapColumnsSaga";
+import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
 // import { getValuesAction } from "../../sagas/getValuesSaga";
 
 /**
@@ -65,7 +65,7 @@ export default function withColumnVectorData(WrappedComponent) {
         }
         swapColumnVectors={(targetColumnIds) =>
           dispatch(
-            swapColumnsAction({
+            swapColumnsRequest({
               sourceIds: columnIds,
               targetIds: targetColumnIds,
             })
