@@ -1,16 +1,41 @@
-import { TextField } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 const EditableText = ({
   initialValue,
   onChange,
   inputRef = null,
+  isReadOnly = true,
+  isEditable = false, // New prop to control editability from parent
   debounceDelay = 300, // in milliseconds
   placeholder = "Operation name",
   fontSize = "2rem",
+  onEditingStateChange, // Callback to notify parent of editing state changes
 }) => {
   const [localValue, setLocalValue] = useState(initialValue || "");
+  const internalRef = useRef(null);
+
+  // Combine refs and expose focus/select methods to parent
+  const combinedRef = (element) => {
+    internalRef.current = element;
+    if (inputRef) {
+      if (typeof inputRef === "function") {
+        inputRef(element);
+      } else {
+        inputRef.current = element;
+        // Expose methods for parent to control editing
+        if (element) {
+          inputRef.current.focusAndSelect = () => {
+            element.focus();
+            element.select();
+          };
+          inputRef.current.blur = () => {
+            element.blur();
+          };
+        }
+      }
+    }
+  };
 
   // Update local state when initialValue changes
   useEffect(() => {
@@ -31,38 +56,49 @@ const EditableText = ({
   }, [localValue, initialValue, debounceDelay, onChange]);
 
   const handleChange = (event) => {
+    event.preventDefault();
     setLocalValue(event.target.value);
   };
 
+  const handleFocus = (event) => {
+    // Only allow focus if editable is enabled by parent
+    if (isReadOnly && !isEditable) {
+      event.target.blur();
+    }
+  };
+
+  const handleBlur = (event) => {
+    // Notify parent that editing has ended
+    if (onEditingStateChange) {
+      onEditingStateChange(false);
+    }
+    handleChange(event);
+  };
+
   return (
-    <TextField
-      inputRef={inputRef}
+    <input
+      type="text"
+      ref={combinedRef}
       value={localValue}
       onChange={handleChange}
-      onBlur={handleChange}
-      variant="standard"
-      slotProps={{
-        input: {
-          inputProps: {
-            style: {
-              fontSize,
-              fontWeight: "bold",
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              padding: 0,
-            },
-          },
-        },
-      }}
-      sx={{
-        // width: "100%",
-        "& .MuiInput-underline:before": {
-          borderBottomColor: "transparent",
-        },
-        "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-          borderBottomColor: "rgba(0, 0, 0, 0.42)",
-        },
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      readOnly={isReadOnly && !isEditable}
+      style={{
+        background: "transparent",
+        border: "none",
+        cursor: isReadOnly && !isEditable ? "default" : "text",
+        // Remove default focus outline and box shadow
+        // This is necessary to prevent the default browser styles from interfering
+        // with the custom styles applied to the input.
+        outline: "none", // Remove default focus outline
+        boxShadow: "none", // Remove default focus box shadow
+        fontSize,
+        fontWeight: "bold",
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        padding: 0,
       }}
       placeholder={placeholder}
     />
@@ -73,10 +109,13 @@ EditableText.propTypes = {
   initialValue: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
+  isReadOnly: PropTypes.bool,
+  isEditable: PropTypes.bool,
   debounceDelay: PropTypes.number,
   fontSize: PropTypes.string,
   maxWidth: PropTypes.string,
   inputRef: PropTypes.object,
+  onEditingStateChange: PropTypes.func,
 };
 
 export default EditableText;

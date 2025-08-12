@@ -105,11 +105,11 @@ const StyledCellPaper = styled(Paper)(
 );
 
 function Cell({
+  // Props from withColumnData HOC
   column,
   isNull,
   isSelected,
   isHovered,
-  // Functions for dispatching actions
   hoverColumn,
   unHoverColumn,
   nullColumn,
@@ -152,8 +152,8 @@ function Cell({
     canDrop: () => false, // Handle doesn't accept drops
   });
 
-  // Ref to combine the drop target with the drag preview
   const cellRef = useRef(null);
+  const [isColumnNameEditable, setIsColumnNameEditable] = useState(false);
 
   // Combine refs for the main cell (drop target + drag preview)
   const setCellRef = (element) => {
@@ -165,7 +165,6 @@ function Cell({
   // Check if this is a drop zone (something is being dragged but not over this element)
   const isDropZone = canDropHere && !isOver && !isDragging;
 
-  // Additional variables derived from props
   const isLastInTable = false; // TODO: implement logic to determine if this is the last column in the table  // // Context menu
   const [anchorEl, setAnchorEl] = useState(null);
   const isPopoverOpen = Boolean(anchorEl);
@@ -213,10 +212,11 @@ function Cell({
       label: "Rename",
       disabled: isNull,
       onClick: () => {
+        setIsColumnNameEditable(true);
         closePopover();
         // Delay focus to allow menu to close first
         setTimeout(() => {
-          inputRef.current?.focus();
+          inputRef.current?.focusAndSelect();
         }, 100); // 50-100ms is usually enough
       },
     },
@@ -349,11 +349,16 @@ function Cell({
           }}
         >
           <EditableText
-            ref={inputRef}
+            inputRef={inputRef}
             initialValue={column?.name}
             placeholder={`Column ${column?.index + 1}`}
-            fontSize="1rem"
             onChange={renameColumn}
+            isReadOnly={true}
+            isEditable={isColumnNameEditable}
+            onEditingStateChange={(isEditable) =>
+              setIsColumnNameEditable(isEditable)
+            }
+            fontSize="1rem"
           />
           <ValuesSample values={Object.keys(column?.values || {})} />
         </Box>

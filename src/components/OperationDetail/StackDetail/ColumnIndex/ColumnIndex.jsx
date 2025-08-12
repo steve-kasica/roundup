@@ -54,6 +54,7 @@ export function ColumnIndex({
   const operationColumnNameRef = useRef(null); // Needed to focus the input element from context menu
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [isHeaderEditable, setIsHeaderEditable] = useState(false);
   const isMenuOpen = Boolean(menuAnchorEl);
 
   const menuItems = [
@@ -61,9 +62,9 @@ export function ColumnIndex({
       label: "Rename column",
       action: () => {
         // Delay focus to allow menu to close first
+        setIsHeaderEditable(true);
         setTimeout(() => {
-          operationColumnNameRef.current?.focus();
-          operationColumnNameRef.current?.select();
+          operationColumnNameRef.current?.focusAndSelect();
         }, 100); // 50-100ms is usually enough
       },
     },
@@ -170,7 +171,11 @@ export function ColumnIndex({
             id={headerId}
             index={index}
             onColumnClick={onColumnClick}
+            isHeaderEditable={isHeaderEditable}
             operationColumnNameRef={operationColumnNameRef}
+            onHeaderEditableStateChange={(isEditable) =>
+              setIsHeaderEditable(isEditable)
+            }
           />
         </Box>
         {columnIds.map((columnId, i) => (
