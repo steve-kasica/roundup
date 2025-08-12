@@ -87,25 +87,37 @@ function StackDetailView({
       />
       <div className="StackDetail">
         <div className="left-panel">
-          <div className="label" style={{ textAlign: "center" }}>
-            <span>{yAxisLabel}</span>
-          </div>
-          <div
-            className="column-group"
-            style={{
-              display: "grid",
-              gridTemplateRows: `repeat(${childIds.length + 1}, 1fr)`,
-              gap: "0.25rem", // Match the margin from ColumnView Papers
-              alignItems: "center",
+          <Box
+            sx={{
+              marginTop: `${69}px`,
+              marginLeft: "20px",
+              position: "relative",
+              "&::before": {
+                content: `"${yAxisLabel}"`,
+                position: "absolute",
+                left: "-50px",
+                top: "50%",
+                transform: "translateY(-50%) rotate(-90deg)",
+                transformOrigin: "center",
+                fontSize: "0.75rem",
+                fontFamily: "inherit",
+                fontWeight: 400,
+                color: "#555",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                whiteSpace: "nowrap",
+                opacity: 0.8,
+                userSelect: "none",
+                pointerEvents: "none",
+              },
             }}
           >
-            {/* Add spacer to account for x-axis header */}
-            <div style={{ height: "2rem" }}></div>{" "}
-            {/* Match the height of Typography variant="subtitle1" */}
-            {childIds.map((childId) => (
-              <TableView key={childId} id={childId} />
-            ))}
-          </div>
+            <Box>
+              {childIds.map((childId) => (
+                <TableView key={childId} id={childId} />
+              ))}
+            </Box>
+          </Box>
         </div>
         <div className="right-panel">
           <Box style={{ textAlign: "center" }}>
