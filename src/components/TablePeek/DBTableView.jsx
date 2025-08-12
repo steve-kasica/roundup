@@ -12,12 +12,15 @@ const pageSize = 25;
 
 export default function DBTableView({
   table,
+  operation,
   removedColumnIds,
   activeColumnIds,
-  name,
   onClose,
 }) {
-  const id = table.id;
+  const id = table?.id || operation?.id;
+  const rowCount = table?.rowCount || operation?.rowCount || 0;
+  const name = table?.name || operation?.name || "View";
+
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
   const rowsExplored = rows.length;
@@ -36,7 +39,12 @@ export default function DBTableView({
     async (pageNum) => {
       setLoading(true);
       const offset = pageNum * pageSize;
-      const newRows = await getTableRows(id, activeColumnIds, pageSize, offset);
+      const newRows = await getTableRows(
+        id,
+        table ? activeColumnIds : [],
+        pageSize,
+        offset
+      );
       setRows((prevRows) => {
         const updatedRows = pageNum === 0 ? newRows : [...prevRows, ...newRows];
         return updatedRows;
@@ -57,7 +65,7 @@ export default function DBTableView({
     setPage(0);
     setHasMore(true);
     fetchRows(0);
-  }, [id, fetchRows]);
+  }, [id, fetchRows, operation]);
 
   // Fetch next page when page changes
   useEffect(() => {
@@ -103,13 +111,14 @@ export default function DBTableView({
       <h2>
         {name}{" "}
         <small>
-          ({formatNumber(table.rowCount)} x {columns.length})
+          ({formatNumber(rowCount)} x {columns.length})
         </small>
       </h2>
       <p>
         Rows explored: {formatNumber(rowsExplored)} (
-        {Math.round((rowsExplored / table.rowCount) * 100)}%)
+        {Math.round((rowsExplored / rowCount) * 100)}%)
       </p>
+
       <div
         className="table-container"
         ref={tableContainerRef}

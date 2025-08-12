@@ -155,6 +155,7 @@ const columnsSlice = createSlice({
         })
         .forEach((column) => (column[attribute] = value));
     },
+    // need to rename to delete columns
     dropColumns(state, action) {
       let ids = action.payload;
       if (!Array.isArray(ids)) {

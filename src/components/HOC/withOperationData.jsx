@@ -15,7 +15,9 @@ import { isTableId } from "../../slices/tablesSlice";
 import {
   selectActiveColumnCountByTableId,
   selectColumnIdsByTableId,
+  selectRemovedColumnIdsByTableId,
 } from "../../slices/columnsSlice";
+import { useMemo } from "react";
 
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
@@ -25,8 +27,19 @@ export default function withOperationData(WrappedComponent) {
     const depth = useSelector((state) => selectOperationDepth(state, id));
     const focusedOperationId = useSelector(selectFocusedOperationId);
     const hoveredOperationId = useSelector(selectHoveredOperation);
-    const columnIds = useSelector((state) =>
-      selectColumnIdsByTableId(state, id)
+    const columnIds = useSelector(
+      (state) => selectColumnIdsByTableId(state, id) // TODO, generalize name for operations too
+    );
+    // Get columnIds associated with this table, both active and "removed"
+    const removedColumnIds = useSelector(
+      (state) => selectRemovedColumnIdsByTableId(state, id) // TODO, generalize name for operations too
+    );
+
+    // Use useMemo to ensure activeColumnIds updates when table.columnIds or removedColumnIds change
+    const activeColumnIds = useMemo(
+      () =>
+        columnIds.filter((columnId) => !removedColumnIds.includes(columnId)),
+      [columnIds, removedColumnIds]
     );
 
     return (
@@ -37,6 +50,8 @@ export default function withOperationData(WrappedComponent) {
         depth={depth}
         columnCount={columnIds.length}
         columnIds={columnIds}
+        removedColumnIds={removedColumnIds}
+        activeColumnIds={activeColumnIds}
         rowCount={operation?.rowCount}
         isFocused={operation?.id === focusedOperationId}
         isHovered={operation?.id === hoveredOperationId}

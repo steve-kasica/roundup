@@ -138,7 +138,7 @@ function PackOutputDetails({
             defaultChecked
             sx={{ margin: 0, padding: 0 }}
             onClick={(e) => {
-              // e.stopPropagation(); // Prevent accordion toggle when clicking checkbox
+              e.stopPropagation(); // Prevent accordion toggle when clicking checkbox
               setCheckState((state) => [e.target.checked, state[1], state[2]]);
             }}
           />

@@ -2,17 +2,16 @@ import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { getDuckDB } from "./duckdbClient";
 
 // With these UNION ALL query, the view will take on the column names of the first child.
-export async function createPackView(opData) {
+export async function createPackView(opData, columnList) {
   const db = await getDuckDB();
   const conn = await db.connect();
-  const joinType = "JOIN";
-  const query = formQuery(opData, joinType);
+  const query = formQuery(opData, columnList);
   const response = await conn.query(query);
   await conn.close();
   return response;
 }
 
-export function formQuery(op) {
+export function formQuery(op, columnList) {
   const table1 = op.children[0].id;
   const table2 = op.children[1].id;
   const { joinType, joinKey1, joinKey2, joinPredicate } = op;
@@ -76,7 +75,7 @@ export function formQuery(op) {
   }
 
   const query = `
-    CREATE OR REPLACE VIEW ${op.id} AS
+    CREATE OR REPLACE VIEW ${op.id}(${columnList.join(", ")}) AS
     ${definition}`;
   return query;
 }

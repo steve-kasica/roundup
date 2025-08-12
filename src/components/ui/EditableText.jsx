@@ -5,10 +5,10 @@ const EditableText = ({
   initialValue,
   onChange,
   inputRef = null,
-  isReadOnly = true,
-  isEditable = false, // New prop to control editability from parent
+  isReadOnly = false,
+  isEditable = false,
   debounceDelay = 300, // in milliseconds
-  placeholder = "Operation name",
+  placeholder = "Lorem ipsum dolor sit amet",
   fontSize = "2rem",
   onEditingStateChange, // Callback to notify parent of editing state changes
 }) => {
