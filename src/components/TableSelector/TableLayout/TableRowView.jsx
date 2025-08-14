@@ -154,11 +154,17 @@ function TableRowView({
     }),
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult();
-      if (dropResult.accepted && item.type === "multiple-tables") {
-        addSelectedTablesToSchema(dropResult.operationType);
-      } else if (dropResult.accepted && item.type === "table") {
-        addTableToSchema(dropResult.operationType);
+
+      // Only process if we have a valid drop result and it was accepted
+      if (dropResult && dropResult.accepted) {
+        if (item.type === "multiple-tables") {
+          addSelectedTablesToSchema(dropResult.operationType);
+        } else if (item.type === "table") {
+          addTableToSchema(dropResult.operationType);
+        }
       }
+      // If no drop result or drop was rejected, the drag operation just ends
+      // without any action - this prevents the freeze issue
     },
   });
 

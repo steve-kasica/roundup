@@ -127,7 +127,7 @@ export default function CustomDragLayer() {
         top: 0,
         width: "100%",
         height: "100%",
-        zIndex: 99, // Lower z-index to ensure it doesn't interfere with drop detection
+        zIndex: 100,
       }}
     >
       {itemType === TABLE_ROW_VIEW_CLASS ? (
