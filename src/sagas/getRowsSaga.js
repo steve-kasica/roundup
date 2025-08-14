@@ -12,19 +12,19 @@
 //   selectColumnIdsByTableId,
 // } from "../slices/columnsSlice";
 // import { incrementRowsExplored } from "../slices/tablesSlice";
-// // import { addTableToSchema } from "./addTableToSchemaSaga";
+// // import { addTablesToSchema } from "./addTablesToSchemaSaga";
 
 // export const fetchRows = createAction("fetchRows");
 
 // export default function* getRowsSagaWatcher() {
 //   // Run the saga whenever a table is added to the schema
-//   yield takeEvery(addTableToSchema.type, addTableToSchemaWorker);
+//   yield takeEvery(addTablesToSchema.type, addTablesToSchemaWorker);
 
 //   // Run the saga whenever the action is called directly, e.g. for pagination
 //   yield takeEvery(fetchRows.type, getRowsSagaWorker);
 // }
 
-// function* addTableToSchemaWorker(action) {
+// function* addTablesToSchemaWorker(action) {
 //   const { tableId } = action.payload;
 //   yield put(fetchRows({ tableId, start: 0, limit: 1000 }));
 // }

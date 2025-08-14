@@ -15,7 +15,7 @@ import {
   setTableColumnIds,
   TABLE_SOURCE_OPEN_REFINE,
 } from "../slices/tablesSlice";
-import { addTableToSchema } from "./addTableToSchemaSaga";
+import { addTablesToSchemaRequest } from "./addTablesToSchemaSaga";
 import { peekTableAction } from "./peekTableSaga";
 
 /**
@@ -44,7 +44,7 @@ export const fetchColumnMetadataFailure = createAction(
  * Listens for two actions:
  * 1. `fetchColumnMetadataRequest.type`: Triggers the `fetchColumnMetadataWorker` saga directly
  *    to handle fetching column metadata.
- * 2. `addTableToSchema.type`: When a table is added to the schema, dispatches a `fetchColumnMetadataRequest`
+ * 2. `addTablesToSchemaRequest.type`: When a table is added to the schema, dispatches a `fetchColumnMetadataRequest`
  *    action to fetch metadata for the newly added table, using both remote and local table IDs.
  * 3. `peekTableAction.type`: When a table is peeked at, dispatches a `fetchColumnMetadataRequest`
  *    this mechanism provides some opportunistic data fetching b/c we assume that peeking a table
@@ -56,7 +56,7 @@ export const fetchColumnMetadataFailure = createAction(
 export default function* fetchColumnMetadataWatcher() {
   yield all([
     takeEvery(fetchColumnMetadataRequest.type, fetchColumnMetadataWorker),
-    takeEvery(addTableToSchema.type, function* (action) {
+    takeEvery(addTablesToSchemaRequest.type, function* (action) {
       const { tableId } = action.payload;
       yield put(
         fetchColumnMetadataRequest({

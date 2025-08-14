@@ -65,25 +65,11 @@
         background-color: $stack-3-color;
       }
     }
-    &.dragging,
-    &.pressed {
-      cursor: grabbing;
-    }
     &.hovered {
       background-color: $hover-color;
     }
     &.selected {
       background-color: $selected-color;
-    }
-
-    .drag-handle {
-      text-align: center;
-      cursor: grab;
-      background-color: #eee;
-
-      &:hover {
-        background-color: #ddd;
-      }
     }
   }
 }

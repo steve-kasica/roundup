@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useDrag } from "react-dnd";
 import PropTypes from "prop-types";
 import { useMemo } from "react";
 
@@ -22,16 +20,15 @@ import {
   changeTablesName,
   selectTablesById,
   setSelectedTables,
-  dataType as SourceTable,
   setTablesAttribute,
 } from "../../slices/tablesSlice";
 
 import { dropTablesAction } from "../../sagas/dropTablesSaga";
 import { removeTablesAction } from "../../sagas/removeTablesSaga";
-import { addTableToSchema } from "../../sagas/addTableToSchemaSaga";
+import { addTablesToSchemaRequest } from "../../sagas/addTablesToSchemaSaga";
 
 export default function withTableData(WrappedComponent) {
-  function EnhancedComponent({ id, isDraggable = false, ...props }) {
+  function EnhancedComponent({ id, ...props }) {
     const dispatch = useDispatch();
 
     // Get table data from the Redux store
@@ -77,33 +74,6 @@ export default function withTableData(WrappedComponent) {
     const isHovered = hoveredTable === id;
     const isSelected = selectedTables.includes(id);
 
-    const [isPressed, setIsPressed] = useState(false);
-
-    // TODO: this should be in the view
-    const [{ isDragging }, dragRef] = useDrag(
-      () => ({
-        type: SourceTable,
-        item: { tableId: id },
-        canDrag: isDraggable,
-        end: (item, monitor) => {
-          const result = monitor.getDropResult();
-          if (monitor.didDrop() && id === result.tableId) {
-            dispatch(
-              addTableToSchema({
-                tableId: id,
-                operationType: result.operationType,
-              })
-            );
-          }
-          setIsPressed(false);
-        },
-        collect: (monitor) => ({
-          isDragging: monitor.isDragging(),
-        }),
-      }),
-      [id]
-    );
-
     return (
       <WrappedComponent
         {...props}
@@ -121,11 +91,8 @@ export default function withTableData(WrappedComponent) {
         isHovered={isHovered}
         isInSchema={isInSchema}
         isSelected={isSelected}
-        isDragging={isDragging}
-        isPressed={isPressed}
         isFocused={parentOperation ? true : false}
         // Interaction handlers
-        dragRef={dragRef}
         onHover={() => dispatch(setHoveredTable(id))} // TODO: remove
         onUnhover={() => dispatch(clearHoveredTable())} // TODO: remove
         hoverTable={() => dispatch(setHoveredTable(id))}
@@ -161,6 +128,22 @@ export default function withTableData(WrappedComponent) {
             })
           )
         }
+        addSelectedTablesToSchema={(operationType) =>
+          dispatch(
+            addTablesToSchemaRequest({
+              tableIds: selectedTables,
+              operationType,
+            })
+          )
+        }
+        addTableToSchema={(operationType) =>
+          dispatch(
+            addTablesToSchemaRequest({
+              tableIds: [id],
+              operationType,
+            })
+          )
+        }
       />
     );
   }
@@ -180,5 +163,4 @@ withTableData.propTypes = {
 // EnhancedComponent prop types
 export const EnhancedComponentPropTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  isDraggable: PropTypes.bool,
 };

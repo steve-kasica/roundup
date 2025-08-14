@@ -4,24 +4,19 @@ import {
   MODULE_NAME as COLUMN_INDEX,
   ColumnIndex,
 } from "./components/OperationDetail/StackDetail/ColumnIndex";
-import { Paper } from "@mui/material";
+import { TABLE_ROW_VIEW_CLASS } from "./components/TableSelector/TableLayout/TableRowView";
+import StackedTableDragPreview from "./components/ui/StackedTableDragPreview";
+import { Box, Paper } from "@mui/material";
 
 export default function CustomDragLayer() {
-  const {
-    item,
-    itemType,
-    currentOffset,
-    deltaOffset,
-    initialOffset,
-    isDragging,
-  } = useDragLayer((monitor) => ({
-    item: monitor.getItem(),
-    itemType: monitor.getItemType(),
-    currentOffset: monitor.getSourceClientOffset(),
-    deltaOffset: monitor.getDifferenceFromInitialOffset(),
-    initialOffset: monitor.getInitialSourceClientOffset(),
-    isDragging: monitor.isDragging(),
-  }));
+  const { item, itemType, currentOffset, initialOffset, isDragging } =
+    useDragLayer((monitor) => ({
+      item: monitor.getItem(),
+      itemType: monitor.getItemType(),
+      currentOffset: monitor.getSourceClientOffset(),
+      initialOffset: monitor.getInitialSourceClientOffset(),
+      isDragging: monitor.isDragging(),
+    }));
 
   if (!isDragging || !currentOffset) {
     return null;
@@ -32,6 +27,9 @@ export default function CustomDragLayer() {
       case COLUMN_INDEX:
         // For COLUMN_INDEX, we want to center the drag preview
         return currentOffset.x - item.width / 2;
+      case TABLE_ROW_VIEW_CLASS:
+        // Center the table drag preview
+        return currentOffset.x - 150; // Half of estimated preview width (300px)
       default:
         return currentOffset.x;
     }
@@ -42,6 +40,8 @@ export default function CustomDragLayer() {
       case COLUMN:
       case COLUMN_INDEX:
         return initialOffset.y; // Don't allow ghost to move vertically
+      case TABLE_ROW_VIEW_CLASS:
+        return currentOffset.y - 20; // Slightly offset above cursor
       default:
         return currentOffset.y - 1;
     }
@@ -92,16 +92,29 @@ export default function CustomDragLayer() {
             onHeaderChange={() => {}} // No-op
           />
         );
+      case TABLE_ROW_VIEW_CLASS:
+        // Handle both single table and multi-table drags
+        if (
+          item.type === "multiple-tables" &&
+          item.tables &&
+          item.tables.length > 1
+        ) {
+          return (
+            <StackedTableDragPreview
+              tables={item.tables}
+              primaryTable={item.primaryTable || item.tables[0]}
+            />
+          );
+        } else if (item.type === "table" || item.table) {
+          // Single table drag - use the stacked preview for consistency
+          const table = item.table || item;
+          return (
+            <StackedTableDragPreview tables={[table]} primaryTable={table} />
+          );
+        }
+        return null;
       default:
         return null;
-        // <div
-        //   style={{
-        //     backgroundColor: "lightgray",
-        //     width: `${item.width || 100}px`,
-        //     height: "100px",
-        //     opacity: 0.5,
-        //   }}
-        // ></div>
     }
   };
 
@@ -114,19 +127,33 @@ export default function CustomDragLayer() {
         top: 0,
         width: "100%",
         height: "100%",
-        zIndex: 100,
+        zIndex: 99, // Lower z-index to ensure it doesn't interfere with drop detection
       }}
     >
-      <Paper
-        elevation={3}
-        sx={{
-          transform: `translate(${x()}px, ${y()}px)`,
-          WebkitTransform: `translate(${x()}px, ${y()}px)`,
-          width: `${item.width || 100}px`,
-        }}
-      >
-        {renderDragPreview()}
-      </Paper>
+      {itemType === TABLE_ROW_VIEW_CLASS ? (
+        // For table drags, don't wrap in Paper as StackedTableDragPreview handles styling
+        <Box
+          sx={{
+            transform: `translate(${x()}px, ${y()}px)`,
+            WebkitTransform: `translate(${x()}px, ${y()}px)`,
+            maxWidth: "300px", // Limit width for stacked preview
+          }}
+        >
+          {renderDragPreview()}
+        </Box>
+      ) : (
+        // For other drag types, use Paper wrapper
+        <Paper
+          elevation={3}
+          sx={{
+            transform: `translate(${x()}px, ${y()}px)`,
+            WebkitTransform: `translate(${x()}px, ${y()}px)`,
+            width: `${item.width || 100}px`,
+          }}
+        >
+          {renderDragPreview()}
+        </Paper>
+      )}
     </div>
   );
 }

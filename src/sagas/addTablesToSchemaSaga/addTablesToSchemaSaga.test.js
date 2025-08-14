@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { runSaga } from "redux-saga";
 import * as operationsSlice from "../../slices/operationsSlice";
 import * as tablesSlice from "../../slices/tablesSlice";
-import { addTableToSchemaSagaWorker } from "./addTableToSchemaSaga";
+import { addTablesToSchemaSagaWorker } from "./addTablesToSchemaSaga";
 
 const tableId = "table-1";
 const operationType = "JOIN";
@@ -32,7 +32,7 @@ async function recordSaga(saga, initialAction, state = {}) {
   return dispatched;
 }
 
-describe("addTableToSchemaSagaWorker", () => {
+describe("addTablesToSchemaSagaWorker", () => {
   it("should initialize when no root operation", async () => {
     vi.spyOn(operationsSlice, "selectRootOperation").mockReturnValue(undefined);
     const addOperation = vi
@@ -46,7 +46,7 @@ describe("addTableToSchemaSagaWorker", () => {
       }));
 
     const dispatched = await recordSaga(
-      addTableToSchemaSagaWorker,
+      addTablesToSchemaSagaWorker,
       { payload: { tableId, operationType } },
       {}
     );
@@ -89,7 +89,7 @@ describe("addTableToSchemaSagaWorker", () => {
       }));
 
     const dispatched = await recordSaga(
-      addTableToSchemaSagaWorker,
+      addTablesToSchemaSagaWorker,
       { payload: { tableId, operationType } },
       {}
     );
@@ -131,7 +131,7 @@ describe("addTableToSchemaSagaWorker", () => {
       }));
 
     const dispatched = await recordSaga(
-      addTableToSchemaSagaWorker,
+      addTablesToSchemaSagaWorker,
       { payload: { tableId, operationType } },
       {}
     );
@@ -166,7 +166,7 @@ describe("addTableToSchemaSagaWorker", () => {
       }));
 
     const dispatched = await recordSaga(
-      addTableToSchemaSagaWorker,
+      addTablesToSchemaSagaWorker,
       { payload: { tableId, operationType } },
       {}
     );

@@ -5,7 +5,7 @@ import {
   selectColumnIdsByTableId,
   updateColumns,
 } from "../../slices/columnsSlice";
-import { addTableToSchemaSuccess } from "../addTableToSchemaSaga/addTableToSchemaSaga";
+import { addTablesToSchemaSuccess } from "../addTablesToSchemaSaga/addTablesToSchemaSaga";
 
 /**
  * Redux action creator for initiating the getting of values.
@@ -27,14 +27,12 @@ export const getValuesAction = createAction("saga/countColumnValues/request");
  */
 export default function* countColumnValuesSagaWatcher() {
   yield takeLatest(getValuesAction.type, countColumnValuesSagaWorker);
-  yield takeEvery(addTableToSchemaSuccess.type, function* (action) {
-    const { tableId } = action.payload;
+  yield takeEvery(addTablesToSchemaSuccess.type, function* (action) {
+    const { tableIds } = action.payload;
     const columnIds = yield select((state) =>
-      selectColumnIdsByTableId(state, tableId)
+      tableIds.map((tableId) => selectColumnIdsByTableId(state, tableId))
     );
-    yield countColumnValuesSagaWorker({
-      payload: { columnIds, tableId }, // Adjust as needed
-    });
+    yield put(getValuesAction({ columnIds, tableIds })); // Assuming you want to fetch for the first tableId
   });
 }
 
@@ -50,22 +48,28 @@ export default function* countColumnValuesSagaWatcher() {
  * If the table's source is OpenRefine, triggers a fetch subroutine for values from OpenRefine.
  */
 function* countColumnValuesSagaWorker(action) {
-  let { columnIds, tableId } = action.payload;
+  // columnIds is a 2D array of column IDs, tableIds is an array of table IDs
+  let { columnIds, tableIds } = action.payload;
+
   // Normalize the payload to always be an array of column IDs
   columnIds = Array.isArray(columnIds) ? columnIds : [columnIds];
 
   const limit = 1000; // Default limit for values
 
-  // Get value counts for each column
-  const columns = [];
-  for (const id of columnIds) {
-    try {
-      const values = yield call(getValueCounts, tableId, id, limit);
-      columns.push({ id, values });
-    } catch (error) {
-      console.error(`Failed to get value counts for column ${id}:`, error);
+  for (let i = 0; i < tableIds.length; i++) {
+    const tableId = tableIds[i];
+    const ids = columnIds[i];
+    // Get value counts for each column
+    const columns = [];
+    for (const id of ids) {
+      try {
+        const values = yield call(getValueCounts, tableId, id, limit);
+        columns.push({ id, values });
+      } catch (error) {
+        console.error(`Failed to get value counts for column ${id}:`, error);
+      }
     }
+    // Dispatch action to store the value counts in Redux state
+    yield put(updateColumns(columns));
   }
-  // Dispatch action to store the value counts in Redux state
-  yield put(updateColumns(columns));
 }

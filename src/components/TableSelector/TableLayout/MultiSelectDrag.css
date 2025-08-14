@@ -1,0 +1,71 @@
+/* Multi-select drag and drop styling enhancements */
+
+.TableRowView.multi-selected {
+  position: relative;
+}
+
+.TableRowView.multi-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #1976d2, #42a5f5);
+  z-index: 1;
+}
+
+.TableRowView.multi-selected .drag-handle {
+  background: linear-gradient(135deg, #1976d2, #42a5f5) !important;
+  color: white !important;
+}
+
+.TableRowView.multi-selected .drag-handle svg {
+  color: white !important;
+}
+
+.TableRowView.multi-selected.dragging {
+  box-shadow: 0 8px 24px rgba(25, 118, 210, 0.4) !important;
+  border-color: #1976d2 !important;
+}
+
+.TableRowView.multi-selected.dragging::after {
+  content: attr(data-selection-count) " selected";
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  background: #1976d2;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 1000;
+}
+
+/* Enhanced drag feedback for multi-selection */
+.StyledDraggableRow[data-multiselected="true"] {
+  background-color: rgba(25, 118, 210, 0.05) !important;
+}
+
+.StyledDraggableRow[data-multiselected="true"].dragging {
+  background-color: rgba(25, 118, 210, 0.15) !important;
+  transform: scale(1.02) rotate(0.5deg) !important;
+}
+
+/* Drag handle special styling for multi-select */
+.drag-handle[data-multiselected="true"] {
+  background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%) !important;
+  position: relative;
+}
+
+.drag-handle[data-multiselected="true"]::after {
+  content: "⋮⋮";
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 8px;
+  line-height: 1;
+}

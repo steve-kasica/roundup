@@ -73,7 +73,7 @@ export default function CompositeTableSchema() {
         </Grid>
       ) : (
         <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
-          <Typography>Add a source table</Typography>
+          <Typography>Drag to add a source table</Typography>
         </TableDropTarget>
       )}
     </div>

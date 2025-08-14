@@ -1,13 +1,7 @@
 import { createAction } from "@reduxjs/toolkit";
 import { put, select, takeEvery } from "redux-saga/effects";
 import { rankColumnsKeyness } from "../../lib/duckdb/rankColumnsKeyness";
-import { createOperationViewSuccess } from "../createOperationViewSaga";
-import {
-  OPERATION_TYPE_PACK,
-  OPERATION_TYPE_STACK,
-} from "../../slices/operationsSlice";
-import { addTableToSchemaSuccess } from "../addTableToSchemaSaga/addTableToSchemaSaga";
-import { selectTablesById } from "../../slices/tablesSlice";
+import { addTablesToSchemaSuccess } from "../addTablesToSchemaSaga/addTablesToSchemaSaga";
 import {
   selectColumnIdsByTableId,
   updateColumns,
@@ -18,21 +12,23 @@ export const computeColumnsKeynessAction = createAction(
 );
 
 // Watcher saga
+// This whole module should be renamed to computeColumnStats (TODO)
 export default function* watchComputeColumnKeyness() {
   yield takeEvery(computeColumnsKeynessAction.type, computeColumnKeynessWorker);
-  yield takeEvery(addTableToSchemaSuccess.type, function* (action) {
-    const { tableId } = action.payload;
+  yield takeEvery(addTablesToSchemaSuccess.type, function* (action) {
+    const { tableIds } = action.payload;
     const columnIds = yield select((state) =>
-      selectColumnIdsByTableId(state, tableId)
+      tableIds.map((tableId) => selectColumnIdsByTableId(state, tableId))
     );
-    yield computeColumnKeynessWorker({
-      payload: { columnIds, tableId }, // Adjust as needed
-    });
+    yield put(computeColumnsKeynessAction({ columnIds, tableIds }));
   });
 }
 
 function* computeColumnKeynessWorker(action) {
-  const { columnIds, tableId } = action.payload;
-  const result = yield rankColumnsKeyness(columnIds, tableId);
-  yield put(updateColumns(result));
+  const { columnIds, tableIds } = action.payload;
+  for (let i = 0; i < tableIds.length; i++) {
+    const tableId = tableIds[i];
+    const columnUpdates = yield rankColumnsKeyness(columnIds[i], tableId);
+    yield put(updateColumns(columnUpdates)); // {id, totalRows, uniqueValues, nonNullValues}
+  }
 }

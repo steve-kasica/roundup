@@ -1,12 +1,19 @@
-import { DragIndicator, MoreVert } from "@mui/icons-material";
+import { MoreVert } from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
+import StyledDraggableRow from "../../ui/StyledDraggableRow";
 import { IconButton, Typography } from "@mui/material";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Menu, MenuItem } from "@mui/material";
 import { formatDate, formatNumber, formatBytes } from "../../../lib/utilities";
 import withTableData from "../../HOC/withTableData";
 import { isPointInBoundingBox } from "../../../lib/utilities/dom";
+import { useDrag } from "react-dnd";
+import { getEmptyImage } from "react-dnd-html5-backend";
 import PropTypes from "prop-types";
+import "./MultiSelectDrag.css";
+
+export const TABLE_ROW_VIEW_CLASS = "TableRowView";
 
 function TableRowView({
   // props from withTableData
@@ -15,7 +22,6 @@ function TableRowView({
   isHovered,
   depth,
   parentOperation,
-  dragRef,
   // functions to dispatch actions
   peekTable,
   hoverTable,
@@ -26,6 +32,8 @@ function TableRowView({
   dropTable,
   isInSchema,
   isSelected,
+  addSelectedTablesToSchema,
+  addTableToSchema,
 
   // props from parent component
   isDisabled = false,
@@ -34,6 +42,60 @@ function TableRowView({
   const [anchorEl, setAnchorEl] = useState(null);
   const trRef = useRef(null);
   const open = Boolean(anchorEl);
+
+  // Get selection state for multi-row dragging
+  const selectedTableIds = useSelector((state) => state.tables.selected || []);
+  const selectedTables = useSelector((state) =>
+    selectedTableIds.map((id) => state.tables.data[id]).filter(Boolean)
+  );
+
+  // Set up drag functionality for table rows
+  const [{ isDragging }, dragRef, dragPreview] = useDrag({
+    type: TABLE_ROW_VIEW_CLASS,
+    item: () => {
+      // If this table is selected and there are multiple selected tables,
+      // drag all selected tables as a group
+      const isCurrentTableSelected = selectedTableIds.includes(table.id);
+
+      if (isCurrentTableSelected && selectedTableIds.length > 1) {
+        const item = {
+          id: selectedTableIds, // Array of IDs for multi-select
+          tables: selectedTables, // Array of table objects
+          count: selectedTables.length,
+          type: "multiple-tables",
+          primaryTable: table, // The table being dragged
+        };
+        return item;
+      } else {
+        // Single table drag
+        const item = {
+          id: table.id,
+          name: table.name,
+          type: "table",
+          tables: [table], // Consistent array format
+          count: 1,
+        };
+        return item;
+      }
+    },
+    canDrag: () => !isDisabled,
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+    end: (item, monitor) => {
+      const dropResult = monitor.getDropResult();
+      if (dropResult.accepted && item.type === "multiple-tables") {
+        addSelectedTablesToSchema(dropResult.operationType);
+      } else if (dropResult.accepted && item.type === "table") {
+        addTableToSchema(dropResult.operationType);
+      }
+    },
+  });
+
+  // Remove default drag preview
+  useEffect(() => {
+    dragPreview(getEmptyImage(), { captureDraggingState: true });
+  }, [dragPreview]);
 
   const handleMenuOpen = (event) => {
     event.stopPropagation(); // Prevent row click from firing
@@ -100,18 +162,39 @@ function TableRowView({
 
   const className = [
     "TableRowView",
-    isSelected ? "selected" : "",
-    isDisabled ? "disabled" : "",
-    isHovered ? "hovered" : "",
     parentOperation ? parentOperation.operationType : "",
     depth !== undefined ? `depth-${depth}` : "",
+    selectedTableIds.includes(table.id) && selectedTableIds.length > 1
+      ? "multi-selected"
+      : "",
   ].filter(Boolean);
 
+  // Combine the drag ref from withTableData with our table drag ref
+  // const setCombinedRef = (node) => {
+  //   if (dragRef) {
+  //     if (typeof dragRef === "function") {
+  //       dragRef(node);
+  //     } else {
+  //       dragRef.current = node;
+  //     }
+  //   }
+  //   dragRef(node);
+  //   trRef.current = node;
+  // };
+
   return (
-    <tr
-      ref={trRef}
+    <StyledDraggableRow
+      ref={dragRef}
       className={className.join(" ")}
+      isDragging={isDragging}
+      isDisabled={isDisabled}
+      isSelected={isSelected}
+      isHovered={isHovered}
       data-tableid={table.id}
+      data-multiselected={
+        selectedTableIds.includes(table.id) && selectedTableIds.length > 1
+      }
+      data-selection-count={selectedTableIds.length}
       onMouseEnter={hoverTable}
       onMouseLeave={unhoverTable}
       onClick={(event) => {
@@ -150,24 +233,34 @@ function TableRowView({
         }
       }}
     >
-      <td className="drag-handle" ref={dragRef}>
-        <DragIndicator />
-      </td>
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         <HighlightText pattern={searchString} text={table.name} />
+        {selectedTableIds.includes(table.id) && selectedTableIds.length > 1 && (
+          <span
+            style={{
+              marginLeft: "8px",
+              padding: "2px 6px",
+              backgroundColor: isDragging ? "#ff9800" : "#1976d2",
+              color: "white",
+              fontSize: "0.75rem",
+              borderRadius: "12px",
+              fontWeight: "bold",
+            }}
+          >
+            +{selectedTableIds.length - 1}
+          </span>
+        )}
       </Typography>
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         {formatBytes(table.size)}
       </Typography>
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
-        {table.fileType || "N/A"}
+        {table.mimeType || "N/A"}
       </Typography>
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         {formatNumber(table.rowCount)}
       </Typography>
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
-        {/* this value doesn't change if rows are disabled */}
-        {/* TODO: add tooltip to signal rows have been removed */}
         {`${formatNumber(table.columnIds.length)}`}
         <sup
           style={{ display: removedColumnIds.length > 0 ? "inline" : "none" }}
@@ -206,7 +299,7 @@ function TableRowView({
           ))}
         </Menu>
       </td>
-    </tr>
+    </StyledDraggableRow>
   );
 }
 

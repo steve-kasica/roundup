@@ -61,15 +61,14 @@ function OperationKeyColumnSelect({
     );
   };
 
-  // Get random sample of values for tooltip
-  const getRandomValues = (column, count = 5) => {
+  // Get a sample of values
+  const getValues = (column, count = 5) => {
     if (!column || !column.values) {
       return [];
     }
 
     const allValues = Object.keys(column.values);
-    const shuffled = [...allValues].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, Math.min(count, allValues.length));
+    return allValues.slice(0, Math.min(count, allValues.length));
   };
 
   return (
@@ -92,7 +91,7 @@ function OperationKeyColumnSelect({
             <em>No key column</em>
           </MenuItem>
           {sortedColumns.map((column) => {
-            const randomValues = getRandomValues(column, 5);
+            const valueSample = getValues(column, 5);
 
             return (
               <MenuItem key={column.id} value={column.id}>
@@ -118,8 +117,8 @@ function OperationKeyColumnSelect({
                       </Box>
                     }
                     secondary={
-                      randomValues.length > 0
-                        ? randomValues.join(", ") + "..."
+                      valueSample.length > 0
+                        ? valueSample.join(", ") + "..."
                         : "No sample values available"
                     }
                     slotProps={{
