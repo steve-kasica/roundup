@@ -1,7 +1,7 @@
-import { MoreVert } from "@mui/icons-material";
+import { DragIndicator, MoreVert } from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
 import StyledDraggableRow from "../../ui/StyledDraggableRow";
-import { IconButton, Typography } from "@mui/material";
+import { IconButton, styled, Typography, Checkbox, Stack } from "@mui/material";
 import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Menu, MenuItem } from "@mui/material";
@@ -14,6 +14,75 @@ import PropTypes from "prop-types";
 import "./MultiSelectDrag.css";
 
 export const TABLE_ROW_VIEW_CLASS = "TableRowView";
+
+// Styled table row component that handles all drag and drop states
+const StyledTableRow = styled("tr", {
+  shouldForwardProp: (prop) =>
+    !["isDragging", "isDisabled", "isSelected", "isHovered"].includes(prop),
+})(({ isDragging, isDisabled, isSelected, isHovered }) => {
+  let styles = {
+    transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+    cursor: "context-menu",
+    borderRadius: "6px",
+    position: "relative",
+    margin: "1px 0",
+  };
+
+  // Base selected styles - blue theme for selection
+  if (isSelected) {
+    styles = {
+      ...styles,
+      backgroundColor: "rgba(25, 118, 210, 0.12)",
+      boxShadow: "inset 3px 0 0 #1976d2, 0 1px 3px rgba(25, 118, 210, 0.15)",
+    };
+  }
+
+  // Hover styles - subtle gray with shadow
+  if (isHovered && !isDragging && !isSelected) {
+    styles = {
+      ...styles,
+      backgroundColor: "rgba(0, 0, 0, 0.02)",
+      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+      transform: "translateY(-1px)",
+    };
+  }
+
+  // Selected + Hovered - enhanced selected state
+  if (isSelected && isHovered && !isDragging) {
+    styles = {
+      ...styles,
+      backgroundColor: "rgba(25, 118, 210, 0.16)",
+      boxShadow: "inset 3px 0 0 #1976d2, 0 2px 6px rgba(25, 118, 210, 0.2)",
+      transform: "translateY(-1px)",
+    };
+  }
+
+  // Dragging styles - orange theme with elevation
+  if (isDragging) {
+    styles = {
+      ...styles,
+      cursor: "grabbing",
+      backgroundColor: "rgba(255, 152, 0, 0.15)",
+      boxShadow: "inset 4px 0 0 #f57c00, 0 12px 24px rgba(255, 152, 0, 0.35)",
+      zIndex: 1000,
+      opacity: 0.95,
+    };
+  }
+
+  // Disabled styles (highest priority) - maintains connection but muted
+  if (isDisabled) {
+    styles = {
+      ...styles,
+      opacity: 0.4,
+      cursor: "not-allowed",
+      backgroundColor: "rgba(0, 0, 0, 0.02)",
+      transform: "none",
+      boxShadow: "none",
+    };
+  }
+
+  return styles;
+});
 
 function TableRowView({
   // props from withTableData
@@ -44,6 +113,7 @@ function TableRowView({
   const open = Boolean(anchorEl);
 
   // Get selection state for multi-row dragging
+  // TODO: I don't think I need this
   const selectedTableIds = useSelector((state) => state.tables.selected || []);
   const selectedTables = useSelector((state) =>
     selectedTableIds.map((id) => state.tables.data[id]).filter(Boolean)
@@ -160,37 +230,15 @@ function TableRowView({
     },
   ];
 
-  const className = [
-    "TableRowView",
-    parentOperation ? parentOperation.operationType : "",
-    depth !== undefined ? `depth-${depth}` : "",
-    selectedTableIds.includes(table.id) && selectedTableIds.length > 1
-      ? "multi-selected"
-      : "",
-  ].filter(Boolean);
-
-  // Combine the drag ref from withTableData with our table drag ref
-  // const setCombinedRef = (node) => {
-  //   if (dragRef) {
-  //     if (typeof dragRef === "function") {
-  //       dragRef(node);
-  //     } else {
-  //       dragRef.current = node;
-  //     }
-  //   }
-  //   dragRef(node);
-  //   trRef.current = node;
-  // };
-
   return (
-    <StyledDraggableRow
+    <StyledTableRow
       ref={dragRef}
-      className={className.join(" ")}
       isDragging={isDragging}
       isDisabled={isDisabled}
       isSelected={isSelected}
       isHovered={isHovered}
       data-tableid={table.id}
+      data-isSelected={isSelected}
       data-multiselected={
         selectedTableIds.includes(table.id) && selectedTableIds.length > 1
       }
@@ -199,6 +247,7 @@ function TableRowView({
       onMouseLeave={unhoverTable}
       onClick={(event) => {
         event.stopPropagation();
+        console.log("Row clicked", table.id, event.shiftKey);
 
         if (event.shiftKey) {
           const tr = event.currentTarget;
@@ -206,8 +255,8 @@ function TableRowView({
           const ids = rows.map((row) => row.getAttribute("data-tableid"));
           const clickedIndex = ids.indexOf(table.id);
           // Find all selected rows in DOM order
-          const selectedRows = rows.filter((row) =>
-            row.classList.contains("selected")
+          const selectedRows = rows.filter(
+            (row) => row.getAttribute("data-isSelected") === "true"
           );
           const selectedIndices = selectedRows.map((row) =>
             ids.indexOf(row.getAttribute("data-tableid"))
@@ -234,22 +283,34 @@ function TableRowView({
       }}
     >
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
-        <HighlightText pattern={searchString} text={table.name} />
-        {selectedTableIds.includes(table.id) && selectedTableIds.length > 1 && (
-          <span
-            style={{
-              marginLeft: "8px",
-              padding: "2px 6px",
-              backgroundColor: isDragging ? "#ff9800" : "#1976d2",
-              color: "white",
-              fontSize: "0.75rem",
-              borderRadius: "12px",
-              fontWeight: "bold",
+        <Stack direction="row" alignItems="center" gap={2}>
+          <DragIndicator
+            sx={{
+              cursor: "grab",
+              color: "text.secondary",
+              transition: "all 0.2s ease-in-out",
+              "&:hover": {
+                color: "#ff9800",
+                transform: "scale(1.1)",
+                filter: "drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3))",
+              },
+              "&:active": {
+                cursor: "grabbing",
+                transform: "scale(0.95)",
+                color: "#f57c00",
+              },
             }}
-          >
-            +{selectedTableIds.length - 1}
-          </span>
-        )}
+          />
+          <Checkbox
+            checked={isSelected}
+            disabled
+            size="small"
+            sx={{ padding: 0 }}
+          />
+        </Stack>
+      </Typography>
+      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+        <HighlightText pattern={searchString} text={table.name} />
       </Typography>
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         {formatBytes(table.size)}
@@ -272,10 +333,8 @@ function TableRowView({
         {formatDate(new Date(table.dateLastModified))}
       </Typography>
       <td className="more-options">
-        <IconButton onClick={handleMenuOpen}>
-          <MoreVert />
-        </IconButton>
-        <Menu
+        {/* <IconButton onClick={handleMenuOpen}> */}
+        {/* <Menu
           anchorEl={anchorEl}
           open={open}
           onClose={handleMenuClose}
@@ -297,9 +356,9 @@ function TableRowView({
               {item.label}
             </MenuItem>
           ))}
-        </Menu>
+        </Menu> */}
       </td>
-    </StyledDraggableRow>
+    </StyledTableRow>
   );
 }
 

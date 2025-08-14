@@ -31,7 +31,7 @@ import {
 import Operation, {
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice/Operation";
-import { updateTables } from "../../slices/tablesSlice";
+import { clearSelectedTables, updateTables } from "../../slices/tablesSlice";
 
 /**
  * Action creator for adding a table to a schema.
@@ -133,6 +133,6 @@ export function* addTablesToSchemaSagaWorker(action) {
       updateTables(tableIds.map((id) => ({ id, operationId: operation.id })))
     );
   }
-
+  yield put(clearSelectedTables());
   yield put(addTablesToSchemaSuccess(action.payload));
 }

@@ -107,12 +107,7 @@ export default function withTableData(WrappedComponent) {
             );
           }
         }}
-        setTableSelection={(ids) => {
-          if (ids === undefined) {
-            ids = id;
-          }
-          dispatch(setSelectedTables(ids));
-        }}
+        setTableSelection={(ids) => dispatch(setSelectedTables(ids))}
         unselectTable={() => dispatch(removeFromSelectedTables(id))}
         peekTable={() => dispatch(setPeekedTable(id))}
         renameTable={(newNames) =>

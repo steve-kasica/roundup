@@ -97,6 +97,7 @@ export default function TableLayout({ searchString, tables, loading, error }) {
                     }
                   }}
                 >
+                  {/* TODO */}
                   {/* <Tooltip placement="top" title={header.tooltip}> */}
                   {header.label}
                   {/* </Tooltip> */}
@@ -120,13 +121,7 @@ export default function TableLayout({ searchString, tables, loading, error }) {
             </tr>
           ) : (
             tableIds.map((id) => (
-              <TableRowView
-                key={id}
-                id={id}
-                isDraggable={true}
-                headers={headers}
-                searchString={searchString}
-              />
+              <TableRowView key={id} id={id} searchString={searchString} />
             ))
           )}
         </tbody>
