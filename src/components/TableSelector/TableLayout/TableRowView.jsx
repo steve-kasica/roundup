@@ -2,12 +2,11 @@ import { DragIndicator, MoreVert } from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
 import StyledDraggableRow from "../../ui/StyledDraggableRow";
 import { IconButton, styled, Typography, Checkbox, Stack } from "@mui/material";
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Menu, MenuItem } from "@mui/material";
 import { formatDate, formatNumber, formatBytes } from "../../../lib/utilities";
 import withTableData from "../../HOC/withTableData";
-import { isPointInBoundingBox } from "../../../lib/utilities/dom";
 import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import PropTypes from "prop-types";
@@ -109,7 +108,6 @@ function TableRowView({
   searchString,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const trRef = useRef(null);
   const open = Boolean(anchorEl);
 
   // Get selection state for multi-row dragging
@@ -174,18 +172,17 @@ function TableRowView({
   }, [dragPreview]);
 
   const handleMenuOpen = (event) => {
+    event.preventDefault(); // Prevent default context menu
     event.stopPropagation(); // Prevent row click from firing
-    setAnchorEl(event.currentTarget);
+    setAnchorEl({
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
   };
 
   const handleMenuClose = (event) => {
-    event.stopPropagation(); // Prevent row click from firing
-    const isMouseOver = isPointInBoundingBox(
-      { x: event.clientX, y: event.clientY },
-      trRef.current.getBoundingClientRect()
-    );
-    if (!isMouseOver) {
-      unhoverTable();
+    if (event) {
+      event.stopPropagation(); // Prevent row click from firing
     }
     setAnchorEl(null);
   };
@@ -251,6 +248,7 @@ function TableRowView({
       data-selection-count={selectedTableIds.length}
       onMouseEnter={hoverTable}
       onMouseLeave={unhoverTable}
+      onContextMenu={handleMenuOpen}
       onClick={(event) => {
         event.stopPropagation();
         console.log("Row clicked", table.id, event.shiftKey);
@@ -339,19 +337,16 @@ function TableRowView({
         {formatDate(new Date(table.dateLastModified))}
       </Typography>
       <td className="more-options">
-        {/* <IconButton onClick={handleMenuOpen}> */}
-        {/* <Menu
-          anchorEl={anchorEl}
+        <Menu
+          anchorEl={null}
           open={open}
           onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            anchorEl !== null
+              ? { top: anchorEl.clientY, left: anchorEl.clientX }
+              : undefined
+          }
         >
           {menuItems.map((item) => (
             <MenuItem
@@ -362,7 +357,7 @@ function TableRowView({
               {item.label}
             </MenuItem>
           ))}
-        </Menu> */}
+        </Menu>
       </td>
     </StyledTableRow>
   );
