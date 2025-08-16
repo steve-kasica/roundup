@@ -39,6 +39,7 @@ const headers = [
     tooltip: "Sort by file type",
     attrType: COLUMN_TYPE_CATEGORICAL,
   },
+  // TODO: grouping by group is not implemented yet
   {
     attr: "??",
     label: "Group",

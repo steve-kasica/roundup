@@ -139,7 +139,7 @@ function Cell({
   const {
     dragRef: dragHandleRef,
     isDragging,
-    dragPreviewRef,
+    dragPreview: dragPreviewRef,
   } = useDragAndDrop({
     dragType,
     dropType: "", // Handle doesn't accept drops (DnD package needs it to be a string)

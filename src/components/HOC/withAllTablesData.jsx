@@ -23,7 +23,6 @@ const withAllTablesData = (WrappedComponent) => {
       )
     );
     const bytesMax = Math.max(0, ...tables.map((table) => table.size));
-    console.log(columnMax, "columnMax");
 
     return (
       <WrappedComponent
