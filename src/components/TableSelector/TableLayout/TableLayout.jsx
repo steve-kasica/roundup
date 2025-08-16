@@ -2,7 +2,7 @@
  * TableLayout.jsx
  * -------------------------------
  */
-import { Button } from "@mui/material";
+import { Button, Tooltip } from "@mui/material";
 import {
   ArrowDown01,
   ArrowDownAZ,
@@ -66,7 +66,13 @@ const headers = [
   },
 ];
 
-export default function TableLayout({ searchString, tables, loading, error }) {
+export default function TableLayout({
+  searchString,
+  tables,
+  rowMax,
+  columnMax,
+  bytesMax,
+}) {
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
 
@@ -97,10 +103,9 @@ export default function TableLayout({ searchString, tables, loading, error }) {
                     }
                   }}
                 >
-                  {/* TODO */}
-                  {/* <Tooltip placement="top" title={header.tooltip}> */}
-                  {header.label}
-                  {/* </Tooltip> */}
+                  <Tooltip placement="top" title={header.tooltip}>
+                    {header.label}
+                  </Tooltip>
                   &nbsp;
                   <SortIcon
                     attr={header.attr}
@@ -111,19 +116,19 @@ export default function TableLayout({ searchString, tables, loading, error }) {
                 </Button>
               </th>
             ))}
-            <th></th>
           </tr>
         </thead>
         <tbody>
-          {loading || error ? (
-            <tr>
-              <td>Loading/error</td>
-            </tr>
-          ) : (
-            tableIds.map((id) => (
-              <TableRowView key={id} id={id} searchString={searchString} />
-            ))
-          )}
+          {tableIds.map((id) => (
+            <TableRowView
+              key={id}
+              id={id}
+              searchString={searchString}
+              rowMax={rowMax}
+              columnMax={columnMax}
+              bytesMax={bytesMax}
+            />
+          ))}
         </tbody>
       </table>
     </div>
@@ -133,8 +138,9 @@ export default function TableLayout({ searchString, tables, loading, error }) {
 TableLayout.propTypes = {
   searchString: PropTypes.string,
   tables: PropTypes.arrayOf(PropTypes.object).isRequired,
-  loading: PropTypes.bool,
-  error: PropTypes.any,
+  rowMax: PropTypes.number.isRequired,
+  columnMax: PropTypes.number.isRequired,
+  bytesMax: PropTypes.number.isRequired,
 };
 
 function SortIcon({ attr, isSort, attrType, isAscending }) {

@@ -82,6 +82,7 @@ export default function withTableData(WrappedComponent) {
         removedColumnIds={removedColumnIds}
         activeColumnIds={activeColumnIds}
         columnIds={activeColumnIds} // deprecate
+        columnCount={activeColumnIds.length}
         // Other related objects
         columnNames={columnNames} // TODO: remove this, should only pass Ids
         selectedColumnIds={selectedColumnIds}

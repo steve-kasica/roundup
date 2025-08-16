@@ -1,7 +1,6 @@
-import { DragIndicator, MoreVert } from "@mui/icons-material";
+import { DragIndicator } from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
-import StyledDraggableRow from "../../ui/StyledDraggableRow";
-import { IconButton, styled, Typography, Checkbox, Stack } from "@mui/material";
+import { styled, Typography, Checkbox, Stack, Box } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Menu, MenuItem } from "@mui/material";
@@ -10,9 +9,37 @@ import withTableData from "../../HOC/withTableData";
 import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import PropTypes from "prop-types";
-import "./MultiSelectDrag.css";
 
 export const TABLE_ROW_VIEW_CLASS = "TableRowView";
+
+// Styled component for bar chart background in table cells
+const BarChartCell = styled(Typography, {
+  shouldForwardProp: (prop) => !["percentage", "isDisabled"].includes(prop),
+})(({ percentage, isDisabled }) => ({
+  position: "relative",
+  backgroundImage: `linear-gradient(to right, ${
+    isDisabled ? "rgba(0, 0, 0, 0.05)" : "rgba(25, 118, 210, 0.15)"
+  } 0%, ${
+    isDisabled ? "rgba(0, 0, 0, 0.05)" : "rgba(25, 118, 210, 0.15)"
+  } ${percentage.toFixed(1)}%, transparent ${percentage.toFixed(1)}%)`,
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "100% 100%",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: `linear-gradient(to right, ${
+      isDisabled ? "rgba(0, 0, 0, 0.08)" : "rgba(25, 118, 210, 0.2)"
+    } 0%, ${
+      isDisabled ? "rgba(0, 0, 0, 0.08)" : "rgba(25, 118, 210, 0.2)"
+    } ${percentage.toFixed(1)}%, transparent ${percentage.toFixed(1)}%)`,
+    zIndex: -1,
+    borderRadius: "2px",
+  },
+}));
 
 // Styled table row component that handles all drag and drop states
 const StyledTableRow = styled("tr", {
@@ -25,6 +52,7 @@ const StyledTableRow = styled("tr", {
     borderRadius: "6px",
     position: "relative",
     margin: "1px 0",
+    userSelect: "none",
   };
 
   // Base selected styles - blue theme for selection
@@ -87,9 +115,14 @@ function TableRowView({
   // props from withTableData
   table,
   removedColumnIds,
+  columnCount,
   isHovered,
-  depth,
-  parentOperation,
+  // Props drilled down from withTableData
+  rowMax,
+  columnMax,
+  bytesMax,
+  // depth,
+  // parentOperation,
   // functions to dispatch actions
   peekTable,
   hoverTable,
@@ -235,7 +268,6 @@ function TableRowView({
 
   return (
     <StyledTableRow
-      ref={dragRef}
       isDragging={isDragging}
       isDisabled={isDisabled}
       isSelected={isSelected}
@@ -288,23 +320,32 @@ function TableRowView({
     >
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         <Stack direction="row" alignItems="center" gap={2}>
-          <DragIndicator
+          <Box
+            ref={dragRef}
             sx={{
+              display: "flex",
+              alignItems: "center",
               cursor: "grab",
-              color: "text.secondary",
-              transition: "all 0.2s ease-in-out",
-              "&:hover": {
+              "&:hover .drag-icon": {
                 color: "#ff9800",
                 transform: "scale(1.1)",
                 filter: "drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3))",
               },
-              "&:active": {
+              "&:active .drag-icon": {
                 cursor: "grabbing",
                 transform: "scale(0.95)",
                 color: "#f57c00",
               },
             }}
-          />
+          >
+            <DragIndicator
+              className="drag-icon"
+              sx={{
+                color: "text.secondary",
+                transition: "all 0.2s ease-in-out",
+              }}
+            />
+          </Box>
           <Checkbox
             checked={isSelected}
             disabled
@@ -316,23 +357,38 @@ function TableRowView({
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         <HighlightText pattern={searchString} text={table.name} />
       </Typography>
-      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+      <BarChartCell
+        component="td"
+        color={isDisabled ? "textDisabled" : "normal"}
+        percentage={(table.size / bytesMax) * 100}
+        isDisabled={isDisabled}
+      >
         {formatBytes(table.size)}
-      </Typography>
+      </BarChartCell>
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         {table.mimeType || "N/A"}
       </Typography>
-      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+      <BarChartCell
+        component="td"
+        color={isDisabled ? "textDisabled" : "normal"}
+        percentage={(table.rowCount / rowMax) * 100}
+        isDisabled={isDisabled}
+      >
         {formatNumber(table.rowCount)}
-      </Typography>
-      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+      </BarChartCell>
+      <BarChartCell
+        component="td"
+        color={isDisabled ? "textDisabled" : "normal"}
+        percentage={(columnCount / columnMax) * 100}
+        isDisabled={isDisabled}
+      >
         {`${formatNumber(table.columnIds.length)}`}
         <sup
           style={{ display: removedColumnIds.length > 0 ? "inline" : "none" }}
         >
           *
         </sup>
-      </Typography>
+      </BarChartCell>
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         {formatDate(new Date(table.dateLastModified))}
       </Typography>
@@ -385,10 +441,13 @@ TableRowView.propTypes = {
   removeTableFromSchema: PropTypes.func.isRequired,
   renameTable: PropTypes.func.isRequired,
   dropTable: PropTypes.func.isRequired,
+  addSelectedTablesToSchema: PropTypes.func.isRequired,
+  addTableToSchema: PropTypes.func.isRequired,
   isInSchema: PropTypes.bool,
   isSelected: PropTypes.bool,
   isDisabled: PropTypes.bool,
   searchString: PropTypes.string,
+  rowMax: PropTypes.number.isRequired,
 };
 
 const EnhancedTableRowView = withTableData(TableRowView);

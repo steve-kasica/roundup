@@ -28,8 +28,9 @@ const DEFAULT_LAYOUT = tableLayout; // Default layout can be set to either 'tabl
 function TableSelector({
   tables,
   selectedTables,
-  isLoading,
-  error,
+  rowMax,
+  columnMax,
+  bytesMax,
   unselectAllTables,
 }) {
   const dispatch = useDispatch();
@@ -44,12 +45,6 @@ function TableSelector({
         selectedTableType.length === 0 ||
         table.mimeType.includes(selectedTableType)
     );
-
-  const tableTypes = Array.from(
-    new Set(
-      !(isLoading && error) ? tables.map((table) => table.mimeType).flat() : []
-    )
-  );
 
   async function handleFileUpload(files) {
     // setError(null);
@@ -112,15 +107,17 @@ function TableSelector({
         <ListLayout
           searchString={searchString}
           tables={filteredTables}
-          loading={isLoading}
-          error={error}
+          rowMax={rowMax}
+          columnMax={columnMax}
+          bytesMax={bytesMax}
         />
       ) : (
         <TableLayout
           searchString={searchString}
           tables={filteredTables}
-          loading={isLoading}
-          error={error}
+          rowMax={rowMax}
+          columnMax={columnMax}
+          bytesMax={bytesMax}
         />
       )}
     </div>
@@ -135,8 +132,7 @@ TableSelector.propTypes = {
     })
   ).isRequired,
   selectedTables: PropTypes.array.isRequired,
-  isLoading: PropTypes.bool.isRequired,
-  error: PropTypes.any,
+  rowMax: PropTypes.number.isRequired,
   unselectAllTables: PropTypes.func.isRequired,
 };
 
