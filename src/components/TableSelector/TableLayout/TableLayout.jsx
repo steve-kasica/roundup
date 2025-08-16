@@ -15,7 +15,6 @@ import {
 import { useState } from "react";
 import { ascending, descending } from "d3";
 import TableRowView from "./TableRowView";
-import "./TableLayout.scss";
 import PropTypes from "prop-types";
 import {
   COLUMN_TYPE_NUMERICAL,
@@ -35,16 +34,22 @@ const headers = [
     attrType: COLUMN_TYPE_CATEGORICAL,
   },
   {
-    attr: "size",
-    label: "Size",
-    tooltip: "Sort by file size",
-    attrType: COLUMN_TYPE_NUMERICAL,
-  },
-  {
     attr: "mimeType",
     label: "Type",
     tooltip: "Sort by file type",
     attrType: COLUMN_TYPE_CATEGORICAL,
+  },
+  {
+    attr: "??",
+    label: "Group",
+    tooltip: "Sort by group",
+    attrType: COLUMN_TYPE_CATEGORICAL,
+  },
+  {
+    attr: "size",
+    label: "Size",
+    tooltip: "Sort by file size",
+    attrType: COLUMN_TYPE_NUMERICAL,
   },
   {
     attr: "rowCount",

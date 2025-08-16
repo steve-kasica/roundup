@@ -117,6 +117,7 @@ function TableRowView({
   removedColumnIds,
   columnCount,
   isHovered,
+  parentOperation,
   // Props drilled down from withTableData
   rowMax,
   columnMax,
@@ -357,6 +358,12 @@ function TableRowView({
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         <HighlightText pattern={searchString} text={table.name} />
       </Typography>
+      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+        {table.mimeType || "N/A"}
+      </Typography>
+      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+        {parentOperation?.name || "N/A"}
+      </Typography>
       <BarChartCell
         component="td"
         color={isDisabled ? "textDisabled" : "normal"}
@@ -365,9 +372,6 @@ function TableRowView({
       >
         {formatBytes(table.size)}
       </BarChartCell>
-      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
-        {table.mimeType || "N/A"}
-      </Typography>
       <BarChartCell
         component="td"
         color={isDisabled ? "textDisabled" : "normal"}
