@@ -5,6 +5,10 @@ import {
   ColumnIndex,
 } from "./components/OperationDetail/StackDetail/ColumnIndex";
 import { TABLE_ROW_VIEW_CLASS } from "./components/TableSelector/TableLayout/TableRowView";
+import {
+  CELL_DRAG_TYPE_PREFIX,
+  default as Cell,
+} from "./components/OperationDetail/StackDetail/ColumnIndex/Cell/Cell";
 import StackedTableDragPreview from "./components/ui/StackedTableDragPreview";
 import { Box, Paper } from "@mui/material";
 
@@ -31,6 +35,10 @@ export default function CustomDragLayer() {
         // Center the table drag preview
         return currentOffset.x - 150; // Half of estimated preview width (300px)
       default:
+        // Check if it's a Cell drag type (COLUMN-tableId pattern)
+        if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
+          return currentOffset.x - 100; // Center the cell preview
+        }
         return currentOffset.x;
     }
   }
@@ -43,6 +51,10 @@ export default function CustomDragLayer() {
       case TABLE_ROW_VIEW_CLASS:
         return currentOffset.y - 20; // Slightly offset above cursor
       default:
+        // Check if it's a Cell drag type (COLUMN-tableId pattern)
+        if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
+          return currentOffset.y - 10; // Slightly offset above cursor
+        }
         return currentOffset.y - 1;
     }
   }
@@ -114,6 +126,14 @@ export default function CustomDragLayer() {
         }
         return null;
       default:
+        // Check if it's a Cell drag type (COLUMN-tableId pattern)
+        if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
+          return (
+            <Box sx={{ width: "200px", opacity: 0.75, cursor: "grabbing" }}>
+              <Cell id={item.id} />
+            </Box>
+          );
+        }
         return null;
     }
   };
@@ -130,13 +150,14 @@ export default function CustomDragLayer() {
         zIndex: 100,
       }}
     >
-      {itemType === TABLE_ROW_VIEW_CLASS ? (
-        // For table drags, don't wrap in Paper as StackedTableDragPreview handles styling
+      {itemType === TABLE_ROW_VIEW_CLASS ||
+      (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) ? (
+        // For table drags and cell drags, don't wrap in Paper as they handle their own styling
         <Box
           sx={{
             transform: `translate(${x()}px, ${y()}px)`,
             WebkitTransform: `translate(${x()}px, ${y()}px)`,
-            maxWidth: "300px", // Limit width for stacked preview
+            maxWidth: itemType === TABLE_ROW_VIEW_CLASS ? "300px" : "auto", // Limit width for stacked preview
           }}
         >
           {renderDragPreview()}

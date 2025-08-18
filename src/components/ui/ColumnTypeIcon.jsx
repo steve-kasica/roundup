@@ -8,10 +8,10 @@ import { Tooltip } from "@mui/material";
 import PropTypes from "prop-types";
 import { COLUMN_TYPE_VARCHAR } from "../../slices/columnsSlice";
 
-export default function ColumnTypeIcon({ column, onClick }) {
+export default function ColumnTypeIcon({ column, onClick = () => {}, sx: customSx = {} }) {
   const { columnType, uniqueValues, nonNullValues } = column;
   const isKey = uniqueValues === nonNullValues;
-  const sx = {
+  const defaultSx = {
     color: "gray.300",
     fontSize: "1.5rem",
     cursor: "pointer",
@@ -31,7 +31,7 @@ export default function ColumnTypeIcon({ column, onClick }) {
 
   if (columnType === COLUMN_TYPE_VARCHAR && isKey) {
     Icon = KeyIcon;
-    sx["fontSize"] = "1rem";
+    defaultSx["fontSize"] = "1rem";
     tooltipText = "Key column (unique text)";
   } else if (columnType === COLUMN_TYPE_VARCHAR) {
     Icon = CategoricalIcon;
@@ -44,9 +44,12 @@ export default function ColumnTypeIcon({ column, onClick }) {
     tooltipText = "Date column";
   }
 
+  // Merge custom sx with default sx (custom sx takes precedence)
+  const mergedSx = { ...defaultSx, ...customSx };
+
   return (
     <Tooltip title={tooltipText} placement="right" arrow>
-      <Icon sx={sx} onClick={onClick} />
+      <Icon sx={mergedSx} onClick={onClick} />
     </Tooltip>
   );
 }
@@ -60,4 +63,5 @@ ColumnTypeIcon.propTypes = {
     nonNullValues: PropTypes.number,
   }).isRequired,
   onClick: PropTypes.func,
+  sx: PropTypes.object,
 };

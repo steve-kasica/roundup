@@ -29,6 +29,9 @@ import { DragIndicator } from "@mui/icons-material";
 import ColumnTypeIcon from "../../../../ui/ColumnTypeIcon";
 import { useDragAndDrop } from "./DragLayer";
 
+// Export drag type constant for use in CustomDragLayer
+export const CELL_DRAG_TYPE_PREFIX = "COLUMN";
+
 // Styled component for the cell Paper creates a clear state hierarchy:
 //
 // - Selected cells: Most prominent with blue theme and strong effects
@@ -119,7 +122,7 @@ function Cell({
   swapColumnsWithinTable,
 }) {
   // Separate drag and drop functionality
-  const dragType = `COLUMN-${column?.tableId}`; // Only drag and drop within the same table
+  const dragType = `${CELL_DRAG_TYPE_PREFIX}-${column?.tableId}`; // Only drag and drop within the same table
   const {
     dropRef: dropReference,
     isOver,
@@ -136,18 +139,11 @@ function Cell({
   });
 
   // Drag functionality only for the drag handle
-  const {
-    dragRef: dragHandleRef,
-    isDragging,
-    dragPreview: dragPreviewRef,
-  } = useDragAndDrop({
+  const { dragRef: dragHandleRef, isDragging } = useDragAndDrop({
     dragType,
     dropType: "", // Handle doesn't accept drops (DnD package needs it to be a string)
-    getDragItem: () => ({
-      id: column?.id,
-      name: column?.name,
-      index: column?.index,
-    }),
+    hideDefaultPreview: true, // Use custom drag layer instead
+    getDragItem: () => column,
     canDrag: () => true, // Enable dragging only on handle
     canDrop: () => false, // Handle doesn't accept drops
   });
@@ -155,11 +151,10 @@ function Cell({
   const cellRef = useRef(null);
   const [isColumnNameEditable, setIsColumnNameEditable] = useState(false);
 
-  // Combine refs for the main cell (drop target + drag preview)
+  // Combine refs for the main cell (drop target only, drag preview handled by CustomDragLayer)
   const setCellRef = (element) => {
     cellRef.current = element;
     dropReference(element);
-    dragPreviewRef(element);
   };
 
   // Check if this is a drop zone (something is being dragged but not over this element)
