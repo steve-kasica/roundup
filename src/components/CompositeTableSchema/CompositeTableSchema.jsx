@@ -39,22 +39,6 @@ export default function CompositeTableSchema() {
 
   return (
     <div className="CompositeTableSchema">
-      <Button
-        variant="outlined"
-        disabled={rootOperationId === null}
-        sx={{ mb: 2 }}
-        onClick={() => setExportOpen(true)}
-        data-testid="export-table-btn"
-      >
-        Export
-      </Button>
-      <ExportCompositeTable
-        open={exportOpen}
-        id={rootOperationId}
-        onClose={() => setExportOpen(false)}
-        onExport={() => setExportOpen(false)}
-        tableName={tableName}
-      />
       {maxOperationDepth >= 0 ? (
         <Grid container spacing={0}>
           <Grid size={gridWidth}>
