@@ -36,9 +36,8 @@ function OperationView({
   index,
   peekTable,
   renameOperation,
+  focusOperation,
 }) {
-  const dispatch = useDispatch();
-
   const label =
     operation.operationType.charAt(0).toUpperCase() +
     operation.operationType.slice(1);
@@ -120,9 +119,7 @@ function OperationView({
       }
       disablePadding
     >
-      <ListItemButton
-        onClick={() => dispatch(setFocusedOperation({ id: operation.id }))}
-      >
+      <ListItemButton onClick={focusOperation}>
         <ListItemText
           primary={`${position}. ${operation.name} (${columnCount})`}
           secondary={`${label}: ${childrenIds.join(", ")}`}

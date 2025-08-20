@@ -1,5 +1,4 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { isOperationId } from "./Operation";
 
 /**
  * Selects an operation by its ID from the Redux state.

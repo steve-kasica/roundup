@@ -16,7 +16,6 @@ import {
   TABLE_SOURCE_OPEN_REFINE,
 } from "../slices/tablesSlice";
 import { addTablesToSchemaRequest } from "./addTablesToSchemaSaga";
-import { peekTableAction } from "./peekTableSaga";
 
 /**
  * Action creator for initiating the fetch of column metadata.
@@ -57,14 +56,6 @@ export default function* fetchColumnMetadataWatcher() {
   yield all([
     takeEvery(fetchColumnMetadataRequest.type, fetchColumnMetadataWorker),
     takeEvery(addTablesToSchemaRequest.type, function* (action) {
-      const { tableId } = action.payload;
-      yield put(
-        fetchColumnMetadataRequest({
-          localTableIds: [tableId],
-        })
-      );
-    }),
-    takeEvery(peekTableAction.type, function* (action) {
       const { tableId } = action.payload;
       yield put(
         fetchColumnMetadataRequest({

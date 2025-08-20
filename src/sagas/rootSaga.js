@@ -9,8 +9,6 @@ import removeColumnsSagaWatcher from "./removeColumnsSaga";
 import swapColumnsSaga from "./swapColumnsSaga";
 import addTablesToSchemaWatcher from "./addTablesToSchemaSaga";
 import coordinateHoverSaga from "./coordinateHoverSaga";
-// import getRowsSagaWatcher from "./getRowsSaga";
-import peekTableSagaWatcher from "./peekTableSaga";
 import countColumnValuesSagaWatcher from "./countColumnValuesSaga";
 import uploadTablesSagaWatcher from "./uploadTablesSaga";
 import dropTablesSagaWatcher from "./dropTablesSaga";
@@ -27,7 +25,7 @@ export default function* rootSaga() {
     call(removeColumnsSagaWatcher),
     call(swapColumnsSaga),
     call(coordinateHoverSaga),
-    call(peekTableSagaWatcher),
+    // call(peekTableSagaWatcher),
     call(countColumnValuesSagaWatcher),
     call(uploadTablesSagaWatcher),
     call(dropTablesSagaWatcher),

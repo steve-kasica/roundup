@@ -7,6 +7,7 @@ import {
   selectHoveredOperation,
   updateOperations,
   OPERATION_TYPE_PACK,
+  setFocusedOperation,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
@@ -63,6 +64,7 @@ export default function withOperationData(WrappedComponent) {
         renameOperation={(newName) =>
           dispatch(updateOperations({ id, name: newName }))
         }
+        focusOperation={() => dispatch(setFocusedOperation({ id }))}
       />
     );
   };

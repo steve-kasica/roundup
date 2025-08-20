@@ -13,7 +13,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import withColumnData from "../HOC/withColumnData";
 
 // Styled component for column header
-const StyledColumnHeader = styled("th", {
+const StyledColumnHeader = styled("div", {
   shouldForwardProp: (prop) =>
     !["isLoading", "isSelected", "isHovered", "isKey"].includes(prop),
 })(({ isLoading, isSelected, isHovered, isKey }) => ({
@@ -22,11 +22,17 @@ const StyledColumnHeader = styled("th", {
   minWidth: "120px",
   whiteSpace: "nowrap",
   backgroundColor: isSelected ? "#e3f2fd" : isHovered ? "#f5f5f5" : "inherit",
-  borderLeft: isKey ? "3px solid #1976d2" : "inherit",
+  border: "1px solid #ddd",
+  // borderLeft: isKey ? "3px solid #1976d2" : "inherit",
   ...(isLoading && {
     fontStyle: "italic",
     color: "#999",
   }),
+  flex: 1,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  fontWeight: 600,
 }));
 
 function ColumnHeader({
@@ -159,29 +165,20 @@ function ColumnHeader({
         // unHoverColumn();
       }}
     >
-      <Box
+      <Typography variant="body2" sx={{ fontWeight: "medium" }}>
+        {name || column?.name}
+      </Typography>
+      <IconButton
+        size="small"
         sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          position: "relative",
+          opacity: isMenuIconVisible || isMenuOpen ? 1 : 0,
+          transition: "opacity 0.2s ease-in-out",
+          ml: 1,
         }}
+        onClick={(event) => setMenuAnchorEl(event.currentTarget)}
       >
-        <Typography variant="body2" sx={{ fontWeight: "medium" }}>
-          {name || column?.name}
-        </Typography>
-        <IconButton
-          size="small"
-          sx={{
-            opacity: isMenuIconVisible || isMenuOpen ? 1 : 0,
-            transition: "opacity 0.2s ease-in-out",
-            ml: 1,
-          }}
-          onClick={(event) => setMenuAnchorEl(event.currentTarget)}
-        >
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
-      </Box>
+        <MoreVertIcon fontSize="small" />
+      </IconButton>
       <Popover
         open={isMenuOpen}
         anchorEl={menuAnchorEl}

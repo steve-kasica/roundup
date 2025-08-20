@@ -10,21 +10,15 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./themes/theme-default";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { DashboardGrid } from "./layouts";
-import TableSelector from "./components/TableSelector";
-import CompositeTableSchema from "./components/CompositeTableSchema";
-import OperationDetail from "./components/OperationDetail";
-import OperationsList from "./components/OperationsList";
 import CustomDragLayer from "./CustomDragLayer";
-import SelectedTableView from "./components/TablePeek/TablePeek";
-import ColumnIndexDetails from "./components/ColumnIndexDetails/SelectedColumns";
+import SupportingPane from "./layouts/SupportingPane";
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <DndProvider backend={HTML5Backend}>
         <CustomDragLayer />
-        <DashboardGrid
+        {/* <DashboardGrid
           components={[
             TableSelector,
             CompositeTableSchema,
@@ -42,7 +36,8 @@ function App() {
             "Column Index Details",
           ]}
           dashboardTitle="Open Roundup"
-        />
+        /> */}
+        <SupportingPane />
       </DndProvider>
     </ThemeProvider>
   );
