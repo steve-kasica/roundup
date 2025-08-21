@@ -14,12 +14,13 @@ import { useRef } from "react";
 import { selectTablesById } from "../../../slices/tablesSlice/tableSelectors";
 import TableView from "./TableView";
 import { Box, Typography } from "@mui/material";
+import withOperationData from "../../HOC/withOperationData";
 
 const yAxisLabel = "table name";
 const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
-function StackDetailView({
+function StackOperationView({
   childIds,
   columnIdMatrix,
   m,
@@ -208,7 +209,7 @@ function StackDetailView({
   }
 }
 
-StackDetailView.propTypes = {
+StackOperationView.propTypes = {
   childIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
@@ -219,5 +220,7 @@ StackDetailView.propTypes = {
   n: PropTypes.number.isRequired,
 };
 
-const StackDetailViewWithData = withStackOperationData(StackDetailView);
+const StackDetailViewWithData = withOperationData(
+  withStackOperationData(StackOperationView)
+);
 export default StackDetailViewWithData;

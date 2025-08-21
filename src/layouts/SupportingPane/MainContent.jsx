@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectRootOperation } from "../../slices/operationsSlice";
 import LowLevelTable from "../../components/LowLevelTable";
+import HighLevelTable from "../../components/HighLevelTable";
 
 // Resolution constants
 const RESOLUTION_HIGH = "high";
@@ -46,8 +47,7 @@ export default function MainContent() {
       </ToggleButtonGroup>
       {resolution === RESOLUTION_HIGH && (
         <Box sx={{ padding: 2 }}>
-          <h2>High Resolution Content</h2>
-          {/* Render high resolution content here */}
+          <HighLevelTable />
         </Box>
       )}
       {resolution === RESOLUTION_MEDIUM && (

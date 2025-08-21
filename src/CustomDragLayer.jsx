@@ -3,12 +3,13 @@ import { DATA_TYPE as COLUMN } from "./slices/columnsSlice";
 import {
   MODULE_NAME as COLUMN_INDEX,
   ColumnIndex,
-} from "./components/OperationDetail/StackDetail/ColumnIndex";
-import { TABLE_ROW_VIEW_CLASS } from "./components/TableSelector/TableLayout/TableRowView";
+} from "./components/HighLevelTable/StackOperationView/ColumnIndex";
 import {
   CELL_DRAG_TYPE_PREFIX,
   default as Cell,
-} from "./components/OperationDetail/StackDetail/ColumnIndex/Cell/Cell";
+} from "./components/HighLevelTable/StackOperationView/ColumnIndex/Cell";
+
+import { TABLE_ROW_VIEW_CLASS } from "./components/TableSelector/TableLayout/TableRowView";
 import StackedTableDragPreview from "./components/ui/StackedTableDragPreview";
 import { Box, Paper } from "@mui/material";
 

@@ -1,6 +1,8 @@
 import { getDuckDB } from "./duckdbClient";
 
-import { MATCH_TYPES } from "../../components/OperationDetail/PackDetail/PackOutputDetails/MatchDetail/withMatchDetailData";
+// import { MATCH_TYPES } from "../../components/HighLevelTable/PackDetail/PackOutputDetails/MatchDetail/withMatchDetailData";
+// TODO: add these to Output file
+import { MATCH_TYPES } from "../../components/PackDetail/PackOutputDetails/MatchDetail/withMatchDetailData";
 
 export async function getMatchValues(
   leftTableId,
