@@ -1,24 +1,15 @@
 import {
   Box,
-  IconButton,
   List,
   ListItemButton,
   Paper,
   Popover,
-  Typography,
   styled,
 } from "@mui/material";
-// import { useEffect } from "react";
-// import { useRef } from "react";
-import Cell from "./Cell/Cell";
-import withColumnVectorData from "../../../HOC/withColumnVectorData";
+import withColumnVectorData from "../../HOC/withColumnVectorData";
 import PropTypes from "prop-types";
-// import { useDrag, useDragLayer, useDrop } from "react-dnd";
-// import { getEmptyImage } from "react-dnd-html5-backend";
 import Header from "./Header";
-import { DragIndicator } from "@mui/icons-material";
 import { useRef, useState } from "react";
-// import { MODULE_NAME } from ".";
 
 // Styled component for the ColumnIndex Paper
 const StyledColumnIndexPaper = styled(Paper)(() => ({
@@ -36,16 +27,12 @@ const StyledColumnIndexPaper = styled(Paper)(() => ({
 export function ColumnIndex({
   index,
   columnIds,
-  // columnName,
   headerId,
-  // maxColumnNameLength,
-  // hasSelected,
   hoverColumnVector,
   unhoverColumnVector,
   onCellClick,
   onColumnClick,
-  // undragColumnVector,
-  // swapColumnVectors,
+  children,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const isPopoverOpen = Boolean(anchorEl);
@@ -81,68 +68,6 @@ export function ColumnIndex({
       action: () => onColumnClick({ shiftKey: false }, index, true),
     },
   ];
-  // Use useDragLayer to monitor global drag state
-  // const boxRef = useRef(null);
-  // const { isDraggingColumnIndex } = useDragLayer((monitor) => ({
-  //   isDraggingColumnIndex:
-  //     monitor.isDragging() && monitor.getItemType() === MODULE_NAME,
-  // }));
-
-  // const [{ isDragging }, dragRef, previewRef] = useDrag({
-  //   type: MODULE_NAME,
-  //   item: () => {
-  //     const width = boxRef.current?.getBoundingClientRect().width || WIDTH;
-  //     return {
-  //       columnIds,
-  //       index,
-  //       columnName,
-  //       maxColumnNameLength,
-  //       hasSelected,
-  //       width,
-  //     };
-  //   },
-  //   collect: (monitor) => {
-  //     return {
-  //       isDragging: monitor.isDragging(),
-  //     };
-  //   },
-  //   end: () => {
-  //     // Dispatch certain actions when the drag operation ends,
-  //     // regardless of whether or it reached a drop target
-  //     undragColumnVector();
-  //     unhoverColumnVector();
-  //   },
-  // });
-
-  // This useEffect is to make the isDragging state available globally
-  // TODO: causing an infinite loop
-  // useEffect(() => {
-  //   if (isDragging) {
-  //     // dispatch(addColumnsToDragging(columnIds));
-  //   } else {
-  //     // dispatch(removeFromHoveredColumns(columnIds));
-  //   }
-  // }, [isDragging, columnIds, dispatch]);
-
-  // const [{ isHovered }, dropRef] = useDrop({
-  //   accept: MODULE_NAME,
-  //   drop: (droppedItem) => {
-  //     // Remember, in this context `droppedItem.columnIds` === `columnIds` in useDrag
-  //     if (droppedItem.index !== index) {
-  //       swapColumnVectors(droppedItem.columnIds);
-  //     }
-  //   },
-  //   collect: (monitor) => ({
-  //     isHovered: monitor.isOver(),
-  //   }),
-  // });
-
-  // // Disable the default drag preview
-  // useEffect(() => {
-  //   previewRef(getEmptyImage(), { captureDraggingState: true });
-  // }, [previewRef]);
-
-  // const isPotentialDropZone = isDraggingColumnIndex && !isDragging;
 
   return (
     <>
@@ -178,13 +103,7 @@ export function ColumnIndex({
             }
           />
         </Box>
-        {columnIds.map((columnId, i) => (
-          <Cell
-            key={`${i}-${columnId}`}
-            id={columnId}
-            onCellClick={onCellClick}
-          />
-        ))}
+        {children}
       </StyledColumnIndexPaper>
       <Popover
         open={isMenuOpen}

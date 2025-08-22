@@ -1,7 +1,6 @@
 /**
- * ColumnBlockView.jsx
+ * ColumnMetaData.jsx
  *
- * A view for Column instance data within the StackDetail component
  *
  * Notes:
  *  - *autofocus*: I had technical trouble trigger focus on input elements from the rename option in
@@ -21,12 +20,12 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 
-import withColumnData from "../../../../HOC/withColumnData";
-import EditableText from "../../../../ui/EditableText";
+import withColumnData from "../../HOC/withColumnData";
+import EditableText from "../../ui/EditableText";
 import ValuesSample from "./ValuesSample";
 import Box from "@mui/material/Box";
 import { DragIndicator } from "@mui/icons-material";
-import ColumnTypeIcon from "../../../../ui/ColumnTypeIcon";
+import ColumnTypeIcon from "../../ui/ColumnTypeIcon";
 import { useDragAndDrop } from "./DragLayer";
 
 // Export drag type constant for use in CustomDragLayer
@@ -38,7 +37,7 @@ export const CELL_DRAG_TYPE_PREFIX = "COLUMN";
 // - Hovered cells: Subtle feedback with light gray background and gentle shadow
 // - Null cells: Always gray background regardless of other states
 // - Normal cells: Default styling
-const StyledCellPaper = styled(Paper)(
+const StyledPaper = styled(Paper)(
   ({ isNull, isSelected, isHovered, isDragging, isOver, isDropZone }) => ({
     display: "flex",
     flexDirection: "row",
@@ -107,7 +106,7 @@ const StyledCellPaper = styled(Paper)(
   })
 );
 
-function Cell({
+function ColumnMetaData({
   // Props from withColumnData HOC
   column,
   isNull,
@@ -219,7 +218,7 @@ function Cell({
 
   if (isNull) {
     return (
-      <StyledCellPaper
+      <StyledPaper
         elevation={0}
         variant="outlined"
         isNull={isNull}
@@ -235,12 +234,12 @@ function Cell({
         >
           null
         </Typography>
-      </StyledCellPaper>
+      </StyledPaper>
     );
   }
   return (
     <>
-      <StyledCellPaper
+      <StyledPaper
         elevation={0}
         variant="outlined"
         isNull={isNull}
@@ -370,7 +369,7 @@ function Cell({
         >
           <ColumnTypeIcon column={column} />
         </Box>
-      </StyledCellPaper>
+      </StyledPaper>
 
       <Popover
         open={isPopoverOpen}
@@ -421,7 +420,7 @@ function Cell({
   );
 }
 
-Cell.propTypes = {
+ColumnMetaData.propTypes = {
   column: PropTypes.oneOfType([PropTypes.object, PropTypes.oneOf([null])]),
   isNull: PropTypes.bool,
   isSelected: PropTypes.bool,
@@ -457,5 +456,5 @@ function getPercentOverlap(a, b) {
   return Math.max(0, overlap);
 }
 
-const EnhancedCell = withColumnData(Cell);
+const EnhancedCell = withColumnData(ColumnMetaData);
 export default EnhancedCell;

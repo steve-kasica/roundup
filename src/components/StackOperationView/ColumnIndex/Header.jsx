@@ -1,5 +1,5 @@
-import EditableText from "../../../ui/EditableText";
-import withColumnData from "../../../HOC/withColumnData";
+import EditableText from "../../ui/EditableText";
+import withColumnData from "../../HOC/withColumnData";
 import { Box, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import { useState } from "react";

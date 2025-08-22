@@ -8,7 +8,12 @@ import { Tooltip } from "@mui/material";
 import PropTypes from "prop-types";
 import { COLUMN_TYPE_VARCHAR } from "../../slices/columnsSlice";
 
-export default function ColumnTypeIcon({ column, onClick = () => {}, sx: customSx = {} }) {
+export default function ColumnTypeIcon({
+  column,
+  onClick = () => {},
+  sx: customSx = {},
+}) {
+  if (!column) return null;
   const { columnType, uniqueValues, nonNullValues } = column;
   const isKey = uniqueValues === nonNullValues;
   const defaultSx = {

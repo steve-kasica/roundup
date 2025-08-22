@@ -12,3 +12,4 @@ export * from "./getValueCounts";
 export * from "./getColumnNames";
 export * from "./calcPackStats";
 export * from "./getMatchValues";
+export * from "./getColumnValues";

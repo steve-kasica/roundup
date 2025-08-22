@@ -1,9 +1,8 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { updateOperations } from "../../../slices/operationsSlice";
-import { selectColumnIdsByTableId } from "../../../slices/columnsSlice";
+import useOperationData from "../../hooks/useOperationData";
 
-// TODO: how to handlethe case when tableIds are actually
+// TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
 // would just be a view?
 /**
@@ -24,23 +23,20 @@ import { selectColumnIdsByTableId } from "../../../slices/columnsSlice";
  * @returns
  */
 export default function withStackOperationData(WrappedComponent) {
-  function EnhancedComponent({ operation, ...props }) {
-    const dispatch = useDispatch();
+  function EnhancedComponent({ id, ...props }) {
+    const { operation, columnIds, childrenIds, ...operationDataProps } =
+      useOperationData(id);
 
     const droppedColumnIds = useSelector((state) => state.columns.dropped);
 
-    const operationColumnIds = useSelector((state) =>
-      selectColumnIdsByTableId(state, operation.id)
-    );
-
     const columnIdMatrix = useSelector((state) => {
       // TODO: what if the childId is not a table?
-      const rawColumnIds = operation.children.map((childId) =>
+      const rawColumnIds = (operation?.children || []).map((childId) =>
         (state.columns.idsByTable[childId] || []).filter(
           (cid) => !droppedColumnIds.includes(cid)
         )
       );
-      const maxLength = Math.max(...rawColumnIds.map((row) => row.length));
+      const maxLength = Math.max(...rawColumnIds.map((row) => row.length), 0);
       return rawColumnIds.map((row) => {
         if (row.length < maxLength) {
           return [...row, ...Array(maxLength - row.length).fill(null)];
@@ -49,22 +45,23 @@ export default function withStackOperationData(WrappedComponent) {
       });
     });
 
-    const m = Math.max(...columnIdMatrix.map((c) => c.length));
+    const m = Math.max(...columnIdMatrix.map((c) => c.length), 0);
     const n = columnIdMatrix.length;
 
     return (
       <WrappedComponent
-        {...props}
-        columnIds={operationColumnIds} // this reflects to columnIds of the operation/view, not its children
-        childIds={operation.children} // TODO: what if these are not all tables?
-        columnIdMatrix={columnIdMatrix} // matrix of child column IDs
+        columnIds={columnIds}
+        childIds={childrenIds}
+        columnIdMatrix={columnIdMatrix}
         m={m}
         n={n}
+        {...operationDataProps}
+        {...props}
       />
     );
   }
   EnhancedComponent.propTypes = {
-    operation: PropTypes.object.isRequired,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   };
   return EnhancedComponent;
 }

@@ -1,4 +1,4 @@
-import withTableData from "../../HOC/withTableData";
+import withTableData from "../HOC/withTableData";
 import PropTypes from "prop-types";
 import { Box } from "@mui/material";
 
@@ -15,8 +15,8 @@ function TableView({ table, hoverTable, unhoverTable }) {
         alignItems: "center",
         textAlign: "right",
         justifyContent: "flex-end",
-        padding: "2.5px 8px", // Match Cell inner box padding
-        margin: "5px 0px", // Match Cell component margin
+        paddingLeft: "8px",
+        paddingTop: "8px",
         fontSize: "0.875rem",
       }}
     >

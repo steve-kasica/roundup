@@ -10,11 +10,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   clearSelectedColumns,
   selectSelectedColumns,
-} from "../../../slices/columnsSlice";
-import { removeColumnsRequest } from "../../../sagas/removeColumnsSaga";
-import { setShowColumnIndexDetails } from "../../../slices/uiSlice";
+} from "../../slices/columnsSlice";
+import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
+import { setShowColumnIndexDetails } from "../../slices/uiSlice";
 
-export default function StackDetailToolbar({
+export default function Toolbar({
   setSelectionAnchorCell,
   setSelectionExtentCell,
 }) {
@@ -112,7 +112,7 @@ export default function StackDetailToolbar({
   );
 }
 
-StackDetailToolbar.propTypes = {
+Toolbar.propTypes = {
   setSelectionAnchorCell: PropTypes.func.isRequired,
   setSelectionExtentCell: PropTypes.func.isRequired,
 };

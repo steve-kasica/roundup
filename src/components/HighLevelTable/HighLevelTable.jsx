@@ -5,7 +5,7 @@ import {
   selectFocusedOperationId,
   selectOperation,
 } from "../../slices/operationsSlice";
-import StackOperationView from "./StackOperationView";
+import StackOperationView from "../StackOperationView/StackOperationView";
 
 export const COMPONENT_ID = "FOCUSED_TABLE_VIEW";
 

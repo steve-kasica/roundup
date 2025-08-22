@@ -3,11 +3,8 @@ import { DATA_TYPE as COLUMN } from "./slices/columnsSlice";
 import {
   MODULE_NAME as COLUMN_INDEX,
   ColumnIndex,
-} from "./components/HighLevelTable/StackOperationView/ColumnIndex";
-import {
-  CELL_DRAG_TYPE_PREFIX,
-  default as Cell,
-} from "./components/HighLevelTable/StackOperationView/ColumnIndex/Cell";
+} from "./components/StackOperationView/ColumnIndex";
+import { CELL_DRAG_TYPE_PREFIX } from "./components/StackOperationView/HighLevelView";
 
 import { TABLE_ROW_VIEW_CLASS } from "./components/TableSelector/TableLayout/TableRowView";
 import StackedTableDragPreview from "./components/ui/StackedTableDragPreview";
@@ -36,7 +33,7 @@ export default function CustomDragLayer() {
         // Center the table drag preview
         return currentOffset.x - 150; // Half of estimated preview width (300px)
       default:
-        // Check if it's a Cell drag type (COLUMN-tableId pattern)
+        // Check if it's a HighLevelView drag type (COLUMN-tableId pattern)
         if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
           return currentOffset.x - 100; // Center the cell preview
         }

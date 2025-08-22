@@ -1,13 +1,16 @@
 import { Box, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
 import { useState } from "react";
+import {
+  OPERATION_TYPE_STACK,
+  OPERATION_TYPE_PACK,
+  selectFocusedOperationId,
+  selectOperation,
+} from "../../slices/operationsSlice";
 import { useSelector } from "react-redux";
-import { selectRootOperation } from "../../slices/operationsSlice";
-import LowLevelTable from "../../components/LowLevelTable";
-import HighLevelTable from "../../components/HighLevelTable";
+import StackOperationView from "../../components/StackOperationView";
 
 // Resolution constants
 const RESOLUTION_HIGH = "high";
-const RESOLUTION_MEDIUM = "medium";
 const RESOLUTION_LOW = "low";
 
 // Default resolution
@@ -15,8 +18,10 @@ const DEFAULT_RESOLUTION = RESOLUTION_LOW;
 
 export default function MainContent() {
   const [resolution, setResolution] = useState(DEFAULT_RESOLUTION);
-  //   const rootOperation = useSelector((state) => state.operations.data[selectRootOperation(state)]);
-  console.log("MainContent rendered with resolution:", resolution);
+  const focusedOperation = useSelector((state) => {
+    const id = selectFocusedOperationId(state);
+    return selectOperation(state, id);
+  });
 
   return (
     <Box sx={{ position: "relative", height: "100%" }}>
@@ -36,32 +41,20 @@ export default function MainContent() {
         }}
       >
         <ToggleButton value={RESOLUTION_LOW} aria-label="low resolution">
-          <Tooltip title="Low Resolution">1</Tooltip>
-        </ToggleButton>
-        <ToggleButton value={RESOLUTION_MEDIUM} aria-label="medium resolution">
-          <Tooltip title="Medium Resolution">2</Tooltip>
+          <Tooltip title="Low Resolution">Low</Tooltip>
         </ToggleButton>
         <ToggleButton value={RESOLUTION_HIGH} aria-label="high resolution">
-          <Tooltip title="High Resolution">3</Tooltip>
+          <Tooltip title="High Resolution">High</Tooltip>
         </ToggleButton>
       </ToggleButtonGroup>
-      {resolution === RESOLUTION_HIGH && (
-        <Box sx={{ padding: 2 }}>
-          <HighLevelTable />
-        </Box>
-      )}
-      {resolution === RESOLUTION_MEDIUM && (
-        <Box sx={{ padding: 2 }}>
-          <h2>Medium Resolution Content</h2>
-          {/* Render medium resolution content here */}
-        </Box>
-      )}
-      {resolution === RESOLUTION_LOW && (
-        <Box sx={{ padding: 2 }}>
-          <LowLevelTable />
-          {/* Render low resolution content here */}
-        </Box>
-      )}
+      <Box sx={{ padding: 2 }}>
+        {focusedOperation?.operationType === OPERATION_TYPE_STACK && (
+          <StackOperationView
+            resolution={resolution}
+            id={focusedOperation.id}
+          />
+        )}
+      </Box>
     </Box>
   );
 }

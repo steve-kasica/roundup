@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Box, Typography } from "@mui/material";
-import withPaginatedRows from "../HOC/withPaginatedRows";
+import withPaginatedRows from "../../HOC/withPaginatedRows";
 
 const rowHeight = 25; // in px
 
