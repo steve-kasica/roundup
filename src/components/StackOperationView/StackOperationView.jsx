@@ -3,7 +3,7 @@
 import withStackOperationData from "./withStackOperationData";
 import Toolbar from "./Toolbar";
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useRef, useState } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { scaleBand } from "d3";
 import { setSelectedColumns } from "../../slices/columnsSlice";
@@ -21,6 +21,10 @@ const yAxisLabel = "table name";
 const xAxisLabel = "column index";
 const cellSize = 50; // height and width of cells (in pixels)
 
+export const DRAG_MODE_DISABLED = "disabled";
+export const DRAG_MODE_COLUMN_INDEX = "column-index";
+export const DRAG_MODE_COLUMN = "column";
+
 function StackOperationView(props) {
   const dispatch = useDispatch(); // TODO: remove redux from View
   const {
@@ -32,6 +36,8 @@ function StackOperationView(props) {
     columnIds,
     renameOperationColumn,
   } = props;
+
+  const [dragMode, setDragMode] = useState(DRAG_MODE_DISABLED);
 
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
   // TODO is this necessary?
@@ -145,6 +151,26 @@ function StackOperationView(props) {
 
   // Use a ref to track the grid container
   const gridContainerRef = useRef();
+  const containerRef = useRef();
+
+  useEffect(() => {
+    if (dragMode === DRAG_MODE_DISABLED) return;
+
+    const handleClick = (event) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setDragMode(DRAG_MODE_DISABLED);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClick);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, [dragMode]);
+
   return (
     <>
       <Toolbar
@@ -152,6 +178,7 @@ function StackOperationView(props) {
         setSelectionExtentCell={setSelectionExtentCell}
       />
       <Box
+        ref={containerRef}
         sx={{
           display: "flex",
           flexDirection: "row",
@@ -261,12 +288,16 @@ function StackOperationView(props) {
                     columnIds={columnIdMatrix.map((row) => row[j]).flat()}
                     tableIds={childIds}
                     onCellClick={onCellClick}
+                    dragMode={dragMode}
+                    setDragMode={setDragMode}
                   />
                 ) : resolution === "low" ? (
                   <LowLevelView
                     columnIds={columnIdMatrix.map((row) => row[j]).flat()}
                     tableIds={childIds}
                     onCellClick={onCellClick}
+                    dragMode={dragMode}
+                    setDragMode={setDragMode}
                   />
                 ) : null}
               </ColumnIndex>

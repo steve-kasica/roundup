@@ -49,7 +49,7 @@ export default function ValuesSample({ values }) {
         whiteSpace: "nowrap",
         maxWidth: "100%",
         width: "100%",
-        cursor: isOverflowing ? "ew-resize" : "default",
+        cursor: isOverflowing ? "ew-resize" : "inherit",
         "&:hover": {
           overflowX: "auto",
           textOverflow: "clip",

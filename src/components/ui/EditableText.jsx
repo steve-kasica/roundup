@@ -87,7 +87,7 @@ const EditableText = ({
       style={{
         background: "transparent",
         border: "none",
-        cursor: isReadOnly && !isEditable ? "default" : "text",
+        cursor: isReadOnly && !isEditable ? "inherit" : "text",
         // Remove default focus outline and box shadow
         // This is necessary to prevent the default browser styles from interfering
         // with the custom styles applied to the input.

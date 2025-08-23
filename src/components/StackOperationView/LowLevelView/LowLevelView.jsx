@@ -24,8 +24,7 @@ export default function LowLevelView({ columnIds, tableIds }) {
       {columnIds.map((id, i) => (
         <ColumnValues
           key={id}
-          columnId={id}
-          tableId={tableIds[i]}
+          id={id}
           limit={valueCount}
           scrollTop={scrollTop}
           onScroll={handleScroll}

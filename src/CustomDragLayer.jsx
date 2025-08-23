@@ -4,7 +4,10 @@ import {
   MODULE_NAME as COLUMN_INDEX,
   ColumnIndex,
 } from "./components/StackOperationView/ColumnIndex";
-import { CELL_DRAG_TYPE_PREFIX } from "./components/StackOperationView/HighLevelView";
+import {
+  CELL_DRAG_TYPE_PREFIX,
+  ColumnMetaData,
+} from "./components/StackOperationView/HighLevelView";
 
 import { TABLE_ROW_VIEW_CLASS } from "./components/TableSelector/TableLayout/TableRowView";
 import StackedTableDragPreview from "./components/ui/StackedTableDragPreview";
@@ -49,7 +52,7 @@ export default function CustomDragLayer() {
       case TABLE_ROW_VIEW_CLASS:
         return currentOffset.y - 20; // Slightly offset above cursor
       default:
-        // Check if it's a Cell drag type (COLUMN-tableId pattern)
+        // Check if it's a ColumnMetaData drag type (COLUMN-tableId pattern)
         if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
           return currentOffset.y - 10; // Slightly offset above cursor
         }
@@ -124,11 +127,11 @@ export default function CustomDragLayer() {
         }
         return null;
       default:
-        // Check if it's a Cell drag type (COLUMN-tableId pattern)
+        // Check if it's a ColumnMetaData drag type (COLUMN-tableId pattern)
         if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
           return (
             <Box sx={{ width: "200px", opacity: 0.75, cursor: "grabbing" }}>
-              <Cell id={item.id} />
+              <ColumnMetaData id={item.id} />
             </Box>
           );
         }
