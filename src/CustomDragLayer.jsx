@@ -8,6 +8,10 @@ import {
   CELL_DRAG_TYPE_PREFIX,
   ColumnMetaData,
 } from "./components/StackOperationView/HighLevelView";
+import {
+  DRAG_TYPE as COLUMN_VALUES,
+  default as ColumnValuesView,
+} from "./components/StackOperationView/LowLevelView/ColumnView";
 
 import { TABLE_ROW_VIEW_CLASS } from "./components/TableSelector/TableLayout/TableRowView";
 import StackedTableDragPreview from "./components/ui/StackedTableDragPreview";
@@ -76,66 +80,58 @@ export default function CustomDragLayer() {
 
   // Render different effects based on the item type
   const renderDragPreview = () => {
-    switch (itemType) {
-      case COLUMN:
+    if (itemType.startsWith(COLUMN_VALUES)) {
+      return (
+        <Box sx={{ width: "200px", opacity: 0.75, cursor: "grabbing" }}>
+          <ColumnValuesView id={item.id} />
+        </Box>
+      );
+    } else if (itemType === COLUMN_INDEX) {
+      return (
+        <ColumnIndex
+          index={item.index}
+          columnIds={item.columnIds}
+          columnName={item.columnName || `Column ${item.index + 1}`}
+          maxColumnNameLength={item.maxColumnNameLength}
+          hasSelected={item.hasSelected}
+          hoverColumnVector={() => {}} // No-op
+          unhoverColumnVector={() => {}} // No-op
+          onCellClick={() => {}} // No-op
+          onColumnClick={() => {}} // No-op
+          undragColumnVector={() => {}} // No-op
+          swapColumnVectors={() => {}} // No-op
+          onHeaderChange={() => {}} // No-op
+        />
+      );
+    } else if (itemType === TABLE_ROW_VIEW_CLASS) {
+      // Handle both single table and multi-table drags
+      if (
+        item.type === "multiple-tables" &&
+        item.tables &&
+        item.tables.length > 1
+      ) {
         return (
-          <div
-            style={{
-              backgroundColor: "lightblue",
-              width: `${item.width || 100}px`,
-              height: "37px",
-              opacity: 0.5,
-            }}
-          ></div>
-        );
-      case COLUMN_INDEX:
-        return (
-          <ColumnIndex
-            index={item.index}
-            columnIds={item.columnIds}
-            columnName={item.columnName || `Column ${item.index + 1}`}
-            maxColumnNameLength={item.maxColumnNameLength}
-            hasSelected={item.hasSelected}
-            hoverColumnVector={() => {}} // No-op
-            unhoverColumnVector={() => {}} // No-op
-            onCellClick={() => {}} // No-op
-            onColumnClick={() => {}} // No-op
-            undragColumnVector={() => {}} // No-op
-            swapColumnVectors={() => {}} // No-op
-            onHeaderChange={() => {}} // No-op
+          <StackedTableDragPreview
+            tables={item.tables}
+            primaryTable={item.primaryTable || item.tables[0]}
           />
         );
-      case TABLE_ROW_VIEW_CLASS:
-        // Handle both single table and multi-table drags
-        if (
-          item.type === "multiple-tables" &&
-          item.tables &&
-          item.tables.length > 1
-        ) {
-          return (
-            <StackedTableDragPreview
-              tables={item.tables}
-              primaryTable={item.primaryTable || item.tables[0]}
-            />
-          );
-        } else if (item.type === "table" || item.table) {
-          // Single table drag - use the stacked preview for consistency
-          const table = item.table || item;
-          return (
-            <StackedTableDragPreview tables={[table]} primaryTable={table} />
-          );
-        }
-        return null;
-      default:
-        // Check if it's a ColumnMetaData drag type (COLUMN-tableId pattern)
-        if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
-          return (
-            <Box sx={{ width: "200px", opacity: 0.75, cursor: "grabbing" }}>
-              <ColumnMetaData id={item.id} />
-            </Box>
-          );
-        }
-        return null;
+      } else if (item.type === "table" || item.table) {
+        // Single table drag - use the stacked preview for consistency
+        const table = item.table || item;
+        return (
+          <StackedTableDragPreview tables={[table]} primaryTable={table} />
+        );
+      }
+      return null;
+    } else if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
+      return (
+        <Box sx={{ width: "200px", opacity: 0.75, cursor: "grabbing" }}>
+          <ColumnMetaData id={item.id} />
+        </Box>
+      );
+    } else {
+      return null;
     }
   };
 

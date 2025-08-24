@@ -7,7 +7,7 @@ import withColumnData from "../../HOC/withColumnData";
 import { DRAG_MODE_COLUMN, DRAG_MODE_DISABLED } from "../StackOperationView";
 import EditableText from "../../ui/EditableText";
 
-const DRAG_TYPE_PREFIX = "COLUMN_VALUES";
+export const DRAG_TYPE = "COLUMN_VALUES";
 
 function ColumnView({
   column,
@@ -25,7 +25,7 @@ function ColumnView({
   setDragMode,
   limit = 10,
   scrollTop = 0,
-  onScroll,
+  onScroll = () => {},
 }) {
   const columnId = column?.id;
   const tableId = column?.tableId;
@@ -38,7 +38,7 @@ function ColumnView({
   const inputRef = useRef(null);
   const [isColumnNameEditable, setIsColumnNameEditable] = useState(false);
 
-  const dragType = `${DRAG_TYPE_PREFIX}-${column?.tableId}`;
+  const dragType = `${DRAG_TYPE}-${column?.tableId}`;
   const isDraggable = dragMode === dragType;
 
   // Reset state when columnId or tableId changes
