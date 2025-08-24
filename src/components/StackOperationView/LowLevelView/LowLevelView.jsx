@@ -1,36 +1,38 @@
-// import { useState } from "react";
-// import { Box, Typography, Slider } from "@mui/material";
-// import withStackOperationData from "../withStackOperationData";
-// import ColumnHeader from "./ColumnHeader";
-// import TableView from "./TableView";
 import { useState } from "react";
-import ColumnValues from "./ColumnValues";
-import Box from "@mui/material/Box";
-
-const DEFAULT_VALUE_COUNT = 10;
-
+import ColumnView from "./ColumnView";
 import PropTypes from "prop-types";
 
-export default function LowLevelView({ columnIds, tableIds }) {
-  const [valueCount, setValueCount] = useState(DEFAULT_VALUE_COUNT);
+// Really, all this component does is sync scroll between column views
+export default function LowLevelView({
+  columnIds,
+  onCellClick,
+  dragMode,
+  setDragMode,
+  valueCount = 10,
+  tableIds,
+}) {
   const [scrollTop, setScrollTop] = useState(0);
 
   // Handler to sync scroll position
   const handleScroll = (newScrollTop) => {
     setScrollTop(newScrollTop);
   };
+
   return (
-    <Box>
-      {columnIds.map((id, i) => (
-        <ColumnValues
+    <>
+      {columnIds.map((id) => (
+        <ColumnView
           key={id}
           id={id}
           limit={valueCount}
+          onCellClick={onCellClick}
           scrollTop={scrollTop}
           onScroll={handleScroll}
+          dragMode={dragMode}
+          setDragMode={setDragMode}
         />
       ))}
-    </Box>
+    </>
   );
 }
 

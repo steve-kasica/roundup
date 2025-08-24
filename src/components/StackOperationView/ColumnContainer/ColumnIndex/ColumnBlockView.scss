@@ -1,0 +1,18 @@
+@use "sass:math";
+
+@use "../../../../styles/variables.scss" as *;
+$horizontalGutterWidth: 10px;
+$enabledCellOutlineColor: #aaa;
+$table-border-style: solid;
+$table-border-width: 1px;
+$cell-border-width: $table-border-width;
+$cell-border-style: dotted;
+$cellPadding: 5px;
+
+.ColumnBlockView {
+  cursor: context-menu;
+  &.hover,
+  &:hover {
+    background-color: $hover-color;
+  }
+}

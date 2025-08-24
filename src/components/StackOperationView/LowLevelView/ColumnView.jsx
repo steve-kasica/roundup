@@ -9,7 +9,7 @@ import EditableText from "../../ui/EditableText";
 
 const DRAG_TYPE_PREFIX = "COLUMN_VALUES";
 
-function ColumnValues({
+function ColumnView({
   column,
   isSelected,
   isHovered,
@@ -37,6 +37,9 @@ function ColumnValues({
   const containerRef = useRef(null);
   const inputRef = useRef(null);
   const [isColumnNameEditable, setIsColumnNameEditable] = useState(false);
+
+  const dragType = `${DRAG_TYPE_PREFIX}-${column?.tableId}`;
+  const isDraggable = dragMode === dragType;
 
   // Reset state when columnId or tableId changes
   useEffect(() => {
@@ -107,8 +110,8 @@ function ColumnValues({
       name={column?.name}
       index={column?.index}
       tableId={column?.tableId}
-      isDraggable={dragMode === DRAG_MODE_COLUMN}
-      dragType={`${DRAG_TYPE_PREFIX}-${column?.tableId}`}
+      isDraggable={isDraggable}
+      dragType={dragType}
       isSelected={isSelected}
       isHovered={isHovered}
       isNull={isNull}
@@ -120,7 +123,7 @@ function ColumnValues({
       handleOnClick={(event) => onCellClick(event, column?.id)}
       handleOnMouseEnter={hoverColumn}
       handleOnMouseLeave={unHoverColumn}
-      handleOnSwapClick={() => setDragMode(DRAG_MODE_COLUMN)}
+      handleOnSwapClick={() => setDragMode(dragType)}
       handleOnRemoveClick={removeColumn}
       handleOnNullClick={nullColumn}
       handleOnRenameClick={() => {
@@ -175,7 +178,7 @@ function ColumnValues({
   );
 }
 
-ColumnValues.propTypes = {
+ColumnView.propTypes = {
   column: PropTypes.object.isRequired,
   isSelected: PropTypes.bool,
   isHovered: PropTypes.bool,
@@ -194,5 +197,5 @@ ColumnValues.propTypes = {
   onScroll: PropTypes.func,
 };
 
-const EnhancedColumnValues = withColumnData(ColumnValues);
-export default EnhancedColumnValues;
+const EnhancedColumnView = withColumnData(ColumnView);
+export default EnhancedColumnView;
