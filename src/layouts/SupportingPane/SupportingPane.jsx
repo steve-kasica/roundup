@@ -13,9 +13,10 @@ import { name as APP_NAME } from "../../../package.json";
 import TableSelector from "../../components/TableSelector";
 import CompositeTableSchema from "../../components/CompositeTableSchema";
 import MainContent from "./MainContent";
-import ExportCompositeTable from "../../components/ExportCompositeTable";
 import { Typography, Box } from "@mui/material";
 import OperationsList from "../../components/OperationsList";
+import Toolbar from "./Toolbar";
+import ModalDialog from "./ModalDialog";
 // import { Paper } from "@mui/material";
 // import PanelResizeHandle from "./PanelResizeHandle";
 // import { useDispatch } from "react-redux";
@@ -30,38 +31,41 @@ const MAIN_PANEL_WIDTH = 12 - SIDE_PANEL_WIDTH;
 
 export default function SupportingPane() {
   return (
-    <Grid container spacing={1}>
-      <Grid size={12} sx={{ borderBottom: "1px solid #ddd" }}>
-        <Box
+    <>
+      <Grid container spacing={1}>
+        <Grid size={12} sx={{ borderBottom: "1px solid #ddd" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" component="div">
+              {APP_NAME}
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Toolbar />
+            </Box>
+          </Box>
+        </Grid>
+        <Grid
+          size={SIDE_PANEL_WIDTH}
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            height: "100vh",
+            overflowX: "scroll",
           }}
         >
-          <Typography variant="h6" component="div">
-            {APP_NAME}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <ExportCompositeTable />
-          </Box>
-        </Box>
+          <TableSelector />
+          <OperationsList />
+          <CompositeTableSchema />
+        </Grid>
+        <Grid size={MAIN_PANEL_WIDTH} sx={{ padding: "10px" }}>
+          <MainContent />
+        </Grid>
       </Grid>
-      <Grid
-        size={SIDE_PANEL_WIDTH}
-        sx={{
-          height: "100vh",
-          overflowX: "scroll",
-        }}
-      >
-        <TableSelector />
-        <OperationsList />
-        <CompositeTableSchema />
-      </Grid>
-      <Grid size={MAIN_PANEL_WIDTH} sx={{ padding: "10px" }}>
-        <MainContent />
-      </Grid>
-    </Grid>
+      <ModalDialog />
+    </>
   );
   // {
   //   /* <PandelGroup autoSaveId={LAYOUT_ID} direction="horizontal">

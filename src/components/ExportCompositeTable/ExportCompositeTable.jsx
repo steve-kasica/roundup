@@ -1,30 +1,16 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ExportDialog from "./ExportDialog";
-import { Button } from "@mui/material";
 import { selectRootOperation } from "../../slices/operationsSlice";
+import { setDialogContent } from "../../slices/uiSlice";
+import { useCallback } from "react";
 
 export default function ExportCompositeTable() {
-  const [exportOpen, setExportOpen] = useState(false);
+  const dispatch = useDispatch();
   const rootOperationId = useSelector((state) => selectRootOperation(state));
-  const isDisabled = rootOperationId === null || rootOperationId === undefined;
 
-  return (
-    <>
-      <Button
-        variant="outlined"
-        disabled={isDisabled}
-        sx={{ mb: 2 }}
-        onClick={() => setExportOpen(true)}
-      >
-        Export
-      </Button>
-      <ExportDialog
-        open={exportOpen}
-        id={rootOperationId}
-        onClose={() => setExportOpen(false)}
-        onExport={() => setExportOpen(false)}
-      />
-    </>
-  );
+  const closeDialog = useCallback(() => {
+    dispatch(setDialogContent(null));
+  }, [dispatch]);
+
+  return <ExportDialog id={rootOperationId} onClose={closeDialog} />;
 }

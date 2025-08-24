@@ -17,19 +17,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ExportButton } from "./ExportButton";
 import withOperationData from "../HOC/withOperationData";
 
-function ExportDialog({ operation, open, onClose }) {
+function ExportDialog({ operation, onClose }) {
   const [format, setFormat] = useState("csv");
   const [includeHeaders, setIncludeHeaders] = useState(true);
   const [exportName, setExportName] = useState(
     `${operation?.name || "export"}.${format}`
   );
 
-  // const handleExport = () => {
-  //   onExport && onExport({ format, includeHeaders, fileName });
-  // };
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <>
       <DialogTitle
         sx={{
           display: "flex",
@@ -95,7 +91,7 @@ function ExportDialog({ operation, open, onClose }) {
           includeHeaders={includeHeaders}
         />
       </DialogActions>
-    </Dialog>
+    </>
   );
 }
 

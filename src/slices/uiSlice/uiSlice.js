@@ -4,12 +4,19 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 
+export const LOD = {
+  LOW: "low",
+  HIGH: "high",
+};
+
 export const initialState = {
   drawerContents: null,
   selectedTables: [],
   hoveredTable: null,
   peekedTable: null,
   showColumnIndexDetails: false,
+  dialogContent: null,
+  levelOfDetail: null,
 
   // Used to coordinate the visibility of columns
   // in Operations Detail with the Composite Table Schema
@@ -20,6 +27,12 @@ export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    setLevelOfDetail(state, action) {
+      state.levelOfDetail = action.payload;
+    },
+    setDialogContent(state, action) {
+      state.dialogContent = action.payload;
+    },
     setShowColumnIndexDetails(state, action) {
       // action.payload should be a boolean
       if (typeof action.payload !== "boolean") {
@@ -89,6 +102,8 @@ export const uiSlice = createSlice({
 // Action
 export const {
   setDrawerContents,
+  setDialogContent,
+  setLevelOfDetail,
 
   setPeekedTable,
   clearPeekedTable,
