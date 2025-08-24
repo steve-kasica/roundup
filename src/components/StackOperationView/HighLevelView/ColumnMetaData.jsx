@@ -22,7 +22,7 @@ import { DRAG_MODE_COLUMN, DRAG_MODE_DISABLED } from "../StackOperationView";
 import ColumnContainer from "../ColumnContainer";
 
 // Export drag type constant for use in CustomDragLayer
-export const CELL_DRAG_TYPE_PREFIX = "COLUMN";
+export const CELL_DRAG_TYPE_PREFIX = "COLUMN-METADATA";
 
 function ColumnMetaData({
   // Props from withColumnData HOC
@@ -41,6 +41,8 @@ function ColumnMetaData({
   setDragMode,
 }) {
   const [isColumnNameEditable, setIsColumnNameEditable] = useState(false);
+  const dragType = `${CELL_DRAG_TYPE_PREFIX}-${column?.tableId}`;
+  const isDraggable = dragMode === dragType;
   // const cellRef = useRef(null);
 
   // // Combine refs for the main cell (drop target only, drag preview handled by CustomDragLayer)
@@ -54,12 +56,51 @@ function ColumnMetaData({
 
   if (isNull) {
     return (
-      <Typography
-        variant="h5"
-        sx={{ color: "text.secondary", opacity: 0.5, fontStyle: "italic" }}
+      <ColumnContainer
+        column={null}
+        name={null}
+        index={null}
+        tableId={null}
+        isDraggable={false}
+        dragType={dragType}
+        isSelected={false}
+        isHovered={false}
+        isNull={isNull}
+        handleOnDrop={(draggedColumn) => {
+          // TODO: what happens if you drop a column on a null column?
+          // const droppedColumn = column;
+          // swapColumnsWithinTable(draggedColumn.id, droppedColumn.id);
+          setDragMode(DRAG_MODE_DISABLED);
+        }}
+        handleOnClick={(event) => null}
+        handleOnMouseEnter={() => null}
+        handleOnMouseLeave={() => null}
+        handleOnSwapClick={() => null}
+        handleOnRemoveClick={() => null}
+        handleOnNullClick={() => null}
+        handleOnRenameClick={() => null}
+        handleOnPopoverClose={() => null}
       >
-        null
-      </Typography>
+        <Box
+          sx={{
+            height: "40px",
+            textAlign: "left",
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              color: "text.secondary",
+              opacity: 0.5,
+              padding: "5px",
+              fontStyle: "italic",
+              cursor: "not-allowed",
+            }}
+          >
+            null
+          </Typography>
+        </Box>
+      </ColumnContainer>
     );
   }
   return (
@@ -69,8 +110,8 @@ function ColumnMetaData({
         name={column?.name}
         index={column?.index}
         tableId={column?.tableId}
-        isDraggable={dragMode === DRAG_MODE_COLUMN}
-        dragType={`${CELL_DRAG_TYPE_PREFIX}-${column?.tableId}`}
+        isDraggable={isDraggable}
+        dragType={dragType}
         isSelected={isSelected}
         isHovered={isHovered}
         isNull={isNull}
@@ -82,7 +123,7 @@ function ColumnMetaData({
         handleOnClick={(event) => onCellClick(event, column?.id)}
         handleOnMouseEnter={() => hoverColumn()}
         handleOnMouseLeave={() => unHoverColumn()}
-        handleOnSwapClick={() => setDragMode(DRAG_MODE_COLUMN)}
+        handleOnSwapClick={() => setDragMode(dragType)}
         handleOnRemoveClick={() => removeColumn()}
         handleOnNullClick={() => nullColumn()}
         handleOnRenameClick={() => {
@@ -95,7 +136,14 @@ function ColumnMetaData({
         }}
         handleOnPopoverClose={() => unHoverColumn()}
       >
-        <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+            height: "40px",
+          }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -117,9 +165,7 @@ function ColumnMetaData({
               onChange={renameColumn}
               isReadOnly={true}
               isEditable={isColumnNameEditable}
-              onEditingStateChange={(isEditable) =>
-                setIsColumnNameEditable(isEditable)
-              }
+              onEditingStateChange={setIsColumnNameEditable}
               fontSize="1rem"
             />
             <ValuesSample values={Object.keys(column?.values || {})} />

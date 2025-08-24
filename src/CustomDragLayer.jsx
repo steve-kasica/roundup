@@ -31,36 +31,32 @@ export default function CustomDragLayer() {
     return null;
   }
   function x() {
-    switch (itemType) {
-      case COLUMN:
-      case COLUMN_INDEX:
-        // For COLUMN_INDEX, we want to center the drag preview
-        return currentOffset.x - item.width / 2;
-      case TABLE_ROW_VIEW_CLASS:
-        // Center the table drag preview
-        return currentOffset.x - 150; // Half of estimated preview width (300px)
-      default:
-        // Check if it's a HighLevelView drag type (COLUMN-tableId pattern)
-        if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
-          return currentOffset.x - 100; // Center the cell preview
-        }
-        return currentOffset.x;
+    if (itemType === TABLE_ROW_VIEW_CLASS) {
+      // Center the table drag preview
+      return currentOffset.x - 150; // Half of estimated preview width (300px)
+    } else if (
+      itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-") ||
+      itemType.startsWith(COLUMN_VALUES) ||
+      itemType === COLUMN_INDEX
+    ) {
+      // HighLevelView drag type (COLUMN-tableId pattern)
+      return currentOffset.x; // Center the cell preview
+    } else {
+      return currentOffset.x;
     }
   }
 
   function y() {
-    switch (itemType) {
-      case COLUMN:
-      case COLUMN_INDEX:
-        return initialOffset.y; // Don't allow ghost to move vertically
-      case TABLE_ROW_VIEW_CLASS:
-        return currentOffset.y - 20; // Slightly offset above cursor
-      default:
-        // Check if it's a ColumnMetaData drag type (COLUMN-tableId pattern)
-        if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
-          return currentOffset.y - 10; // Slightly offset above cursor
-        }
-        return currentOffset.y - 1;
+    if (itemType === TABLE_ROW_VIEW_CLASS) {
+      return currentOffset.y - 20; // Slightly offset above cursor
+    } else if (
+      itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-") ||
+      itemType.startsWith(COLUMN_VALUES) ||
+      itemType === COLUMN_INDEX
+    ) {
+      return initialOffset.y - 10; // Don't allow ghost to move vertically
+    } else {
+      return currentOffset.y - 1;
     }
   }
 
@@ -80,10 +76,16 @@ export default function CustomDragLayer() {
 
   // Render different effects based on the item type
   const renderDragPreview = () => {
-    if (itemType.startsWith(COLUMN_VALUES)) {
+    if (itemType && itemType.startsWith(COLUMN_VALUES)) {
       return (
         <Box sx={{ width: "200px", opacity: 0.75, cursor: "grabbing" }}>
           <ColumnValuesView id={item.id} />
+        </Box>
+      );
+    } else if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX)) {
+      return (
+        <Box sx={{ width: "200px", opacity: 0.75, cursor: "grabbing" }}>
+          <ColumnMetaData id={item.id} />
         </Box>
       );
     } else if (itemType === COLUMN_INDEX) {
@@ -124,12 +126,6 @@ export default function CustomDragLayer() {
         );
       }
       return null;
-    } else if (itemType && itemType.startsWith(CELL_DRAG_TYPE_PREFIX + "-")) {
-      return (
-        <Box sx={{ width: "200px", opacity: 0.75, cursor: "grabbing" }}>
-          <ColumnMetaData id={item.id} />
-        </Box>
-      );
     } else {
       return null;
     }
