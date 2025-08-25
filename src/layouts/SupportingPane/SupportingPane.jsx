@@ -18,6 +18,8 @@ import OperationsList from "../../components/OperationsList";
 import Toolbar from "./Toolbar";
 import ModalDialog from "./ModalDialog";
 import AppDrawer from "./AppDrawer";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { DragIndicator } from "@mui/icons-material";
 // import { Paper } from "@mui/material";
 // import PanelResizeHandle from "./PanelResizeHandle";
 // import { useDispatch } from "react-redux";
@@ -31,6 +33,7 @@ const SIDE_PANEL_WIDTH = 4; // 1/3 of the grid
 const MAIN_PANEL_WIDTH = 12 - SIDE_PANEL_WIDTH;
 
 export default function SupportingPane() {
+  const [firstPanelWidth, setFirstPanelWidth] = useState(PRIMARY_PANEL_DEFAULT);
   return (
     <>
       <Grid container spacing={1}>
@@ -50,20 +53,47 @@ export default function SupportingPane() {
             </Box>
           </Box>
         </Grid>
-        <Grid
-          size={SIDE_PANEL_WIDTH}
-          sx={{
-            height: "100vh",
-            overflowX: "scroll",
-          }}
-        >
-          <TableSelector />
-          <OperationsList />
-          <CompositeTableSchema />
-        </Grid>
-        <Grid size={MAIN_PANEL_WIDTH} sx={{ padding: "10px" }}>
-          <MainContent />
-        </Grid>
+        <PanelGroup autoSaveId={"SupportingPane"} direction="horizontal">
+          <Panel
+            collapsible={true}
+            minSize={10}
+            defaultSize={50}
+            maxSize={75}
+            order={1}
+            style={{ height: "100vh" }}
+          >
+            <TableSelector />
+            <OperationsList />
+            <CompositeTableSchema />
+          </Panel>
+          <PanelResizeHandle
+            style={{
+              cursor: "col-resize",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <DragIndicator
+              sx={{
+                cursor: "col-resize",
+                transition:
+                  "transform .12s ease, color .12s ease, opacity .12s ease",
+                opacity: 0.7,
+                "&:hover": {
+                  transform: "scale(1.25)",
+                  color: "primary.main",
+                  opacity: 1,
+                },
+              }}
+              aria-hidden={false}
+              aria-label="resize handle"
+            />
+          </PanelResizeHandle>
+          <Panel order={2}>
+            <MainContent />
+          </Panel>
+        </PanelGroup>
       </Grid>
       <ModalDialog />
       <AppDrawer open={false} />

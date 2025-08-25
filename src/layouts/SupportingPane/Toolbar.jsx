@@ -96,10 +96,12 @@ export default function AppToolbar() {
           <IconButton
             disabled={selectedColumnIds.length === 0}
             onClick={() => {
+              // TODO: probably need to make this column
+              // selection state logic global
+              // small refactor work
               // setSelectionAnchorCell(null);
               // setSelectionExtentCell(null);
               dispatch(clearSelectedColumns());
-              // dispatch(setShowColumnIndexDetails(false));
             }}
           >
             <ClearSelectionIcon />
