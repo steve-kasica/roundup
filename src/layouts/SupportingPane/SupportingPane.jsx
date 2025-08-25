@@ -17,6 +17,7 @@ import { Typography, Box } from "@mui/material";
 import OperationsList from "../../components/OperationsList";
 import Toolbar from "./Toolbar";
 import ModalDialog from "./ModalDialog";
+import AppDrawer from "./AppDrawer";
 // import { Paper } from "@mui/material";
 // import PanelResizeHandle from "./PanelResizeHandle";
 // import { useDispatch } from "react-redux";
@@ -65,6 +66,7 @@ export default function SupportingPane() {
         </Grid>
       </Grid>
       <ModalDialog />
+      <AppDrawer open={false} />
     </>
   );
   // {

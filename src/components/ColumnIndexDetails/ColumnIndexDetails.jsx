@@ -6,8 +6,6 @@ import TableView from "./TableView";
 import SimilaritySummary from "./SimilaritySummary";
 import { extent } from "d3-array";
 
-export const COMPONENT_ID = "./ColumnIndexDetails";
-
 const ROW_HEIGHT = 32; // px, adjust as needed
 
 const Y_AXIS_WIDTH = 33.333; // a fixed percentage width for the Y-axis column (value names)
@@ -97,7 +95,7 @@ function ColumnIndexDetails({
       sx={{
         display: "flex",
         flexDirection: "column",
-        width: "300px",
+        width: "100%",
         overflow: "hidden",
       }}
     >

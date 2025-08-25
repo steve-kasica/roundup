@@ -14,7 +14,12 @@ import {
   Clear as ClearSelectionIcon,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { LOD, setDialogContent, setLevelOfDetail } from "../../slices/uiSlice";
+import {
+  LOD,
+  setDialogContent,
+  setDrawerContents,
+  setLevelOfDetail,
+} from "../../slices/uiSlice";
 import { MODULE_NAME as EXPORT_MODULE } from "../../components/ExportCompositeTable";
 import { selectAllOperationIds } from "../../slices/operationsSlice";
 import {
@@ -22,6 +27,7 @@ import {
   selectSelectedColumns,
 } from "../../slices/columnsSlice";
 import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
+import { ID as COLUMN_INDEX_DETAILS_COMPONENT } from "../../components/ColumnIndexDetails";
 
 export default function AppToolbar() {
   const dispatch = useDispatch();
@@ -66,9 +72,9 @@ export default function AppToolbar() {
         <span>
           <IconButton
             disabled={selectedColumnIds.length < 2}
-            onClick={() => {
-              // dispatch(setShowColumnIndexDetails(true));
-            }}
+            onClick={() =>
+              dispatch(setDrawerContents(COLUMN_INDEX_DETAILS_COMPONENT))
+            }
           >
             <CompareColumnsIcon />
           </IconButton>

@@ -1,3 +1,3 @@
-import ColumnValueMatrix from "./ColumnIndexDetails";
-export { COMPONENT_ID } from "./ColumnIndexDetails";
-export default ColumnValueMatrix;
+import ColumnIndexDetails from "./ColumnIndexDetails";
+export const ID = "ColumnIndexDetails";
+export default ColumnIndexDetails;
