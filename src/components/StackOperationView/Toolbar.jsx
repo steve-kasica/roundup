@@ -27,36 +27,36 @@ export default function Toolbar({
   };
 
   const menuItems = [
-    {
-      label: "Compare column values",
-      icon: <CompareIcon />,
-      disabled: selectedColumnIds.length < 2,
-      action: () => {
-        dispatch(setShowColumnIndexDetails(true));
-        handleMenuClose();
-      },
-    },
-    {
-      label: "Remove selected columns",
-      icon: <DeleteIcon />,
-      disabled: selectedColumnIds.length === 0,
-      action: () => {
-        dispatch(removeColumnsRequest(selectedColumnIds));
-        handleMenuClose();
-      },
-    },
-    {
-      label: "Clear column selection",
-      icon: <ClearIcon />,
-      disabled: selectedColumnIds.length === 0,
-      action: () => {
-        setSelectionAnchorCell(null);
-        setSelectionExtentCell(null);
-        dispatch(clearSelectedColumns());
-        dispatch(setShowColumnIndexDetails(false));
-        handleMenuClose();
-      },
-    },
+    // {
+    //   label: "Compare column values",
+    //   icon: <CompareIcon />,
+    //   disabled: selectedColumnIds.length < 2,
+    //   action: () => {
+    //     dispatch(setShowColumnIndexDetails(true));
+    //     handleMenuClose();
+    //   },
+    // },
+    // {
+    //   label: "Remove selected columns",
+    //   icon: <DeleteIcon />,
+    //   disabled: selectedColumnIds.length === 0,
+    //   action: () => {
+    //     dispatch(removeColumnsRequest(selectedColumnIds));
+    //     handleMenuClose();
+    //   },
+    // },
+    // {
+    //   label: "Clear column selection",
+    //   icon: <ClearIcon />,
+    //   disabled: selectedColumnIds.length === 0,
+    //   action: () => {
+    //     setSelectionAnchorCell(null);
+    //     setSelectionExtentCell(null);
+    //     dispatch(clearSelectedColumns());
+    //     dispatch(setShowColumnIndexDetails(false));
+    //     handleMenuClose();
+    //   },
+    // },
   ];
 
   return (

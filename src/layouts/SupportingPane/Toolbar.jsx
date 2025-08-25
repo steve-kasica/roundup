@@ -7,18 +7,21 @@ import {
   Typography,
   Tooltip,
 } from "@mui/material";
-import FormatBoldIcon from "@mui/icons-material/FormatBold";
-import FormatItalicIcon from "@mui/icons-material/FormatItalic";
-import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
-import ViewListIcon from "@mui/icons-material/ViewList";
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import ExportCompositeTable from "../../components/ExportCompositeTable";
-import { GetApp as ExportIcon } from "@mui/icons-material";
+import {
+  GetApp as ExportIcon,
+  Compare as CompareColumnsIcon,
+  Delete as DeleteColumnsIcon,
+  Clear as ClearSelectionIcon,
+} from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { LOD, setDialogContent, setLevelOfDetail } from "../../slices/uiSlice";
 import { MODULE_NAME as EXPORT_MODULE } from "../../components/ExportCompositeTable";
 import { selectAllOperationIds } from "../../slices/operationsSlice";
+import {
+  clearSelectedColumns,
+  selectSelectedColumns,
+} from "../../slices/columnsSlice";
+import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
 
 export default function AppToolbar() {
   const dispatch = useDispatch();
@@ -26,6 +29,9 @@ export default function AppToolbar() {
   const operationCount = useSelector(
     (state) => selectAllOperationIds(state).length
   );
+
+  const lod = useSelector((state) => state.ui.levelOfDetail);
+  const selectedColumnIds = useSelector(selectSelectedColumns);
 
   const [formats, setFormats] = React.useState([]);
   const [view, setView] = React.useState("list");
@@ -40,7 +46,7 @@ export default function AppToolbar() {
 
   return (
     <Toolbar>
-      <ToggleButtonGroup
+      {/* <ToggleButtonGroup
         value={formats}
         onChange={handleFormat}
         aria-label="text formatting"
@@ -55,9 +61,48 @@ export default function AppToolbar() {
         <ToggleButton value="underlined" aria-label="underlined">
           <FormatUnderlinedIcon />
         </ToggleButton>
-      </ToggleButtonGroup>
+      </ToggleButtonGroup> */}
+      <Tooltip title="Compare selected columns" arrow>
+        <span>
+          <IconButton
+            disabled={selectedColumnIds.length < 2}
+            onClick={() => {
+              // dispatch(setShowColumnIndexDetails(true));
+            }}
+          >
+            <CompareColumnsIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+      <Tooltip title="Remove selected columns" arrow>
+        <span>
+          <IconButton
+            disabled={selectedColumnIds.length === 0}
+            onClick={() => dispatch(removeColumnsRequest(selectedColumnIds))}
+          >
+            <DeleteColumnsIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+
+      <Tooltip title="Clear selection" arrow>
+        <span>
+          <IconButton
+            disabled={selectedColumnIds.length === 0}
+            onClick={() => {
+              // setSelectionAnchorCell(null);
+              // setSelectionExtentCell(null);
+              dispatch(clearSelectedColumns());
+              // dispatch(setShowColumnIndexDetails(false));
+            }}
+          >
+            <ClearSelectionIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+
       <ToggleButtonGroup
-        value={view}
+        value={lod}
         exclusive
         onChange={(event, lod) => dispatch(setLevelOfDetail(lod))}
         aria-label="view mode"

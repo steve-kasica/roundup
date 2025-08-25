@@ -16,7 +16,7 @@ export const initialState = {
   peekedTable: null,
   showColumnIndexDetails: false,
   dialogContent: null,
-  levelOfDetail: null,
+  levelOfDetail: LOD.HIGH, // set HIGH as default
 
   // Used to coordinate the visibility of columns
   // in Operations Detail with the Composite Table Schema

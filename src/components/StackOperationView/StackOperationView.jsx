@@ -173,10 +173,6 @@ function StackOperationView(props) {
 
   return (
     <>
-      <Toolbar
-        setSelectionAnchorCell={setSelectionAnchorCell}
-        setSelectionExtentCell={setSelectionExtentCell}
-      />
       <Box
         ref={containerRef}
         sx={{
