@@ -1,5 +1,3 @@
-
-
 // Variables
 $hover-color: pink;
 
@@ -31,8 +29,21 @@ $hover-color: pink;
   }
 } */
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 body {
   background-color: whitesmoke;
+}
+
+#root {
+  height: 100%;
+  overflow: hidden;
 }
 
 .panel-resize-handle {
