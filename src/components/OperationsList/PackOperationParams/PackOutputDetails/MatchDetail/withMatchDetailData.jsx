@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { getMatchValues } from "../../../../lib/duckdb";
-import { JOIN_PREDICATES } from "../../../../slices/operationsSlice";
+import { getMatchValues } from "../../../../../lib/duckdb";
+import { JOIN_PREDICATES } from "../../../../../slices/operationsSlice";
 
 export const MATCH_TYPES = {
   LEFT_UNJOINED: "left_unjoined",

@@ -7,15 +7,13 @@ import {
   IconButton,
 } from "@mui/material";
 import SwapIcon from "@mui/icons-material/SwapVert";
-import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { JOIN_PREDICATES } from "../../../slices/operationsSlice";
-import OperationKeyColumnSelect from "./OperationKeyColumnSelect";
+import OperationKeyColumnSelect from "../OperationsList/PackOperationParams/OperationKeyColumnSelect";
 import EditableText from "../../ui/EditableText";
 import withPackOperationData from "./withPackOperationData";
-import PackOutputDetails from "./PackOutputDetails";
 
-const PackDetail = ({
+const PackOperationView = ({
   operation,
   setJoinPredicate,
   setLeftTableJoinKey,
@@ -24,68 +22,68 @@ const PackDetail = ({
   renameOperation,
   setJoinType,
 }) => {
-  const [selectedPredicate, setSelectedPredicate] = useState(
-    operation.joinPredicate || ""
-  );
-  const [comparisonFunction, setComparisonFunction] = useState(null);
+  // const [selectedPredicate, setSelectedPredicate] = useState(
+  //   operation.joinPredicate || ""
+  // );
+  // const [comparisonFunction, setComparisonFunction] = useState(null);
 
-  // Dynamic import of comparison function based on predicate
-  useEffect(() => {
-    const loadComparisonFunction = async () => {
-      if (!selectedPredicate) {
-        // Default to equals if no predicate selected
-        try {
-          const module = await import(
-            "./PackOutputDetails/comparisonFunctions"
-          );
-          setComparisonFunction(() => module.equals);
-        } catch (error) {
-          console.error("Failed to load default comparison function:", error);
-        }
-        return;
-      }
+  // // Dynamic import of comparison function based on predicate
+  // useEffect(() => {
+  //   const loadComparisonFunction = async () => {
+  //     if (!selectedPredicate) {
+  //       // Default to equals if no predicate selected
+  //       try {
+  //         const module = await import(
+  //           "./PackOutputDetails/comparisonFunctions"
+  //         );
+  //         setComparisonFunction(() => module.equals);
+  //       } catch (error) {
+  //         console.error("Failed to load default comparison function:", error);
+  //       }
+  //       return;
+  //     }
 
-      try {
-        const module = await import("./PackOutputDetails/comparisonFunctions");
+  //     try {
+  //       const module = await import("./PackOutputDetails/comparisonFunctions");
 
-        let functionName;
-        switch (selectedPredicate) {
-          case JOIN_PREDICATES.EQUALS:
-            functionName = "equals";
-            break;
-          case JOIN_PREDICATES.CONTAINS:
-            functionName = "contains";
-            break;
-          case JOIN_PREDICATES.STARTS_WITH:
-            functionName = "startsWith";
-            break;
-          case JOIN_PREDICATES.ENDS_WITH:
-            functionName = "endsWith";
-            break;
-          default:
-            functionName = "equals";
-        }
+  //       let functionName;
+  //       switch (selectedPredicate) {
+  //         case JOIN_PREDICATES.EQUALS:
+  //           functionName = "equals";
+  //           break;
+  //         case JOIN_PREDICATES.CONTAINS:
+  //           functionName = "contains";
+  //           break;
+  //         case JOIN_PREDICATES.STARTS_WITH:
+  //           functionName = "startsWith";
+  //           break;
+  //         case JOIN_PREDICATES.ENDS_WITH:
+  //           functionName = "endsWith";
+  //           break;
+  //         default:
+  //           functionName = "equals";
+  //       }
 
-        setComparisonFunction(() => module[functionName]);
-      } catch (error) {
-        console.error("Failed to load comparison function:", error);
-        // Fallback to equals
-        try {
-          const module = await import(
-            "./PackOutputDetails/comparisonFunctions"
-          );
-          setComparisonFunction(() => module.equals);
-        } catch (fallbackError) {
-          console.error(
-            "Failed to load fallback comparison function:",
-            fallbackError
-          );
-        }
-      }
-    };
+  //       setComparisonFunction(() => module[functionName]);
+  //     } catch (error) {
+  //       console.error("Failed to load comparison function:", error);
+  //       // Fallback to equals
+  //       try {
+  //         const module = await import(
+  //           "./PackOutputDetails/comparisonFunctions"
+  //         );
+  //         setComparisonFunction(() => module.equals);
+  //       } catch (fallbackError) {
+  //         console.error(
+  //           "Failed to load fallback comparison function:",
+  //           fallbackError
+  //         );
+  //       }
+  //     }
+  //   };
 
-    loadComparisonFunction();
-  }, [selectedPredicate]);
+  //   loadComparisonFunction();
+  // }, [selectedPredicate]);
 
   const handlePredicateChange = (event) => {
     setSelectedPredicate(event.target.value);
@@ -167,21 +165,13 @@ const PackDetail = ({
             />
           </div>
         </div>
-        <PackOutputDetails
-          leftTableId={operation.children[0]}
-          rightTableId={operation.children[1]}
-          leftColumnId={operation.joinKey1}
-          rightColumnId={operation.joinKey2}
-          joinType={operation.joinPredicate}
-          joinPredicate={operation.joinPredicate}
-          setJoinType={setJoinType}
-        />
+        ß
       </div>
     </Box>
   );
 };
 
-PackDetail.propTypes = {
+PackOperationView.propTypes = {
   operation: PropTypes.shape({
     name: PropTypes.string,
     children: PropTypes.arrayOf(
@@ -199,5 +189,5 @@ PackDetail.propTypes = {
   setJoinType: PropTypes.func.isRequired,
 };
 
-const EnhancedPackDetail = withPackOperationData(PackDetail);
-export default EnhancedPackDetail;
+const EnhancedPackOperationView = withPackOperationData(PackOperationView);
+export default EnhancedPackOperationView;

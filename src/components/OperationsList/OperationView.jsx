@@ -1,19 +1,22 @@
 import {
+  Box,
+  Collapse,
   IconButton,
   ListItem,
-  ListItemButton,
   ListItemText,
-  Menu,
-  MenuItem,
   Tooltip,
   styled,
 } from "@mui/material";
-import { setFocusedOperation } from "../../slices/operationsSlice";
-import { useDispatch } from "react-redux";
 import withOperationData from "../HOC/withOperationData";
 import PropTypes from "prop-types";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import React from "react";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import {
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
+} from "../../slices/operationsSlice";
+import StackOperationParams from "./StackOperationParams";
+import PackOperationParams from "./PackOperationParams/PackOperationParams";
 
 export const LAYOUT_ID = "operationListItem";
 
@@ -44,14 +47,10 @@ function OperationView({
   const position = index + 1;
 
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
   };
 
   // Parse error message if it's a JSON string
@@ -71,61 +70,35 @@ function OperationView({
   };
 
   const listItemContent = (
-    <StyledListItem
-      hasError={Boolean(operation.error)}
-      secondaryAction={
-        <>
+    <>
+      <ListItem
+        onClick={() => {
+          focusOperation();
+          setDetailsOpen(!detailsOpen);
+        }}
+        secondaryAction={
           <IconButton edge="end" aria-label="menu" onClick={handleMenuOpen}>
-            <MoreVertIcon />
+            {detailsOpen ? <ExpandMore /> : <ExpandLess />}
           </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleMenuClose}
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            transformOrigin={{ vertical: "top", horizontal: "left" }}
-          >
-            <MenuItem
-              onClick={(event) => {
-                peekTable();
-                handleMenuClose(event);
-              }}
-            >
-              Peek at table
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                const newName = prompt(
-                  "Enter new operation name:",
-                  operation.name
-                );
-                if (
-                  newName &&
-                  newName.trim() &&
-                  newName.trim() !== operation.name
-                ) {
-                  renameOperation(newName.trim());
-                }
-                handleMenuClose();
-              }}
-            >
-              Rename
-            </MenuItem>
-
-            {/* TODO: delete operation from this menu */}
-            {/* <MenuItem onClick={handleMenuClose}>Delete</MenuItem> */}
-          </Menu>
-        </>
-      }
-      disablePadding
-    >
-      <ListItemButton onClick={focusOperation}>
+        }
+      >
         <ListItemText
           primary={`${position}. ${operation.name} (${columnCount})`}
           secondary={`${label}: ${childrenIds.join(", ")}`}
         />
-      </ListItemButton>
-    </StyledListItem>
+      </ListItem>
+
+      <Collapse in={detailsOpen} timeout="auto" unmountOnExit>
+        <Box>
+          {operation.operationType === OPERATION_TYPE_STACK && (
+            <StackOperationParams />
+          )}
+          {operation.operationType === OPERATION_TYPE_PACK && (
+            <PackOperationParams id={operation.id} />
+          )}
+        </Box>
+      </Collapse>
+    </>
   );
 
   return operation.error ? (
@@ -159,3 +132,51 @@ OperationView.propTypes = {
 
 const EnhancedOperationView = withOperationData(OperationView);
 export default EnhancedOperationView;
+
+/**
+ *     // <StyledListItem
+    //   hasError={Boolean(operation.error)}
+    //   secondaryAction={
+    //     <>
+    //       {/* <IconButton edge="end" aria-label="menu" onClick={handleMenuOpen}>
+    //         <MoreVertIcon />
+    //       </IconButton>
+    //       <Menu
+    //         anchorEl={anchorEl}
+    //         open={open}
+    //         onClose={handleMenuClose}
+    //         anchorOrigin={{ vertical: "top", horizontal: "right" }}
+    //         transformOrigin={{ vertical: "top", horizontal: "left" }}
+    //       >
+    //         <MenuItem
+    //           onClick={(event) => {
+    //             peekTable();
+    //             handleMenuClose(event);
+    //           }}
+    //         >
+    //           Peek at table
+    //         </MenuItem>
+    //         <MenuItem
+    //           onClick={() => {
+    //             const newName = prompt(
+    //               "Enter new operation name:",
+    //               operation.name
+    //             );
+    //             if (
+    //               newName &&
+    //               newName.trim() &&
+    //               newName.trim() !== operation.name
+    //             ) {
+    //               renameOperation(newName.trim());
+    //             }
+    //             handleMenuClose();
+    //           }}
+    //         >
+    //           Rename
+    //         </MenuItem>
+    //       </Menu> 
+    //     </>
+    //   }
+    //   disablePadding
+    // >
+ */

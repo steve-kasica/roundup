@@ -3,9 +3,9 @@ import {
   selectOperation,
   OPERATION_TYPE_PACK,
   updateOperations,
-} from "../../../slices/operationsSlice";
+} from "../../slices/operationsSlice";
 import PropTypes from "prop-types";
-import withOperationData from "../../HOC/withOperationData";
+import withOperationData from "../HOC/withOperationData";
 import { useCallback } from "react";
 
 export default function withPackOperationData(WrappedComponent) {
