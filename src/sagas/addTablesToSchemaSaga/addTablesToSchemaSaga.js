@@ -27,6 +27,7 @@ import {
   selectOperation,
   selectRootOperation,
   removeOperation,
+  setFocusedOperation,
 } from "../../slices/operationsSlice";
 import Operation, {
   OPERATION_TYPE_STACK,
@@ -88,6 +89,7 @@ export function* addTablesToSchemaSagaWorker(action) {
     yield put(
       updateTables(tableIds.map((id) => ({ id, operationId: operation.id })))
     );
+    yield put(setFocusedOperation(operation));
   } else if (rootOperation.operationType === OPERATION_TYPE_NO_OP) {
     // Case: first table added after schema initialized with only one table
     // Update the operation type and add the new table as a child
@@ -108,6 +110,7 @@ export function* addTablesToSchemaSagaWorker(action) {
 
     yield put(removeOperation(rootOperation.id));
     yield put(addOperation(operation));
+    yield put(setFocusedOperation(operation));
   } else if (rootOperation.operationType === operationType) {
     // Case: tables added to an existing operation of the same type
 

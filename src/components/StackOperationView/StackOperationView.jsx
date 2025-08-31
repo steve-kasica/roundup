@@ -168,6 +168,8 @@ function StackOperationView(props) {
     };
   }, [dragMode]);
 
+  console.log("Stack operation view");
+
   return (
     <>
       <Box

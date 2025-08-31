@@ -1,3 +1,3 @@
-import PackDetail from "./PackDetail";
+import PackOperationView from "./PackOperationView";
 
-export default PackDetail;
+export default PackOperationView;
