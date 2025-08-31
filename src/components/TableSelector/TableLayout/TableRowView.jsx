@@ -1,4 +1,4 @@
-import { DragIndicator } from "@mui/icons-material";
+import { BorderBottom, DragIndicator } from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
 import { styled, Typography, Checkbox, Stack, Box } from "@mui/material";
 import { useState, useEffect } from "react";
@@ -53,6 +53,14 @@ const StyledTableRow = styled("tr", {
     position: "relative",
     margin: "1px 0",
     userSelect: "none",
+    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+    // make drag handle visible when the whole row is hovered
+    "&:hover .drag-icon": {
+      opacity: 1,
+      // color: "#ff9800",
+      // transform: "scale(1.08)",
+      transition: "all 0.18s ease-in-out",
+    },
   };
 
   // Base selected styles - blue theme for selection
@@ -320,7 +328,7 @@ function TableRowView({
       }}
     >
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
-        <Stack direction="row" alignItems="center" gap={2}>
+        <Stack direction="row" alignItems="center" gap="1px">
           <Box
             ref={dragRef}
             sx={{
@@ -343,6 +351,7 @@ function TableRowView({
               className="drag-icon"
               sx={{
                 color: "text.secondary",
+                opacity: 0,
                 transition: "all 0.2s ease-in-out",
               }}
             />
@@ -355,17 +364,30 @@ function TableRowView({
           />
         </Stack>
       </Typography>
-      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+      <Typography
+        component="td"
+        sx={{ fontSize: "13px" }}
+        color={isDisabled ? "textDisabled" : "normal"}
+      >
         <HighlightText pattern={searchString} text={table.name} />
       </Typography>
-      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+      <Typography
+        component="td"
+        sx={{ fontSize: "13px" }}
+        color={isDisabled ? "textDisabled" : "normal"}
+      >
         {table.mimeType || "N/A"}
       </Typography>
-      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+      <Typography
+        component="td"
+        sx={{ fontSize: "13px" }}
+        color={isDisabled ? "textDisabled" : "normal"}
+      >
         {parentOperation?.name || "N/A"}
       </Typography>
       <BarChartCell
         component="td"
+        sx={{ fontSize: "13px" }}
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(table.size / bytesMax) * 100}
         isDisabled={isDisabled}
@@ -374,6 +396,7 @@ function TableRowView({
       </BarChartCell>
       <BarChartCell
         component="td"
+        sx={{ fontSize: "13px" }}
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(table.rowCount / rowMax) * 100}
         isDisabled={isDisabled}
@@ -382,6 +405,7 @@ function TableRowView({
       </BarChartCell>
       <BarChartCell
         component="td"
+        sx={{ fontSize: "13px" }}
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(columnCount / columnMax) * 100}
         isDisabled={isDisabled}
@@ -393,7 +417,11 @@ function TableRowView({
           *
         </sup>
       </BarChartCell>
-      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+      <Typography
+        component="td"
+        sx={{ fontSize: "13px" }}
+        color={isDisabled ? "textDisabled" : "normal"}
+      >
         {formatDate(new Date(table.dateLastModified))}
       </Typography>
       <td className="more-options">

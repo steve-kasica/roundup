@@ -91,16 +91,26 @@ export default function TableLayout({
     .map((table) => table.id);
 
   return (
-    <div className="TableLayout">
-      <table>
+    <div>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+        }}
+      >
         <thead>
-          <tr>
+          <tr
+            style={{
+              borderBottom: "2px solid rgba(0, 0, 0, 0.12)",
+            }}
+          >
             <th></th>
             {headers.map((header) => (
               <th key={header.attr}>
                 <Button
                   color="inherit"
                   fullWidth
+                  sx={{ fontSize: "13px" }}
                   onClick={() => {
                     if (header.attr === sortAttribute) {
                       setIsAscending(!isAscending);
