@@ -29,9 +29,6 @@ const EditableText = ({
             element.focus();
             element.select();
           };
-          inputRef.current.blur = () => {
-            element.blur();
-          };
         }
       }
     }
