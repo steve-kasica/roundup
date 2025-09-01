@@ -1,21 +1,17 @@
 import {
   Divider,
   Grid2 as Grid,
+  IconButton,
   InputAdornment,
-  Paper,
   styled,
   TextField,
-  ToggleButton,
-  Tooltip,
+  Menu,
+  MenuItem,
 } from "@mui/material";
+import { useState } from "react";
 import {
   Search as SearchIcon,
-  Clear as ClearIcon,
-  Upload as UploadIcon,
-  ViewList as ViewListIcon,
-  TableRows as TableRowsIcon,
-  SelectAll as SelectAllIcon,
-  Delete as DeleteIcon,
+  MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 import PropTypes from "prop-types";
 
@@ -25,22 +21,6 @@ import ToggleButtonGroup, {
 
 import { LAYOUT_ID as tableLayout } from "./TableLayout";
 import { LAYOUT_ID as listLayout } from "./ListLayout";
-
-const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-  [`& .${toggleButtonGroupClasses.grouped}`]: {
-    margin: theme.spacing(0.5),
-    border: 0,
-    borderRadius: theme.shape.borderRadius,
-    [`&.${toggleButtonGroupClasses.disabled}`]: {
-      border: 0,
-    },
-  },
-  [`& .${toggleButtonGroupClasses.middleButton},& .${toggleButtonGroupClasses.lastButton}`]:
-    {
-      marginLeft: -1,
-      borderLeft: "1px solid transparent",
-    },
-}));
 
 export default function Toolbar({
   searchString,
@@ -53,6 +33,19 @@ export default function Toolbar({
   onDeleteAll,
   onSearchChange,
 }) {
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const menuOpen = Boolean(menuAnchorEl);
+
+  const handleMenuOpen = (event) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+
+  // menu items written in JSX below (so dividers can be added manually)
   return (
     <Grid
       container
@@ -90,101 +83,105 @@ export default function Toolbar({
                   <SearchIcon />
                 </InputAdornment>
               ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleMenuOpen}
+                    aria-haspopup="true"
+                    aria-expanded={menuOpen ? "true" : undefined}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
             },
           }}
         />
       </Grid>
-      <Grid size="auto">
-        <Paper
-          elevation={0}
-          sx={{
-            display: "flex",
-            // border: `1px solid ${theme.palette.divider}`,
-            flexWrap: "wrap",
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={menuOpen}
+        onClose={handleMenuClose}
+        onClick={handleMenuClose}
+      >
+        <MenuItem
+          disabled={!searchString}
+          onClick={() => {
+            onSearchChange({ target: { value: "" } });
           }}
         >
-          <StyledToggleButtonGroup size="small">
-            <ToggleButton
-              onClick={onSelectAll}
-              aria-label="select all"
-              value="select-all"
-            >
-              <Tooltip title="Select all">
-                <SelectAllIcon />
-              </Tooltip>
-            </ToggleButton>
+          Clear search
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            onSelectAll();
+            handleMenuClose();
+          }}
+        >
+          Select all
+        </MenuItem>
+        <MenuItem
+          disabled={selectedTables.length === 0}
+          onClick={() => {
+            onDeleteAll();
+            handleMenuClose();
+          }}
+        >
+          Delete all
+        </MenuItem>
+        <MenuItem
+          disabled={selectedTables.length === 0}
+          onClick={() => {
+            onClearSelection();
+            handleMenuClose();
+          }}
+        >
+          Clear selection
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            document.getElementById("file-upload-input")?.click();
+            handleMenuClose();
+          }}
+        >
+          Upload more files
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          disabled={layout === tableLayout}
+          onClick={() => {
+            onLayoutChange(null, tableLayout);
+            handleMenuClose();
+          }}
+        >
+          Table view
+        </MenuItem>
+        <MenuItem
+          disabled={layout === listLayout}
+          onClick={() => {
+            onLayoutChange(null, listLayout);
+            handleMenuClose();
+          }}
+        >
+          List view
+        </MenuItem>
+      </Menu>
 
-            <ToggleButton
-              disabled={selectedTables.length === 0}
-              onClick={onDeleteAll}
-              aria-label="delete all"
-              value="delete-all"
-            >
-              <Tooltip title="Delete all">
-                <DeleteIcon />
-              </Tooltip>
-            </ToggleButton>
-
-            <Tooltip title="Clear selection">
-              <span>
-                {/* span allows tooltip to work when button is disabled */}
-                <ToggleButton
-                  onClick={onClearSelection}
-                  disabled={selectedTables.length === 0}
-                  aria-label="clear selection"
-                  value="clear-selection"
-                >
-                  <ClearIcon />
-                </ToggleButton>
-              </span>
-            </Tooltip>
-
-            <ToggleButton
-              onClick={() =>
-                document.getElementById("file-upload-input")?.click()
-              }
-              aria-label="file upload"
-              value="file-upload"
-            >
-              <Tooltip title="Upload more files">
-                <UploadIcon />
-              </Tooltip>
-            </ToggleButton>
-            {/* Hidden file input */}
-            <input
-              type="file"
-              multiple
-              onChange={(event) => {
-                onFileUpload(event);
-                // Reset input value to allow selecting the same file again
-                event.target.value = "";
-              }}
-              style={{ display: "none" }}
-              id="file-upload-input"
-              accept=".csv,.json,.txt,.xls,.xlsx,.tsv"
-            />
-          </StyledToggleButtonGroup>
-          <Divider flexItem orientation="vertical" sx={{ mx: 0.5, my: 1 }} />
-          <StyledToggleButtonGroup
-            value={layout}
-            exclusive
-            onChange={onLayoutChange}
-            size="small"
-            aria-label="change layout"
-          >
-            <ToggleButton value={tableLayout} aria-label="table view">
-              <Tooltip title="Table view">
-                <TableRowsIcon />
-              </Tooltip>
-            </ToggleButton>
-            <ToggleButton value={listLayout} aria-label="list view">
-              <Tooltip title="List view">
-                <ViewListIcon />
-              </Tooltip>
-            </ToggleButton>
-          </StyledToggleButtonGroup>
-        </Paper>
-      </Grid>
+      {/* hidden file input used by the Upload menu item */}
+      <input
+        type="file"
+        multiple
+        onChange={(event) => {
+          onFileUpload(event);
+          // Reset input value to allow selecting the same file again
+          event.target.value = "";
+        }}
+        style={{ display: "none" }}
+        id="file-upload-input"
+        accept=".csv,.json,.txt,.xls,.xlsx,.tsv"
+      />
     </Grid>
   );
 }

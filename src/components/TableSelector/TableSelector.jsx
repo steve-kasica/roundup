@@ -47,8 +47,6 @@ function TableSelector({
     );
 
   async function handleFileUpload(files) {
-    // setError(null);
-    // setLoading(true);
     if (!files.length) return;
     registerFiles(files)
       .then(() => {
@@ -66,7 +64,6 @@ function TableSelector({
       })
       .catch((error) => {
         alert("Error uploading files: " + error.message);
-        // setError(error.message);
       })
       .finally(() => {
         // setLoading(false);
