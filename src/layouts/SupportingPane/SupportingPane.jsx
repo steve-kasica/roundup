@@ -13,7 +13,6 @@ import Toolbar from "./Toolbar";
 import ModalDialog from "./ModalDialog";
 import AppDrawer from "./AppDrawer";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { DragIndicator } from "@mui/icons-material";
 import LeftSideBar from "./LeftSideBar";
 
 // styled wrapper so we can apply hover styles inline (no external CSS required)
@@ -27,7 +26,7 @@ const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
   transition: "background 0.12s ease, box-shadow 0.12s ease",
   // show blue bar on hover/active
   "&:hover, &:active": {
-    background: "rgba(10, 50, 160, 1)",
+    background: "rgba(10, 185, 255, 1)",
     boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.03)",
   },
 }));
@@ -77,42 +76,4 @@ export default function SupportingPane() {
       <AppDrawer open={false} />
     </Box>
   );
-  // {
-  //   /* <PandelGroup autoSaveId={LAYOUT_ID} direction="horizontal">
-  //         <Panel
-  //           collapsible={true}
-  //           minSize={PRIMARY_PANEL_MIN}
-  //           defaultSize={PRIMARY_PANEL_DEFAULT}
-  //           maxSize={PRIMARY_PANEL_MAX}
-  //           order={1}
-  //           style={{ height: "100vh" }}
-  //           onResize={(size) => dispatch(setFirstPaneWidth(size))}
-  //         >
-  //           <Paper
-  //             sx={{
-  //               borderRadius: "5px",
-  //               padding: "10px",
-  //               // height: "100vh"
-  //             }}
-  //           >
-  //             {primaryContent}
-  //           </Paper>
-  //         </Panel>
-  //         <PanelResizeHandle />
-  //         <Panel order={2}>
-  //           <Paper
-  //             sx={{
-  //               borderRadius: "5px",
-  //               padding: "10px",
-  //               // height: "100vh"
-  //             }}
-  //           >
-  //             {secondaryContent}
-  //           </Paper>
-  //         </Panel>
-  //       </PanelGroup> */
-  // }
-  // //     </Grid>
-  // //   </Grid>
-  // // );
 }

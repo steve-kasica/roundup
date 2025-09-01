@@ -1,9 +1,11 @@
 import React from "react";
 import { Box, Tabs, Tab } from "@mui/material";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 import TableSelector from "../../components/TableSelector";
 import OperationsList from "../../components/OperationsList";
 import CompositeTableSchema from "../../components/CompositeTableSchema";
+import { selectAllOperationIds } from "../../slices/operationsSlice";
 // import CustomTabPanel from "./CustomTabPanel";
 
 function CustomTabPanel(props) {
@@ -31,9 +33,23 @@ CustomTabPanel.propTypes = {
 const LeftSideBar = () => {
   const [value, setValue] = React.useState(0);
 
+  // condition to disable the Operations tab
+  const operations = useSelector(selectAllOperationIds);
+  const disableOperations = operations.length === 0; // example condition
+
+  // prevent switching to a disabled tab
   const handleChange = (event, newValue) => {
+    // block switching to Operations tab when disabled
+    if (newValue === 1 && disableOperations) return;
     setValue(newValue);
   };
+
+  // if the tab becomes disabled while selected, fallback to the first tab
+  React.useEffect(() => {
+    if (disableOperations && value === 1) {
+      setValue(0);
+    }
+  }, [disableOperations, value]);
 
   function a11yProps(index) {
     return {
@@ -51,7 +67,11 @@ const LeftSideBar = () => {
           aria-label="basic tabs example"
         >
           <Tab label="Source Tables" {...a11yProps(0)} />
-          <Tab label="Operations" {...a11yProps(1)} />
+          <Tab
+            label="Operations"
+            {...a11yProps(1)}
+            disabled={disableOperations}
+          />
         </Tabs>
       </Box>
       <Box sx={{ flex: 1, overflow: "auto" }}>
