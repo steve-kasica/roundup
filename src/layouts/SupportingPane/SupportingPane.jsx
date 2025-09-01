@@ -6,20 +6,31 @@
 //  *  - [Canonical layouts, Suppoting pane](https://m3.material.io/foundations/layout/canonical-layouts/supporting-pane)
 //  */
 
-// import { Panel, PanelGroup } from "react-resizable-panels";
 import { name as APP_NAME } from "../../../package.json";
 import MainContent from "./MainContent";
-import { Typography, Box } from "@mui/material";
+import { styled, Typography, Box } from "@mui/material";
 import Toolbar from "./Toolbar";
 import ModalDialog from "./ModalDialog";
 import AppDrawer from "./AppDrawer";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { DragIndicator } from "@mui/icons-material";
 import LeftSideBar from "./LeftSideBar";
-// import { Paper } from "@mui/material";
-// import PanelResizeHandle from "./PanelResizeHandle";
-// import { useDispatch } from "react-redux";
-// import { setFirstPaneWidth } from "../data/uiSlice";
+
+// styled wrapper so we can apply hover styles inline (no external CSS required)
+const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
+  width: "2px",
+  cursor: "col-resize",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "transparent",
+  transition: "background 0.12s ease, box-shadow 0.12s ease",
+  // show blue bar on hover/active
+  "&:hover, &:active": {
+    background: "rgba(10, 50, 160, 1)",
+    boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.03)",
+  },
+}));
 
 export default function SupportingPane() {
   return (
@@ -55,30 +66,7 @@ export default function SupportingPane() {
           >
             <LeftSideBar />
           </Panel>
-          <PanelResizeHandle
-            style={{
-              cursor: "col-resize",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <DragIndicator
-              sx={{
-                cursor: "col-resize",
-                transition:
-                  "transform .12s ease, color .12s ease, opacity .12s ease",
-                opacity: 0.7,
-                "&:hover": {
-                  transform: "scale(1.25)",
-                  color: "primary.main",
-                  opacity: 1,
-                },
-              }}
-              aria-hidden={false}
-              aria-label="resize handle"
-            />
-          </PanelResizeHandle>
+          <StyledPanelResizeHandle />
           <Panel order={2}>
             <MainContent />
           </Panel>

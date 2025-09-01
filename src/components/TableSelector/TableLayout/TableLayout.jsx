@@ -2,7 +2,7 @@
  * TableLayout.jsx
  * -------------------------------
  */
-import { Button, Tooltip } from "@mui/material";
+import { Box, Button, Tooltip } from "@mui/material";
 import {
   ArrowDown01,
   ArrowDownAZ,
@@ -91,7 +91,7 @@ export default function TableLayout({
     .map((table) => table.id);
 
   return (
-    <div>
+    <Box sx={{ overflowX: "auto", width: "100%" }}>
       <table
         style={{
           width: "100%",
@@ -147,7 +147,7 @@ export default function TableLayout({
           ))}
         </tbody>
       </table>
-    </div>
+    </Box>
   );
 }
 
