@@ -8,15 +8,30 @@
 
 import { name as APP_NAME } from "../../../package.json";
 import MainContent from "./MainContent";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, styled } from "@mui/material";
 import Toolbar from "./Toolbar";
 import ModalDialog from "./ModalDialog";
 import AppDrawer from "./AppDrawer";
-import { Panel, PanelGroup } from "react-resizable-panels";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import LeftSideBar from "./LeftSideBar";
 import { useSelector } from "react-redux";
 import { selectAllTablesData } from "../../slices/tablesSlice";
-import StyledPanelResizeHandle from "./PanelResizeHandle";
+import CompositeTableSchema from "../../components/CompositeTableSchema";
+
+const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
+  width: "2px",
+  cursor: "col-resize",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "#ccc",
+  transition: "background 0.12s ease, box-shadow 0.12s ease",
+  // show blue bar on hover/active
+  "&:hover, &:active": {
+    background: "rgba(10, 185, 255, 1)",
+    boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.03)",
+  },
+}));
 
 export default function SupportingPane() {
   const tables = useSelector(selectAllTablesData);
@@ -50,7 +65,7 @@ export default function SupportingPane() {
             <LeftSideBar />
           </Box>
         ) : (
-          <PanelGroup autoSaveId={"SupportingPane"} direction="horizontal">
+          <PanelGroup autoSaveId="SupportingPane" direction="horizontal">
             <Panel
               collapsible={true}
               minSize={10}
@@ -58,11 +73,25 @@ export default function SupportingPane() {
               maxSize={100}
               order={1}
             >
-              <LeftSideBar />
+              <PanelGroup autoSaveId="LeftSidebarPane" direction="vertical">
+                <Panel
+                  collapsible={true}
+                  minSize={10}
+                  defaultSize={75}
+                  maxSize={100}
+                  order={1}
+                >
+                  <LeftSideBar />
+                </Panel>
+                <StyledPanelResizeHandle
+                  sx={{ height: "2px", width: "100%" }}
+                />
+                <Panel order={2}>
+                  <CompositeTableSchema />
+                </Panel>
+              </PanelGroup>
             </Panel>
-            <StyledPanelResizeHandle>
-              {/* visible indicator can be added here if desired */}
-            </StyledPanelResizeHandle>
+            <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
             <Panel order={2}>
               <MainContent />
             </Panel>
