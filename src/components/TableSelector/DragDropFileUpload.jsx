@@ -35,6 +35,7 @@ const FileUploadZone = styled(Paper, {
     backgroundColor: theme.palette.action.hover,
   },
   marginBottom: theme.spacing(2),
+  height: "100%",
 }));
 
 const DragDropFileUpload = ({ handleFileUpload, acceptedTypes = "*" }) => {
@@ -164,7 +165,7 @@ const DragDropFileUpload = ({ handleFileUpload, acceptedTypes = "*" }) => {
   };
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box sx={{ mb: 2, height: "100%" }}>
       <input
         type="file"
         multiple

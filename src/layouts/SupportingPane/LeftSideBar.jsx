@@ -18,9 +18,23 @@ function CustomTabPanel(props) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      style={{ height: "100%" }}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && (
+        <Box
+          sx={{
+            p: 3,
+            height: "90%", // TODO: Adjust height based on content
+            boxSizing: "border-box",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0,
+          }}
+        >
+          <Box sx={{ flex: 1, minHeight: 0 }}>{children}</Box>
+        </Box>
+      )}
     </div>
   );
 }
@@ -75,6 +89,8 @@ const LeftSideBar = () => {
           />
         </Tabs>
       </Box>
+
+      {/* make the selector area vertically resizable so CompositeTableSchema height can be adjusted */}
       <Box sx={{ flex: 1, minHeight: 0 }}>
         <PanelGroup direction="vertical" autoSaveId={"LeftSideBar"}>
           <Panel order={1} minSize={20} defaultSize={70} maxSize={90}>
@@ -87,21 +103,25 @@ const LeftSideBar = () => {
               </CustomTabPanel>
             </Box>
           </Panel>
+
           <StyledPanelResizeHandle
             sx={{
-              height: "2px",
+              height: "8px",
               width: "100%",
               cursor: "row-resize",
               display: "block",
               background: "#dedede",
               transition: "background 0.12s ease",
             }}
-          ></StyledPanelResizeHandle>
+          />
+
           <Panel order={2} minSize={10} defaultSize={30} maxSize={80}>
-            <Typography variant="h6" gutterBottom sx={{ padding: 1 }}>
-              Output Table Schema
-            </Typography>
-            <CompositeTableSchema />
+            <Box sx={{ height: "100%", overflow: "auto" }}>
+              <Typography variant="h6" gutterBottom sx={{ padding: 1 }}>
+                Output Table Schema
+              </Typography>
+              <CompositeTableSchema />
+            </Box>
           </Panel>
         </PanelGroup>
       </Box>
