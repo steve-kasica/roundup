@@ -14,6 +14,8 @@ import ModalDialog from "./ModalDialog";
 import AppDrawer from "./AppDrawer";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import LeftSideBar from "./LeftSideBar";
+import { useSelector } from "react-redux";
+import { selectAllTablesData } from "../../slices/tablesSlice";
 
 // styled wrapper so we can apply hover styles inline (no external CSS required)
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -32,6 +34,8 @@ const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
 }));
 
 export default function SupportingPane() {
+  const tables = useSelector(selectAllTablesData);
+  const isOpen = tables.length > 0;
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header */}
@@ -55,21 +59,30 @@ export default function SupportingPane() {
 
       {/* Main Content Area */}
       <Box sx={{ flex: 1, overflow: "hidden" }}>
-        <PanelGroup autoSaveId={"SupportingPane"} direction="horizontal">
-          <Panel
-            collapsible={true}
-            minSize={10}
-            defaultSize={50}
-            maxSize={75}
-            order={1}
-          >
+        {/* If there are no uploaded tables, show the left sidebar at full width */}
+        {!isOpen ? (
+          <Box sx={{ height: "100%", width: "100%", overflow: "auto" }}>
             <LeftSideBar />
-          </Panel>
-          <StyledPanelResizeHandle />
-          <Panel order={2}>
-            <MainContent />
-          </Panel>
-        </PanelGroup>
+          </Box>
+        ) : (
+          <PanelGroup autoSaveId={"SupportingPane"} direction="horizontal">
+            <Panel
+              collapsible={true}
+              minSize={10}
+              defaultSize={25}
+              maxSize={100}
+              order={1}
+            >
+              <LeftSideBar />
+            </Panel>
+            <StyledPanelResizeHandle>
+              {/* visible indicator can be added here if desired */}
+            </StyledPanelResizeHandle>
+            <Panel order={2}>
+              <MainContent />
+            </Panel>
+          </PanelGroup>
+        )}
       </Box>
 
       <ModalDialog />
