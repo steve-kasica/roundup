@@ -1,12 +1,13 @@
 import React from "react";
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab, Typography } from "@mui/material";
+import { Panel, PanelGroup } from "react-resizable-panels";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import TableSelector from "../../components/TableSelector";
 import OperationsList from "../../components/OperationsList";
 import CompositeTableSchema from "../../components/CompositeTableSchema";
 import { selectAllOperationIds } from "../../slices/operationsSlice";
-// import CustomTabPanel from "./CustomTabPanel";
+import StyledPanelResizeHandle from "./PanelResizeHandle";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -74,16 +75,35 @@ const LeftSideBar = () => {
           />
         </Tabs>
       </Box>
-      <Box sx={{ flex: 1, overflow: "auto" }}>
-        <CustomTabPanel value={value} index={0}>
-          <TableSelector />
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          <OperationsList />
-        </CustomTabPanel>
-      </Box>
-      <Box sx={{ mt: "auto", border: "1px solid #ddd", padding: 5 }}>
-        <CompositeTableSchema />
+      <Box sx={{ flex: 1, minHeight: 0 }}>
+        <PanelGroup direction="vertical" autoSaveId={"LeftSideBar"}>
+          <Panel order={1} minSize={20} defaultSize={70} maxSize={90}>
+            <Box sx={{ overflow: "auto", height: "100%" }}>
+              <CustomTabPanel value={value} index={0}>
+                <TableSelector />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={1}>
+                <OperationsList />
+              </CustomTabPanel>
+            </Box>
+          </Panel>
+          <StyledPanelResizeHandle
+            sx={{
+              height: "2px",
+              width: "100%",
+              cursor: "row-resize",
+              display: "block",
+              background: "#dedede",
+              transition: "background 0.12s ease",
+            }}
+          ></StyledPanelResizeHandle>
+          <Panel order={2} minSize={10} defaultSize={30} maxSize={80}>
+            <Typography variant="h6" gutterBottom sx={{ padding: 1 }}>
+              Output Table Schema
+            </Typography>
+            <CompositeTableSchema />
+          </Panel>
+        </PanelGroup>
       </Box>
     </Box>
   );

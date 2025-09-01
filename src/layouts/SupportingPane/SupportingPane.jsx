@@ -8,30 +8,15 @@
 
 import { name as APP_NAME } from "../../../package.json";
 import MainContent from "./MainContent";
-import { styled, Typography, Box } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import Toolbar from "./Toolbar";
 import ModalDialog from "./ModalDialog";
 import AppDrawer from "./AppDrawer";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { Panel, PanelGroup } from "react-resizable-panels";
 import LeftSideBar from "./LeftSideBar";
 import { useSelector } from "react-redux";
 import { selectAllTablesData } from "../../slices/tablesSlice";
-
-// styled wrapper so we can apply hover styles inline (no external CSS required)
-const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
-  width: "2px",
-  cursor: "col-resize",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "transparent",
-  transition: "background 0.12s ease, box-shadow 0.12s ease",
-  // show blue bar on hover/active
-  "&:hover, &:active": {
-    background: "rgba(10, 185, 255, 1)",
-    boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.03)",
-  },
-}));
+import StyledPanelResizeHandle from "./PanelResizeHandle";
 
 export default function SupportingPane() {
   const tables = useSelector(selectAllTablesData);
