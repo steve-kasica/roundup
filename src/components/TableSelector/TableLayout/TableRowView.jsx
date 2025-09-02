@@ -1,4 +1,4 @@
-import { BorderBottom, DragIndicator } from "@mui/icons-material";
+import { DragIndicator } from "@mui/icons-material";
 import HighlightText from "../../ui/HighlightText";
 import { styled, Typography, Checkbox, Stack, Box } from "@mui/material";
 import { useState, useEffect } from "react";
@@ -24,6 +24,9 @@ const BarChartCell = styled(Typography, {
   } ${percentage.toFixed(1)}%, transparent ${percentage.toFixed(1)}%)`,
   backgroundRepeat: "no-repeat",
   backgroundSize: "100% 100%",
+  borderRight: "2px solid transparent",
+  textWrap: "nowrap",
+  borderTop: "2px solid transparent",
   "&::before": {
     content: '""',
     position: "absolute",
@@ -57,8 +60,6 @@ const StyledTableRow = styled("tr", {
     // make drag handle visible when the whole row is hovered
     "&:hover .drag-icon": {
       opacity: 1,
-      // color: "#ff9800",
-      // transform: "scale(1.08)",
       transition: "all 0.18s ease-in-out",
     },
   };
@@ -351,7 +352,7 @@ function TableRowView({
               className="drag-icon"
               sx={{
                 color: "text.secondary",
-                opacity: 0,
+                opacity: 0.1,
                 transition: "all 0.2s ease-in-out",
               }}
             />
@@ -405,7 +406,7 @@ function TableRowView({
       </BarChartCell>
       <BarChartCell
         component="td"
-        sx={{ fontSize: "13px" }}
+        sx={{ fontSize: "13px", padding: "0 4px" }}
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(columnCount / columnMax) * 100}
         isDisabled={isDisabled}
