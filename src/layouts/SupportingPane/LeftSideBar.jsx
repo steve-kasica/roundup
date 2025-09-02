@@ -1,10 +1,11 @@
 import React from "react";
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab, Chip } from "@mui/material";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import TableSelector from "../../components/TableSelector";
 import OperationsList from "../../components/OperationsList";
 import { selectAllOperationIds } from "../../slices/operationsSlice";
+import { selectAllTablesData } from "../../slices/tablesSlice";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -49,6 +50,8 @@ const LeftSideBar = () => {
   const operations = useSelector(selectAllOperationIds);
   const disableOperations = operations.length === 0; // example condition
 
+  const tables = useSelector(selectAllTablesData);
+
   // prevent switching to a disabled tab
   const handleChange = (event, newValue) => {
     // block switching to Operations tab when disabled
@@ -78,11 +81,32 @@ const LeftSideBar = () => {
           onChange={handleChange}
           aria-label="basic tabs example"
         >
-          <Tab label="Source Tables" {...a11yProps(0)} />
           <Tab
-            label="Operations"
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                Source Tables
+                <Chip
+                  label={tables.length}
+                  disabled={tables.length === 0}
+                  size="small"
+                />
+              </Box>
+            }
+            {...a11yProps(0)}
+          />
+          <Tab
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                Operations
+                <Chip
+                  label={operations.length}
+                  disabled={operations.length === 0}
+                  size="small"
+                />
+              </Box>
+            }
             {...a11yProps(1)}
-            disabled={disableOperations}
+            disabled={operations.length === 0}
           />
         </Tabs>
       </Box>
