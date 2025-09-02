@@ -1,15 +1,11 @@
 import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
 import ColumnMetaData from "./ColumnMetaData.jsx";
+import { forwardRef } from "react";
 
-export default function HighLevelView({
-  columnIds,
-  dragMode,
-  onCellClick,
-  setDragMode,
-}) {
-  return (
-    <Box>
+const HighLevelView = forwardRef(
+  ({ columnIds, dragMode, onCellClick, setDragMode }, ref) => (
+    <Box ref={ref}>
       {columnIds.map((id) => (
         <ColumnMetaData
           key={id}
@@ -20,8 +16,10 @@ export default function HighLevelView({
         />
       ))}
     </Box>
-  );
-}
+  )
+);
+
+HighLevelView.displayName = "HighLevelView";
 
 HighLevelView.propTypes = {
   columnIds: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -30,3 +28,5 @@ HighLevelView.propTypes = {
   setDragMode: PropTypes.func.isRequired,
   onCellClick: PropTypes.func.isRequired,
 };
+
+export default HighLevelView;

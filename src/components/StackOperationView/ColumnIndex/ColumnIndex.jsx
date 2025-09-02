@@ -1,28 +1,16 @@
-import {
-  Box,
-  List,
-  ListItemButton,
-  Paper,
-  Popover,
-  styled,
-} from "@mui/material";
+import { Box, List, ListItemButton, Paper, Popover } from "@mui/material";
 import withColumnVectorData from "../../HOC/withColumnVectorData";
 import PropTypes from "prop-types";
 import Header from "./Header";
-import { useRef, useState } from "react";
-
-// Styled component for the ColumnIndex Paper
-const StyledColumnIndexPaper = styled(Paper)(() => ({
-  minWidth: "200px", // width of the column index
-  padding: "0px 7.5px",
-  margin: "0px 0.25rem",
-  position: "relative",
-  transition: "width 0.3s ease-in-out",
-  textAlign: "center",
-  fontSize: "0.75rem",
-  userSelect: "none",
-  cursor: "context-menu",
-}));
+import {
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  Children,
+  isValidElement,
+  cloneElement,
+} from "react";
 
 export function ColumnIndex({
   index,
@@ -34,15 +22,62 @@ export function ColumnIndex({
   onColumnClick,
   children,
 }) {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const isPopoverOpen = Boolean(anchorEl);
   const hoverTimeoutRef = useRef(null);
+  const paperRef = useRef(null);
+
+  const childRefs = useRef([]);
+  // Clone children and attach refs
+  const childrenWithRefs = Children.map(children, (child, i) =>
+    isValidElement(child)
+      ? cloneElement(child, {
+          ref: (el) => (childRefs.current[i] = el),
+        })
+      : child
+  );
+
+  const isMouseOverChild = (event) =>
+    childRefs.current.some((ref) => ref?.contains(event.target));
 
   const operationColumnNameRef = useRef(null); // Needed to focus the input element from context menu
 
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [isHeaderEditable, setIsHeaderEditable] = useState(false);
   const isMenuOpen = Boolean(menuAnchorEl);
+
+  // Use mouseover/mouseout to handle transitions between child and parent
+  const handleMouseOver = useCallback(
+    (event) => {
+      // Only fire if mouse is entering from outside the parent (not from a child)
+      if (!isMouseOverChild(event)) {
+        if (hoverTimeoutRef.current) {
+          clearTimeout(hoverTimeoutRef.current);
+        }
+        hoverColumnVector();
+      }
+    },
+    [hoverColumnVector]
+  );
+
+  const handleMouseOut = useCallback(
+    (event) => {
+      // Only fire if mouse is leaving to outside the parent (not to a child)
+      if (!event.currentTarget.contains(event.relatedTarget)) {
+        hoverTimeoutRef.current = setTimeout(() => {
+          unhoverColumnVector();
+        }, 50);
+      }
+    },
+    [unhoverColumnVector]
+  );
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const menuItems = [
     {
@@ -71,15 +106,23 @@ export function ColumnIndex({
 
   return (
     <>
-      <StyledColumnIndexPaper
+      <Paper
+        ref={paperRef}
+        sx={{
+          minWidth: "200px", // width of the column index
+          padding: "0px 7.5px",
+          margin: "0px 0.25rem",
+          position: "relative",
+          transition: "width 0.3s ease-in-out",
+          textAlign: "center",
+          fontSize: "0.75rem",
+          userSelect: "none",
+          cursor: "context-menu",
+        }}
         elevation={1}
-        // ref={(node) => {
-        //   dropRef(node); // Drop target for the column index
-        //   boxRef.current = node; // Reference to the box for width calculation
-        // }} // Drop target on the container
         data-columnids={columnIds.join(",")}
-        onMouseEnter={hoverColumnVector}
-        onMouseLeave={unhoverColumnVector}
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
         onContextMenu={(event) => {
           event.preventDefault();
           setMenuAnchorEl(event.currentTarget);
@@ -98,13 +141,11 @@ export function ColumnIndex({
             onColumnClick={onColumnClick}
             isHeaderEditable={isHeaderEditable}
             operationColumnNameRef={operationColumnNameRef}
-            onHeaderEditableStateChange={(isEditable) =>
-              setIsHeaderEditable(isEditable)
-            }
+            onHeaderEditableStateChange={setIsHeaderEditable}
           />
         </Box>
-        {children}
-      </StyledColumnIndexPaper>
+        {childrenWithRefs}
+      </Paper>
       <Popover
         open={isMenuOpen}
         anchorEl={menuAnchorEl}
@@ -174,6 +215,7 @@ ColumnIndex.propTypes = {
   swapColumnVectors: PropTypes.func.isRequired,
   maxColumnNameLength: PropTypes.number.isRequired,
   headerId: PropTypes.string.isRequired,
+  children: PropTypes.node,
 };
 
 const EnhancedColumnIndex = withColumnVectorData(ColumnIndex);

@@ -121,11 +121,11 @@ function ColumnMetaData({
           setDragMode(DRAG_MODE_DISABLED);
         }}
         handleOnClick={(event) => onCellClick(event, column?.id)}
-        handleOnMouseEnter={() => hoverColumn()}
-        handleOnMouseLeave={() => unHoverColumn()}
+        handleOnMouseEnter={hoverColumn}
+        handleOnMouseLeave={unHoverColumn}
         handleOnSwapClick={() => setDragMode(dragType)}
-        handleOnRemoveClick={() => removeColumn()}
-        handleOnNullClick={() => nullColumn()}
+        handleOnRemoveClick={removeColumn}
+        handleOnNullClick={nullColumn}
         handleOnRenameClick={() => {
           setIsColumnNameEditable(true);
 
@@ -134,7 +134,7 @@ function ColumnMetaData({
             inputRef.current?.focusAndSelect();
           }, 100); // 50-100ms is usually enough
         }}
-        handleOnPopoverClose={() => unHoverColumn()}
+        handleOnPopoverClose={unHoverColumn}
       >
         <Box
           sx={{

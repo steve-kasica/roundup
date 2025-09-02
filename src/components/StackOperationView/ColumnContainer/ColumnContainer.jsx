@@ -134,7 +134,10 @@ function ColumnContainer({
           event.stopPropagation(); // Prevent event from bubbling up to parent
           setAnchorEl(event.currentTarget);
         }}
-        onMouseEnter={handleOnMouseEnter}
+        onMouseEnter={() => {
+          console.log("Mouse enter: ColumnContainer");
+          handleOnMouseEnter();
+        }}
         onMouseLeave={() => !isPopoverOpen && handleOnMouseLeave()}
       >
         <Box

@@ -9,7 +9,7 @@ import {
   getIndexOfValue,
 } from "./selectionUtils/selectionUtils";
 import { Box, Typography } from "@mui/material";
-import { ColumnIndex } from "./ColumnContainer/ColumnIndex";
+import ColumnIndex from "./ColumnIndex";
 import TableView from "./TableView";
 import HighLevelView from "./HighLevelView";
 import LowLevelView from "./LowLevelView";
