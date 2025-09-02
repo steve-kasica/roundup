@@ -123,6 +123,7 @@ export function ColumnIndex({
         data-columnids={columnIds.join(",")}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
+        onClick={() => onColumnClick({ shiftKey: false }, index)}
         onContextMenu={(event) => {
           event.preventDefault();
           setMenuAnchorEl(event.currentTarget);
