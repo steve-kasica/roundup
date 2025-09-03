@@ -29,14 +29,6 @@ export default function MainContent() {
   const tables = useSelector(selectAllTablesData);
   const operations = useSelector(selectAllOperationIds);
   const resolution = useSelector((state) => state.ui.levelOfDetail);
-  console.log(
-    "tables",
-    tables,
-    "operations",
-    operations,
-    "focusedOperation",
-    focusedOperation
-  );
 
   return (
     <Box

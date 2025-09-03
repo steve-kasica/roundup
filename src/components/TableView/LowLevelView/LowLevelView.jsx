@@ -1,4 +1,7 @@
+import { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
+import ColumnHeader from "./ColumnHeader";
+import { summarizeTable } from "../../../lib/duckdb";
 import {
   Box,
   IconButton,
@@ -17,10 +20,10 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { formatNumber } from "../../../lib/utilities";
 import withPaginatedRows from "../../HOC/withPaginatedRows";
-import ColumnHeader from "../ColumnHeader";
 
-function LowLevelView({
+const LowLevelView = ({
   table,
+  id,
   operation,
   activeColumnIds,
   onClose,
@@ -31,8 +34,33 @@ function LowLevelView({
   hasMore,
   error,
   tableContainerRef,
-}) {
-  const id = table?.id || operation?.id;
+  // Add sorting props
+  onRefresh,
+  sortBy,
+  sortDirection,
+}) => {
+  //   const [columns, setColumns] = useState([]);
+
+  //   const fetchColumns = useCallback(async () => {
+  //     const columns = await summarizeTable(id, activeColumnIds);
+  //     setColumns(columns);
+  //   }, [id, activeColumnIds]);
+
+  //   useEffect(() => {
+  //     fetchColumns();
+  //   }, [fetchColumns]);
+
+  const handleSort = useCallback(
+    (columnName, direction) => {
+      // Call onRefresh with sorting parameters
+      onRefresh({
+        sortBy: columnName,
+        sortDirection: direction,
+      });
+    },
+    [onRefresh]
+  );
+
   const rowCount = table?.rowCount || operation?.rowCount || 0;
   const name = table?.name || operation?.name || "View";
 
@@ -150,17 +178,14 @@ function LowLevelView({
                 #
               </TableCell>
               {activeColumnIds.map((id, i) => (
-                <TableCell
+                <ColumnHeader
                   key={i}
-                  sx={{
-                    fontWeight: 600,
-                    backgroundColor: "grey.50",
-                    minWidth: 120,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <ColumnHeader key={id} id={id} />
-                </TableCell>
+                  index={i}
+                  id={id}
+                  sortBy={sortBy}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
               ))}
             </TableRow>
           </TableHead>
@@ -246,7 +271,7 @@ function LowLevelView({
       </Box>
     </Box>
   );
-}
+};
 
 LowLevelView.propTypes = {
   table: PropTypes.shape({
@@ -270,6 +295,9 @@ LowLevelView.propTypes = {
   hasMore: PropTypes.bool,
   error: PropTypes.object,
   tableContainerRef: PropTypes.object,
+  onRefresh: PropTypes.func,
+  sortBy: PropTypes.string,
+  sortDirection: PropTypes.oneOf(["asc", "desc"]),
 };
 
 // Export the enhanced component with pagination

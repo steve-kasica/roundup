@@ -25,6 +25,8 @@ export default function withPaginatedRows(WrappedComponent, options = {}) {
     // Pagination state
     const [rows, setRows] = useState([]);
     const [page, setPage] = useState(0);
+    const [sortBy, setSortBy] = useState(null);
+    const [sortDirection, setSortDirection] = useState("asc");
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [error, setError] = useState(null);
@@ -45,7 +47,9 @@ export default function withPaginatedRows(WrappedComponent, options = {}) {
             queryId,
             currentActiveColumnIds,
             pageSize,
-            offset
+            offset,
+            sortBy,
+            sortDirection
           );
 
           setRows((prevRows) => {
@@ -65,7 +69,7 @@ export default function withPaginatedRows(WrappedComponent, options = {}) {
           setLoading(false);
         }
       },
-      [queryId, pageSize] // Remove activeColumnIds from deps
+      [queryId, sortBy, sortDirection] // Remove activeColumnIds from deps
     );
 
     // Reset pagination when ID or active columns change
@@ -119,6 +123,19 @@ export default function withPaginatedRows(WrappedComponent, options = {}) {
       fetchRows(page);
     }, [page, fetchRows]);
 
+    const handleRefresh = useCallback((params = {}) => {
+      const { sortBy: newSortBy, sortDirection: newSortDirection } = params;
+
+      // If sorting parameters changed, reset pagination
+      if (newSortBy !== undefined || newSortDirection !== undefined) {
+        setSortBy(newSortBy);
+        setSortDirection(newSortDirection);
+        setRows([]);
+        setPage(0);
+        setHasMore(true);
+      }
+    }, []);
+
     // Enhanced props to pass to wrapped component
     const paginationProps = {
       // Data
@@ -135,6 +152,9 @@ export default function withPaginatedRows(WrappedComponent, options = {}) {
       fetchRows,
       resetPagination,
       loadNextPage,
+      onRefresh: handleRefresh,
+      sortBy,
+      sortDirection,
 
       // Refs
       tableContainerRef,
@@ -148,115 +168,115 @@ export default function withPaginatedRows(WrappedComponent, options = {}) {
   };
 }
 
-/**
- * Hook version for components that prefer hooks over HOCs
- */
-export function usePaginatedRows(id, columnIds = [], options = {}) {
-  const { pageSize = 25, scrollThreshold = 100 } = options;
+// /**
+//  * Hook version for components that prefer hooks over HOCs
+//  */
+// export function usePaginatedRows(id, columnIds = [], options = {}) {
+//   const { pageSize = 25, scrollThreshold = 100 } = options;
 
-  const [rows, setRows] = useState([]);
-  const [page, setPage] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState(null);
-  const tableContainerRef = useRef(null);
+//   const [rows, setRows] = useState([]);
+//   const [page, setPage] = useState(0);
+//   const [loading, setLoading] = useState(false);
+//   const [hasMore, setHasMore] = useState(true);
+//   const [error, setError] = useState(null);
+//   const tableContainerRef = useRef(null);
 
-  const activeColumnIds = useMemo(() => [...columnIds], [columnIds]);
-  const activeColumnIdsRef = useRef(activeColumnIds);
-  activeColumnIdsRef.current = activeColumnIds;
+//   const activeColumnIds = useMemo(() => [...columnIds], [columnIds]);
+//   const activeColumnIdsRef = useRef(activeColumnIds);
+//   activeColumnIdsRef.current = activeColumnIds;
 
-  const fetchRows = useCallback(
-    async (pageNum) => {
-      const currentActiveColumnIds = activeColumnIdsRef.current;
-      if (!id) return;
+//   const fetchRows = useCallback(
+//     async (pageNum) => {
+//       const currentActiveColumnIds = activeColumnIdsRef.current;
+//       if (!id) return;
 
-      setLoading(true);
-      setError(null);
+//       setLoading(true);
+//       setError(null);
 
-      try {
-        const offset = pageNum * pageSize;
-        const newRows = await getTableRows(
-          id,
-          currentActiveColumnIds,
-          pageSize,
-          offset
-        );
+//       try {
+//         const offset = pageNum * pageSize;
+//         const newRows = await getTableRows(
+//           id,
+//           currentActiveColumnIds,
+//           pageSize,
+//           offset
+//         );
 
-        setRows((prevRows) => {
-          const updatedRows =
-            pageNum === 0 ? newRows : [...prevRows, ...newRows];
-          return updatedRows;
-        });
+//         setRows((prevRows) => {
+//           const updatedRows =
+//             pageNum === 0 ? newRows : [...prevRows, ...newRows];
+//           return updatedRows;
+//         });
 
-        if (newRows.length < pageSize) {
-          setHasMore(false);
-        }
-      } catch (err) {
-        setError(err);
-        console.error("Error fetching rows:", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [id, pageSize] // Remove activeColumnIds from deps
-  );
+//         if (newRows.length < pageSize) {
+//           setHasMore(false);
+//         }
+//       } catch (err) {
+//         setError(err);
+//         console.error("Error fetching rows:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     },
+//     [id, pageSize] // Remove activeColumnIds from deps
+//   );
 
-  const resetPagination = useCallback(() => {
-    setRows([]);
-    setPage(0);
-    setHasMore(true);
-    setError(null);
-  }, []);
+//   const resetPagination = useCallback(() => {
+//     setRows([]);
+//     setPage(0);
+//     setHasMore(true);
+//     setError(null);
+//   }, []);
 
-  const loadNextPage = useCallback(() => {
-    if (!loading && hasMore) {
-      setPage((prev) => prev + 1);
-    }
-  }, [loading, hasMore]);
+//   const loadNextPage = useCallback(() => {
+//     if (!loading && hasMore) {
+//       setPage((prev) => prev + 1);
+//     }
+//   }, [loading, hasMore]);
 
-  const handleScroll = useCallback(() => {
-    const container = tableContainerRef.current;
-    if (!container || loading || !hasMore) return;
+//   const handleScroll = useCallback(() => {
+//     const container = tableContainerRef.current;
+//     if (!container || loading || !hasMore) return;
 
-    const { scrollTop, scrollHeight, clientHeight } = container;
+//     const { scrollTop, scrollHeight, clientHeight } = container;
 
-    if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
-      loadNextPage();
-    }
-  }, [loading, hasMore, scrollThreshold, loadNextPage]);
+//     if (scrollHeight - scrollTop - clientHeight < scrollThreshold) {
+//       loadNextPage();
+//     }
+//   }, [loading, hasMore, scrollThreshold, loadNextPage]);
 
-  useEffect(() => {
-    const container = tableContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => {
-        container.removeEventListener("scroll", handleScroll);
-      };
-    }
-  }, [handleScroll]);
+//   useEffect(() => {
+//     const container = tableContainerRef.current;
+//     if (container) {
+//       container.addEventListener("scroll", handleScroll);
+//       return () => {
+//         container.removeEventListener("scroll", handleScroll);
+//       };
+//     }
+//   }, [handleScroll]);
 
-  useEffect(() => {
-    resetPagination();
-    fetchRows(0);
-  }, [id, fetchRows, resetPagination]);
+//   useEffect(() => {
+//     resetPagination();
+//     fetchRows(0);
+//   }, [id, fetchRows, resetPagination]);
 
-  useEffect(() => {
-    if (page === 0) return;
-    fetchRows(page);
-  }, [page, fetchRows]);
+//   useEffect(() => {
+//     if (page === 0) return;
+//     fetchRows(page);
+//   }, [page, fetchRows]);
 
-  return {
-    rows,
-    rowsExplored: rows.length,
-    loading,
-    hasMore,
-    error,
-    page,
-    fetchRows,
-    resetPagination,
-    loadNextPage,
-    tableContainerRef,
-    pageSize,
-    scrollThreshold,
-  };
-}
+//   return {
+//     rows,
+//     rowsExplored: rows.length,
+//     loading,
+//     hasMore,
+//     error,
+//     page,
+//     fetchRows,
+//     resetPagination,
+//     loadNextPage,
+//     tableContainerRef,
+//     pageSize,
+//     scrollThreshold,
+//   };
+// }
