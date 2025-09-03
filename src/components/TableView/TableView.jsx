@@ -1,10 +1,7 @@
 /**
  * Example of using the withPaginatedRows HOC with TableView
  */
-import { useEffect, useState, useCallback } from "react";
-// import ColumnHeader from "./ColumnHeader";
 import PropTypes from "prop-types";
-import { summarizeTable } from "../../lib/duckdb";
 import {
   Box,
   IconButton,
@@ -24,6 +21,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { formatNumber } from "../../lib/utilities";
 import withPaginatedRows from "../HOC/withPaginatedRows";
 import withTableData from "../HOC/withTableData";
+import ColumnHeader from "./ColumnHeader";
 
 function TableView({
   table,
@@ -42,17 +40,16 @@ function TableView({
   const rowCount = table?.rowCount || operation?.rowCount || 0;
   const name = table?.name || operation?.name || "View";
 
-  const [columns, setColumns] = useState([]);
-
-  const fetchColumns = useCallback(async () => {
-    const columns = await summarizeTable(id, activeColumnIds);
-    setColumns(columns);
-  }, [id, activeColumnIds]);
-
-  useEffect(() => {
-    // Fetch columns when component mounts
-    fetchColumns();
-  }, [id, fetchColumns]);
+  // TODO: break this into a per column basis in the ColumnHeader component
+  // const [columns, setColumns] = useState([]);
+  // const fetchColumns = useCallback(async () => {
+  //   const columns = await summarizeTable(id, activeColumnIds);
+  //   setColumns(columns);
+  // }, [id, activeColumnIds]);
+  // useEffect(() => {
+  //   // Fetch columns when component mounts
+  //   fetchColumns();
+  // }, [id, fetchColumns]);
 
   const explorationPercentage =
     rowCount > 0 ? Math.round((rowsExplored / rowCount) * 100) : 0;
@@ -94,7 +91,9 @@ function TableView({
             }}
           >
             <Chip
-              label={`${formatNumber(rowCount)} rows × ${columns.length} cols`}
+              label={`${formatNumber(rowCount)} rows × ${
+                activeColumnIds.length
+              } cols`}
               size="small"
               variant="outlined"
             />
@@ -165,7 +164,7 @@ function TableView({
               >
                 #
               </TableCell>
-              {columns.map((column, i) => (
+              {activeColumnIds.map((id, i) => (
                 <TableCell
                   key={i}
                   sx={{
@@ -175,7 +174,7 @@ function TableView({
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {column?.column_name}
+                  <ColumnHeader key={id} id={id} />
                 </TableCell>
               ))}
             </TableRow>
@@ -296,8 +295,16 @@ const EnhancedTableView = withPaginatedRows(TableView, {
 
 EnhancedTableView.displayName = "EnhancedTableView";
 
-const TableMetadata = ({ table, activeColumnIds }) => {
-  return <EnhancedTableView id={table.id} columnIds={activeColumnIds} />;
+const TableMetadata = ({ table, operation, activeColumnIds }) => {
+  return (
+    <EnhancedTableView
+      id={table.id}
+      activeColumnIds={activeColumnIds}
+      columnIds={activeColumnIds}
+      table={table}
+      operation={operation}
+    />
+  );
 };
 
 TableMetadata.propTypes = {
