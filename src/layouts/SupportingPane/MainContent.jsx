@@ -19,6 +19,7 @@ import StackOperationView from "../../components/StackOperationView";
 import PackOperationView from "../../components/PackOperationView";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
+import TableView from "../../components/TableView";
 
 export default function MainContent() {
   const focusedOperation = useSelector((state) => {
@@ -28,6 +29,14 @@ export default function MainContent() {
   const tables = useSelector(selectAllTablesData);
   const operations = useSelector(selectAllOperationIds);
   const resolution = useSelector((state) => state.ui.levelOfDetail);
+  console.log(
+    "tables",
+    tables,
+    "operations",
+    operations,
+    "focusedOperation",
+    focusedOperation
+  );
 
   return (
     <Box
@@ -53,6 +62,11 @@ export default function MainContent() {
           <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
             <Typography>Drag to add a source table</Typography>
           </TableDropTarget>
+        ) : focusedOperation?.operationType === OPERATION_TYPE_NO_OP ? (
+          <TableView
+            resolution={resolution}
+            id={focusedOperation.children[0]} // Just display it's only table child
+          />
         ) : focusedOperation?.operationType === OPERATION_TYPE_STACK ? (
           <StackOperationView
             resolution={resolution}

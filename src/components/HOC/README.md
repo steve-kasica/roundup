@@ -170,7 +170,3 @@ The HOC uses `getTableRows(id, activeColumnIds, pageSize, offset)` from your Duc
 - Set `scrollThreshold: 100-200` to trigger loading before user reaches bottom
 - Consider implementing virtual scrolling for very large datasets
 - Use `resetPagination()` when table/filters change
-
-## Examples
-
-See `EnhancedDBTableView.jsx` for a complete implementation example.
