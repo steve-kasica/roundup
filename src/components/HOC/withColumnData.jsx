@@ -2,7 +2,6 @@ import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 
 import {
-  DATA_TYPE as COLUMN,
   selectColumnById,
   selectColumnIdsByTableId,
   addColumnsToDragging,
@@ -17,16 +16,10 @@ import {
   removeFromSelectedColumns,
   selectSelectedColumns,
 } from "../../slices/columnsSlice";
-
 import { renameColumnsRequest } from "../../sagas/renameColumnsSaga";
 import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
 import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
-
 import { selectFirstSelectedColumn } from "../../slices/uiSlice";
-
-import { useEffect } from "react";
-import { useDrop, useDrag } from "react-dnd";
-import { getEmptyImage } from "react-dnd-html5-backend";
 import { selectTablesById } from "../../slices/tablesSlice";
 
 export default function withColumnData(WrappedComponent) {
@@ -61,60 +54,10 @@ export default function withColumnData(WrappedComponent) {
     const error = column?.error;
     const alias = column?.alias;
 
-    // // TODO: remove drag logic from this HOC
-    // const [{ isDragging }, dragRef, previewRef] = useDrag({
-    //   type: COLUMN,
-    //   canDrag: isDraggable,
-    //   item: () => {
-    //     // In this context `id` is the dragging column. It's different from `id` in useDrop
-    //     return { id, name, tableId, isNull, index };
-    //   },
-    //   collect: (monitor) => ({
-    //     isDragging: monitor.isDragging(),
-    //   }),
-    //   end: () => {
-    //     unDragColumn();
-    //     unHoverColumn();
-    //   },
-    // });
-
-    // useEffect(() => {
-    //   if (isDragging) {
-    //     dispatch(addColumnsToDragging(id));
-    //   } else {
-    //     dispatch(removeColumnsFromDragging(id));
-    //   }
-    // }, [isDragging, id, dispatch]);
-
-    // const [{ isOver }, dropRef] = useDrop({
-    //   accept: COLUMN,
-    //   drop: (droppedItem) => {
-    //     // In this context `droppedItem.id` === `id` in useDrag
-
-    //     if (droppedItem.tableId === tableId && !isNull) {
-    //       dispatch(
-    //         swapColumnsRequest({ sourceIds: droppedItem.id, targetIds: id })
-    //       );
-    //     }
-    //     unDragColumn();
-    //     dispatch(clearSelectedColumns());
-    //   },
-    //   collect: (monitor) => ({
-    //     isOver: monitor.isOver(),
-    //   }),
-    // });
-
-    // Disable the default drag preview
-    // useEffect(() => {
-    //   previewRef(getEmptyImage(), { captureDraggingState: true });
-    // }, []);
-
     return (
       <WrappedComponent
         {...props}
         column={column}
-        // dragRef={dragRef}
-        // dropRef={dropRef}
         id={id}
         tableId={tableId}
         name={name}
@@ -128,8 +71,6 @@ export default function withColumnData(WrappedComponent) {
         isLoading={isLoading}
         isHovered={isHovered}
         isKey={isKey}
-        // isDragging={isDragging}
-        // isOver={isOver}
         error={error}
         // Actions handlers
         hoverColumn={hoverColumn}

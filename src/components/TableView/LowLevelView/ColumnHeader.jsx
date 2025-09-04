@@ -1,9 +1,39 @@
 import PropTypes from "prop-types";
-import { TableCell, Box, Typography, IconButton } from "@mui/material";
-import { ArrowUpward, ArrowDownward, UnfoldMore } from "@mui/icons-material";
+import {
+  TableCell,
+  Box,
+  Typography,
+  IconButton,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  Divider,
+  Stack,
+} from "@mui/material";
+import {
+  ArrowUpward,
+  ArrowDownward,
+  UnfoldMore,
+  VisibilityOff,
+  ContentCopy,
+  FilterList,
+  Info,
+  MoreVert,
+} from "@mui/icons-material";
 import withColumnData from "../../HOC/withColumnData";
+import { useState } from "react";
 
-const ColumnHeader = ({ column, sortBy, sortDirection, onSort, index = 0 }) => {
+const ColumnHeader = ({
+  column,
+  sortBy,
+  sortDirection,
+  onSort,
+  index = 0,
+  removeColumn,
+  renameColumn,
+}) => {
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const handleSort = () => {
     if (!onSort) return;
 
@@ -34,87 +64,177 @@ const ColumnHeader = ({ column, sortBy, sortDirection, onSort, index = 0 }) => {
   };
 
   return (
-    <TableCell
-      sx={{
-        fontWeight: 600,
-        backgroundColor: "grey.50",
-        minWidth: 120,
-        whiteSpace: "nowrap",
-        cursor: onSort ? "pointer" : "default",
-        userSelect: "none",
-        "&:hover": onSort
-          ? {
-              backgroundColor: "grey.100",
-            }
-          : {},
-      }}
-      onClick={handleSort}
-    >
-      <Box
+    <>
+      <TableCell
         sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 1,
+          fontWeight: 600,
+          backgroundColor: "grey.50",
+          minWidth: 120,
+          padding: 0.5,
+          whiteSpace: "nowrap",
+          cursor: "default",
+          userSelect: "none",
+          "&:hover": onSort
+            ? {
+                backgroundColor: "grey.100",
+              }
+            : {},
         }}
       >
-        <Typography
-          variant="subtitle2"
+        <Box
           sx={{
-            fontWeight: 600,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1,
           }}
         >
-          {column.name || `Column ${index}`}
-        </Typography>
-
-        {onSort && (
-          <IconButton
-            size="small"
+          <Typography
+            variant="subtitle2"
             sx={{
-              p: 0.25,
-              color: getSortIconColor(),
-              "&:hover": {
-                backgroundColor: "transparent",
-              },
+              fontWeight: 600,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              flex: 1,
             }}
-            disableRipple
           >
-            {getSortIcon()}
-          </IconButton>
-        )}
-      </Box>
+            {column.name || `Column ${index}`}
+            {column.columnType && (
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                  fontSize: "0.7rem",
+                  display: "block",
+                  lineHeight: 1,
+                }}
+              >
+                {column.columnType}
+              </Typography>
+            )}
+          </Typography>
 
-      {/* Column type indicator */}
-      {column.type && (
-        <Typography
-          variant="caption"
-          sx={{
-            color: "text.secondary",
-            fontSize: "0.7rem",
-            display: "block",
-            lineHeight: 1,
-          }}
-        >
-          {column.type}
-        </Typography>
-      )}
-    </TableCell>
+          {onSort && (
+            <Stack
+              direction="row"
+              spacing={0} // Adjust spacing as needed
+              alignItems="center"
+            >
+              <IconButton
+                size="small"
+                onClick={handleSort}
+                sx={{
+                  p: 0,
+                  color: getSortIconColor(),
+                  "&:hover": {
+                    backgroundColor: "action.hover",
+                  },
+                }}
+                disableRipple
+              >
+                {getSortIcon()}
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={(e) => setMenuAnchorEl(e.currentTarget)}
+                sx={{
+                  p: 0,
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: "action.hover",
+                    color: "text.primary",
+                  },
+                }}
+              >
+                <MoreVert fontSize="small" />
+              </IconButton>
+            </Stack>
+          )}
+        </Box>
+      </TableCell>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => setMenuAnchorEl(null)}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        PaperProps={{
+          sx: {
+            minWidth: 200,
+            boxShadow: 3,
+          },
+        }}
+      >
+        <MenuItem onClick={removeColumn}>
+          <ListItemIcon>
+            <VisibilityOff fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Remove Column</ListItemText>
+        </MenuItem>
+
+        <MenuItem onClick={renameColumn}>
+          <ListItemIcon>
+            <ContentCopy fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Rename Column</ListItemText>
+        </MenuItem>
+
+        <Divider />
+
+        {/* TODO */}
+        {/* <MenuItem onClick={() => console.log("filter")}>
+          <ListItemIcon>
+            <FilterList fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Filter Column</ListItemText>
+        </MenuItem> */}
+
+        <MenuItem onClick={() => console.log("sort-asc")}>
+          <ListItemIcon>
+            <ArrowUpward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Sort Ascending</ListItemText>
+        </MenuItem>
+
+        <MenuItem onClick={() => console.log("sort-desc")}>
+          <ListItemIcon>
+            <ArrowDownward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Sort Descending</ListItemText>
+        </MenuItem>
+
+        <Divider />
+
+        {/* TODO   */}
+        {/* <MenuItem onClick={() => console.log("info")}>
+          <ListItemIcon>
+            <Info fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Column Info</ListItemText>
+        </MenuItem> */}
+      </Menu>
+    </>
   );
 };
 
 ColumnHeader.propTypes = {
   column: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     name: PropTypes.string,
     column_name: PropTypes.string,
-    type: PropTypes.string,
+    columnType: PropTypes.string,
   }).isRequired,
   sortBy: PropTypes.string,
   sortDirection: PropTypes.oneOf(["asc", "desc"]),
   onSort: PropTypes.func,
+  index: PropTypes.number,
 };
 
 const EnhancedColumnHeader = withColumnData(ColumnHeader);
