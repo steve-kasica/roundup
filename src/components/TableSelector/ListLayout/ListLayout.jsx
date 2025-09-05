@@ -21,7 +21,17 @@ import PropTypes from "prop-types";
 
 export const LAYOUT_ID = "list";
 
-function ListLayout({ searchString, tables, loading, error }) {
+function ListLayout({
+  searchString,
+  tables,
+  loading,
+  error,
+  selectedTableIds = [],
+  schemaTableIds = [],
+  onTableSelect,
+  onTableHover,
+  onTableUnhover,
+}) {
   // Loading state
   if (loading) {
     return (
@@ -189,6 +199,11 @@ function ListLayout({ searchString, tables, loading, error }) {
               id={sourceTable.id}
               isDraggable={true}
               searchString={searchString}
+              isSelected={selectedTableIds.includes(sourceTable.id)}
+              isInSchema={schemaTableIds.includes(sourceTable.id)}
+              onSelect={(event) => onTableSelect?.(sourceTable.id, event)}
+              onHover={() => onTableHover?.(sourceTable.id)}
+              onUnhover={() => onTableUnhover?.(sourceTable.id)}
             />
             {i < tables.length - 1 && <Divider component="li" />}
           </Box>
@@ -207,6 +222,15 @@ ListLayout.propTypes = {
   ).isRequired,
   loading: PropTypes.bool,
   error: PropTypes.any,
+  selectedTableIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ),
+  schemaTableIds: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ),
+  onTableSelect: PropTypes.func,
+  onTableHover: PropTypes.func,
+  onTableUnhover: PropTypes.func,
 };
 
 const EnhancedListLayout = withAllTablesData(ListLayout);

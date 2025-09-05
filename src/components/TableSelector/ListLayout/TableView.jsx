@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { DragIndicator } from "@mui/icons-material";
+import { DragIndicator, CheckCircle } from "@mui/icons-material";
 import {
   ListItem,
   ListItemIcon,
@@ -29,6 +29,7 @@ function TableView({
   isDisabled = false,
   isSelected = false,
   isHovered = false,
+  isInSchema = false,
   searchString,
   onSelect,
   onHover,
@@ -40,13 +41,33 @@ function TableView({
   renameTable,
   dropTable,
   addTableToSchema,
-  isInSchema = false,
 }) {
   const [contextMenu, setContextMenu] = useState(null);
 
   const columnCount = useMemo(() => {
     return activeColumnIds.length - removedColumnIds.length;
   }, [activeColumnIds.length, removedColumnIds.length]);
+
+  // Helper functions for styling based on state
+  const getBackgroundColor = () => {
+    if (isSelected && isInSchema) {
+      return "rgba(76, 175, 80, 0.1)"; // Light green for both
+    } else if (isSelected) {
+      return "rgba(25, 118, 210, 0.08)"; // Light blue for selected only
+    } else if (isInSchema) {
+      return "rgba(76, 175, 80, 0.05)"; // Very light green for schema only
+    }
+    return "transparent";
+  };
+
+  const getHoverBackgroundColor = () => {
+    if (isInSchema) {
+      return "rgba(76, 175, 80, 0.15)";
+    } else if (isSelected) {
+      return "rgba(25, 118, 210, 0.12)";
+    }
+    return "action.hover";
+  };
 
   const handleContextMenu = (event) => {
     event.preventDefault();
@@ -121,25 +142,36 @@ function TableView({
     <>
       <ListItem
         disablePadding
-        selected={isSelected}
+        selected={false} // Don't use Material-UI's selected state
         onClick={handleItemClick}
         onMouseEnter={onHover}
         onMouseLeave={onUnhover}
         onContextMenu={handleContextMenu}
         sx={{
-          cursor: "context-menu",
-          backgroundColor: isSelected ? "action.selected" : "transparent",
+          cursor: "pointer",
+          // Background colors for different states
+          backgroundColor: getBackgroundColor(),
+          // Border for schema inclusion (green left border)
+          borderLeft: isInSchema ? "4px solid" : "1px solid transparent",
+          borderColor: isInSchema ? "success.main" : "transparent",
+          // Selection outline (blue outline)
+          outline: isSelected ? "2px solid" : "none",
+          outlineColor: isSelected ? "primary.main" : "transparent",
+          outlineOffset: "-2px",
           "&:hover": {
-            backgroundColor: "action.hover",
+            backgroundColor: getHoverBackgroundColor(),
           },
           opacity: isDisabled ? 0.5 : 1,
           borderRadius: 1,
           mb: 0.5,
-          border: isHovered ? "1px solid" : "1px solid transparent",
-          borderColor: isHovered ? "primary.main" : "transparent",
+          // Additional visual feedback
+          boxShadow: isSelected ? 1 : 0,
+          // Ensure proper border spacing
+          marginLeft: isInSchema ? 0 : "4px",
+          transition: "all 0.2s ease-in-out",
         }}
       >
-        {/* Drag Handle and Checkbox */}
+        {/* Drag Handle, Schema Indicator, and Checkbox */}
         <ListItemIcon sx={{ minWidth: "auto", mr: 1 }}>
           <Stack direction="row" alignItems="center" spacing={0.5}>
             <DragIndicator
@@ -152,10 +184,17 @@ function TableView({
                 },
               }}
             />
+
             <Checkbox
               checked={isSelected}
               size="small"
-              sx={{ p: 0 }}
+              sx={{
+                p: 0,
+                color: isSelected ? "primary.main" : "text.secondary",
+                "&.Mui-checked": {
+                  color: "primary.main",
+                },
+              }}
               onClick={(e) => e.stopPropagation()}
               disabled
             />
@@ -171,7 +210,10 @@ function TableView({
               <Typography
                 variant="body2"
                 color={isDisabled ? "text.disabled" : "text.primary"}
-                sx={{ fontWeight: 500 }}
+                sx={{
+                  fontWeight: isSelected ? 600 : 500,
+                  transition: "font-weight 0.2s ease-in-out",
+                }}
               >
                 <HighlightText pattern={searchString} text={table.name} />
               </Typography>
@@ -180,11 +222,12 @@ function TableView({
               <Chip
                 label={table.mimeType || "Table"}
                 size="small"
-                variant="outlined"
+                variant={isInSchema ? "filled" : "outlined"}
+                color={isInSchema ? "success" : "default"}
                 sx={{
                   fontSize: "0.7rem",
                   height: "20px",
-                  color: isDisabled ? "text.disabled" : "text.secondary",
+                  color: isDisabled ? "text.disabled" : undefined,
                 }}
               />
             </Box>
@@ -233,6 +276,17 @@ function TableView({
             </Stack>
           }
         />
+        {/* Schema status indicator */}
+        {isInSchema && (
+          <CheckCircle
+            sx={{
+              color: "success.main",
+              fontSize: "1rem",
+              marginRight: "8px",
+            }}
+            titleAccess="Included in schema"
+          />
+        )}
       </ListItem>
 
       {/* Right-click Context Menu */}
