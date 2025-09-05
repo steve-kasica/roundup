@@ -37,17 +37,6 @@ const LowLevelView = ({
   sortBy,
   sortDirection,
 }) => {
-  //   const [columns, setColumns] = useState([]);
-
-  //   const fetchColumns = useCallback(async () => {
-  //     const columns = await summarizeTable(id, activeColumnIds);
-  //     setColumns(columns);
-  //   }, [id, activeColumnIds]);
-
-  //   useEffect(() => {
-  //     fetchColumns();
-  //   }, [fetchColumns]);
-
   const handleSort = useCallback(
     (columnName, direction) => {
       // Call onRefresh with sorting parameters
@@ -163,17 +152,28 @@ const LowLevelView = ({
           },
         }}
       >
-        <Table stickyHeader size="small" sx={{ minWidth: 650 }}>
+        <Table
+          stickyHeader
+          size="small"
+          sx={{
+            minWidth: 325, // Reduced from 650 to half
+            tableLayout: "fixed", // Enforces consistent column widths
+          }}
+        >
           <TableHead>
             <TableRow>
               <TableCell
                 sx={{
                   fontWeight: 600,
                   backgroundColor: "grey.50",
-                  minWidth: 60,
+                  width: 30, // Reduced from 60 to half
+                  minWidth: 30,
+                  maxWidth: 30,
                   position: "sticky",
                   left: 0,
-                  zIndex: 2,
+                  zIndex: 100,
+                  padding: "4px 8px", // Reduced padding
+                  fontSize: "0.75rem", // Smaller font
                 }}
               >
                 #
@@ -186,6 +186,12 @@ const LowLevelView = ({
                   sortBy={sortBy}
                   sortDirection={sortDirection}
                   onSort={handleSort}
+                  sx={{
+                    width: 60, // Half of previous ~120px
+                    minWidth: 60,
+                    maxWidth: 60,
+                    padding: "4px 6px", // Reduced padding
+                  }}
                 />
               ))}
             </TableRow>
@@ -213,6 +219,12 @@ const LowLevelView = ({
                         left: 0,
                         backgroundColor: "inherit",
                         zIndex: 1,
+                        width: 30,
+                        minWidth: 30,
+                        maxWidth: 30,
+                        padding: "4px 8px", // Reduced padding
+                        fontSize: "0.75rem", // Smaller font
+                        textAlign: "center",
                       }}
                     >
                       {rowIndex + 1}
@@ -221,10 +233,14 @@ const LowLevelView = ({
                       <TableCell
                         key={cellIndex}
                         sx={{
-                          maxWidth: 200,
+                          width: 60, // Half of previous 120px
+                          minWidth: 60,
+                          maxWidth: 60, // Reduced from 200 to 100
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           whiteSpace: "nowrap",
+                          padding: "4px 6px", // Reduced padding
+                          fontSize: "0.8rem", // Slightly smaller font
                         }}
                         title={String(cell)} // Show full content on hover
                       >
