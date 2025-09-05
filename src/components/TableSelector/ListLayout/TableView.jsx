@@ -20,6 +20,7 @@ import {
 } from "../../../lib/utilities/formaters";
 import withTableData from "../../HOC/withTableData";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 
 function TableView({
   table,
@@ -41,8 +42,12 @@ function TableView({
   renameTable,
   dropTable,
   addTableToSchema,
+  setTableSelection,
 }) {
   const [contextMenu, setContextMenu] = useState(null);
+
+  // TODO: should this be in the HOC?
+  const selectedTableIds = useSelector((state) => state.tables.selected || []);
 
   const columnCount = useMemo(() => {
     return activeColumnIds.length - removedColumnIds.length;
@@ -94,8 +99,73 @@ function TableView({
 
   const handleItemClick = (event) => {
     event.stopPropagation();
-    if (onSelect) {
-      onSelect(event);
+
+    if (event.shiftKey) {
+      // For List items, we need to traverse differently
+      const listItem = event.currentTarget;
+      const listContainer = listItem.closest(".list-layout"); // Find the list container
+
+      if (!listContainer) {
+        // Fallback to regular selection if we can't find the container
+        setTableSelection([table.id]);
+        return;
+      }
+
+      // Get all list items within the container
+      const allListItems = Array.from(
+        listContainer.querySelectorAll("[data-tableid]")
+      );
+
+      const ids = allListItems.map((item) => item.getAttribute("data-tableid"));
+      const clickedIndex = ids.indexOf(String(table.id));
+
+      // Find all selected items
+      const selectedItems = allListItems.filter(
+        (item) => item.getAttribute("data-isSelected") === "true"
+      );
+      const selectedIndices = selectedItems.map((item) =>
+        ids.indexOf(item.getAttribute("data-tableid"))
+      );
+
+      let anchorIndex;
+      if (selectedIndices.length > 0) {
+        // Use the last selected item as the anchor
+        anchorIndex = selectedIndices[selectedIndices.length - 1];
+      } else {
+        anchorIndex = clickedIndex;
+      }
+
+      const [start, end] = [
+        Math.min(anchorIndex, clickedIndex),
+        Math.max(anchorIndex, clickedIndex),
+      ];
+
+      const rangeIds = ids.slice(start, end + 1);
+      setTableSelection(rangeIds);
+    } else if (event.ctrlKey || event.metaKey) {
+      // Ctrl/Cmd click for multi-selection toggle
+      if (isSelected) {
+        // If already selected, remove from selection
+        const currentSelection = selectedTableIds.filter(
+          (id) => String(id) !== String(table.id)
+        );
+        setTableSelection(currentSelection);
+      } else {
+        // If not selected, add to selection
+        setTableSelection([...selectedTableIds, table.id]);
+      }
+    } else {
+      // Regular click - toggle selection if already selected, otherwise select
+      if (isSelected && selectedTableIds.length === 1) {
+        // If this is the only selected item, deselect it
+        setTableSelection([]);
+      } else if (isSelected && selectedTableIds.length > 1) {
+        // If multiple items are selected and this is one of them, select only this one
+        setTableSelection([table.id]);
+      } else {
+        // If not selected, select it
+        setTableSelection([table.id]);
+      }
     }
   };
 
@@ -147,8 +217,15 @@ function TableView({
         onMouseEnter={onHover}
         onMouseLeave={onUnhover}
         onContextMenu={handleContextMenu}
+        data-tableid={table.id}
+        data-isSelected={isSelected}
+        data-multiselected={
+          selectedTableIds.includes(table.id) && selectedTableIds.length > 1
+        }
+        data-selection-count={selectedTableIds.length}
         sx={{
-          cursor: "pointer",
+          cursor: "context-menu",
+          userSelect: "none",
           // Background colors for different states
           backgroundColor: getBackgroundColor(),
           // Border for schema inclusion (green left border)

@@ -153,8 +153,7 @@ function TableRowView({
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  // Get selection state for multi-row dragging
-  // TODO: I don't think I need this
+  // TODO: Should this be in the HOC?
   const selectedTableIds = useSelector((state) => state.tables.selected || []);
   const selectedTables = useSelector((state) =>
     selectedTableIds.map((id) => state.tables.data[id]).filter(Boolean)

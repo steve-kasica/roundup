@@ -199,11 +199,11 @@ function ListLayout({
               id={sourceTable.id}
               isDraggable={true}
               searchString={searchString}
-              isSelected={selectedTableIds.includes(sourceTable.id)}
-              isInSchema={schemaTableIds.includes(sourceTable.id)}
-              onSelect={(event) => onTableSelect?.(sourceTable.id, event)}
-              onHover={() => onTableHover?.(sourceTable.id)}
-              onUnhover={() => onTableUnhover?.(sourceTable.id)}
+              // isSelected={selectedTableIds.includes(sourceTable.id)}
+              // isInSchema={schemaTableIds.includes(sourceTable.id)}
+              // onSelect={(event) => onTableSelect?.(sourceTable.id, event)}
+              // onHover={() => onTableHover?.(sourceTable.id)}
+              // onUnhover={() => onTableUnhover?.(sourceTable.id)}
             />
             {i < tables.length - 1 && <Divider component="li" />}
           </Box>
