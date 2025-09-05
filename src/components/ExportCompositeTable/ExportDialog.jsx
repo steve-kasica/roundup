@@ -20,7 +20,7 @@ function ExportDialog({ operation, onClose }) {
   const [format, setFormat] = useState("csv");
   const [includeHeaders, setIncludeHeaders] = useState(true);
   const [exportName, setExportName] = useState(
-    `${operation?.name || "export"}.${format}`
+    `${operation?.name || "export"}`
   );
 
   return (
@@ -39,7 +39,7 @@ function ExportDialog({ operation, onClose }) {
       </DialogTitle>
       <DialogContent>
         <Typography gutterBottom>
-          Export as <b>{exportName || `table.${format}`}</b>:
+          Export as <b>{(exportName || `table`) + "." + format}</b>:
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
@@ -47,9 +47,7 @@ function ExportDialog({ operation, onClose }) {
             value={exportName.replace(/\.[^/.]+$/, "")} // Remove any existing extension for display
             onChange={(e) =>
               setExportName(
-                `${e.target.value
-                  .replace(/\.[^/.]+$/, "")
-                  .toLowerCase()}.${format}` // Append the correct extension
+                `${e.target.value.replace(/\.[^/.]+$/, "").toLowerCase()}` // Append the correct extension
               )
             }
             fullWidth
@@ -66,6 +64,7 @@ function ExportDialog({ operation, onClose }) {
             size="small"
           >
             <option value="csv">CSV</option>
+            <option value="tsv">TSV</option>
           </TextField>
           <FormControlLabel
             control={

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { exportTableToCSVStreamManual } from "../../lib/duckdb/exportTableToCSVStreamManual";
+import exportTableToStreamManual from "../../lib/duckdb/exportTableToStreamManual";
 import "./ExportButton.css";
 
 export function ExportButton({
@@ -19,7 +19,7 @@ export function ExportButton({
     setProgress(0);
 
     try {
-      const result = await exportTableToCSVStreamManual(
+      const result = await exportTableToStreamManual(
         operationId,
         `${exportName}.${format}`,
         {
@@ -27,6 +27,7 @@ export function ExportButton({
           onProgress: (progressInfo) => {
             setProgress(progressInfo.percentage);
           },
+          delimiter: format === "tsv" ? "\t" : ",",
           includeHeaders,
         }
       );

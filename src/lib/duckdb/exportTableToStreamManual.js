@@ -1,9 +1,9 @@
 import { getDuckDB } from "./duckdbClient";
 
 /**
- * Export a table/view to CSV with manual streaming and progress callback
+ * Export a table/view to CSV/TSV with manual streaming and progress callback
  */
-export async function exportTableToCSVStreamManual(
+export default async function exportTableToStreamManual(
   operationId,
   filename = "export.csv",
   options = {}
@@ -11,7 +11,7 @@ export async function exportTableToCSVStreamManual(
   const {
     chunkSize = 1000, // Number of rows per chunk
     onProgress = null, // Progress callback function
-    delimiter = ",",
+    delimiter = ",", // Can be "," for CSV or "\t" for TSV
     includeHeaders = true,
   } = options;
 
@@ -32,6 +32,10 @@ export async function exportTableToCSVStreamManual(
     const chunks = [];
     let processedRows = 0;
 
+    // Determine MIME type based on delimiter
+    const mimeType =
+      delimiter === "\t" ? "text/tab-separated-values" : "text/csv";
+
     // Add headers if requested
     if (includeHeaders) {
       chunks.push(columns.join(delimiter) + "\n");
@@ -48,12 +52,12 @@ export async function exportTableToCSVStreamManual(
       const rows = result.toArray();
       if (rows.length === 0) break;
 
-      // Convert rows to CSV format
+      // Convert rows to CSV/TSV format
       const csvChunk =
         rows
           .map((row) =>
             columns
-              .map((col) => formatCSVValue(row[col], delimiter))
+              .map((col) => formatValue(row[col], delimiter))
               .join(delimiter)
           )
           .join("\n") + "\n";
@@ -72,7 +76,7 @@ export async function exportTableToCSVStreamManual(
     }
 
     // Create and download the file
-    const blob = new Blob(chunks, { type: "text/csv" });
+    const blob = new Blob(chunks, { type: mimeType });
     downloadBlob(blob, filename);
 
     return {
@@ -86,16 +90,31 @@ export async function exportTableToCSVStreamManual(
 }
 
 /**
- * Format a value for CSV output, handling escaping
+ * Format a value for CSV/TSV output, handling escaping
  */
-function formatCSVValue(value, delimiter = ",") {
+function formatValue(value, delimiter = ",") {
   if (value === null || value === undefined) {
     return "";
   }
 
   const stringValue = String(value);
 
-  // Check if the value needs to be quoted
+  // For TSV, we handle tabs differently - replace with spaces or escape
+  if (delimiter === "\t") {
+    // For TSV, replace tabs in data with spaces and handle newlines
+    const tsvValue = stringValue
+      .replace(/\t/g, " ") // Replace tabs with spaces
+      .replace(/\r?\n/g, " "); // Replace newlines with spaces
+
+    // TSV typically doesn't use quotes, but we can quote if there are problematic characters
+    if (tsvValue.includes('"')) {
+      return tsvValue.replace(/"/g, '""'); // Escape quotes by doubling
+    }
+
+    return tsvValue;
+  }
+
+  // Standard CSV handling
   const needsQuotes =
     stringValue.includes(delimiter) ||
     stringValue.includes('"') ||
