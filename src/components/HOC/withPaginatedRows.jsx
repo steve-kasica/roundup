@@ -35,7 +35,6 @@ export default function withPaginatedRows(WrappedComponent, options = {}) {
     // Fetch rows for a given page
     const fetchRows = useCallback(
       async (pageNum) => {
-        const currentActiveColumnIds = activeColumnIdsRef.current;
         if (!queryId) return;
 
         setLoading(true);
@@ -45,7 +44,7 @@ export default function withPaginatedRows(WrappedComponent, options = {}) {
           const offset = pageNum * pageSize;
           const newRows = await getTableRows(
             queryId,
-            currentActiveColumnIds,
+            activeColumnIds,
             pageSize,
             offset,
             sortBy,
@@ -69,7 +68,7 @@ export default function withPaginatedRows(WrappedComponent, options = {}) {
           setLoading(false);
         }
       },
-      [queryId, sortBy, sortDirection] // Remove activeColumnIds from deps
+      [queryId, sortBy, sortDirection, activeColumnIds]
     );
 
     // Reset pagination when ID or active columns change

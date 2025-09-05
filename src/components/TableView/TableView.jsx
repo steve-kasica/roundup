@@ -9,17 +9,17 @@ import HighLevelView from "./HighLevelView";
 const TableView = ({ table, operation, activeColumnIds, resolution }) => {
   return resolution === "low" ? (
     <LowLevelView
-      table={table}
       id={table.id}
+      columnIds={activeColumnIds}
+      table={table}
       operation={operation}
-      activeColumnIds={activeColumnIds}
     />
   ) : (
     <HighLevelView
-      table={table}
       id={table.id}
+      columnIds={activeColumnIds}
+      table={table}
       operation={operation}
-      activeColumnIds={activeColumnIds}
     />
   );
 };

@@ -1,7 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback } from "react";
 import PropTypes from "prop-types";
 import ColumnHeader from "./ColumnHeader";
-import { summarizeTable } from "../../../lib/duckdb";
 import {
   Box,
   IconButton,
@@ -23,9 +22,8 @@ import withPaginatedRows from "../../HOC/withPaginatedRows";
 
 const LowLevelView = ({
   table,
-  id,
   operation,
-  activeColumnIds,
+  columnIds: activeColumnIds,
   onClose,
   // Props from withPaginatedRows HOC
   rows,
@@ -284,7 +282,7 @@ LowLevelView.propTypes = {
     rowCount: PropTypes.number,
     name: PropTypes.string,
   }),
-  activeColumnIds: PropTypes.arrayOf(
+  columnIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
   onClose: PropTypes.func,

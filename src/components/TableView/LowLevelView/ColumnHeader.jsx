@@ -38,6 +38,8 @@ const ColumnHeader = ({
   const handleSort = (newDirection = "asc") => {
     if (!onSort) return;
 
+    console.log("Sorting column:", column.id, "Direction:", newDirection);
+
     // If this column is already sorted, toggle direction
     if (sortBy === column.id) {
       newDirection = sortDirection === "asc" ? "desc" : "asc";
@@ -133,7 +135,7 @@ const ColumnHeader = ({
             >
               <IconButton
                 size="small"
-                onClick={handleSort}
+                onClick={() => handleSort()}
                 sx={{
                   p: 0,
                   color: getSortIconColor(),
