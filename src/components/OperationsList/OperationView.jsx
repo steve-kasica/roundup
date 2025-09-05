@@ -36,9 +36,10 @@ function OperationView({
   operation,
   childrenIds,
   columnCount,
+  isFocused,
   index,
-  peekTable,
-  renameOperation,
+  // peekTable,
+  // renameOperation,
   focusOperation,
 }) {
   const label =
@@ -81,6 +82,17 @@ function OperationView({
             {detailsOpen ? <ExpandMore /> : <ExpandLess />}
           </IconButton>
         }
+        sx={{
+          backgroundColor: isFocused ? "primary.light" : "inherit", // Highlight background when focused
+          borderLeft: isFocused ? "4px solid" : "none", // Add a left border when focused
+          borderColor: isFocused ? "primary.main" : "transparent", // Border color for focus
+          "& .MuiListItemText-primary": {
+            fontWeight: isFocused ? "bold" : "normal", // Bold text when focused
+          },
+          "&:hover": {
+            backgroundColor: "action.hover", // Add hover effect
+          },
+        }}
       >
         <ListItemText
           primary={`${position}. ${operation.name} (${columnCount})`}
@@ -125,9 +137,12 @@ OperationView.propTypes = {
   childrenIds: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
+  columnCount: PropTypes.number,
+  isFocused: PropTypes.bool,
   index: PropTypes.number.isRequired,
   peekTable: PropTypes.func.isRequired,
   renameOperation: PropTypes.func.isRequired,
+  focusOperation: PropTypes.func.isRequired,
 };
 
 const EnhancedOperationView = withOperationData(OperationView);

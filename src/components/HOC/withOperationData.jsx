@@ -6,15 +6,12 @@ import {
   setHoveredOperation,
   selectHoveredOperation,
   updateOperations,
-  OPERATION_TYPE_PACK,
   setFocusedOperation,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { setPeekedTable } from "../../slices/uiSlice";
-import { isTableId } from "../../slices/tablesSlice";
 import {
-  selectActiveColumnCountByTableId,
   selectColumnIdsByTableId,
   selectRemovedColumnIdsByTableId,
 } from "../../slices/columnsSlice";
