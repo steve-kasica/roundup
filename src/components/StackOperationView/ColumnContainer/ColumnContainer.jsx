@@ -128,7 +128,10 @@ function ColumnContainer({
         ref={setCellRef}
         data-table-id={tableId}
         data-column-index={index}
-        onClick={(event) => (!isPopoverOpen ? handleOnClick(event) : null)}
+        onClick={(event) => {
+          event.stopPropagation(); // Prevent event from bubbling up to parent
+          !isPopoverOpen ? handleOnClick(event) : null;
+        }}
         onContextMenu={(event) => {
           event.preventDefault();
           event.stopPropagation(); // Prevent event from bubbling up to parent
