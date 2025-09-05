@@ -69,7 +69,7 @@ const LowLevelView = ({
     <Box
       sx={{
         position: "relative",
-        height: "400px",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         backgroundColor: "background.paper",
@@ -86,7 +86,7 @@ const LowLevelView = ({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          flexShrink: 0,
+          flexShrink: 0, // Prevent shrinking
         }}
       >
         <Box>
@@ -142,8 +142,11 @@ const LowLevelView = ({
         elevation={0}
         ref={tableContainerRef}
         sx={{
-          flex: 1,
-          overflow: "auto",
+          flex: 1, // Takes all remaining space
+          minHeight: 0, // Allows flex child to shrink below content size
+          overflow: "auto", // Enables scrolling
+          height: "inherit",
+
           "&::-webkit-scrollbar": {
             width: 8,
             height: 8,
@@ -238,14 +241,14 @@ const LowLevelView = ({
       {/* Footer Status */}
       <Box
         sx={{
-          p: 2,
+          p: "1px",
           borderTop: 1,
           borderColor: "divider",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          flexShrink: 0,
-          minHeight: 60,
+          flexShrink: 0, // Prevent shrinking
+          height: "2px", // Fixed height for footer
         }}
       >
         {loading && (
