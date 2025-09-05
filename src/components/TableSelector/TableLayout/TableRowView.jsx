@@ -293,7 +293,6 @@ function TableRowView({
       onContextMenu={handleMenuOpen}
       onClick={(event) => {
         event.stopPropagation();
-        console.log("Row clicked", table.id, event.shiftKey);
 
         if (event.shiftKey) {
           const tr = event.currentTarget;
@@ -323,8 +322,30 @@ function TableRowView({
 
           const rangeIds = ids.slice(start, end + 1);
           setTableSelection(rangeIds);
+        } else if (event.ctrlKey || event.metaKey) {
+          // Ctrl/Cmd click for multi-selection toggle
+          if (isSelected) {
+            // If already selected, remove from selection
+            const currentSelection = selectedTableIds.filter(
+              (id) => id !== table.id
+            );
+            setTableSelection(currentSelection);
+          } else {
+            // If not selected, add to selection
+            setTableSelection([...selectedTableIds, table.id]);
+          }
         } else {
-          setTableSelection(table.id);
+          // Regular click - toggle selection if already selected, otherwise select
+          if (isSelected && selectedTableIds.length === 1) {
+            // If this is the only selected row, deselect it
+            setTableSelection([]);
+          } else if (isSelected && selectedTableIds.length > 1) {
+            // If multiple rows are selected and this is one of them, select only this one
+            setTableSelection(table.id);
+          } else {
+            // If not selected, select it
+            setTableSelection(table.id);
+          }
         }
       }}
     >
