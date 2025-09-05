@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import {
-  Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
@@ -40,19 +39,17 @@ function ExportDialog({ operation, onClose }) {
       </DialogTitle>
       <DialogContent>
         <Typography gutterBottom>
-          Export as{" "}
-          <b>
-            {exportName || `table`}.{format.toLowerCase()}
-          </b>
-          :
+          Export as <b>{exportName || `table.${format}`}</b>:
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             label="File Name"
-            value={exportName}
+            value={exportName.replace(/\.[^/.]+$/, "")} // Remove any existing extension for display
             onChange={(e) =>
               setExportName(
-                e.target.value.replace(/\.[^/.]+$/, "").toLowerCase()
+                `${e.target.value
+                  .replace(/\.[^/.]+$/, "")
+                  .toLowerCase()}.${format}` // Append the correct extension
               )
             }
             fullWidth
@@ -96,6 +93,7 @@ function ExportDialog({ operation, onClose }) {
 }
 
 ExportDialog.propTypes = {
+  operation: PropTypes.object.isRequired,
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onExport: PropTypes.func,
