@@ -106,7 +106,7 @@ const LowLevelView = ({
             <Chip
               label={`${formatNumber(rowCount)} rows × ${
                 activeColumnIds.length
-              } cols`}
+              } columns`}
               size="small"
               variant="outlined"
             />

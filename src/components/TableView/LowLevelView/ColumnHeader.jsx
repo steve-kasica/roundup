@@ -15,14 +15,13 @@ import {
   ArrowUpward,
   ArrowDownward,
   UnfoldMore,
-  VisibilityOff,
-  ContentCopy,
-  FilterList,
-  Info,
+  VisibilityOff as RemoveIcon,
+  DriveFileRenameOutline as RenameIcon,
   MoreVert,
 } from "@mui/icons-material";
 import withColumnData from "../../HOC/withColumnData";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import EditableText from "../../ui/EditableText";
 
 const ColumnHeader = ({
   column,
@@ -34,10 +33,10 @@ const ColumnHeader = ({
   renameColumn,
 }) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-  const handleSort = () => {
+  const columnNameRef = useRef(null);
+  const [isHeaderEditable, setIsHeaderEditable] = useState(false);
+  const handleSort = (newDirection = "asc") => {
     if (!onSort) return;
-
-    let newDirection = "asc";
 
     // If this column is already sorted, toggle direction
     if (sortBy === column.id) {
@@ -99,7 +98,18 @@ const ColumnHeader = ({
               flex: 1,
             }}
           >
-            {column.name || `Column ${index}`}
+            <EditableText
+              inputRef={columnNameRef}
+              initialValue={column?.name}
+              placeholder={`Column ${index + 1}`}
+              onChange={renameColumn}
+              isReadOnly={true}
+              isEditable={isHeaderEditable}
+              onEditingStateChange={() =>
+                setIsHeaderEditable(!isHeaderEditable)
+              }
+              fontSize="1rem"
+            />
             {column.columnType && (
               <Typography
                 variant="caption"
@@ -172,38 +182,52 @@ const ColumnHeader = ({
           },
         }}
       >
-        <MenuItem onClick={removeColumn}>
+        <MenuItem
+          onClick={() => {
+            setMenuAnchorEl(null);
+            removeColumn();
+          }}
+        >
           <ListItemIcon>
-            <VisibilityOff fontSize="small" />
+            <RemoveIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Remove Column</ListItemText>
         </MenuItem>
 
-        <MenuItem onClick={renameColumn}>
+        <MenuItem
+          onClick={() => {
+            setMenuAnchorEl(null);
+            // Delay focus to allow menu to close first
+            setIsHeaderEditable(true);
+            setTimeout(() => {
+              columnNameRef.current?.focusAndSelect();
+            }, 100); // 50-100ms is usually enough
+          }}
+        >
           <ListItemIcon>
-            <ContentCopy fontSize="small" />
+            <RenameIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Rename Column</ListItemText>
         </MenuItem>
 
-        <Divider />
-
-        {/* TODO */}
-        {/* <MenuItem onClick={() => console.log("filter")}>
-          <ListItemIcon>
-            <FilterList fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Filter Column</ListItemText>
-        </MenuItem> */}
-
-        <MenuItem onClick={() => console.log("sort-asc")}>
+        <MenuItem
+          onClick={() => {
+            handleSort("asc");
+            setMenuAnchorEl(null);
+          }}
+        >
           <ListItemIcon>
             <ArrowUpward fontSize="small" />
           </ListItemIcon>
           <ListItemText>Sort Ascending</ListItemText>
         </MenuItem>
 
-        <MenuItem onClick={() => console.log("sort-desc")}>
+        <MenuItem
+          onClick={() => {
+            handleSort("desc");
+            setMenuAnchorEl(null);
+          }}
+        >
           <ListItemIcon>
             <ArrowDownward fontSize="small" />
           </ListItemIcon>
@@ -235,6 +259,8 @@ ColumnHeader.propTypes = {
   sortDirection: PropTypes.oneOf(["asc", "desc"]),
   onSort: PropTypes.func,
   index: PropTypes.number,
+  removeColumn: PropTypes.func.isRequired,
+  renameColumn: PropTypes.func.isRequired,
 };
 
 const EnhancedColumnHeader = withColumnData(ColumnHeader);
