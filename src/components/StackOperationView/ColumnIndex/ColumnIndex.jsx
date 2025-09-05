@@ -47,8 +47,9 @@ export function ColumnIndex({
   // Use mouseover/mouseout to handle transitions between child and parent
   const handleMouseOver = useCallback(
     (event) => {
+      const isPopoverOpen = document.querySelector('[role="presentation"]');
       // Only fire if mouse is entering from outside the parent (not from a child)
-      if (!isMouseOverChild(event)) {
+      if (!isMouseOverChild(event) && !isPopoverOpen) {
         if (hoverTimeoutRef.current) {
           clearTimeout(hoverTimeoutRef.current);
         }
@@ -123,7 +124,10 @@ export function ColumnIndex({
         data-columnids={columnIds.join(",")}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
-        onClick={() => onColumnClick({ shiftKey: false }, index)}
+        onClick={() => {
+          console.log("ColumnIndex clicked");
+          onColumnClick({ shiftKey: false }, index);
+        }}
         onContextMenu={(event) => {
           event.preventDefault();
           setMenuAnchorEl(event.currentTarget);
@@ -178,7 +182,9 @@ export function ColumnIndex({
             },
           },
         }}
-        onClose={() => {
+        onClose={(event) => {
+          console.log("Popover onClose");
+          event.stopPropagation();
           setMenuAnchorEl(null);
         }}
       >
@@ -186,7 +192,8 @@ export function ColumnIndex({
           {menuItems.map((item, index) => (
             <ListItemButton
               key={index}
-              onClick={() => {
+              onClick={(event) => {
+                event.stopPropagation();
                 item.action();
                 setMenuAnchorEl(null);
               }}

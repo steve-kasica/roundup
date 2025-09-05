@@ -61,7 +61,10 @@ function ColumnContainer({
   const isDropZone = canDropHere && !isOver && !isDragging;
 
   const hoverTimeoutRef = useRef(null);
-  const closePopover = () => {
+  const closePopover = (event) => {
+    if (event) {
+      event.stopPropagation();
+    }
     setAnchorEl(null);
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
@@ -75,7 +78,6 @@ function ColumnContainer({
       disabled: false,
       onClick: () => {
         handleOnSwapClick();
-        closePopover();
       },
     },
     {
@@ -83,31 +85,28 @@ function ColumnContainer({
       disabled: isNull,
       onClick: () => {
         handleOnRemoveClick();
-        closePopover();
       },
     },
-    {
-      label: "Remove all to the right",
-      disabled: true,
-      onClick: () => {
-        // TODO: implement logic to remove all columns to the right
-        // handleRemoveColumnsAfter();
-        closePopover();
-      },
-    },
-    {
-      label: "Null column",
-      disabled: isNull,
-      onClick: () => {
-        handleOnNullClick();
-        closePopover();
-      },
-    },
+    // {
+    //   label: "Remove all to the right",
+    //   disabled: true,
+    //   onClick: () => {
+    //     // TODO: implement logic to remove all columns to the right
+    //     // handleRemoveColumnsAfter();
+    //     return null;
+    //   },
+    // },
+    // {
+    //   label: "Null column",
+    //   disabled: isNull,
+    //   onClick: () => {
+    //     handleOnNullClick();
+    //   },
+    // },
     {
       label: "Rename",
       disabled: isNull,
       onClick: () => {
-        closePopover();
         handleOnRenameClick();
       },
     },
@@ -133,12 +132,12 @@ function ColumnContainer({
           !isPopoverOpen ? handleOnClick(event) : null;
         }}
         onContextMenu={(event) => {
-          event.preventDefault();
+          event.preventDefault(); // Prevent browser's context menu
           event.stopPropagation(); // Prevent event from bubbling up to parent
-          setAnchorEl(event.currentTarget);
+          setAnchorEl(event.currentTarget); // Open popover
+          handleOnClick(event); // Select column on right-click as well
         }}
         onMouseEnter={() => {
-          console.log("Mouse enter: ColumnContainer");
           handleOnMouseEnter();
         }}
         onMouseLeave={() => !isPopoverOpen && handleOnMouseLeave()}
@@ -156,7 +155,12 @@ function ColumnContainer({
       <Popover
         open={isPopoverOpen}
         anchorEl={anchorEl}
-        onClose={closePopover}
+        onClose={(event, reason) => {
+          if (event && reason === "backdropClick") {
+            event.stopPropagation();
+          }
+          closePopover(event);
+        }}
         anchorOrigin={{
           vertical: "center",
           horizontal: "right",
@@ -191,7 +195,11 @@ function ColumnContainer({
             <ListItemButton
               key={item.label}
               disabled={item.disabled}
-              onClick={item.onClick}
+              onClick={(event) => {
+                event.stopPropagation();
+                item.onClick();
+                closePopover();
+              }}
             >
               {item.label}
             </ListItemButton>

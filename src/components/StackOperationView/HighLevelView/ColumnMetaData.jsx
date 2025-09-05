@@ -10,7 +10,7 @@
  */
 
 import { useState, useRef } from "react";
-import { Popover, List, ListItemButton, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import PropTypes from "prop-types";
 
 import withColumnData from "../../HOC/withColumnData";
@@ -18,7 +18,7 @@ import EditableText from "../../ui/EditableText";
 import ValuesSample from "./ValuesSample";
 import Box from "@mui/material/Box";
 import ColumnTypeIcon from "../../ui/ColumnTypeIcon";
-import { DRAG_MODE_COLUMN, DRAG_MODE_DISABLED } from "../StackOperationView";
+import { DRAG_MODE_DISABLED } from "../StackOperationView";
 import ColumnContainer from "../ColumnContainer";
 
 // Export drag type constant for use in CustomDragLayer
