@@ -1,10 +1,14 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Collapse,
   IconButton,
   ListItem,
   ListItemText,
   Tooltip,
+  Typography,
   styled,
 } from "@mui/material";
 import withOperationData from "../HOC/withOperationData";
@@ -54,6 +58,17 @@ function OperationView({
     setAnchorEl(event.currentTarget);
   };
 
+  const renderOperationParams = () => {
+    switch (operation.operationType) {
+      case OPERATION_TYPE_PACK:
+        return <PackOperationParams id={operation.id} />;
+      case OPERATION_TYPE_STACK:
+        return <StackOperationParams />;
+      default:
+        return <Typography component="pre">Unknown operation type</Typography>;
+    }
+  };
+
   // Parse error message if it's a JSON string
   const getErrorMessage = () => {
     if (!operation.error) return "";
@@ -72,35 +87,60 @@ function OperationView({
 
   const listItemContent = (
     <>
-      <ListItem
+      <Accordion
         onClick={() => {
           focusOperation();
-          setDetailsOpen(!detailsOpen);
+          // TODO: remove
+          // setDetailsOpen(!detailsOpen);
         }}
-        secondaryAction={
-          <IconButton edge="end" aria-label="menu" onClick={handleMenuOpen}>
-            {detailsOpen ? <ExpandMore /> : <ExpandLess />}
-          </IconButton>
-        }
         sx={{
-          backgroundColor: isFocused ? "primary.light" : "inherit", // Highlight background when focused
           borderLeft: isFocused ? "4px solid" : "none", // Add a left border when focused
           borderColor: isFocused ? "primary.main" : "transparent", // Border color for focus
-          "& .MuiListItemText-primary": {
-            fontWeight: isFocused ? "bold" : "normal", // Bold text when focused
-          },
           "&:hover": {
             backgroundColor: "action.hover", // Add hover effect
           },
         }}
       >
-        <ListItemText
-          primary={`${position}. ${operation.name} (${columnCount})`}
-          secondary={`${label}: ${childrenIds.join(", ")}`}
-        />
-      </ListItem>
+        <AccordionSummary
+          expandIcon={<ExpandMore />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+          sx={{
+            "& .MuiListItemText-primary": {
+              fontWeight: isFocused ? "bold" : "normal", // Bold text when focused
+            },
+          }}
+        >
+          <ListItemText
+            primary={`${position}. ${operation.name} (${columnCount})`}
+            secondary={`${label}: ${childrenIds.join(", ")}`}
+          />
+        </AccordionSummary>
+        <AccordionDetails
+          sx={{
+            backgroundColor: "grey.50",
+            border: "1px solid",
+            borderColor: "grey.300",
+            borderRadius: 1,
+            margin: 1,
+            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.1)",
+            "&:before": {
+              content: '""',
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "1px",
+              background:
+                "linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)",
+            },
+          }}
+        >
+          <Box sx={{ padding: 2 }}>{renderOperationParams()}</Box>
+        </AccordionDetails>
+      </Accordion>
 
-      <Collapse in={detailsOpen} timeout="auto" unmountOnExit>
+      {/* <Collapse in={detailsOpen} timeout="auto" unmountOnExit>
         <Box>
           {operation.operationType === OPERATION_TYPE_STACK && (
             <StackOperationParams />
@@ -109,7 +149,7 @@ function OperationView({
             <PackOperationParams id={operation.id} />
           )}
         </Box>
-      </Collapse>
+      </Collapse> */}
     </>
   );
 
