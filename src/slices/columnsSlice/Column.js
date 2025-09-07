@@ -81,25 +81,48 @@ export const COLUMN_TYPES = [
  * @throws {Error} If any required parameter is undefined or if columnType is invalid.
  * @returns {Object} The newly created column object with properties: id, tableId, name, index, columnType, and values.
  */
-export default function Column(tableId, index, name, columnType) {
+export default function Column(
+  tableId,
+  index,
+  summary = {
+    name: null,
+    columnType: null,
+    approxUnique: null,
+    avg: null,
+    count: null,
+    max: null,
+    min: null,
+    nullPercent: null,
+    q25: null,
+    q50: null,
+    q75: null,
+    std: null,
+  }
+) {
   if (tableId === undefined) {
     throw new Error("Param undefined `tableId`");
   } else if (index === undefined) {
     throw new Error("Param undefined, `index`");
-  } else if (columnType === undefined) {
-    throw new Error("Param undefined, `columnType`");
-  } else if (!COLUMN_TYPES.includes(columnType)) {
-    throw new InvalidColumnTypeError(columnType);
   }
 
   const id = `c${++idCounter}`;
 
   return {
     id, // id is immutable and used as the unique identifier for table columns
-    name, // name is mutable and can be changed by the user
-    tableId, // tableId is immutable and used to identify the table the column belongs to
+    tableId, // tableId is immutable and used to identify the table the column belongs to. Columns do not transfer between tables in this application.
     index,
-    columnType,
+    name: summary.name, // name is mutable and can be changed by the user
+    columnType: summary.columnType, // columnType is mutable and can be changed by the user
+    approxUnique: summary.approxUnique,
+    avg: summary.avg,
+    count: summary.count,
+    max: summary.max,
+    min: summary.min,
+    nullPercent: summary.nullPercent,
+    q25: summary.q25,
+    q50: summary.q50,
+    q75: summary.q75,
+    std: summary.std,
     uniqueValues: null, // Unique values in the column, can be null if not computed yet
     totalRows: null, // Total number of rows in the column, can be null if not computed yet
     nonNullValues: null, // Number of non-null values in the column, can be null if not computed yet

@@ -50,7 +50,7 @@ export function* uploadTablesSagaWorker(action) {
   const columnsArrays = Promise.all(
     tables.map(async (table) =>
       (await summarizeTable(table.id)).map((summary, i) =>
-        Column(table.id, i, summary.column_name, summary.column_type)
+        Column(table.id, i, summary)
       )
     )
   );
