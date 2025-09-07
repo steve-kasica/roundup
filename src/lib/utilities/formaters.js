@@ -2,6 +2,8 @@ import { format, utcFormat } from "d3";
 
 export const formatNumber = format(",");
 
+export const formatPercentage = format(".1%");
+
 export const formatDate = utcFormat("%b. %d, %Y");
 
 /**

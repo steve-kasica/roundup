@@ -53,11 +53,18 @@ export default function withColumnData(WrappedComponent) {
     const values = column?.values;
     const error = column?.error;
     const alias = column?.alias;
+    const nullCount = isNull
+      ? column.count
+      : Math.floor(column.count * column.nullPercentage);
+    const completeness = isNull ? 0 : 1 - column.nullPercentage;
 
     return (
       <WrappedComponent
         {...props}
         column={column}
+        nullCount={nullCount}
+        completeness={completeness}
+        completeCount={column.count - nullCount}
         id={id}
         tableId={tableId}
         name={name}
