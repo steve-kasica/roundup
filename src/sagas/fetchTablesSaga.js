@@ -6,8 +6,6 @@ import {
   TABLE_SOURCE_OPEN_REFINE,
 } from "../slices/tablesSlice";
 import { createAction } from "@reduxjs/toolkit";
-import { fetchColumnMetadataRequest } from "./fetchColumnMetadataSaga";
-import { fetchColumnMetadataSuccess } from "./fetchColumnMetadataSaga";
 // import { fetchColumnMetadata } from "./fetchColumnMetadata";
 
 export const fetchTablesRequest = createAction("saga/fetchTablesRequest");
