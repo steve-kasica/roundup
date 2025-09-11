@@ -14,6 +14,7 @@ import {
   DataUsage as DataIcon,
 } from "@mui/icons-material";
 import EnhancedColumnCard from "./ColumnCard";
+import ColumnView from "../../ColumnView/ColumnView";
 
 const HighLevelView = ({ table, activeColumnIds }) => {
   const [summary, setSummary] = useState(null);
@@ -97,7 +98,7 @@ const HighLevelView = ({ table, activeColumnIds }) => {
       >
         {activeColumnIds.map((id, index) => (
           <Box sx={{ flex: "0 0 auto" }} key={id}>
-            <EnhancedColumnCard id={id} index={index} />
+            <ColumnView id={id} />
           </Box>
         ))}
       </Box>

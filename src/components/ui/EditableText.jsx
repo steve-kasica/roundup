@@ -8,7 +8,7 @@ const EditableText = ({
   isReadOnly = false,
   isEditable = false,
   debounceDelay = 300, // in milliseconds
-  placeholder = "Lorem ipsum dolor sit amet",
+  placeholder = "Lorem",
   fontSize = "2rem",
   onEditingStateChange, // Callback to notify parent of editing state changes
 }) => {
@@ -82,6 +82,8 @@ const EditableText = ({
       onBlur={handleBlur}
       readOnly={isReadOnly && !isEditable}
       style={{
+        width: `${localValue.length + 2}ch`,
+        maxWidth: "100px",
         background: "transparent",
         border: "none",
         cursor: isReadOnly && !isEditable ? "inherit" : "text",

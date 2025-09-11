@@ -17,6 +17,7 @@ import LeftSideBar from "./LeftSideBar";
 import { useSelector } from "react-redux";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import CompositeTableSchema from "../../components/CompositeTableSchema";
+import ColumnDetail from "../../components/ColumnDetail";
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
   width: "2px",
@@ -94,6 +95,11 @@ export default function SupportingPane() {
             <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
             <Panel order={2}>
               <MainContent />
+            </Panel>
+            <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
+            <Panel order={3}>
+              {/* Right sidebar could go here */}
+              <ColumnDetail />
             </Panel>
           </PanelGroup>
         )}
