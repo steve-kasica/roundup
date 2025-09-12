@@ -89,8 +89,8 @@ const HighLevelView = ({ table, activeColumnIds }) => {
         {activeColumnIds.map((id, index) => (
           <Box sx={{ flex: "0 0 auto" }} key={id}>
             <ColumnCard id={id}>
-              <ColumnHeader id={id} />
-              <ColumnValuesSample id={id} />
+              <ColumnHeader id={id} width={"auto"} />
+              <ColumnValuesSample id={id} limit={5} />
             </ColumnCard>
           </Box>
         ))}

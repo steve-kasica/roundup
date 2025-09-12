@@ -20,7 +20,13 @@ import {
 import withColumnData from "./withColumnData";
 
 const ColumnHeader = withColumnData(
-  ({ column, isReadOnly = true, renameColumn, removeColumn }) => {
+  ({
+    column,
+    isReadOnly = true,
+    renameColumn,
+    removeColumn,
+    width = "150px",
+  }) => {
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [isEditable, setIsEditable] = useState(false);
     const headerInputRef = useRef(null);
@@ -28,7 +34,13 @@ const ColumnHeader = withColumnData(
       {
         label: "Rename",
         icon: RenameIcon,
-        action: () => setIsEditable(true),
+        action: () => {
+          // Delay focus to allow menu to close first
+          setIsEditable(true);
+          setTimeout(() => {
+            headerInputRef.current?.focusAndSelect();
+          }, 100); // 50-100ms is usually enough
+        },
       },
       {
         label: "Remove",
@@ -47,7 +59,7 @@ const ColumnHeader = withColumnData(
           display="flex"
           flexDirection="row"
           alignItems="center"
-          sx={{ gap: 0 }}
+          sx={{ gap: 0, width: width }}
         >
           <Box
             backgroundColor="#ddd"
