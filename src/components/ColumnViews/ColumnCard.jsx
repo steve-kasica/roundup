@@ -1,5 +1,6 @@
 import withColumnData from "./withColumnData";
-import StyledPaper from "./StyledPaper";
+import { styled } from "@mui/system";
+import { Paper } from "@mui/material";
 
 const StyledPaper = styled(Paper)(
   ({
