@@ -2,10 +2,8 @@ import {
   Box,
   ToggleButton,
   ToggleButtonGroup,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
 import {
   OPERATION_TYPE_STACK,
   OPERATION_TYPE_PACK,
@@ -14,14 +12,17 @@ import {
   selectAllOperationIds,
   OPERATION_TYPE_NO_OP,
 } from "../../slices/operationsSlice";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import StackOperationView from "../../components/StackOperationView";
 import PackOperationView from "../../components/PackOperationView";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
 import TableView from "../../components/TableView";
+import { LOD, setLevelOfDetail } from "../../slices/uiSlice";
 
 export default function MainContent() {
+  const dispatch = useDispatch();
+  const lod = useSelector((state) => state.ui.levelOfDetail);
   const focusedOperation = useSelector((state) => {
     const id = selectFocusedOperationId(state);
     return selectOperation(state, id);
@@ -46,6 +47,31 @@ export default function MainContent() {
           overflow: "auto",
         }}
       >
+        <Box
+          display={"flex"}
+          alignItems="center"
+          justifyContent={"space-between"}
+        >
+          <Typography variant="h6" gutterBottom>
+            Operation view: {focusedOperation?.name || "No operation"}
+          </Typography>
+          <ToggleButtonGroup
+            value={lod}
+            exclusive
+            onChange={(event, lod) => dispatch(setLevelOfDetail(lod))}
+            aria-label="view mode"
+            size="small"
+            sx={{ ml: 2 }}
+          >
+            <ToggleButton value={LOD.LOW} aria-label="low view">
+              Low
+            </ToggleButton>
+            <ToggleButton value={LOD.HIGH} aria-label="high view">
+              High
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+
         {tables.length === 0 ? (
           <Box sx={{ width: "100%", textAlign: "center" }}>
             <pre>No tables uploaded to Roundup</pre>

@@ -1,20 +1,10 @@
-import { useState, useEffect } from "react";
-import { summarizeTable } from "../../../lib/duckdb";
+import { useState } from "react";
 import withTableData from "../../HOC/withTableData";
 import { Box, Typography, LinearProgress } from "@mui/material";
-import {
-  TableChart as TableIcon,
-  Numbers as NumberIcon,
-  TextFields as TextIcon,
-  Event as DateIcon,
-  CheckBox as BooleanIcon,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
-  Remove as NullIcon,
-  DataUsage as DataIcon,
-} from "@mui/icons-material";
-import EnhancedColumnCard from "./ColumnCard";
-import ColumnView from "../../ColumnView/ColumnView";
+import { TableChart as TableIcon } from "@mui/icons-material";
+import { ColumnCard } from "../../ColumnViews";
+import ColumnHeader from "../../ColumnViews/ColumnHeader";
+import ColumnValuesSample from "../../ColumnViews/ColumnValuesSample";
 
 const HighLevelView = ({ table, activeColumnIds }) => {
   const [summary, setSummary] = useState(null);
@@ -98,7 +88,10 @@ const HighLevelView = ({ table, activeColumnIds }) => {
       >
         {activeColumnIds.map((id, index) => (
           <Box sx={{ flex: "0 0 auto" }} key={id}>
-            <ColumnView id={id} />
+            <ColumnCard id={id}>
+              <ColumnHeader id={id} />
+              <ColumnValuesSample id={id} />
+            </ColumnCard>
           </Box>
         ))}
       </Box>

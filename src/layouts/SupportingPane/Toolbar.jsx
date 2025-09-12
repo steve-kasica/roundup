@@ -14,12 +14,7 @@ import {
   Clear as ClearSelectionIcon,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  LOD,
-  setDialogContent,
-  setDrawerContents,
-  setLevelOfDetail,
-} from "../../slices/uiSlice";
+import { setDialogContent, setDrawerContents } from "../../slices/uiSlice";
 import { MODULE_NAME as EXPORT_MODULE } from "../../components/ExportCompositeTable";
 import { selectAllOperationIds } from "../../slices/operationsSlice";
 import {
@@ -108,22 +103,6 @@ export default function AppToolbar() {
           </IconButton>
         </span>
       </Tooltip>
-
-      <ToggleButtonGroup
-        value={lod}
-        exclusive
-        onChange={(event, lod) => dispatch(setLevelOfDetail(lod))}
-        aria-label="view mode"
-        size="small"
-        sx={{ ml: 2 }}
-      >
-        <ToggleButton value={LOD.LOW} aria-label="low view">
-          Low
-        </ToggleButton>
-        <ToggleButton value={LOD.HIGH} aria-label="high view">
-          High
-        </ToggleButton>
-      </ToggleButtonGroup>
       <Tooltip title="Download the composite table as a file" arrow>
         <span>
           <IconButton

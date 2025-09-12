@@ -17,7 +17,8 @@ import LeftSideBar from "./LeftSideBar";
 import { useSelector } from "react-redux";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import CompositeTableSchema from "../../components/CompositeTableSchema";
-import ColumnDetail from "../../components/ColumnDetail";
+import RightSidebar from "./RightSidebar";
+import BottomPane from "./BottomPane";
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
   width: "2px",
@@ -88,25 +89,43 @@ export default function SupportingPane() {
                   sx={{ height: "2px", width: "100%" }}
                 />
                 <Panel order={2}>
+                  <Typography variant="h6" sx={{ p: 1 }}>
+                    Output Schema
+                  </Typography>
                   <CompositeTableSchema />
                 </Panel>
               </PanelGroup>
             </Panel>
             <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
             <Panel order={2}>
-              <MainContent />
+              <PanelGroup autoSaveId="MainContentPane" direction="vertical">
+                <Panel
+                  collapsible={true}
+                  minSize={10}
+                  defaultSize={75}
+                  maxSize={100}
+                  order={1}
+                >
+                  <MainContent />
+                </Panel>
+                <StyledPanelResizeHandle
+                  sx={{ height: "2px", width: "100%" }}
+                />
+                <Panel order={2} defaultSize={25} minSize={10} maxSize={50}>
+                  <BottomPane />
+                </Panel>
+              </PanelGroup>
             </Panel>
             <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
             <Panel order={3}>
-              {/* Right sidebar could go here */}
-              <ColumnDetail />
+              <RightSidebar />
             </Panel>
           </PanelGroup>
         )}
       </Box>
 
       <ModalDialog />
-      <AppDrawer open={false} />
+      <AppDrawer open={false} onClose={() => {}} />
     </Box>
   );
 }
