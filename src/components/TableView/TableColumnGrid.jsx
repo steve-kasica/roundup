@@ -10,15 +10,12 @@ const TableColumnGrid = withTableData(({ table, activeColumnIds }) => {
       <Box
         sx={{
           display: "flex",
-          width: "100%",
-          height: "200px",
+          flexGrow: 1,
           overflowY: "auto",
+          minHeight: 0,
           flexWrap: "wrap",
           justifyContent: "space-around",
-          alignItems: "stretch",
-          padding: 1,
-          mb: 3,
-          gap: 2,
+          gap: 1,
         }}
       >
         {activeColumnIds.map((id, index) => (

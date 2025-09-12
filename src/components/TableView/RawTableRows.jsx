@@ -84,7 +84,7 @@ const RawTableRows = withTableData(
     return (
       <TableContainer
         component={Paper}
-        sx={{ height: "300px", mt: 1, overflow: "auto" }}
+        sx={{ mt: 1, overflow: "auto", width: "100%" }}
         ref={tableContainerRef}
         onScroll={handleScroll}
       >

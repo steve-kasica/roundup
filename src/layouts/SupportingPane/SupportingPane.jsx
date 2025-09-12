@@ -111,7 +111,13 @@ export default function SupportingPane() {
                 <StyledPanelResizeHandle
                   sx={{ height: "2px", width: "100%" }}
                 />
-                <Panel order={2} defaultSize={25} minSize={10} maxSize={100}>
+                <Panel
+                  order={2}
+                  defaultSize={25}
+                  minSize={10}
+                  maxSize={100}
+                  style={{ display: "flex" }}
+                >
                   <BottomPane />
                 </Panel>
               </PanelGroup>

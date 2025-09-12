@@ -1,5 +1,7 @@
 import {
   Box,
+  Divider,
+  Stack,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
@@ -8,9 +10,10 @@ import { useSelector } from "react-redux";
 import TableView, { RawTableRows } from "../../components/TableView";
 import { selectFocusedOperationId } from "../../slices/operationsSlice";
 import TableViewContainer from "../../components/TableView/TableViewContainer";
-import TableViewTitle from "../../components/TableView/TableViewTitle";
+import TableViewHeader from "../../components/TableView/TableViewHeader";
 import { useState } from "react";
 import TableColumnGrid from "../../components/TableView/TableColumnGrid";
+import TableViewIcon from "../../components/TableView/TableViewIcon";
 
 const TOGGLE_VALUES = {
   COLUMN_GRID: "column-grid",
@@ -41,15 +44,27 @@ const BottomPane = () => {
   }
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Box display={"flex"} flexDirection="column">
+    <Box
+      display="flex"
+      flexDirection="column"
+      flexGrow={1}
+      minHeight={0}
+      overflowX="auto"
+      width="100%"
+      padding={1}
+    >
+      {/* Fixed header section */}
+      <Box display="flex" flexDirection="column" flexShrink={0}>
         <Box
           display={"flex"}
           justifyContent="space-between"
           alignContent="center"
           mb={2}
         >
-          <TableViewTitle id={tableId} />
+          <Stack direction="row" spacing={1} alignItems="center">
+            <TableViewIcon id={tableId} />
+            <TableViewHeader id={tableId} />
+          </Stack>
           <ToggleButtonGroup
             size="small"
             exclusive
@@ -65,8 +80,20 @@ const BottomPane = () => {
           </ToggleButtonGroup>
         </Box>
       </Box>
-      {lod === TOGGLE_VALUES.RAW_ROWS && <RawTableRows id={tableId} />}
-      {lod === TOGGLE_VALUES.COLUMN_GRID && <TableColumnGrid id={tableId} />}
+      <Divider />
+
+      {/* Scrollable content section */}
+      <Box
+        flexGrow={1}
+        minHeight={0}
+        overflow="auto"
+        width="100%"
+        display="flex"
+        flexDirection="column"
+      >
+        {lod === TOGGLE_VALUES.RAW_ROWS && <RawTableRows id={tableId} />}
+        {lod === TOGGLE_VALUES.COLUMN_GRID && <TableColumnGrid id={tableId} />}
+      </Box>
     </Box>
   );
 };

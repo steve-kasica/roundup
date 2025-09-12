@@ -1,7 +1,7 @@
 import EditableText from "../ui/EditableText";
 import withTableData from "../HOC/withTableData";
 
-const TableViewTitle = withTableData(({ table, renameTable }) => {
+const TableViewHeader = withTableData(({ table, renameTable }) => {
   return (
     <EditableText
       initialValue={table.name}
@@ -13,4 +13,4 @@ const TableViewTitle = withTableData(({ table, renameTable }) => {
   );
 });
 
-export default TableViewTitle;
+export default TableViewHeader;

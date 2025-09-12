@@ -82,8 +82,9 @@ const EditableText = ({
       onBlur={handleBlur}
       readOnly={isReadOnly && !isEditable}
       style={{
-        width: `${localValue.length + 2}ch`,
-        maxWidth: "100px",
+        // TODO: what's up here?
+        // width: `${localValue.length + 2}ch`,
+        // maxWidth: "100px",
         background: "transparent",
         border: "none",
         cursor: isReadOnly && !isEditable ? "inherit" : "text",
