@@ -23,9 +23,11 @@ const RawTableRows = withTableData(({ table, activeColumnIds }) => {
     activeColumnIds
   );
   return (
-    <Box sx={{}}>
+    <Box>
       <Typography variant="h6">Row View: {table?.name}</Typography>
-      <TableContainer component={Paper} sx={{ height: 300, mt: 1 }}>
+      {/* TODO: users may never be able to scroll to the bottom of the table, but this makes the 
+      table sufficiently long so that resize the parent pane doesn't case issues */}
+      <TableContainer component={Paper} sx={{ height: "100vh", mt: 1 }}>
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
