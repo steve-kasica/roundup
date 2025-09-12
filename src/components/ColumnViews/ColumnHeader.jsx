@@ -16,6 +16,7 @@ import {
   DeleteForever as RemoveIcon,
   MoreVert,
   PanTool as RearrangeIcon,
+  Done as SelectIcon,
 } from "@mui/icons-material";
 import withColumnData from "./withColumnData";
 
@@ -25,6 +26,7 @@ const ColumnHeader = withColumnData(
     isReadOnly = true,
     renameColumn,
     removeColumn,
+    selectSingleColumn,
     width = "150px",
   }) => {
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -51,6 +53,11 @@ const ColumnHeader = withColumnData(
         label: "Rearrange",
         icon: RearrangeIcon,
         action: () => console.log("Rearrange clicked"),
+      },
+      {
+        label: "Select",
+        icon: SelectIcon,
+        action: selectSingleColumn,
       },
     ];
     return (
@@ -89,7 +96,7 @@ const ColumnHeader = withColumnData(
               onChange={(newName) => renameColumn(newName)}
               isReadOnly={isReadOnly}
               isEditable={isEditable}
-              onEditingStateChange={() => console.log("TODO")}
+              onEditingStateChange={() => console.log("Editing state change")}
               fontSize="1rem"
             />
           </Box>

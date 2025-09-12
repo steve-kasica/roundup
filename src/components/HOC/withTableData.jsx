@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
   selectOperationDepth,
@@ -10,6 +10,8 @@ import { setPeekedTable } from "../../slices/uiSlice";
 import {
   selectColumnById,
   selectRemovedColumnIdsByTableId,
+  selectSelectedColumns,
+  setSelectedColumns,
 } from "../../slices/columnsSlice";
 import {
   removeFromSelectedTables,
@@ -50,9 +52,11 @@ export default function withTableData(WrappedComponent) {
       [table, removedColumnIds]
     );
 
-    // TODO: deprecate selectedColumnIds
-    const selectedColumnIds = useSelector(
-      (state) => state.columns.idsByTable[table.id]
+    // The intersection of the set of columns in this table and the set of selected columns
+    const selectedColumnIds = useSelector((state) =>
+      selectSelectedColumns(state).filter((colId) =>
+        activeColumnIds.includes(colId)
+      )
     );
 
     // TODO: deprecate columns
@@ -74,6 +78,12 @@ export default function withTableData(WrappedComponent) {
     const isHovered = hoveredTable === id;
     const isSelected = selectedTables.includes(id);
 
+    // Functions to handle interactions
+    const selectColumns = useCallback(
+      (columnIds) => dispatch(setSelectedColumns(columnIds)),
+      [dispatch]
+    );
+
     return (
       <WrappedComponent
         {...props}
@@ -94,6 +104,7 @@ export default function withTableData(WrappedComponent) {
         isSelected={isSelected}
         isFocused={parentOperation ? true : false}
         // Interaction handlers
+        selectColumns={selectColumns}
         onHover={() => dispatch(setHoveredTable(id))} // TODO: remove
         onUnhover={() => dispatch(clearHoveredTable())} // TODO: remove
         hoverTable={() => dispatch(setHoveredTable(id))}
