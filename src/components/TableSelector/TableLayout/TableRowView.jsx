@@ -282,7 +282,7 @@ function TableRowView({
       isSelected={isSelected}
       isHovered={isHovered}
       data-tableid={table.id}
-      data-isSelected={isSelected}
+      data-selected={isSelected}
       data-multiselected={
         selectedTableIds.includes(table.id) && selectedTableIds.length > 1
       }
@@ -300,7 +300,7 @@ function TableRowView({
           const clickedIndex = ids.indexOf(table.id);
           // Find all selected rows in DOM order
           const selectedRows = rows.filter(
-            (row) => row.getAttribute("data-isSelected") === "true"
+            (row) => row.getAttribute("data-selected") === "true"
           );
           const selectedIndices = selectedRows.map((row) =>
             ids.indexOf(row.getAttribute("data-tableid"))
