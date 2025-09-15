@@ -14,11 +14,13 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import TableViewContainer from "./TableViewContainer";
 import ColumnTableHeader from "../ColumnViews/ColumnTableHeader";
 
 const RawTableRows = withTableData(
   ({ table, activeColumnIds, selectedColumnIds, selectColumns }) => {
+    const selectedColumnIndices = activeColumnIds.map((colId) =>
+      selectedColumnIds.includes(colId) ? true : false
+    );
     const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
       table.id,
       activeColumnIds
@@ -186,7 +188,15 @@ const RawTableRows = withTableData(
                       {rowIndex + 1}
                     </TableCell>
                     {row.map((value, colIndex) => (
-                      <TableCell key={colIndex}>
+                      <TableCell
+                        key={colIndex}
+                        sx={{
+                          backgroundColor: selectedColumnIndices[colIndex]
+                            ? "#e3f2fd"
+                            : "inherit",
+                          userSelect: "none",
+                        }}
+                      >
                         {value === null ? (
                           <Typography
                             color="text.secondary"
