@@ -57,3 +57,5 @@ export const selectAllTablesData = createSelector(
 
 export const selectSelectedTables = (state) => state.tables.selected;
 export const selectHoveredTable = (state) => state.tables.hovered;
+
+export const selectFocusedTableId = (state) => state.tables.focused;

@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import CompositeTableSchema from "../../components/CompositeTableSchema";
 import RightSidebar from "./RightSidebar";
-import BottomPane from "./BottomPane";
+import SpreadsheetWindow from "./SpreadsheetWindow";
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
   width: "2px",
@@ -102,7 +102,7 @@ export default function SupportingPane() {
                 <Panel
                   collapsible={true}
                   minSize={10}
-                  defaultSize={75}
+                  defaultSize={10}
                   maxSize={100}
                   order={1}
                 >
@@ -113,12 +113,12 @@ export default function SupportingPane() {
                 />
                 <Panel
                   order={2}
-                  defaultSize={25}
+                  defaultSize={90}
                   minSize={10}
                   maxSize={100}
                   style={{ display: "flex" }}
                 >
-                  <BottomPane />
+                  <SpreadsheetWindow />
                 </Panel>
               </PanelGroup>
             </Panel>

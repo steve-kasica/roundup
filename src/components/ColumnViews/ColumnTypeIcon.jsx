@@ -1,11 +1,12 @@
+/* eslint-disable react/prop-types */
 import {
   Abc as CategoricalIcon,
   Numbers as NumericIcon,
   CalendarMonth as DateIcon,
   Key as KeyIcon,
+  QuestionMark as UndefinedIcon,
 } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
-import PropTypes from "prop-types";
 import { COLUMN_TYPE_VARCHAR } from "../../slices/columnsSlice";
 
 export default function ColumnTypeIcon({
@@ -35,7 +36,10 @@ export default function ColumnTypeIcon({
   let Icon;
   let tooltipText = "";
 
-  if (columnType === COLUMN_TYPE_VARCHAR && isKey) {
+  if (columnType === undefined) {
+    Icon = UndefinedIcon;
+    tooltipText = "Unknown column type";
+  } else if (columnType === COLUMN_TYPE_VARCHAR && isKey) {
     Icon = KeyIcon;
     defaultSx["fontSize"] = "1rem";
     tooltipText = "Key column (unique text)";
@@ -59,15 +63,3 @@ export default function ColumnTypeIcon({
     </Tooltip>
   );
 }
-
-ColumnTypeIcon.propTypes = {
-  column: PropTypes.shape({
-    // TODO: these need to be somewhere in the column slice
-    // and exported here
-    columnType: PropTypes.oneOf(["VARCHAR", "NUMERIC", "DATE"]).isRequired,
-    uniqueValues: PropTypes.number,
-    nonNullValues: PropTypes.number,
-  }).isRequired,
-  onClick: PropTypes.func,
-  sx: PropTypes.object,
-};

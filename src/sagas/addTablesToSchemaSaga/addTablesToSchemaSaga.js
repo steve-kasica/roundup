@@ -32,7 +32,11 @@ import {
 import Operation, {
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice/Operation";
-import { clearSelectedTables, updateTables } from "../../slices/tablesSlice";
+import {
+  clearSelectedTables,
+  setFocusedTableId,
+  updateTables,
+} from "../../slices/tablesSlice";
 
 /**
  * Action creator for adding a table to a schema.
@@ -89,7 +93,7 @@ export function* addTablesToSchemaSagaWorker(action) {
     yield put(
       updateTables(tableIds.map((id) => ({ id, operationId: operation.id })))
     );
-    yield put(setFocusedOperation(operation));
+    yield put(setFocusedTableId(tableIds[0]));
   } else if (rootOperation.operationType === OPERATION_TYPE_NO_OP) {
     // Case: first table added after schema initialized with only one table
     // Update the operation type and add the new table as a child

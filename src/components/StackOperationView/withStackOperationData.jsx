@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import useOperationData from "../../hooks/useOperationData";
+import { selectSelectedColumns } from "../../slices/columnsSlice";
 
 // TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -47,12 +48,20 @@ export default function withStackOperationData(WrappedComponent) {
 
     const m = Math.max(...columnIdMatrix.map((c) => c.length), 0);
     const n = columnIdMatrix.length;
+    const selectedColumns = useSelector(selectSelectedColumns);
+    const selectedColumnIndices = columnIds.map((colId) =>
+      selectedColumns.includes(colId) ? true : false
+    );
+
+    console.log("withStackOperationData", operationDataProps);
 
     return (
       <WrappedComponent
+        operation={operation}
         columnIds={columnIds}
         childIds={childrenIds}
         columnIdMatrix={columnIdMatrix}
+        selectedColumnIndices={selectedColumnIndices}
         m={m}
         n={n}
         {...operationDataProps}

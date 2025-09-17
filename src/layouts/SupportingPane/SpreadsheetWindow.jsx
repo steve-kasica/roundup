@@ -8,12 +8,21 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import TableView, { RawTableRows } from "../../components/TableView";
-import { selectFocusedOperationId } from "../../slices/operationsSlice";
+import {
+  OPERATION_TYPE_NO_OP,
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
+  selectFocusedOperationId,
+  selectOperation,
+} from "../../slices/operationsSlice";
 import TableViewContainer from "../../components/TableView/TableViewContainer";
 import TableViewHeader from "../../components/TableView/TableViewHeader";
 import { useState } from "react";
 import TableColumnGrid from "../../components/TableView/TableColumnGrid";
 import TableViewIcon from "../../components/TableView/TableViewIcon";
+import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget"; // TODO: move to other area
+import { selectFocusedTableId } from "../../slices/tablesSlice";
+import StackVirtualTableRows from "../../components/StackOperationView/StackVirtualTableRows";
 
 const TOGGLE_VALUES = {
   COLUMN_GRID: "column-grid",
@@ -25,23 +34,14 @@ const TOGGLE_LABELS = {
   [TOGGLE_VALUES.RAW_ROWS]: "Low",
 };
 
-const BottomPane = () => {
-  const tableId = useSelector((state) => {
-    const focusedOperation = selectFocusedOperationId(state);
-    if (!focusedOperation) return null;
-    return state.operations.data[focusedOperation].children[0];
+const SpreadsheetWindow = () => {
+  const focusedOperationId = useSelector(selectFocusedOperationId);
+  const focusedOperationType = useSelector((state) => {
+    if (!focusedOperationId) return null;
+    return selectOperation(state, focusedOperationId).operationType;
   });
-  const [lod, setLod] = useState(TOGGLE_VALUES.COLUMN_GRID);
-
-  if (tableId === null) {
-    return (
-      <Box sx={{ p: 2 }}>
-        <Typography variant="body2" color="text.secondary">
-          No table selected.
-        </Typography>
-      </Box>
-    );
-  }
+  const focusedTableId = useSelector(selectFocusedTableId);
+  // const [lod, setLod] = useState(TOGGLE_VALUES.COLUMN_GRID);
 
   return (
     <Box
@@ -55,7 +55,7 @@ const BottomPane = () => {
     >
       {/* Fixed header section */}
       <Box display="flex" flexDirection="column" flexShrink={0}>
-        <Box
+        {/* <Box
           display={"flex"}
           justifyContent="space-between"
           alignContent="center"
@@ -78,7 +78,7 @@ const BottomPane = () => {
               {TOGGLE_LABELS[TOGGLE_VALUES.COLUMN_GRID]}
             </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </Box> */}
       </Box>
       <Divider />
 
@@ -91,11 +91,29 @@ const BottomPane = () => {
         display="flex"
         flexDirection="column"
       >
-        {lod === TOGGLE_VALUES.RAW_ROWS && <RawTableRows id={tableId} />}
-        {lod === TOGGLE_VALUES.COLUMN_GRID && <TableColumnGrid id={tableId} />}
+        {focusedTableId === null && focusedOperationId === null ? (
+          <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
+            <Typography>Drag to add a source table</Typography>
+          </TableDropTarget>
+        ) : focusedOperationId === null && focusedTableId !== null ? (
+          <RawTableRows id={focusedTableId} />
+        ) : focusedOperationType === OPERATION_TYPE_STACK ? (
+          <StackVirtualTableRows id={focusedOperationId} />
+        ) : focusedOperationType === OPERATION_TYPE_PACK ? (
+          <Typography sx={{ p: 2 }}>
+            Table view not available for pack operations.
+          </Typography>
+        ) : (
+          <pre>Error: unsupported state</pre>
+        )}
+
+        {/* {lod === TOGGLE_VALUES.RAW_ROWS && <RawTableRows id={tableId} />}
+            {lod === TOGGLE_VALUES.COLUMN_GRID && (
+              <TableColumnGrid id={tableId} />
+            )} */}
       </Box>
     </Box>
   );
 };
 
-export default BottomPane;
+export default SpreadsheetWindow;

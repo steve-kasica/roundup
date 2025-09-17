@@ -1,44 +1,59 @@
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import ColumnHeader from "../ColumnViews/ColumnHeader";
 import withTableData from "../HOC/withTableData";
-import { useRef, useCallback } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
+import { useRef, useCallback, useEffect } from "react";
+import { Box } from "@mui/material";
 import ColumnTableHeader from "../ColumnViews/ColumnTableHeader";
+import TableBody from "./TableBody.jsx";
+import TableHead from "./TableHead.jsx";
+import { COLUMN_WIDTHS } from "./index.js";
 
 const RawTableRows = withTableData(
-  ({ table, activeColumnIds, selectedColumnIds, selectColumns }) => {
+  ({
+    table,
+    activeColumnIds,
+    selectedColumnIds,
+    selectColumns,
+    showTableHead = true,
+    onScrollContainerRef,
+    onScroll,
+    allowExternalScrollSync = false,
+  }) => {
     const selectedColumnIndices = activeColumnIds.map((colId) =>
       selectedColumnIds.includes(colId) ? true : false
     );
-    const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
-      table.id,
-      activeColumnIds
-    );
+    // const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
+    //   table.id,
+    //   activeColumnIds
+    // );
 
     const tableContainerRef = useRef(null);
 
-    const handleScroll = useCallback(
-      (event) => {
-        const { scrollTop, scrollHeight, clientHeight } = event.target;
-        const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100; // Trigger 100px before bottom
+    // Notify parent of scroll container ref when it changes
+    useEffect(() => {
+      if (onScrollContainerRef && tableContainerRef.current) {
+        onScrollContainerRef(tableContainerRef.current);
+      }
+    }, [onScrollContainerRef]);
 
-        if (isNearBottom && hasMore && !loading) {
-          loadMore();
-        }
-      },
-      [hasMore, loading, loadMore]
-    );
+    // const handleScroll = useCallback(
+    //   (event) => {
+    //     const { scrollTop, scrollHeight, clientHeight, scrollLeft } =
+    //       event.target;
+    //     const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+
+    //     // Handle lazy loading
+    //     if (isNearBottom && hasMore && !loading) {
+    //       loadMore();
+    //     }
+
+    //     // Notify parent for scroll synchronization
+    //     if (onScroll && allowExternalScrollSync) {
+    //       onScroll(scrollLeft, scrollTop);
+    //     }
+    //   },
+    //   [hasMore, loading, loadMore, onScroll, allowExternalScrollSync]
+    // );
 
     const handleColumnClick = useCallback(
       (event, columnId) => {
@@ -84,165 +99,23 @@ const RawTableRows = withTableData(
       table sufficiently long so that resize the parent pane doesn't case issues */
     }
     return (
-      <TableContainer
-        component={Paper}
-        sx={{ mt: 1, overflow: "auto", width: "100%" }}
+      <Box
+        sx={{ overflow: "hidden", width: "100%" }}
         ref={tableContainerRef}
-        onScroll={handleScroll}
+        // onScroll={handleScroll}
       >
-        <Table stickyHeader size="small">
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "background.paper" }}>
-              <TableCell
-                sx={{
-                  position: "sticky",
-                  left: 0,
-                  backgroundColor: "background.paper",
-                  zIndex: 3,
-                  width: "30px",
-                  borderRight: "1px solid",
-                  borderColor: "divider",
-                }}
-              >
-                #
-              </TableCell>
-              {activeColumnIds.map((columnId) => (
-                <ColumnTableHeader
-                  key={columnId}
-                  id={columnId}
-                  isSelected={selectedColumnIds.includes(columnId)}
-                  onClickHandler={(event) => handleColumnClick(event, columnId)}
-                >
-                  <ColumnHeader id={columnId} />
-                </ColumnTableHeader>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              Array.from({ length: 10 }).map((_, idx) => (
-                <TableRow
-                  key={idx}
-                  sx={{
-                    backgroundColor: idx % 2 === 0 ? "#f9f9f9" : "white",
-                  }}
-                >
-                  <TableCell
-                    sx={{
-                      position: "sticky",
-                      left: 0,
-                      backgroundColor: "background.paper",
-                      zIndex: 1,
-                      width: "30px",
-                      borderRight: "1px solid",
-                      borderColor: "divider",
-                    }}
-                  >
-                    {idx + 1}
-                  </TableCell>
-                  {activeColumnIds.map((columnId) => (
-                    <TableCell key={columnId} sx={{ textAlign: "center" }}>
-                      <CircularProgress size={20} />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : error ? (
-              <TableRow>
-                <TableCell
-                  sx={{
-                    position: "sticky",
-                    left: 0,
-                    backgroundColor: "background.paper",
-                    zIndex: 1,
-                    width: "30px",
-                    borderRight: "1px solid",
-                    borderColor: "divider",
-                  }}
-                >
-                  -
-                </TableCell>
-                <TableCell colSpan={activeColumnIds.length}>
-                  <Alert severity="error">Error: {error}</Alert>
-                </TableCell>
-              </TableRow>
-            ) : (
-              <>
-                {data.map((row, rowIndex) => (
-                  <TableRow
-                    key={rowIndex}
-                    sx={{
-                      backgroundColor: rowIndex % 2 === 0 ? "#f9f9f9" : "white",
-                    }}
-                  >
-                    <TableCell
-                      sx={{
-                        position: "sticky",
-                        left: 0,
-                        backgroundColor: "inherit",
-                        zIndex: 1,
-                        borderRight: "1px solid",
-                        borderColor: "divider",
-                      }}
-                    >
-                      {rowIndex + 1}
-                    </TableCell>
-                    {row.map((value, colIndex) => (
-                      <TableCell
-                        key={colIndex}
-                        sx={{
-                          backgroundColor: selectedColumnIndices[colIndex]
-                            ? "#e3f2fd"
-                            : "inherit",
-                          userSelect: "none",
-                        }}
-                      >
-                        {value === null ? (
-                          <Typography
-                            color="text.secondary"
-                            sx={{ fontStyle: "italic", opacity: 0.6 }}
-                          >
-                            NULL
-                          </Typography>
-                        ) : typeof value === "number" ? (
-                          value.toLocaleString()
-                        ) : (
-                          value
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-                {loading && hasMore && (
-                  <TableRow>
-                    <TableCell
-                      sx={{
-                        position: "sticky",
-                        left: 0,
-                        backgroundColor: "background.paper",
-                        zIndex: 1,
-                        borderRight: "1px solid",
-                        borderColor: "divider",
-                      }}
-                    >
-                      -
-                    </TableCell>
-                    <TableCell
-                      colSpan={activeColumnIds.length}
-                      sx={{ textAlign: "center", py: 2 }}
-                    >
-                      <CircularProgress size={24} />
-                      <Typography variant="body2" sx={{ mt: 1 }}>
-                        Loading more rows...
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        {showTableHead && (
+          <TableHead
+            activeColumnIds={activeColumnIds}
+            selectedColumnIds={selectedColumnIds}
+            handleColumnClick={handleColumnClick}
+          />
+        )}
+        <TableBody
+          id={table.id}
+          selectedColumnIndices={selectedColumnIndices}
+        />
+      </Box>
     );
   }
 );

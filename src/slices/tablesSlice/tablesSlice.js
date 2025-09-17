@@ -9,6 +9,7 @@ const initialState = {
   loading: [],
   hovered: null, // ID of the table currently hovered over
   selected: [],
+  focused: null, // ID of the table currently focused
   error: null,
 };
 
@@ -258,6 +259,11 @@ const slice = createSlice({
       // Clear the hovered table ID
       state.hovered = null;
     },
+    setFocusedTableId(state, action) {
+      const tableId = action.payload;
+      // Set the focused table ID
+      state.focused = tableId;
+    },
   }, // end reducers
 });
 
@@ -281,6 +287,8 @@ export const {
 
   setHoveredTable,
   clearHoveredTable,
+
+  setFocusedTableId,
 } = slice.actions;
 
 export default slice;
