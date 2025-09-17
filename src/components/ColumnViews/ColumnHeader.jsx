@@ -5,7 +5,6 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Typography,
 } from "@mui/material";
 import EditableText from "../ui/EditableText";
 import PropTypes from "prop-types";

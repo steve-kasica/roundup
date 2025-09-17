@@ -61,12 +61,12 @@ const TableBody = withTableData(
           loadMore();
         }
 
-        // Notify parent for scroll synchronization
-        if (onScroll && allowExternalScrollSync) {
+        // Always notify parent for scroll synchronization (both horizontal and vertical)
+        if (onScroll) {
           onScroll(scrollLeft, scrollTop);
         }
       },
-      [hasMore, loading, loadMore, onScroll, allowExternalScrollSync]
+      [hasMore, loading, loadMore, onScroll]
     );
 
     // Handle external scroll updates
@@ -130,6 +130,9 @@ const TableBody = withTableData(
               key={idx}
               sx={{
                 backgroundColor: idx % 2 === 0 ? "#f9f9f9" : "white",
+                minWidth: "fit-content",
+                display: "flex",
+                flexWrap: "nowrap",
               }}
             >
               {activeColumnIds.map((columnId) => (
@@ -137,6 +140,8 @@ const TableBody = withTableData(
                   key={columnId}
                   sx={{
                     justifyContent: "center",
+                    flexShrink: 0,
+                    minWidth: COLUMN_WIDTHS.default || "150px",
                   }}
                 >
                   <CircularProgress size={20} />
@@ -164,16 +169,19 @@ const TableBody = withTableData(
                 index={rowIndex}
                 sx={{
                   backgroundColor: rowIndex % 2 === 0 ? "#f9f9f9" : "white",
+                  minWidth: "fit-content",
+                  display: "flex",
+                  flexWrap: "nowrap",
                 }}
               >
                 {row.map((value, colIndex) => (
                   <TableCell
                     key={colIndex}
+                    isSelected={selectedColumnIndices[colIndex]}
                     sx={{
-                      backgroundColor: selectedColumnIndices[colIndex]
-                        ? "#e3f2fd"
-                        : "inherit",
                       userSelect: "none",
+                      flexShrink: 0,
+                      minWidth: COLUMN_WIDTHS.default || "150px",
                     }}
                   >
                     {value === null ? (
@@ -194,9 +202,9 @@ const TableBody = withTableData(
             ))}
             {loading && hasMore && (
               // Loading more rows indicator
-              <Box sx={{ display: "flex" }}>
+              <Box sx={{ display: "flex", minWidth: "fit-content" }}>
                 <Box sx={indexCellSx}>...</Box>
-                <TableCell>
+                <TableCell sx={{ flexShrink: 0 }}>
                   <CircularProgress size={24} />
                   <Typography variant="body2" sx={{ mt: 1 }}>
                     Loading more rows...

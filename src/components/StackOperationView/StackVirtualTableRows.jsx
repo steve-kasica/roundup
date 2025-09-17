@@ -25,7 +25,10 @@ const StackVirtualTableRows = withStackOperationData(
 
         isSyncingRef.current = true;
 
-        // Sync to all other `<TableBody>` containers
+        // Sync to all other containers
+        console.log("StackVirtualTableRows handleScrollSync", {
+          scrollContainersRef,
+        });
         scrollContainersRef.current.forEach((container, childId) => {
           if (childId !== sourceChildId && container) {
             container.scrollLeft = scrollLeft;
@@ -43,7 +46,18 @@ const StackVirtualTableRows = withStackOperationData(
 
     return (
       <Box display="flex" flexDirection="column" height="100%" gap={1}>
-        <TableHead activeColumnIds={columnIds} selectedColumnIds={[]} />
+        <TableHead
+          activeColumnIds={columnIds}
+          selectedColumnIds={[]}
+          handleColumnClick={() => {}}
+          allowExternalScrollSync={true}
+          onScrollContainerRef={(el) =>
+            registerScrollContainer("table-head", el)
+          }
+          onScroll={(scrollLeft, scrollTop) =>
+            handleScrollSync("table-head", scrollLeft, scrollTop)
+          }
+        />
         {operation.children.map((childId) => (
           <TableBody
             key={childId}
@@ -62,37 +76,3 @@ const StackVirtualTableRows = withStackOperationData(
 );
 
 export default StackVirtualTableRows;
-
-/**
- *       {<Table stickyHeader size="small">
-         <TableHead>
-          <TableRow sx={{ backgroundColor: "background.paper" }}>
-            <TableCell
-              sx={{
-                position: "sticky",
-                left: 0,
-                backgroundColor: "background.paper",
-                zIndex: 3,
-                width: "30px",
-                borderRight: "1px solid",
-                borderColor: "divider",
-              }}
-            >
-              #
-            </TableCell>
-            {columnIds.map((columnId) => (
-              <ColumnTableHeader
-                key={columnId}
-                id={columnId}
-                isSelected={false}
-                // isSelected={selectedColumnIds.includes(columnId)}
-                onClickHandler={(event) => handleColumnClick(event, columnId)}
-              >
-                {columnId}
-                <ColumnHeader id={columnId} />
-              </ColumnTableHeader>
-            ))}
-          </TableRow>
-        </TableHead> 
-      </Table> 
- */

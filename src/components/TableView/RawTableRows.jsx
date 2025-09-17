@@ -1,59 +1,50 @@
-import { usePaginatedTableRows } from "../../hooks/useTableRowData";
-import ColumnHeader from "../ColumnViews/ColumnHeader";
 import withTableData from "../HOC/withTableData";
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback } from "react";
 import { Box } from "@mui/material";
-import ColumnTableHeader from "../ColumnViews/ColumnTableHeader";
 import TableBody from "./TableBody.jsx";
 import TableHead from "./TableHead.jsx";
-import { COLUMN_WIDTHS } from "./index.js";
 
 const RawTableRows = withTableData(
-  ({
-    table,
-    activeColumnIds,
-    selectedColumnIds,
-    selectColumns,
-    showTableHead = true,
-    onScrollContainerRef,
-    onScroll,
-    allowExternalScrollSync = false,
-  }) => {
+  ({ table, activeColumnIds, selectedColumnIds, selectColumns }) => {
     const selectedColumnIndices = activeColumnIds.map((colId) =>
       selectedColumnIds.includes(colId) ? true : false
     );
-    // const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
-    //   table.id,
-    //   activeColumnIds
-    // );
 
-    const tableContainerRef = useRef(null);
+    const scrollContainersRef = useRef(new Map());
+    const isSyncingRef = useRef(false);
 
-    // Notify parent of scroll container ref when it changes
-    useEffect(() => {
-      if (onScrollContainerRef && tableContainerRef.current) {
-        onScrollContainerRef(tableContainerRef.current);
+    const registerScrollContainer = useCallback((childId, scrollElement) => {
+      if (scrollElement) {
+        scrollContainersRef.current.set(childId, scrollElement);
+      } else {
+        scrollContainersRef.current.delete(childId);
       }
-    }, [onScrollContainerRef]);
+    }, []);
 
-    // const handleScroll = useCallback(
-    //   (event) => {
-    //     const { scrollTop, scrollHeight, clientHeight, scrollLeft } =
-    //       event.target;
-    //     const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+    const handleScrollSync = useCallback(
+      (sourceChildId, scrollLeft, scrollTop) => {
+        if (isSyncingRef.current) return;
 
-    //     // Handle lazy loading
-    //     if (isNearBottom && hasMore && !loading) {
-    //       loadMore();
-    //     }
+        isSyncingRef.current = true;
 
-    //     // Notify parent for scroll synchronization
-    //     if (onScroll && allowExternalScrollSync) {
-    //       onScroll(scrollLeft, scrollTop);
-    //     }
-    //   },
-    //   [hasMore, loading, loadMore, onScroll, allowExternalScrollSync]
-    // );
+        // Sync to all other containers
+        console.log("StackVirtualTableRows handleScrollSync", {
+          scrollContainersRef,
+        });
+        scrollContainersRef.current.forEach((container, childId) => {
+          if (childId !== sourceChildId && container) {
+            container.scrollLeft = scrollLeft;
+            container.scrollTop = scrollTop;
+          }
+        });
+
+        // Use setTimeout instead of requestAnimationFrame for more reliable timing
+        setTimeout(() => {
+          isSyncingRef.current = false;
+        }, 0);
+      },
+      []
+    );
 
     const handleColumnClick = useCallback(
       (event, columnId) => {
@@ -94,26 +85,31 @@ const RawTableRows = withTableData(
       },
       [activeColumnIds, selectedColumnIds, selectColumns]
     );
-    {
-      /* TODO: users may never be able to scroll to the bottom of the table, but this makes the
-      table sufficiently long so that resize the parent pane doesn't case issues */
-    }
+
     return (
-      <Box
-        sx={{ overflow: "hidden", width: "100%" }}
-        ref={tableContainerRef}
-        // onScroll={handleScroll}
-      >
-        {showTableHead && (
-          <TableHead
-            activeColumnIds={activeColumnIds}
-            selectedColumnIds={selectedColumnIds}
-            handleColumnClick={handleColumnClick}
-          />
-        )}
+      <Box sx={{ overflow: "hidden", width: "100%", height: "100%" }}>
+        <TableHead
+          activeColumnIds={activeColumnIds}
+          selectedColumnIds={selectedColumnIds}
+          handleColumnClick={handleColumnClick}
+          allowExternalScrollSync={true}
+          onScrollContainerRef={(el) =>
+            registerScrollContainer("table-head", el)
+          }
+          onScroll={(scrollLeft, scrollTop) =>
+            handleScrollSync("table-head", scrollLeft, scrollTop)
+          }
+        />
         <TableBody
           id={table.id}
           selectedColumnIndices={selectedColumnIndices}
+          allowExternalScrollSync={true}
+          onScrollContainerRef={(el) => {
+            registerScrollContainer(table.id, el);
+          }}
+          onScroll={(scrollLeft, scrollTop) =>
+            handleScrollSync(table.id, scrollLeft, scrollTop)
+          }
         />
       </Box>
     );

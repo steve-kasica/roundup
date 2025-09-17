@@ -1,18 +1,20 @@
 import { Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-const TableCell = styled(Box)(({ theme, width }) => ({
-  padding: "6px 16px",
+const TableCell = styled(Box)(({ theme, width, isSelected }) => ({
+  padding: "3px 8px",
   display: "flex",
   alignItems: "left",
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
-  backgroundColor: "inherit",
-  width: width || "200px",
-  maxWidth: width || "75px",
-  minWidth: width || "75px",
-  flexShrink: 1,
+  backgroundColor: isSelected ? "#e3f2fd" : "inherit",
+  borderLeft: "1px solid #ddd",
+  // width: width || "200px",
+  // maxWidth: width || "75px",
+  // minWidth: width || "75px",
+  width: "150px",
+  flexShrink: 0,
   flexGrow: 1,
 
   // Variants for different cell types
@@ -29,10 +31,6 @@ const TableCell = styled(Box)(({ theme, width }) => ({
     zIndex: 1,
     borderRight: `1px solid ${theme.palette.divider}`,
     justifyContent: "center",
-  },
-
-  "&.selected": {
-    backgroundColor: theme.palette.action.selected,
   },
 
   "&.clickable": {
