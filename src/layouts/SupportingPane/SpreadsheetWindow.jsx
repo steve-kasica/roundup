@@ -1,13 +1,6 @@
-import {
-  Box,
-  Divider,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
-import TableView, { RawTableRows } from "../../components/TableView";
+import { RawTableRows } from "../../components/TableView";
 import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
@@ -15,14 +8,10 @@ import {
   selectFocusedOperationId,
   selectOperation,
 } from "../../slices/operationsSlice";
-import TableViewContainer from "../../components/TableView/TableViewContainer";
-import TableViewHeader from "../../components/TableView/TableViewHeader";
-import { useState } from "react";
-import TableColumnGrid from "../../components/TableView/TableColumnGrid";
-import TableViewIcon from "../../components/TableView/TableViewIcon";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget"; // TODO: move to other area
 import { selectFocusedTableId } from "../../slices/tablesSlice";
 import StackVirtualTableRows from "../../components/StackOperationView/StackVirtualTableRows";
+import PackVirtualTable from "../../components/PackOperationView/PackVirtualTable";
 
 const TOGGLE_VALUES = {
   COLUMN_GRID: "column-grid",
@@ -100,9 +89,7 @@ const SpreadsheetWindow = () => {
         ) : focusedOperationType === OPERATION_TYPE_STACK ? (
           <StackVirtualTableRows id={focusedOperationId} />
         ) : focusedOperationType === OPERATION_TYPE_PACK ? (
-          <Typography sx={{ p: 2 }}>
-            Table view not available for pack operations.
-          </Typography>
+          <PackVirtualTable id={focusedOperationId} />
         ) : (
           <pre>Error: unsupported state</pre>
         )}

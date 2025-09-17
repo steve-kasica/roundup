@@ -1,5 +1,6 @@
 import { Box, styled } from "@mui/material";
-const TableRow = styled(Box)(({ theme }) => ({
+
+const TableRow = styled(Box)(({ theme, index }) => ({
   display: "flex",
   justifyContent: "space-evenly",
   marginLeft: 2,

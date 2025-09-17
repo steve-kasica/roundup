@@ -15,6 +15,7 @@ const TableBody = withTableData(
     onScroll,
     onScrollContainerRef,
     allowExternalScrollSync = false,
+    sx = {},
   }) => {
     const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
       table.id,
@@ -121,6 +122,7 @@ const TableBody = withTableData(
           overflow: "auto",
           height: "100%",
           maxHeight: "100%",
+          ...sx,
         }}
       >
         {loading && data.length === 0 ? (
@@ -135,6 +137,7 @@ const TableBody = withTableData(
                 flexWrap: "nowrap",
               }}
             >
+              <TableCell>{idx + 1}</TableCell>
               {activeColumnIds.map((columnId) => (
                 <TableCell
                   key={columnId}
@@ -174,6 +177,9 @@ const TableBody = withTableData(
                   flexWrap: "nowrap",
                 }}
               >
+                <TableCell sx={{ width: "10px", fontSize: "0.875rem" }}>
+                  {rowIndex + 1}
+                </TableCell>
                 {row.map((value, colIndex) => (
                   <TableCell
                     key={colIndex}

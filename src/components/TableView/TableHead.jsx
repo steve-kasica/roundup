@@ -39,6 +39,17 @@ const TableHead = ({
         msOverflowStyle: "none",
       }}
     >
+      <TableCell
+        sx={{
+          flexShrink: 0,
+          width: "10px",
+          // minWidth: COLUMN_WIDTHS.rowHeader || "50px",
+          backgroundColor: "#f0f0f0",
+          borderRight: "1px solid #ddd",
+        }}
+      >
+        #
+      </TableCell>
       {/* Data column headers */}
       {activeColumnIds.map((columnId) => (
         <TableCell
