@@ -1,7 +1,10 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import useOperationData from "../../hooks/useOperationData";
-import { selectSelectedColumns } from "../../slices/columnsSlice";
+import {
+  selectSelectedColumns,
+  setSelectedColumns,
+} from "../../slices/columnsSlice";
 
 // TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -25,6 +28,7 @@ import { selectSelectedColumns } from "../../slices/columnsSlice";
  */
 export default function withStackOperationData(WrappedComponent) {
   function EnhancedComponent({ id, ...props }) {
+    const dispatch = useDispatch();
     const { operation, columnIds, childrenIds, ...operationDataProps } =
       useOperationData(id);
 
@@ -64,6 +68,7 @@ export default function withStackOperationData(WrappedComponent) {
         selectedColumnIndices={selectedColumnIndices}
         m={m}
         n={n}
+        selectColumns={(colIds) => dispatch(setSelectedColumns(colIds))}
         {...operationDataProps}
         {...props}
       />

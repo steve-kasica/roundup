@@ -7,7 +7,6 @@
 //  */
 
 import { name as APP_NAME } from "../../../package.json";
-import MainContent from "./MainContent";
 import { Typography, Box, styled } from "@mui/material";
 import Toolbar from "./Toolbar";
 import ModalDialog from "./ModalDialog";
@@ -19,6 +18,7 @@ import { selectAllTablesData } from "../../slices/tablesSlice";
 import CompositeTableSchema from "../../components/CompositeTableSchema";
 import RightSidebar from "./RightSidebar";
 import SpreadsheetWindow from "./SpreadsheetWindow";
+import SchemaWindow from "./SchemaWindow";
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
   width: "2px",
@@ -106,7 +106,7 @@ export default function SupportingPane() {
                   maxSize={100}
                   order={1}
                 >
-                  <MainContent />
+                  <SchemaWindow />
                 </Panel>
                 <StyledPanelResizeHandle
                   sx={{ height: "2px", width: "100%" }}

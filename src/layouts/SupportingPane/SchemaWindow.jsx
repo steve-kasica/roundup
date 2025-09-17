@@ -18,9 +18,9 @@ import PackOperationView from "../../components/PackOperationView";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
 import TableView from "../../components/TableView";
-import { LOD, setLevelOfDetail } from "../../slices/uiSlice";
+import StackSchemaView from "../../components/StackOperationView/StackSchemaView";
 
-export default function MainContent() {
+export default function SchemaWindow() {
   const dispatch = useDispatch();
   const lod = useSelector((state) => state.ui.levelOfDetail);
   const focusedOperation = useSelector((state) => {
@@ -47,14 +47,11 @@ export default function MainContent() {
           overflow: "auto",
         }}
       >
-        <Box
+        {/* <Box
           display={"flex"}
           alignItems="center"
           justifyContent={"space-between"}
         >
-          <Typography variant="h6" gutterBottom>
-            Operation view: {focusedOperation?.name || "No operation"}
-          </Typography>
           <ToggleButtonGroup
             value={lod}
             exclusive
@@ -70,7 +67,7 @@ export default function MainContent() {
               High
             </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </Box> */}
 
         {tables.length === 0 ? (
           <Box sx={{ width: "100%", textAlign: "center" }}>
@@ -80,16 +77,8 @@ export default function MainContent() {
           <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
             <Typography>Drag to add a source table</Typography>
           </TableDropTarget>
-        ) : focusedOperation?.operationType === OPERATION_TYPE_NO_OP ? (
-          <TableView
-            resolution={resolution}
-            id={focusedOperation.children[0]} // Just display it's only table child
-          />
         ) : focusedOperation?.operationType === OPERATION_TYPE_STACK ? (
-          <StackOperationView
-            resolution={resolution}
-            id={focusedOperation.id}
-          />
+          <StackSchemaView id={focusedOperation.id} />
         ) : focusedOperation?.operationType === OPERATION_TYPE_PACK ? (
           <PackOperationView resolution={resolution} id={focusedOperation.id} />
         ) : (

@@ -87,9 +87,9 @@ const ColumnCard = withColumnData(
     isSelected,
     hoverColumn,
     unhoverColumn,
-    selectSingleColumn,
-    unselectColumn,
     children,
+    onClick,
+    sx,
   }) => {
     return (
       <>
@@ -102,13 +102,10 @@ const ColumnCard = withColumnData(
             flexDirection: "column",
             padding: 1,
             cursor: "pointer",
-            width: 200,
             userSelect: "none",
+            ...sx,
           }}
-          onClick={() => {
-            if (!isSelected) selectSingleColumn();
-            else unselectColumn();
-          }}
+          onClick={onClick}
           onMouseEnter={hoverColumn}
           onMouseLeave={unhoverColumn}
         >
