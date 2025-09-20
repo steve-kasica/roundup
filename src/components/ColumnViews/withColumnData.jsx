@@ -54,11 +54,12 @@ export default function withColumnData(WrappedComponent) {
     const error = column?.error;
     const alias = column?.alias;
     const nullCount = isNull
-      ? column.count
+      ? undefined
       : Math.floor(column.count * column.nullPercentage);
     const completeness = isNull ? 0 : 1 - column.nullPercentage;
     const uniqueCount = Object.keys(column?.values || {}).length;
     const duplicateCount = isNull ? 0 : column.count - nullCount - uniqueCount;
+    const completeCount = isNull ? 0 : column.count - nullCount;
 
     return (
       <WrappedComponent
@@ -66,7 +67,7 @@ export default function withColumnData(WrappedComponent) {
         column={column}
         nullCount={nullCount}
         completeness={completeness}
-        completeCount={column.count - nullCount}
+        completeCount={completeCount}
         duplicateCount={duplicateCount}
         uniqueCount={uniqueCount}
         mode={
