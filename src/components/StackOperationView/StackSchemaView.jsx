@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useCallback, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
 import { Box } from "@mui/material";
@@ -13,11 +14,17 @@ import { ColumnCard } from "../ColumnViews";
 const topRowHeight = 50; // Fixed height for the top row (column headers)
 
 const StackSchemaView = withStackOperationData(
-  ({ operation, columnIdMatrix, m, selectColumns }) => {
+  ({
+    operation,
+    columnIdMatrix,
+    m,
+    selectColumns,
+    selectedColumns,
+    swapColumns,
+  }) => {
     const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
     // TODO is this necessary?
     const [selectionExtentCell, setSelectionExtentCell] = useState(null);
-    console.log("columnIdMatrix", columnIdMatrix, selectionExtentCell);
 
     const onCellClick = useCallback(
       (event, columnId) => {
@@ -201,14 +208,16 @@ const StackSchemaView = withStackOperationData(
                 </Box>
                 {/* Column Cards Container with scroll */}
                 <Box
+                  selectedColumns={selectedColumns} // Pass selected columns
+                  columnIdMatrix={columnIdMatrix} // Pass the matrix
                   sx={{
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-evenly",
                     gap: "4px",
                     flex: 1,
-                    overflowY: "auto", // Allow scrolling within each column
-                    padding: "0 2px", // Preserve column card left-right borders
+                    overflowY: "auto",
+                    padding: "0 2px",
                   }}
                 >
                   {columnIdMatrix.map((row) => {
@@ -217,6 +226,9 @@ const StackSchemaView = withStackOperationData(
                         key={row[colIndex]}
                         id={row[colIndex]}
                         onClick={(e) => onCellClick(e, row[colIndex])}
+                        onDrop={(draggedColumn, droppedColumn) => {
+                          swapColumns(draggedColumn.id, droppedColumn.id);
+                        }}
                         sx={{ height: "100%" }}
                       >
                         <ColumnHeader id={row[colIndex]} />

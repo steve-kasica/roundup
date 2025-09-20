@@ -1,6 +1,8 @@
 import withColumnData from "./withColumnData";
 import { styled } from "@mui/system";
 import { Paper } from "@mui/material";
+import { useDrag, useDrop } from "react-dnd";
+import { useRef } from "react";
 
 const StyledPaper = styled(Paper)(
   ({
@@ -26,7 +28,13 @@ const StyledPaper = styled(Paper)(
       ? "dashed"
       : "solid",
     borderWidth: isOver ? "2px" : isDropZone ? "1px" : "1px",
-    cursor: isDraggable ? "grab" : "context-menu", // <-- USE isDraggable
+    cursor: isDragging
+      ? "grabbing"
+      : isDraggable && !isNull
+      ? "grab"
+      : isSelected
+      ? "pointer"
+      : "pointer",
     backgroundColor: isNull
       ? "#f5f5f5"
       : isDragging
@@ -76,13 +84,12 @@ const StyledPaper = styled(Paper)(
     opacity: isDragging ? 0.8 : isDropZone ? 0.95 : 1,
     transition: "all 0.2s ease-in-out",
     zIndex: isDragging ? 1000 : isOver ? 100 : undefined,
-    // Optionally, add a visual indicator for draggable state:
-    outline: isDraggable ? "2px dashed #2196f3" : undefined,
   })
 );
 
 const ColumnCard = withColumnData(
   ({
+    column,
     isHovered,
     isSelected,
     isNull,
@@ -91,19 +98,91 @@ const ColumnCard = withColumnData(
     children,
     onClick,
     sx,
+    onDrop, // Add callback for when something is dropped on this card
+    onDragEnd, // Add callback for when dragging ends
   }) => {
+    const ref = useRef(null);
+
+    const [{ isDragging }, drag] = useDrag({
+      type: "ColumnCard",
+      item: () => ({
+        ...column,
+        type: "ColumnCard",
+      }),
+      canDrag: !isNull, // Allow dragging if not null (remove isSelected requirement)
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+      end: (item, monitor) => {
+        const dropResult = monitor.getDropResult();
+        if (onDragEnd) {
+          onDragEnd(item, dropResult, monitor.didDrop());
+        }
+      },
+    });
+
+    const [{ isOver, isDropZone }, drop] = useDrop({
+      accept: "ColumnCard",
+      drop: (draggedColumn, monitor) => {
+        // Prevent nested drops
+        if (monitor.didDrop()) {
+          return;
+        }
+
+        // Don't drop on self
+        if (draggedColumn.id === column?.id) {
+          return;
+        }
+
+        const dropResult = {
+          id: column?.id,
+          column: column,
+          type: "ColumnCard",
+        };
+
+        if (onDrop) {
+          onDrop(draggedColumn, dropResult);
+        }
+
+        return dropResult;
+      },
+      canDrop: (draggedColumn) => {
+        // Can't drop on self or null cards
+        return (
+          !isNull &&
+          draggedColumn.id !== column?.id &&
+          draggedColumn.tableId === column?.tableId
+        );
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver({ shallow: true }),
+        isDropZone: monitor.canDrop(),
+      }),
+    });
+
+    // Combine drag and drop refs
+    const attachRef = (node) => {
+      ref.current = node;
+      drag(node);
+      drop(node);
+    };
+
     return (
       <>
         <StyledPaper
+          ref={attachRef}
           elevation={1}
-          isHovered={isHovered}
-          isSelected={isSelected}
           isNull={isNull}
+          isSelected={isSelected}
+          isHovered={isHovered}
+          isDragging={isDragging}
+          isOver={isOver}
+          isDropZone={isDropZone}
+          isDraggable={isSelected}
           sx={{
             display: "flex",
             flexDirection: "column",
             padding: 1,
-            cursor: "pointer",
             userSelect: "none",
             ...sx,
           }}

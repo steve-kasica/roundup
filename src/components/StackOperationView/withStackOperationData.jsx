@@ -12,6 +12,7 @@ import {
   selectOperation,
   selectOperationDepth,
 } from "../../slices/operationsSlice";
+import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
 
 // TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -46,6 +47,7 @@ export default function withStackOperationData(WrappedComponent) {
     const removedColumnIds = useSelector((state) =>
       selectRemovedColumnIdsByTableId(state, id)
     );
+    const selectedColumns = useSelector(selectSelectedColumns);
 
     // const activeColumnIds = useMemo(
     //   () =>
@@ -74,7 +76,6 @@ export default function withStackOperationData(WrappedComponent) {
 
     const m = Math.max(...columnIdMatrix.map((c) => c.length), 0);
     const n = columnIdMatrix.length;
-    const selectedColumns = useSelector(selectSelectedColumns);
     const selectedColumnIndices = columnIds.map((colId) =>
       selectedColumns.includes(colId) ? true : false
     );
@@ -88,6 +89,12 @@ export default function withStackOperationData(WrappedComponent) {
         m={m}
         n={n}
         selectColumns={(colIds) => dispatch(setSelectedColumns(colIds))}
+        swapColumns={(targets, sources) =>
+          dispatch(
+            swapColumnsRequest({ targetIds: targets, sourceIds: sources })
+          )
+        }
+        selectedColumns={selectedColumns}
         {...props}
       />
     );
