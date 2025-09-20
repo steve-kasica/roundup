@@ -44,13 +44,8 @@ export default function withTableData(WrappedComponent) {
     );
 
     // Use useMemo to ensure activeColumnIds updates when table.columnIds or removedColumnIds change
-    const activeColumnIds = useMemo(
-      () =>
-        table.columnIds.filter(
-          (columnId) => !removedColumnIds.includes(columnId)
-        ),
-      [table, removedColumnIds]
-    );
+    // deprecated
+    const activeColumnIds = table.columnIds;
 
     // The intersection of the set of columns in this table and the set of selected columns
     const selectedColumnIds = useSelector((state) =>

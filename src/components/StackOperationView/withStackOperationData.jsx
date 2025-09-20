@@ -2,9 +2,16 @@ import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import useOperationData from "../../hooks/useOperationData";
 import {
+  selectRemovedColumnIdsByTableId,
   selectSelectedColumns,
   setSelectedColumns,
 } from "../../slices/columnsSlice";
+import {
+  selectFocusedOperationId,
+  selectHoveredOperation,
+  selectOperation,
+  selectOperationDepth,
+} from "../../slices/operationsSlice";
 
 // TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -29,8 +36,23 @@ import {
 export default function withStackOperationData(WrappedComponent) {
   function EnhancedComponent({ id, ...props }) {
     const dispatch = useDispatch();
-    const { operation, columnIds, childrenIds, ...operationDataProps } =
-      useOperationData(id);
+    const operation = useSelector((state) => selectOperation(state, id));
+    const depth = useSelector((state) => selectOperationDepth(state, id));
+    const focusedOperationId = useSelector(selectFocusedOperationId);
+    const hoveredOperationId = useSelector(selectHoveredOperation);
+    const columnIds = useSelector((state) =>
+      selectRemovedColumnIdsByTableId(state, id)
+    );
+    const removedColumnIds = useSelector((state) =>
+      selectRemovedColumnIdsByTableId(state, id)
+    );
+
+    // const activeColumnIds = useMemo(
+    //   () =>
+    //     columnIds.filter((columnId) => !removedColumnIds.includes(columnId)),
+    //   [columnIds, removedColumnIds]
+    // );
+    const childrenIds = operation.children;
 
     const droppedColumnIds = useSelector((state) => state.columns.dropped);
 
@@ -57,19 +79,15 @@ export default function withStackOperationData(WrappedComponent) {
       selectedColumns.includes(colId) ? true : false
     );
 
-    console.log("withStackOperationData", operationDataProps);
-
     return (
       <WrappedComponent
         operation={operation}
-        columnIds={columnIds}
-        childIds={childrenIds}
+        depth={depth}
         columnIdMatrix={columnIdMatrix}
         selectedColumnIndices={selectedColumnIndices}
         m={m}
         n={n}
         selectColumns={(colIds) => dispatch(setSelectedColumns(colIds))}
-        {...operationDataProps}
         {...props}
       />
     );

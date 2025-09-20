@@ -1,4 +1,4 @@
-import withColumnData from "../HOC/withColumnData";
+import withColumnData from "../ColumnViews/withColumnData";
 import PropTypes from "prop-types";
 
 function ColumnView({

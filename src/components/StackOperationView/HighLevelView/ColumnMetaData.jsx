@@ -13,7 +13,7 @@ import { useState, useRef } from "react";
 import { Typography } from "@mui/material";
 import PropTypes from "prop-types";
 
-import withColumnData from "../../HOC/withColumnData";
+import withColumnData from "../../ColumnViews/withColumnData";
 import EditableText from "../../ui/EditableText";
 import ValuesSample from "./ValuesSample";
 import Box from "@mui/material/Box";

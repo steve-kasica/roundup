@@ -12,6 +12,11 @@ import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarg
 import { selectFocusedTableId } from "../../slices/tablesSlice";
 import StackVirtualTableRows from "../../components/StackOperationView/StackVirtualTableRows";
 import PackVirtualTable from "../../components/PackOperationView/PackVirtualTable";
+import {
+  selectColumnById,
+  selectSelectedColumns,
+} from "../../slices/columnsSlice";
+import { group } from "d3";
 
 const TOGGLE_VALUES = {
   COLUMN_GRID: "column-grid",
@@ -24,13 +29,24 @@ const TOGGLE_LABELS = {
 };
 
 const SpreadsheetWindow = () => {
-  const focusedOperationId = useSelector(selectFocusedOperationId);
-  const focusedOperationType = useSelector((state) => {
-    if (!focusedOperationId) return null;
-    return selectOperation(state, focusedOperationId).operationType;
+  const focusedOperation = useSelector((state) => {
+    const id = selectFocusedOperationId(state);
+    return selectOperation(state, id);
   });
-  const focusedTableId = useSelector(selectFocusedTableId);
-  // const [lod, setLod] = useState(TOGGLE_VALUES.COLUMN_GRID);
+  const selectedTableIds = useSelector((state) => {
+    const selectedColumnIds = selectSelectedColumns(state);
+    const columns = selectedColumnIds.map((columnId) =>
+      selectColumnById(state, columnId)
+    );
+    if (columns.length === 0) return null;
+    return Array.from(
+      group(columns, (c) => c.tableId),
+      ([tableId, columns]) => ({
+        tableId,
+        columnIds: columns.map((c) => c.id),
+      })
+    );
+  });
 
   return (
     <Box
@@ -69,9 +85,7 @@ const SpreadsheetWindow = () => {
           </ToggleButtonGroup>
         </Box> */}
       </Box>
-      <Divider />
-
-      {/* Scrollable content section */}
+      {/* <Divider /> */}
       <Box
         flexGrow={1}
         minHeight={0}
@@ -79,25 +93,29 @@ const SpreadsheetWindow = () => {
         width="100%"
         display="flex"
         flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
       >
-        {focusedTableId === null && focusedOperationId === null ? (
-          <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
-            <Typography>Drag to add a source table</Typography>
-          </TableDropTarget>
-        ) : focusedOperationId === null && focusedTableId !== null ? (
-          <RawTableRows id={focusedTableId} />
-        ) : focusedOperationType === OPERATION_TYPE_STACK ? (
-          <StackVirtualTableRows id={focusedOperationId} />
-        ) : focusedOperationType === OPERATION_TYPE_PACK ? (
-          <PackVirtualTable id={focusedOperationId} />
+        {selectedTableIds === null || selectedTableIds.length === 0 ? (
+          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
+            No columns selected. Please select columns from the schema window.
+          </Typography>
+        ) : selectedTableIds.length === 1 ? (
+          <RawTableRows id={selectedTableIds[0].tableId} />
+        ) : selectedTableIds.length > 1 &&
+          focusedOperation.operationType === OPERATION_TYPE_STACK ? (
+          <StackVirtualTableRows
+            tableIds={selectedTableIds.map((t) => t.tableId)}
+          />
+        ) : selectedTableIds.length > 1 &&
+          focusedOperation.operationType === OPERATION_TYPE_PACK ? (
+          <PackVirtualTable tableIds={selectedTableIds.map((t) => t.tableId)} />
         ) : (
-          <pre>Error: unsupported state</pre>
+          <pre>
+            Error: unsupported state
+            {JSON.stringify(selectedTableIds)}
+          </pre>
         )}
-
-        {/* {lod === TOGGLE_VALUES.RAW_ROWS && <RawTableRows id={tableId} />}
-            {lod === TOGGLE_VALUES.COLUMN_GRID && (
-              <TableColumnGrid id={tableId} />
-            )} */}
       </Box>
     </Box>
   );

@@ -19,6 +19,15 @@ import CompositeTableSchema from "../../components/CompositeTableSchema";
 import RightSidebar from "./RightSidebar";
 import SpreadsheetWindow from "./SpreadsheetWindow";
 import SchemaWindow from "./SchemaWindow";
+import {
+  OPERATION_TYPE_NO_OP,
+  selectAllOperationIds,
+  selectOperation,
+  selectRootOperation,
+} from "../../slices/operationsSlice";
+import { useEffect, useRef, useState } from "react";
+import { selectSelectedColumns } from "../../slices/columnsSlice";
+// Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
   width: "2px",
@@ -37,7 +46,14 @@ const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
 
 export default function SupportingPane() {
   const tables = useSelector(selectAllTablesData);
+  const rootOperation = useSelector((state) => {
+    const id = selectRootOperation(state);
+    return id ? selectOperation(state, id) : null;
+  });
+  const selectedColumns = useSelector(selectSelectedColumns);
   const isOpen = tables.length > 0;
+  const columnWindowRef = useRef(null);
+
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header */}
@@ -79,53 +95,82 @@ export default function SupportingPane() {
                 <Panel
                   collapsible={true}
                   minSize={10}
-                  defaultSize={75}
-                  maxSize={100}
+                  defaultSize={rootOperation ? 75 : 100}
+                  maxSize={90}
                   order={1}
+                  style={{ padding: "5px" }}
                 >
                   <LeftSideBar />
                 </Panel>
-                <StyledPanelResizeHandle
-                  sx={{ height: "2px", width: "100%" }}
-                />
-                <Panel order={2}>
-                  <Typography variant="h6" sx={{ p: 1 }}>
-                    Output Schema
-                  </Typography>
-                  <CompositeTableSchema />
-                </Panel>
+                {rootOperation && (
+                  <>
+                    <StyledPanelResizeHandle
+                      sx={{ height: "2px", width: "100%" }}
+                    />
+                    <Panel
+                      minSize={10}
+                      collapsible={false}
+                      style={{ padding: "5px" }}
+                    >
+                      <Typography variant="window-label">
+                        Composite Table Schema
+                      </Typography>
+                      <CompositeTableSchema />
+                    </Panel>
+                  </>
+                )}
               </PanelGroup>
             </Panel>
             <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
             <Panel order={2}>
               <PanelGroup autoSaveId="MainContentPane" direction="vertical">
-                <Panel
-                  collapsible={true}
-                  minSize={10}
-                  defaultSize={10}
-                  maxSize={100}
-                  order={1}
-                >
-                  <SchemaWindow />
-                </Panel>
-                <StyledPanelResizeHandle
-                  sx={{ height: "2px", width: "100%" }}
-                />
+                {rootOperation?.operationType !== OPERATION_TYPE_NO_OP && (
+                  <>
+                    <Panel
+                      collapsible={true}
+                      minSize={10}
+                      defaultSize={25}
+                      // defaultSize={25}
+                      maxSize={75}
+                      order={1}
+                      style={{ padding: "5px" }}
+                    >
+                      <SchemaWindow />
+                    </Panel>
+                    <StyledPanelResizeHandle
+                      sx={{ height: "2px", width: "100%" }}
+                    />
+                  </>
+                )}
                 <Panel
                   order={2}
-                  defaultSize={90}
-                  minSize={10}
-                  maxSize={100}
-                  style={{ display: "flex" }}
+                  collapsible={true}
+                  style={{ display: "flex", padding: "5px" }}
                 >
                   <SpreadsheetWindow />
                 </Panel>
               </PanelGroup>
             </Panel>
-            <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
-            <Panel order={3}>
-              <RightSidebar />
-            </Panel>
+            {/* {selectedColumns && selectedColumns.length > 0 && (
+              <>
+                <StyledPanelResizeHandle
+                  sx={{ width: "2px", height: "100%" }}
+                />
+                <Panel
+                  order={3}
+                  collapsible={true}
+                  collapsed={!(selectedColumns && selectedColumns.length)}
+                  maxSize={50}
+                  defaultSize={25}
+                  style={{ padding: "5px" }}
+                >
+                  <Typography variant="window-label">
+                    Column detail window
+                  </Typography>
+                  <RightSidebar />
+                </Panel>
+              </>
+            )} */}
           </PanelGroup>
         )}
       </Box>

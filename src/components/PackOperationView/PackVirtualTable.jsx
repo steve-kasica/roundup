@@ -2,8 +2,9 @@ import withPackOperationData from "./withPackOperationData";
 import { Box } from "@mui/material";
 import TableBody from "../TableView/TableBody";
 import { useCallback, useRef } from "react";
+import { RawTableRows } from "../TableView";
 
-const PackVirtualTable = withPackOperationData(({ operation }) => {
+const PackVirtualTable = ({ tableIds }) => {
   const scrollContainersRef = useRef(new Map());
   const isSyncingRef = useRef(false);
 
@@ -39,8 +40,17 @@ const PackVirtualTable = withPackOperationData(({ operation }) => {
   return (
     <>
       {/* <pre>{JSON.stringify(operation, null, 2)}</pre> */}
-      <Box display="flex" flexDirection="row" height="100%">
-        {operation.children.map((childId) => (
+      <Box
+        display="flex"
+        flexDirection="row"
+        height="100%"
+        gap={2}
+        width={"100%"}
+      >
+        {tableIds.map((childId) => (
+          <RawTableRows id={childId} key={childId} />
+        ))}
+        {/* {operation.children.map((childId) => (
           <TableBody
             key={childId}
             id={childId}
@@ -54,10 +64,10 @@ const PackVirtualTable = withPackOperationData(({ operation }) => {
               handleScrollSync(childId, scrollLeft, scrollTop)
             }
           />
-        ))}
+        ))} */}
       </Box>
     </>
   );
-});
+};
 
 export default PackVirtualTable;

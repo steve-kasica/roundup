@@ -1,4 +1,4 @@
-import withColumnData from "../../../../HOC/withColumnData";
+import withColumnData from "../../../../ColumnViews/withColumnData";
 function ColumnView({ column }) {
   return column.name;
 }

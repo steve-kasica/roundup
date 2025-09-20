@@ -7,6 +7,10 @@ import {
 import PropTypes from "prop-types";
 import withOperationData from "../HOC/withOperationData";
 import { useCallback } from "react";
+import {
+  selectColumnIdsByTableId,
+  setSelectedColumns,
+} from "../../slices/columnsSlice";
 
 export default function withPackOperationData(WrappedComponent) {
   // First wrap with the base operation data HOC
@@ -31,6 +35,13 @@ export default function withPackOperationData(WrappedComponent) {
       [dispatch, id]
     );
 
+    const leftHandColumns = useSelector((state) =>
+      selectColumnIdsByTableId(state, operation?.children[0])
+    );
+    const rightHandColumns = useSelector((state) =>
+      selectColumnIdsByTableId(state, operation?.children[1])
+    );
+
     return (
       <ComponentWithOperationData
         {...props}
@@ -41,6 +52,8 @@ export default function withPackOperationData(WrappedComponent) {
         joinKey1={operation.joinKey1}
         joinKey2={operation.joinKey2}
         isPack={isPack}
+        leftHandColumns={leftHandColumns}
+        rightHandColumns={rightHandColumns}
         // Pack-specific join dispatchers
         setJoinType={setJoinType}
         setLeftTableJoinKey={(columnId) => {
@@ -72,6 +85,12 @@ export default function withPackOperationData(WrappedComponent) {
             })
           )
         }
+        selectColumns={useCallback(
+          (columnIds) => {
+            dispatch(setSelectedColumns(columnIds));
+          },
+          [dispatch]
+        )}
       />
     );
   }

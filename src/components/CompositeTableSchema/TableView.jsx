@@ -12,7 +12,7 @@ import PropTypes from "prop-types";
 function TableView({
   // props via withTableData
   table,
-  activeColumnIds,
+  activeColumnIds, // TODO: replace with just table.columnIds
   isHovered,
   isDragging,
   isPressed,

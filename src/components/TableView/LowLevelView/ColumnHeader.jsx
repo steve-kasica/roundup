@@ -19,7 +19,7 @@ import {
   DriveFileRenameOutline as RenameIcon,
   MoreVert,
 } from "@mui/icons-material";
-import withColumnData from "../../HOC/withColumnData";
+import withColumnData from "../../ColumnViews/withColumnData";
 import { useRef, useState } from "react";
 import EditableText from "../../ui/EditableText";
 

@@ -1,14 +1,25 @@
 import withTableData from "../HOC/withTableData";
 import { useRef, useCallback } from "react";
-import { Box } from "@mui/material";
-import TableBody from "./TableBody.jsx";
-import TableHead from "./TableHead.jsx";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import ColumnHeader from "../ColumnViews/ColumnHeader.jsx";
+import { usePaginatedTableRows } from "../../hooks/useTableRowData.js";
 
 const RawTableRows = withTableData(
   ({ table, activeColumnIds, selectedColumnIds, selectColumns }) => {
     const selectedColumnIndices = activeColumnIds.map((colId) =>
       selectedColumnIds.includes(colId) ? true : false
     );
+
+    const { data } = usePaginatedTableRows(table.id, selectedColumnIds);
 
     const scrollContainersRef = useRef(new Map());
     const isSyncingRef = useRef(false);
@@ -87,31 +98,58 @@ const RawTableRows = withTableData(
     );
 
     return (
-      <Box sx={{ overflow: "hidden", width: "100%", height: "100%" }}>
-        <TableHead
-          activeColumnIds={activeColumnIds}
-          selectedColumnIds={selectedColumnIds}
-          handleColumnClick={handleColumnClick}
-          allowExternalScrollSync={true}
-          onScrollContainerRef={(el) =>
-            registerScrollContainer("table-head", el)
-          }
-          onScroll={(scrollLeft, scrollTop) =>
-            handleScrollSync("table-head", scrollLeft, scrollTop)
-          }
-        />
-        <TableBody
-          id={table.id}
-          selectedColumnIndices={selectedColumnIndices}
-          allowExternalScrollSync={true}
-          onScrollContainerRef={(el) => {
-            registerScrollContainer(table.id, el);
-          }}
-          onScroll={(scrollLeft, scrollTop) =>
-            handleScrollSync(table.id, scrollLeft, scrollTop)
-          }
-        />
-      </Box>
+      <TableContainer>
+        <Table size="small" stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell>#</TableCell>
+              {selectedColumnIds.map((colId, index) => (
+                <TableCell
+                  key={colId}
+                  align="center"
+                  sx={{ p: 1 }}
+                  // sx={{
+                  //   borderBottom: "1px solid rgba(224, 224, 224, 1)",
+                  //   backgroundColor: selectedColumnIndices[index]
+                  //     ? "rgba(25, 118, 210, 0.08)"
+                  //     : "inherit",
+                  //   cursor: "pointer",
+                  //   userSelect: "none",
+                  //   width: table.columnsById[colId]?.width || "auto",
+                  //   minWidth: 50,
+                  //   maxWidth: 400,
+                  // }}
+                >
+                  <ColumnHeader key={colId} id={colId} />
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row, rowIndex) => (
+              <TableRow key={rowIndex} hover>
+                <TableCell>{rowIndex + 1}</TableCell>
+                {row.map((value, cellIndex) => (
+                  <TableCell key={activeColumnIds[cellIndex]}>
+                    {value === null ? (
+                      <Typography
+                        color="text.secondary"
+                        sx={{ fontStyle: "italic", opacity: 0.6 }}
+                      >
+                        NULL
+                      </Typography>
+                    ) : typeof value === "number" ? (
+                      value.toLocaleString()
+                    ) : (
+                      value
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     );
   }
 );

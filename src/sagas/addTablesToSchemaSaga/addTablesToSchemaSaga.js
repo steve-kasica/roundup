@@ -34,9 +34,13 @@ import Operation, {
 } from "../../slices/operationsSlice/Operation";
 import {
   clearSelectedTables,
-  setFocusedTableId,
+  setSelectedTables,
   updateTables,
 } from "../../slices/tablesSlice";
+import {
+  selectColumnIdsByTableId,
+  setSelectedColumns,
+} from "../../slices/columnsSlice";
 
 /**
  * Action creator for adding a table to a schema.
@@ -93,7 +97,11 @@ export function* addTablesToSchemaSagaWorker(action) {
     yield put(
       updateTables(tableIds.map((id) => ({ id, operationId: operation.id })))
     );
-    yield put(setFocusedTableId(tableIds[0]));
+    // Select table by selecting all columns
+    const tableColumns = yield select((state) =>
+      selectColumnIdsByTableId(state, tableIds[0])
+    );
+    yield put(setSelectedColumns(tableColumns));
   } else if (rootOperation.operationType === OPERATION_TYPE_NO_OP) {
     // Case: first table added after schema initialized with only one table
     // Update the operation type and add the new table as a child

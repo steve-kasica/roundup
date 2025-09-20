@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import withColumnData from "../../HOC/withColumnData";
+import withColumnData from "../../ColumnViews/withColumnData";
 import {
   Box,
   Card,

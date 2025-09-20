@@ -30,6 +30,7 @@ export function useColumnValues(
 
   const fetchData = useCallback(async () => {
     if (!tableId || !columnId) {
+      setData(Array.from({ length: limit || 0 }, () => "null")); // Return array of nulls if no tableId or columnId
       return;
     }
 

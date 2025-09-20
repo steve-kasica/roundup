@@ -19,6 +19,7 @@ import { selectAllTablesData } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
 import TableView from "../../components/TableView";
 import StackSchemaView from "../../components/StackOperationView/StackSchemaView";
+import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 
 export default function SchemaWindow() {
   const dispatch = useDispatch();
@@ -36,18 +37,15 @@ export default function SchemaWindow() {
       sx={{
         position: "relative",
         height: "100%",
+        width: "100%",
         background: "#fff",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden", // Prevent overflow from parent
       }}
     >
-      <Box
-        sx={{
-          height: "100%",
-          padding: 2,
-          boxSizing: "border-box",
-          overflow: "auto",
-        }}
-      >
-        {/* <Box
+      <Typography variant="window-label">Schema window</Typography>
+      {/* <Box
           display={"flex"}
           alignItems="center"
           justifyContent={"space-between"}
@@ -69,22 +67,45 @@ export default function SchemaWindow() {
           </ToggleButtonGroup>
         </Box> */}
 
-        {tables.length === 0 ? (
-          <Box sx={{ width: "100%", textAlign: "center" }}>
-            <pre>No tables uploaded to Roundup</pre>
-          </Box>
-        ) : operations.length === 0 ? (
+      {tables.length === 0 ? (
+        <Box
+          sx={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <pre>No tables uploaded to Roundup</pre>
+        </Box>
+      ) : operations.length === 0 ? (
+        <Box sx={{ flex: 1, height: "100%" }}>
           <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
             <Typography>Drag to add a source table</Typography>
           </TableDropTarget>
-        ) : focusedOperation?.operationType === OPERATION_TYPE_STACK ? (
+        </Box>
+      ) : focusedOperation?.operationType === OPERATION_TYPE_STACK ? (
+        <Box sx={{ flex: 1, height: "100%", overflow: "hidden" }}>
           <StackSchemaView id={focusedOperation.id} />
-        ) : focusedOperation?.operationType === OPERATION_TYPE_PACK ? (
-          <PackOperationView resolution={resolution} id={focusedOperation.id} />
-        ) : (
+        </Box>
+      ) : focusedOperation?.operationType === OPERATION_TYPE_PACK ? (
+        <Box sx={{ flex: 1, height: "100%", overflow: "hidden" }}>
+          <PackSchemaView id={focusedOperation.id} />
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            flex: 1,
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <pre>Error: unsupported state</pre>
-        )}
-      </Box>
+        </Box>
+      )}
     </Box>
   );
 }

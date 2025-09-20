@@ -74,7 +74,6 @@ export function* removeColumnsSagaWorker(action) {
       };
     });
     const columnIdGroups = group(data, (d) => d.tableId);
-    console.log(columnIdGroups);
     return Array.from(columnIdGroups, ([tableId, values]) => {
       const table = selectTablesById(state, tableId);
       const excludeList = values.map(({ columnId }) => columnId);
@@ -87,6 +86,9 @@ export function* removeColumnsSagaWorker(action) {
     });
   });
   yield put(updateTables(updatedTables));
+
+  // TODO: if you remove all the columns from the table,
+  // we also need to remove the table, probably should call another saga
 
   yield put(removeColumnsFromLoading(columnIds));
 

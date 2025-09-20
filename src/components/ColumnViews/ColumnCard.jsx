@@ -85,6 +85,7 @@ const ColumnCard = withColumnData(
   ({
     isHovered,
     isSelected,
+    isNull,
     hoverColumn,
     unhoverColumn,
     children,
@@ -97,6 +98,7 @@ const ColumnCard = withColumnData(
           elevation={1}
           isHovered={isHovered}
           isSelected={isSelected}
+          isNull={isNull}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -105,7 +107,7 @@ const ColumnCard = withColumnData(
             userSelect: "none",
             ...sx,
           }}
-          onClick={onClick}
+          onClick={!isNull ? onClick : undefined}
           onMouseEnter={hoverColumn}
           onMouseLeave={unhoverColumn}
         >
