@@ -5,6 +5,7 @@ import {
   CalendarMonth as DateIcon,
   Key as KeyIcon,
   QuestionMark as UndefinedIcon,
+  DoNotDisturb as NullIcon,
 } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 import { COLUMN_TYPE_VARCHAR } from "../../slices/columnsSlice";
@@ -15,9 +16,8 @@ export default function ColumnTypeIcon({
   onClick = () => {},
   sx: customSx = {},
 }) {
-  if (!column) return null;
-  const { columnType, uniqueValues, nonNullValues } = column;
-  const isKey = uniqueValues === nonNullValues;
+  let Icon;
+  let tooltipText = "";
   const defaultSx = {
     color: "gray.300",
     fontSize: "1.5rem",
@@ -32,24 +32,25 @@ export default function ColumnTypeIcon({
       transform: "scale(0.95)",
     },
   };
+  const isKey = column && column.uniqueValues === column.nonNullValues;
 
-  let Icon;
-  let tooltipText = "";
-
-  if (columnType === undefined) {
+  if (!column) {
+    Icon = NullIcon;
+    tooltipText = "Column is null";
+  } else if (column.columnType === undefined) {
     Icon = UndefinedIcon;
     tooltipText = "Unknown column type";
-  } else if (columnType === COLUMN_TYPE_VARCHAR && isKey) {
+  } else if (column.columnType === COLUMN_TYPE_VARCHAR && isKey) {
     Icon = KeyIcon;
     defaultSx["fontSize"] = "1rem";
     tooltipText = "Key column (unique text)";
-  } else if (columnType === COLUMN_TYPE_VARCHAR) {
+  } else if (column.columnType === COLUMN_TYPE_VARCHAR) {
     Icon = CategoricalIcon;
     tooltipText = "Text column";
-  } else if (columnType === "NUMERIC") {
+  } else if (column.columnType === "NUMERIC") {
     Icon = NumericIcon;
     tooltipText = "Numeric column";
-  } else if (columnType === "DATE") {
+  } else if (column.columnType === "DATE") {
     Icon = DateIcon;
     tooltipText = "Date column";
   }

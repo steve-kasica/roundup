@@ -5,6 +5,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import EditableText from "../ui/EditableText";
 import PropTypes from "prop-types";
@@ -22,11 +23,12 @@ import withColumnData from "./withColumnData";
 const ColumnHeader = withColumnData(
   ({
     column,
+    isNull,
     isReadOnly = true,
     renameColumn,
     removeColumn,
     selectSingleColumn,
-    width = "150px",
+    sx,
   }) => {
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [isEditable, setIsEditable] = useState(false);
@@ -65,7 +67,7 @@ const ColumnHeader = withColumnData(
           display="flex"
           flexDirection="row"
           alignItems="center"
-          sx={{ gap: 0, width: width }}
+          sx={{ gap: 0, ...sx }}
         >
           <Box
             backgroundColor="#ddd"
@@ -88,16 +90,20 @@ const ColumnHeader = withColumnData(
             padding={1}
             overflow="hidden"
           >
-            <EditableText
-              inputRef={headerInputRef}
-              initialValue={column.name}
-              placeholder={`Column ${column.index + 1}`}
-              onChange={(newName) => renameColumn(newName)}
-              isReadOnly={isReadOnly}
-              isEditable={isEditable}
-              onEditingStateChange={() => console.log("Editing state change")}
-              fontSize="1rem"
-            />
+            {isNull ? (
+              <Typography color="error">NULL</Typography>
+            ) : (
+              <EditableText
+                inputRef={headerInputRef}
+                initialValue={column?.name}
+                placeholder={`Column ${column?.index + 1}`}
+                onChange={(newName) => renameColumn(newName)}
+                isReadOnly={isReadOnly}
+                isEditable={isEditable}
+                onEditingStateChange={() => console.log("Editing state change")}
+                fontSize="1rem"
+              />
+            )}
           </Box>
           <IconButton
             size="small"

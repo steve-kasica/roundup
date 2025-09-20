@@ -2,10 +2,10 @@ import { Typography } from "@mui/material";
 import { useColumnValues } from "../../hooks/useColumnValues";
 import withColumnData from "./withColumnData";
 
-const ColumnValuesSample = withColumnData(({ column, limit = 3 }) => {
+const ColumnValuesSample = withColumnData(({ column, isNull, limit = 3 }) => {
   const { data, loading, error } = useColumnValues(
-    column.tableId,
-    column.id,
+    !isNull ? column.tableId : null,
+    !isNull ? column.id : null,
     limit
   );
   if (loading) return <Typography variant="caption">Loading...</Typography>;
@@ -30,7 +30,7 @@ const ColumnValuesSample = withColumnData(({ column, limit = 3 }) => {
       }}
     >
       {data.join(", ")}
-      {column.count <= limit ? "" : ", ..."}
+      {(column?.count || 0) <= limit ? "" : ", ..."}
     </Typography>
   );
 });
