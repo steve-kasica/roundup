@@ -189,7 +189,16 @@ const RawTableRows = withTableData(
             ) : loading && data.length === 0 ? (
               // Show skeleton rows with loading indicators only for initial load
               Array.from({ length: 10 }).map((_, rowIndex) => (
-                <TableRow key={`loading-${rowIndex}`} hover>
+                <TableRow
+                  key={`loading-${rowIndex}`}
+                  hover
+                  sx={{
+                    backgroundColor:
+                      rowIndex % 2 === 0
+                        ? "transparent"
+                        : "rgba(0, 0, 0, 0.04)",
+                  }}
+                >
                   <TableCell>{rowIndex + 1}</TableCell>
                   {selectedColumnIds.map((colId) => (
                     <TableCell key={colId} align="center">
@@ -202,7 +211,16 @@ const RawTableRows = withTableData(
               // Show actual data
               <>
                 {data.map((row, rowIndex) => (
-                  <TableRow key={rowIndex} hover>
+                  <TableRow
+                    key={rowIndex}
+                    hover
+                    sx={{
+                      backgroundColor:
+                        rowIndex % 2 === 0
+                          ? "transparent"
+                          : "rgba(0, 0, 0, 0.04)",
+                    }}
+                  >
                     <TableCell>{rowIndex + 1}</TableCell>
                     {row.map((value, cellIndex) => (
                       <TableCell key={activeColumnIds[cellIndex]}>
