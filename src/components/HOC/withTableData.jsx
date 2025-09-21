@@ -11,6 +11,7 @@ import {
   selectColumnById,
   selectRemovedColumnIdsByTableId,
   selectSelectedColumns,
+  setHoveredColumns,
   setSelectedColumns,
 } from "../../slices/columnsSlice";
 import {
@@ -53,6 +54,9 @@ export default function withTableData(WrappedComponent) {
         activeColumnIds.includes(colId)
       )
     );
+    const hoveredColumnIds = useSelector((state) =>
+      state.columns.hovered.filter((colId) => table.columnIds.includes(colId))
+    );
 
     // TODO: deprecate columns
     const columns = useSelector((state) =>
@@ -79,6 +83,17 @@ export default function withTableData(WrappedComponent) {
       [dispatch]
     );
 
+    const hoverColumn = useCallback(
+      (columnIds) => {
+        dispatch(setHoveredColumns(columnIds));
+      },
+      [dispatch]
+    );
+
+    const unhoverColumn = useCallback(() => {
+      dispatch(setHoveredColumns([]));
+    }, [dispatch]);
+
     return (
       <WrappedComponent
         {...props}
@@ -91,6 +106,7 @@ export default function withTableData(WrappedComponent) {
         // Other related objects
         columnNames={columnNames} // TODO: remove this, should only pass Ids
         selectedColumnIds={selectedColumnIds}
+        hoveredColumnIds={hoveredColumnIds} // Only hovered columnIDs in this table
         parentOperation={parentOperation} // TODO: should only pass Ids
         depth={depth}
         // Interaction state
@@ -100,6 +116,8 @@ export default function withTableData(WrappedComponent) {
         isFocused={parentOperation ? true : false}
         // Interaction handlers
         selectColumns={selectColumns}
+        hoverColumn={hoverColumn}
+        unhoverColumn={unhoverColumn}
         onHover={() => dispatch(setHoveredTable(id))} // TODO: remove
         onUnhover={() => dispatch(clearHoveredTable())} // TODO: remove
         hoverTable={() => dispatch(setHoveredTable(id))}

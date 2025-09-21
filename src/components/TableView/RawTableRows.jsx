@@ -1,5 +1,5 @@
 import withTableData from "../HOC/withTableData";
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -12,38 +12,65 @@ import {
   Alert,
   Button,
   Box,
+  styled,
 } from "@mui/material";
 import ColumnHeader from "../ColumnViews/ColumnHeader.jsx";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData.js";
 
-const RawTableRows = withTableData(
-  ({ table, activeColumnIds, selectedColumnIds, selectColumns }) => {
-    const selectedColumnIndices = activeColumnIds.map((colId) =>
-      selectedColumnIds.includes(colId) ? true : false
-    );
+// Row handles alternating colors + row hover
+const StyledAlternatingTableRow = styled(TableRow)(({ isEven }) => ({
+  backgroundColor: isEven ? "#fff" : "#f5f5f5",
+  "&:hover": {
+    backgroundColor: isEven ? "#e3f2fd" : "#bbdefb",
+  },
+  "&:hover td": {
+    backgroundColor: "inherit", // Inherit row hover color
+  },
+  transition: "background-color 0.1s ease",
+}));
 
+// Cell only handles column hover (overrides row hover when active)
+const StyledHoverableTableCell = styled(TableCell)(({ isHovered, isEven }) => ({
+  backgroundColor:
+    isHovered && isEven
+      ? "#e3f2fd"
+      : isHovered && !isEven
+      ? "#bbdefb"
+      : "transparent",
+  transition: "background-color 0.1s ease",
+}));
+
+const RawTableRows = withTableData(
+  ({
+    table,
+    hoveredColumnIds,
+    activeColumnIds,
+    selectedColumnIds,
+    hoverColumn,
+    unhoverColumn,
+  }) => {
     const {
       data,
       loading,
       error,
       hasMore,
-      currentPage,
+      // currentPage,
       loadMore,
       refresh,
-      reset,
+      // reset,
     } = usePaginatedTableRows(table.id, selectedColumnIds);
 
-    const scrollContainersRef = useRef(new Map());
-    const isSyncingRef = useRef(false);
+    // const scrollContainersRef = useRef(new Map());
+    // const isSyncingRef = useRef(false);
     const tableContainerRef = useRef(null);
 
-    const registerScrollContainer = useCallback((childId, scrollElement) => {
-      if (scrollElement) {
-        scrollContainersRef.current.set(childId, scrollElement);
-      } else {
-        scrollContainersRef.current.delete(childId);
-      }
-    }, []);
+    // const registerScrollContainer = useCallback((childId, scrollElement) => {
+    //   if (scrollElement) {
+    //     scrollContainersRef.current.set(childId, scrollElement);
+    //   } else {
+    //     scrollContainersRef.current.delete(childId);
+    //   }
+    // }, []);
 
     const handleScroll = useCallback(
       (event) => {
@@ -60,70 +87,30 @@ const RawTableRows = withTableData(
       [hasMore, loading, error, loadMore]
     );
 
-    const handleScrollSync = useCallback(
-      (sourceChildId, scrollLeft, scrollTop) => {
-        if (isSyncingRef.current) return;
+    // const handleScrollSync = useCallback(
+    //   (sourceChildId, scrollLeft, scrollTop) => {
+    //     if (isSyncingRef.current) return;
 
-        isSyncingRef.current = true;
+    //     isSyncingRef.current = true;
 
-        // Sync to all other containers
-        console.log("StackVirtualTableRows handleScrollSync", {
-          scrollContainersRef,
-        });
-        scrollContainersRef.current.forEach((container, childId) => {
-          if (childId !== sourceChildId && container) {
-            container.scrollLeft = scrollLeft;
-            container.scrollTop = scrollTop;
-          }
-        });
+    //     // Sync to all other containers
+    //     console.log("StackVirtualTableRows handleScrollSync", {
+    //       scrollContainersRef,
+    //     });
+    //     scrollContainersRef.current.forEach((container, childId) => {
+    //       if (childId !== sourceChildId && container) {
+    //         container.scrollLeft = scrollLeft;
+    //         container.scrollTop = scrollTop;
+    //       }
+    //     });
 
-        // Use setTimeout instead of requestAnimationFrame for more reliable timing
-        setTimeout(() => {
-          isSyncingRef.current = false;
-        }, 0);
-      },
-      []
-    );
-
-    const handleColumnClick = useCallback(
-      (event, columnId) => {
-        const isCtrlOrCmd = event.ctrlKey || event.metaKey;
-        const isShift = event.shiftKey;
-
-        if (isShift && selectedColumnIds.length > 0) {
-          // Shift click: select range from last selected column to current column
-          const currentIndex = activeColumnIds.indexOf(columnId);
-          const lastSelectedIndex = activeColumnIds.indexOf(
-            selectedColumnIds[selectedColumnIds.length - 1]
-          );
-
-          const startIndex = Math.min(currentIndex, lastSelectedIndex);
-          const endIndex = Math.max(currentIndex, lastSelectedIndex);
-
-          const rangeSelection = activeColumnIds.slice(
-            startIndex,
-            endIndex + 1
-          );
-
-          // Combine existing selection with range selection
-          const newSelection = [
-            ...new Set([...selectedColumnIds, ...rangeSelection]),
-          ];
-          selectColumns(newSelection);
-        } else if (isCtrlOrCmd) {
-          // Ctrl/Cmd click: toggle column selection
-          if (selectedColumnIds.includes(columnId)) {
-            selectColumns(selectedColumnIds.filter((id) => id !== columnId));
-          } else {
-            selectColumns([...selectedColumnIds, columnId]);
-          }
-        } else {
-          // Normal click: select only this column
-          selectColumns([columnId]);
-        }
-      },
-      [activeColumnIds, selectedColumnIds, selectColumns]
-    );
+    //     // Use setTimeout instead of requestAnimationFrame for more reliable timing
+    //     setTimeout(() => {
+    //       isSyncingRef.current = false;
+    //     }, 0);
+    //   },
+    //   []
+    // );
 
     return (
       <TableContainer
@@ -135,22 +122,18 @@ const RawTableRows = withTableData(
           <TableHead>
             <TableRow>
               <TableCell>#</TableCell>
-              {selectedColumnIds.map((colId, index) => (
+              {selectedColumnIds.map((colId) => (
                 <TableCell
                   key={colId}
                   align="center"
-                  sx={{ p: 1 }}
-                  // sx={{
-                  //   borderBottom: "1px solid rgba(224, 224, 224, 1)",
-                  //   backgroundColor: selectedColumnIndices[index]
-                  //     ? "rgba(25, 118, 210, 0.08)"
-                  //     : "inherit",
-                  //   cursor: "pointer",
-                  //   userSelect: "none",
-                  //   width: table.columnsById[colId]?.width || "auto",
-                  //   minWidth: 50,
-                  //   maxWidth: 400,
-                  // }}
+                  sx={{
+                    p: 1,
+                    backgroundColor: hoveredColumnIds.includes(colId)
+                      ? "#bbdefb"
+                      : "#f5f5f5",
+                  }}
+                  onMouseEnter={() => hoverColumn(colId)}
+                  onMouseLeave={unhoverColumn}
                 >
                   <ColumnHeader key={colId} id={colId} />
                 </TableCell>
@@ -189,41 +172,40 @@ const RawTableRows = withTableData(
             ) : loading && data.length === 0 ? (
               // Show skeleton rows with loading indicators only for initial load
               Array.from({ length: 10 }).map((_, rowIndex) => (
-                <TableRow
+                <StyledAlternatingTableRow
                   key={`loading-${rowIndex}`}
-                  hover
-                  sx={{
-                    backgroundColor:
-                      rowIndex % 2 === 0
-                        ? "transparent"
-                        : "rgba(0, 0, 0, 0.04)",
-                  }}
+                  isEven={rowIndex % 2 === 0}
                 >
                   <TableCell>{rowIndex + 1}</TableCell>
                   {selectedColumnIds.map((colId) => (
-                    <TableCell key={colId} align="center">
+                    <StyledHoverableTableCell
+                      key={colId}
+                      align="center"
+                      isHovered={hoveredColumnIds.includes(colId)}
+                      isEven={rowIndex % 2 === 0}
+                    >
                       <CircularProgress size={16} />
-                    </TableCell>
+                    </StyledHoverableTableCell>
                   ))}
-                </TableRow>
+                </StyledAlternatingTableRow>
               ))
             ) : (
               // Show actual data
               <>
                 {data.map((row, rowIndex) => (
-                  <TableRow
+                  <StyledAlternatingTableRow
                     key={rowIndex}
-                    hover
-                    sx={{
-                      backgroundColor:
-                        rowIndex % 2 === 0
-                          ? "transparent"
-                          : "rgba(0, 0, 0, 0.04)",
-                    }}
+                    isEven={rowIndex % 2 === 0}
                   >
                     <TableCell>{rowIndex + 1}</TableCell>
                     {row.map((value, cellIndex) => (
-                      <TableCell key={activeColumnIds[cellIndex]}>
+                      <StyledHoverableTableCell
+                        key={activeColumnIds[cellIndex]}
+                        isHovered={hoveredColumnIds.includes(
+                          activeColumnIds[cellIndex]
+                        )}
+                        isEven={rowIndex % 2 === 0}
+                      >
                         {value === null ? (
                           <Typography
                             color="text.secondary"
@@ -236,13 +218,13 @@ const RawTableRows = withTableData(
                         ) : (
                           value
                         )}
-                      </TableCell>
+                      </StyledHoverableTableCell>
                     ))}
-                  </TableRow>
+                  </StyledAlternatingTableRow>
                 ))}
                 {/* Loading indicator for pagination */}
                 {loading && data.length > 0 && (
-                  <TableRow>
+                  <StyledAlternatingTableRow isEven={data.length % 2 === 0}>
                     <TableCell
                       colSpan={selectedColumnIds.length + 1}
                       align="center"
@@ -261,7 +243,7 @@ const RawTableRows = withTableData(
                         </Typography>
                       </Box>
                     </TableCell>
-                  </TableRow>
+                  </StyledAlternatingTableRow>
                 )}
               </>
             )}
