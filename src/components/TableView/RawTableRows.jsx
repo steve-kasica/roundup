@@ -1,5 +1,5 @@
 import withTableData from "../HOC/withTableData";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Alert,
   Button,
+  Box,
 } from "@mui/material";
 import ColumnHeader from "../ColumnViews/ColumnHeader.jsx";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData.js";
@@ -34,6 +35,7 @@ const RawTableRows = withTableData(
 
     const scrollContainersRef = useRef(new Map());
     const isSyncingRef = useRef(false);
+    const tableContainerRef = useRef(null);
 
     const registerScrollContainer = useCallback((childId, scrollElement) => {
       if (scrollElement) {
@@ -42,6 +44,21 @@ const RawTableRows = withTableData(
         scrollContainersRef.current.delete(childId);
       }
     }, []);
+
+    const handleScroll = useCallback(
+      (event) => {
+        const container = event.target;
+        const { scrollTop, scrollHeight, clientHeight } = container;
+
+        // Check if user has scrolled near the bottom (within 100px)
+        const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+
+        if (isNearBottom && hasMore && !loading && !error) {
+          loadMore();
+        }
+      },
+      [hasMore, loading, error, loadMore]
+    );
 
     const handleScrollSync = useCallback(
       (sourceChildId, scrollLeft, scrollTop) => {
@@ -109,7 +126,11 @@ const RawTableRows = withTableData(
     );
 
     return (
-      <TableContainer>
+      <TableContainer
+        ref={tableContainerRef}
+        onScroll={handleScroll}
+        sx={{ maxHeight: "100%", overflow: "auto" }}
+      >
         <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>
@@ -165,8 +186,8 @@ const RawTableRows = withTableData(
                   </Alert>
                 </TableCell>
               </TableRow>
-            ) : loading ? (
-              // Show skeleton rows with loading indicators
+            ) : loading && data.length === 0 ? (
+              // Show skeleton rows with loading indicators only for initial load
               Array.from({ length: 10 }).map((_, rowIndex) => (
                 <TableRow key={`loading-${rowIndex}`} hover>
                   <TableCell>{rowIndex + 1}</TableCell>
@@ -179,27 +200,52 @@ const RawTableRows = withTableData(
               ))
             ) : (
               // Show actual data
-              data.map((row, rowIndex) => (
-                <TableRow key={rowIndex} hover>
-                  <TableCell>{rowIndex + 1}</TableCell>
-                  {row.map((value, cellIndex) => (
-                    <TableCell key={activeColumnIds[cellIndex]}>
-                      {value === null ? (
-                        <Typography
-                          color="text.secondary"
-                          sx={{ fontStyle: "italic", opacity: 0.6 }}
-                        >
-                          NULL
+              <>
+                {data.map((row, rowIndex) => (
+                  <TableRow key={rowIndex} hover>
+                    <TableCell>{rowIndex + 1}</TableCell>
+                    {row.map((value, cellIndex) => (
+                      <TableCell key={activeColumnIds[cellIndex]}>
+                        {value === null ? (
+                          <Typography
+                            color="text.secondary"
+                            sx={{ fontStyle: "italic", opacity: 0.6 }}
+                          >
+                            NULL
+                          </Typography>
+                        ) : typeof value === "number" ? (
+                          value.toLocaleString()
+                        ) : (
+                          value
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+                {/* Loading indicator for pagination */}
+                {loading && data.length > 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={selectedColumnIds.length + 1}
+                      align="center"
+                    >
+                      <Box
+                        sx={{
+                          py: 2,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <CircularProgress size={20} />
+                        <Typography variant="body2" sx={{ ml: 1 }}>
+                          Loading more rows...
                         </Typography>
-                      ) : typeof value === "number" ? (
-                        value.toLocaleString()
-                      ) : (
-                        value
-                      )}
+                      </Box>
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
+                  </TableRow>
+                )}
+              </>
             )}
           </TableBody>
         </Table>
