@@ -1,5 +1,5 @@
 import withTableData from "../HOC/withTableData";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -59,7 +59,13 @@ const RawTableRows = withTableData(
     selectedColumnIds,
     hoverColumn,
     unhoverColumn,
+    onScrollContainerRef,
+    onScroll,
   }) => {
+    const scrollContainersRef = useRef(new Map());
+    const isSyncingRef = useRef(false);
+    const tableContainerRef = useRef(null);
+
     const {
       data,
       loading,
@@ -71,22 +77,50 @@ const RawTableRows = withTableData(
       // reset,
     } = usePaginatedTableRows(table.id, selectedColumnIds);
 
-    // const scrollContainersRef = useRef(new Map());
-    // const isSyncingRef = useRef(false);
-    const tableContainerRef = useRef(null);
+    const registerScrollContainer = useCallback((childId, scrollElement) => {
+      if (scrollElement) {
+        scrollContainersRef.current.set(childId, scrollElement);
+      } else {
+        scrollContainersRef.current.delete(childId);
+      }
+    }, []);
 
-    // const registerScrollContainer = useCallback((childId, scrollElement) => {
-    //   if (scrollElement) {
-    //     scrollContainersRef.current.set(childId, scrollElement);
-    //   } else {
-    //     scrollContainersRef.current.delete(childId);
+    // Register this table container with parent
+    useEffect(() => {
+      if (tableContainerRef.current && onScrollContainerRef) {
+        onScrollContainerRef(tableContainerRef.current);
+      }
+    }, [onScrollContainerRef]);
+
+    // Sync scroll position from parent
+    const syncScroll = useCallback((scrollLeft, scrollTop) => {
+      if (tableContainerRef.current && !isSyncingRef.current) {
+        isSyncingRef.current = true;
+        tableContainerRef.current.scrollLeft = scrollLeft;
+        tableContainerRef.current.scrollTop = scrollTop;
+        setTimeout(() => {
+          isSyncingRef.current = false;
+        }, 0);
+      }
+    }, []);
+
+    // // Expose sync function to parent if needed
+    // useEffect(() => {
+    //   if (onScrollContainerRef) {
+    //     onScrollContainerRef(tableContainerRef.current);
     //   }
-    // }, []);
+    // }, [onScrollContainerRef]);
 
     const handleScroll = useCallback(
       (event) => {
         const container = event.target;
-        const { scrollTop, scrollHeight, clientHeight } = container;
+        const { scrollTop, scrollHeight, clientHeight, scrollLeft } = container;
+
+        // Notify parent of scroll position for coordination
+        // parent will know which child is the source
+        if (onScroll) {
+          onScroll(scrollLeft, scrollTop);
+        }
 
         // Check if user has scrolled near the bottom (within 100px)
         const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
@@ -95,33 +129,33 @@ const RawTableRows = withTableData(
           loadMore();
         }
       },
-      [hasMore, loading, error, loadMore]
+      [hasMore, loading, error, loadMore, onScroll]
     );
 
-    // const handleScrollSync = useCallback(
-    //   (sourceChildId, scrollLeft, scrollTop) => {
-    //     if (isSyncingRef.current) return;
+    const handleScrollSync = useCallback(
+      (sourceChildId, scrollLeft, scrollTop) => {
+        if (isSyncingRef.current) return;
 
-    //     isSyncingRef.current = true;
+        isSyncingRef.current = true;
 
-    //     // Sync to all other containers
-    //     console.log("StackVirtualTableRows handleScrollSync", {
-    //       scrollContainersRef,
-    //     });
-    //     scrollContainersRef.current.forEach((container, childId) => {
-    //       if (childId !== sourceChildId && container) {
-    //         container.scrollLeft = scrollLeft;
-    //         container.scrollTop = scrollTop;
-    //       }
-    //     });
+        // Sync to all other containers
+        console.log("StackVirtualTableRows handleScrollSync", {
+          scrollContainersRef,
+        });
+        scrollContainersRef.current.forEach((container, childId) => {
+          if (childId !== sourceChildId && container) {
+            container.scrollLeft = scrollLeft;
+            container.scrollTop = scrollTop;
+          }
+        });
 
-    //     // Use setTimeout instead of requestAnimationFrame for more reliable timing
-    //     setTimeout(() => {
-    //       isSyncingRef.current = false;
-    //     }, 0);
-    //   },
-    //   []
-    // );
+        // Use setTimeout instead of requestAnimationFrame for more reliable timing
+        setTimeout(() => {
+          isSyncingRef.current = false;
+        }, 0);
+      },
+      []
+    );
 
     return (
       <TableContainer

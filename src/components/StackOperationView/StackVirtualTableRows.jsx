@@ -26,9 +26,6 @@ const StackVirtualTableRows = ({ tableIds }) => {
       isSyncingRef.current = true;
 
       // Sync to all other containers
-      console.log("StackVirtualTableRows handleScrollSync", {
-        scrollContainersRef,
-      });
       scrollContainersRef.current.forEach((container, childId) => {
         if (childId !== sourceChildId && container) {
           container.scrollLeft = scrollLeft;
@@ -54,7 +51,14 @@ const StackVirtualTableRows = ({ tableIds }) => {
     >
       {tableIds.map((tableId) => (
         // <Box key={tableId} display="flex" flexDirection="row" width={"50%"}>
-        <RawTableRows key={tableId} id={tableId} />
+        <RawTableRows
+          key={tableId}
+          id={tableId}
+          onScrollContainerRef={(el) => registerScrollContainer(tableId, el)}
+          onScroll={(scrollLeft, scrollTop) =>
+            handleScrollSync(tableId, scrollLeft, scrollTop)
+          }
+        />
         // </Box>
       ))}
       {/* <TableHead
@@ -62,12 +66,6 @@ const StackVirtualTableRows = ({ tableIds }) => {
           selectedColumnIds={[]}
           handleColumnClick={() => {}}
           allowExternalScrollSync={true}
-          onScrollContainerRef={(el) =>
-            registerScrollContainer("table-head", el)
-          }
-          onScroll={(scrollLeft, scrollTop) =>
-            handleScrollSync("table-head", scrollLeft, scrollTop)
-          }
         />
         {operation.children.map((childId) => (
           <TableBody
