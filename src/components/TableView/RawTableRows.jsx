@@ -40,6 +40,17 @@ const StyledHoverableTableCell = styled(TableCell)(({ isHovered, isEven }) => ({
   transition: "background-color 0.1s ease",
 }));
 
+// Sticky row number cell that stays fixed during horizontal scroll
+const StyledStickyRowNumberCell = styled(TableCell)(() => ({
+  position: "sticky",
+  left: 0,
+  backgroundColor: "inherit",
+  textAlign: "right",
+  color: "#888",
+  zIndex: 1,
+  borderRight: "1px solid rgba(224, 224, 224, 1)",
+}));
+
 const RawTableRows = withTableData(
   ({
     table,
@@ -121,7 +132,11 @@ const RawTableRows = withTableData(
         <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell>#</TableCell>
+              <StyledStickyRowNumberCell
+                sx={{ zIndex: 3, backgroundColor: "#f5f5f5" }}
+              >
+                #
+              </StyledStickyRowNumberCell>
               {selectedColumnIds.map((colId) => (
                 <TableCell
                   key={colId}
@@ -176,7 +191,9 @@ const RawTableRows = withTableData(
                   key={`loading-${rowIndex}`}
                   isEven={rowIndex % 2 === 0}
                 >
-                  <TableCell>{rowIndex + 1}</TableCell>
+                  <StyledStickyRowNumberCell>
+                    {rowIndex + 1}
+                  </StyledStickyRowNumberCell>
                   {selectedColumnIds.map((colId) => (
                     <StyledHoverableTableCell
                       key={colId}
@@ -197,7 +214,9 @@ const RawTableRows = withTableData(
                     key={rowIndex}
                     isEven={rowIndex % 2 === 0}
                   >
-                    <TableCell>{rowIndex + 1}</TableCell>
+                    <StyledStickyRowNumberCell>
+                      {rowIndex + 1}
+                    </StyledStickyRowNumberCell>
                     {row.map((value, cellIndex) => (
                       <StyledHoverableTableCell
                         key={activeColumnIds[cellIndex]}
