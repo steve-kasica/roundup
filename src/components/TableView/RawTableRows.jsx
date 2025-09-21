@@ -161,7 +161,7 @@ const RawTableRows = withTableData(
       <TableContainer
         ref={tableContainerRef}
         onScroll={handleScroll}
-        sx={{ maxHeight: "100%", overflow: "auto" }}
+        sx={{ height: "100%", overflow: "auto" }}
       >
         <Table size="small" stickyHeader>
           <TableHead>
