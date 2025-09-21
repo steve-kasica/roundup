@@ -1,7 +1,6 @@
 import withTableData from "../HOC/withTableData";
 import { useRef, useCallback } from "react";
 import {
-  Box,
   Table,
   TableBody,
   TableCell,
@@ -9,6 +8,9 @@ import {
   TableHead,
   TableRow,
   Typography,
+  CircularProgress,
+  Alert,
+  Button,
 } from "@mui/material";
 import ColumnHeader from "../ColumnViews/ColumnHeader.jsx";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData.js";
@@ -19,7 +21,16 @@ const RawTableRows = withTableData(
       selectedColumnIds.includes(colId) ? true : false
     );
 
-    const { data } = usePaginatedTableRows(table.id, selectedColumnIds);
+    const {
+      data,
+      loading,
+      error,
+      hasMore,
+      currentPage,
+      loadMore,
+      refresh,
+      reset,
+    } = usePaginatedTableRows(table.id, selectedColumnIds);
 
     const scrollContainersRef = useRef(new Map());
     const isSyncingRef = useRef(false);
@@ -126,27 +137,70 @@ const RawTableRows = withTableData(
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, rowIndex) => (
-              <TableRow key={rowIndex} hover>
-                <TableCell>{rowIndex + 1}</TableCell>
-                {row.map((value, cellIndex) => (
-                  <TableCell key={activeColumnIds[cellIndex]}>
-                    {value === null ? (
-                      <Typography
-                        color="text.secondary"
-                        sx={{ fontStyle: "italic", opacity: 0.6 }}
-                      >
-                        NULL
-                      </Typography>
-                    ) : typeof value === "number" ? (
-                      value.toLocaleString()
-                    ) : (
-                      value
-                    )}
-                  </TableCell>
-                ))}
+            {error ? (
+              <TableRow sx={{ height: "100%" }}>
+                <TableCell
+                  colSpan={selectedColumnIds.length + 1}
+                  sx={{
+                    height: "100%",
+                    verticalAlign: "middle",
+                    padding: 2,
+                  }}
+                >
+                  <Alert
+                    severity="error"
+                    sx={{
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                    action={
+                      <Button color="inherit" size="small" onClick={refresh}>
+                        Retry
+                      </Button>
+                    }
+                  >
+                    Error loading table data:{" "}
+                    {error?.message || "Unknown error"}
+                  </Alert>
+                </TableCell>
               </TableRow>
-            ))}
+            ) : loading ? (
+              // Show skeleton rows with loading indicators
+              Array.from({ length: 10 }).map((_, rowIndex) => (
+                <TableRow key={`loading-${rowIndex}`} hover>
+                  <TableCell>{rowIndex + 1}</TableCell>
+                  {selectedColumnIds.map((colId) => (
+                    <TableCell key={colId} align="center">
+                      <CircularProgress size={16} />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              // Show actual data
+              data.map((row, rowIndex) => (
+                <TableRow key={rowIndex} hover>
+                  <TableCell>{rowIndex + 1}</TableCell>
+                  {row.map((value, cellIndex) => (
+                    <TableCell key={activeColumnIds[cellIndex]}>
+                      {value === null ? (
+                        <Typography
+                          color="text.secondary"
+                          sx={{ fontStyle: "italic", opacity: 0.6 }}
+                        >
+                          NULL
+                        </Typography>
+                      ) : typeof value === "number" ? (
+                        value.toLocaleString()
+                      ) : (
+                        value
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
