@@ -136,7 +136,7 @@ const PackOperationParams = ({
         />
       </Box>
       <Box sx={{ mt: 2 }}>
-        <PackOutputDetails
+        {/* <PackOutputDetails
           leftTableId={operation.children[0]}
           rightTableId={operation.children[1]}
           leftColumnId={operation.joinKey1}
@@ -144,7 +144,7 @@ const PackOperationParams = ({
           joinType={operation.joinPredicate}
           joinPredicate={operation.joinPredicate}
           setJoinType={setJoinType}
-        />
+        /> */}
       </Box>
     </Box>
   );

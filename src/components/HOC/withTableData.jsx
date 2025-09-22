@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import {
   selectOperationDepth,

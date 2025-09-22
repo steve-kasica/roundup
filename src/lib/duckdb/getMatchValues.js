@@ -12,6 +12,7 @@ export async function getMatchValues(
   order = "total_count",
   order_direction = "DESC"
 ) {
+  console.log("matchType:", matchType);
   const db = await getDuckDB();
   const conn = await db.connect();
   // TODO: refactor to util file for DRY
@@ -84,7 +85,6 @@ export async function getMatchValues(
     throw new Error(`Unsupported match type: ${matchType}`);
   }
 
-  console.log("Executing query:", query);
   const response = await conn.query(query);
   await conn.close();
   return response.toArray().map((proxyStruct) => proxyStruct.toJSON());
