@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import { useColumnValues } from "../../hooks/useColumnValues";
+import { useColumnValues } from "../../hooks";
 import withColumnData from "./withColumnData";
 
 const ColumnValuesSample = withColumnData(({ column, isNull, limit = 3 }) => {
