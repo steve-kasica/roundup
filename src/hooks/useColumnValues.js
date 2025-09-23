@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getColumnValues } from "../../lib/duckdb/getColumnValues.js";
+import { getColumnValues } from "../lib/duckdb/getColumnValues.js";
 
 /**
  * Custom React Hook for querying DuckDB database column values
@@ -17,7 +17,7 @@ import { getColumnValues } from "../../lib/duckdb/getColumnValues.js";
  * @returns {Function} refetch - Function to manually trigger data fetch
  * @returns {Function} reset - Function to reset state to initial values
  */
-export default function useColumnValues(
+export function useColumnValues(
   tableId,
   columnId,
   limit = null,

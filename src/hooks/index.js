@@ -1,2 +1,2 @@
-export { useColumnValues } from "./useColumnValues";
-export { useTableRowData } from "./useTableRowData";
+export { useColumnValues } from "./useColumnValues.js";
+export { useTableRowData, usePaginatedTableRows } from "./useTableRowData.js";

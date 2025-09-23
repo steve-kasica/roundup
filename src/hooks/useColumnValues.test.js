@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
-import useColumnValues, {
+import {
+  useColumnValues,
   usePaginatedColumnValues,
 } from "./useColumnValues.js";
-import { getColumnValues } from "../../lib/duckdb/getColumnValues.js";
+import { getColumnValues } from "../lib/duckdb/getColumnValues.js";
 
 // Mock the DuckDB function
 vi.mock("../../lib/duckdb/getColumnValues.js", () => ({
