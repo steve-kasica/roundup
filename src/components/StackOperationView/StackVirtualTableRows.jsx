@@ -1,8 +1,6 @@
 import withStackOperationData from "./withStackOperationData";
 import { Box } from "@mui/material";
 import { useRef, useCallback } from "react";
-import TableBody from "../TableView/TableBody";
-import TableHead from "../TableView/TableHead";
 import { RawTableRows } from "../TableView";
 
 const StackVirtualTableRows = ({ tableIds }) => {

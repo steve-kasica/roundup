@@ -1,6 +1,5 @@
 import withPackOperationData from "./withPackOperationData";
 import { Box } from "@mui/material";
-import TableBody from "../TableView/TableBody";
 import { useCallback, useRef } from "react";
 import { RawTableRows } from "../TableView";
 

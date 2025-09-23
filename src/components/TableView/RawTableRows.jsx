@@ -1,5 +1,5 @@
 import withTableData from "../HOC/withTableData";
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import {
   Button,
   Box,
   styled,
+  TableSortLabel,
 } from "@mui/material";
 import ColumnHeader from "../ColumnViews/ColumnHeader.jsx";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData.js";
@@ -51,6 +52,16 @@ const StyledStickyRowNumberCell = styled(TableCell)(() => ({
   borderRight: "1px solid rgba(224, 224, 224, 1)",
 }));
 
+// Styled sortable header cell
+const StyledSortableHeaderCell = styled(TableCell)(({ isHovered }) => ({
+  cursor: "pointer",
+  backgroundColor: isHovered ? "#bbdefb" : "#f5f5f5",
+  transition: "background-color 0.1s ease",
+  "&:hover": {
+    backgroundColor: "#bbdefb",
+  },
+}));
+
 const RawTableRows = withTableData(
   ({
     table,
@@ -62,27 +73,34 @@ const RawTableRows = withTableData(
     onScrollContainerRef,
     onScroll,
   }) => {
-    const scrollContainersRef = useRef(new Map());
-    const isSyncingRef = useRef(false);
     const tableContainerRef = useRef(null);
+    const [sortConfig, setSortConfig] = useState({
+      columnId: null,
+      direction: null, // 'asc', 'desc', or null
+    });
 
-    const {
-      data,
-      loading,
-      error,
-      hasMore,
-      // currentPage,
-      loadMore,
-      refresh,
-      // reset,
-    } = usePaginatedTableRows(table.id, selectedColumnIds);
+    const { data, loading, error, hasMore, loadMore, refresh } =
+      usePaginatedTableRows(
+        table.id,
+        selectedColumnIds,
+        50, // pageSize
+        sortConfig.columnId, // sortBy
+        sortConfig.direction // sortDirection
+      );
 
-    const registerScrollContainer = useCallback((childId, scrollElement) => {
-      if (scrollElement) {
-        scrollContainersRef.current.set(childId, scrollElement);
-      } else {
-        scrollContainersRef.current.delete(childId);
-      }
+    const handleSort = useCallback((columnId) => {
+      setSortConfig((prev) => {
+        if (prev.columnId === columnId) {
+          // Cycle through: asc -> desc -> none -> asc
+          if (prev.direction === "asc") {
+            return { columnId, direction: "desc" };
+          } else if (prev.direction === "desc") {
+            return { columnId: null, direction: null };
+          }
+        }
+        // First click or different column
+        return { columnId, direction: "asc" };
+      });
     }, []);
 
     // Register this table container with parent
@@ -91,25 +109,6 @@ const RawTableRows = withTableData(
         onScrollContainerRef(tableContainerRef.current);
       }
     }, [onScrollContainerRef]);
-
-    // Sync scroll position from parent
-    const syncScroll = useCallback((scrollLeft, scrollTop) => {
-      if (tableContainerRef.current && !isSyncingRef.current) {
-        isSyncingRef.current = true;
-        tableContainerRef.current.scrollLeft = scrollLeft;
-        tableContainerRef.current.scrollTop = scrollTop;
-        setTimeout(() => {
-          isSyncingRef.current = false;
-        }, 0);
-      }
-    }, []);
-
-    // // Expose sync function to parent if needed
-    // useEffect(() => {
-    //   if (onScrollContainerRef) {
-    //     onScrollContainerRef(tableContainerRef.current);
-    //   }
-    // }, [onScrollContainerRef]);
 
     const handleScroll = useCallback(
       (event) => {
@@ -132,31 +131,6 @@ const RawTableRows = withTableData(
       [hasMore, loading, error, loadMore, onScroll]
     );
 
-    const handleScrollSync = useCallback(
-      (sourceChildId, scrollLeft, scrollTop) => {
-        if (isSyncingRef.current) return;
-
-        isSyncingRef.current = true;
-
-        // Sync to all other containers
-        console.log("StackVirtualTableRows handleScrollSync", {
-          scrollContainersRef,
-        });
-        scrollContainersRef.current.forEach((container, childId) => {
-          if (childId !== sourceChildId && container) {
-            container.scrollLeft = scrollLeft;
-            container.scrollTop = scrollTop;
-          }
-        });
-
-        // Use setTimeout instead of requestAnimationFrame for more reliable timing
-        setTimeout(() => {
-          isSyncingRef.current = false;
-        }, 0);
-      },
-      []
-    );
-
     return (
       <TableContainer
         ref={tableContainerRef}
@@ -172,20 +146,34 @@ const RawTableRows = withTableData(
                 #
               </StyledStickyRowNumberCell>
               {selectedColumnIds.map((colId) => (
-                <TableCell
+                <StyledSortableHeaderCell
                   key={colId}
                   align="center"
-                  sx={{
-                    p: 1,
-                    backgroundColor: hoveredColumnIds.includes(colId)
-                      ? "#bbdefb"
-                      : "#f5f5f5",
-                  }}
+                  sx={{ p: 1 }}
+                  isHovered={hoveredColumnIds.includes(colId)}
                   onMouseEnter={() => hoverColumn(colId)}
                   onMouseLeave={unhoverColumn}
+                  onClick={() => handleSort(colId)}
                 >
-                  <ColumnHeader key={colId} id={colId} />
-                </TableCell>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ColumnHeader key={colId} id={colId} />
+                    <TableSortLabel
+                      active={sortConfig.columnId === colId}
+                      direction={
+                        sortConfig.columnId === colId
+                          ? sortConfig.direction || "asc"
+                          : "asc"
+                      }
+                      sx={{ ml: 1 }}
+                    />
+                  </Box>
+                </StyledSortableHeaderCell>
               ))}
             </TableRow>
           </TableHead>
@@ -241,7 +229,7 @@ const RawTableRows = withTableData(
                 </StyledAlternatingTableRow>
               ))
             ) : (
-              // Show actual data
+              // Show actual data (now sorted)
               <>
                 {data.map((row, rowIndex) => (
                   <StyledAlternatingTableRow
