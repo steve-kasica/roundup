@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getTableRows } from "../lib/duckdb";
+import { getTableRows } from "../../lib/duckdb/getTableRows.js";
 
 /**
  * Custom React Hook for querying DuckDB database rows
