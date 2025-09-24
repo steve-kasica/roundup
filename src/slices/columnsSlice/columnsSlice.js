@@ -24,6 +24,7 @@ const initialState = {
   idsByTable: {},
   data: {},
   selected: [],
+  focused: [],
   hovered: [],
   loading: [],
   dragging: [],
@@ -417,6 +418,23 @@ const columnsSlice = createSlice({
       }
       state.idsByTable[tableId] = columnIds;
     },
+
+    /**
+     * Sets the focused column
+     * @param {Object} state - The current state
+     * @param {Object} action - The action containing the column ID to focus
+     */
+    setFocusedColumns(state, action) {
+      state.focused = action.payload;
+    },
+
+    /**
+     * Clears the focused column
+     * @param {Object} state - The current state
+     */
+    clearFocusedColumns(state) {
+      state.focused = [];
+    },
   },
 });
 
@@ -455,4 +473,8 @@ export const {
   // Dropping columns
   addColumnsToDropped,
   removeColumnsFromDropped,
+
+  // Focused column
+  setFocusedColumns,
+  clearFocusedColumns,
 } = columnsSlice.actions;
