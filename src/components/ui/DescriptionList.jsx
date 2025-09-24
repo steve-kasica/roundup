@@ -1,6 +1,7 @@
 import { Stack, Typography } from "@mui/material";
 
-const ColumnStats = ({ data }) => {
+// eslint-disable-next-line react/prop-types
+const DescriptionList = ({ data }) => {
   return (
     <>
       {Object.entries(data).map(([key, value]) => (
@@ -41,4 +42,6 @@ const ColumnStats = ({ data }) => {
   );
 };
 
-export default ColumnStats;
+DescriptionList.displayName = "DescriptionList";
+
+export default DescriptionList;

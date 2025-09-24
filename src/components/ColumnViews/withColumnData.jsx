@@ -65,10 +65,10 @@ export default function withColumnData(WrappedComponent) {
       <WrappedComponent
         {...props}
         column={column}
-        nullCount={nullCount}
-        completeness={completeness}
-        completeCount={completeCount}
-        duplicateCount={duplicateCount}
+        nullCount={nullCount} // Total number of null values
+        completeness={completeness} // Percentage of non-null values
+        completeCount={completeCount} // Total number of non-null values
+        duplicateCount={duplicateCount} // Total number of duplicate values
         uniqueCount={uniqueCount}
         mode={
           Object.entries(column?.values || {}).reduce(

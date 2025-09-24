@@ -3,7 +3,6 @@ import { Box, Alert, Button, Typography } from "@mui/material";
 import withPackOperationData from "./withPackOperationData";
 import { ColumnCard } from "../ColumnViews";
 import ColumnHeader from "../ColumnViews/ColumnHeader";
-import TableLabel from "../TableView/TableLabel";
 import { useCallback, useEffect, useState } from "react";
 import useMatchValues from "../../hooks/useMatchValues";
 

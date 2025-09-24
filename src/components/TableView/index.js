@@ -1,5 +1,7 @@
 import TableView from "./TableView";
 export { default as RawTableRows } from "./RawTableRows";
+export { TableLabel } from "./TableLabel";
+export { TableSummary } from "./TableSummary";
 
 export const COLUMN_WIDTHS = {
   index: 10, // Row number column

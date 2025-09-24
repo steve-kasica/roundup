@@ -1,7 +1,7 @@
 import React from "react";
 import withColumnData from "./withColumnData";
 import { Box, Divider, Typography } from "@mui/material";
-import ColumnStats from "./ColumnStats";
+import ColumnStats from "../ui/DescriptionList";
 import ColumnValues from "./ColumnValues";
 import ValueCounts from "./ValueCounts";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";

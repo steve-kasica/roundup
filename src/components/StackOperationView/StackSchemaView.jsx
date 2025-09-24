@@ -8,7 +8,7 @@ import {
   getValuesInRange,
   getIndexOfValue,
 } from "./selectionUtils/selectionUtils";
-import TableLabel from "../TableView/TableLabel";
+import { TableLabel } from "../TableView";
 import { ColumnCard } from "../ColumnViews";
 
 const topRowHeight = 50; // Fixed height for the top row (column headers)

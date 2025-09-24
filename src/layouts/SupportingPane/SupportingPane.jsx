@@ -17,7 +17,7 @@ import { useSelector } from "react-redux";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import CompositeTableSchema from "../../components/CompositeTableSchema";
 import RightSidebar from "./RightSidebar";
-import SpreadsheetWindow from "./SpreadsheetWindow";
+import TableWindow from "./TableWindow";
 import SchemaWindow from "./SchemaWindow";
 import {
   OPERATION_TYPE_NO_OP,
@@ -27,6 +27,7 @@ import {
 } from "../../slices/operationsSlice";
 import { useEffect, useRef, useState } from "react";
 import { selectSelectedColumns } from "../../slices/columnsSlice";
+import TableView from "../../components/TableView";
 // Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -147,7 +148,7 @@ export default function SupportingPane() {
                   collapsible={true}
                   style={{ display: "flex", padding: "5px" }}
                 >
-                  <SpreadsheetWindow />
+                  <TableWindow />
                 </Panel>
               </PanelGroup>
             </Panel>

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { useTableRowData, usePaginatedTableRows } from "../useTableRowData.js";
-import { getTableRows } from "../../lib/duckdb/getTableRows.js";
+import { useTableRowData, usePaginatedTableRows } from "./useTableRowData.js";
+import { getTableRows } from "../lib/duckdb/getTableRows.js";
 
 // Mock the DuckDB function
 vi.mock("../../lib/duckdb/getTableRows.js", () => ({
