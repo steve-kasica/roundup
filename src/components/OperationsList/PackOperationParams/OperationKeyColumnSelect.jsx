@@ -1,13 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import {
-  Typography,
-  MenuItem,
-  Box,
-  Chip,
-  ListItemText,
-  FormHelperText,
-} from "@mui/material";
+import { Typography, MenuItem, Box, Chip, ListItemText } from "@mui/material";
 import withTableData from "../../HOC/withTableData";
 import { descending } from "d3";
 import { useSelector } from "react-redux";

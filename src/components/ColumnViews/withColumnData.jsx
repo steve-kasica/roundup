@@ -24,7 +24,7 @@ import { selectFirstSelectedColumn } from "../../slices/uiSlice";
 import { selectTablesById } from "../../slices/tablesSlice";
 
 export default function withColumnData(WrappedComponent) {
-  return function EnhancedComponent({ id, isDraggable = false, ...props }) {
+  return function EnhancedComponent({ id, ...props }) {
     const dispatch = useDispatch();
     const isNull = id === null;
     let column = useSelector((state) =>

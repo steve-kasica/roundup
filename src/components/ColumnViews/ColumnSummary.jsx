@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import withColumnData from "./withColumnData";
-import DescriptionList from "../ui/DescriptionList";
 import {
   Box,
   Stack,
@@ -183,7 +182,7 @@ const ColumnSummary = ({
       <Stack
         direction={"row"}
         spacing={2}
-        sx={{ mb: 1, justifyContent: "space-between", mb: 0.5 }}
+        sx={{ justifyContent: "space-between", mb: 0.5 }}
       >
         <StyledStatLabel variant="caption" color="text.secondary">
           Type
@@ -195,7 +194,7 @@ const ColumnSummary = ({
       <Stack
         direction={"row"}
         spacing={2}
-        sx={{ mb: 1, justifyContent: "space-between", mb: 0.5 }}
+        sx={{ justifyContent: "space-between", mb: 0.5 }}
       >
         <StyledStatLabel variant="caption" color="text.secondary">
           Count
@@ -207,7 +206,7 @@ const ColumnSummary = ({
       <Stack
         direction={"row"}
         spacing={2}
-        sx={{ mb: 1, justifyContent: "space-between", mb: 0.5 }}
+        sx={{ justifyContent: "space-between", mb: 0.5 }}
       >
         <StyledStatLabel variant="caption" color="text.secondary">
           Nulls
@@ -219,7 +218,7 @@ const ColumnSummary = ({
       <Stack
         direction={"row"}
         spacing={2}
-        sx={{ mb: 1, justifyContent: "space-between", mb: 0.5 }}
+        sx={{ justifyContent: "space-between", mb: 0.5 }}
       >
         <StyledStatLabel variant="caption" color="text.secondary">
           Unique
@@ -231,7 +230,7 @@ const ColumnSummary = ({
       <Stack
         direction={"row"}
         spacing={2}
-        sx={{ mb: 1, justifyContent: "space-between", mb: 0.5 }}
+        sx={{ justifyContent: "space-between", mb: 0.5 }}
       >
         <StyledStatLabel variant="caption" color="text.secondary">
           Top

@@ -20,9 +20,6 @@ import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 import OperationView from "./OperationView";
-import ExportCompositeTable from "../ExportCompositeTable/ExportCompositeTable";
-import { useState } from "react";
-import Button from "@mui/material/Button";
 
 const gridColumns = 12;
 const gridWidth = gridColumns - 2;
@@ -30,12 +27,6 @@ const gridWidth = gridColumns - 2;
 export default function CompositeTableSchema() {
   const rootOperationId = useSelector(selectRootOperation);
   const maxOperationDepth = useSelector(selectMaxOperationDepth);
-  const [exportOpen, setExportOpen] = useState(false);
-
-  // Example: get the table name from somewhere, or use a placeholder
-  const tableName = rootOperationId
-    ? `composite_table_${rootOperationId}`
-    : "composite_table";
 
   return (
     <div className="CompositeTableSchema">

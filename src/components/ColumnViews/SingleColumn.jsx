@@ -1,4 +1,3 @@
-import React from "react";
 import withColumnData from "./withColumnData";
 import { Box, Divider, Typography } from "@mui/material";
 import ColumnStats from "../ui/DescriptionList";

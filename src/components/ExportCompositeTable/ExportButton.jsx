@@ -19,18 +19,14 @@ export function ExportButton({
     setProgress(0);
 
     try {
-      const result = await exportTableToStreamManual(
-        operationId,
-        `${exportName}.${format}`,
-        {
-          chunkSize: 1000,
-          onProgress: (progressInfo) => {
-            setProgress(progressInfo.percentage);
-          },
-          delimiter: format === "tsv" ? "\t" : ",",
-          includeHeaders,
-        }
-      );
+      await exportTableToStreamManual(operationId, `${exportName}.${format}`, {
+        chunkSize: 1000,
+        onProgress: (progressInfo) => {
+          setProgress(progressInfo.percentage);
+        },
+        delimiter: format === "tsv" ? "\t" : ",",
+        includeHeaders,
+      });
     } finally {
       setIsExporting(false);
       setProgress(0);

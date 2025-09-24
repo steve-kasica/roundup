@@ -86,7 +86,7 @@ function ColumnIndexDetails({
         .split("")
         .map((v, i) => [Number(v), i])
         .filter(([b]) => b)
-        .map(([b, i]) => i)
+        .map(([, i]) => i)
     )
   );
 

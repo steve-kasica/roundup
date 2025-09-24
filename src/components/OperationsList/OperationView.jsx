@@ -3,18 +3,13 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  Collapse,
-  IconButton,
-  ListItem,
   ListItemText,
   Tooltip,
   Typography,
-  styled,
 } from "@mui/material";
 import withOperationData from "../HOC/withOperationData";
 import PropTypes from "prop-types";
-import React from "react";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { ExpandMore } from "@mui/icons-material";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
@@ -23,18 +18,6 @@ import StackOperationParams from "./StackOperationParams";
 import PackOperationParams from "./PackOperationParams/PackOperationParams";
 
 export const LAYOUT_ID = "operationListItem";
-
-const StyledListItem = styled(ListItem, {
-  shouldForwardProp: (prop) => prop !== "hasError",
-})(({ theme, hasError }) => ({
-  ...(hasError && {
-    backgroundColor: theme.palette.error.main,
-    borderLeft: `4px solid ${theme.palette.error.dark}`,
-    "& .MuiListItemText-primary, .MuiListItemText-secondary": {
-      color: theme.palette.error.contrastText,
-    },
-  }),
-}));
 
 function OperationView({
   operation,
@@ -50,13 +33,6 @@ function OperationView({
     operation.operationType.charAt(0).toUpperCase() +
     operation.operationType.slice(1);
   const position = index + 1;
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [detailsOpen, setDetailsOpen] = React.useState(false);
-
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const renderOperationParams = () => {
     switch (operation.operationType) {

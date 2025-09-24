@@ -1,5 +1,4 @@
 import { useDragLayer } from "react-dnd";
-import { DATA_TYPE as COLUMN } from "./slices/columnsSlice";
 import {
   MODULE_NAME as COLUMN_INDEX,
   ColumnIndex,
