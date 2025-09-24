@@ -69,6 +69,7 @@ const ColumnSummary = ({
   uniqueCount,
   completeCount,
   unselectColumn,
+  focusColumn,
   onDrop,
   onDragEnd,
 }) => {
@@ -77,7 +78,7 @@ const ColumnSummary = ({
 
   // Calculate values first
   const top = column?.max;
-  const tableIndex = column?.index ? column.index + 1 : 0;
+  const tableIndex = column.index + 1;
 
   // Drag functionality
   const [{ isDragging }, drag] = useDrag({
@@ -173,7 +174,10 @@ const ColumnSummary = ({
         }}
       >
         <MenuItem onClick={() => handleMenuClose(unselectColumn)}>
-          Deselect Column
+          Hide Column
+        </MenuItem>
+        <MenuItem onClick={() => handleMenuClose(focusColumn)}>
+          Focus Column
         </MenuItem>
       </Menu>
       <Stack

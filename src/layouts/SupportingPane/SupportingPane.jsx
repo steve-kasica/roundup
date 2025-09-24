@@ -16,12 +16,11 @@ import LeftSideBar from "./LeftSideBar";
 import { useSelector } from "react-redux";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import CompositeTableSchema from "../../components/CompositeTableSchema";
-import RightSidebar from "./RightSidebar";
+import ColumnWindow from "./ColumnWindow";
 import TableWindow from "./TableWindow";
 import SchemaWindow from "./SchemaWindow";
 import {
   OPERATION_TYPE_NO_OP,
-  selectAllOperationIds,
   selectOperation,
   selectRootOperation,
 } from "../../slices/operationsSlice";
@@ -52,6 +51,7 @@ export default function SupportingPane() {
     return id ? selectOperation(state, id) : null;
   });
   const selectedColumns = useSelector(selectSelectedColumns);
+  const focusedColumns = useSelector((state) => state.columns.focused);
   const isOpen = tables.length > 0;
   const columnWindowRef = useRef(null);
 
@@ -152,7 +152,7 @@ export default function SupportingPane() {
                 </Panel>
               </PanelGroup>
             </Panel>
-            {/* {selectedColumns && selectedColumns.length > 0 && (
+            {focusedColumns && focusedColumns.length > 0 && (
               <>
                 <StyledPanelResizeHandle
                   sx={{ width: "2px", height: "100%" }}
@@ -160,18 +160,15 @@ export default function SupportingPane() {
                 <Panel
                   order={3}
                   collapsible={true}
-                  collapsed={!(selectedColumns && selectedColumns.length)}
+                  collapsed={!(focusedColumns && focusedColumns.length)}
                   maxSize={50}
                   defaultSize={25}
                   style={{ padding: "5px" }}
                 >
-                  <Typography variant="window-label">
-                    Column detail window
-                  </Typography>
-                  <RightSidebar />
+                  <ColumnWindow />
                 </Panel>
               </>
-            )} */}
+            )}
           </PanelGroup>
         )}
       </Box>

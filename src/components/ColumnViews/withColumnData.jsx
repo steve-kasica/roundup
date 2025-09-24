@@ -15,6 +15,7 @@ import {
   appendToSelectedColumns,
   removeFromSelectedColumns,
   selectSelectedColumns,
+  setFocusedColumns,
 } from "../../slices/columnsSlice";
 import { renameColumnsRequest } from "../../sagas/renameColumnsSaga";
 import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
@@ -111,6 +112,11 @@ export default function withColumnData(WrappedComponent) {
           if (!isNull) {
             dispatch(clearSelectedColumns());
             dispatch(appendToSelectedColumns(id));
+          }
+        }}
+        focusColumn={() => {
+          if (!isNull) {
+            dispatch(setFocusedColumns(id));
           }
         }}
         unselectColumn={() => {
