@@ -7,14 +7,23 @@ import {
   Typography,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import TableView from "../../components/TableView";
-import { TableLabel, TableSummary } from "../../components/TableView";
+import {
+  TableLabel,
+  TableRows,
+  TableSummary,
+} from "../../components/TableView";
+import { StackVirtualizedTable } from "../../components/StackOperationView";
 import {
   selectColumnById,
   selectSelectedColumns,
 } from "../../slices/columnsSlice";
 import { group } from "d3";
 import { useState } from "react";
+import {
+  OPERATION_TYPE_STACK,
+  selectFocusedOperationId,
+  selectOperation,
+} from "../../slices/operationsSlice";
 
 const TOGGLE_VALUES = {
   LOW: "Low",
@@ -36,6 +45,10 @@ const TableWindow = () => {
         columnIds: columns.map((c) => c.id),
       })
     );
+  });
+  const focusedOperation = useSelector((state) => {
+    const opId = selectFocusedOperationId(state);
+    return opId ? selectOperation(state, opId) : null;
   });
 
   return (
@@ -101,9 +114,16 @@ const TableWindow = () => {
             No columns selected. Please select columns from the schema window.
           </Typography>
         ) : selectedTableIds.length === 1 && lod === TOGGLE_VALUES.LOW ? (
-          <TableView id={selectedTableIds[0].tableId} objectType={"table"} />
+          <TableRows id={selectedTableIds[0].tableId} />
         ) : selectedTableIds.length === 1 && lod === TOGGLE_VALUES.HIGH ? (
           <TableSummary id={selectedTableIds[0].tableId} />
+        ) : selectedTableIds.length > 1 &&
+          focusedOperation.operationType === OPERATION_TYPE_STACK &&
+          lod === TOGGLE_VALUES.LOW ? (
+          <StackVirtualizedTable
+            tableIds={selectedTableIds.map((t) => t.tableId)}
+            operationId={focusedOperation.id}
+          />
         ) : (
           <pre>
             Error: unsupported state

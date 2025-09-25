@@ -6,7 +6,7 @@
  */
 import ColumnView from "./ColumnView.jsx";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
-import withTableData from "../HOC/withTableData.jsx";
+import withTableData from "../TableView/withTableData.jsx";
 import PropTypes from "prop-types";
 
 function TableView({

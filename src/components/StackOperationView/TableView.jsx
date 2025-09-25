@@ -1,4 +1,4 @@
-import withTableData from "../HOC/withTableData";
+import withTableData from "../TableView/withTableData";
 import PropTypes from "prop-types";
 import { Box } from "@mui/material";
 

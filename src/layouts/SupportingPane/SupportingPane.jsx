@@ -24,9 +24,8 @@ import {
   selectOperation,
   selectRootOperation,
 } from "../../slices/operationsSlice";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { selectSelectedColumns } from "../../slices/columnsSlice";
-import TableView from "../../components/TableView";
 // Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -125,24 +124,20 @@ export default function SupportingPane() {
             <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
             <Panel order={2}>
               <PanelGroup autoSaveId="MainContentPane" direction="vertical">
-                {rootOperation?.operationType !== OPERATION_TYPE_NO_OP && (
-                  <>
-                    <Panel
-                      collapsible={true}
-                      minSize={10}
-                      defaultSize={25}
-                      // defaultSize={25}
-                      maxSize={75}
-                      order={1}
-                      style={{ padding: "5px" }}
-                    >
-                      <SchemaWindow />
-                    </Panel>
-                    <StyledPanelResizeHandle
-                      sx={{ height: "2px", width: "100%" }}
-                    />
-                  </>
-                )}
+                <Panel
+                  collapsible={true}
+                  minSize={10}
+                  defaultSize={25}
+                  // defaultSize={25}
+                  maxSize={75}
+                  order={1}
+                  style={{ padding: "5px" }}
+                >
+                  <SchemaWindow />
+                </Panel>
+                <StyledPanelResizeHandle
+                  sx={{ height: "2px", width: "100%" }}
+                />
                 <Panel
                   order={2}
                   collapsible={true}

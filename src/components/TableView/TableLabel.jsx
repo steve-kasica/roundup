@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import withTableData from "../HOC/withTableData";
+import withTableData from "./withTableData";
 import { Stack, Typography } from "@mui/material";
 import { TableChart } from "@mui/icons-material";
 import { formatNumber } from "../../lib/utilities/formaters";

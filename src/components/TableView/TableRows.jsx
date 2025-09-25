@@ -1,4 +1,5 @@
-import withTableData from "../HOC/withTableData";
+/* eslint-disable react/prop-types */
+import withTableData from "./withTableData.jsx";
 import { useRef, useCallback, useEffect, useState } from "react";
 import {
   Table,
@@ -16,7 +17,7 @@ import {
   TableSortLabel,
 } from "@mui/material";
 import ColumnHeader from "../ColumnViews/ColumnHeader.jsx";
-import { usePaginatedTableRows } from "../../hooks";
+import { usePaginatedTableRows } from "../../hooks/index.js";
 
 // Row handles alternating colors + row hover
 const StyledAlternatingTableRow = styled(TableRow)(({ isEven }) => ({
@@ -62,14 +63,15 @@ const StyledSortableHeaderCell = styled(TableCell)(({ isHovered }) => ({
   },
 }));
 
-const RawTableRows = ({
-  tableId,
-  columnIds,
-  hoveredIndex,
+const TableRows = ({
+  table,
+  selectedColumnIds,
+  hoveredIndex = 0,
   hoverColumn,
   unhoverColumn,
   onScrollContainerRef = null,
   onScroll = null,
+  showHeader = true,
 }) => {
   const tableContainerRef = useRef(null);
   const [sortConfig, setSortConfig] = useState({
@@ -79,8 +81,8 @@ const RawTableRows = ({
 
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
-      tableId,
-      columnIds,
+      table.id,
+      selectedColumnIds,
       50, // pageSize
       sortConfig.columnId, // sortBy
       sortConfig.direction // sortDirection
@@ -136,50 +138,52 @@ const RawTableRows = ({
       sx={{ height: "100%", overflow: "auto" }}
     >
       <Table size="small" stickyHeader>
-        <TableHead>
-          <TableRow>
-            <StyledStickyRowNumberCell
-              sx={{ zIndex: 3, backgroundColor: "#f5f5f5" }}
-            >
-              #
-            </StyledStickyRowNumberCell>
-            {columnIds.map((colId, i) => (
-              <StyledSortableHeaderCell
-                key={colId}
-                align="center"
-                sx={{ p: 1 }}
-                isHovered={hoveredIndex === i}
-                onMouseEnter={() => hoverColumn(colId)}
-                onMouseLeave={unhoverColumn}
-                onClick={() => handleSort(colId)}
+        {showHeader && (
+          <TableHead>
+            <TableRow>
+              <StyledStickyRowNumberCell
+                sx={{ zIndex: 3, backgroundColor: "#f5f5f5" }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                #
+              </StyledStickyRowNumberCell>
+              {selectedColumnIds.map((colId, i) => (
+                <StyledSortableHeaderCell
+                  key={colId}
+                  align="center"
+                  sx={{ p: 1 }}
+                  isHovered={hoveredIndex === i}
+                  onMouseEnter={() => hoverColumn(colId)}
+                  onMouseLeave={unhoverColumn}
+                  onClick={() => handleSort(colId)}
                 >
-                  <ColumnHeader key={colId} id={colId} />
-                  <TableSortLabel
-                    active={sortConfig.columnId === colId}
-                    direction={
-                      sortConfig.columnId === colId
-                        ? sortConfig.direction || "asc"
-                        : "asc"
-                    }
-                    sx={{ ml: 1 }}
-                  />
-                </Box>
-              </StyledSortableHeaderCell>
-            ))}
-          </TableRow>
-        </TableHead>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ColumnHeader key={colId} id={colId} />
+                    <TableSortLabel
+                      active={sortConfig.columnId === colId}
+                      direction={
+                        sortConfig.columnId === colId
+                          ? sortConfig.direction || "asc"
+                          : "asc"
+                      }
+                      sx={{ ml: 1 }}
+                    />
+                  </Box>
+                </StyledSortableHeaderCell>
+              ))}
+            </TableRow>
+          </TableHead>
+        )}
         <TableBody>
           {error ? (
             <TableRow sx={{ height: "100%" }}>
               <TableCell
-                colSpan={columnIds.length + 1}
+                colSpan={selectedColumnIds.length + 1}
                 sx={{
                   height: "100%",
                   verticalAlign: "middle",
@@ -213,7 +217,7 @@ const RawTableRows = ({
                 <StyledStickyRowNumberCell>
                   {rowIndex + 1}
                 </StyledStickyRowNumberCell>
-                {columnIds.map((colId, i) => (
+                {selectedColumnIds.map((colId, i) => (
                   <StyledHoverableTableCell
                     key={colId}
                     align="center"
@@ -238,7 +242,7 @@ const RawTableRows = ({
                   </StyledStickyRowNumberCell>
                   {row.map((value, i) => (
                     <StyledHoverableTableCell
-                      key={columnIds[i]}
+                      key={selectedColumnIds[i]}
                       isHovered={hoveredIndex === i}
                       isEven={rowIndex % 2 === 0}
                     >
@@ -261,7 +265,10 @@ const RawTableRows = ({
               {/* Loading indicator for pagination */}
               {loading && data.length > 0 && (
                 <StyledAlternatingTableRow isEven={data.length % 2 === 0}>
-                  <TableCell colSpan={columnIds.length + 1} align="center">
+                  <TableCell
+                    colSpan={selectedColumnIds.length + 1}
+                    align="center"
+                  >
                     <Box
                       sx={{
                         py: 2,
@@ -286,6 +293,8 @@ const RawTableRows = ({
   );
 };
 
-RawTableRows.displayName = "RawTableRows";
+TableRows.displayName = "TableRows";
 
-export default RawTableRows;
+const EnhancedTableRows = withTableData(TableRows);
+
+export { EnhancedTableRows as TableRows };

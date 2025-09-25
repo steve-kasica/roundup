@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Menu, MenuItem } from "@mui/material";
 import { formatDate, formatNumber, formatBytes } from "../../../lib/utilities";
-import withTableData from "../../HOC/withTableData";
+import withTableData from "../../TableView/withTableData";
 import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import PropTypes from "prop-types";

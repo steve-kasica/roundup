@@ -15,7 +15,6 @@ import {
   setSelectedColumns,
 } from "../../slices/columnsSlice";
 import {
-  removeFromSelectedTables,
   selectHoveredTable,
   clearHoveredTable,
   setHoveredTable,

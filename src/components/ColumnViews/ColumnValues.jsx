@@ -1,10 +1,11 @@
+/* eslint-disable react/prop-types */
 import { Box, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { getColumnValues } from "../../lib/duckdb";
+import withColumnData from "./withColumnData";
 
 const ColumnValues = ({
-  columnId,
-  tableId,
+  column,
   limit = 10,
   scrollTop = 0,
   onScroll = () => null,
@@ -15,20 +16,20 @@ const ColumnValues = ({
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef(null);
-  // Reset state when columnId or tableId changes
+  // Reset state when column.id or column.tableId changes
   useEffect(() => {
     setValues([]);
     setOffset(0);
     setHasMore(true);
     setError(null);
-  }, [columnId, tableId]);
+  }, [column.id, column.tableId]);
 
   // Load values when offset changes or initial load
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
     setError(null);
-    getColumnValues(tableId, columnId, limit, offset)
+    getColumnValues(column.tableId, column.id, limit, offset)
       .then((result) => {
         if (isMounted) {
           setValues((prev) =>
@@ -46,7 +47,7 @@ const ColumnValues = ({
     return () => {
       isMounted = false;
     };
-  }, [columnId, tableId, offset, limit]);
+  }, [column.id, column.tableId, offset, limit]);
 
   // Remove handleLoadMore and inline logic in scroll handler to avoid dependency warning
 
@@ -108,4 +109,6 @@ const ColumnValues = ({
   );
 };
 
-export default ColumnValues;
+const EnhancedColumnValues = withColumnData(ColumnValues);
+
+export { EnhancedColumnValues as ColumnValues };

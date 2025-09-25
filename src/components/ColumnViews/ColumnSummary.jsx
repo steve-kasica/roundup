@@ -20,12 +20,14 @@ const StyledDataTypeTypography = styled(Typography)(() => ({
   overflow: "hidden",
   textOverflow: "ellipsis",
   width: "50%",
+  userSelect: "none", // Prevent text selection
 }));
 
 const StyledStatLabel = styled(Typography)(() => ({
   fontWeight: "bold",
   width: "50%",
   textTransform: "capitalize", // Capitalizes first letter of each word
+  userSelect: "none", // Prevent text selection
 }));
 
 const StyledHeaderContainer = styled(Box)(() => ({
@@ -33,12 +35,12 @@ const StyledHeaderContainer = styled(Box)(() => ({
   alignItems: "center",
   justifyContent: "space-between",
   marginBottom: "8px",
+  userSelect: "none", // Prevent text selection
 }));
 
 const DraggableColumnSummary = styled(Box)(
   ({ theme, isDragging, isOver, canDropHere }) => ({
     minWidth: 200,
-    padding: theme.spacing(1),
     border: `2px solid ${
       isOver && canDropHere
         ? theme.palette.primary.main
@@ -139,22 +141,22 @@ const ColumnSummary = ({
     setMenuAnchorEl(event.currentTarget);
   };
 
-  const handleMenuClose = (callback) => {
+  const handleMenuClose = (event, callback) => {
+    event.stopPropagation();
     setMenuAnchorEl(null);
     if (callback) callback();
   };
 
   return (
-    <DraggableColumnSummary
-      ref={dragDropRef}
-      isDragging={isDragging}
-      isOver={isOver}
-      canDropHere={canDropHere}
-    >
+    // <DraggableColumnSummary
+    //   ref={dragDropRef}
+    //   isDragging={isDragging}
+    //   isOver={isOver}
+    //   canDropHere={canDropHere}
+    // >
+    <>
       <StyledHeaderContainer>
-        <h3 style={{ margin: 0, flex: 1 }}>
-          {tableIndex}. {column.name}
-        </h3>
+        <h3 style={{ margin: 0, flex: 1 }}>{column.name}</h3>
         <IconButton size="small" onClick={handleMenuClick} sx={{ p: 0.5 }}>
           <MoreVert fontSize="small" />
         </IconButton>
@@ -172,74 +174,77 @@ const ColumnSummary = ({
           horizontal: "right",
         }}
       >
-        <MenuItem onClick={() => handleMenuClose(unselectColumn)}>
+        <MenuItem onClick={(event) => handleMenuClose(event, unselectColumn)}>
           Hide Column
         </MenuItem>
-        <MenuItem onClick={() => handleMenuClose(focusColumn)}>
+        <MenuItem onClick={(event) => handleMenuClose(event, focusColumn)}>
           Focus Column
         </MenuItem>
       </Menu>
-      <Stack
-        direction={"row"}
-        spacing={2}
-        sx={{ justifyContent: "space-between", mb: 0.5 }}
-      >
-        <StyledStatLabel variant="caption" color="text.secondary">
-          Type
-        </StyledStatLabel>
-        <StyledDataTypeTypography variant="caption" color="text.secondary">
-          {column.columnType}
-        </StyledDataTypeTypography>
-      </Stack>
-      <Stack
-        direction={"row"}
-        spacing={2}
-        sx={{ justifyContent: "space-between", mb: 0.5 }}
-      >
-        <StyledStatLabel variant="caption" color="text.secondary">
-          Count
-        </StyledStatLabel>
-        <StyledDataTypeTypography variant="caption" color="text.secondary">
-          {formatNumber(completeCount)}
-        </StyledDataTypeTypography>
-      </Stack>
-      <Stack
-        direction={"row"}
-        spacing={2}
-        sx={{ justifyContent: "space-between", mb: 0.5 }}
-      >
-        <StyledStatLabel variant="caption" color="text.secondary">
-          Nulls
-        </StyledStatLabel>
-        <StyledDataTypeTypography variant="caption" color="text.secondary">
-          {formatNumber(nullCount)}
-        </StyledDataTypeTypography>
-      </Stack>
-      <Stack
-        direction={"row"}
-        spacing={2}
-        sx={{ justifyContent: "space-between", mb: 0.5 }}
-      >
-        <StyledStatLabel variant="caption" color="text.secondary">
-          Unique
-        </StyledStatLabel>
-        <StyledDataTypeTypography variant="caption" color="text.secondary">
-          {formatNumber(uniqueCount)}
-        </StyledDataTypeTypography>
-      </Stack>
-      <Stack
-        direction={"row"}
-        spacing={2}
-        sx={{ justifyContent: "space-between", mb: 0.5 }}
-      >
-        <StyledStatLabel variant="caption" color="text.secondary">
-          Top
-        </StyledStatLabel>
-        <StyledDataTypeTypography variant="caption" color="text.secondary">
-          {top}
-        </StyledDataTypeTypography>
-      </Stack>
-    </DraggableColumnSummary>
+      <Box width={"100%"}>
+        <Stack
+          direction={"row"}
+          spacing={2}
+          sx={{ justifyContent: "space-between", mb: 0.5 }}
+        >
+          <StyledStatLabel variant="caption" color="text.secondary">
+            Type
+          </StyledStatLabel>
+          <StyledDataTypeTypography variant="caption" color="text.secondary">
+            {column.columnType}
+          </StyledDataTypeTypography>
+        </Stack>
+        <Stack
+          direction={"row"}
+          spacing={2}
+          sx={{ justifyContent: "space-between", mb: 0.5 }}
+        >
+          <StyledStatLabel variant="caption" color="text.secondary">
+            Count
+          </StyledStatLabel>
+          <StyledDataTypeTypography variant="caption" color="text.secondary">
+            {formatNumber(completeCount)}
+          </StyledDataTypeTypography>
+        </Stack>
+        <Stack
+          direction={"row"}
+          spacing={2}
+          sx={{ justifyContent: "space-between", mb: 0.5 }}
+        >
+          <StyledStatLabel variant="caption" color="text.secondary">
+            Nulls
+          </StyledStatLabel>
+          <StyledDataTypeTypography variant="caption" color="text.secondary">
+            {formatNumber(nullCount)}
+          </StyledDataTypeTypography>
+        </Stack>
+        <Stack
+          direction={"row"}
+          spacing={2}
+          sx={{ justifyContent: "space-between", mb: 0.5 }}
+        >
+          <StyledStatLabel variant="caption" color="text.secondary">
+            Unique
+          </StyledStatLabel>
+          <StyledDataTypeTypography variant="caption" color="text.secondary">
+            {formatNumber(uniqueCount)}
+          </StyledDataTypeTypography>
+        </Stack>
+        <Stack
+          direction={"row"}
+          spacing={2}
+          sx={{ justifyContent: "space-between", mb: 0.5 }}
+        >
+          <StyledStatLabel variant="caption" color="text.secondary">
+            Top
+          </StyledStatLabel>
+          <StyledDataTypeTypography variant="caption" color="text.secondary">
+            {top}
+          </StyledDataTypeTypography>
+        </Stack>
+      </Box>
+    </>
+    // </DraggableColumnSummary>
   );
 };
 

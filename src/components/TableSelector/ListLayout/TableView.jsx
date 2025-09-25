@@ -18,7 +18,7 @@ import {
   formatBytes,
   formatDate,
 } from "../../../lib/utilities/formaters";
-import withTableData from "../../HOC/withTableData";
+import withTableData from "../../TableView/withTableData";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 

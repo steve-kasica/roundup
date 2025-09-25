@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import withTableData from "../HOC/withTableData";
+import withTableData from "../TableView/withTableData";
 
 function TableView({ table, colWidth }) {
   return (

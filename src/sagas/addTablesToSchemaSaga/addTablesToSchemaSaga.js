@@ -97,11 +97,7 @@ export function* addTablesToSchemaSagaWorker(action) {
     yield put(
       updateTables(tableIds.map((id) => ({ id, operationId: operation.id })))
     );
-    // Select table by selecting all columns
-    const tableColumns = yield select((state) =>
-      selectColumnIdsByTableId(state, tableIds[0])
-    );
-    yield put(setSelectedColumns(tableColumns));
+    yield put(setFocusedOperation(operation));
   } else if (rootOperation.operationType === OPERATION_TYPE_NO_OP) {
     // Case: first table added after schema initialized with only one table
     // Update the operation type and add the new table as a child

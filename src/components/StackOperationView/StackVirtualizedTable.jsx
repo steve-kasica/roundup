@@ -1,9 +1,8 @@
-import withStackOperationData from "./withStackOperationData";
 import { Box } from "@mui/material";
 import { useRef, useCallback } from "react";
-import { RawTableRows } from "../TableView";
+import { TableRows } from "../TableView";
 
-const StackVirtualTableRows = ({ tableIds }) => {
+export const StackVirtualizedTable = ({ tableIds, operationId }) => {
   // Map of childId -> `<TableBody>` scroll container
   const scrollContainersRef = useRef(new Map());
   const isSyncingRef = useRef(false);
@@ -48,37 +47,16 @@ const StackVirtualTableRows = ({ tableIds }) => {
       width={"100%"}
     >
       {tableIds.map((tableId) => (
-        // <Box key={tableId} display="flex" flexDirection="row" width={"50%"}>
-        <RawTableRows
+        <TableRows
           key={tableId}
           id={tableId}
+          showHeader={false}
           onScrollContainerRef={(el) => registerScrollContainer(tableId, el)}
           onScroll={(scrollLeft, scrollTop) =>
             handleScrollSync(tableId, scrollLeft, scrollTop)
           }
         />
-        // </Box>
       ))}
-      {/* <TableHead
-          activeColumnIds={columnIds}
-          selectedColumnIds={[]}
-          handleColumnClick={() => {}}
-          allowExternalScrollSync={true}
-        />
-        {operation.children.map((childId) => (
-          <TableBody
-            key={childId}
-            id={childId}
-            selectedColumnIndices={selectedColumnIndices}
-            allowExternalScrollSync={true}
-            onScrollContainerRef={(el) => registerScrollContainer(childId, el)}
-            onScroll={(scrollLeft, scrollTop) =>
-              handleScrollSync(childId, scrollLeft, scrollTop)
-            }
-          />
-        ))} */}
     </Box>
   );
 };
-
-export default StackVirtualTableRows;

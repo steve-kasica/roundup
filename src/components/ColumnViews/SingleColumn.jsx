@@ -1,7 +1,7 @@
 import withColumnData from "./withColumnData";
 import { Box, Divider, Typography } from "@mui/material";
 import ColumnStats from "../ui/DescriptionList";
-import ColumnValues from "./ColumnValues";
+import { ColumnValues } from "./ColumnValues";
 import ValueCounts from "./ValueCounts";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useState } from "react";
@@ -52,9 +52,7 @@ const SingleColumn = withColumnData(
             uniqueCount={uniqueCount}
           />
         )}
-        {view === "raw values" && (
-          <ColumnValues columnId={column.id} tableId={column.tableId} />
-        )}
+        {view === "raw values" && <ColumnValues id={column.id} />}
       </Box>
     );
   }

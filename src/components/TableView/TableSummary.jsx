@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import { Box, Card } from "@mui/material";
-import withTableData from "../HOC/withTableData";
+import withTableData from "./withTableData";
 import { ColumnSummary } from "../ColumnViews/ColumnSummary";
 
 const TableSummary = ({ selectedColumnIds }) => {
