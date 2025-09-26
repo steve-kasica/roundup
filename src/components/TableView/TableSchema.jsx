@@ -238,9 +238,12 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
         display={"flex"}
         flexDirection="row"
         alignContent={"flex-start"}
-        justifyContent={"space-between"}
         flex="1 1 auto"
         gap={1}
+        sx={{
+          overflowX: "auto",
+          overflowY: "hidden",
+        }}
       >
         {/* Column Cards Grid */}
         {table.columnIds.map((columnId, i) => (
@@ -249,8 +252,9 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
             sx={{
               display: "flex",
               flexDirection: "column",
-              flex: "1 1 0",
+              flex: "0 0 auto",
               minWidth: 200,
+              width: 200,
             }}
           >
             <Typography

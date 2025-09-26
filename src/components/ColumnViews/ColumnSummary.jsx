@@ -8,11 +8,16 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Tooltip,
+  Divider,
 } from "@mui/material";
-import { MoreVert } from "@mui/icons-material";
+import { MoreVert, Info } from "@mui/icons-material";
 import { useState, useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { formatNumber } from "../../lib/utilities";
+import ProportionBar from "../visualization/ProportionBar";
+import SingleBar from "../visualization/SingleBar";
+import { scaleLinear } from "d3";
 
 const StyledDataTypeTypography = styled(Typography)(() => ({
   textAlign: "right",
@@ -148,12 +153,6 @@ const ColumnSummary = ({
   };
 
   return (
-    // <DraggableColumnSummary
-    //   ref={dragDropRef}
-    //   isDragging={isDragging}
-    //   isOver={isOver}
-    //   canDropHere={canDropHere}
-    // >
     <>
       <StyledHeaderContainer>
         <h3 style={{ margin: 0, flex: 1 }}>{column.name}</h3>
@@ -222,70 +221,72 @@ const ColumnSummary = ({
           Rename column
         </MenuItem>
       </Menu>
-      <Box width={"100%"}>
-        <Stack
-          direction={"row"}
-          spacing={2}
-          sx={{ justifyContent: "space-between", mb: 0.5 }}
-        >
-          <StyledStatLabel variant="caption" color="text.secondary">
-            Type
-          </StyledStatLabel>
-          <StyledDataTypeTypography variant="caption" color="text.secondary">
-            {column.columnType}
-          </StyledDataTypeTypography>
-        </Stack>
-        <Stack
-          direction={"row"}
-          spacing={2}
-          sx={{ justifyContent: "space-between", mb: 0.5 }}
-        >
-          <StyledStatLabel variant="caption" color="text.secondary">
-            Count
-          </StyledStatLabel>
-          <StyledDataTypeTypography variant="caption" color="text.secondary">
-            {formatNumber(completeCount)}
-          </StyledDataTypeTypography>
-        </Stack>
-        <Stack
-          direction={"row"}
-          spacing={2}
-          sx={{ justifyContent: "space-between", mb: 0.5 }}
-        >
-          <StyledStatLabel variant="caption" color="text.secondary">
-            Nulls
-          </StyledStatLabel>
-          <StyledDataTypeTypography variant="caption" color="text.secondary">
-            {formatNumber(nullCount)}
-          </StyledDataTypeTypography>
-        </Stack>
-        <Stack
-          direction={"row"}
-          spacing={2}
-          sx={{ justifyContent: "space-between", mb: 0.5 }}
-        >
-          <StyledStatLabel variant="caption" color="text.secondary">
-            Unique
-          </StyledStatLabel>
-          <StyledDataTypeTypography variant="caption" color="text.secondary">
-            {formatNumber(uniqueCount)}
-          </StyledDataTypeTypography>
-        </Stack>
-        <Stack
-          direction={"row"}
-          spacing={2}
-          sx={{ justifyContent: "space-between", mb: 0.5 }}
-        >
-          <StyledStatLabel variant="caption" color="text.secondary">
-            Top
-          </StyledStatLabel>
-          <StyledDataTypeTypography variant="caption" color="text.secondary">
-            {top}
-          </StyledDataTypeTypography>
-        </Stack>
+      <Divider sx={{ my: 1 }} />
+      <Box sx={{ userSelect: "none" /* Prevent text selection */ }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Null values
+          </Typography>
+          <Tooltip
+            title="Shows the proportion of non-null values versus null/missing values in this column. Higher completeness indicates fewer missing values."
+            placement="top"
+            arrow
+          >
+            <Info
+              fontSize="small"
+              sx={{
+                fontSize: 12,
+                color: "text.disabled",
+                cursor: "help",
+                "&:hover": {
+                  color: "text.secondary",
+                },
+              }}
+            />
+          </Tooltip>
+        </Box>
+        <SingleBar
+          value={nullCount}
+          xAxisScale={scaleLinear().domain([0, completeCount])}
+          height={20}
+          color="#424242"
+          backgroundColor="#eee"
+          showPercentage={true}
+          maxValue={completeCount}
+        />
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Duplicate values
+          </Typography>
+          <Tooltip
+            title="Shows the proportion of unique values versus duplicate values in this column. Higher uniqueness indicates more distinct values."
+            placement="top"
+            arrow
+          >
+            <Info
+              fontSize="small"
+              sx={{
+                fontSize: 12,
+                color: "text.disabled",
+                cursor: "help",
+                "&:hover": {
+                  color: "text.secondary",
+                },
+              }}
+            />
+          </Tooltip>
+        </Box>
+        <SingleBar
+          value={completeCount - uniqueCount}
+          xAxisScale={scaleLinear().domain([0, completeCount])}
+          height={20}
+          color="#424242"
+          backgroundColor="#eee"
+          showPercentage={true}
+          maxValue={completeCount}
+        />
       </Box>
     </>
-    // </DraggableColumnSummary>
   );
 };
 

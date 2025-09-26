@@ -1,4 +1,5 @@
-const ProportionBar = ({ data, height = 20 }) => {
+/* eslint-disable react/prop-types */
+const ProportionBar = ({ data, barStyles = {}, height = 20 }) => {
   const values = Object.values(data);
   const total = values.reduce((sum, v) => sum + v, 0);
   if (total === 0) {
@@ -25,7 +26,6 @@ const ProportionBar = ({ data, height = 20 }) => {
     >
       {Object.entries(data).map(([label, value], index) => {
         const widthPercent = (value / total) * 100;
-        console.log({ label, value, widthPercent });
         return (
           <div
             key={index}
@@ -33,14 +33,17 @@ const ProportionBar = ({ data, height = 20 }) => {
               width: `${widthPercent}%`,
               display: "flex",
               alignItems: "center",
-              backgroundColor: index % 2 === 0 ? "#4caf50" : "#81c784",
               height: "100%",
               fontFamily: "sans-serif",
               fontSize: "0.75rem",
+              minWidth: "1%",
+              ...barStyles[label],
             }}
-            title={`${label}: ${value} (${widthPercent.toFixed(1)}%)`}
+            title={`${label}: ${value.toLocaleString()} (${widthPercent.toFixed(
+              1
+            )}%)`}
           >
-            <span style={{ padding: "0 4px" }}>{label}</span>
+            <span style={{ padding: "0 4px" }}>{widthPercent.toFixed(1)}%</span>
           </div>
         );
       })}
