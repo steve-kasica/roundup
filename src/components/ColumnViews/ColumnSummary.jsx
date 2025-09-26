@@ -180,6 +180,47 @@ const ColumnSummary = ({
         <MenuItem onClick={(event) => handleMenuClose(event, focusColumn)}>
           Focus Column
         </MenuItem>
+        <MenuItem
+          onClick={(event) =>
+            handleMenuClose(event, () =>
+              console.log("Change Column Type (TODO)")
+            )
+          }
+        >
+          Change Column Type
+        </MenuItem>
+        <MenuItem
+          onClick={(event) =>
+            handleMenuClose(event, () =>
+              console.log("Insert column to the left (TODO)")
+            )
+          }
+        >
+          Insert column to the left
+        </MenuItem>
+        <MenuItem
+          onClick={(event) =>
+            handleMenuClose(event, () =>
+              console.log("Insert column to the right (TODO)")
+            )
+          }
+        >
+          Insert column to the right
+        </MenuItem>
+        <MenuItem
+          onClick={(event) =>
+            handleMenuClose(event, () => console.log("Drag column (TODO)"))
+          }
+        >
+          Reposition column
+        </MenuItem>
+        <MenuItem
+          onClick={(event) =>
+            handleMenuClose(event, () => console.log("Rename column (TODO)"))
+          }
+        >
+          Rename column
+        </MenuItem>
       </Menu>
       <Box width={"100%"}>
         <Stack
