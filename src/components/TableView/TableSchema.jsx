@@ -304,11 +304,7 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
                 handleColumnDoubleClick(event, columnId)
               }
             >
-              {/* <ColumnHeader id={columnId} /> */}
-              {/* <ColumnValues id={columnId} /> */}
-              <Box sx={{ flex: "1 1 0", minHeight: 0, overflowY: "hidden", overflowX: "auto" }}>
-                <ColumnSummary id={columnId} />
-              </Box>
+              <ColumnSummary id={columnId} />
             </Card>
           </Box>
         ))}

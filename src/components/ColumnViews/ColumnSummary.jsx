@@ -2,9 +2,7 @@
 import withColumnData from "./withColumnData";
 import {
   Box,
-  Stack,
   Typography,
-  styled,
   IconButton,
   Menu,
   MenuItem,
@@ -14,54 +12,10 @@ import {
 import { MoreVert, Info } from "@mui/icons-material";
 import { useState, useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import { formatNumber } from "../../lib/utilities";
-import ProportionBar from "../visualization/ProportionBar";
 import SingleBar from "../visualization/SingleBar";
 import { scaleLinear } from "d3";
 import ColumnValuesSample from "./ColumnValuesSample";
 import ColumnTypeIcon from "./ColumnTypeIcon";
-
-const StyledDataTypeTypography = styled(Typography)(() => ({
-  textAlign: "right",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  width: "50%",
-  userSelect: "none", // Prevent text selection
-}));
-
-const StyledStatLabel = styled(Typography)(() => ({
-  fontWeight: "bold",
-  width: "50%",
-  textTransform: "capitalize", // Capitalizes first letter of each word
-  userSelect: "none", // Prevent text selection
-}));
-
-const DraggableColumnSummary = styled(Box)(
-  ({ theme, isDragging, isOver, canDropHere }) => ({
-    minWidth: 200,
-    border: `2px solid ${
-      isOver && canDropHere
-        ? theme.palette.primary.main
-        : isDragging
-        ? theme.palette.action.disabled
-        : "transparent"
-    }`,
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor:
-      isOver && canDropHere
-        ? theme.palette.action.hover
-        : isDragging
-        ? theme.palette.action.selected
-        : "transparent",
-    cursor: isDragging ? "grabbing" : "grab",
-    opacity: isDragging ? 0.5 : 1,
-    transition: "all 0.2s ease",
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover,
-    },
-  })
-);
 
 const ColumnSummary = ({
   column,
@@ -147,7 +101,18 @@ const ColumnSummary = ({
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        flex: "1 1 0",
+        minHeight: 0,
+        overflowY: "hidden",
+        overflowX: "auto",
+        containerType: "size",
+        display: "flex",
+        justifyContent: "space-evenly",
+        flexDirection: "column",
+      }}
+    >
       <Menu
         anchorEl={menuAnchorEl}
         open={Boolean(menuAnchorEl)}
@@ -209,12 +174,15 @@ const ColumnSummary = ({
           Rename column
         </MenuItem>
       </Menu>
+
+      {/* Header - Always visible */}
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          userSelect: "none", // Prevent text selection
+          userSelect: "none",
+          //   mb: 1,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flex: 1 }}>
@@ -225,30 +193,62 @@ const ColumnSummary = ({
           <MoreVert fontSize="small" />
         </IconButton>
       </Box>
-      <ColumnValuesSample id={column.id} />
-      <Divider sx={{ my: 1 }} />
-      <Box sx={{ userSelect: "none" /* Prevent text selection */ }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
+
+      {/* Sample Values - Hidden when height < 200px */}
+      <Box
+        sx={{
+          "@container (min-height: 50px)": {
+            display: "block",
+          },
+          "@container (max-height: 49px)": {
+            display: "none",
+          },
+        }}
+      >
+        <ColumnValuesSample id={column.id} />
+      </Box>
+
+      {/* Null Values - Hidden when height < 150px */}
+      <Box
+        sx={{
+          "@container (min-height: 90px)": {
+            display: "block",
+          },
+          "@container (max-height: 89px)": {
+            display: "none",
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            mb: 0.5,
+          }}
+        >
           <Typography variant="body2" color="text.secondary">
             Null values
           </Typography>
-          <Tooltip
-            title="Shows the proportion of non-null values versus null/missing values in this column. Higher completeness indicates fewer missing values."
-            placement="top"
-            arrow
-          >
-            <Info
-              fontSize="small"
-              sx={{
-                fontSize: 12,
-                color: "text.disabled",
-                cursor: "help",
-                "&:hover": {
-                  color: "text.secondary",
-                },
-              }}
-            />
-          </Tooltip>
+          <Box>
+            <Tooltip
+              title="Shows the proportion of non-null values versus null/missing values in this column. Higher completeness indicates fewer missing values."
+              placement="top"
+              arrow
+            >
+              <Info
+                fontSize="small"
+                sx={{
+                  fontSize: 12,
+                  color: "text.disabled",
+                  cursor: "help",
+                  "&:hover": {
+                    color: "text.secondary",
+                  },
+                }}
+              />
+            </Tooltip>
+          </Box>
         </Box>
         <SingleBar
           value={nullCount}
@@ -259,27 +259,49 @@ const ColumnSummary = ({
           showPercentage={true}
           maxValue={completeCount}
         />
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+      </Box>
+
+      {/* Duplicate Values - Hidden when height < 175px */}
+      <Box
+        sx={{
+          "@container (min-height: 140px)": {
+            display: "block",
+          },
+          "@container (max-height: 139px)": {
+            display: "none",
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            mt: 1,
+          }}
+        >
           <Typography variant="body2" color="text.secondary">
             Duplicate values
           </Typography>
-          <Tooltip
-            title="Shows the proportion of unique values versus duplicate values in this column. Higher uniqueness indicates more distinct values."
-            placement="top"
-            arrow
-          >
-            <Info
-              fontSize="small"
-              sx={{
-                fontSize: 12,
-                color: "text.disabled",
-                cursor: "help",
-                "&:hover": {
-                  color: "text.secondary",
-                },
-              }}
-            />
-          </Tooltip>
+          <Box>
+            <Tooltip
+              title="Shows the proportion of unique values versus duplicate values in this column. Higher uniqueness indicates more distinct values."
+              placement="top"
+              arrow
+            >
+              <Info
+                fontSize="small"
+                sx={{
+                  fontSize: 12,
+                  color: "text.disabled",
+                  cursor: "help",
+                  "&:hover": {
+                    color: "text.secondary",
+                  },
+                }}
+              />
+            </Tooltip>
+          </Box>
         </Box>
         <SingleBar
           value={completeCount - uniqueCount}
@@ -291,7 +313,7 @@ const ColumnSummary = ({
           maxValue={completeCount}
         />
       </Box>
-    </>
+    </Box>
   );
 };
 

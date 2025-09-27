@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useCallback, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
-import { Box } from "@mui/material";
+import { Box, Card } from "@mui/material";
 import ColumnHeader from "../ColumnViews/ColumnHeader";
 import ColumnValuesSample from "../ColumnViews/ColumnValuesSample";
 import {
@@ -10,6 +10,7 @@ import {
 } from "./selectionUtils/selectionUtils";
 import { TableLabel } from "../TableView";
 import { ColumnCard } from "../ColumnViews";
+import { ColumnSummary } from "../ColumnViews/ColumnSummary";
 
 const topRowHeight = 50; // Fixed height for the top row (column headers)
 
@@ -222,18 +223,55 @@ const StackSchemaView = withStackOperationData(
                 >
                   {columnIdMatrix.map((row) => {
                     return (
-                      <ColumnCard
+                      <Card
                         key={row[colIndex]}
-                        id={row[colIndex]}
-                        onClick={(e) => onCellClick(e, row[colIndex])}
-                        onDrop={(draggedColumn, droppedColumn) => {
-                          swapColumns(draggedColumn.id, droppedColumn.id);
+                        sx={{
+                          p: 1,
+                          flex: "1 1 0",
+                          minHeight: 0,
+                          display: "flex",
+                          flexDirection: "column",
+                          cursor: "pointer",
+                          overflow: "hidden",
+                          // border: selectedColumnIds.includes(columnId)
+                          //   ? "2px solid"
+                          //   : "1px solid transparent",
+                          // borderColor: selectedColumnIds.includes(columnId)
+                          //   ? "primary.main"
+                          //   : "divider",
+                          // backgroundColor: selectedColumnIds.includes(columnId)
+                          //   ? "action.selected"
+                          //   : "background.paper",
+                          // "&:hover": {
+                          //   backgroundColor: selectedColumnIds.includes(
+                          //     columnId
+                          //   )
+                          //     ? "action.selected"
+                          //     : "action.hover",
+                          // },
                         }}
-                        sx={{ height: "100%" }}
+                        // onClick={(event) => handleColumnClick(event, columnId)}
+                        // onDoubleClick={(event) =>
+                        //   handleColumnDoubleClick(event, columnId)
+                        // }
                       >
-                        <ColumnHeader id={row[colIndex]} />
-                        <ColumnValuesSample id={row[colIndex]} />
-                      </ColumnCard>
+                        <ColumnSummary
+                          id={row[colIndex]}
+                          onClick={onCellClick}
+                        />
+                      </Card>
+                      // <ColumnCard
+                      //   key={row[colIndex]}
+                      //   id={row[colIndex]}
+                      //   onClick={(e) => onCellClick(e, row[colIndex])}
+                      //   onDrop={(draggedColumn, droppedColumn) => {
+                      //     swapColumns(draggedColumn.id, droppedColumn.id);
+                      //   }}
+                      //   sx={{ height: "100%" }}
+                      // >
+                      //   <ColumnHeader id={row[colIndex]} />
+                      //   <ColumnValuesSample id={row[colIndex]} />
+                      // </ColumnCard>
                     );
                   })}
                 </Box>
