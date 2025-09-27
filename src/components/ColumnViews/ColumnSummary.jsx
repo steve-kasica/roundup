@@ -18,6 +18,8 @@ import { formatNumber } from "../../lib/utilities";
 import ProportionBar from "../visualization/ProportionBar";
 import SingleBar from "../visualization/SingleBar";
 import { scaleLinear } from "d3";
+import ColumnValuesSample from "./ColumnValuesSample";
+import ColumnTypeIcon from "./ColumnTypeIcon";
 
 const StyledDataTypeTypography = styled(Typography)(() => ({
   textAlign: "right",
@@ -32,14 +34,6 @@ const StyledStatLabel = styled(Typography)(() => ({
   fontWeight: "bold",
   width: "50%",
   textTransform: "capitalize", // Capitalizes first letter of each word
-  userSelect: "none", // Prevent text selection
-}));
-
-const StyledHeaderContainer = styled(Box)(() => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  marginBottom: "8px",
   userSelect: "none", // Prevent text selection
 }));
 
@@ -154,12 +148,6 @@ const ColumnSummary = ({
 
   return (
     <>
-      <StyledHeaderContainer>
-        <h3 style={{ margin: 0, flex: 1 }}>{column.name}</h3>
-        <IconButton size="small" onClick={handleMenuClick} sx={{ p: 0.5 }}>
-          <MoreVert fontSize="small" />
-        </IconButton>
-      </StyledHeaderContainer>
       <Menu
         anchorEl={menuAnchorEl}
         open={Boolean(menuAnchorEl)}
@@ -221,9 +209,26 @@ const ColumnSummary = ({
           Rename column
         </MenuItem>
       </Menu>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          userSelect: "none", // Prevent text selection
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flex: 1 }}>
+          <h3 style={{ margin: 0, marginRight: "5px" }}>{column.name}</h3>
+          <ColumnTypeIcon column={column} />
+        </Box>
+        <IconButton size="small" onClick={handleMenuClick} sx={{ p: 0.5 }}>
+          <MoreVert fontSize="small" />
+        </IconButton>
+      </Box>
+      <ColumnValuesSample id={column.id} />
       <Divider sx={{ my: 1 }} />
       <Box sx={{ userSelect: "none" /* Prevent text selection */ }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
           <Typography variant="body2" color="text.secondary">
             Null values
           </Typography>

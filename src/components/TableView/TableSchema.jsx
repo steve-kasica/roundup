@@ -124,6 +124,14 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
     },
     [dispatch, table.columnIds, selectedColumnIds]
   );
+
+  const handleColumnDoubleClick = useCallback(
+    (event, columnId) => {
+      // Double-click: Focus on the column (same as focus button action)
+      dispatch(setFocusedColumns([columnId]));
+    },
+    [dispatch]
+  );
   return (
     <Box display="flex" flexDirection="column" height="100%">
       {/* Toolbar */}
@@ -255,6 +263,7 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
               flex: "0 0 auto",
               minWidth: 200,
               width: 200,
+              userSelect: "none",
             }}
           >
             <Typography
@@ -262,7 +271,6 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
               textAlign="center"
               width="100%"
               gutterBottom
-              userSelect="none"
             >
               {i + 1}
             </Typography>
@@ -292,10 +300,13 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
                 },
               }}
               onClick={(event) => handleColumnClick(event, columnId)}
+              onDoubleClick={(event) =>
+                handleColumnDoubleClick(event, columnId)
+              }
             >
               {/* <ColumnHeader id={columnId} /> */}
               {/* <ColumnValues id={columnId} /> */}
-              <Box sx={{ flex: "1 1 0", minHeight: 0, overflow: "auto" }}>
+              <Box sx={{ flex: "1 1 0", minHeight: 0, overflowY: "hidden", overflowX: "auto" }}>
                 <ColumnSummary id={columnId} />
               </Box>
             </Card>
