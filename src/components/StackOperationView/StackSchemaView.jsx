@@ -164,8 +164,9 @@ const StackSchemaView = withStackOperationData(
                   key={childId}
                   sx={{
                     fontWeight: "bold",
-                    minHeight: "25px", // coordinate with ColumnSummary.jsx
+                    minHeight: "26px", // Adjust manually to match ColumnSummary
                     border: "1px solid #fff",
+                    padding: "8px 0",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "flex-end",
