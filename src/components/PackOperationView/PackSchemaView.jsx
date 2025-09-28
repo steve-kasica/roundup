@@ -20,6 +20,7 @@ const PackSchemaView = withPackOperationData(
   }) => {
     const leftTable = operation.children[0];
     const rightTable = operation.children[1];
+    console.log(leftHandColumns, rightHandColumns);
     // const [selectedColumns, setSelectedColumns] = useState([
     //   leftHandColumns.map(() => false),
     //   rightHandColumns.map(() => false),
@@ -77,80 +78,80 @@ const PackSchemaView = withPackOperationData(
     // );
 
     // Handle error state
-    if (error) {
-      return (
-        <Box display="flex" flexDirection="column" gap={2} width="100%">
-          <Alert
-            severity="error"
-            action={
-              <Button color="inherit" size="small" onClick={refetch}>
-                Retry
-              </Button>
-            }
-          >
-            <Typography variant="body2">
-              Error loading match values: {error.message || "Unknown error"}
-            </Typography>
-          </Alert>
-        </Box>
-      );
-    }
+    // if (error) {
+    //   return (
+    //     <Box display="flex" flexDirection="column" gap={2} width="100%">
+    //       <Alert
+    //         severity="error"
+    //         action={
+    //           <Button color="inherit" size="small" onClick={refetch}>
+    //             Retry
+    //           </Button>
+    //         }
+    //       >
+    //         <Typography variant="body2">
+    //           Error loading match values: {error.message || "Unknown error"}
+    //         </Typography>
+    //       </Alert>
+    //     </Box>
+    //   );
+    // }
 
     // Handle loading state
-    if (loading) {
-      return (
-        <Box
-          display="flex"
-          flexDirection="column"
-          gap={2}
-          width="100%"
-          alignItems="center"
-        >
-          <Typography variant="body2" color="text.secondary">
-            Loading match values...
-          </Typography>
-        </Box>
-      );
-    }
+    // if (loading) {
+    //   return (
+    //     <Box
+    //       display="flex"
+    //       flexDirection="column"
+    //       gap={2}
+    //       width="100%"
+    //       alignItems="center"
+    //     >
+    //       <Typography variant="body2" color="text.secondary">
+    //         Loading match values...
+    //       </Typography>
+    //     </Box>
+    //   );
+    // }
 
     return (
       <Box display={"flex"} flexDirection="column" gap={0} width={"100%"}>
-        <Box display="flex" flexDirection="column" gap={0} alignItems="center">
-          <TableLabel id={operation.children[0]} />
-          <Box display={"flex"} flexDirection="row" gap={0}>
-            {leftHandColumns.map((columnId) => (
-              <ColumnCard
-                key={columnId}
-                id={columnId}
-                sx={{ width: "150px" }}
-                // onClick={(event) => handleColumnClick(event, "left", columnId)}
-              >
-                <ColumnHeader id={columnId} />
-              </ColumnCard>
-            ))}
-          </Box>
-        </Box>
+        {/* //   <Box display="flex" flexDirection="column" gap={0} alignItems="center">
+      //     <TableLabel id={operation.children[0]} />
+      //     <Box display={"flex"} flexDirection="row" gap={0}>
+      //       {leftHandColumns.map((columnId) => (
+      //         <ColumnCard
+      //           key={columnId}
+      //           id={columnId}
+      //           sx={{ width: "150px" }}
+      //           // onClick={(event) => handleColumnClick(event, "left", columnId)}
+      //         >
+      //           <ColumnHeader id={columnId} />
+      //         </ColumnCard>
+      //       ))}
+      //     </Box>
+      //   </Box>
 
-        <Box
-          display={"flex"}
-          flexDirection="column"
-          gap={0}
-          alignItems="center"
-        >
-          <TableLabel id={operation.children[1]} />
-          <Box display={"flex"} flexDirection="row" gap={0}>
-            {rightHandColumns.map((columnId) => (
-              <ColumnCard
-                key={columnId}
-                id={columnId}
-                sx={{ width: "150px" }}
-                // onClick={(event) => handleColumnClick(event, "right", columnId)}
-              >
-                <ColumnHeader id={columnId} />
-              </ColumnCard>
-            ))}
-          </Box>
-        </Box>
+      //   <Box
+      //     display={"flex"}
+      //     flexDirection="column"
+      //     gap={0}
+      //     alignItems="center"
+      //   >
+      //     <TableLabel id={operation.children[1]} />
+      //     <Box display={"flex"} flexDirection="row" gap={0}>
+      //       {rightHandColumns.map((columnId) => (
+      //         <ColumnCard
+      //           key={columnId}
+      //           id={columnId}
+      //           sx={{ width: "150px" }}
+      //           // onClick={(event) => handleColumnClick(event, "right", columnId)}
+      //         >
+      //           <ColumnHeader id={columnId} />
+      //         </ColumnCard>
+      //       ))}
+      //     </Box>
+      //   </Box> */}
       </Box>
     );
   }

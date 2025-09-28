@@ -64,6 +64,7 @@ export default function withPackOperationData(WrappedComponent) {
             })
           );
         }}
+        setName={(name) => dispatch(updateOperations({ id, name }))}
         setRightTableJoinKey={(columnId) =>
           dispatch(
             updateOperations({
@@ -74,6 +75,9 @@ export default function withPackOperationData(WrappedComponent) {
         }
         setJoinPredicate={(joinPredicate) =>
           dispatch(updateOperations({ id, joinPredicate }))
+        }
+        setOperationType={(operationType) =>
+          dispatch(updateOperations({ id, operationType }))
         }
         swapTablePositions={() =>
           dispatch(

@@ -12,6 +12,7 @@ import {
   selectHoveredOperation,
   selectOperation,
   selectOperationDepth,
+  updateOperations,
 } from "../../slices/operationsSlice";
 import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
 
@@ -97,6 +98,15 @@ export default function withStackOperationData(WrappedComponent) {
         }
         focusColumns={(colIds) => dispatch(setFocusedColumns(colIds))}
         selectedColumns={selectedColumns}
+        setOperationType={(operationType) =>
+          dispatch(
+            updateOperations({
+              id,
+              operationType,
+            })
+          )
+        }
+        setName={(name) => dispatch(updateOperations({ id, name }))}
         {...props}
       />
     );

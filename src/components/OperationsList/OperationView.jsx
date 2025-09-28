@@ -14,8 +14,8 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
-import StackOperationParams from "./StackOperationParams";
-import PackOperationParams from "./PackOperationParams/PackOperationParams";
+import StackParametersForm from "../StackOperationView/StackParametersForm";
+import PackParametersForm from "../PackOperationView/PackParametersForm";
 
 export const LAYOUT_ID = "operationListItem";
 
@@ -37,9 +37,9 @@ function OperationView({
   const renderOperationParams = () => {
     switch (operation.operationType) {
       case OPERATION_TYPE_PACK:
-        return <PackOperationParams id={operation.id} />;
+        return <PackParametersForm id={operation.id} />;
       case OPERATION_TYPE_STACK:
-        return <StackOperationParams />;
+        return <StackParametersForm id={operation.id} />;
       default:
         return <Typography component="pre">Unknown operation type</Typography>;
     }
@@ -98,7 +98,7 @@ function OperationView({
             border: "1px solid",
             borderColor: "grey.300",
             borderRadius: 1,
-            margin: 1,
+            margin: 0.5,
             boxShadow: "inset 0 2px 4px rgba(0,0,0,0.1)",
             "&:before": {
               content: '""',
@@ -112,20 +112,9 @@ function OperationView({
             },
           }}
         >
-          <Box sx={{ padding: 2 }}>{renderOperationParams()}</Box>
+          <Box sx={{ padding: 0 }}>{renderOperationParams()}</Box>
         </AccordionDetails>
       </Accordion>
-
-      {/* <Collapse in={detailsOpen} timeout="auto" unmountOnExit>
-        <Box>
-          {operation.operationType === OPERATION_TYPE_STACK && (
-            <StackOperationParams />
-          )}
-          {operation.operationType === OPERATION_TYPE_PACK && (
-            <PackOperationParams id={operation.id} />
-          )}
-        </Box>
-      </Collapse> */}
     </>
   );
 
