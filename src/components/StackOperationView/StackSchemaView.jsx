@@ -68,46 +68,106 @@ const StackSchemaView = withStackOperationData(
     );
     const onRowLabelClick = useCallback(
       (event, rowIndex) => {
-        let anchorIndex, extentIndex;
+        const currentRowGroup = columnIdMatrix[rowIndex];
+
         if (event.shiftKey && selectionAnchorCell !== null) {
-          // Shift+Click: select range from anchor to extent
-          extentIndex = rowIndex;
-          anchorIndex = selectionAnchorCell;
-          selectColumns(
-            getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
-          );
+          // Shift+Click: select range of row groups from anchor to extent
+          const anchorIndex = selectionAnchorCell;
+          const extentIndex = rowIndex;
+          const startIndex = Math.min(anchorIndex, extentIndex);
+          const endIndex = Math.max(anchorIndex, extentIndex);
+
+          // Collect all columns in the range of row groups
+          const rangeColumns = [];
+          for (let i = startIndex; i <= endIndex; i++) {
+            rangeColumns.push(...columnIdMatrix[i]);
+          }
+
+          selectColumns(rangeColumns);
+          setSelectionExtentCell(extentIndex);
         } else if (event.metaKey || event.ctrlKey) {
-          // Cmd/Ctrl+Click: toggle selection
-          //   selectColumns(columnId);
+          // Cmd/Ctrl+Click: toggle selection of this row group
+          const currentlySelectedColumns = selectedColumns || [];
+          const isRowGroupSelected = currentRowGroup.every((colId) =>
+            currentlySelectedColumns.includes(colId)
+          );
+
+          if (isRowGroupSelected) {
+            // Remove this row group from selection
+            const newSelection = currentlySelectedColumns.filter(
+              (colId) => !currentRowGroup.includes(colId)
+            );
+            selectColumns(newSelection);
+          } else {
+            // Add this row group to selection
+            const newSelection = [
+              ...new Set([...currentlySelectedColumns, ...currentRowGroup]),
+            ];
+            selectColumns(newSelection);
+          }
+
+          setSelectionAnchorCell(rowIndex);
+          setSelectionExtentCell(rowIndex);
         } else {
-          // Single click: select only this column, also handles initial shift clicks
-          selectColumns(columnIdMatrix[rowIndex]);
+          // Single click: select only this row group, also handles initial shift clicks
+          selectColumns(currentRowGroup);
+          setSelectionAnchorCell(rowIndex);
+          setSelectionExtentCell(rowIndex);
         }
-        setSelectionExtentCell(extentIndex);
-        setSelectionAnchorCell(anchorIndex);
       },
-      [columnIdMatrix, selectionAnchorCell, selectColumns]
+      [columnIdMatrix, selectionAnchorCell, selectColumns, selectedColumns]
     );
 
     const onColumnLabelClick = useCallback(
       (event, colIndex) => {
-        let anchorIndex, extentIndex;
+        const currentColumnGroup = columnIdMatrix.map((row) => row[colIndex]);
+
         if (event.shiftKey && selectionAnchorCell !== null) {
-          // Shift+Click: select range from anchor to extent
-          extentIndex = colIndex;
-          anchorIndex = selectionAnchorCell;
-          // selectColumns(getValuesInRange(columnIds, anchorIndex, extentIndex));
+          // Shift+Click: select range of column groups from anchor to extent
+          const anchorIndex = selectionAnchorCell;
+          const extentIndex = colIndex;
+          const startIndex = Math.min(anchorIndex, extentIndex);
+          const endIndex = Math.max(anchorIndex, extentIndex);
+
+          // Collect all columns in the range of column groups
+          const rangeColumns = [];
+          for (let i = startIndex; i <= endIndex; i++) {
+            rangeColumns.push(...columnIdMatrix.map((row) => row[i]));
+          }
+
+          selectColumns(rangeColumns);
+          setSelectionExtentCell(extentIndex);
         } else if (event.metaKey || event.ctrlKey) {
-          // Cmd/Ctrl+Click: toggle selection
-          //   selectColumns(columnId);
+          // Cmd/Ctrl+Click: toggle selection of this column group
+          const currentlySelectedColumns = selectedColumns || [];
+          const isGroupSelected = currentColumnGroup.every((colId) =>
+            currentlySelectedColumns.includes(colId)
+          );
+
+          if (isGroupSelected) {
+            // Remove this column group from selection
+            const newSelection = currentlySelectedColumns.filter(
+              (colId) => !currentColumnGroup.includes(colId)
+            );
+            selectColumns(newSelection);
+          } else {
+            // Add this column group to selection
+            const newSelection = [
+              ...new Set([...currentlySelectedColumns, ...currentColumnGroup]),
+            ];
+            selectColumns(newSelection);
+          }
+
+          setSelectionAnchorCell(colIndex);
+          setSelectionExtentCell(colIndex);
         } else {
-          // Single click: select only this column, also handles initial shift clicks
-          selectColumns(columnIdMatrix.map((row) => [row[colIndex]]).flat());
+          // Single click: select only this column group, also handles initial shift clicks
+          selectColumns(currentColumnGroup);
+          setSelectionAnchorCell(colIndex);
+          setSelectionExtentCell(colIndex);
         }
-        setSelectionExtentCell(extentIndex);
-        setSelectionAnchorCell(anchorIndex);
       },
-      [selectionAnchorCell, selectColumns, columnIdMatrix]
+      [selectionAnchorCell, selectColumns, columnIdMatrix, selectedColumns]
     );
 
     return (
@@ -189,6 +249,7 @@ const StackSchemaView = withStackOperationData(
             flex: 1,
             gap: "4px",
             minHeight: "100%", // Take full height
+            userSelect: "none",
           }}
         >
           {Array.from({ length: m }).map((_, colIndex) => (
