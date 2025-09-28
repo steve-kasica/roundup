@@ -5,6 +5,8 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
@@ -32,6 +34,7 @@ const TOGGLE_VALUES = {
 
 const TableWindow = () => {
   const [lod, setLod] = useState(TOGGLE_VALUES.LOW); // Sets low as default
+  const [viewsSynced, setViewsSynced] = useState(true); // Default to synced views
   const selectedTableIds = useSelector((state) => {
     const selectedColumnIds = selectSelectedColumns(state);
     const columns = selectedColumnIds.map((columnId) =>
@@ -86,18 +89,41 @@ const TableWindow = () => {
               <TableLabel id={selectedTableIds?.[0]?.tableId} />
             )}
           </Stack>
-          <ToggleButtonGroup
-            size="small"
-            exclusive
-            value={lod}
-            onChange={(e, val) => setLod(val)}
-          >
-            {Object.entries(TOGGLE_VALUES).map(([key, label]) => (
-              <ToggleButton key={key} value={label}>
-                {label}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <ToggleButtonGroup
+              size="small"
+              exclusive
+              value={lod}
+              onChange={(e, val) => setLod(val)}
+            >
+              {Object.entries(TOGGLE_VALUES).map(([key, label]) => (
+                <ToggleButton key={key} value={label} disabled={key === "HIGH"}>
+                  {label}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={viewsSynced}
+                  disabled={
+                    selectedTableIds === null || selectedTableIds.length <= 1
+                  }
+                  onChange={(e) => setViewsSynced(e.target.checked)}
+                />
+              }
+              label="Sync"
+              sx={{
+                mr: 0,
+                "& .MuiFormControlLabel-label": {
+                  fontSize: "0.875rem",
+                  userSelect: "none",
+                },
+              }}
+            />
+          </Stack>
         </Box>
       </Box>
       <Divider />
@@ -105,7 +131,6 @@ const TableWindow = () => {
         flexGrow={1}
         minHeight={0}
         overflow="auto"
-        width="100%"
         display="flex"
         flexDirection="column"
       >

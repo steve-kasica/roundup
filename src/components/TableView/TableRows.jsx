@@ -32,20 +32,27 @@ const StyledAlternatingTableRow = styled(TableRow)(({ isEven }) => ({
 }));
 
 // Cell only handles column hover (overrides row hover when active)
-const StyledHoverableTableCell = styled(TableCell)(({ isHovered, isEven }) => ({
-  backgroundColor:
-    isHovered && isEven
-      ? "#e3f2fd"
-      : isHovered && !isEven
-      ? "#bbdefb"
-      : "transparent",
-  transition: "background-color 0.1s ease",
-}));
+const StyledHoverableTableCell = styled(TableCell)(
+  ({ isHovered, isEven, maxWidth = "200px" }) => ({
+    backgroundColor:
+      isHovered && isEven
+        ? "#e3f2fd"
+        : isHovered && !isEven
+        ? "#bbdefb"
+        : "transparent",
+    transition: "background-color 0.1s ease",
+    maxWidth: maxWidth, // Dynamic maximum column width
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  })
+);
 
 // Sticky row number cell that stays fixed during horizontal scroll
 const StyledStickyRowNumberCell = styled(TableCell)(() => ({
   position: "sticky",
   left: 0,
+  maxWidth: "10px",
   backgroundColor: "inherit",
   textAlign: "right",
   color: "#888",
@@ -54,14 +61,20 @@ const StyledStickyRowNumberCell = styled(TableCell)(() => ({
 }));
 
 // Styled sortable header cell
-const StyledSortableHeaderCell = styled(TableCell)(({ isHovered }) => ({
-  cursor: "pointer",
-  backgroundColor: isHovered ? "#bbdefb" : "#f5f5f5",
-  transition: "background-color 0.1s ease",
-  "&:hover": {
-    backgroundColor: "#bbdefb",
-  },
-}));
+const StyledSortableHeaderCell = styled(TableCell)(
+  ({ isHovered, maxWidth = "200px" }) => ({
+    cursor: "pointer",
+    backgroundColor: isHovered ? "#bbdefb" : "#f5f5f5",
+    transition: "background-color 0.1s ease",
+    maxWidth: maxWidth, // Dynamic maximum column width
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    "&:hover": {
+      backgroundColor: "#bbdefb",
+    },
+  })
+);
 
 const TableRows = ({
   table,
@@ -72,6 +85,7 @@ const TableRows = ({
   onScrollContainerRef = null,
   onScroll = null,
   showHeader = true,
+  columnWidths = {}, // Optional prop for custom column widths
 }) => {
   const tableContainerRef = useRef(null);
   const [sortConfig, setSortConfig] = useState({
@@ -137,7 +151,7 @@ const TableRows = ({
       onScroll={handleScroll}
       sx={{ height: "100%", overflow: "auto" }}
     >
-      <Table size="small" stickyHeader>
+      <Table size="small" stickyHeader sx={{ width: "auto" }}>
         {showHeader && (
           <TableHead>
             <TableRow>
@@ -152,6 +166,7 @@ const TableRows = ({
                   align="center"
                   sx={{ p: 1 }}
                   isHovered={hoveredIndex === i}
+                  maxWidth={columnWidths[colId] || "200px"}
                   onMouseEnter={() => hoverColumn(colId)}
                   onMouseLeave={unhoverColumn}
                   onClick={() => handleSort(colId)}
@@ -160,7 +175,7 @@ const TableRows = ({
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
+                      justifyContent: "flex-start",
                     }}
                   >
                     <ColumnHeader key={colId} id={colId} />
@@ -223,6 +238,7 @@ const TableRows = ({
                     align="center"
                     isHovered={hoveredIndex === i}
                     isEven={rowIndex % 2 === 0}
+                    maxWidth={columnWidths[colId] || "200px"}
                   >
                     <CircularProgress size={16} />
                   </StyledHoverableTableCell>
@@ -245,6 +261,7 @@ const TableRows = ({
                       key={selectedColumnIds[i]}
                       isHovered={hoveredIndex === i}
                       isEven={rowIndex % 2 === 0}
+                      maxWidth={columnWidths[selectedColumnIds[i]] || "200px"}
                     >
                       {value === null ? (
                         <Typography
