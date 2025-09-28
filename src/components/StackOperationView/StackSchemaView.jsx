@@ -190,7 +190,6 @@ const StackSchemaView = withStackOperationData(
             flex: 1,
             gap: "4px",
             minHeight: "100%", // Take full height
-            overflow: "hidden", // Prevent overflow on container
           }}
         >
           {Array.from({ length: m }).map((_, colIndex) => (
@@ -202,6 +201,7 @@ const StackSchemaView = withStackOperationData(
                 gap: "4px",
                 flex: 1,
                 height: "100%", // Take full height
+                minWidth: "125px",
                 overflow: "hidden", // Prevent overflow
               }}
             >
@@ -230,7 +230,8 @@ const StackSchemaView = withStackOperationData(
                   justifyContent: "space-evenly",
                   gap: 1,
                   flex: 1,
-                  overflowY: "hidden",
+                  overflow: "hidden",
+                  // minWidth: "85px",
                   padding: "2px",
                   // userSelect: "none",
                 }}

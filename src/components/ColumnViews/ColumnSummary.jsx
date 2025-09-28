@@ -110,6 +110,7 @@ const ColumnSummary = ({
         p: 1,
         flex: "1 1 0",
         minHeight: "25px",
+        minWidth: "100px",
         display: "flex",
         flexDirection: "column",
         cursor: "pointer",
@@ -232,9 +233,32 @@ const ColumnSummary = ({
             >
               {column.name}
             </h3>
-            <ColumnTypeIcon column={column} />
+            <Box
+              sx={{
+                "@container (min-width: 150px)": {
+                  display: "block",
+                },
+                "@container (max-width: 149px)": {
+                  display: "none",
+                },
+              }}
+            >
+              <ColumnTypeIcon column={column} />
+            </Box>
           </Box>
-          <IconButton size="small" onClick={handleMenuClick} sx={{ p: 0.5 }}>
+          <IconButton
+            size="small"
+            onClick={handleMenuClick}
+            sx={{
+              p: 0.5,
+              "@container (min-width: 100px)": {
+                display: "inline-flex",
+              },
+              "@container (max-width: 99px)": {
+                display: "none",
+              },
+            }}
+          >
             <MoreVert fontSize="small" />
           </IconButton>
         </Box>
