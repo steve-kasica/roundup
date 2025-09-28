@@ -9,7 +9,7 @@ import {
 import { TableName } from "../TableView";
 import { ColumnSummary } from "../ColumnViews/ColumnSummary";
 
-const topRowHeight = 50; // Fixed height for the top row (column headers)
+const topRowHeight = 25; // Fixed height for the top row (column headers)
 
 const StackSchemaView = withStackOperationData(
   ({
@@ -137,7 +137,7 @@ const StackSchemaView = withStackOperationData(
               display: "flex",
               flexDirection: "column",
               gap: "4px",
-              width: `${topRowHeight}px`,
+              paddingLeft: 1,
               flexShrink: 0,
               height: "100%", // Take full height
             }}
