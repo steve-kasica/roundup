@@ -35,17 +35,7 @@ export default function SchemaWindow() {
   const operations = useSelector(selectAllOperationIds);
 
   return (
-    <Box
-      sx={{
-        position: "relative",
-        height: "100%",
-        width: "100%",
-        background: "#fff",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden", // Prevent overflow from parent
-      }}
-    >
+    <>
       {tables.length === 0 ? (
         <Box
           sx={{
@@ -65,9 +55,7 @@ export default function SchemaWindow() {
           </TableDropTarget>
         </Box>
       ) : focusedOperation?.operationType === OPERATION_TYPE_STACK ? (
-        <Box sx={{ flex: 1, height: "100%", overflow: "hidden" }}>
-          <StackSchemaView id={focusedOperation.id} />
-        </Box>
+        <StackSchemaView id={focusedOperation.id} />
       ) : focusedOperation?.operationType === OPERATION_TYPE_PACK ? (
         <Box sx={{ flex: 1, height: "100%", overflow: "hidden" }}>
           <PackSchemaView id={focusedOperation.id} />
@@ -101,6 +89,6 @@ export default function SchemaWindow() {
           </Box>
         </Box>
       )}
-    </Box>
+    </>
   );
 }

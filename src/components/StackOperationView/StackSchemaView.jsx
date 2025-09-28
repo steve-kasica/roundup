@@ -111,151 +111,150 @@ const StackSchemaView = withStackOperationData(
     );
 
     return (
+      // <Box
+      //   className="stack-schema-view"
+      //   sx={{
+      //     height: "100%",
+      //     overflow: "hidden", // Prevent scrolling on the main container
+      //     display: "flex",
+      //     flexDirection: "column",
+      //     userSelect: "none",
+      //   }}
+      // >
       <Box
-        className="stack-schema-view"
         sx={{
-          height: "100%",
-          overflow: "hidden", // Prevent scrolling on the main container
           display: "flex",
-          flexDirection: "column",
-          userSelect: "none",
+          flexDirection: "row",
+          width: "100%",
+          minHeight: "100%", // Take full height of parent when space is available
+          gap: "4px",
         }}
       >
+        {/* Left Column - Row Labels */}
         <Box
           sx={{
             display: "flex",
-            flexDirection: "row",
-            width: "100%",
-            height: "100%", // Take full height of parent
+            flexDirection: "column",
             gap: "4px",
-            overflow: "hidden", // Prevent overflow
+            paddingLeft: 1,
+            flexShrink: 0,
+            minHeight: "100%", // Take full height
           }}
         >
-          {/* Left Column - Row Labels */}
+          {/* Empty space for top-left corner */}
+          <Box
+            sx={{
+              height: `${topRowHeight}px`,
+              flexShrink: 0,
+            }}
+          ></Box>
+          {/* Row labels container */}
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
-              gap: "4px",
-              paddingLeft: 1,
-              flexShrink: 0,
-              height: "100%", // Take full height
-            }}
-          >
-            {/* Empty space for top-left corner */}
-            <Box
-              sx={{
-                height: `${topRowHeight}px`,
-                flexShrink: 0,
-              }}
-            ></Box>
-            {/* Row labels container */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-evenly",
-                gap: 1,
-                flex: 1,
-              }}
-            >
-              {operation.children.map((childId, rowIndex) => (
-                <Box
-                  key={childId}
-                  sx={{
-                    fontWeight: "bold",
-                    minHeight: "26px", // Adjust manually to match ColumnSummary
-                    border: "1px solid #fff",
-                    padding: "8px 0",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    height: "100%", // Match column card height
-                    cursor: "pointer",
-                  }}
-                >
-                  <TableName
-                    id={childId}
-                    onClick={(event) => onRowLabelClick(event, rowIndex)}
-                  />
-                </Box>
-              ))}
-            </Box>
-          </Box>
-
-          {/* Data Columns Container - Takes remaining space */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
+              justifyContent: "space-evenly",
+              gap: 1,
               flex: 1,
-              gap: "4px",
-              height: "100%", // Take full height
-              overflow: "hidden", // Prevent overflow on container
             }}
           >
-            {Array.from({ length: m }).map((_, colIndex) => (
+            {operation.children.map((childId, rowIndex) => (
               <Box
-                key={colIndex}
+                key={childId}
                 sx={{
+                  fontWeight: "bold",
+                  minHeight: "26px", // Adjust manually to match ColumnSummary
+                  border: "1px solid #fff",
+                  padding: "8px 0",
                   display: "flex",
-                  flexDirection: "column",
-                  gap: "4px",
-                  flex: 1,
-                  height: "100%", // Take full height
-                  overflow: "hidden", // Prevent overflow
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  height: "100%", // Match column card height
+                  cursor: "pointer",
                 }}
               >
-                {/* Column Header */}
-                <Box
-                  sx={{
-                    fontWeight: "bold",
-                    display: "flex",
-                    height: `${topRowHeight}px`,
-                    flexShrink: 0,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                  }}
-                  onClick={(e) => onColumnLabelClick(e, colIndex)}
-                >
-                  {colIndex + 1}
-                </Box>
-                {/* Column Cards Container with scroll */}
-                <Box
-                  selectedColumns={selectedColumns} // Pass selected columns
-                  columnIdMatrix={columnIdMatrix} // Pass the matrix
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-evenly",
-                    gap: 1,
-                    flex: 1,
-                    overflowY: "hidden",
-                    padding: "2px",
-                    // userSelect: "none",
-                  }}
-                >
-                  {columnIdMatrix.map((row) => {
-                    const columnId = row[colIndex];
-                    return (
-                      <ColumnSummary
-                        key={columnId}
-                        id={columnId}
-                        isSelected={isSelected(columnId)}
-                        onClick={(event) => onCellClick(event, columnId)}
-                        onDoubleClick={(event) =>
-                          onCellDoubleClick(event, columnId)
-                        }
-                      />
-                    );
-                  })}
-                </Box>
+                <TableName
+                  id={childId}
+                  onClick={(event) => onRowLabelClick(event, rowIndex)}
+                />
               </Box>
             ))}
           </Box>
         </Box>
+
+        {/* Data Columns Container - Takes remaining space */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            flex: 1,
+            gap: "4px",
+            minHeight: "100%", // Take full height
+            overflow: "hidden", // Prevent overflow on container
+          }}
+        >
+          {Array.from({ length: m }).map((_, colIndex) => (
+            <Box
+              key={colIndex}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+                flex: 1,
+                height: "100%", // Take full height
+                overflow: "hidden", // Prevent overflow
+              }}
+            >
+              {/* Column Header */}
+              <Box
+                sx={{
+                  fontWeight: "bold",
+                  display: "flex",
+                  height: `${topRowHeight}px`,
+                  flexShrink: 0,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                }}
+                onClick={(e) => onColumnLabelClick(e, colIndex)}
+              >
+                {colIndex + 1}
+              </Box>
+              {/* Column Cards Container with scroll */}
+              <Box
+                selectedColumns={selectedColumns} // Pass selected columns
+                columnIdMatrix={columnIdMatrix} // Pass the matrix
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-evenly",
+                  gap: 1,
+                  flex: 1,
+                  overflowY: "hidden",
+                  padding: "2px",
+                  // userSelect: "none",
+                }}
+              >
+                {columnIdMatrix.map((row) => {
+                  const columnId = row[colIndex];
+                  return (
+                    <ColumnSummary
+                      key={columnId}
+                      id={columnId}
+                      isSelected={isSelected(columnId)}
+                      onClick={(event) => onCellClick(event, columnId)}
+                      onDoubleClick={(event) =>
+                        onCellDoubleClick(event, columnId)
+                      }
+                    />
+                  );
+                })}
+              </Box>
+            </Box>
+          ))}
+        </Box>
       </Box>
+      // </Box>
     );
   }
 );

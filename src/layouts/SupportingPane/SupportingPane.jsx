@@ -131,7 +131,7 @@ export default function SupportingPane() {
                   // defaultSize={25}
                   maxSize={75}
                   order={1}
-                  style={{ padding: "5px" }}
+                  style={{ padding: "5px", overflow: "auto" }}
                 >
                   <SchemaWindow />
                 </Panel>
