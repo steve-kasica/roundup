@@ -2,8 +2,17 @@
 import { Typography } from "@mui/material";
 import withTableData from "./withTableData";
 
-const TableName = ({ table }) => {
-  return <Typography>{table?.name || "No table name available"}</Typography>;
+const TableName = ({ table, onClick }) => {
+  return (
+    <Typography
+      onClick={onClick}
+      fontSize={10}
+      fontFamily={"monospace"}
+      color="#777"
+    >
+      {table?.name || "No table name available"}
+    </Typography>
+  );
 };
 
 const EnhancedTableName = withTableData(TableName);
