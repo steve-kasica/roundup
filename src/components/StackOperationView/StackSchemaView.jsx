@@ -1,15 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useCallback, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
-import { Box, Card } from "@mui/material";
-import ColumnHeader from "../ColumnViews/ColumnHeader";
-import ColumnValuesSample from "../ColumnViews/ColumnValuesSample";
+import { Box } from "@mui/material";
 import {
   getValuesInRange,
   getIndexOfValue,
 } from "./selectionUtils/selectionUtils";
-import { TableLabel } from "../TableView";
-import { ColumnCard } from "../ColumnViews";
+import { TableName } from "../TableView";
 import { ColumnSummary } from "../ColumnViews/ColumnSummary";
 
 const topRowHeight = 50; // Fixed height for the top row (column headers)
@@ -21,11 +18,20 @@ const StackSchemaView = withStackOperationData(
     m,
     selectColumns,
     selectedColumns,
+    focusColumns,
     swapColumns,
   }) => {
     const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
     // TODO is this necessary?
     const [selectionExtentCell, setSelectionExtentCell] = useState(null);
+
+    // Function to determine if a columnId is selected
+    const isSelected = useCallback(
+      (columnId) => {
+        return selectedColumns && selectedColumns.includes(columnId);
+      },
+      [selectedColumns]
+    );
 
     const onCellClick = useCallback(
       (event, columnId) => {
@@ -53,7 +59,13 @@ const StackSchemaView = withStackOperationData(
       },
       [columnIdMatrix, selectionAnchorCell, selectColumns]
     );
-
+    const onCellDoubleClick = useCallback(
+      (event, columnId) => {
+        // Double-click: Focus on the column (same as focus button action)
+        focusColumns([columnId]);
+      },
+      [focusColumns]
+    );
     const onRowLabelClick = useCallback(
       (event, rowIndex) => {
         let anchorIndex, extentIndex;
@@ -106,6 +118,7 @@ const StackSchemaView = withStackOperationData(
           overflow: "hidden", // Prevent scrolling on the main container
           display: "flex",
           flexDirection: "column",
+          userSelect: "none",
         }}
       >
         <Box
@@ -127,7 +140,6 @@ const StackSchemaView = withStackOperationData(
               width: `${topRowHeight}px`,
               flexShrink: 0,
               height: "100%", // Take full height
-              overflow: "hidden", // Prevent overflow
             }}
           >
             {/* Empty space for top-left corner */}
@@ -137,15 +149,14 @@ const StackSchemaView = withStackOperationData(
                 flexShrink: 0,
               }}
             ></Box>
-            {/* Row labels container with scroll */}
+            {/* Row labels container */}
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-evenly",
-                gap: "4px",
+                gap: 1,
                 flex: 1,
-                overflowY: "auto", // Allow scrolling for row labels if needed
               }}
             >
               {operation.children.map((childId, rowIndex) => (
@@ -153,14 +164,16 @@ const StackSchemaView = withStackOperationData(
                   key={childId}
                   sx={{
                     fontWeight: "bold",
+                    minHeight: "25px", // coordinate with ColumnSummary.jsx
                     border: "1px solid #fff",
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "flex-end",
                     height: "100%", // Match column card height
                     cursor: "pointer",
                   }}
                 >
-                  <TableLabel
+                  <TableName
                     id={childId}
                     onClick={(event) => onRowLabelClick(event, rowIndex)}
                   />
@@ -215,63 +228,25 @@ const StackSchemaView = withStackOperationData(
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-evenly",
-                    gap: "4px",
+                    gap: 1,
                     flex: 1,
-                    overflowY: "auto",
-                    padding: "0 2px",
+                    overflowY: "hidden",
+                    padding: "2px",
+                    // userSelect: "none",
                   }}
                 >
                   {columnIdMatrix.map((row) => {
+                    const columnId = row[colIndex];
                     return (
-                      <Card
-                        key={row[colIndex]}
-                        sx={{
-                          p: 1,
-                          flex: "1 1 0",
-                          minHeight: 0,
-                          display: "flex",
-                          flexDirection: "column",
-                          cursor: "pointer",
-                          overflow: "hidden",
-                          // border: selectedColumnIds.includes(columnId)
-                          //   ? "2px solid"
-                          //   : "1px solid transparent",
-                          // borderColor: selectedColumnIds.includes(columnId)
-                          //   ? "primary.main"
-                          //   : "divider",
-                          // backgroundColor: selectedColumnIds.includes(columnId)
-                          //   ? "action.selected"
-                          //   : "background.paper",
-                          // "&:hover": {
-                          //   backgroundColor: selectedColumnIds.includes(
-                          //     columnId
-                          //   )
-                          //     ? "action.selected"
-                          //     : "action.hover",
-                          // },
-                        }}
-                        // onClick={(event) => handleColumnClick(event, columnId)}
-                        // onDoubleClick={(event) =>
-                        //   handleColumnDoubleClick(event, columnId)
-                        // }
-                      >
-                        <ColumnSummary
-                          id={row[colIndex]}
-                          onClick={onCellClick}
-                        />
-                      </Card>
-                      // <ColumnCard
-                      //   key={row[colIndex]}
-                      //   id={row[colIndex]}
-                      //   onClick={(e) => onCellClick(e, row[colIndex])}
-                      //   onDrop={(draggedColumn, droppedColumn) => {
-                      //     swapColumns(draggedColumn.id, droppedColumn.id);
-                      //   }}
-                      //   sx={{ height: "100%" }}
-                      // >
-                      //   <ColumnHeader id={row[colIndex]} />
-                      //   <ColumnValuesSample id={row[colIndex]} />
-                      // </ColumnCard>
+                      <ColumnSummary
+                        key={columnId}
+                        id={columnId}
+                        isSelected={isSelected(columnId)}
+                        onClick={(event) => onCellClick(event, columnId)}
+                        onDoubleClick={(event) =>
+                          onCellDoubleClick(event, columnId)
+                        }
+                      />
                     );
                   })}
                 </Box>

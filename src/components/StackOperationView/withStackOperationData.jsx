@@ -4,6 +4,7 @@ import useOperationData from "../../hooks/useOperationData";
 import {
   selectRemovedColumnIdsByTableId,
   selectSelectedColumns,
+  setFocusedColumns,
   setSelectedColumns,
 } from "../../slices/columnsSlice";
 import {
@@ -94,6 +95,7 @@ export default function withStackOperationData(WrappedComponent) {
             swapColumnsRequest({ targetIds: targets, sourceIds: sources })
           )
         }
+        focusColumns={(colIds) => dispatch(setFocusedColumns(colIds))}
         selectedColumns={selectedColumns}
         {...props}
       />

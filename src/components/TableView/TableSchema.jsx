@@ -274,38 +274,13 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
             >
               {i + 1}
             </Typography>
-            <Card
-              key={columnId}
-              sx={{
-                p: 1,
-                flex: "1 1 0",
-                minHeight: 0,
-                display: "flex",
-                flexDirection: "column",
-                cursor: "pointer",
-                overflow: "hidden",
-                border: selectedColumnIds.includes(columnId)
-                  ? "2px solid"
-                  : "1px solid transparent",
-                borderColor: selectedColumnIds.includes(columnId)
-                  ? "primary.main"
-                  : "divider",
-                backgroundColor: selectedColumnIds.includes(columnId)
-                  ? "action.selected"
-                  : "background.paper",
-                "&:hover": {
-                  backgroundColor: selectedColumnIds.includes(columnId)
-                    ? "action.selected"
-                    : "action.hover",
-                },
-              }}
+            <ColumnSummary
+              id={columnId}
               onClick={(event) => handleColumnClick(event, columnId)}
               onDoubleClick={(event) =>
                 handleColumnDoubleClick(event, columnId)
               }
-            >
-              <ColumnSummary id={columnId} />
-            </Card>
+            />
           </Box>
         ))}
       </Box>
