@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState, useMemo } from "react";
 import { DragIndicator, CheckCircle } from "@mui/icons-material";
 import {
@@ -12,27 +13,24 @@ import {
   MenuItem,
   Checkbox,
 } from "@mui/material";
-import HighlightText from "../../ui/HighlightText";
+import HighlightText from "../ui/HighlightText";
 import {
   formatNumber,
   formatBytes,
   formatDate,
-} from "../../../lib/utilities/formaters";
-import withTableData from "../../TableView/withTableData";
-import PropTypes from "prop-types";
+} from "../../lib/utilities/formaters";
+import withTableData from "./withTableData";
 import { useSelector } from "react-redux";
 
-function TableView({
+function TableListItemSummary({
   table,
   activeColumnIds,
   removedColumnIds = [],
   parentOperation,
   isDisabled = false,
   isSelected = false,
-  isHovered = false,
   isInSchema = false,
   searchString,
-  onSelect,
   onHover,
   onUnhover,
   onContextMenu,
@@ -398,43 +396,5 @@ function TableView({
   );
 }
 
-TableView.propTypes = {
-  table: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    name: PropTypes.string.isRequired,
-    rowCount: PropTypes.number.isRequired,
-    size: PropTypes.number.isRequired,
-    mimeType: PropTypes.string,
-    dateLastModified: PropTypes.string.isRequired,
-    columnIds: PropTypes.array.isRequired,
-  }).isRequired,
-  activeColumnIds: PropTypes.arrayOf(
-    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ).isRequired,
-  removedColumnIds: PropTypes.arrayOf(
-    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ),
-  parentOperation: PropTypes.shape({
-    name: PropTypes.string,
-  }),
-  // Selection and interaction props
-  isDisabled: PropTypes.bool,
-  isSelected: PropTypes.bool,
-  isHovered: PropTypes.bool,
-  isInSchema: PropTypes.bool,
-  searchString: PropTypes.string,
-  // Event handlers
-  onSelect: PropTypes.func,
-  onHover: PropTypes.func,
-  onUnhover: PropTypes.func,
-  onContextMenu: PropTypes.func,
-  // Action handlers
-  peekTable: PropTypes.func,
-  removeTableFromSchema: PropTypes.func,
-  renameTable: PropTypes.func,
-  dropTable: PropTypes.func,
-  addTableToSchema: PropTypes.func,
-};
-
-const EnhancedTableView = withTableData(TableView);
-export default EnhancedTableView;
+const EnhancedTableListItemSummary = withTableData(TableListItemSummary);
+export { EnhancedTableListItemSummary, TableListItemSummary };

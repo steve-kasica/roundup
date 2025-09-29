@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
   selectOperationDepth,
@@ -23,6 +23,7 @@ import {
   selectTablesById,
   setSelectedTables,
   setTablesAttribute,
+  removeFromSelectedTables,
 } from "../../slices/tablesSlice";
 
 import { dropTablesAction } from "../../sagas/dropTablesSaga";
@@ -51,12 +52,15 @@ export default function withTableData(WrappedComponent) {
       // deprecated
       const activeColumnIds = table.columnIds;
 
+      // Get selected columns from state
+      const allSelectedColumns = useSelector(selectSelectedColumns);
+
       // The intersection of the set of columns in this table and the set of selected columns
-      const selectedColumnIds = useSelector((state) =>
-        selectSelectedColumns(state).filter((colId) =>
+      const selectedColumnIds = useMemo(() => {
+        return allSelectedColumns.filter((colId) =>
           activeColumnIds.includes(colId)
-        )
-      );
+        );
+      }, [allSelectedColumns, activeColumnIds]);
       const hoveredColumnIds = useSelector((state) =>
         state.columns.hovered.filter((colId) => table.columnIds.includes(colId))
       );

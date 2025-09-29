@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { ascending, descending } from "d3";
-import TableRowView from "./TableRowView";
+import { EnhancedTableRowSummary } from "../../TableView";
 import PropTypes from "prop-types";
 import {
   COLUMN_TYPE_NUMERICAL,
@@ -136,7 +136,7 @@ export default function TableLayout({
         </thead>
         <tbody>
           {tableIds.map((id) => (
-            <TableRowView
+            <EnhancedTableRowSummary
               key={id}
               id={id}
               searchString={searchString}

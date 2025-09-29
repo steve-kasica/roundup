@@ -1,22 +1,41 @@
-/* eslint-disable react/prop-types */
+import PropTypes from "prop-types";
 import withTableData from "./withTableData";
 import { Stack, Typography } from "@mui/material";
 import { TableChart } from "@mui/icons-material";
 import { formatNumber } from "../../lib/utilities/formaters";
 
-const TableLabel = ({ table, columnCount, onClick = () => {} }) => {
+const TableLabel = ({
+  table,
+  columnCount,
+  onClick = () => {},
+  includeDimensions = true,
+  includeIcon = true,
+}) => {
   const rowCount = formatNumber(table.rowCount);
   return (
     <Stack direction={"row"} spacing={1} alignItems="center" onClick={onClick}>
-      <TableChart />
+      {includeIcon && <TableChart />}
       <Typography variant="h6" component="div" sx={{ userSelect: "none" }}>
         {table.name}{" "}
-        <small>
-          ({columnCount} x {rowCount})
-        </small>
+        {includeDimensions && (
+          <small>
+            ({columnCount} x {rowCount})
+          </small>
+        )}
       </Typography>
     </Stack>
   );
+};
+
+TableLabel.propTypes = {
+  table: PropTypes.shape({
+    name: PropTypes.string,
+    rowCount: PropTypes.number,
+  }),
+  columnCount: PropTypes.number,
+  onClick: PropTypes.func,
+  includeDimensions: PropTypes.bool,
+  includeIcon: PropTypes.bool,
 };
 
 TableLabel.displayName = "TableLabel";

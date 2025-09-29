@@ -6,7 +6,7 @@ import {
   getValuesInRange,
   getIndexOfValue,
 } from "./selectionUtils/selectionUtils";
-import { TableName } from "../TableView";
+import { TableLabel } from "../TableView";
 import { ColumnSummary } from "../ColumnViews/ColumnSummary";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
@@ -232,9 +232,11 @@ const StackSchemaView = withStackOperationData(
                   cursor: "pointer",
                 }}
               >
-                <TableName
+                <TableLabel
                   id={childId}
                   onClick={(event) => onRowLabelClick(event, rowIndex)}
+                  includeIcon={false}
+                  includeDimensions={false}
                 />
               </Box>
             ))}

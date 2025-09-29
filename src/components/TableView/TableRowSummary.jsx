@@ -1,16 +1,16 @@
 import { DragIndicator } from "@mui/icons-material";
-import HighlightText from "../../ui/HighlightText";
+import HighlightText from "../ui/HighlightText";
 import { styled, Typography, Checkbox, Stack, Box } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Menu, MenuItem } from "@mui/material";
-import { formatDate, formatNumber, formatBytes } from "../../../lib/utilities";
-import withTableData from "../../TableView/withTableData";
+import { formatDate, formatNumber, formatBytes } from "../../lib/utilities";
+import withTableData from "./withTableData";
 import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import PropTypes from "prop-types";
 
-export const TABLE_ROW_VIEW_CLASS = "TableRowView";
+export const TABLE_ROW_VIEW_CLASS = "TableRowSummary";
 
 // Styled component for bar chart background in table cells
 const BarChartCell = styled(Typography, {
@@ -120,7 +120,7 @@ const StyledTableRow = styled("tr", {
   return styles;
 });
 
-function TableRowView({
+function TableRowSummary({
   // props from withTableData
   table,
   removedColumnIds,
@@ -472,7 +472,7 @@ function TableRowView({
   );
 }
 
-TableRowView.propTypes = {
+TableRowSummary.propTypes = {
   table: PropTypes.object.isRequired,
   isHovered: PropTypes.bool,
   depth: PropTypes.number,
@@ -503,5 +503,5 @@ TableRowView.propTypes = {
   rowMax: PropTypes.number.isRequired,
 };
 
-const EnhancedTableRowView = withTableData(TableRowView);
-export default EnhancedTableRowView;
+const EnhancedTableRowSummary = withTableData(TableRowSummary);
+export { EnhancedTableRowSummary, TableRowSummary };

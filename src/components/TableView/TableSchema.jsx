@@ -1,8 +1,6 @@
-/* eslint-disable react/prop-types */
-
+import PropTypes from "prop-types";
 import {
   Box,
-  Card,
   Typography,
   IconButton,
   Toolbar,
@@ -286,6 +284,15 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
       </Box>
     </Box>
   );
+};
+
+TableSchema.propTypes = {
+  table: PropTypes.shape({
+    name: PropTypes.string,
+    columnIds: PropTypes.arrayOf(PropTypes.string),
+    rowCount: PropTypes.number,
+  }),
+  selectedColumnIds: PropTypes.arrayOf(PropTypes.string),
 };
 
 TableSchema.displayName = "TableSchema";

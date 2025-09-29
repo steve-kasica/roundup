@@ -7,12 +7,10 @@ import {
   CircularProgress,
 } from "@mui/material";
 import withPackOperationData from "./withPackOperationData";
-import { ColumnCard, EnhancedColumnName } from "../ColumnViews";
-import ColumnHeader from "../ColumnViews/ColumnHeader";
+import { EnhancedColumnName } from "../ColumnViews";
 import { useCallback, useEffect, useState } from "react";
-import useMatchValues from "../../hooks/useMatchValues";
 import { usePackStats } from "../../hooks/usePackStats";
-import { TableName } from "../TableView";
+import { TableLabel } from "../TableView";
 import StatisticsBar from "./StatisticsBar";
 
 const PackSchemaView = withPackOperationData(
@@ -139,7 +137,12 @@ const PackSchemaView = withPackOperationData(
             height="100%"
             gap={0.5}
           >
-            <TableName id={leftTableId} /> {leftRowCount} rows
+            <TableLabel
+              id={leftTableId}
+              includeIcon={false}
+              includeDimensions={false}
+            />{" "}
+            {leftRowCount} rows
             <Box
               display={"flex"}
               alignItems="center"

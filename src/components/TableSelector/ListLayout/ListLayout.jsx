@@ -15,7 +15,7 @@ import {
   Skeleton,
 } from "@mui/material";
 import { ErrorOutline, TableChart } from "@mui/icons-material";
-import TableView from "./TableView";
+import { EnhancedTableListItemSummary } from "../../TableView";
 import withAllTablesData from "../../HOC/withAllTablesData";
 import PropTypes from "prop-types";
 
@@ -195,7 +195,7 @@ function ListLayout({
         })
         .map((sourceTable, i) => (
           <Box key={sourceTable.id}>
-            <TableView
+            <EnhancedTableListItemSummary
               id={sourceTable.id}
               isDraggable={true}
               searchString={searchString}
