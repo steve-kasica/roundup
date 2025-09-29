@@ -11,6 +11,8 @@ import {
   selectColumnIdsByTableId,
   setSelectedColumns,
 } from "../../slices/columnsSlice";
+import { selectSelectedColumns } from "../../slices/columnsSlice/columnSelectors";
+import { selectTablesById } from "../../slices/tablesSlice";
 
 export default function withPackOperationData(WrappedComponent) {
   // First wrap with the base operation data HOC
@@ -42,6 +44,32 @@ export default function withPackOperationData(WrappedComponent) {
       selectColumnIdsByTableId(state, operation?.children[1])
     );
 
+    // Get all selected columns from Redux store
+    const allSelectedColumns = useSelector(selectSelectedColumns);
+
+    // Filter selected columns by left and right table IDs
+    const leftSelectedColumns = allSelectedColumns.filter((columnId) => {
+      const leftTableColumns = leftHandColumns || [];
+      return leftTableColumns.includes(columnId);
+    });
+
+    const rightSelectedColumns = allSelectedColumns.filter((columnId) => {
+      const rightTableColumns = rightHandColumns || [];
+      return rightTableColumns.includes(columnId);
+    });
+
+    // Get left and right table data to extract row counts
+    const leftTable = useSelector((state) =>
+      selectTablesById(state, operation?.children[0])
+    );
+    const rightTable = useSelector((state) =>
+      selectTablesById(state, operation?.children[1])
+    );
+
+    // Extract row counts from table objects
+    const leftRowCount = leftTable?.rowCount || 0;
+    const rightRowCount = rightTable?.rowCount || 0;
+
     return (
       <ComponentWithOperationData
         {...props}
@@ -49,11 +77,21 @@ export default function withPackOperationData(WrappedComponent) {
         // Pack-specific props
         joinType={operation.joinType}
         joinPredicate={operation.joinPredicate}
-        joinKey1={operation.joinKey1}
-        joinKey2={operation.joinKey2}
+        joinKey1={operation.joinKey1} // Deprecated, use leftKey
+        leftKey={operation.joinKey1}
+        joinKey2={operation.joinKey2} // Deprecated, use rightKey
+        rightKey={operation.joinKey2}
+        leftTableId={operation.children[0]}
+        rightTableId={operation.children[1]}
+        leftRowCount={leftRowCount}
+        rightRowCount={rightRowCount}
         isPack={isPack}
-        leftHandColumns={leftHandColumns}
-        rightHandColumns={rightHandColumns}
+        leftHandColumns={leftHandColumns} // Deprecated, use leftColumns
+        leftColumns={leftHandColumns}
+        rightHandColumns={rightHandColumns} // Deprecated, use rightColumns
+        rightColumns={rightHandColumns}
+        leftSelectedColumns={leftSelectedColumns}
+        rightSelectedColumns={rightSelectedColumns}
         // Pack-specific join dispatchers
         setJoinType={setJoinType}
         setLeftTableJoinKey={(columnId) => {

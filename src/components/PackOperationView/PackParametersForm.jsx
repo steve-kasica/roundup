@@ -16,6 +16,7 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
+import { ColumnName, EnhancedColumnName } from "../ColumnViews";
 
 /* eslint-disable react/prop-types */
 
@@ -104,7 +105,7 @@ const PackParametersForm = ({
           {leftHandColumns &&
             leftHandColumns.map((columnId) => (
               <MenuItem key={columnId} value={columnId}>
-                {columnId}
+                <EnhancedColumnName id={columnId} />
               </MenuItem>
             ))}
         </Select>
@@ -123,7 +124,7 @@ const PackParametersForm = ({
           {rightHandColumns &&
             rightHandColumns.map((columnId) => (
               <MenuItem key={columnId} value={columnId}>
-                {columnId}
+                <EnhancedColumnName id={columnId} />
               </MenuItem>
             ))}
         </Select>

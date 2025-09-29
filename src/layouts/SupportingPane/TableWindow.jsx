@@ -22,10 +22,12 @@ import {
 import { group } from "d3";
 import { useState } from "react";
 import {
+  OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectFocusedOperationId,
   selectOperation,
 } from "../../slices/operationsSlice";
+import { EnhancedPackVirtualTable } from "../../components/PackOperationView/PackVirtualTable";
 
 const TOGGLE_VALUES = {
   LOW: "Low",
@@ -149,11 +151,15 @@ const TableWindow = () => {
             tableIds={selectedTableIds.map((t) => t.tableId)}
             operationId={focusedOperation.id}
           />
+        ) : selectedTableIds.length > 1 &&
+          focusedOperation.operationType === OPERATION_TYPE_PACK &&
+          lod === TOGGLE_VALUES.LOW ? (
+          <EnhancedPackVirtualTable id={focusedOperation.id} />
         ) : (
-          <pre>
-            Error: unsupported state
-            {JSON.stringify(selectedTableIds)}
-          </pre>
+          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
+            Error: unsupported state!
+            {JSON.stringify({ selectedTableIds, focusedOperation })}
+          </Typography>
         )}
       </Box>
     </Box>
