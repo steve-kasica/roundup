@@ -8,7 +8,7 @@
  * **Table Tree**, by design.
  */
 
-import TableView from "./TableView";
+import { TableBlock } from "../TableView";
 import withOperationData from "../HOC/withOperationData";
 import { isOperationId } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
@@ -85,7 +85,7 @@ function OperationView({
         : null}
       {childTableIds.length > 0
         ? childTableIds.map((tableId) => (
-            <TableView
+            <TableBlock
               key={tableId}
               id={tableId}
               isDraggable={false}

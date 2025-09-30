@@ -1,3 +1,39 @@
+/**
+ * TableRows Component
+ *
+ * A comprehensive data table component that renders table data with advanced features
+ * including sorting, pagination, column hovering, and infinite scrolling. This component
+ * displays tabular data in a Material-UI Table with enhanced user interactions.
+ *
+ * Key Features:
+ * - Sortable columns with visual indicators (asc/desc/none cycling)
+ * - Infinite scrolling with automatic pagination
+ * - Column hover effects and highlighting
+ * - Sticky row numbers for easy row identification
+ * - Loading states and error handling
+ * - Responsive column widths with text truncation
+ * - Alternating row colors for better readability
+ * - Sticky header that remains visible during scrolling
+ *
+ * @component
+ * @example
+ * ```jsx
+ * // Basic usage (typically wrapped with withTableData HOC)
+ * <TableRows
+ *   table={tableObject}
+ *   selectedColumnIds={['col1', 'col2', 'col3']}
+ *   hoverColumn={handleHover}
+ *   unhoverColumn={handleUnhover}
+ * />
+ *
+ * // Enhanced version with HOC (recommended usage)
+ * <EnhancedTableRows
+ *   id="table-1"
+ *   selectedColumnIds={['col1', 'col2']}
+ * />
+ * ```
+ */
+
 /* eslint-disable react/prop-types */
 import withTableData from "./withTableData.jsx";
 import { useRef, useCallback, useEffect, useState } from "react";
@@ -19,7 +55,10 @@ import {
 import ColumnHeader from "../ColumnViews/ColumnHeader.jsx";
 import { usePaginatedTableRows } from "../../hooks/index.js";
 
-// Row handles alternating colors + row hover
+/**
+ * Styled TableRow component with alternating row colors and hover effects
+ * Provides visual feedback for row interactions
+ */
 const StyledAlternatingTableRow = styled(TableRow)(({ isEven }) => ({
   backgroundColor: isEven ? "#fff" : "#f5f5f5",
   "&:hover": {
@@ -31,7 +70,10 @@ const StyledAlternatingTableRow = styled(TableRow)(({ isEven }) => ({
   transition: "background-color 0.1s ease",
 }));
 
-// Cell only handles column hover (overrides row hover when active)
+/**
+ * Styled TableCell with column-specific hover effects
+ * Handles individual column highlighting that overrides row hover
+ */
 const StyledHoverableTableCell = styled(TableCell)(
   ({ isHovered, isEven, maxWidth = "200px" }) => ({
     backgroundColor:
@@ -48,7 +90,10 @@ const StyledHoverableTableCell = styled(TableCell)(
   })
 );
 
-// Sticky row number cell that stays fixed during horizontal scroll
+/**
+ * Sticky row number cell that remains fixed during horizontal scrolling
+ * Provides persistent row identification regardless of scroll position
+ */
 const StyledStickyRowNumberCell = styled(TableCell)(() => ({
   position: "sticky",
   left: 0,
@@ -60,7 +105,10 @@ const StyledStickyRowNumberCell = styled(TableCell)(() => ({
   borderRight: "1px solid rgba(224, 224, 224, 1)",
 }));
 
-// Styled sortable header cell
+/**
+ * Styled header cell with sorting capabilities and hover effects
+ * Provides visual feedback for sortable columns
+ */
 const StyledSortableHeaderCell = styled(TableCell)(
   ({ isHovered, maxWidth = "200px" }) => ({
     cursor: "pointer",
@@ -76,6 +124,22 @@ const StyledSortableHeaderCell = styled(TableCell)(
   })
 );
 
+/**
+ * TableRows component renders paginated, sortable table data with advanced interactions
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.table - Table object containing metadata
+ * @param {string} props.table.id - Unique identifier for the table
+ * @param {string[]} props.selectedColumnIds - Array of column IDs to display
+ * @param {number} [props.hoveredIndex=0] - Index of currently hovered column
+ * @param {Function} props.hoverColumn - Function called when column is hovered
+ * @param {Function} props.unhoverColumn - Function called when column hover ends
+ * @param {Function} [props.onScrollContainerRef=null] - Callback to register scroll container ref
+ * @param {Function} [props.onScroll=null] - Callback for scroll events
+ * @param {boolean} [props.showHeader=true] - Whether to show the table header
+ * @param {Object} [props.columnWidths={}] - Custom width settings for columns
+ * @returns {JSX.Element} The rendered TableRows component
+ */
 const TableRows = ({
   table,
   selectedColumnIds,
@@ -88,11 +152,19 @@ const TableRows = ({
   columnWidths = {}, // Optional prop for custom column widths
 }) => {
   const tableContainerRef = useRef(null);
+
+  /**
+   * Sorting configuration state
+   * @type {Object} sortConfig - Current sort settings
+   * @property {string|null} columnId - ID of column being sorted (null for no sort)
+   * @property {string|null} direction - Sort direction: 'asc', 'desc', or null
+   */
   const [sortConfig, setSortConfig] = useState({
     columnId: null,
     direction: null, // 'asc', 'desc', or null
   });
 
+  // Hook for managing paginated data with sorting
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
       table.id,
@@ -102,6 +174,12 @@ const TableRows = ({
       sortConfig.direction // sortDirection
     );
 
+  /**
+   * Handles column sorting with three-state cycle: asc -> desc -> none -> asc
+   * Clicking the same column cycles through sort states, clicking different column starts fresh
+   *
+   * @param {string} columnId - ID of the column to sort by
+   */
   const handleSort = useCallback((columnId) => {
     setSortConfig((prev) => {
       if (prev.columnId === columnId) {
@@ -117,13 +195,22 @@ const TableRows = ({
     });
   }, []);
 
-  // Register this table container with parent
+  /**
+   * Registers the table container reference with parent component
+   * Allows parent to coordinate scrolling across multiple table instances
+   */
   useEffect(() => {
     if (tableContainerRef.current && onScrollContainerRef) {
       onScrollContainerRef(tableContainerRef.current);
     }
   }, [onScrollContainerRef]);
 
+  /**
+   * Handles scroll events for infinite scrolling and parent coordination
+   * Triggers pagination when near bottom and notifies parent of scroll position
+   *
+   * @param {Event} event - Scroll event from the table container
+   */
   const handleScroll = useCallback(
     (event) => {
       const container = event.target;
@@ -152,14 +239,18 @@ const TableRows = ({
       sx={{ height: "100%", overflow: "auto" }}
     >
       <Table size="small" stickyHeader sx={{ width: "auto" }}>
+        {/* Table Header - Sortable column headers with hover effects */}
         {showHeader && (
           <TableHead>
             <TableRow>
+              {/* Sticky Row Number Header */}
               <StyledStickyRowNumberCell
                 sx={{ zIndex: 3, backgroundColor: "#f5f5f5" }}
               >
                 #
               </StyledStickyRowNumberCell>
+
+              {/* Column Headers with Sorting */}
               {selectedColumnIds.map((colId, i) => (
                 <StyledSortableHeaderCell
                   key={colId}
@@ -194,7 +285,10 @@ const TableRows = ({
             </TableRow>
           </TableHead>
         )}
+
+        {/* Table Body - Data rows with loading, error, and pagination states */}
         <TableBody>
+          {/* Error State - Full-width error message with retry option */}
           {error ? (
             <TableRow sx={{ height: "100%" }}>
               <TableCell
@@ -223,7 +317,7 @@ const TableRows = ({
               </TableCell>
             </TableRow>
           ) : loading && data.length === 0 ? (
-            // Show skeleton rows with loading indicators only for initial load
+            /* Initial Loading State - Skeleton rows with loading indicators */
             Array.from({ length: 10 }).map((_, rowIndex) => (
               <StyledAlternatingTableRow
                 key={`loading-${rowIndex}`}
@@ -246,16 +340,19 @@ const TableRows = ({
               </StyledAlternatingTableRow>
             ))
           ) : (
-            // Show actual data (now sorted)
+            /* Data Rows - Actual table content with alternating colors and hover effects */
             <>
               {data.map((row, rowIndex) => (
                 <StyledAlternatingTableRow
                   key={rowIndex}
                   isEven={rowIndex % 2 === 0}
                 >
+                  {/* Row Number Cell */}
                   <StyledStickyRowNumberCell>
                     {rowIndex + 1}
                   </StyledStickyRowNumberCell>
+
+                  {/* Data Cells with proper formatting for different data types */}
                   {row.map((value, i) => (
                     <StyledHoverableTableCell
                       key={selectedColumnIds[i]}
@@ -279,7 +376,8 @@ const TableRows = ({
                   ))}
                 </StyledAlternatingTableRow>
               ))}
-              {/* Loading indicator for pagination */}
+
+              {/* Pagination Loading Indicator - Shows when loading more data */}
               {loading && data.length > 0 && (
                 <StyledAlternatingTableRow isEven={data.length % 2 === 0}>
                   <TableCell
@@ -310,8 +408,26 @@ const TableRows = ({
   );
 };
 
+// Set display name for debugging
 TableRows.displayName = "TableRows";
 
+/**
+ * Enhanced TableRows component wrapped with the withTableData HOC
+ * This is the recommended export that automatically provides table data from Redux state
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.id - Table ID to load data for
+ * @param {string[]} props.selectedColumnIds - Array of column IDs to display
+ * @param {number} [props.hoveredIndex] - Index of currently hovered column
+ * @param {Function} [props.hoverColumn] - Function called when column is hovered
+ * @param {Function} [props.unhoverColumn] - Function called when column hover ends
+ * @param {Function} [props.onScrollContainerRef] - Callback to register scroll container ref
+ * @param {Function} [props.onScroll] - Callback for scroll events
+ * @param {boolean} [props.showHeader] - Whether to show the table header
+ * @param {Object} [props.columnWidths] - Custom width settings for columns
+ * @returns {JSX.Element} The enhanced TableRows component with automatic data loading
+ */
 const EnhancedTableRows = withTableData(TableRows);
 
 export { EnhancedTableRows as TableRows };

@@ -1,7 +1,7 @@
-import withColumnData from "../ColumnViews/withColumnData";
-import PropTypes from "prop-types";
+/* eslint-disable react/prop-types */
+import withColumnData from "./withColumnData";
 
-function ColumnView({
+function ColumnTick({
   isNull,
   isSelected,
   isLoading,
@@ -11,7 +11,7 @@ function ColumnView({
   error,
 }) {
   const className = [
-    "ColumnView",
+    "ColumnTick",
     isNull ? "null" : undefined,
     isSelected ? "selected" : undefined,
     isLoading ? "loading" : undefined,
@@ -26,15 +26,5 @@ function ColumnView({
   return <div className={className}></div>;
 }
 
-ColumnView.propTypes = {
-  isNull: PropTypes.bool,
-  isSelected: PropTypes.bool,
-  isLoading: PropTypes.bool,
-  isHovered: PropTypes.bool,
-  isDragging: PropTypes.bool,
-  isOver: PropTypes.bool,
-  error: PropTypes.any,
-};
-
-const EnhancedColumnView = withColumnData(ColumnView);
-export default EnhancedColumnView;
+const EnhancedColumnTick = withColumnData(ColumnTick);
+export { ColumnTick, EnhancedColumnTick };

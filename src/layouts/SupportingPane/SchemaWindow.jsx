@@ -12,7 +12,7 @@ import { selectAllTablesData } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
 import StackSchemaView from "../../components/StackOperationView/StackSchemaView";
 import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
-import { TableSchema } from "../../components/TableView";
+import { EnhancedTableSchema } from "../../components/TableView";
 import {
   selectColumnById,
   selectSelectedColumns,
@@ -61,7 +61,7 @@ export default function SchemaWindow() {
           <PackSchemaView id={focusedOperation.id} />
         </Box>
       ) : focusedOperation?.operationType === OPERATION_TYPE_NO_OP ? (
-        <TableSchema id={focusedOperation.children[0]} />
+        <EnhancedTableSchema id={focusedOperation.children[0]} />
       ) : (
         <Box
           sx={{

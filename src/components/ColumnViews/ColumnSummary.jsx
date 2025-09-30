@@ -7,7 +7,6 @@ import {
   Menu,
   MenuItem,
   Tooltip,
-  Divider,
   Card,
 } from "@mui/material";
 import { MoreVert, Info } from "@mui/icons-material";
@@ -35,7 +34,6 @@ const ColumnSummary = ({
   const ref = useRef(null);
 
   // Calculate values first
-  const top = column?.max;
   const tableIndex = column.index + 1;
 
   // Drag functionality

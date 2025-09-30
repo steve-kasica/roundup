@@ -1,15 +1,10 @@
-/**
- * CompositeTableSchema/TableView.jsx
- * -----------------------------------------------------------------
- * A visual representation of **source table** data in the
- * **Table Tree**.
- */
-import ColumnView from "./ColumnView.jsx";
-import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
-import withTableData from "../TableView/withTableData.jsx";
-import PropTypes from "prop-types";
+/* eslint-disable react/prop-types */
 
-function TableView({
+import ColumnTick from "../ColumnViews";
+import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
+import withTableData from "./withTableData.jsx";
+
+function TableBlock({
   // props via withTableData
   table,
   activeColumnIds, // TODO: replace with just table.columnIds
@@ -49,8 +44,9 @@ function TableView({
       <div className="label">
         {table.name} <span className="column-count">({columnCount})</span>
       </div>
+      {/* This should be children */}
       {ticks.map((columnId, index) => (
-        <ColumnView
+        <ColumnTick
           key={`${columnId}-${index}`} // Ensure unique key even when columnId is null
           id={columnId}
         />
@@ -59,20 +55,5 @@ function TableView({
   );
 }
 
-TableView.propTypes = {
-  table: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-  activeColumnIds: PropTypes.arrayOf(
-    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ).isRequired,
-  isHovered: PropTypes.bool,
-  isDragging: PropTypes.bool,
-  isPressed: PropTypes.bool,
-  isFocused: PropTypes.bool,
-  parentOperationType: PropTypes.string,
-  parentColumnCount: PropTypes.number,
-};
-
-const EnhancedTableView = withTableData(TableView);
-export default EnhancedTableView;
+const EnhancedTableBlock = withTableData(TableBlock);
+export { TableBlock, EnhancedTableBlock };

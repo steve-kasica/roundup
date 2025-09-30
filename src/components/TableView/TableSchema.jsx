@@ -1,4 +1,33 @@
-import PropTypes from "prop-types";
+/**
+ * TableSchema Component
+ *
+ * A comprehensive table schema viewer that displays a table's columns as interactive cards
+ * with a toolbar for performing bulk operations. This component provides a visual overview
+ * of table structure and allows users to select, manipulate, and analyze columns.
+ *
+ * Features:
+ * - Column selection (single, multi-select with Ctrl/Cmd, range selection with Shift)
+ * - Bulk operations (select all, delete, focus, change column types)
+ * - Interactive column cards showing statistics and data previews
+ * - Horizontal scrolling for tables with many columns
+ * - Real-time updates through Redux state management
+ *
+ * @component
+ * @example
+ * ```jsx
+ * // Basic usage (typically wrapped with withTableData HOC)
+ * <TableSchema
+ *   table={tableObject}
+ *   selectedColumnIds={[]}
+ * />
+ *
+ * // Enhanced version with HOC (recommended usage)
+ * <EnhancedTableSchema id="table-1" />
+ * ```
+ */
+
+/* eslint-disable react/prop-types */
+
 import {
   Box,
   Typography,
@@ -34,18 +63,38 @@ import {
 } from "../../slices/columnsSlice/Column";
 import { ColumnSummary } from "../ColumnViews/ColumnSummary";
 
+/**
+ * TableSchema component renders a table's schema as a collection of interactive column cards
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.table - Table object containing schema information
+ * @param {string} props.table.name - Name of the table
+ * @param {string[]} props.table.columnIds - Array of column IDs in the table
+ * @param {number} [props.table.rowCount] - Number of rows in the table
+ * @param {string[]} [props.selectedColumnIds=[]] - Array of currently selected column IDs
+ * @returns {JSX.Element} The rendered TableSchema component
+ */
 const TableSchema = ({ table, selectedColumnIds = [] }) => {
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
 
+  /**
+   * Clears all selected columns
+   */
   const handleClearSelection = useCallback(() => {
     dispatch(clearSelectedColumns());
   }, [dispatch]);
 
+  /**
+   * Selects all columns in the table
+   */
   const handleSelectAll = useCallback(() => {
     dispatch(setSelectedColumns(table.columnIds));
   }, [dispatch, table.columnIds]);
 
+  /**
+   * Deletes the currently selected columns and clears the selection
+   */
   const handleDeleteSelected = useCallback(() => {
     if (selectedColumnIds.length > 0) {
       dispatch(dropColumns(selectedColumnIds));
@@ -53,20 +102,34 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
     }
   }, [dispatch, selectedColumnIds]);
 
+  /**
+   * Sets focus on selected columns for detailed view (limited to 1-2 columns)
+   */
   const handleFocusSelected = useCallback(() => {
     if (selectedColumnIds.length > 0 && selectedColumnIds.length <= 2) {
       dispatch(setFocusedColumns(selectedColumnIds));
     }
   }, [dispatch, selectedColumnIds]);
 
+  /**
+   * Opens the column type dropdown menu
+   * @param {Event} event - Click event from the dropdown button
+   */
   const handleColumnTypeMenuOpen = useCallback((event) => {
     setColumnTypeMenuAnchor(event.currentTarget);
   }, []);
 
+  /**
+   * Closes the column type dropdown menu
+   */
   const handleColumnTypeMenuClose = useCallback(() => {
     setColumnTypeMenuAnchor(null);
   }, []);
 
+  /**
+   * Changes the type of selected columns
+   * @param {string|null} columnType - The new column type to apply, or null for auto-detect
+   */
   const handleColumnTypeChange = useCallback(
     (columnType) => {
       if (selectedColumnIds.length > 0) {
@@ -79,6 +142,15 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
     [dispatch, selectedColumnIds, handleColumnTypeMenuClose]
   );
 
+  /**
+   * Handles column selection with support for multiple selection modes:
+   * - Regular click: Replace current selection with clicked column
+   * - Ctrl/Cmd+click: Toggle clicked column in selection
+   * - Shift+click: Select range from last selected column to clicked column
+   *
+   * @param {Event} event - Click event containing modifier key information
+   * @param {string} columnId - ID of the clicked column
+   */
   const handleColumnClick = useCallback(
     (event, columnId) => {
       const columnIds = table.columnIds;
@@ -123,6 +195,11 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
     [dispatch, table.columnIds, selectedColumnIds]
   );
 
+  /**
+   * Handles double-click on a column to focus it for detailed viewing
+   * @param {Event} event - Double-click event
+   * @param {string} columnId - ID of the double-clicked column
+   */
   const handleColumnDoubleClick = useCallback(
     (event, columnId) => {
       // Double-click: Focus on the column (same as focus button action)
@@ -130,9 +207,10 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
     },
     [dispatch]
   );
+
   return (
     <Box display="flex" flexDirection="column" height="100%">
-      {/* Toolbar */}
+      {/* Toolbar with table info and action buttons */}
       <Toolbar
         variant="dense"
         sx={{
@@ -144,7 +222,7 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
           gap: 1,
         }}
       >
-        {/* Table Info */}
+        {/* Table Information Section - Shows table name and dimensions */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <TableChart fontSize="small" color="action" />
           <Typography
@@ -159,8 +237,9 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
           </Typography>
         </Box>
 
-        {/* Actions */}
+        {/* Action Buttons Section - Bulk operations for selected columns */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          {/* Select All Columns */}
           <IconButton
             size="small"
             onClick={handleSelectAll}
@@ -169,6 +248,8 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
           >
             <SelectAll fontSize="small" />
           </IconButton>
+
+          {/* Focus Selected Columns (max 2 for comparison) */}
           <IconButton
             size="small"
             onClick={handleFocusSelected}
@@ -180,6 +261,8 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
           >
             <Visibility fontSize="small" />
           </IconButton>
+
+          {/* Change Column Type Dropdown */}
           <IconButton
             size="small"
             onClick={handleColumnTypeMenuOpen}
@@ -188,6 +271,8 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
           >
             <ArrowDropDown fontSize="small" />
           </IconButton>
+
+          {/* Delete Selected Columns */}
           <IconButton
             size="small"
             onClick={handleDeleteSelected}
@@ -197,6 +282,8 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
           >
             <Delete fontSize="small" />
           </IconButton>
+
+          {/* Clear Selection */}
           <IconButton
             size="small"
             onClick={handleClearSelection}
@@ -208,7 +295,7 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
         </Box>
       </Toolbar>
 
-      {/* Column Type Menu */}
+      {/* Column Type Change Menu */}
       <Menu
         anchorEl={columnTypeMenuAnchor}
         open={Boolean(columnTypeMenuAnchor)}
@@ -238,7 +325,7 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
         </MenuItem>
       </Menu>
 
-      {/* Column Cards Container */}
+      {/* Column Cards Container - Horizontally scrollable grid of column summaries */}
       <Box
         p={1}
         display={"flex"}
@@ -251,7 +338,7 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
           overflowY: "hidden",
         }}
       >
-        {/* Column Cards Grid */}
+        {/* Individual Column Cards - Each column rendered as a numbered card with summary */}
         {table.columnIds.map((columnId, i) => (
           <Box
             key={columnId}
@@ -264,6 +351,7 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
               userSelect: "none",
             }}
           >
+            {/* Column Number Header */}
             <Typography
               variant="h6"
               textAlign="center"
@@ -272,6 +360,8 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
             >
               {i + 1}
             </Typography>
+
+            {/* Interactive Column Summary Card */}
             <ColumnSummary
               id={columnId}
               onClick={(event) => handleColumnClick(event, columnId)}
@@ -286,17 +376,18 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
   );
 };
 
-TableSchema.propTypes = {
-  table: PropTypes.shape({
-    name: PropTypes.string,
-    columnIds: PropTypes.arrayOf(PropTypes.string),
-    rowCount: PropTypes.number,
-  }),
-  selectedColumnIds: PropTypes.arrayOf(PropTypes.string),
-};
-
+// Set display name for debugging
 TableSchema.displayName = "TableSchema";
 
+/**
+ * Enhanced TableSchema component wrapped with the withTableData HOC
+ * This is the recommended export that automatically provides table data from Redux state
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.id - Table ID to load data for
+ * @returns {JSX.Element} The enhanced TableSchema component with automatic data loading
+ */
 const EnhancedTableSchema = withTableData(TableSchema);
 
 export { EnhancedTableSchema as TableSchema };
