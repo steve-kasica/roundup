@@ -393,4 +393,4 @@ ColumnSummary.displayName = "ColumnSummary";
 
 const EnhancedColumnSummary = withColumnData(ColumnSummary);
 
-export { EnhancedColumnSummary as ColumnSummary };
+export { EnhancedColumnSummary, ColumnSummary };

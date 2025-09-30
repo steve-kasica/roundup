@@ -42,4 +42,4 @@ TableLabel.displayName = "TableLabel";
 
 const EnhancedTableLabel = withTableData(TableLabel);
 
-export { EnhancedTableLabel as TableLabel };
+export { EnhancedTableLabel, TableLabel };

@@ -9,7 +9,10 @@ import {
   Checkbox,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import { TableLabel, TableRows } from "../../components/TableView";
+import {
+  EnhancedTableLabel,
+  EnhancedTableRows,
+} from "../../components/TableView";
 import { StackVirtualizedTable } from "../../components/StackOperationView";
 import {
   selectColumnById,
@@ -84,7 +87,7 @@ const TableWindow = () => {
                 No Table Selected
               </Typography>
             ) : (
-              <TableLabel id={selectedTableIds?.[0]?.tableId} />
+              <EnhancedTableLabel id={selectedTableIds?.[0]?.tableId} />
             )}
           </Stack>
           <Stack direction="row" spacing={2} alignItems="center">
@@ -137,7 +140,7 @@ const TableWindow = () => {
             No columns selected. Please select columns from the schema window.
           </Typography>
         ) : selectedTableIds.length === 1 && lod === TOGGLE_VALUES.LOW ? (
-          <TableRows id={selectedTableIds[0].tableId} />
+          <EnhancedTableRows id={selectedTableIds[0].tableId} />
         ) : selectedTableIds.length > 1 &&
           focusedOperation.operationType === OPERATION_TYPE_STACK &&
           lod === TOGGLE_VALUES.LOW ? (

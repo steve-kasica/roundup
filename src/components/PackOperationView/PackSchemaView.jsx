@@ -10,7 +10,7 @@ import withPackOperationData from "./withPackOperationData";
 import { EnhancedColumnName } from "../ColumnViews";
 import { useCallback, useEffect, useState } from "react";
 import { usePackStats } from "../../hooks/usePackStats";
-import { TableLabel } from "../TableView";
+import { EnhancedTableLabel } from "../TableView";
 import StatisticsBar from "./StatisticsBar";
 
 const PackSchemaView = withPackOperationData(
@@ -137,12 +137,7 @@ const PackSchemaView = withPackOperationData(
             height="100%"
             gap={0.5}
           >
-            <TableLabel
-              id={leftTableId}
-              includeIcon={false}
-              includeDimensions={false}
-            />{" "}
-            {leftRowCount} rows
+            <EnhancedTableLabel id={leftTableId} includeIcon={false} />
             <Box
               display={"flex"}
               alignItems="center"
@@ -191,8 +186,7 @@ const PackSchemaView = withPackOperationData(
             flexDirection={"column"}
             gap={0.5}
           >
-            <TableName id={rightTableId} />
-            {rightRowCount} rows
+            <EnhancedTableLabel id={rightTableId} includeIcon={false} />
             <Box
               display={"flex"}
               alignItems="center"

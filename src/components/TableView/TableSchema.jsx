@@ -61,7 +61,7 @@ import {
   COLUMN_TYPE_CATEGORICAL,
   COLUMN_TYPE_VARCHAR,
 } from "../../slices/columnsSlice/Column";
-import { ColumnSummary } from "../ColumnViews/ColumnSummary";
+import { EnhancedColumnSummary } from "../ColumnViews";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -362,7 +362,7 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
             </Typography>
 
             {/* Interactive Column Summary Card */}
-            <ColumnSummary
+            <EnhancedColumnSummary
               id={columnId}
               onClick={(event) => handleColumnClick(event, columnId)}
               onDoubleClick={(event) =>
@@ -390,4 +390,4 @@ TableSchema.displayName = "TableSchema";
  */
 const EnhancedTableSchema = withTableData(TableSchema);
 
-export { EnhancedTableSchema as TableSchema };
+export { EnhancedTableSchema, TableSchema };

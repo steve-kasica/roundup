@@ -11,8 +11,7 @@ import {
   DRAG_TYPE as COLUMN_VALUES,
   default as ColumnValuesView,
 } from "./components/StackOperationView/LowLevelView/ColumnView";
-
-import { TABLE_ROW_VIEW_CLASS } from "./components/TableSelector/TableLayout/TableRowView";
+import { TABLE_ROW_VIEW_CLASS } from "./components/TableView";
 import StackedTableDragPreview from "./components/ui/StackedTableDragPreview";
 import { Box, Paper } from "@mui/material";
 

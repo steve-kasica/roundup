@@ -430,4 +430,6 @@ TableRows.displayName = "TableRows";
  */
 const EnhancedTableRows = withTableData(TableRows);
 
-export { EnhancedTableRows as TableRows };
+EnhancedTableRows.displayName = "EnhancedTableRows";
+
+export { EnhancedTableRows, TableRows };

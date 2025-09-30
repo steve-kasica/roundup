@@ -8,7 +8,7 @@
 import PropTypes from "prop-types";
 import { forwardRef } from "react";
 import { useDrop } from "react-dnd";
-import { TABLE_ROW_VIEW_CLASS } from "../TableSelector/TableLayout/TableRowView";
+import { TABLE_ROW_VIEW_CLASS } from "../TableView";
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/material";
 

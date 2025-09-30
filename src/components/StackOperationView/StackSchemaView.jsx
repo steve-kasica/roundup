@@ -6,8 +6,8 @@ import {
   getValuesInRange,
   getIndexOfValue,
 } from "./selectionUtils/selectionUtils";
-import { TableLabel } from "../TableView";
-import { ColumnSummary } from "../ColumnViews/ColumnSummary";
+import { EnhancedTableLabel } from "../TableView";
+import { EnhancedColumnSummary } from "../ColumnViews";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -232,7 +232,7 @@ const StackSchemaView = withStackOperationData(
                   cursor: "pointer",
                 }}
               >
-                <TableLabel
+                <EnhancedTableLabel
                   id={childId}
                   onClick={(event) => onRowLabelClick(event, rowIndex)}
                   includeIcon={false}
@@ -301,7 +301,7 @@ const StackSchemaView = withStackOperationData(
                 {columnIdMatrix.map((row) => {
                   const columnId = row[colIndex];
                   return (
-                    <ColumnSummary
+                    <EnhancedColumnSummary
                       key={columnId}
                       id={columnId}
                       isSelected={isSelected(columnId)}

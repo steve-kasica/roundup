@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { useRef, useCallback } from "react";
-import { TableRows } from "../TableView";
+import { EnhancedTableRows } from "../TableView";
 
 export const StackVirtualizedTable = ({ tableIds, operationId }) => {
   // Map of childId -> `<TableBody>` scroll container
@@ -47,7 +47,7 @@ export const StackVirtualizedTable = ({ tableIds, operationId }) => {
       width={"100%"}
     >
       {tableIds.map((tableId) => (
-        <TableRows
+        <EnhancedTableRows
           key={tableId}
           id={tableId}
           showHeader={false}

@@ -3,3 +3,4 @@ export { default as SingleColumn } from "./SingleColumn";
 export { ColumnValues } from "./ColumnValues";
 export * from "./ColumnName";
 export * from "./ColumnTick";
+export * from "./ColumnSummary";
