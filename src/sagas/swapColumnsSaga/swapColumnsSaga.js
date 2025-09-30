@@ -8,6 +8,7 @@ import {
   selectColumnIdsByTableId,
   updateColumnsArray,
 } from "../../slices/columnsSlice";
+import { selectTablesById, updateTables } from "../../slices/tablesSlice";
 
 /**
  * Action creator for swapping two columns in the columns state.
@@ -64,9 +65,8 @@ export function* swapColumnsSagaWorker(action) {
     const tableId = yield select(
       (state) => selectColumnById(state, sourceIds[i]).tableId
     );
-    const prevColumnOrder = yield select((state) =>
-      selectColumnIdsByTableId(state, tableId)
-    );
+    const table = yield select((state) => selectTablesById(state, tableId));
+    const prevColumnOrder = table.columnIds;
 
     // Create a copy of the previous column order and swap the source and target columns
     const nextColumnOrder = [...prevColumnOrder];
@@ -78,7 +78,7 @@ export function* swapColumnsSagaWorker(action) {
     nextColumnOrder[targetIndex] = sourceIds[i];
 
     yield put(addColumnsToLoading([sourceIds[i], targetIds[i]]));
-    yield put(updateColumnsArray({ tableId, columnIds: nextColumnOrder }));
+    yield put(updateTables({ id: tableId, columnIds: nextColumnOrder }));
     yield put(removeColumnsFromLoading([sourceIds[i], targetIds[i]]));
   }
   yield put(clearSelectedColumns());

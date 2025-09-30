@@ -15,6 +15,7 @@ import {
   updateOperations,
 } from "../../slices/operationsSlice";
 import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
+import { selectTablesById } from "../../slices/tablesSlice";
 
 // TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -41,31 +42,15 @@ export default function withStackOperationData(WrappedComponent) {
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperation(state, id));
     const depth = useSelector((state) => selectOperationDepth(state, id));
-    const focusedOperationId = useSelector(selectFocusedOperationId);
-    const hoveredOperationId = useSelector(selectHoveredOperation);
     const columnIds = useSelector((state) =>
-      selectRemovedColumnIdsByTableId(state, id)
-    );
-    const removedColumnIds = useSelector((state) =>
       selectRemovedColumnIdsByTableId(state, id)
     );
     const selectedColumns = useSelector(selectSelectedColumns);
 
-    // const activeColumnIds = useMemo(
-    //   () =>
-    //     columnIds.filter((columnId) => !removedColumnIds.includes(columnId)),
-    //   [columnIds, removedColumnIds]
-    // );
-    const childrenIds = operation.children;
-
-    const droppedColumnIds = useSelector((state) => state.columns.dropped);
-
     const columnIdMatrix = useSelector((state) => {
       // TODO: what if the childId is not a table?
-      const rawColumnIds = (operation?.children || []).map((childId) =>
-        (state.columns.idsByTable[childId] || []).filter(
-          (cid) => !droppedColumnIds.includes(cid)
-        )
+      const rawColumnIds = (operation?.children || []).map(
+        (childId) => selectTablesById(state, childId).columnIds
       );
       const maxLength = Math.max(...rawColumnIds.map((row) => row.length), 0);
       return rawColumnIds.map((row) => {
@@ -91,9 +76,9 @@ export default function withStackOperationData(WrappedComponent) {
         m={m}
         n={n}
         selectColumns={(colIds) => dispatch(setSelectedColumns(colIds))}
-        swapColumns={(targets, sources) =>
+        swapColumns={(target, source) =>
           dispatch(
-            swapColumnsRequest({ targetIds: targets, sourceIds: sources })
+            swapColumnsRequest({ targetIds: [target], sourceIds: [source] })
           )
         }
         focusColumns={(colIds) => dispatch(setFocusedColumns(colIds))}

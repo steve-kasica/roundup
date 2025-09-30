@@ -29,6 +29,7 @@ import {
 import { dropTablesAction } from "../../sagas/dropTablesSaga";
 import { removeTablesAction } from "../../sagas/removeTablesSaga";
 import { addTablesToSchemaRequest } from "../../sagas/addTablesToSchemaSaga";
+import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
 
 export default function withTableData(WrappedComponent) {
   const componentName =
@@ -127,6 +128,13 @@ export default function withTableData(WrappedComponent) {
           selectColumns={selectColumns}
           hoverColumn={hoverColumn}
           unhoverColumn={unhoverColumn}
+          swapColumns={(target, source) => {
+            console.log("Swapping columns", { target, source });
+            dispatch(
+              swapColumnsRequest({ targetIds: [target], sourceIds: [source] })
+            );
+          }}
+          // Table action handlers
           onHover={() => dispatch(setHoveredTable(id))} // TODO: remove
           onUnhover={() => dispatch(clearHoveredTable())} // TODO: remove
           hoverTable={() => dispatch(setHoveredTable(id))}

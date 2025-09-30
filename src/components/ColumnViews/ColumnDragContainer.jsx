@@ -22,23 +22,14 @@ import {
 import {
   selectIsColumnDropTarget,
   selectColumnIdsByTableId,
-  selectIsColumnHoverTarget,
 } from "../../slices/columnsSlice/columnSelectors";
-import { use } from "react";
 
 /**
  * ColumnDragContainer - A container component that handles drag functionality for columns
  * Passes dragDropRef to its children instead of wrapping them
  */
 const ColumnDragContainer = withColumnData(
-  ({
-    column,
-    children,
-    // onDragStart = () => {},
-    onDragEnd = () => {},
-    onDrop = () => {},
-    columnIndex,
-  }) => {
+  ({ column, children, onDragEnd, onDrop }) => {
     const dispatch = useDispatch();
     const ref = useRef(null);
     const dragType = `${column.tableId}_Column`; // Unique drag type per table
@@ -71,7 +62,6 @@ const ColumnDragContainer = withColumnData(
         return {
           ...column,
           type: dragType,
-          columnIndex,
         };
       },
       canDrag: !!column,

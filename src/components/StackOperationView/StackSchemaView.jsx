@@ -307,13 +307,9 @@ const StackSchemaView = withStackOperationData(
                       key={columnId}
                       id={columnId}
                       columnIndex={colIndex}
-                      onDragEnd={() => {
-                        console.log("Drag End");
-                      }}
-                      onDrop={(draggedItem, targetItem) => {
-                        // Only handle swaps within the same stack operation
-                        console.log("Dropped", { draggedItem, targetItem });
-                      }}
+                      onDrop={(draggedItem, targetItem) =>
+                        swapColumns(targetItem.id, draggedItem.id)
+                      }
                     >
                       <EnhancedColumnSummary
                         id={columnId}

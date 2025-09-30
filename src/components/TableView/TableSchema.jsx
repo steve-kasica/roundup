@@ -62,6 +62,7 @@ import {
   COLUMN_TYPE_VARCHAR,
 } from "../../slices/columnsSlice/Column";
 import { EnhancedColumnSummary } from "../ColumnViews";
+import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -74,7 +75,7 @@ import { EnhancedColumnSummary } from "../ColumnViews";
  * @param {string[]} [props.selectedColumnIds=[]] - Array of currently selected column IDs
  * @returns {JSX.Element} The rendered TableSchema component
  */
-const TableSchema = ({ table, selectedColumnIds = [] }) => {
+const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
 
@@ -361,14 +362,23 @@ const TableSchema = ({ table, selectedColumnIds = [] }) => {
               {i + 1}
             </Typography>
 
-            {/* Interactive Column Summary Card */}
-            <EnhancedColumnSummary
+            <ColumnDragContainer
               id={columnId}
-              onClick={(event) => handleColumnClick(event, columnId)}
-              onDoubleClick={(event) =>
-                handleColumnDoubleClick(event, columnId)
-              }
-            />
+              columnIndex={i}
+              onDrop={(draggedItem, targetItem) => {
+                console.log("Dropped", { draggedItem, targetItem });
+                swapColumns(targetItem.id, draggedItem.id);
+              }}
+            >
+              {/* Interactive Column Summary Card */}
+              <EnhancedColumnSummary
+                id={columnId}
+                onClick={(event) => handleColumnClick(event, columnId)}
+                onDoubleClick={(event) =>
+                  handleColumnDoubleClick(event, columnId)
+                }
+              />
+            </ColumnDragContainer>
           </Box>
         ))}
       </Box>
