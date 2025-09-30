@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
 import { Box } from "@mui/material";
 import {
@@ -8,6 +8,8 @@ import {
 } from "./selectionUtils/selectionUtils";
 import { EnhancedTableLabel } from "../TableView";
 import { EnhancedColumnSummary } from "../ColumnViews";
+import { useDrag } from "react-dnd";
+import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -301,15 +303,27 @@ const StackSchemaView = withStackOperationData(
                 {columnIdMatrix.map((row) => {
                   const columnId = row[colIndex];
                   return (
-                    <EnhancedColumnSummary
+                    <ColumnDragContainer
                       key={columnId}
                       id={columnId}
-                      isSelected={isSelected(columnId)}
-                      onClick={(event) => onCellClick(event, columnId)}
-                      onDoubleClick={(event) =>
-                        onCellDoubleClick(event, columnId)
-                      }
-                    />
+                      columnIndex={colIndex}
+                      onDragEnd={() => {
+                        console.log("Drag End");
+                      }}
+                      onDrop={(draggedItem, targetItem) => {
+                        // Only handle swaps within the same stack operation
+                        console.log("Dropped", { draggedItem, targetItem });
+                      }}
+                    >
+                      <EnhancedColumnSummary
+                        id={columnId}
+                        isSelected={isSelected(columnId)}
+                        onClick={(event) => onCellClick(event, columnId)}
+                        onDoubleClick={(event) =>
+                          onCellDoubleClick(event, columnId)
+                        }
+                      />
+                    </ColumnDragContainer>
                   );
                 })}
               </Box>
@@ -317,7 +331,6 @@ const StackSchemaView = withStackOperationData(
           ))}
         </Box>
       </Box>
-      // </Box>
     );
   }
 );

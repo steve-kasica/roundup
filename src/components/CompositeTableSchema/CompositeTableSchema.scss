@@ -154,18 +154,6 @@ $null-column-border-color: $null-column-background;
       border-radius: $table-border-radius;
       border-color: $table-border-color;
 
-      > .ColumnView {
-        pointer-events: none; // Disable all mouse events
-        flex: 1 1 0;
-        box-sizing: border-box;
-        display: block;
-        border: none;
-
-        &.null {
-          cursor: default;
-        }
-      }
-
       .label {
         position: absolute;
         top: $label-offset-top;

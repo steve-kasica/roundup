@@ -29,6 +29,8 @@ const initialState = {
   loading: [],
   dragging: [],
   dropped: [],
+  dropTargets: [], // Array of column IDs that can accept drops
+  hoverTargets: [], // Array of column IDs currently being hovered over during drag
   errors: {},
 };
 
@@ -211,6 +213,52 @@ const columnsSlice = createSlice({
       state.dragging = state.dragging.filter(
         (columnId) => !ids.includes(columnId)
       );
+    },
+    addColumnsToDropTargets(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      ids.forEach((id) => {
+        if (!state.dropTargets.includes(id)) {
+          state.dropTargets.push(id);
+        }
+      });
+    },
+    removeColumnsFromDropTargets(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      state.dropTargets = state.dropTargets.filter(
+        (columnId) => !ids.includes(columnId)
+      );
+    },
+    clearDropTargets(state) {
+      state.dropTargets = [];
+    },
+    addColumnsToHoverTargets(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      ids.forEach((id) => {
+        if (!state.hoverTargets.includes(id)) {
+          state.hoverTargets.push(id);
+        }
+      });
+    },
+    removeColumnsFromHoverTargets(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      state.hoverTargets = state.hoverTargets.filter(
+        (columnId) => !ids.includes(columnId)
+      );
+    },
+    clearHoverTargets(state) {
+      state.hoverTargets = [];
     },
     setHoveredColumns(state, action) {
       const columnIds = Array.isArray(action.payload)
@@ -461,6 +509,12 @@ export const {
   removeErrorForColumn,
   addColumnsToDragging,
   removeColumnsFromDragging,
+  addColumnsToDropTargets,
+  removeColumnsFromDropTargets,
+  clearDropTargets,
+  addColumnsToHoverTargets,
+  removeColumnsFromHoverTargets,
+  clearHoverTargets,
   setHoveredColumns,
   appendToHoveredColumns,
   removeFromHoveredColumns,

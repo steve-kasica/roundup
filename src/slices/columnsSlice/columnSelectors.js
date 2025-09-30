@@ -142,3 +142,43 @@ export const selectActiveColumnCountByTableId = createSelector(
     return columnIds.filter((id) => !removedColumnIds.includes(id)).length;
   }
 );
+
+/**
+ * Selects whether a column is a valid drop target.
+ *
+ * @param {Object} state - The Redux state.
+ * @param {string} columnId - The ID of the column to check.
+ * @returns {boolean} - True if the column is a valid drop target.
+ */
+export const selectIsColumnDropTarget = createSelector(
+  [(state) => state.columns.dropTargets, (_, columnId) => columnId],
+  (dropTargets, columnId) => dropTargets.includes(columnId)
+);
+
+/**
+ * Selects all drop target column IDs.
+ *
+ * @param {Object} state - The Redux state.
+ * @returns {Array<string>} - An array of column IDs that are drop targets.
+ */
+export const selectDropTargets = (state) => state.columns.dropTargets;
+
+/**
+ * Selects whether a column is currently being hovered over during drag.
+ *
+ * @param {Object} state - The Redux state.
+ * @param {string} columnId - The ID of the column to check.
+ * @returns {boolean} - True if the column is being hovered over.
+ */
+export const selectIsColumnHoverTarget = createSelector(
+  [(state) => state.columns.hoverTargets, (_, columnId) => columnId],
+  (hoverTargets, columnId) => hoverTargets.includes(columnId)
+);
+
+/**
+ * Selects all hover target column IDs.
+ *
+ * @param {Object} state - The Redux state.
+ * @returns {Array<string>} - An array of column IDs that are hover targets.
+ */
+export const selectHoverTargets = (state) => state.columns.hoverTargets;

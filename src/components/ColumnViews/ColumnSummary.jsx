@@ -8,14 +8,80 @@ import {
   MenuItem,
   Tooltip,
   Card,
+  styled,
 } from "@mui/material";
 import { MoreVert, Info } from "@mui/icons-material";
-import { useState, useRef } from "react";
-import { useDrag, useDrop } from "react-dnd";
+import { useState } from "react";
 import SingleBar from "../visualization/SingleBar";
 import { scaleLinear } from "d3";
 import ColumnValuesSample from "./ColumnValuesSample";
 import ColumnTypeIcon from "./ColumnTypeIcon";
+
+const StyledColumnCard = styled(Card)(
+  ({ isDragging, canDropHere, isSelected, isOver }) => ({
+    padding: 8,
+    flex: "1 1 0",
+    minHeight: "25px",
+    minWidth: "100px",
+    display: "flex",
+    flexDirection: "column",
+    cursor: isDragging ? "grabbing" : "pointer",
+    overflow: "hidden",
+    border: "1px solid",
+    borderColor: isOver
+      ? "#2196f3" // primary.main (blue for active hover)
+      : canDropHere
+      ? "#4caf50" // success.main
+      : isDragging
+      ? "#ff9800" // warning.main
+      : "#e0e0e0", // divider
+    borderStyle: isOver
+      ? "dashed"
+      : canDropHere
+      ? "dashed"
+      : "solid",
+    borderWidth: isOver || canDropHere || isDragging ? "2px" : "1px",
+    outline: isSelected ? "2px solid" : "none",
+    outlineColor: isSelected ? "#1976d2" : "transparent", // primary.main
+    backgroundColor: isOver
+      ? "#e3f2fd" // primary.50 (light blue for active hover)
+      : isDragging
+      ? "#fff3e0" // warning.50
+      : canDropHere
+      ? "#e8f5e8" // success.50
+      : isSelected
+      ? "rgba(0, 0, 0, 0.08)" // action.selected
+      : "#ffffff", // background.paper
+    transform: isOver
+      ? "scale(1.05)"
+      : isDragging
+      ? "scale(0.95) rotate(2deg)"
+      : canDropHere
+      ? "scale(1.02)"
+      : "scale(1)",
+    transition: "all 0.2s ease-in-out",
+    boxShadow: isOver
+      ? "0 6px 12px rgba(33, 150, 243, 0.4)" // Blue glow for active hover
+      : isDragging
+      ? "0 8px 16px rgba(255, 152, 0, 0.3)"
+      : canDropHere
+      ? "0 4px 8px rgba(76, 175, 80, 0.2)"
+      : "none",
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 1000 : "auto",
+    "&:hover": {
+      backgroundColor: isOver
+        ? "#bbdefb" // primary.100 (darker blue for hover over isOver)
+        : isDragging
+        ? "#ffe0b2" // warning.100
+        : canDropHere
+        ? "#c8e6c9" // success.100
+        : isSelected
+        ? "rgba(0, 0, 0, 0.08)" // action.selected
+        : "rgba(0, 0, 0, 0.04)", // action.hover
+    },
+  })
+);
 
 const ColumnSummary = ({
   column,
@@ -24,68 +90,17 @@ const ColumnSummary = ({
   completeCount,
   unselectColumn,
   focusColumn,
-  onDrop,
-  onDragEnd,
+  hoverColumn,
+  unhoverColumn,
   onClick,
   onDoubleClick,
   isSelected,
+  isDragging,
+  isOver,
+  canDropHere,
+  dragDropRef = null,
 }) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-  const ref = useRef(null);
-
-  // Calculate values first
-  const tableIndex = column.index + 1;
-
-  // Drag functionality
-  const [{ isDragging }, drag] = useDrag({
-    type: "ColumnSummary",
-    item: () => ({
-      ...column,
-      type: "ColumnSummary",
-      tableIndex,
-    }),
-    canDrag: !!column,
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-    end: (item, monitor) => {
-      const dropResult = monitor.getDropResult();
-      if (onDragEnd) {
-        onDragEnd(item, dropResult, monitor.didDrop());
-      }
-    },
-  });
-
-  // Drop functionality
-  const [{ isOver, canDropHere }, drop] = useDrop({
-    accept: ["ColumnSummary", "ColumnCard"],
-    drop: (draggedItem, monitor) => {
-      // Prevent nested drops
-      if (monitor.didDrop()) {
-        return;
-      }
-
-      // Don't drop on self
-      if (draggedItem.id === column?.id) {
-        return;
-      }
-
-      const dropResult = onDrop ? onDrop(draggedItem, column, monitor) : {};
-      return { ...dropResult, droppedOn: column };
-    },
-    canDrop: (item) => item.id !== column?.id, // Can't drop on self
-    collect: (monitor) => ({
-      isOver: monitor.isOver({ shallow: true }),
-      canDropHere: monitor.canDrop(),
-    }),
-  });
-
-  // Combine drag and drop refs
-  const dragDropRef = (node) => {
-    ref.current = node;
-    drag(node);
-    drop(node);
-  };
 
   if (!column) {
     return <div>No column data available.</div>;
@@ -103,25 +118,14 @@ const ColumnSummary = ({
   };
 
   return (
-    <Card
-      sx={{
-        p: 1,
-        flex: "1 1 0",
-        minHeight: "25px",
-        minWidth: "100px",
-        display: "flex",
-        flexDirection: "column",
-        cursor: "pointer",
-        overflow: "hidden",
-        border: "1px solid",
-        borderColor: "divider",
-        outline: isSelected ? "2px solid" : "none",
-        outlineColor: isSelected ? "primary.main" : "transparent",
-        backgroundColor: isSelected ? "action.selected" : "background.paper",
-        "&:hover": {
-          backgroundColor: isSelected ? "action.selected" : "action.hover",
-        },
-      }}
+    <StyledColumnCard
+      ref={dragDropRef}
+      isDragging={isDragging}
+      isOver={isOver}
+      canDropHere={canDropHere}
+      isSelected={isSelected}
+      onMouseEnter={hoverColumn}
+      onMouseLeave={unhoverColumn}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
     >
@@ -385,7 +389,7 @@ const ColumnSummary = ({
           </Box>
         </Box>
       </Box>
-    </Card>
+    </StyledColumnCard>
   );
 };
 
