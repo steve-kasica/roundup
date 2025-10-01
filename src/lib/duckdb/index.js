@@ -13,3 +13,4 @@ export * from "./getColumnNames";
 export * from "./calcPackStats";
 export * from "./getMatchValues";
 export * from "./getColumnValues";
+export * from "./getStackRows";

@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
+import { useMemo } from "react";
 import useOperationData from "../../hooks/useOperationData";
 import {
   selectRemovedColumnIdsByTableId,
@@ -16,6 +17,7 @@ import {
 } from "../../slices/operationsSlice";
 import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
 import { selectTablesById } from "../../slices/tablesSlice";
+import { group } from "d3";
 
 // TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -67,12 +69,45 @@ export default function withStackOperationData(WrappedComponent) {
       selectedColumns.includes(colId) ? true : false
     );
 
+    const selection = useMemo(() => {
+      return operation.children
+        .map((tableId, rowIndex) => ({
+          tableId,
+          columnIds: columnIdMatrix[rowIndex].filter((columnId) =>
+            selectedColumns.includes(columnId)
+          ),
+        }))
+        .filter(({ columnIds }) => columnIds.length > 0);
+    }, [operation.children, columnIdMatrix, selectedColumns]);
+
+    const selectedTableIds = useMemo(() => {
+      return columnIdMatrix
+        .map((row, rowIndex) =>
+          row.some((columnId) => columnId && selectedColumns.includes(columnId))
+            ? rowIndex
+            : null
+        )
+        .filter((index) => index !== null)
+        .map((index) => operation.children[index]);
+    }, [columnIdMatrix, operation.children, selectedColumns]);
+
+    const selectedColumnIds = useMemo(() => {
+      return columnIdMatrix
+        .map((row) =>
+          row.filter((columnId) => selectedColumns.includes(columnId))
+        )
+        .filter((columnIds) => columnIds.length > 0);
+    }, [columnIdMatrix, selectedColumns]);
+
     return (
       <WrappedComponent
         operation={operation}
         depth={depth}
         columnIdMatrix={columnIdMatrix}
         selectedColumnIndices={selectedColumnIndices}
+        selectedTableIds={selectedTableIds}
+        selectedColumnIds={selectedColumnIds}
+        selection={selection}
         m={m}
         n={n}
         selectColumns={(colIds) => dispatch(setSelectedColumns(colIds))}

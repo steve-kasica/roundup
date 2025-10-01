@@ -144,10 +144,7 @@ const TableWindow = () => {
         ) : selectedTableIds.length > 1 &&
           focusedOperation.operationType === OPERATION_TYPE_STACK &&
           lod === TOGGLE_VALUES.LOW ? (
-          <StackVirtualizedTable
-            tableIds={selectedTableIds.map((t) => t.tableId)}
-            operationId={focusedOperation.id}
-          />
+          <StackVirtualizedTable id={focusedOperation.id} />
         ) : selectedTableIds.length > 1 &&
           focusedOperation.operationType === OPERATION_TYPE_PACK &&
           lod === TOGGLE_VALUES.LOW ? (

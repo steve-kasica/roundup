@@ -54,56 +54,11 @@ import {
 } from "@mui/material";
 import ColumnHeader from "../ColumnViews/ColumnHeader.jsx";
 import { usePaginatedTableRows } from "../../hooks/index.js";
-
-/**
- * Styled TableRow component with alternating row colors and hover effects
- * Provides visual feedback for row interactions
- */
-const StyledAlternatingTableRow = styled(TableRow)(({ isEven }) => ({
-  backgroundColor: isEven ? "#fff" : "#f5f5f5",
-  "&:hover": {
-    backgroundColor: isEven ? "#e3f2fd" : "#bbdefb",
-  },
-  "&:hover td": {
-    backgroundColor: "inherit", // Inherit row hover color
-  },
-  transition: "background-color 0.1s ease",
-}));
-
-/**
- * Styled TableCell with column-specific hover effects
- * Handles individual column highlighting that overrides row hover
- */
-const StyledHoverableTableCell = styled(TableCell)(
-  ({ isHovered, isEven, maxWidth = "200px" }) => ({
-    backgroundColor:
-      isHovered && isEven
-        ? "#e3f2fd"
-        : isHovered && !isEven
-        ? "#bbdefb"
-        : "transparent",
-    transition: "background-color 0.1s ease",
-    maxWidth: maxWidth, // Dynamic maximum column width
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  })
-);
-
-/**
- * Sticky row number cell that remains fixed during horizontal scrolling
- * Provides persistent row identification regardless of scroll position
- */
-const StyledStickyRowNumberCell = styled(TableCell)(() => ({
-  position: "sticky",
-  left: 0,
-  maxWidth: "10px",
-  backgroundColor: "inherit",
-  textAlign: "right",
-  color: "#888",
-  zIndex: 1,
-  borderRight: "1px solid rgba(224, 224, 224, 1)",
-}));
+import {
+  StyledAlternatingTableRow,
+  StyledTableCell,
+  StickyTableCell,
+} from "../ui/Table";
 
 /**
  * Styled header cell with sorting capabilities and hover effects
@@ -244,11 +199,9 @@ const TableRows = ({
           <TableHead>
             <TableRow>
               {/* Sticky Row Number Header */}
-              <StyledStickyRowNumberCell
-                sx={{ zIndex: 3, backgroundColor: "#f5f5f5" }}
-              >
+              <StickyTableCell sx={{ zIndex: 3, backgroundColor: "#f5f5f5" }}>
                 #
-              </StyledStickyRowNumberCell>
+              </StickyTableCell>
 
               {/* Column Headers with Sorting */}
               {selectedColumnIds.map((colId, i) => (
@@ -323,11 +276,9 @@ const TableRows = ({
                 key={`loading-${rowIndex}`}
                 isEven={rowIndex % 2 === 0}
               >
-                <StyledStickyRowNumberCell>
-                  {rowIndex + 1}
-                </StyledStickyRowNumberCell>
+                <StickyTableCell>{rowIndex + 1}</StickyTableCell>
                 {selectedColumnIds.map((colId, i) => (
-                  <StyledHoverableTableCell
+                  <StyledTableCell
                     key={colId}
                     align="center"
                     isHovered={hoveredIndex === i}
@@ -335,7 +286,7 @@ const TableRows = ({
                     maxWidth={columnWidths[colId] || "200px"}
                   >
                     <CircularProgress size={16} />
-                  </StyledHoverableTableCell>
+                  </StyledTableCell>
                 ))}
               </StyledAlternatingTableRow>
             ))
@@ -348,13 +299,11 @@ const TableRows = ({
                   isEven={rowIndex % 2 === 0}
                 >
                   {/* Row Number Cell */}
-                  <StyledStickyRowNumberCell>
-                    {rowIndex + 1}
-                  </StyledStickyRowNumberCell>
+                  <StickyTableCell>{rowIndex + 1}</StickyTableCell>
 
                   {/* Data Cells with proper formatting for different data types */}
                   {row.map((value, i) => (
-                    <StyledHoverableTableCell
+                    <StyledTableCell
                       key={selectedColumnIds[i]}
                       isHovered={hoveredIndex === i}
                       isEven={rowIndex % 2 === 0}
@@ -372,7 +321,7 @@ const TableRows = ({
                       ) : (
                         value
                       )}
-                    </StyledHoverableTableCell>
+                    </StyledTableCell>
                   ))}
                 </StyledAlternatingTableRow>
               ))}

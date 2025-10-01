@@ -35,11 +35,7 @@ const StyledColumnCard = styled(Card)(
       : isDragging
       ? "#ff9800" // warning.main
       : "#e0e0e0", // divider
-    borderStyle: isOver
-      ? "dashed"
-      : canDropHere
-      ? "dashed"
-      : "solid",
+    borderStyle: isOver ? "dashed" : canDropHere ? "dashed" : "solid",
     borderWidth: isOver || canDropHere || isDragging ? "2px" : "1px",
     outline: isSelected ? "2px solid" : "none",
     outlineColor: isSelected ? "#1976d2" : "transparent", // primary.main
