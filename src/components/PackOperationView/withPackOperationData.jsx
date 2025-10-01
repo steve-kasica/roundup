@@ -66,10 +66,8 @@ export default function withPackOperationData(WrappedComponent) {
         ...leftSelectedColumns,
         ...rightSelectedColumns,
       ];
-      console.log("selectedTableColumnIds:", selectedTableColumnIds);
       return operation.columnIds.filter((columnId) => {
         const operationColumn = selectColumnById(state, columnId);
-        console.log("operationColumn:", operationColumn, columnId);
         return selectedTableColumnIds.includes(operationColumn?.children[0]);
       });
     });

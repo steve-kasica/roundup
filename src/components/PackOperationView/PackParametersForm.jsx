@@ -16,12 +16,11 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
-import { ColumnName, EnhancedColumnName } from "../ColumnViews";
+import { EnhancedColumnName } from "../ColumnViews";
 
 /* eslint-disable react/prop-types */
 
 const PackParametersForm = ({
-  packOperation,
   operation,
   rightHandColumns,
   leftHandColumns,
@@ -95,10 +94,13 @@ const PackParametersForm = ({
         </Select>
       </FormControl>
 
-      <FormControl fullWidth error={!!errors.leftJoinKey}>
+      <FormControl
+        fullWidth
+        error={!!errors.leftJoinKey || !operation?.joinKey1}
+      >
         <InputLabel>Left Join Key</InputLabel>
         <Select
-          value={operation?.joinKey1}
+          value={operation?.joinKey1 || ""}
           onChange={(event) => setLeftTableJoinKey(event.target.value)}
           label="Left Join Key"
         >
@@ -109,15 +111,18 @@ const PackParametersForm = ({
               </MenuItem>
             ))}
         </Select>
-        {errors.leftJoinKey && (
-          <FormHelperText>{errors.leftJoinKey}</FormHelperText>
+        {!operation?.joinKey1 && (
+          <FormHelperText>{"Left join key is required"}</FormHelperText>
         )}
       </FormControl>
 
-      <FormControl fullWidth error={!!errors.rightJoinKey}>
+      <FormControl
+        fullWidth
+        error={!!errors.rightJoinKey || !operation?.joinKey2}
+      >
         <InputLabel>Right Join Key</InputLabel>
         <Select
-          value={operation?.joinKey2}
+          value={operation?.joinKey2 || ""}
           onChange={(event) => setRightTableJoinKey(event.target.value)}
           label="Right Join Key"
         >
@@ -128,8 +133,8 @@ const PackParametersForm = ({
               </MenuItem>
             ))}
         </Select>
-        {errors.rightJoinKey && (
-          <FormHelperText>{errors.rightJoinKey}</FormHelperText>
+        {!operation?.joinKey2 && (
+          <FormHelperText>{"Right join key is required"}</FormHelperText>
         )}
       </FormControl>
     </Box>

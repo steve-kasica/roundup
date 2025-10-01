@@ -1,7 +1,6 @@
 import { createAction } from "@reduxjs/toolkit";
 import { takeLatest, call, put, select, takeEvery } from "redux-saga/effects";
 import {
-  JOIN_TYPES,
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
@@ -14,13 +13,7 @@ import {
   createStackView,
   getTableDimensions,
 } from "../../lib/duckdb";
-import {
-  addColumns,
-  Column,
-  dropColumns,
-  selectColumnById,
-  selectColumnIdsByTableId,
-} from "../../slices/columnsSlice";
+import { selectColumnById } from "../../slices/columnsSlice";
 import { removeColumnsSuccessAction } from "../removeColumnsSaga";
 import { selectTablesById } from "../../slices/tablesSlice";
 
@@ -28,6 +21,45 @@ import { selectTablesById } from "../../slices/tablesSlice";
 export const updateOperationViewRequest = createAction(
   "sagas/updateOperationView/request"
 );
+
+// Watcher Saga
+// Unlike other sagas, this saga is only in charge of
+// syncing database views with operations in the redux store.
+// This it listen for actions by the operations and columns slice
+export default function* watchUpdateOperationView() {
+  yield takeLatest(updateOperationViewRequest.type, updateOperationViewSaga);
+  yield takeLatest(updateOperations.type, function* (action) {
+    const operationId = action.payload.id;
+    const updatedAttributes = Object.keys(action.payload);
+    const dependentProps = [
+      "children", // affects both stack and pack operations
+      "operationType", // affects both stack and pack operations
+      "joinType", // specific to pack operations
+      "joinKey1", // specific to pack operations
+      "joinKey2", // specific to pack operations
+      "joinPredicate", // specific to pack operations
+    ];
+
+    // If the operation has updated any of the dependent properties,
+    // update the view
+    if (updatedAttributes.some((attr) => dependentProps.includes(attr))) {
+      yield put(updateOperationViewRequest(operationId));
+    }
+  });
+
+  // After columns are removed, update the operation view if the table has one
+  yield takeEvery(removeColumnsSuccessAction.type, function* (action) {
+    const columnIds = action.payload;
+    const table = yield select((state) => {
+      const column = selectColumnById(state, columnIds[0]);
+      return selectTablesById(state, column.tableId);
+    });
+
+    if (table.operationId) {
+      yield put(updateOperationViewRequest(table.operationId));
+    }
+  });
+}
 
 // Worker Saga
 function* updateOperationViewSaga(action) {
@@ -45,6 +77,11 @@ function* updateOperationViewSaga(action) {
     const queryData = yield select((state) =>
       selectQueryData(state, operationId)
     );
+    if (operation.operationType === OPERATION_TYPE_STACK) {
+      yield call(createStackView, queryData, operation.columnIds);
+    } else if (operation.operationType === OPERATION_TYPE_PACK) {
+      yield call(createPackView, queryData, operation.columnIds);
+    }
 
     // TODO: return to this idea: how does changing an operation type
     // affect the columns associated with it?
@@ -84,7 +121,7 @@ function* updateOperationViewSaga(action) {
     //     columnIds = [...columnIds, ...additionalColumns.map(({ id }) => id)];
     //     yield put(addColumns(additionalColumns));
     //   }
-    //   yield call(createStackView, queryData, columnIds);
+
     // } else if (operation.operationType === OPERATION_TYPE_PACK) {
     //   // For pack operations, we the columns created when the operation was
     //   // created is still valid, unless the join type is going to a
@@ -165,43 +202,4 @@ function* updateOperationViewSaga(action) {
       })
     );
   }
-}
-
-// Watcher Saga
-// Unlike other sagas, this saga is only in charge of
-// syncing database views with operations in the redux store.
-// This it listen for actions by the operations and columns slice
-export default function* watchUpdateOperationView() {
-  yield takeLatest(updateOperationViewRequest.type, updateOperationViewSaga);
-  yield takeLatest(updateOperations.type, function* (action) {
-    const operationId = action.payload.id;
-    const updatedAttributes = Object.keys(action.payload);
-    const dependentProps = [
-      "children", // affects both stack and pack operations
-      "operationType", // affects both stack and pack operations
-      "joinType", // specific to pack operations
-      "joinKey1", // specific to pack operations
-      "joinKey2", // specific to pack operations
-      "joinPredicate", // specific to pack operations
-    ];
-
-    // If the operation has updated any of the dependent properties,
-    // update the view
-    if (updatedAttributes.some((attr) => dependentProps.includes(attr))) {
-      yield put(updateOperationViewRequest(operationId));
-    }
-  });
-
-  // After columns are removed, update the operation view if the table has one
-  yield takeEvery(removeColumnsSuccessAction.type, function* (action) {
-    const columnIds = action.payload;
-    const table = yield select((state) => {
-      const column = selectColumnById(state, columnIds[0]);
-      return selectTablesById(state, column.tableId);
-    });
-
-    if (table.operationId) {
-      yield put(updateOperationViewRequest(table.operationId));
-    }
-  });
 }
