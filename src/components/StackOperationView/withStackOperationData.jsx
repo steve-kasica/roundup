@@ -65,9 +65,25 @@ export default function withStackOperationData(WrappedComponent) {
 
     const m = Math.max(...columnIdMatrix.map((c) => c.length), 0);
     const n = columnIdMatrix.length;
-    const selectedColumnIndices = columnIds.map((colId) =>
-      selectedColumns.includes(colId) ? true : false
-    );
+    const selectedOperationColumnIds = useMemo(() => {
+      const ids = [];
+
+      for (let colIndex = 0; colIndex < m; colIndex++) {
+        const allSelected = columnIdMatrix.every((row) => {
+          const columnId = row[colIndex];
+          return columnId === null || selectedColumns.includes(columnId);
+        });
+
+        if (
+          allSelected &&
+          columnIdMatrix.some((row) => row[colIndex] !== null)
+        ) {
+          ids.push(operation.columnIds[colIndex]);
+        }
+      }
+
+      return ids;
+    }, [columnIdMatrix, operation.columnIds, selectedColumns, m]);
 
     const selection = useMemo(() => {
       return operation.children
@@ -104,7 +120,8 @@ export default function withStackOperationData(WrappedComponent) {
         operation={operation}
         depth={depth}
         columnIdMatrix={columnIdMatrix}
-        selectedColumnIndices={selectedColumnIndices}
+        selectedColumnIndices={null} // @deprecated selectedOperationColumnIndices
+        selectedOperationColumnIds={selectedOperationColumnIds}
         selectedTableIds={selectedTableIds}
         selectedColumnIds={selectedColumnIds}
         selection={selection}

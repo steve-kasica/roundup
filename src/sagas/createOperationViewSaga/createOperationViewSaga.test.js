@@ -391,7 +391,9 @@ describe("createOperationViewSaga", () => {
           action.type === updateOperations.type && action.payload.error
       );
       expect(errorAction).toBeDefined();
-      expect(errorAction.payload.error).toContain("Cannot read properties of undefined");
+      expect(errorAction.payload.error).toContain(
+        "Cannot read properties of undefined"
+      );
 
       // Should not dispatch success action
       const successAction = dispatched.find(

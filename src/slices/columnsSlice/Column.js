@@ -97,7 +97,8 @@ export default function Column(
     q50: null,
     q75: null,
     std: null,
-  }
+  },
+  children = null
 ) {
   if (tableId === undefined) {
     throw new Error("Param undefined `tableId`");
@@ -109,6 +110,7 @@ export default function Column(
 
   return {
     id, // id is immutable and used as the unique identifier for table columns
+    children, // operation columns have children, to be defined later (if applicable)
     tableId, // tableId is immutable and used to identify the table the column belongs to. Columns do not transfer between tables in this application.
     index,
     name: summary.name, // name is mutable and can be changed by the user
@@ -141,6 +143,7 @@ const attributes = [
   "totalRows",
   "nonNullValues",
   "values",
+  "children",
 ];
 
 /**
@@ -154,6 +157,15 @@ export const isColumn = (obj) =>
   typeof obj === "object" &&
   Object.keys(obj).length > 0 &&
   attributes.every((key) => key in obj);
+
+/**
+ * Checks if an object is an operation column (a column with children).
+ *
+ * @param {Object} obj - The object to check.
+ * @returns {boolean} True if the object matches the structure of a Column, false otherwise.
+ */
+export const isOperationColumn = (obj) =>
+  isColumn(obj) && Array.isArray(obj.children) && obj.children.length > 0;
 
 /**
  * Performs a shallow equality comparison between two Column instances.

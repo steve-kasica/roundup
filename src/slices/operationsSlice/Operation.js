@@ -34,7 +34,7 @@ export const JOIN_PREDICATES = {
 
 let idCounter = 0; // each node gets a unique ID, regardless if it's a table vs operation node
 
-export default function Operation(operationType, children) {
+export default function Operation(operationType, children, columnIds = []) {
   // If the supplied operation type is not one of the valid
   // operation types, then throw an error
   if (!validOperationTypes.includes(operationType)) {
@@ -45,6 +45,7 @@ export default function Operation(operationType, children) {
   return {
     id, // ID is immutable and unique
     name: id, // Name is the same as ID by default, can be changed later
+    columnIds,
     rowCount: null,
     operationType,
     children,

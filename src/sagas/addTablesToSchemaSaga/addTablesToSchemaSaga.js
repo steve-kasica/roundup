@@ -32,15 +32,7 @@ import {
 import Operation, {
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice/Operation";
-import {
-  clearSelectedTables,
-  setSelectedTables,
-  updateTables,
-} from "../../slices/tablesSlice";
-import {
-  selectColumnIdsByTableId,
-  setSelectedColumns,
-} from "../../slices/columnsSlice";
+import { clearSelectedTables, updateTables } from "../../slices/tablesSlice";
 
 /**
  * Action creator for adding a table to a schema.

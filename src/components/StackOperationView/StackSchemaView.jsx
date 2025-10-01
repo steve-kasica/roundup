@@ -37,27 +37,43 @@ const StackSchemaView = withStackOperationData(
 
     const onCellClick = useCallback(
       (event, columnId) => {
-        let anchorIndex, extentIndex;
+        const currentPosition = getIndexOfValue(columnIdMatrix, columnId);
+        if (!currentPosition) return; // Column not found in matrix
+
+        const [currentRow] = currentPosition;
+        let anchorPosition, extentPosition;
+
         if (event.shiftKey && selectionAnchorCell) {
-          // Shift+Click: select range from anchor to extent
-          extentIndex = getIndexOfValue(columnIdMatrix, columnId);
-          anchorIndex = selectionAnchorCell;
-          selectColumns(
-            getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
-          );
+          // Shift+Click: select range from anchor to extent, but only within the same table (row)
+          const [anchorRow] = selectionAnchorCell;
+
+          // Only allow shift selection within the same row (same table)
+          if (anchorRow === currentRow) {
+            anchorPosition = selectionAnchorCell;
+            extentPosition = currentPosition;
+            selectColumns(
+              getValuesInRange(columnIdMatrix, anchorPosition, extentPosition)
+            );
+          } else {
+            // Different row/table: treat as single click
+            anchorPosition = currentPosition;
+            extentPosition = currentPosition;
+            selectColumns(columnId);
+          }
         } else if (event.metaKey || event.ctrlKey) {
-          // Cmd/Ctrl+Click: toggle selection
-          // TODO: decide if we want to toggle selection
-          // It kind of makes sense to just work on contiguous selections
-          // in this context, so we might not need this
+          // Cmd/Ctrl+Click: not allowed for cross-table selection
+          // Treat as single click instead
+          anchorPosition = currentPosition;
+          extentPosition = currentPosition;
+          selectColumns(columnId);
         } else {
           // Single click: select only this column, also handles initial shift clicks
-          anchorIndex = getIndexOfValue(columnIdMatrix, columnId);
-          extentIndex = anchorIndex;
+          anchorPosition = currentPosition;
+          extentPosition = currentPosition;
           selectColumns(columnId);
         }
-        setSelectionExtentCell(extentIndex);
-        setSelectionAnchorCell(anchorIndex);
+        setSelectionExtentCell(extentPosition);
+        setSelectionAnchorCell(anchorPosition);
       },
       [columnIdMatrix, selectionAnchorCell, selectColumns]
     );
@@ -71,53 +87,34 @@ const StackSchemaView = withStackOperationData(
     const onRowLabelClick = useCallback(
       (event, rowIndex) => {
         const currentRowGroup = columnIdMatrix[rowIndex];
+        const isLastTable = rowIndex === columnIdMatrix.length - 1;
 
         if (event.shiftKey && selectionAnchorCell !== null) {
-          // Shift+Click: select range of row groups from anchor to extent
-          const anchorIndex = selectionAnchorCell;
-          const extentIndex = rowIndex;
-          const startIndex = Math.min(anchorIndex, extentIndex);
-          const endIndex = Math.max(anchorIndex, extentIndex);
-
-          // Collect all columns in the range of row groups
-          const rangeColumns = [];
-          for (let i = startIndex; i <= endIndex; i++) {
-            rangeColumns.push(...columnIdMatrix[i]);
-          }
-
-          selectColumns(rangeColumns);
-          setSelectionExtentCell(extentIndex);
-        } else if (event.metaKey || event.ctrlKey) {
-          // Cmd/Ctrl+Click: toggle selection of this row group
-          const currentlySelectedColumns = selectedColumns || [];
-          const isRowGroupSelected = currentRowGroup.every((colId) =>
-            currentlySelectedColumns.includes(colId)
-          );
-
-          if (isRowGroupSelected) {
-            // Remove this row group from selection
-            const newSelection = currentlySelectedColumns.filter(
-              (colId) => !currentRowGroup.includes(colId)
-            );
-            selectColumns(newSelection);
+          // Special case: if shift-clicking on the last table, select all columns
+          if (isLastTable) {
+            const allColumns = columnIdMatrix.flat();
+            selectColumns(allColumns);
+            setSelectionAnchorCell(rowIndex);
+            setSelectionExtentCell(rowIndex);
           } else {
-            // Add this row group to selection
-            const newSelection = [
-              ...new Set([...currentlySelectedColumns, ...currentRowGroup]),
-            ];
-            selectColumns(newSelection);
+            // For other tables, treat shift-click as single click (no cross-table selection)
+            selectColumns(currentRowGroup);
+            setSelectionAnchorCell(rowIndex);
+            setSelectionExtentCell(rowIndex);
           }
-
+        } else if (event.metaKey || event.ctrlKey) {
+          // For all tables, treat ctrl/cmd-click as single click (no cross-table selection)
+          selectColumns(currentRowGroup);
           setSelectionAnchorCell(rowIndex);
           setSelectionExtentCell(rowIndex);
         } else {
-          // Single click: select only this row group, also handles initial shift clicks
+          // Single click: select only this row group for all tables
           selectColumns(currentRowGroup);
           setSelectionAnchorCell(rowIndex);
           setSelectionExtentCell(rowIndex);
         }
       },
-      [columnIdMatrix, selectionAnchorCell, selectColumns, selectedColumns]
+      [columnIdMatrix, selectionAnchorCell, selectColumns]
     );
 
     const onColumnLabelClick = useCallback(
