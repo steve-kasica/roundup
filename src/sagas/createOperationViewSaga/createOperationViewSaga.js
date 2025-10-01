@@ -32,9 +32,6 @@ export const createOperationViewSuccess = createAction(
 );
 
 // Watcher Saga
-// Unlike other sagas, this saga is only in charge of
-// syncing database views with operations in the redux store.
-// This it listen for actions by the operations slice
 export default function* createOperationViewSaga() {
   yield takeEvery(createOperationView.type, createOperationViewSagaWorker);
   yield takeEvery(addOperation.type, function* (action) {
@@ -44,7 +41,7 @@ export default function* createOperationViewSaga() {
 }
 
 // Worker Saga
-function* createOperationViewSagaWorker(action) {
+export function* createOperationViewSagaWorker(action) {
   const operationId = action.payload;
   try {
     const operation = yield select((state) =>
@@ -52,165 +49,177 @@ function* createOperationViewSagaWorker(action) {
     );
 
     if (operation.operationType === OPERATION_TYPE_NO_OP) {
-      // No operation view needed for NO_OP, just return
-      return;
+      return; // No operation view needed for NO_OP
     }
+
     const queryData = yield select((state) =>
       selectQueryData(state, operationId)
     );
 
-    let columns;
-    // createStackView execute a view creation/update query
+    // Create operation view based on type
     if (operation.operationType === OPERATION_TYPE_PACK) {
-      columns = yield select((state) => {
-        const columnIds = operation.children
-          .map((id) => selectColumnIdsByTableId(state, id))
-          .flat();
-        const oldColumns = columnIds.map((id) => selectColumnById(state, id));
-        const newColumns = oldColumns.map((column, i) =>
-          Column(operationId, i, column.name, column.columnType)
-        );
-        return newColumns;
-      });
-      yield put(addColumns(columns)); // Pre-add columns so they exist for the view creation
-
-      yield call(
-        createPackView,
-        queryData,
-        columns.map(({ id }) => id)
-      );
+      yield call(createPackOperationView, operation, queryData);
     } else if (operation.operationType === OPERATION_TYPE_STACK) {
-      columns = yield select((state) => {
-        const columnIds = selectColumnIdsByTableId(
-          state,
-          operation.children[0]
-        );
-        // TODO: what if column is removed?
-        const oldColumns = columnIds.map((id) => selectColumnById(state, id));
-        const newColumns = oldColumns.map((column, i) =>
-          Column(operationId, i, column.name, column.columnType)
-        );
-        return newColumns;
-      });
-      yield put(addColumns(columns)); // Pre-add columns so they exist for the view creation
-
-      // includes stack and NO_OP
-      // TODO: why does it do NO_OP and how does it not break?
-      yield call(
-        createStackView,
-        queryData,
-        columns.map(({ id }) => id)
-      );
+      yield call(createStackOperationView, operation, queryData);
     } else {
-      return; // No view creation needed for other operation types
+      throw new Error("Unsupported operation type");
     }
 
-    // Get dimensions of the operation view
-    // This will throw an error if the operation has no rows or columns
-    const { rowCount, columnCount } = yield call(
-      getTableDimensions,
-      operationId
-    );
-    validateOperationDimensions(operationId, { rowCount, columnCount });
-    yield put(
-      updateOperations({
-        id: operationId,
-        rowCount,
-      })
-    );
+    // Validate and update operation dimensions
+    yield call(validateAndUpdateOperationDimensions, operationId);
 
-    if (operation.error) {
-      // Clear any previous error if the operation was successful
-      yield put(updateOperations({ id: operationId, error: null }));
-    }
-
-    yield put(
-      createOperationViewSuccess({
-        operationId,
-        operationType: operation.operationType,
-      })
-    );
+    // Clear any previous errors and dispatch success
+    yield call(handleOperationSuccess, operation);
   } catch (error) {
     console.error("Error creating operation view:", error);
-    yield put(
-      updateOperations({
-        id: operationId,
-        error: JSON.stringify(error, Object.getOwnPropertyNames(error)), // Serialize the error
-      })
-    );
-  } finally {
-    // // If an error occurs, we still need to update columns associated with this operation
-    // // Create or update columns associated with this operation / view
-    // const sliceColumns = yield select((state) =>
-    //   selectColumnIdsByTableId(state, operationId).map((columnId) =>
-    //     selectColumnById(state, columnId)
-    //   )
-    // );
-    // const dbColumns = yield* getDefaultColumns(operationId);
-    // if (sliceColumns.length === 0 && dbColumns.length > 0) {
-    //   // If operation/view is being created, then no columns exist, create columns
-    //   yield put(addColumns(dbColumns));
-    //   // Name the columns
-    // } else if (sliceColumns.length > 0 && dbColumns.length === 0) {
-    //   console.log(
-    //     "WOAH! No columns in the database for operation",
-    //     operationId
-    //   );
-    // } else if (sliceColumns.length === 0 && dbColumns.length === 0) {
-    //   console.log(
-    //     "WOAH! No columns in the slice or database for operation",
-    //     operationId
-    //   );
-    // } else {
-    //   // We're updating an existing operation/view b/c there are columns in the slice
-    //   // and in the database, so we need to reconcile them
-    //   // This is a bit more complex, since we need to check if columns exist in both.
-    //   const columnsToAdd = [];
-    //   const columnsToRemove = [];
-    //   const columnsToUpdate = [];
-    //   for (
-    //     let i = 0;
-    //     i < Math.max(sliceColumns.length, dbColumns.length);
-    //     i++
-    //   ) {
-    //     const sliceColumn = sliceColumns[i];
-    //     const dbColumn = dbColumns[i];
-    //     if (sliceColumn && dbColumn) {
-    //       if (!areColumnsEqual(sliceColumn, dbColumn)) {
-    //         // If both slice and db columns exist but are not equal, reconcile by updating the slice column
-    //         columnsToUpdate.push({
-    //           id: sliceColumn.id,
-    //           name: sliceColumn.name, // priority to slice column name, since user may have renamed it
-    //           columnType: dbColumn.columnType, // keep the db column type
-    //           index: dbColumn.index, // keep the db column index
-    //         });
-    //       }
-    //     } else if (sliceColumn && !dbColumn) {
-    //       // If there's a slice column at this index but no db column, remove it
-    //       columnsToRemove.push(sliceColumn);
-    //     } else if (!sliceColumn && dbColumn) {
-    //       // If there's a db column at this index but no slice column, add it
-    //       columnsToAdd.push(dbColumn);
-    //     }
-    //   }
-    //   //      yield put(removeColumns(columnsToRemove));
-    //   yield put(addColumns(columnsToAdd));
-    //   yield put(updateColumns(columnsToUpdate));
-    // } // end else block
-  } // end finally block
+    yield call(handleOperationError, operationId, error);
+  }
 }
 
-function* getDefaultColumns(parentId) {
-  const columnIds = yield call(getColumnNames, parentId);
-  const columnNames = yield select((state) =>
-    columnIds.map((id) => selectColumnById(state, id).name)
+/**
+ * Creates a PACK operation view with unified columns from all child tables
+ */
+function* createPackOperationView(operation, queryData) {
+  const { id: operationId, children } = operation;
+
+  // Get all column IDs from all child tables and flatten them
+  const oldColumns = yield select((state) => {
+    const columns = children
+      .map((id) => selectColumnIdsByTableId(state, id))
+      .flat()
+      .map((id) => selectColumnById(state, id));
+    return columns;
+  });
+
+  // Create new columns for the pack operation
+  const operationColumns = oldColumns.map((column, i) =>
+    Column(
+      operationId,
+      i,
+      {
+        name: column.name,
+        columnType: COLUMN_TYPE_CATEGORICAL, // Default to categorical for pack operation
+      },
+      [column.id]
+    )
   );
-  return columnNames.map((name, i) =>
-    Column(parentId, i, name, COLUMN_TYPE_CATEGORICAL)
+
+  // Pre-add columns so they exist for the view creation
+  yield put(addColumns(operationColumns));
+
+  // Update the operation with the new column IDs
+  yield put(
+    updateOperations({
+      id: operationId,
+      columnIds: operationColumns.map((c) => c.id),
+    })
+  );
+
+  // Create the pack view in the database
+  yield call(
+    createPackView,
+    queryData,
+    operationColumns.map(({ id }) => id)
   );
 }
 
-// TODO: this would be like a serialize operation query selector in the operations slice
+/**
+ * Creates a STACK operation view using columns from the first child table
+ */
+function* createStackOperationView(operation, queryData) {
+  const { id: operationId, children } = operation;
+
+  // Use columns from the first child table as the template
+  const childColumns = yield select((state) => {
+    const columnIdMatrix = children.map((childId) => {
+      const columnIds = selectColumnIdsByTableId(state, childId).map((id) =>
+        selectColumnById(state, id)
+      );
+      return columnIds;
+    });
+    return columnIdMatrix;
+  });
+
+  // Create new columns for the stack operation
+  // TODO: dynamically set the column type based on child columns and
+  // the names
+  const operationColumns = childColumns[0].map((column, i) =>
+    Column(
+      operationId,
+      i,
+      {
+        name: column.name,
+        columnType: COLUMN_TYPE_CATEGORICAL, // Default to categorical for stack operation
+      },
+      childColumns.map((row) => row[i]?.id).filter((id) => id) // child column IDs for this operation column
+    )
+  );
+
+  // Pre-add columns so they exist for the view creation
+  yield put(addColumns(operationColumns));
+
+  // Update the operation with the new column IDs
+  yield put(
+    updateOperations({
+      id: operationId,
+      columnIds: operationColumns.map((c) => c.id),
+    })
+  );
+
+  // Create the stack view in the database
+  // TODO: Investigate why this handles NO_OP and how it doesn't break
+  yield call(
+    createStackView,
+    queryData,
+    operationColumns.map(({ id }) => id)
+  );
+}
+
+/**
+ * Validates operation dimensions and updates the operation with row count
+ */
+function* validateAndUpdateOperationDimensions(operationId) {
+  // Get dimensions of the operation view
+  const { rowCount, columnCount } = yield call(getTableDimensions, operationId);
+
+  // This will throw an error if validation fails
+  validateOperationDimensions(operationId, { rowCount, columnCount });
+
+  // Update the operation with the row count
+  yield put(updateOperations({ id: operationId, rowCount }));
+}
+
+/**
+ * Handles successful operation creation
+ */
+function* handleOperationSuccess(operation) {
+  const { id: operationId, operationType, error } = operation;
+
+  // Clear any previous error if the operation was successful
+  if (error) {
+    yield put(updateOperations({ id: operationId, error: null }));
+  }
+
+  // Dispatch success action
+  yield put(createOperationViewSuccess({ operationId, operationType }));
+}
+
+/**
+ * Handles operation creation errors
+ */
+function* handleOperationError(operationId, error) {
+  yield put(
+    updateOperations({
+      id: operationId,
+      error: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+    })
+  );
+}
+
+/**
+ * Selector to build query data for an operation
+ * TODO: This could be moved to a selector in the operations slice
+ */
 export const selectQueryData = (state, operationId) => {
   const operation = selectOperation(state, operationId);
   const parent = { ...operation };
@@ -221,7 +230,10 @@ export const selectQueryData = (state, operationId) => {
   return parent;
 };
 
-// Helper function to validate operation dimensions
+/**
+ * Helper function to validate operation dimensions
+ * Throws an error if dimensions are invalid
+ */
 function validateOperationDimensions(operationId, dimensions) {
   if (dimensions.rowCount === 0) {
     throw new Error(
