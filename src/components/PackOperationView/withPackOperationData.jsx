@@ -11,7 +11,10 @@ import {
   selectColumnIdsByTableId,
   setSelectedColumns,
 } from "../../slices/columnsSlice";
-import { selectSelectedColumns } from "../../slices/columnsSlice/columnSelectors";
+import {
+  selectColumnById,
+  selectSelectedColumns,
+} from "../../slices/columnsSlice/columnSelectors";
 import { selectTablesById } from "../../slices/tablesSlice";
 
 export default function withPackOperationData(WrappedComponent) {
@@ -58,6 +61,19 @@ export default function withPackOperationData(WrappedComponent) {
       return rightTableColumns.includes(columnId);
     });
 
+    const selectedOperationColumnIds = useSelector((state) => {
+      const selectedTableColumnIds = [
+        ...leftSelectedColumns,
+        ...rightSelectedColumns,
+      ];
+      console.log("selectedTableColumnIds:", selectedTableColumnIds);
+      return operation.columnIds.filter((columnId) => {
+        const operationColumn = selectColumnById(state, columnId);
+        console.log("operationColumn:", operationColumn, columnId);
+        return selectedTableColumnIds.includes(operationColumn?.children[0]);
+      });
+    });
+
     // Get left and right table data to extract row counts
     const leftTable = useSelector((state) =>
       selectTablesById(state, operation?.children[0])
@@ -92,6 +108,7 @@ export default function withPackOperationData(WrappedComponent) {
         rightColumns={rightHandColumns}
         leftSelectedColumns={leftSelectedColumns}
         rightSelectedColumns={rightSelectedColumns}
+        selectedOperationColumnIds={selectedOperationColumnIds}
         // Pack-specific join dispatchers
         setJoinType={setJoinType}
         setLeftTableJoinKey={(columnId) => {

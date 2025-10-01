@@ -107,20 +107,30 @@ function* createPackOperationView(operation, queryData) {
   // Pre-add columns so they exist for the view creation
   yield put(addColumns(operationColumns));
 
-  // Update the operation with the new column IDs
-  yield put(
-    updateOperations({
-      id: operationId,
-      columnIds: operationColumns.map((c) => c.id),
-    })
-  );
-
   // Create the pack view in the database
-  yield call(
-    createPackView,
-    queryData,
-    operationColumns.map(({ id }) => id)
-  );
+  try {
+    yield call(
+      createPackView,
+      queryData,
+      operationColumns.map(({ id }) => id)
+    );
+  } catch (error) {
+    console.error("Error creating pack view:", error);
+    yield put(
+      updateOperations({
+        id: operationId,
+        error: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+      })
+    );
+  } finally {
+    // Update the operation with the new column IDs
+    yield put(
+      updateOperations({
+        id: operationId,
+        columnIds: operationColumns.map((c) => c.id),
+      })
+    );
+  }
 }
 
 /**

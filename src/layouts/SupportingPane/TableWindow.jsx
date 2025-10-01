@@ -26,7 +26,7 @@ import {
   selectFocusedOperationId,
   selectOperation,
 } from "../../slices/operationsSlice";
-import { EnhancedPackVirtualTable } from "../../components/PackOperationView/PackVirtualTable";
+import { EnhancedPackVirtualTable } from "../../components/PackOperationView";
 
 const TOGGLE_VALUES = {
   LOW: "Low",

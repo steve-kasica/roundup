@@ -12,7 +12,7 @@
  * - COLUMN_TYPE_NUMERICAL: String constant "NUMERICAL" for numerical columns.
  * - COLUMN_TYPES: Array of valid column types (["NUMERICAL", "CATEGORICAL"]).
  *
- * - Column(tableId, index, name, columnType):
+ * - Column(tableId, index, summary, children):
  *     Factory function to create a new column object with a unique ID, associated table ID, name, index, type,
  *     and an empty values object. Throws an error if required parameters are missing or if columnType is invalid.
  *
