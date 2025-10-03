@@ -13,6 +13,7 @@ import withPackOperationData from "./withPackOperationData";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { usePackStats } from "../../hooks/usePackStats";
 import { TableRowMatches } from "../TableView";
+import { JOIN_TYPES } from "../../slices/operationsSlice";
 
 const matchLablels = new Map([
   ["one_to_one_matches", "1:1"],
@@ -40,6 +41,8 @@ const PackSchemaView = withPackOperationData(
     leftKey,
     rightKey,
     columnCount,
+    // functions
+    setJoinType,
   }) => {
     // Add hover state for coordinating between tables
     const [hoveredMatch, setHoveredMatch] = useState(null);
@@ -78,7 +81,54 @@ const PackSchemaView = withPackOperationData(
       });
     }, [data]);
 
-    useEffect(() => {}, [toggledMatches]);
+    // Calculate join type based on toggled matches
+    useEffect(() => {
+      const signature = (function (
+        one_to_one,
+        one_to_n,
+        n_to_one,
+        n_to_n,
+        one_to_zero,
+        zero_to_one
+      ) {
+        let sig = "";
+        sig += one_to_zero ? "1" : "0";
+        sig += one_to_one || one_to_n || n_to_one || n_to_n ? "1" : "0";
+        sig += zero_to_one ? "1" : "0";
+        return sig;
+      })(
+        toggledMatches.one_to_one_matches,
+        toggledMatches.one_to_many_matches,
+        toggledMatches.many_to_one_matches,
+        toggledMatches.many_to_many_matches,
+        toggledMatches.one_to_zero_matches,
+        toggledMatches.zero_to_one_matches
+      );
+
+      const joinType = (function (sig) {
+        switch (sig) {
+          case "111":
+            return JOIN_TYPES.FULL_OUTER;
+          case "110":
+            return JOIN_TYPES.LEFT_OUTER;
+          case "101":
+            return JOIN_TYPES.FULL_ANTI;
+          case "100":
+            return JOIN_TYPES.LEFT_ANTI;
+          case "011":
+            return JOIN_TYPES.RIGHT_OUTER;
+          case "010":
+            return JOIN_TYPES.INNER;
+          case "001":
+            return JOIN_TYPES.RIGHT_ANTI;
+          case "000":
+          default:
+            return JOIN_TYPES.EMPTY;
+        }
+      })(signature);
+
+      setJoinType(joinType);
+    }, [setJoinType, toggledMatches]);
 
     // Coordinated hover handlers
     const handleBlockEnter = useCallback((event, key) => {
@@ -213,6 +263,9 @@ const PackSchemaView = withPackOperationData(
             {operation.name}
           </Typography>
           <Box display="flex" alignItems="center" gap={1}>
+            <Typography variant="body2" color="textSecondary">
+              {operation.joinType}
+            </Typography>
             <Chip
               label={`${totalRows.toLocaleString()} rows`}
               size="small"
