@@ -21,21 +21,27 @@ import {
 import { group } from "d3";
 import { useState } from "react";
 import {
+  isOperationId,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectFocusedOperationId,
   selectOperation,
 } from "../../slices/operationsSlice";
 import { EnhancedPackVirtualTable } from "../../components/PackOperationView";
+import { isTableId } from "../../slices/tablesSlice";
+import { EnhancedOperationLabel } from "../../components/OperationView";
 
-const TOGGLE_VALUES = {
-  LOW: "Low",
-  HIGH: "High",
-};
+// const TOGGLE_VALUES = {
+//   LOW: "Low",
+//   HIGH: "High",
+// };
 
 const TableWindow = () => {
-  const [lod, setLod] = useState(TOGGLE_VALUES.LOW); // Sets low as default
-  const [viewsSynced, setViewsSynced] = useState(true); // Default to synced views
+  // const [lod, setLod] = useState(TOGGLE_VALUES.LOW); // Sets low as default
+  // const [viewsSynced, setViewsSynced] = useState(true); // Default to synced views
+  // TODO: I'm not doing the selectedTableIds any more
+  // Rather this component just need to know if it show show a table, a stack table, or a
+  // pack table.
   const selectedTableIds = useSelector((state) => {
     const selectedColumnIds = selectSelectedColumns(state);
     const columns = selectedColumnIds.map((columnId) =>
@@ -86,11 +92,13 @@ const TableWindow = () => {
               >
                 No Table Selected
               </Typography>
-            ) : (
-              <EnhancedTableLabel id={selectedTableIds?.[0]?.tableId} />
-            )}
+            ) : isTableId(selectedTableIds?.[0]?.tableId) ? (
+              <EnhancedTableLabel id={selectedTableIds[0].tableId} />
+            ) : isOperationId(selectedTableIds?.[0]?.tableId) ? (
+              <EnhancedOperationLabel id={selectedTableIds[0].tableId} />
+            ) : null}
           </Stack>
-          <Stack direction="row" spacing={2} alignItems="center">
+          {/* <Stack direction="row" spacing={2} alignItems="center">
             <ToggleButtonGroup
               size="small"
               exclusive
@@ -124,7 +132,7 @@ const TableWindow = () => {
                 },
               }}
             />
-          </Stack>
+          </Stack> */}
         </Box>
       </Box>
       <Divider />
@@ -139,15 +147,14 @@ const TableWindow = () => {
           <Typography variant="h6" align="center" sx={{ mt: 2 }}>
             No columns selected. Please select columns from the schema window.
           </Typography>
-        ) : selectedTableIds.length === 1 && lod === TOGGLE_VALUES.LOW ? (
+        ) : selectedTableIds.length === 1 && !focusedOperation ? (
           <EnhancedTableRows id={selectedTableIds[0].tableId} />
-        ) : selectedTableIds.length > 1 &&
+        ) : selectedTableIds.length > 0 &&
           focusedOperation.operationType === OPERATION_TYPE_STACK &&
           lod === TOGGLE_VALUES.LOW ? (
           <StackVirtualizedTable id={focusedOperation.id} />
-        ) : selectedTableIds.length > 1 &&
-          focusedOperation.operationType === OPERATION_TYPE_PACK &&
-          lod === TOGGLE_VALUES.LOW ? (
+        ) : selectedTableIds.length > 0 &&
+          focusedOperation.operationType === OPERATION_TYPE_PACK ? (
           <EnhancedPackVirtualTable id={focusedOperation.id} />
         ) : (
           <Typography variant="h6" align="center" sx={{ mt: 2 }}>

@@ -26,6 +26,7 @@ export default function withPackOperationData(WrappedComponent) {
     const operation = useSelector((state) => selectOperation(state, id));
 
     // Pack-specific data
+    // @deprecated
     const isPack = operation?.operationType === OPERATION_TYPE_PACK;
 
     const setJoinType = useCallback(
@@ -47,6 +48,20 @@ export default function withPackOperationData(WrappedComponent) {
       selectColumnIdsByTableId(state, operation?.children[1])
     );
 
+    const tableToOpColumnMap = new Map();
+    leftHandColumns.forEach((colId, i) => {
+      tableToOpColumnMap.set(colId, {
+        columnId: operation.columnIds[i],
+        tableId: operation.children[0],
+      });
+    });
+    rightHandColumns.forEach((colId, i) => {
+      tableToOpColumnMap.set(colId, {
+        columnId: operation.columnIds[i + (leftHandColumns?.length || 0)],
+        tableId: operation.children[1],
+      });
+    });
+
     // Get all selected columns from Redux store
     const allSelectedColumns = useSelector(selectSelectedColumns);
 
@@ -61,16 +76,9 @@ export default function withPackOperationData(WrappedComponent) {
       return rightTableColumns.includes(columnId);
     });
 
-    const selectedOperationColumnIds = useSelector((state) => {
-      const selectedTableColumnIds = [
-        ...leftSelectedColumns,
-        ...rightSelectedColumns,
-      ];
-      return operation.columnIds.filter((columnId) => {
-        const operationColumn = selectColumnById(state, columnId);
-        return selectedTableColumnIds.includes(operationColumn?.children[0]);
-      });
-    });
+    const selectedOperationColumnIds = operation.columnIds.filter((columnid) =>
+      allSelectedColumns.includes(columnid)
+    );
 
     // Get left and right table data to extract row counts
     const leftTable = useSelector((state) =>
@@ -100,6 +108,7 @@ export default function withPackOperationData(WrappedComponent) {
         leftRowCount={leftRowCount}
         rightRowCount={rightRowCount}
         isPack={isPack}
+        tableToOpColumnMap={tableToOpColumnMap}
         leftHandColumns={leftHandColumns} // Deprecated, use leftColumns
         leftColumns={leftHandColumns}
         rightHandColumns={rightHandColumns} // Deprecated, use rightColumns
@@ -142,12 +151,7 @@ export default function withPackOperationData(WrappedComponent) {
             })
           )
         }
-        selectColumns={useCallback(
-          (columnIds) => {
-            dispatch(setSelectedColumns(columnIds));
-          },
-          [dispatch]
-        )}
+        selectColumns={(columnIds) => dispatch(setSelectedColumns(columnIds))}
       />
     );
   }

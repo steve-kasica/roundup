@@ -10,13 +10,18 @@ const TableLabel = ({
   onClick = () => {},
   includeDimensions = true,
   includeIcon = true,
+  sx = {},
 }) => {
-  const rowCount = formatNumber(table.rowCount);
+  const rowCount = formatNumber(table?.rowCount || 0);
   return (
     <Stack direction={"row"} spacing={1} alignItems="center" onClick={onClick}>
       {includeIcon && <TableChart />}
-      <Typography variant="h6" component="div" sx={{ userSelect: "none" }}>
-        {table.name}{" "}
+      <Typography
+        variant="h6"
+        component="div"
+        sx={{ userSelect: "none", ...sx }}
+      >
+        {table?.name}{" "}
         {includeDimensions && (
           <small>
             ({columnCount} x {rowCount})

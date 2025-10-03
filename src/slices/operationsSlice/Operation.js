@@ -55,7 +55,7 @@ export default function Operation(operationType, children, columnIds = []) {
     // since they have similar but different schema?
     // Maybe they can "inherit" from a generic operation factory
     // It's like inheritance in functional programming.
-    joinType: OPERATION_TYPE_PACK ? JOIN_TYPES.INNER : undefined,
+    joinType: OPERATION_TYPE_PACK ? JOIN_TYPES.FULL_OUTER : undefined,
     joinPredicate: OPERATION_TYPE_PACK ? JOIN_PREDICATES.EQUALS : undefined,
     joinKey1: null,
     joinKey2: null,

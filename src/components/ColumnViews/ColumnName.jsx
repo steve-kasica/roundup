@@ -2,7 +2,14 @@
 import { Typography } from "@mui/material";
 import withColumnData from "./withColumnData";
 
-const ColumnName = ({ id, column, onClick, sx = {} }) => {
+const ColumnName = ({
+  id,
+  column,
+  onClick,
+  sx = {},
+  selectedSx = {},
+  isSelected,
+}) => {
   const handleClick = (event) => {
     if (onClick) {
       onClick(event, column?.id);
@@ -15,6 +22,7 @@ const ColumnName = ({ id, column, onClick, sx = {} }) => {
       sx={{
         cursor: onClick ? "pointer" : "default",
         transition: "color 0.2s ease, text-decoration 0.2s ease",
+        userSelect: "none",
         "&:hover": onClick
           ? {
               color: "primary.main",
@@ -22,6 +30,7 @@ const ColumnName = ({ id, column, onClick, sx = {} }) => {
             }
           : {},
         ...sx,
+        ...(isSelected && selectedSx ? selectedSx : {}), // Apply selected styles if isSelected is true
       }}
     >
       {column?.name || id}

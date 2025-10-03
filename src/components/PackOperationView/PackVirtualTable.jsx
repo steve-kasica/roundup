@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import { useRef, useCallback, useEffect } from "react";
 import {
   TableBody,
   TableCell,
@@ -16,7 +17,7 @@ import { EnhancedColumnName } from "../ColumnViews";
 import withPackOperationData from "./withPackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import { StickyTableCell, StyledAlternatingTableRow } from "../ui/Table";
-
+import { EnhancedTableLabel } from "../TableView";
 /**
  * Virtualized table view for stack operations
  * Supports synchronized or sequential scrolling/loading of multiple tables
@@ -24,14 +25,40 @@ import { StickyTableCell, StyledAlternatingTableRow } from "../ui/Table";
  * @returns
  */
 const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
-  const { data, loading, error } = usePaginatedTableRows(
+  const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
     operation.id,
     selectedOperationColumnIds,
     50
   );
 
+  const tableContainerRef = useRef(null);
+  console.log(selectedOperationColumnIds);
+
+  // Scroll handler for lazy loading
+  const handleScroll = useCallback(() => {
+    const container = tableContainerRef.current;
+    if (!container || loading || !hasMore) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    // Trigger load more when scrolled to within 100px of bottom
+    const threshold = 100;
+    if (scrollTop + clientHeight >= scrollHeight - threshold) {
+      loadMore();
+    }
+  }, [loadMore, loading, hasMore]);
+
+  // Set up scroll listener
+  useEffect(() => {
+    const container = tableContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
   return (
     <TableContainer
+      ref={tableContainerRef}
       sx={{
         maxHeight: "400px",
         overflowY: "auto",
@@ -47,7 +74,7 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
         },
       }}
     >
-      {loading && (
+      {loading && data.length === 0 && (
         <Box display="flex" alignItems="center" gap={2} mb={2}>
           <CircularProgress size={20} />
           <Typography variant="body2" color="text.secondary">
@@ -64,8 +91,48 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
       )}
       <Table size="small" stickyHeader sx={{ width: "100%" }}>
         <TableHead>
+          {/* First row: Table names */}
           <TableRow>
-            <TableCell>#</TableCell>
+            <TableCell rowSpan={2} sx={{ verticalAlign: "middle" }}>
+              #
+            </TableCell>
+            {operation?.children?.map((tableId, tableIndex) => {
+              // For now, assume equal distribution of columns across tables
+              // You may want to pass column-to-table mapping from the parent component
+              const columnsPerTable = Math.ceil(
+                selectedOperationColumnIds.length / operation.children.length
+              );
+              const isLastTable = tableIndex === operation.children.length - 1;
+              const actualColumnCount = isLastTable
+                ? selectedOperationColumnIds.length -
+                  tableIndex * columnsPerTable
+                : columnsPerTable;
+
+              return actualColumnCount > 0 ? (
+                <TableCell
+                  key={tableId}
+                  colSpan={actualColumnCount}
+                  align="center"
+                  sx={{
+                    borderBottom: "1px solid rgba(224, 224, 224, 1)",
+                    fontWeight: "bold",
+                    backgroundColor: "rgba(0, 0, 0, 0.04)",
+                  }}
+                >
+                  <EnhancedTableLabel
+                    id={tableId}
+                    includeDimensions={false}
+                    includeIcon={false}
+                    sx={{
+                      fontSize: "1rem",
+                    }}
+                  />
+                </TableCell>
+              ) : null;
+            })}
+          </TableRow>
+          {/* Second row: Column names */}
+          <TableRow>
             {selectedOperationColumnIds.map((colId, index) => (
               <TableCell key={index} align="left">
                 <EnhancedColumnName id={colId} />
@@ -86,7 +153,6 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
               </StyledAlternatingTableRow>
             ))}
           {data &&
-            !loading &&
             !error &&
             data.map((row, rowIndex) => (
               <StyledAlternatingTableRow
@@ -115,6 +181,44 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
                 ))}
               </StyledAlternatingTableRow>
             ))}
+
+          {/* Loading indicator for pagination */}
+          {loading && data.length > 0 && (
+            <TableRow>
+              <TableCell
+                colSpan={selectedOperationColumnIds.length + 1}
+                align="center"
+                sx={{ py: 2 }}
+              >
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  gap={1}
+                >
+                  <CircularProgress size={16} />
+                  <Typography variant="body2" color="text.secondary">
+                    Loading more rows...
+                  </Typography>
+                </Box>
+              </TableCell>
+            </TableRow>
+          )}
+
+          {/* End of data indicator */}
+          {!loading && !hasMore && data.length > 0 && (
+            <TableRow>
+              <TableCell
+                colSpan={selectedOperationColumnIds.length + 1}
+                align="center"
+                sx={{ py: 2 }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  All data loaded ({data.length} rows)
+                </Typography>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>

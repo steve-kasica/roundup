@@ -5,17 +5,29 @@ import {
   Button,
   Typography,
   CircularProgress,
+  Toolbar,
+  Chip,
 } from "@mui/material";
+import PackOperationIcon from "./PackOperationIcon";
 import withPackOperationData from "./withPackOperationData";
-import { EnhancedColumnName } from "../ColumnViews";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { usePackStats } from "../../hooks/usePackStats";
-import { EnhancedTableLabel } from "../TableView";
-import StatisticsBar from "./StatisticsBar";
+import { TableRowMatches } from "../TableView";
+
+const matchLablels = new Map([
+  ["one_to_one_matches", "1:1"],
+  ["one_to_many_matches", "1:N"],
+  ["many_to_one_matches", "N:1"],
+  ["many_to_many_matches", "N:N"],
+  ["one_to_zero_matches", "1:0"],
+  ["zero_to_one_matches", "0:1"],
+]);
 
 const PackSchemaView = withPackOperationData(
   ({
     operation,
+    tableToOpColumnMap,
+    selectedOperationColumnIds,
     leftTableId,
     leftHandColumns,
     leftRowCount,
@@ -23,39 +35,27 @@ const PackSchemaView = withPackOperationData(
     rightHandColumns,
     rightRowCount,
     selectColumns,
+    selectedColumns,
     joinPredicate,
     leftKey,
     rightKey,
-    isPack,
+    columnCount,
   }) => {
-    const [selectedColumns, setSelectedColumns] = useState([
-      leftHandColumns.map(() => false),
-      rightHandColumns.map(() => false),
-    ]);
+    // Add hover state for coordinating between tables
+    const [hoveredMatch, setHoveredMatch] = useState(null);
 
-    useEffect(() => {
-      selectColumns([
-        ...leftHandColumns.filter((_, i) => selectedColumns[0][i]),
-        ...rightHandColumns.filter((_, i) => selectedColumns[1][i]),
-      ]);
-    }, [selectedColumns, leftHandColumns, rightHandColumns, selectColumns]);
+    // Add state for column selection across tables
+    const [lastSelectedColumn, setLastSelectedColumn] = useState(null);
 
-    const handleColumnClick = useCallback(
-      (event, side, columnId) => {
-        const columnIndex =
-          side === "left"
-            ? leftHandColumns.indexOf(columnId)
-            : rightHandColumns.indexOf(columnId);
-
-        setSelectedColumns((prev) => {
-          const newSelected = [...prev];
-          newSelected[side === "left" ? 0 : 1][columnIndex] =
-            !newSelected[side === "left" ? 0 : 1][columnIndex];
-          return newSelected;
-        });
-      },
-      [leftHandColumns, rightHandColumns]
-    );
+    // Add toggle state for showing/hiding match types
+    const [toggledMatches, setToggledMatches] = useState({
+      one_to_one_matches: true,
+      one_to_many_matches: true,
+      many_to_one_matches: true,
+      many_to_many_matches: true,
+      one_to_zero_matches: true,
+      zero_to_one_matches: true,
+    });
 
     // Call usePackStats hook and log results
     const { data, loading, error } = usePackStats(
@@ -66,212 +66,246 @@ const PackSchemaView = withPackOperationData(
       operation.joinPredicate
     );
 
-    const {
-      one_to_one_matches,
-      one_to_many_matches,
-      many_to_one_matches,
-      many_to_many_matches,
-      one_to_zero_matches,
-      zero_to_one_matches,
-    } = data || {};
+    // Update toggle state when data changes
+    useEffect(() => {
+      setToggledMatches((prev) => {
+        const newState = { ...prev };
+        if (!data) return newState;
+        Object.entries(data).forEach(([key, count]) => {
+          newState[key] = (count || 0) > 0;
+        });
+        return newState;
+      });
+    }, [data]);
+
+    // Coordinated hover handlers
+    const handleBlockEnter = useCallback((event, key) => {
+      setHoveredMatch(key);
+    }, []);
+
+    const handleBlockLeave = useCallback(() => {
+      setHoveredMatch(null);
+    }, []);
+
+    const handleBlockClick = useCallback((event, tableId, key) => {
+      setToggledMatches((prev) => ({
+        ...prev,
+        [key]: !prev[key],
+      }));
+    }, []);
+
+    const handleColumnClick = useCallback(
+      (event, tableId, columnId) => {
+        const isShiftClick = event.shiftKey;
+        const isCtrlClick = event.ctrlKey || event.metaKey; // Support both Ctrl and Cmd on Mac
+
+        if (isShiftClick && lastSelectedColumn) {
+          // Shift click: Range selection
+          const currentIndex = operation.columnIds.indexOf(columnId);
+          const lastIndex = operation.columnIds.indexOf(lastSelectedColumn);
+
+          if (currentIndex !== -1 && lastIndex !== -1) {
+            const start = Math.min(currentIndex, lastIndex);
+            const end = Math.max(currentIndex, lastIndex);
+            const rangeColumns = operation.columnIds.slice(start, end + 1);
+
+            // Merge range with existing selection, removing duplicates
+            const newSelection = [
+              ...new Set([...selectedOperationColumnIds, ...rangeColumns]),
+            ];
+            selectColumns(newSelection);
+          }
+        } else if (isCtrlClick) {
+          // Control click: Multi-selection toggle
+          if (selectedOperationColumnIds.includes(columnId)) {
+            // Remove from selection
+            const newSelection = selectedOperationColumnIds.filter(
+              (id) => id !== columnId
+            );
+            selectColumns(newSelection);
+          } else {
+            // Add to selection
+            const newSelection = [...selectedOperationColumnIds, columnId];
+            selectColumns(newSelection);
+          }
+        } else {
+          // Single select: Replace selection with current column
+          selectColumns([columnId]);
+        }
+
+        // Always update last selected column for future range operations
+        setLastSelectedColumn(columnId);
+      },
+      [
+        operation.columnIds,
+        selectedOperationColumnIds,
+        lastSelectedColumn,
+        selectColumns,
+      ]
+    );
+
+    const getVisibleMatches = () => {
+      return Object.fromEntries(
+        Object.entries(data).filter(([label, count]) => count > 0)
+      );
+    };
 
     const totalRows = Object.values(data || {}).reduce(
       (sum, count) => sum + (count || 0),
       0
     );
 
-    // Console log the pack statistics
-    useEffect(() => {
-      console.log("Pack Statistics Hook Triggered", {
-        data,
-        leftRowCount,
-        rightRowCount,
-        loading,
-        error,
-      });
-      if (data) {
-        console.log("Pack Statistics:", {
-          data,
-          leftRowCount,
-          rightRowCount,
-        });
-      }
-      if (error) {
-        console.error("Pack Statistics Error:", error);
-      }
-      console.log("Pack Statistics Loading:", loading);
-    }, [data, error, loading, leftRowCount, rightRowCount]);
-
     return (
       <Box display={"flex"} flexDirection="column" height="100%">
-        {/* Total rows display */}
-        <Box
-          display="flex"
-          justifyContent="flex-end"
-          alignItems="center"
-          mb={0.5}
-          py={0.25}
-          px={0.5}
+        {/* Operation info toolbar */}
+        <Toolbar
+          variant="dense"
           sx={{
+            minHeight: "auto",
             backgroundColor: "grey.50",
             borderRadius: 0.5,
+            mb: 0.5,
+            px: 1,
+            py: 0.5,
           }}
         >
-          <Typography variant="caption" color="text.secondary">
-            Total Rows: {totalRows.toLocaleString()}
+          <Typography
+            variant="subtitle2"
+            component="div"
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
+            <PackOperationIcon fontSize="small" sx={{ color: "grey.600" }} />
+            {operation.name}
           </Typography>
-        </Box>
+          <Box display="flex" alignItems="center" gap={1}>
+            <Chip
+              label={`${totalRows.toLocaleString()} rows`}
+              size="small"
+              variant="outlined"
+              sx={{
+                borderColor: "grey.400",
+                color: "grey.700",
+                "&:hover": {
+                  borderColor: "grey.500",
+                },
+              }}
+            />
+            <Chip
+              label={`${columnCount} columns`}
+              size="small"
+              variant="outlined"
+              sx={{
+                borderColor: "grey.500",
+                color: "grey.800",
+                "&:hover": {
+                  borderColor: "grey.600",
+                },
+              }}
+            />
+          </Box>
+        </Toolbar>
 
-        <Box
-          display={"flex"}
-          justifyContent="space-evenly"
-          gap={2}
-          width="100%"
-        >
-          <Box
-            display="flex"
-            alignItems="center"
-            flexDirection={"column"}
-            flex={1}
-            height="100%"
-            gap={0.5}
-          >
-            <EnhancedTableLabel id={leftTableId} includeIcon={false} />
+        <Box display={"flex"} flex={1} gap={0.5}>
+          {loading && !data && (
             <Box
-              display={"flex"}
+              display="flex"
               alignItems="center"
-              justifyContent={"space-evenly"}
+              justifyContent="center"
               width="100%"
-              gap={0.5}
             >
-              {leftHandColumns.map((columnId, index) => (
-                <EnhancedColumnName
-                  key={columnId}
-                  id={columnId}
-                  onClick={(event) =>
-                    handleColumnClick(event, "left", columnId)
-                  }
-                  sx={{
-                    ...(columnId === leftKey && {
-                      backgroundColor: "primary.light",
-                      border: "2px solid",
-                      borderColor: "primary.main",
-                      fontWeight: "bold",
-                      "&:hover": {
-                        backgroundColor: "primary.main",
-                        color: "primary.contrastText",
-                      },
-                    }),
-                    ...(selectedColumns[0][index] && {
-                      backgroundColor: "secondary.light",
-                      border: "2px solid",
-                      borderColor: "secondary.main",
-                      fontWeight: "bold",
-                      "&:hover": {
-                        backgroundColor: "secondary.main",
-                        color: "secondary.contrastText",
-                      },
-                    }),
-                  }}
-                />
-              ))}
+              <CircularProgress size={24} />
             </Box>
-          </Box>
-          <Box
-            flex={1}
-            height="100%"
-            display="flex"
-            alignItems="center"
-            flexDirection={"column"}
-            gap={0.5}
-          >
-            <EnhancedTableLabel id={rightTableId} includeIcon={false} />
-            <Box
-              display={"flex"}
-              alignItems="center"
-              justifyContent={"space-evenly"}
-              width="100%"
-              gap={0.5}
-            >
-              {rightHandColumns.map((columnId, index) => (
-                <EnhancedColumnName
-                  key={columnId}
-                  id={columnId}
-                  onClick={(event) =>
-                    handleColumnClick(event, "right", columnId)
-                  }
-                  sx={{
-                    ...(columnId === rightKey && {
-                      backgroundColor: "primary.light",
-                      border: "2px solid",
-                      borderColor: "primary.main",
-                      fontWeight: "bold",
-                      "&:hover": {
-                        backgroundColor: "primary.main",
-                        color: "primary.contrastText",
-                      },
-                    }),
-                    ...(selectedColumns[1][index] && {
-                      backgroundColor: "secondary.light",
-                      border: "2px solid",
-                      borderColor: "secondary.main",
-                      fontWeight: "bold",
-                      "&:hover": {
-                        backgroundColor: "secondary.main",
-                        color: "secondary.contrastText",
-                      },
-                    }),
-                  }}
-                />
-              ))}
-            </Box>
-          </Box>
-        </Box>
-        <Box
-          display={"flex"}
-          flexDirection="column"
-          gap={1}
-          mt={0}
-          height={"100%"}
-        >
-          {loading && <CircularProgress />}
-          {error && <Alert severity="error">{error.message}</Alert>}
-          {!loading && !error && (
+          )}
+          {error && !data && (
+            <Alert severity="error">
+              <Typography variant="body2">
+                Failed to load pack statistics:{" "}
+                {error.message || "Unknown error"}
+              </Typography>
+            </Alert>
+          )}
+          {!loading && !error && data && (
             <>
-              <StatisticsBar
-                height={(one_to_one_matches / totalRows) * 100 + "%"}
-                // variant="success"
-                label={`1:1 (${one_to_one_matches} rows)`}
-              />
-              <StatisticsBar
-                height={(one_to_many_matches / totalRows) * 100 + "%"}
-                // variant="error"
-                clickable
-                label={`1:n (${one_to_many_matches} rows)`}
-              />
-              <StatisticsBar
-                height={(many_to_one_matches / totalRows) * 100 + "%"}
-                // variant="error"
-                clickable
-                label={`n:1 (${many_to_one_matches} rows)`}
-              />
-              <StatisticsBar
-                height={(many_to_many_matches / totalRows) * 100 + "%"}
-                // variant="error"
-                label={`n:n (${many_to_many_matches} rows)`}
-              />
-              <StatisticsBar
-                height={(one_to_zero_matches / totalRows) * 100 + "%"}
-                // variant="warning"
-                clickable
-                label={`1:0 (${one_to_zero_matches} rows)`}
-              />
-              <StatisticsBar
-                height={(zero_to_one_matches / totalRows) * 100 + "%"}
-                // variant="warning"
-                clickable
-                label={`0:1 (${zero_to_one_matches} rows)`}
-              />
+              <Box marginTop="59px">
+                {Object.entries(getVisibleMatches()).map(([key, value]) => (
+                  <Box
+                    key={key}
+                    height={(value / totalRows) * 100 + "%"}
+                    display={"flex"}
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        height: "24px",
+                        userSelect: "none",
+                        cursor: "pointer",
+                        opacity: hoveredMatch === key ? 1 : 0.8,
+                        fontWeight: hoveredMatch === key ? "bold" : "normal",
+                      }}
+                      onMouseEnter={() => setHoveredMatch(key)}
+                      onMouseLeave={() => setHoveredMatch(null)}
+                      onClick={(event) => handleBlockClick(event, "label", key)}
+                    >
+                      {matchLablels.get(key)}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+              <Box
+                display={"flex"}
+                justifyContent="space-evenly"
+                gap={"5px"}
+                width="100%"
+                height={"100%"}
+              >
+                <TableRowMatches
+                  table={{
+                    columnIds: operation.columnIds.slice(
+                      0,
+                      leftHandColumns.length
+                    ),
+                    id: leftTableId,
+                  }}
+                  key={leftKey}
+                  tablePosition="left"
+                  selectedOperationColumnIds={selectedOperationColumnIds}
+                  matches={getVisibleMatches()}
+                  operationRowCount={totalRows}
+                  hoveredRowLabel={hoveredMatch}
+                  toggledMatches={toggledMatches}
+                  onBlockEnter={handleBlockEnter}
+                  onBlockLeave={handleBlockLeave}
+                  onBlockClick={handleBlockClick}
+                  onColumnClick={handleColumnClick}
+                />
+                <TableRowMatches
+                  table={{
+                    columnIds: operation.columnIds.slice(
+                      leftHandColumns.length,
+                      operation.columnIds.length
+                    ),
+                    id: rightTableId,
+                  }}
+                  key={rightKey}
+                  tablePosition="right"
+                  selectedOperationColumnIds={selectedOperationColumnIds}
+                  matches={getVisibleMatches()}
+                  operationRowCount={totalRows}
+                  hoveredRowLabel={hoveredMatch}
+                  toggledMatches={toggledMatches}
+                  onBlockEnter={handleBlockEnter}
+                  onBlockLeave={handleBlockLeave}
+                  onBlockClick={handleBlockClick}
+                  onColumnClick={handleColumnClick}
+                />
+              </Box>
             </>
           )}
         </Box>

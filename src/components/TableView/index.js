@@ -4,3 +4,4 @@ export * from "./TableRowSummary";
 export * from "./TableListItemSummary";
 export * from "./TableBlock";
 export * from "./TableSchema";
+export * from "./TableRowMatches";
