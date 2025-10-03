@@ -57,6 +57,7 @@ const TableRowMatches = ({
   onBlockLeave = () => {},
   onBlockClick = () => {},
   onColumnClick = () => {},
+  onTableLabelClick = () => {},
 }) => {
   const columnWidth = (1 / table.columnIds.length) * 100 + "%";
 
@@ -76,7 +77,11 @@ const TableRowMatches = ({
       height="100%"
       width="100%"
     >
-      <EnhancedTableLabel id={table.id} includeIcon={false} />
+      <EnhancedTableLabel
+        id={table.id}
+        includeIcon={false}
+        onClick={(event) => onTableLabelClick(event, table.id)}
+      />
       <Box display="flex" width="100%" gap={"1px"}>
         {table.columnIds.map((columnId) => (
           <Box

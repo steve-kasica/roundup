@@ -78,6 +78,8 @@ const PackSchemaView = withPackOperationData(
       });
     }, [data]);
 
+    useEffect(() => {}, [toggledMatches]);
+
     // Coordinated hover handlers
     const handleBlockEnter = useCallback((event, key) => {
       setHoveredMatch(key);
@@ -150,6 +152,25 @@ const PackSchemaView = withPackOperationData(
         selectedOperationColumnIds,
         lastSelectedColumn,
         selectColumns,
+      ]
+    );
+
+    const handleTableLabelClick = useCallback(
+      (event, tableId) => {
+        // const isCtrlClick = event.ctrlKey || event.metaKey; // Support both Ctrl and Cmd on Mac
+
+        if (tableId === leftTableId) {
+          selectColumns(operation.columnIds.slice(0, leftHandColumns.length));
+        } else if (tableId === rightTableId) {
+          selectColumns(operation.columnIds.slice(leftHandColumns.length));
+        }
+      },
+      [
+        leftTableId,
+        rightTableId,
+        leftHandColumns,
+        selectColumns,
+        operation.columnIds,
       ]
     );
 
@@ -293,6 +314,7 @@ const PackSchemaView = withPackOperationData(
                   onBlockLeave={handleBlockLeave}
                   onBlockClick={handleBlockClick}
                   onColumnClick={handleColumnClick}
+                  onTableLabelClick={handleTableLabelClick}
                 />
                 <TableRowMatches
                   table={{
@@ -313,6 +335,7 @@ const PackSchemaView = withPackOperationData(
                   onBlockLeave={handleBlockLeave}
                   onBlockClick={handleBlockClick}
                   onColumnClick={handleColumnClick}
+                  onTableLabelClick={handleTableLabelClick}
                 />
               </Box>
             </>
