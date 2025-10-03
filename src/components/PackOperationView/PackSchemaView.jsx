@@ -129,8 +129,17 @@ const PackSchemaView = withPackOperationData(
             selectColumns(newSelection);
           }
         } else {
-          // Single select: Replace selection with current column
-          selectColumns([columnId]);
+          // Single select: Replace selection with current column, or deselect if already selected
+          if (
+            selectedOperationColumnIds.length === 1 &&
+            selectedOperationColumnIds.includes(columnId)
+          ) {
+            // Deselect if this is the only selected column
+            selectColumns([]);
+          } else {
+            // Replace selection with current column
+            selectColumns([columnId]);
+          }
         }
 
         // Always update last selected column for future range operations
