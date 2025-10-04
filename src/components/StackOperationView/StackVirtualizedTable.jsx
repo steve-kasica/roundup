@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
+import { useCallback, useRef } from "react";
 import { EnhancedColumnName } from "../ColumnViews";
 import withStackOperationData from "./withStackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
@@ -25,14 +26,33 @@ import { StickyTableCell, StyledAlternatingTableRow } from "../ui/Table";
  */
 export const StackVirtualizedTable = withStackOperationData(
   ({ operation, selectedOperationColumnIds }) => {
-    const { data, loading, error } = usePaginatedTableRows(
+    const tableContainerRef = useRef(null);
+    const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
       operation.id,
       selectedOperationColumnIds,
       50
     );
 
+    // Handle scroll events for infinite loading
+    const handleScroll = useCallback(
+      (event) => {
+        const container = event.target;
+        const { scrollTop, scrollHeight, clientHeight } = container;
+
+        // Check if user has scrolled near the bottom (within 100px)
+        const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+
+        if (nearBottom && hasMore && !loading) {
+          loadMore();
+        }
+      },
+      [hasMore, loading, loadMore]
+    );
+
     return (
       <TableContainer
+        ref={tableContainerRef}
+        onScroll={handleScroll}
         sx={{
           maxHeight: "400px",
           overflowY: "auto",
@@ -48,7 +68,7 @@ export const StackVirtualizedTable = withStackOperationData(
           },
         }}
       >
-        {loading && (
+        {loading && data.length === 0 && (
           <Box display="flex" alignItems="center" gap={2} mb={2}>
             <CircularProgress size={20} />
             <Typography variant="body2" color="text.secondary">
@@ -89,9 +109,12 @@ export const StackVirtualizedTable = withStackOperationData(
           </TableHead>
           <TableBody>
             {error &&
+              data.length === 0 &&
               Array.from({ length: 5 }).map((_, index) => (
                 <StyledAlternatingTableRow key={index} isEven={index % 2 === 0}>
-                  {Array.from({ length: 4 }).map((_, colIndex) => (
+                  {Array.from({
+                    length: selectedOperationColumnIds.length + 1,
+                  }).map((_, colIndex) => (
                     <TableCell key={colIndex}>
                       <Skeleton variant="text" width="80%" />
                     </TableCell>
@@ -99,7 +122,6 @@ export const StackVirtualizedTable = withStackOperationData(
                 </StyledAlternatingTableRow>
               ))}
             {data &&
-              !loading &&
               !error &&
               data.map((row, rowIndex) => (
                 <StyledAlternatingTableRow
@@ -132,6 +154,41 @@ export const StackVirtualizedTable = withStackOperationData(
                   ))}
                 </StyledAlternatingTableRow>
               ))}
+            {/* Loading more indicator */}
+            {loading && data.length > 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={selectedOperationColumnIds.length + 1}
+                  align="center"
+                >
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    gap={1}
+                    py={2}
+                  >
+                    <CircularProgress size={16} />
+                    <Typography variant="body2" color="text.secondary">
+                      Loading more rows...
+                    </Typography>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            )}
+            {/* End of data indicator */}
+            {!loading && !hasMore && data.length > 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={selectedOperationColumnIds.length + 1}
+                  align="center"
+                >
+                  <Typography variant="body2" color="text.secondary" py={2}>
+                    No more data to load
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
