@@ -19,6 +19,7 @@ import {
   selectDraggingColumns,
   selectDropTargets,
   selectHoverTargets,
+  updateColumns,
 } from "../../slices/columnsSlice";
 import { renameColumnsRequest } from "../../sagas/renameColumnsSaga";
 import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
@@ -115,7 +116,13 @@ export default function withColumnData(WrappedComponent) {
         dragColumn={() => (!isNull ? dispatch(addColumnsToDragging(id)) : null)}
         unDragColumn={unDragColumn}
         removeColumn={() => {
+          // @Deprecated, use excludeColumn instead
           if (!isNull) dispatch(removeColumnsRequest(id));
+        }}
+        excludeColumn={() => {
+          if (!isNull) {
+            dispatch(removeColumnsRequest(id));
+          }
         }}
         addColumnToSelection={() => {
           if (!isNull) dispatch(appendToSelectedColumns(id));
@@ -157,6 +164,27 @@ export default function withColumnData(WrappedComponent) {
             })
           )
         }
+        changeColumnType={(newType) => {
+          if (!isNull) {
+            dispatch(updateColumns({ id, columnType: newType }));
+          }
+        }}
+        insertColumnLeft={() => {
+          if (!isNull) {
+            // TODO: Implement insert column to the left functionality
+            console.log(
+              "Insert column to the left functionality not yet implemented"
+            );
+          }
+        }}
+        insertColumnRight={() => {
+          if (!isNull) {
+            // TODO: Implement insert column to the right functionality
+            console.log(
+              "Insert column to the right functionality not yet implemented"
+            );
+          }
+        }}
       />
     );
 

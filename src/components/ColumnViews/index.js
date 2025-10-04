@@ -4,3 +4,4 @@ export { ColumnValues } from "./ColumnValues";
 export * from "./ColumnName";
 export * from "./ColumnTick";
 export * from "./ColumnSummary";
+export * from "./ColumnContextMenuItems";

@@ -16,6 +16,7 @@ import SingleBar from "../visualization/SingleBar";
 import { scaleLinear } from "d3";
 import ColumnValuesSample from "./ColumnValuesSample";
 import ColumnTypeIcon from "./ColumnTypeIcon";
+import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
 
 const StyledColumnCard = styled(Card)(
   ({ isDragging, canDropHere, isSelected, isOver }) => ({
@@ -149,53 +150,10 @@ const ColumnSummary = ({
             horizontal: "right",
           }}
         >
-          <MenuItem onClick={(event) => handleMenuClose(event, unselectColumn)}>
-            Hide Column
-          </MenuItem>
-          <MenuItem onClick={(event) => handleMenuClose(event, focusColumn)}>
-            Focus Column
-          </MenuItem>
-          <MenuItem
-            onClick={(event) =>
-              handleMenuClose(event, () =>
-                console.log("Change Column Type (TODO)")
-              )
-            }
-          >
-            Change Column Type
-          </MenuItem>
-          <MenuItem
-            onClick={(event) =>
-              handleMenuClose(event, () =>
-                console.log("Insert column to the left (TODO)")
-              )
-            }
-          >
-            Insert column to the left
-          </MenuItem>
-          <MenuItem
-            onClick={(event) =>
-              handleMenuClose(event, () =>
-                console.log("Insert column to the right (TODO)")
-              )
-            }
-          >
-            Insert column to the right
-          </MenuItem>
-          <MenuItem
-            onClick={(event) =>
-              handleMenuClose(event, () => console.log("Drag column (TODO)"))
-            }
-          >
-            Reposition column
-          </MenuItem>
-          <MenuItem
-            onClick={(event) =>
-              handleMenuClose(event, () => console.log("Rename column (TODO)"))
-            }
-          >
-            Rename column
-          </MenuItem>
+          <EnhancedColumnContextMenuItems
+            id={column.id}
+            closeMenu={handleMenuClose}
+          />
         </Menu>
 
         {/* Header - Always visible */}
