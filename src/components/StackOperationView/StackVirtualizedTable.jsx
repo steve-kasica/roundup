@@ -158,14 +158,17 @@ export const StackVirtualizedTable = withStackOperationData(
                         cursor: "pointer",
                         flex: 1,
                         "& .MuiTableSortLabel-icon": {
-                          opacity: sortBy === colId ? 1 : 0.3,
+                          opacity: sortBy === colId ? 1 : 0, // Hide icon completely when not sorting
                         },
                         "&:hover .MuiTableSortLabel-icon": {
-                          opacity: 0.6,
+                          opacity: sortBy === colId ? 1 : 0.6, // Show faded icon on hover
                         },
                       }}
                     >
-                      <EnhancedColumnName id={colId} />
+                      <EnhancedColumnName
+                        id={colId}
+                        sx={{ cursor: "inherit" }}
+                      />
                     </TableSortLabel>
                     <IconButton
                       size="small"
