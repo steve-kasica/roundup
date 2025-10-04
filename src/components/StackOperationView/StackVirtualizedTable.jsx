@@ -11,8 +11,9 @@ import {
   Box,
   CircularProgress,
   Alert,
+  TableSortLabel,
 } from "@mui/material";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { EnhancedColumnName } from "../ColumnViews";
 import withStackOperationData from "./withStackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
@@ -27,10 +28,15 @@ import { StickyTableCell, StyledAlternatingTableRow } from "../ui/Table";
 export const StackVirtualizedTable = withStackOperationData(
   ({ operation, selectedOperationColumnIds }) => {
     const tableContainerRef = useRef(null);
+    const [sortBy, setSortBy] = useState(null);
+    const [sortDirection, setSortDirection] = useState("asc");
+
     const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
       operation.id,
       selectedOperationColumnIds,
-      50
+      50,
+      sortBy,
+      sortDirection
     );
 
     // Handle scroll events for infinite loading
@@ -47,6 +53,21 @@ export const StackVirtualizedTable = withStackOperationData(
         }
       },
       [hasMore, loading, loadMore]
+    );
+
+    // Handle column sorting
+    const handleColumnSort = useCallback(
+      (columnId) => {
+        if (sortBy === columnId) {
+          // Toggle direction if same column
+          setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+        } else {
+          // New column, start with ascending
+          setSortBy(columnId);
+          setSortDirection("asc");
+        }
+      },
+      [sortBy]
     );
 
     return (
@@ -102,7 +123,22 @@ export const StackVirtualizedTable = withStackOperationData(
               <TableCell>#</TableCell>
               {selectedOperationColumnIds.map((colId, index) => (
                 <TableCell key={index} align="left">
-                  <EnhancedColumnName id={colId} />
+                  <TableSortLabel
+                    active={sortBy === colId}
+                    direction={sortBy === colId ? sortDirection : "asc"}
+                    onClick={() => handleColumnSort(colId)}
+                    sx={{
+                      cursor: "pointer",
+                      "& .MuiTableSortLabel-icon": {
+                        opacity: sortBy === colId ? 1 : 0.3,
+                      },
+                      "&:hover .MuiTableSortLabel-icon": {
+                        opacity: 0.6,
+                      },
+                    }}
+                  >
+                    <EnhancedColumnName id={colId} />
+                  </TableSortLabel>
                 </TableCell>
               ))}
             </TableRow>
