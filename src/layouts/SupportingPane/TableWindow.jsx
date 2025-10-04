@@ -30,6 +30,7 @@ import {
 import { EnhancedPackVirtualTable } from "../../components/PackOperationView";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../components/OperationView";
+import { use } from "react";
 
 // const TOGGLE_VALUES = {
 //   LOW: "Low",
@@ -42,12 +43,20 @@ const TableWindow = () => {
   // TODO: I'm not doing the selectedTableIds any more
   // Rather this component just need to know if it show show a table, a stack table, or a
   // pack table.
+  const focusedOperation = useSelector((state) => {
+    const opId = selectFocusedOperationId(state);
+    return opId ? selectOperation(state, opId) : null;
+  });
+
+  // TODO: are these selected or focused columns?
+  // Maybe selected should me, not excluded and focus should mean
+  // selected???
+  const selectedColumnIds = useSelector(selectSelectedColumns);
+  // Group selected columns by their tableId
   const selectedTableIds = useSelector((state) => {
-    const selectedColumnIds = selectSelectedColumns(state);
     const columns = selectedColumnIds.map((columnId) =>
       selectColumnById(state, columnId)
     );
-    if (columns.length === 0) return null;
     return Array.from(
       group(columns, (c) => c.tableId),
       ([tableId, columns]) => ({
@@ -56,9 +65,28 @@ const TableWindow = () => {
       })
     );
   });
-  const focusedOperation = useSelector((state) => {
-    const opId = selectFocusedOperationId(state);
-    return opId ? selectOperation(state, opId) : null;
+
+  if (selectedTableIds.length > 1) {
+    alert("Error: multiple tables selected! This is not yet supported.");
+  }
+
+  const viewMode = useSelector((state) => {
+    const { tableId } = selectedTableIds?.[0] || {};
+    if (isTableId(tableId)) {
+      return "TABLE";
+    } else if (
+      isOperationId(tableId) &&
+      selectOperation(state, tableId).operationType === OPERATION_TYPE_STACK
+    ) {
+      return "STACK";
+    } else if (
+      isOperationId(tableId) &&
+      selectOperation(state, tableId).operationType === OPERATION_TYPE_PACK
+    ) {
+      return "PACK";
+    } else {
+      return "UNKNOWN";
+    }
   });
 
   return (
@@ -84,7 +112,7 @@ const TableWindow = () => {
           padding={1}
         >
           <Stack direction="row" spacing={1} alignItems="center">
-            {selectedTableIds === null || selectedTableIds.length === 0 ? (
+            {viewMode === "UNKNOWN" ? (
               <Typography
                 variant="h6"
                 component="div"
@@ -92,47 +120,20 @@ const TableWindow = () => {
               >
                 No Table Selected
               </Typography>
-            ) : isTableId(selectedTableIds?.[0]?.tableId) ? (
+            ) : viewMode === "TABLE" ? (
               <EnhancedTableLabel id={selectedTableIds[0].tableId} />
-            ) : isOperationId(selectedTableIds?.[0]?.tableId) ? (
+            ) : viewMode === "STACK" || viewMode === "PACK" ? (
               <EnhancedOperationLabel id={selectedTableIds[0].tableId} />
-            ) : null}
+            ) : (
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ userSelect: "none" }}
+              >
+                Error: unsupported state!
+              </Typography>
+            )}
           </Stack>
-          {/* <Stack direction="row" spacing={2} alignItems="center">
-            <ToggleButtonGroup
-              size="small"
-              exclusive
-              value={lod}
-              onChange={(e, val) => setLod(val)}
-            >
-              {Object.entries(TOGGLE_VALUES).map(([key, label]) => (
-                <ToggleButton key={key} value={label} disabled={key === "HIGH"}>
-                  {label}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  size="small"
-                  checked={viewsSynced}
-                  disabled={
-                    selectedTableIds === null || selectedTableIds.length <= 1
-                  }
-                  onChange={(e) => setViewsSynced(e.target.checked)}
-                />
-              }
-              label="Sync"
-              sx={{
-                mr: 0,
-                "& .MuiFormControlLabel-label": {
-                  fontSize: "0.875rem",
-                  userSelect: "none",
-                },
-              }}
-            />
-          </Stack> */}
         </Box>
       </Box>
       <Divider />
@@ -143,18 +144,16 @@ const TableWindow = () => {
         display="flex"
         flexDirection="column"
       >
-        {selectedTableIds === null || selectedTableIds.length === 0 ? (
+        {viewMode === "UNKNOWN" ? (
           <Typography variant="h6" align="center" sx={{ mt: 2 }}>
             No columns selected. Please select columns from the schema window.
           </Typography>
-        ) : selectedTableIds.length === 1 && !focusedOperation ? (
+        ) : viewMode === "TABLE" ? (
           <EnhancedTableRows id={selectedTableIds[0].tableId} />
-        ) : selectedTableIds.length > 0 &&
-          focusedOperation.operationType === OPERATION_TYPE_STACK ? (
-          <StackVirtualizedTable id={focusedOperation.id} />
-        ) : selectedTableIds.length > 0 &&
-          focusedOperation.operationType === OPERATION_TYPE_PACK ? (
-          <EnhancedPackVirtualTable id={focusedOperation.id} />
+        ) : viewMode === "STACK" ? (
+          <StackVirtualizedTable id={selectedTableIds[0].tableId} />
+        ) : viewMode === "PACK" ? (
+          <EnhancedPackVirtualTable id={selectedTableIds[0].tableId} />
         ) : (
           <Typography variant="h6" align="center" sx={{ mt: 2 }}>
             Error: unsupported state!

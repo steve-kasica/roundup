@@ -39,6 +39,8 @@ export const StackVirtualizedTable = withStackOperationData(
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [selectedColumnId, setSelectedColumnId] = useState(null);
 
+    console.log("selectedOperationColumnIds:", selectedOperationColumnIds);
+
     const isMenuOpen = Boolean(menuAnchorEl);
 
     const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(

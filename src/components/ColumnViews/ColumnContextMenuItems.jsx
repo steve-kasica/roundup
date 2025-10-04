@@ -1,5 +1,15 @@
 /* eslint-disable react/prop-types */
-import { MenuItem, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+} from "@mui/material";
 import {
   Edit,
   Delete,
@@ -8,7 +18,7 @@ import {
   KeyboardArrowLeft,
   KeyboardArrowRight,
 } from "@mui/icons-material";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import withColumnData from "./withColumnData";
 
 const ColumnContextMenu = ({
@@ -18,13 +28,35 @@ const ColumnContextMenu = ({
   focusColumn,
   insertColumnLeft,
   insertColumnRight,
+  columnName, // Assuming this comes from withColumnData HOC
+  renameColumn, // Assuming this comes from withColumnData HOC
   // Props passed directly from parent component
   closeMenu,
 }) => {
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [newColumnName, setNewColumnName] = useState("");
+
   const handleRenameColumn = useCallback(() => {
-    // TODO: Implement rename functionality
+    setNewColumnName(columnName || ""); // Pre-fill with current name
+    setRenameDialogOpen(true);
     closeMenu();
-  }, [closeMenu]);
+  }, [closeMenu, columnName]);
+
+  const handleRenameDialogClose = useCallback(() => {
+    setRenameDialogOpen(false);
+    setNewColumnName("");
+  }, []);
+
+  const handleRenameConfirm = useCallback(() => {
+    if (newColumnName.trim() && renameColumn) {
+      renameColumn(newColumnName.trim());
+    }
+    handleRenameDialogClose();
+  }, [newColumnName, renameColumn, handleRenameDialogClose]);
+
+  const handleRenameCancel = useCallback(() => {
+    handleRenameDialogClose();
+  }, [handleRenameDialogClose]);
 
   const handleExcludeColumn = useCallback(() => {
     excludeColumn();
@@ -89,6 +121,44 @@ const ColumnContextMenu = ({
         </ListItemIcon>
         <ListItemText>Insert column to the right</ListItemText>
       </MenuItem>
+
+      {/* Rename Column Dialog */}
+      <Dialog
+        open={renameDialogOpen}
+        onClose={handleRenameCancel}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Rename Column</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Column Name"
+            fullWidth
+            variant="outlined"
+            value={newColumnName}
+            onChange={(e) => setNewColumnName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleRenameConfirm();
+              } else if (e.key === "Escape") {
+                handleRenameCancel();
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleRenameCancel}>Cancel</Button>
+          <Button
+            onClick={handleRenameConfirm}
+            variant="contained"
+            disabled={!newColumnName.trim()}
+          >
+            Rename
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

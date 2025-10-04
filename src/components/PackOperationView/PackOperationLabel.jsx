@@ -7,7 +7,7 @@ const PackOperationLabel = ({ operation, loading = false, error = false }) => {
   if (error) return <span>Error: {error.message}</span>;
   if (!operation) return <span>No data</span>;
 
-  return <Typography>{operation.name || operation.id}</Typography>;
+  return <Typography>PACK: {operation.name || operation.id}</Typography>;
 };
 
 const EnhancedPackOperationLabel = withPackOperationData(PackOperationLabel);

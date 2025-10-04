@@ -18,6 +18,7 @@ const StackSchemaView = withStackOperationData(
     operation,
     columnIdMatrix,
     m,
+    selectedColumnIndices,
     selectColumns,
     selectedColumns,
     focusColumns,
@@ -122,46 +123,42 @@ const StackSchemaView = withStackOperationData(
         const currentColumnGroup = columnIdMatrix.map((row) => row[colIndex]);
 
         if (event.shiftKey && selectionAnchorCell !== null) {
-          // Shift+Click: select range of column groups from anchor to extent
-          const anchorIndex = selectionAnchorCell;
-          const extentIndex = colIndex;
-          const startIndex = Math.min(anchorIndex, extentIndex);
-          const endIndex = Math.max(anchorIndex, extentIndex);
-
-          // Collect all columns in the range of column groups
-          const rangeColumns = [];
-          for (let i = startIndex; i <= endIndex; i++) {
-            rangeColumns.push(...columnIdMatrix.map((row) => row[i]));
-          }
-
-          selectColumns(rangeColumns);
-          setSelectionExtentCell(extentIndex);
+          // // Shift+Click: select range of column groups from anchor to extent
+          // const anchorIndex = selectionAnchorCell;
+          // const extentIndex = colIndex;
+          // const startIndex = Math.min(anchorIndex, extentIndex);
+          // const endIndex = Math.max(anchorIndex, extentIndex);
+          // // Collect all columns in the range of column groups
+          // const rangeColumns = [];
+          // for (let i = startIndex; i <= endIndex; i++) {
+          //   rangeColumns.push(...columnIdMatrix.map((row) => row[i]));
+          // }
+          // selectColumns(rangeColumns);
+          // setSelectionExtentCell(extentIndex);
         } else if (event.metaKey || event.ctrlKey) {
           // Cmd/Ctrl+Click: toggle selection of this column group
-          const currentlySelectedColumns = selectedColumns || [];
-          const isGroupSelected = currentColumnGroup.every((colId) =>
-            currentlySelectedColumns.includes(colId)
-          );
-
-          if (isGroupSelected) {
-            // Remove this column group from selection
-            const newSelection = currentlySelectedColumns.filter(
-              (colId) => !currentColumnGroup.includes(colId)
-            );
-            selectColumns(newSelection);
-          } else {
-            // Add this column group to selection
-            const newSelection = [
-              ...new Set([...currentlySelectedColumns, ...currentColumnGroup]),
-            ];
-            selectColumns(newSelection);
-          }
-
-          setSelectionAnchorCell(colIndex);
-          setSelectionExtentCell(colIndex);
+          // const currentlySelectedColumns = selectedColumns || [];
+          // const isGroupSelected = currentColumnGroup.every((colId) =>
+          //   currentlySelectedColumns.includes(colId)
+          // );
+          // if (isGroupSelected) {
+          //   // Remove this column group from selection
+          //   const newSelection = currentlySelectedColumns.filter(
+          //     (colId) => !currentColumnGroup.includes(colId)
+          //   );
+          //   selectColumns(newSelection);
+          // } else {
+          //   // Add this column group to selection
+          //   const newSelection = [
+          //     ...new Set([...currentlySelectedColumns, ...currentColumnGroup]),
+          //   ];
+          //   selectColumns(newSelection);
+          // }
+          // setSelectionAnchorCell(colIndex);
+          // setSelectionExtentCell(colIndex);
         } else {
           // Single click: select only this column group, also handles initial shift clicks
-          selectColumns(currentColumnGroup);
+          selectColumns(operation.columnIds[colIndex]);
           setSelectionAnchorCell(colIndex);
           setSelectionExtentCell(colIndex);
         }
@@ -260,6 +257,7 @@ const StackSchemaView = withStackOperationData(
                 display: "flex",
                 flexDirection: "column",
                 gap: "4px",
+                padding: "2px", // This has to mach outline thickness in ColumnSummary
                 flex: 1,
                 height: "100%", // Take full height
                 minWidth: "125px",
@@ -281,7 +279,6 @@ const StackSchemaView = withStackOperationData(
               >
                 {colIndex + 1}
               </Box>
-              {/* Column Cards Container with scroll */}
               <Box
                 selectedColumns={selectedColumns} // Pass selected columns
                 columnIdMatrix={columnIdMatrix} // Pass the matrix
@@ -289,11 +286,17 @@ const StackSchemaView = withStackOperationData(
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-evenly",
+                  padding: "2px", // Has to match border thickness in ColumnSummary
                   gap: 1,
                   flex: 1,
                   overflow: "hidden",
-                  // minWidth: "85px",
-                  padding: "2px",
+                  transition: "all 0.2s ease-in-out", // Follows ColumnSummary.jsx
+                  ...(selectedColumnIndices.includes(colIndex) && {
+                    backgroundColor: "rgba(0, 0, 0, 0.1)",
+                    outline: "2px solid blue", // This has to match padding above
+                    outlineColor: "#1976d2",
+                    borderRadius: "4px",
+                  }),
                   // userSelect: "none",
                 }}
               >
@@ -310,7 +313,6 @@ const StackSchemaView = withStackOperationData(
                     >
                       <EnhancedColumnSummary
                         id={columnId}
-                        isSelected={isSelected(columnId)}
                         onClick={(event) => onCellClick(event, columnId)}
                         onDoubleClick={(event) =>
                           onCellDoubleClick(event, columnId)

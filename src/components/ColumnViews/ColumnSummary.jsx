@@ -5,7 +5,6 @@ import {
   Typography,
   IconButton,
   Menu,
-  MenuItem,
   Tooltip,
   Card,
   styled,
@@ -20,7 +19,7 @@ import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
 
 const StyledColumnCard = styled(Card)(
   ({ isDragging, canDropHere, isSelected, isOver }) => ({
-    padding: 8,
+    padding: 4,
     flex: "1 1 0",
     minHeight: "25px",
     minWidth: "100px",
@@ -85,8 +84,6 @@ const ColumnSummary = ({
   nullCount,
   uniqueCount,
   completeCount,
-  unselectColumn,
-  focusColumn,
   hoverColumn,
   unhoverColumn,
   onClick,

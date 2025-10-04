@@ -186,6 +186,7 @@ const TableRows = ({
     },
     [hasMore, loading, error, loadMore, onScroll]
   );
+  console.log("selectedColumnIds", selectedColumnIds);
 
   return (
     <TableContainer
