@@ -26,6 +26,7 @@ import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
 import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
 import { selectFirstSelectedColumn } from "../../slices/uiSlice";
 import { selectTablesById } from "../../slices/tablesSlice";
+import { insertNewColumnRequest } from "../../sagas/insertNewColumnSaga/insertNewColumnSaga";
 
 export default function withColumnData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
@@ -59,7 +60,7 @@ export default function withColumnData(WrappedComponent) {
 
     const name = column?.name;
     const tableId = column?.tableId;
-    const index = column?.index;
+    const index = isNull ? -1 : table.columnIds.indexOf(id);
     const columnType = column?.columnType;
     const values = column?.values;
     const error = column?.error;
@@ -171,17 +172,21 @@ export default function withColumnData(WrappedComponent) {
         }}
         insertColumnLeft={() => {
           if (!isNull) {
-            // TODO: Implement insert column to the left functionality
-            console.log(
-              "Insert column to the left functionality not yet implemented"
+            dispatch(
+              insertNewColumnRequest({
+                tableId: column.tableId,
+                insertionIndex: index,
+              })
             );
           }
         }}
         insertColumnRight={() => {
           if (!isNull) {
-            // TODO: Implement insert column to the right functionality
-            console.log(
-              "Insert column to the right functionality not yet implemented"
+            dispatch(
+              insertNewColumnRequest({
+                tableId: column.tableId,
+                insertionIndex: index + 1,
+              })
             );
           }
         }}

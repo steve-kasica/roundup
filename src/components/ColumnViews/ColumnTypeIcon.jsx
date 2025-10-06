@@ -34,7 +34,7 @@ export default function ColumnTypeIcon({
   };
   const isKey = column && column.uniqueValues === column.nonNullValues;
 
-  if (!column) {
+  if (!column || column.nullPercentage === 1) {
     Icon = NullIcon;
     tooltipText = "Column is null";
   } else if (column.columnType === undefined) {

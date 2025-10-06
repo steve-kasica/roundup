@@ -17,6 +17,7 @@ import removeTablesSagaWatcher from "./removeTablesSaga";
 import watchComputeColumnKeynessWatcher from "./computeColumnsKeyness/computeColumnsKeyness";
 import updateOperationViewSagaWatcher from "./updateOperationViewSaga/updateOperationViewSaga";
 import summarizeColumnsSaga from "./summarizeColumnsSaga";
+import insertNewColumnSaga from "./insertNewColumnSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -26,7 +27,6 @@ export default function* rootSaga() {
     call(removeColumnsSagaWatcher),
     call(swapColumnsSaga),
     call(coordinateHoverSaga),
-    // call(peekTableSagaWatcher),
     call(countColumnValuesSagaWatcher),
     call(uploadTablesSagaWatcher),
     call(dropTablesSagaWatcher),
@@ -35,5 +35,6 @@ export default function* rootSaga() {
     call(removeTablesSagaWatcher),
     call(watchComputeColumnKeynessWatcher),
     call(summarizeColumnsSaga),
+    call(insertNewColumnSaga),
   ]);
 }
