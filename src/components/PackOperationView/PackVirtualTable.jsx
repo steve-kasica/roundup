@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import {
   TableBody,
   TableCell,
@@ -13,7 +13,7 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { EnhancedColumnName } from "../ColumnViews";
+import { EnhancedColumnHeader } from "../ColumnViews";
 import withPackOperationData from "./withPackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import { StickyTableCell, StyledAlternatingTableRow } from "../ui/Table";
@@ -25,14 +25,17 @@ import { EnhancedTableLabel } from "../TableView";
  * @returns
  */
 const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
+  const [sortBy, setSortBy] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
   const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
     operation.id,
     selectedOperationColumnIds,
-    50
+    50,
+    sortBy,
+    sortDirection
   );
 
   const tableContainerRef = useRef(null);
-  console.log(selectedOperationColumnIds);
 
   // Scroll handler for lazy loading
   const handleScroll = useCallback(() => {
@@ -55,6 +58,18 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
     container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
+
+  const handleColumnSort = useCallback(
+    (event, columnId) => {
+      let newDirection = "asc";
+      if (sortBy === columnId) {
+        newDirection = sortDirection === "asc" ? "desc" : "asc";
+      }
+      setSortBy(columnId);
+      setSortDirection(newDirection);
+    },
+    [sortBy, sortDirection]
+  );
 
   return (
     <TableContainer
@@ -135,7 +150,12 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
           <TableRow>
             {selectedOperationColumnIds.map((colId, index) => (
               <TableCell key={index} align="left">
-                <EnhancedColumnName id={colId} />
+                <EnhancedColumnHeader
+                  id={colId}
+                  isActive={sortBy === colId}
+                  onSort={handleColumnSort}
+                  sortDirection={sortDirection}
+                />
               </TableCell>
             ))}
           </TableRow>
@@ -225,5 +245,10 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
   );
 };
 
+PackVirtualTable.displayName = "Pack Virtual Table";
+
 const EnhancedPackVirtualTable = withPackOperationData(PackVirtualTable);
+
+EnhancedPackVirtualTable.displayName = "Enhanced Pack Virtual Table";
+
 export { EnhancedPackVirtualTable, PackVirtualTable };

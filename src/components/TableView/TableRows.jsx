@@ -50,34 +50,14 @@ import {
   Button,
   Box,
   styled,
-  TableSortLabel,
 } from "@mui/material";
-import ColumnHeader from "../ColumnViews/ColumnHeader.jsx";
 import { usePaginatedTableRows } from "../../hooks/index.js";
 import {
   StyledAlternatingTableRow,
   StyledTableCell,
   StickyTableCell,
 } from "../ui/Table";
-
-/**
- * Styled header cell with sorting capabilities and hover effects
- * Provides visual feedback for sortable columns
- */
-const StyledSortableHeaderCell = styled(TableCell)(
-  ({ isHovered, maxWidth = "200px" }) => ({
-    cursor: "pointer",
-    backgroundColor: isHovered ? "#bbdefb" : "#f5f5f5",
-    transition: "background-color 0.1s ease",
-    maxWidth: maxWidth, // Dynamic maximum column width
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    "&:hover": {
-      backgroundColor: "#bbdefb",
-    },
-  })
-);
+import { EnhancedColumnHeader } from "../ColumnViews";
 
 /**
  * TableRows component renders paginated, sortable table data with advanced interactions
@@ -99,8 +79,6 @@ const TableRows = ({
   table,
   selectedColumnIds,
   hoveredIndex = 0,
-  hoverColumn,
-  unhoverColumn,
   onScrollContainerRef = null,
   onScroll = null,
   showHeader = true,
@@ -135,7 +113,7 @@ const TableRows = ({
    *
    * @param {string} columnId - ID of the column to sort by
    */
-  const handleSort = useCallback((columnId) => {
+  const handleColumnSort = useCallback((event, columnId) => {
     setSortConfig((prev) => {
       if (prev.columnId === columnId) {
         // Cycle through: asc -> desc -> none -> asc
@@ -186,7 +164,6 @@ const TableRows = ({
     },
     [hasMore, loading, error, loadMore, onScroll]
   );
-  console.log("selectedColumnIds", selectedColumnIds);
 
   return (
     <TableContainer
@@ -206,35 +183,14 @@ const TableRows = ({
 
               {/* Column Headers with Sorting */}
               {selectedColumnIds.map((colId, i) => (
-                <StyledSortableHeaderCell
-                  key={colId}
-                  align="center"
-                  sx={{ p: 1 }}
-                  isHovered={hoveredIndex === i}
-                  maxWidth={columnWidths[colId] || "200px"}
-                  onMouseEnter={() => hoverColumn(colId)}
-                  onMouseLeave={unhoverColumn}
-                  onClick={() => handleSort(colId)}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "flex-start",
-                    }}
-                  >
-                    <ColumnHeader key={colId} id={colId} />
-                    <TableSortLabel
-                      active={sortConfig.columnId === colId}
-                      direction={
-                        sortConfig.columnId === colId
-                          ? sortConfig.direction || "asc"
-                          : "asc"
-                      }
-                      sx={{ ml: 1 }}
-                    />
-                  </Box>
-                </StyledSortableHeaderCell>
+                <TableCell key={`${i}-${colId}`} align="center" sx={{ p: 1 }}>
+                  <EnhancedColumnHeader
+                    id={colId}
+                    isActive={sortConfig.columnId === colId}
+                    onSort={handleColumnSort}
+                    sortDirection={sortConfig.direction}
+                  />
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>

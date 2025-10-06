@@ -11,19 +11,12 @@ import {
   Box,
   CircularProgress,
   Alert,
-  TableSortLabel,
-  Menu,
-  IconButton,
 } from "@mui/material";
-import { MoreVert } from "@mui/icons-material";
 import { useCallback, useRef, useState } from "react";
-import {
-  EnhancedColumnContextMenuItems,
-  EnhancedColumnName,
-} from "../ColumnViews";
 import withStackOperationData from "./withStackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import { StickyTableCell, StyledAlternatingTableRow } from "../ui/Table";
+import { EnhancedColumnHeader } from "../ColumnViews";
 
 /**
  * Virtualized table view for stack operations
@@ -36,12 +29,6 @@ export const StackVirtualizedTable = withStackOperationData(
     const tableContainerRef = useRef(null);
     const [sortBy, setSortBy] = useState(null);
     const [sortDirection, setSortDirection] = useState("asc");
-    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-    const [selectedColumnId, setSelectedColumnId] = useState(null);
-
-    console.log("selectedOperationColumnIds:", selectedOperationColumnIds);
-
-    const isMenuOpen = Boolean(menuAnchorEl);
 
     const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
       operation.id,
@@ -67,32 +54,17 @@ export const StackVirtualizedTable = withStackOperationData(
       [hasMore, loading, loadMore]
     );
 
-    // Handle column sorting
     const handleColumnSort = useCallback(
-      (columnId) => {
+      (event, columnId) => {
+        let newDirection = "asc";
         if (sortBy === columnId) {
-          // Toggle direction if same column
-          setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-        } else {
-          // New column, start with ascending
-          setSortBy(columnId);
-          setSortDirection("asc");
+          newDirection = sortDirection === "asc" ? "desc" : "asc";
         }
+        setSortBy(columnId);
+        setSortDirection(newDirection);
       },
-      [sortBy]
+      [sortBy, sortDirection]
     );
-
-    // Handle context menu
-    const handleMenuOpen = useCallback((event, columnId) => {
-      event.stopPropagation(); // Prevent sort handler from firing
-      setMenuAnchorEl(event.currentTarget);
-      setSelectedColumnId(columnId);
-    }, []);
-
-    const handleMenuClose = useCallback(() => {
-      setMenuAnchorEl(null);
-      setSelectedColumnId(null);
-    }, []);
 
     return (
       <TableContainer
@@ -147,45 +119,13 @@ export const StackVirtualizedTable = withStackOperationData(
               <TableCell>#</TableCell>
               {selectedOperationColumnIds.map((colId, index) => (
                 <TableCell key={index} align="left">
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <TableSortLabel
-                      active={sortBy === colId}
-                      direction={sortBy === colId ? sortDirection : "asc"}
-                      onClick={() => handleColumnSort(colId)}
-                      sx={{
-                        cursor: "pointer",
-                        flex: 1,
-                        "& .MuiTableSortLabel-icon": {
-                          opacity: sortBy === colId ? 1 : 0, // Hide icon completely when not sorting
-                        },
-                        "&:hover .MuiTableSortLabel-icon": {
-                          opacity: sortBy === colId ? 1 : 0.6, // Show faded icon on hover
-                        },
-                      }}
-                    >
-                      <EnhancedColumnName
-                        id={colId}
-                        sx={{ cursor: "inherit" }}
-                      />
-                    </TableSortLabel>
-                    <IconButton
-                      size="small"
-                      onClick={(event) => handleMenuOpen(event, colId)}
-                      sx={{
-                        ml: 1,
-                        opacity: 0.6,
-                        "&:hover": {
-                          opacity: 1,
-                        },
-                      }}
-                    >
-                      <MoreVert fontSize="small" />
-                    </IconButton>
-                  </Box>
+                  <EnhancedColumnHeader
+                    id={colId}
+                    isActive={sortBy === colId}
+                    onSort={handleColumnSort}
+                    // onMenuClose={handleMenuClose}
+                    sortDirection={sortDirection}
+                  />
                 </TableCell>
               ))}
             </TableRow>
@@ -274,28 +214,6 @@ export const StackVirtualizedTable = withStackOperationData(
             )}
           </TableBody>
         </Table>
-
-        {/* Context Menu */}
-        <Menu
-          anchorEl={menuAnchorEl}
-          open={isMenuOpen}
-          onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-        >
-          {selectedColumnId && (
-            <EnhancedColumnContextMenuItems
-              id={selectedColumnId}
-              closeMenu={handleMenuClose}
-            />
-          )}
-        </Menu>
       </TableContainer>
     );
   }
