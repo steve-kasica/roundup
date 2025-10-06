@@ -29,7 +29,7 @@ import {
  * Passes dragDropRef to its children instead of wrapping them
  */
 const ColumnDragContainer = withColumnData(
-  ({ column, children, onDragEnd, onDrop }) => {
+  ({ column, children, onDragEnd, onDrop, canDrag = true }) => {
     const dispatch = useDispatch();
     const ref = useRef(null);
     const dragType = `${column.tableId}_Column`; // Unique drag type per table
@@ -64,7 +64,7 @@ const ColumnDragContainer = withColumnData(
           type: dragType,
         };
       },
-      canDrag: !!column,
+      canDrag,
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),

@@ -43,6 +43,7 @@ import {
   Visibility,
   TableChart,
   ArrowDropDown,
+  PanTool as DragIcon,
 } from "@mui/icons-material";
 import withTableData from "./withTableData";
 import { useCallback, useState } from "react";
@@ -55,7 +56,7 @@ import {
   dropColumns,
   setFocusedColumns,
   setColumnType,
-} from "../../slices/columnsSlice";
+} from "../../slices/columnsSlice"; // TODO: this should be in an HOC
 import {
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_CATEGORICAL,
@@ -78,6 +79,7 @@ import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
+  const [canDragColumns, setCanDragColumns] = useState(false);
 
   /**
    * Clears all selected columns
@@ -209,6 +211,14 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
     [dispatch]
   );
 
+  /**
+   * Toggles the drag functionality for columns
+   */
+  const handleToggleDrag = useCallback(() => {
+    setCanDragColumns((prev) => !prev);
+    handleClearSelection();
+  }, [handleClearSelection]);
+
   return (
     <Box display="flex" flexDirection="column" height="100%">
       {/* Toolbar with table info and action buttons */}
@@ -240,6 +250,28 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
 
         {/* Action Buttons Section - Bulk operations for selected columns */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          {/* Toggle Drag Mode */}
+          <IconButton
+            size="small"
+            onClick={handleToggleDrag}
+            title={
+              canDragColumns
+                ? "Disable column dragging"
+                : "Enable column dragging"
+            }
+            color={canDragColumns ? "primary" : "default"}
+            sx={{
+              backgroundColor: canDragColumns ? "primary.light" : "transparent",
+              "&:hover": {
+                backgroundColor: canDragColumns
+                  ? "primary.main"
+                  : "action.hover",
+              },
+            }}
+          >
+            <DragIcon fontSize="small" />
+          </IconButton>
+
           {/* Select All Columns */}
           <IconButton
             size="small"
@@ -365,9 +397,10 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
             <ColumnDragContainer
               id={columnId}
               columnIndex={i}
+              canDrag={canDragColumns}
               onDrop={(draggedItem, targetItem) => {
-                console.log("Dropped", { draggedItem, targetItem });
                 swapColumns(targetItem.id, draggedItem.id);
+                setCanDragColumns(false);
               }}
             >
               {/* Interactive Column Summary Card */}
@@ -377,6 +410,7 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
                 onDoubleClick={(event) =>
                   handleColumnDoubleClick(event, columnId)
                 }
+                isDraggable={canDragColumns}
               />
             </ColumnDragContainer>
           </Box>
