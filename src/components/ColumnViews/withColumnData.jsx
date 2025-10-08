@@ -25,8 +25,9 @@ import { renameColumnsRequest } from "../../sagas/renameColumnsSaga";
 import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
 import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
 import { selectFirstSelectedColumn } from "../../slices/uiSlice";
-import { selectTablesById } from "../../slices/tablesSlice";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { insertNewColumnRequest } from "../../sagas/insertNewColumnSaga/insertNewColumnSaga";
+import { selectOperation } from "../../slices/operationsSlice";
 
 export default function withColumnData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
@@ -45,9 +46,15 @@ export default function withColumnData(WrappedComponent) {
     const draggingColumns = useSelector(selectDraggingColumns);
     const dropTargetColumns = useSelector(selectDropTargets);
     const hoverTargetColumns = useSelector(selectHoverTargets);
-    const table = useSelector((state) =>
-      selectTablesById(state, column?.tableId)
-    );
+    const table = useSelector((state) => {
+      if (isNull) {
+        return null;
+      } else if (isTableId(column?.tableId)) {
+        return selectTablesById(state, column.tableId);
+      } else {
+        return selectOperation(state, column.tableId);
+      }
+    });
 
     // Column interaction state properties
     const isSelected = !isNull && selectedColumns.includes(id);
