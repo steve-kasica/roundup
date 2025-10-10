@@ -26,10 +26,9 @@ import {
   removeFromSelectedTables,
 } from "../../slices/tablesSlice";
 
-import { dropTablesAction } from "../../sagas/dropTablesSaga";
-import { removeTablesAction } from "../../sagas/removeTablesSaga";
-import { addTablesToSchemaRequest } from "../../sagas/addTablesToSchemaSaga";
-import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
+import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
+import { updateTablesRequest } from "../../sagas/updateTablesSaga";
+import { createColumnsRequest } from "../../sagas/createColumnsSaga";
 
 export default function withTableData(WrappedComponent) {
   const componentName =
@@ -129,33 +128,46 @@ export default function withTableData(WrappedComponent) {
           hoverColumn={hoverColumn}
           unhoverColumn={unhoverColumn}
           swapColumns={(target, source) => {
-            console.log("Swapping columns", { target, source });
-            dispatch(
-              swapColumnsRequest({ targetIds: [target], sourceIds: [source] })
-            );
+            const updatedColumnIds = [...table.columnIds];
+            const sourceIndex = updatedColumnIds.indexOf(source);
+            const targetIndex = updatedColumnIds.indexOf(target);
+            if (sourceIndex === -1 || targetIndex === -1) return; // Invalid indices
+
+            // Remove source columnId from its original position
+            updatedColumnIds.splice(sourceIndex, 1);
+            // Insert source columnId at the target position
+            updatedColumnIds.splice(targetIndex, 0, source);
+
+            // Update the table's columnIds in the store
+            dispatch(updateTablesRequest({ id, columnIds: updatedColumnIds }));
+          }}
+          insertColumn={(index) => {
+            dispatch(createColumnsRequest({ tableId: id, index }));
           }}
           // Table action handlers
           onHover={() => dispatch(setHoveredTable(id))} // TODO: remove
           onUnhover={() => dispatch(clearHoveredTable())} // TODO: remove
           hoverTable={() => dispatch(setHoveredTable(id))}
           unhoverTable={() => dispatch(clearHoveredTable())}
-          removeTableFromSchema={() => {
-            if (isInSchema) {
-              dispatch(
-                removeTablesAction({
-                  operationIds: [table.operationId],
-                  tableIds: [id],
-                })
-              );
-            }
-          }}
+          // removeTableFromSchema={() => {
+          //   // TODO
+          //   if (isInSchema) {
+          //     dispatch(
+          //       deleteTablesRequest({
+          //         operationIds: [table.operationId],
+          //         tableIds: [id],
+          //       })
+          //     );
+          //   }
+          // }}
           setTableSelection={(ids) => dispatch(setSelectedTables(ids))}
           unselectTable={() => dispatch(removeFromSelectedTables(id))}
           peekTable={() => dispatch(setPeekedTable(id))}
           renameTable={(newNames) =>
             dispatch(changeTablesName({ ids: id, newNames }))
           }
-          dropTable={() => dispatch(dropTablesAction(id))}
+          dropTable={() => dispatch(deleteTablesRequest(id))} // @depricate
+          deleteTable={() => dispatch(deleteTablesRequest(id))}
           setKeyColumn={(columnId) =>
             dispatch(
               setTablesAttribute({
@@ -165,22 +177,14 @@ export default function withTableData(WrappedComponent) {
               })
             )
           }
-          addSelectedTablesToSchema={(operationType) =>
-            dispatch(
-              addTablesToSchemaRequest({
-                tableIds: selectedTables,
-                operationType,
-              })
-            )
-          }
-          addTableToSchema={(operationType) =>
-            dispatch(
-              addTablesToSchemaRequest({
-                tableIds: [id],
-                operationType,
-              })
-            )
-          }
+          // addSelectedTablesToSchema={(operationType) =>
+          //   dispatch(
+          //     addTablesToSchemaRequest({
+          //       tableIds: selectedTables,
+          //       operationType,
+          //     })
+          //   )
+          // }
         />
       );
     } catch (error) {

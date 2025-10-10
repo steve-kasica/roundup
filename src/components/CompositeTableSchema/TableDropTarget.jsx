@@ -11,6 +11,15 @@ import { useDrop } from "react-dnd";
 import { TABLE_ROW_VIEW_CLASS } from "../TableView";
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  OPERATION_TYPE_NO_OP,
+  selectOperation,
+  selectOperationByTableId,
+  selectRootOperation,
+} from "../../slices/operationsSlice";
+import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
+import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 
 const ForwardedBox = forwardRef((props, ref) => <Box ref={ref} {...props} />);
 ForwardedBox.displayName = "ForwardedBox";
@@ -111,9 +120,6 @@ const DropZone = styled(ForwardedBox, {
     styles = {
       ...styles,
       backgroundColor: "tomato",
-      // variant === "default"
-      //   ? "tomato"
-      //   : `${variantStyles[variant].borderColor}20`,
       borderColor:
         variant === "default" ? "tomato" : variantStyles[variant].borderColor,
       borderStyle: "solid",
@@ -132,13 +138,71 @@ const DropZone = styled(ForwardedBox, {
 });
 
 export default function TableDropTarget({ operationType, children }) {
+  const dispatch = useDispatch();
+  const rootOperation = useSelector((state) => {
+    const rootId = selectRootOperation(state);
+    return selectOperation(state, rootId);
+  });
+
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: TABLE_ROW_VIEW_CLASS,
-    drop: (draggedItem, monitor) => {
+    drop: (draggedTable, monitor) => {
       if (monitor.didDrop()) {
         return; // Already handled by a nested drop target
       }
-      return { accepted: true, operationType };
+      console.log(`Dropped table`, draggedTable, rootOperation, operationType);
+      if (
+        operationType === OPERATION_TYPE_NO_OP &&
+        rootOperation === undefined
+      ) {
+        // Case: Initialize the first operation
+        dispatch(
+          createOperationsRequest({
+            operationData: [
+              {
+                operationType,
+                childIds: [draggedTable.id],
+              },
+            ],
+          })
+        );
+      } else if (rootOperation?.operationType === OPERATION_TYPE_NO_OP) {
+        // Case: first table added after schema initialized with only one table
+        // Update the operation type and add the new table as a child
+        // This allows the operation to evolve from a NO_OP to either PACK or STACK
+        dispatch(
+          updateOperationsRequest({
+            operationUpdate: {
+              id: rootOperation.id,
+              operationType,
+              children: [...rootOperation.children, draggedTable.id],
+            },
+          })
+        );
+      } else if (rootOperation?.operationType === operationType) {
+        // Case: tables added to an existing operation of the same type
+        dispatch(
+          updateOperationsRequest({
+            operationUpdate: {
+              id: rootOperation.id,
+              children: [...rootOperation.children, draggedTable.id],
+            },
+          })
+        );
+      } else {
+        // Case: tables added to an existing operation of a different type
+        // Create a new operation with the existing root and the new table as children
+        dispatch(
+          createOperationsRequest({
+            operationData: [
+              {
+                operationType,
+                childIds: [rootOperation.id, draggedTable.id],
+              },
+            ],
+          })
+        );
+      }
     },
     canDrop: () => true,
     collect: (monitor) => ({

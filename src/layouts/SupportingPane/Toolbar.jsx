@@ -21,7 +21,7 @@ import {
   clearSelectedColumns,
   selectSelectedColumns,
 } from "../../slices/columnsSlice";
-import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
+import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import { ID as COLUMN_INDEX_DETAILS_COMPONENT } from "../../components/ColumnIndexDetails";
 
 export default function AppToolbar() {
@@ -79,7 +79,7 @@ export default function AppToolbar() {
         <span>
           <IconButton
             disabled={selectedColumnIds.length === 0}
-            onClick={() => dispatch(removeColumnsRequest(selectedColumnIds))}
+            onClick={() => dispatch(deleteColumnsRequest(selectedColumnIds))}
           >
             <DeleteColumnsIcon />
           </IconButton>

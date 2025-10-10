@@ -1,13 +1,17 @@
 /* eslint-disable react/prop-types */
 import { useCallback, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import {
   getValuesInRange,
   getIndexOfValue,
 } from "./selectionUtils/selectionUtils";
 import { EnhancedTableLabel } from "../TableView";
-import { EnhancedColumnSummary } from "../ColumnViews";
+import {
+  ColumnSummary,
+  EnhancedColumnSummary,
+  StyledColumnCard,
+} from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
@@ -104,6 +108,7 @@ const StackSchemaView = withStackOperationData(
 
     const onColumnLabelClick = useCallback(
       (event, colIndex) => {
+        console.log("Column header clicked:", colIndex, event);
         if (event.shiftKey && selectionAnchorCell !== null) {
           // Shift+Click: select range of operation column indices from anchor to extent
           const anchorIndex = selectionAnchorCell;
@@ -278,24 +283,76 @@ const StackSchemaView = withStackOperationData(
               >
                 {columnIdMatrix.map((row) => {
                   const columnId = row[colIndex];
-                  return (
-                    <ColumnDragContainer
-                      key={columnId}
-                      id={columnId}
-                      columnIndex={colIndex}
-                      onDrop={(draggedItem, targetItem) =>
-                        swapColumns(targetItem.id, draggedItem.id)
-                      }
-                    >
-                      <EnhancedColumnSummary
+                  if (columnId === null) {
+                    return (
+                      <StyledColumnCard
+                        key={`empty-${colIndex}`}
+                        isError={true}
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          textAlign: "center",
+                          // minHeight: "120px",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: 1,
+                          }}
+                        >
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{
+                              fontWeight: "medium",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                              fontSize: "0.7rem",
+                            }}
+                          >
+                            Schema Mismatch
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              fontSize: "0.75rem",
+                              lineHeight: 1.3,
+                              maxWidth: "90%",
+                            }}
+                          >
+                            Column structure
+                            <br />
+                            inconsistency detected
+                          </Typography>
+                        </Box>
+                      </StyledColumnCard>
+                    );
+                  } else {
+                    return (
+                      <ColumnDragContainer
+                        key={columnId}
                         id={columnId}
-                        onClick={(event) => onCellClick(event, columnId)}
-                        onDoubleClick={(event) =>
-                          onCellDoubleClick(event, columnId)
+                        columnIndex={colIndex}
+                        onDrop={(draggedItem, targetItem) =>
+                          swapColumns(targetItem.id, draggedItem.id)
                         }
-                      />
-                    </ColumnDragContainer>
-                  );
+                      >
+                        <EnhancedColumnSummary
+                          id={columnId}
+                          onClick={(event) => onCellClick(event, columnId)}
+                          onDoubleClick={(event) =>
+                            onCellDoubleClick(event, columnId)
+                          }
+                        />
+                      </ColumnDragContainer>
+                    );
+                  }
                 })}
               </Box>
             </Box>

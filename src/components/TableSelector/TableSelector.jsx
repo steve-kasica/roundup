@@ -11,7 +11,7 @@ import ListLayout from "./ListLayout";
 
 import DragDropFileUpload from "./DragDropFileUpload";
 import withAllTablesData from "../HOC/withAllTablesData";
-import { uploadTablesAction } from "../../sagas/uploadTablesSaga";
+import { createTablesRequest } from "../../sagas/createTablesSaga";
 import { registerFiles } from "../../lib/duckdb";
 
 import "./SourceTables.scss";
@@ -21,7 +21,7 @@ import Toolbar from "./Toolbar";
 import { LAYOUT_ID as listLayout } from "./ListLayout";
 import { LAYOUT_ID as tableLayout } from "./TableLayout";
 import { setSelectedTables } from "../../slices/tablesSlice";
-import { dropTablesAction } from "../../sagas/dropTablesSaga";
+import { deleteTablesRequest } from "../../sagas/deleteTablesSaga/actions";
 
 const DEFAULT_LAYOUT = tableLayout; // Default layout can be set to either 'table' or 'list'
 
@@ -51,14 +51,18 @@ function TableSelector({
     registerFiles(files)
       .then(() => {
         dispatch(
-          uploadTablesAction({
-            filesInfo: files.map((f) => ({
-              name: f.name,
+          createTablesRequest({
+            tablesInfo: files.map((f) => ({
+              source: "file upload",
+              name: f.name
+                .replace(/\.[^/.]+$/, "")
+                .replace(/[^a-zA-Z0-9_]/g, "_"),
+              fileName: f.name,
+              extension: f.name.split(".").pop().toLowerCase(),
               size: f.size,
-              type: f.type,
-              lastModified: f.lastModified,
+              mimeType: f.type,
+              dateLastModified: f.lastModified,
             })),
-            source: "duckdb",
           })
         );
       })
@@ -93,7 +97,7 @@ function TableSelector({
             handleFileUpload(Array.from(files));
           }
         }}
-        onDeleteAll={() => dispatch(dropTablesAction(selectedTables))}
+        onDeleteAll={() => dispatch(deleteTablesRequest(selectedTables))}
         onClearSelection={() => unselectAllTables()}
         onSelectAll={() =>
           dispatch(setSelectedTables(filteredTables.map(({ id }) => id)))

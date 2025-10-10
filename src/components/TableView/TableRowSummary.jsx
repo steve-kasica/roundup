@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { DragIndicator } from "@mui/icons-material";
 import HighlightText from "../ui/HighlightText";
 import { styled, Typography, Checkbox, Stack, Box } from "@mui/material";
@@ -8,7 +9,6 @@ import { formatDate, formatNumber, formatBytes } from "../../lib/utilities";
 import withTableData from "./withTableData";
 import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-import PropTypes from "prop-types";
 
 export const TABLE_ROW_VIEW_CLASS = "TableRowSummary";
 
@@ -138,13 +138,10 @@ function TableRowSummary({
   hoverTable,
   unhoverTable,
   setTableSelection,
-  removeTableFromSchema,
   renameTable,
   dropTable,
   isInSchema,
   isSelected,
-  addSelectedTablesToSchema,
-  addTableToSchema,
 
   // props from parent component
   isDisabled = false,
@@ -196,13 +193,14 @@ function TableRowSummary({
       const dropResult = monitor.getDropResult();
 
       // Only process if we have a valid drop result and it was accepted
-      if (dropResult && dropResult.accepted) {
-        if (item.type === "multiple-tables") {
-          addSelectedTablesToSchema(dropResult.operationType);
-        } else if (item.type === "table") {
-          addTableToSchema(dropResult.operationType);
-        }
-      }
+      // TODO: how does the new architecture handle drops with multiple tables?
+      // if (dropResult && dropResult.accepted) {
+      //   if (item.type === "multiple-tables") {
+      //     // addSelectedTablesToSchema(dropResult.operationType);
+      //   } else if (item.type === "table") {
+      //     // addTableToSchema(dropResult.operationType);
+      //   }
+      // }
       // If no drop result or drop was rejected, the drag operation just ends
       // without any action - this prevents the freeze issue
     },
@@ -261,7 +259,7 @@ function TableRowSummary({
       label: `Remove from schema`,
       isDisabled: !isInSchema,
       onClick: (event) => {
-        removeTableFromSchema();
+        // TODO
         handleMenuClose(event);
       },
     },
@@ -471,37 +469,6 @@ function TableRowSummary({
     </StyledTableRow>
   );
 }
-
-TableRowSummary.propTypes = {
-  table: PropTypes.object.isRequired,
-  isHovered: PropTypes.bool,
-  depth: PropTypes.number,
-  parentOperation: PropTypes.oneOfType([
-    PropTypes.shape({ operationType: PropTypes.string }),
-    PropTypes.oneOf([null]),
-  ]),
-  dragRef: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.any }),
-  ]),
-  removedColumnIds: PropTypes.arrayOf(
-    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ).isRequired,
-  peekTable: PropTypes.func.isRequired,
-  hoverTable: PropTypes.func.isRequired,
-  unhoverTable: PropTypes.func.isRequired,
-  setTableSelection: PropTypes.func.isRequired,
-  removeTableFromSchema: PropTypes.func.isRequired,
-  renameTable: PropTypes.func.isRequired,
-  dropTable: PropTypes.func.isRequired,
-  addSelectedTablesToSchema: PropTypes.func.isRequired,
-  addTableToSchema: PropTypes.func.isRequired,
-  isInSchema: PropTypes.bool,
-  isSelected: PropTypes.bool,
-  isDisabled: PropTypes.bool,
-  searchString: PropTypes.string,
-  rowMax: PropTypes.number.isRequired,
-};
 
 const EnhancedTableRowSummary = withTableData(TableRowSummary);
 export { EnhancedTableRowSummary, TableRowSummary };

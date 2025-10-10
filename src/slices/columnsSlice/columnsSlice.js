@@ -361,13 +361,15 @@ const columnsSlice = createSlice({
       const columnIds = Array.isArray(action.payload)
         ? action.payload
         : [action.payload];
-      state.selected = columnIds;
+      const validColumnIds = columnIds.filter(Boolean); // Filter out null/undefined/empty string
+      state.selected = validColumnIds;
     },
     appendToSelectedColumns(state, action) {
       const columnIds = Array.isArray(action.payload)
         ? action.payload
         : [action.payload];
-      state.selected = [...state.selected, ...columnIds];
+      const validColumnIds = columnIds.filter(Boolean); // Filter out null/undefined/empty string
+      state.selected = [...state.selected, ...validColumnIds];
     },
     clearSelectedColumns(state) {
       state.selected = initialState.selected;

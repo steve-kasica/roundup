@@ -15,7 +15,7 @@ import {
   selectOperationDepth,
   updateOperations,
 } from "../../slices/operationsSlice";
-import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
+import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { group } from "d3";
 
@@ -119,11 +119,26 @@ export default function withStackOperationData(WrappedComponent) {
         m={m}
         n={n}
         selectColumns={(colIds) => dispatch(setSelectedColumns(colIds))}
-        swapColumns={(target, source) =>
-          dispatch(
-            swapColumnsRequest({ targetIds: [target], sourceIds: [source] })
-          )
-        }
+        swapColumns={(target, source) => {
+          const updatedColumnIds = [...operation.columnIds];
+          const sourceIndex = updatedColumnIds.indexOf(source);
+          const targetIndex = updatedColumnIds.indexOf(target);
+          if (sourceIndex === -1 || targetIndex === -1) return; // Invalid indices
+
+          // Remove source columnId from its original position
+          updatedColumnIds.splice(sourceIndex, 1);
+          // Insert source columnId at the target position
+          updatedColumnIds.splice(targetIndex, 0, source);
+
+          if (sourceIndex !== targetIndex) {
+            dispatch(
+              updateOperationsRequest({
+                id,
+                columnIds: updatedColumnIds,
+              })
+            );
+          }
+        }}
         focusColumns={(colIds) => dispatch(setFocusedColumns(colIds))}
         selectedColumns={selectedColumns}
         setOperationType={(operationType) =>

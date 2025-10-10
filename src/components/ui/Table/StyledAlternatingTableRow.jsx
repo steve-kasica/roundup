@@ -4,7 +4,9 @@ import { styled } from "@mui/system";
  * Styled TableRow component with alternating row colors and hover effects
  * Provides visual feedback for row interactions
  */
-const StyledAlternatingTableRow = styled(TableRow)(({ isEven }) => ({
+const StyledAlternatingTableRow = styled(TableRow, {
+  shouldForwardProp: (prop) => prop !== "isEven",
+})(({ isEven }) => ({
   backgroundColor: isEven ? "#fff" : "#f5f5f5",
   "&:hover": {
     backgroundColor: isEven ? "#e3f2fd" : "#bbdefb",

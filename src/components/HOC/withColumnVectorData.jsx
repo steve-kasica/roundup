@@ -11,8 +11,6 @@ import {
 
 import { setDrawerContents } from "../../slices/uiSlice";
 import { ID as COLUMN_INDEX_VALUES_COMPONENT } from "../ColumnIndexDetails";
-import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
-// import { getValuesAction } from "../../sagas/getValuesSaga";
 
 /**
  * This HOC takes an array of columnIds are passes on some relevalent metadata about this
@@ -57,20 +55,11 @@ export default function withColumnVectorData(WrappedComponent) {
         compareVectorValues={() =>
           dispatch(setDrawerContents(COLUMN_INDEX_VALUES_COMPONENT))
         }
-        fetchColumnValues={() => {
-          // dispatch(getValuesAction(columnIds.filter(Boolean)));
-        }}
+        fetchColumnValues={() => {}}
         undragColumnVector={() =>
           dispatch(removeColumnsFromDragging(columnIds))
         }
-        swapColumnVectors={(targetColumnIds) =>
-          dispatch(
-            swapColumnsRequest({
-              sourceIds: columnIds,
-              targetIds: targetColumnIds,
-            })
-          )
-        }
+        swapColumnVectors={() => null}
       />
     );
   }

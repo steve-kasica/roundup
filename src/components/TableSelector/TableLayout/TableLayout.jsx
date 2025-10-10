@@ -119,9 +119,9 @@ export default function TableLayout({
                     }
                   }}
                 >
-                  <Tooltip placement="top" title={header.tooltip}>
-                    {header.label}
-                  </Tooltip>
+                  {/* <Tooltip placement="top" title={header.tooltip}> */}
+                  {header.label}
+                  {/* </Tooltip> */}
                   &nbsp;
                   <SortIcon
                     attr={header.attr}

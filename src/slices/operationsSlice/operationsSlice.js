@@ -31,17 +31,21 @@ const operationsSlice = createSlice({
      * and it becomes the new root operation. This is how we build the tree structure
      * of operations from the bottom up.
      */
-    addOperation(state, action) {
-      const operation = action.payload;
-      if (state.data[operation.id]) {
-        throw new Error(`Operation with ID ${operation.id} already exists`);
-      }
-      if (state.root) {
-        operation.children = [...operation.children, state.root];
-      }
-      state.data[operation.id] = operation;
-      state.ids.push(operation.id);
-      state.root = operation.id; // Set the new operation as the root
+    addOperations(state, action) {
+      let operations = action.payload;
+      operations = Array.isArray(operations) ? operations : [operations];
+
+      operations.forEach((operation) => {
+        if (state.data[operation.id]) {
+          throw new Error(`Operation with ID ${operation.id} already exists`);
+        }
+        if (state.root) {
+          operation.children = [...operation.children, state.root];
+        }
+        state.data[operation.id] = operation;
+        state.ids.push(operation.id);
+        state.root = operation.id; // Set the new operation as the root
+      });
     },
 
     /**
@@ -160,10 +164,10 @@ const operationsSlice = createSlice({
      *
      * @param {Object} state - The current state of the operations slice.
      * @param {Object} action - The dispatched action containing the payload.
-     * @param {string|number} action.payload.id - The ID of the operation to focus.
+     * @param {string|number} action.payload - The ID of the operation to focus.
      */
     setFocusedOperation(state, action) {
-      const { id } = action.payload;
+      const id = action.payload;
       state.focused = id;
     },
 
@@ -182,7 +186,7 @@ const operationsSlice = createSlice({
 });
 
 export const {
-  addOperation,
+  addOperations,
   removeOperation,
   addChildToOperation,
   updateOperations,

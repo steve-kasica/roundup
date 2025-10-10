@@ -19,14 +19,11 @@ import {
   selectDraggingColumns,
   selectDropTargets,
   selectHoverTargets,
-  updateColumns,
 } from "../../slices/columnsSlice";
-import { renameColumnsRequest } from "../../sagas/renameColumnsSaga";
-import { removeColumnsRequest } from "../../sagas/removeColumnsSaga";
-import { swapColumnsRequest } from "../../sagas/swapColumnsSaga";
+import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
+import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import { selectFirstSelectedColumn } from "../../slices/uiSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { insertNewColumnRequest } from "../../sagas/insertNewColumnSaga/insertNewColumnSaga";
 import { selectOperation } from "../../slices/operationsSlice";
 
 export default function withColumnData(WrappedComponent) {
@@ -118,18 +115,18 @@ export default function withColumnData(WrappedComponent) {
         unHoverColumn={unHoverColumn} // Deprecated
         unhoverColumn={unHoverColumn}
         renameColumn={(name) => {
-          if (!isNull) dispatch(renameColumnsRequest({ ids: id, name }));
+          if (!isNull) dispatch(updateColumnsRequest([{ id, name }]));
         }}
         unfocusColumn={unfocusColumn}
         dragColumn={() => (!isNull ? dispatch(addColumnsToDragging(id)) : null)}
         unDragColumn={unDragColumn}
         removeColumn={() => {
           // @Deprecated, use excludeColumn instead
-          if (!isNull) dispatch(removeColumnsRequest(id));
+          if (!isNull) dispatch(deleteColumnsRequest(id));
         }}
         excludeColumn={() => {
           if (!isNull) {
-            dispatch(removeColumnsRequest(id));
+            dispatch(deleteColumnsRequest(id));
           }
         }}
         addColumnToSelection={() => {
@@ -164,39 +161,23 @@ export default function withColumnData(WrappedComponent) {
             // TODO: implement logic to nullify column
           }
         }}
-        swapColumnsWithinTable={(srcColumnId, targetColumnId) =>
-          dispatch(
-            swapColumnsRequest({
-              sourceIds: srcColumnId,
-              targetIds: targetColumnId,
-            })
-          )
-        }
         changeColumnType={(newType) => {
           if (!isNull) {
-            dispatch(updateColumns({ id, columnType: newType }));
+            dispatch(updateColumnsRequest({ id, columnType: newType }));
           }
         }}
-        insertColumnLeft={() => {
-          if (!isNull) {
-            dispatch(
-              insertNewColumnRequest({
-                tableId: column.tableId,
-                insertionIndex: index,
-              })
-            );
-          }
-        }}
-        insertColumnRight={() => {
-          if (!isNull) {
-            dispatch(
-              insertNewColumnRequest({
-                tableId: column.tableId,
-                insertionIndex: index + 1,
-              })
-            );
-          }
-        }}
+        // insertColumnLeft={() => {
+        //   if (!isNull) {
+        //     dispatch(
+        //     );
+        //   }
+        // }}
+        // insertColumnRight={() => {
+        //   if (!isNull) {
+        //     dispatch(
+        //     );
+        //   }
+        // }}
       />
     );
 

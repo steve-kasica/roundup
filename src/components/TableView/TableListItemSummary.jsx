@@ -36,10 +36,8 @@ function TableListItemSummary({
   onContextMenu,
   // Menu actions
   peekTable,
-  removeTableFromSchema,
   renameTable,
   dropTable,
-  addTableToSchema,
   setTableSelection,
 }) {
   const [contextMenu, setContextMenu] = useState(null);
@@ -187,11 +185,6 @@ function TableListItemSummary({
     {
       label: isInSchema ? "Remove from Schema" : "Add to Schema",
       onClick: () => {
-        if (isInSchema) {
-          removeTableFromSchema?.(table.id);
-        } else {
-          addTableToSchema?.(table);
-        }
         handleContextMenuClose();
       },
       isDisabled: false,

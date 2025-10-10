@@ -6,3 +6,4 @@ export * from "./ColumnTick";
 export * from "./ColumnSummary";
 export * from "./ColumnContextMenuItems";
 export * from "./ColumnHeader";
+export { default as StyledColumnCard } from "./StyledColumnCard";
