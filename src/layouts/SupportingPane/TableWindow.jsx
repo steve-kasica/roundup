@@ -95,8 +95,8 @@ const TableWindow = () => {
       flexDirection="column"
       flexGrow={1}
       minHeight={0}
-      overflowX="auto"
       width="100%"
+      sx={{ overflowX: "auto" }}
     >
       {/* Fixed header section */}
       <Box

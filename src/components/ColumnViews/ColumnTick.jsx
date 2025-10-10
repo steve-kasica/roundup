@@ -2,7 +2,19 @@
 import { Box, styled } from "@mui/material";
 import withColumnData from "./withColumnData";
 
-const StyledTick = styled(Box)(
+const StyledTick = styled(Box, {
+  shouldForwardProp: (prop) =>
+    ![
+      "isNull",
+      "isSelected",
+      "isLoading",
+      "isHovered",
+      "isDragging",
+      "isDropTarget",
+      "isOver",
+      "isError",
+    ].includes(prop),
+})(
   ({
     isNull,
     isSelected,
@@ -11,7 +23,7 @@ const StyledTick = styled(Box)(
     isDragging,
     isDropTarget,
     isOver,
-    error,
+    isError,
   }) => ({
     pointerEvents: "none", // Disable all mouse events
     flex: "1 1 0",
@@ -78,7 +90,7 @@ const StyledTick = styled(Box)(
     }),
 
     // Error state
-    ...(error && {
+    ...(isError && {
       backgroundColor: "#ffebee",
       borderColor: "#f44336",
       borderWidth: 2,
@@ -97,7 +109,18 @@ const StyledTick = styled(Box)(
   })
 );
 
-const ColumnTick = (props) => <StyledTick {...props} />;
+const ColumnTick = (props) => (
+  <StyledTick
+    isNull={props.isNull}
+    isSelected={props.isSelected}
+    isLoading={props.isLoading}
+    isHovered={props.isHovered}
+    isDragging={props.isDragging}
+    isDropTarget={props.isDropTarget}
+    isOver={props.isOver}
+    isError={props.error}
+  />
+);
 
 ColumnTick.displayName = "ColumnTick";
 
