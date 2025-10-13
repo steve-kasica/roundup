@@ -26,12 +26,14 @@ export default function* createTablesWorker(action) {
 
       // Create tables in DuckDB from previously registered files
       // identified by their file names in the Table object
-      const [tableStats] = yield call(createDBTables, table);
-      table.rowCount = tableStats.rowCount;
-      table.initialColumnCount = tableStats.columnCount;
+      const [{ rowCount, columnCount }] = yield call(createDBTables, table);
+      table.rowCount = rowCount;
+      table.initialColumnCount = columnCount;
       successfulCreations.push(table);
     } catch (error) {
       console.error("Error creating tables:", error);
+      table.rowCount = 0;
+      table.initialColumnCount = 0;
       table.error = JSON.stringify(error);
       failedCreations.push(table);
     }

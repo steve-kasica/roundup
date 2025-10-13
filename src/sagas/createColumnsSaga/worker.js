@@ -13,32 +13,77 @@ import {
 import { getTableColumnNames } from "../../lib/duckdb/getTableColumnNames";
 import { selectOperation } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { CREATION_MODE_INSERTION, CREATION_MODE_INITIALIZATION } from ".";
 
-export function* initializeTableColumnsWorker(action) {
+export default function* createColumnsWorker(action) {
+  const { columnInfo, mode } = action.payload;
   const successfulCreations = [];
   const failedCreations = [];
-  const { tableId } = action.payload;
-  // Get all columns from the table in the database
-  const columnNames = yield call(getTableColumnNames, tableId);
-  const columnStats = yield call(getColumnStats, tableId, columnNames);
+  const tableIdToColumnNames = new Map();
 
-  // Create new column objects
-  const columns = columnNames.map((name, index) =>
-    Column(tableId, index, columnStats[index])
-  );
-  try {
-    // Rename DB table columns to match the column IDs
-    yield call(
-      renameColumns,
-      tableId,
-      columns.map((column) => column.name), // old names
-      columns.map((column) => column.id) // new names
-    );
+  for (const { parentId, index } of columnInfo) {
+    // Create new column object
+    const newColumn = Column(parentId, index, {});
 
-    successfulCreations.push(...columns);
-  } catch (error) {
-    console.error("Error creating columns:", error);
-    failedCreations.push(...columns);
+    if (mode === CREATION_MODE_INSERTION) {
+      try {
+        yield call(insertColumn, parentId, newColumn.id);
+      } catch (error) {
+        console.error("Error inserting column:", error);
+        newColumn.error = JSON.stringify(error);
+        failedCreations.push(newColumn);
+      }
+      successfulCreations.push(newColumn);
+    } else if (mode === CREATION_MODE_INITIALIZATION) {
+      if (isTableId(parentId)) {
+        if (!tableIdToColumnNames.has(parentId)) {
+          const columnNames = yield call(getTableColumnNames, parentId);
+          tableIdToColumnNames.set(parentId, columnNames);
+        }
+        const columnNames = tableIdToColumnNames.get(parentId);
+        if (index < 0 || index >= columnNames.length) {
+          const errorMsg = `Index ${index} is out of bounds for table with ${columnNames.length} columns.`;
+          console.error(errorMsg);
+          failedCreations.push({ parentId, error: errorMsg });
+          continue; // Skip to the next iteration
+        }
+        newColumn.name = columnNames[index];
+
+        try {
+          // Rename DB table columns to match the column IDs
+          yield call(
+            renameColumns,
+            parentId,
+            [newColumn.name], // old name
+            [newColumn.id] // new name
+          );
+
+          successfulCreations.push(newColumn);
+        } catch (error) {
+          console.error("Error renaming column:", error);
+          newColumn.error = JSON.stringify(error);
+          failedCreations.push(newColumn);
+        }
+      } else {
+        // TODO
+        // Parent is an operation; get operation details
+        // const operation = yield select((state) =>
+        //   selectOperation(state, parentId)
+        // );
+        // if (!operation) {
+        //   const errorMsg = `Operation with ID ${parentId} not found.`;
+        //   console.error(errorMsg);
+        //   failedCreations.push({ parentId, error: errorMsg });
+        //   continue; // Skip to the next iteration
+        // }
+        // if (operation.operationType === "NO_OP") {
+        //   const errorMsg = `Operation with ID ${parentId} is a NO_OP and cannot have columns.`;
+        //   console.error(errorMsg);
+        //   failedCreations.push({ parentId, error: errorMsg });
+        //   continue; // Skip to the next iteration
+        // }
+      }
+    }
   }
 
   yield put(addColumnsToSlice([...successfulCreations, ...failedCreations]));
@@ -47,53 +92,7 @@ export function* initializeTableColumnsWorker(action) {
     yield put(
       createColumnsSuccess({
         columnIds: successfulCreations.map((col) => col.id),
-      })
-    );
-  }
-
-  if (failedCreations.length > 0) {
-    yield put(
-      createColumnsFailure({ columnIds: failedCreations.map((c) => c.id) })
-    );
-  }
-}
-
-export function* insertColumnsWorker(action) {
-  const successfulCreations = [];
-  const failedCreations = [];
-  const { columnPositions } = action.payload;
-  // Non-initialization: create single columns at specified positions
-  // Shift existing columns to the right of insertion index
-  for (const { tableId, index } of columnPositions) {
-    const { columnCount } = yield call(getTableDimensions, tableId);
-
-    if (index < 0 || index > columnCount) {
-      throw new Error(
-        `Index ${index} is out of bounds for table with ${columnCount} columns.`
-      );
-    }
-
-    // Create new column object
-    const newColumn = Column(tableId, index, {});
-
-    try {
-      // Create a new column in the DB table at the specified index
-      yield call(insertColumn, tableId, newColumn.id);
-
-      successfulCreations.push(newColumn);
-    } catch (error) {
-      console.error("Error fetching current column names:", error);
-      failedCreations.push({ tableId, error: error.message });
-      continue; // Skip to the next iteration
-    }
-  }
-  yield put(addColumnsToSlice([...successfulCreations, ...failedCreations]));
-
-  if (successfulCreations.length > 0) {
-    // Add column to columns slice
-    yield put(
-      createColumnsSuccess({
-        successfulCreations: successfulCreations.map((col) => col.id),
+        mode,
       })
     );
   }
@@ -101,98 +100,58 @@ export function* insertColumnsWorker(action) {
   if (failedCreations.length > 0) {
     yield put(
       createColumnsFailure({
-        failedCreations: failedCreations.map((col) => col.id),
+        columnIds: failedCreations.map((c) => c.id),
+        mode,
       })
     );
   }
 }
 
-export function* createPackColumnsWorker(action) {
-  const successfulCreations = [];
-  const failedCreations = [];
-  const { operationId } = action.payload;
+// export function* insertColumnsWorker(action) {
+//   const successfulCreations = [];
+//   const failedCreations = [];
+//   const { columnPositions } = action.payload;
+//   // Non-initialization: create single columns at specified positions
+//   // Shift existing columns to the right of insertion index
+//   for (const { tableId, index } of columnPositions) {
+//     const { columnCount } = yield call(getTableDimensions, tableId);
 
-  const operation = yield select((state) =>
-    selectOperation(state, operationId)
-  );
-  const columnIds = select((state) =>
-    operation.children.flatMap((childId) => {
-      if (isTableId(childId)) {
-        return selectTablesById(state, childId).columnIds;
-      } else {
-        return selectOperation(state, childId).columnIds;
-      }
-    })
-  );
-  for (let i = 0; i < columnIds.length; i++) {
-    const newColumn = Column(operation.id, i, {});
-    // try {
-    successfulCreations.push(newColumn);
-    // } catch (error) {
-    //   console.error("Error creating columns for pack operation:", error);
-    //   failedCreations.push(newColumn);
-    //   continue; // Skip to the next iteration
-    // }
-  }
+//     if (index < 0 || index > columnCount) {
+//       throw new Error(
+//         `Index ${index} is out of bounds for table with ${columnCount} columns.`
+//       );
+//     }
 
-  yield put(addColumnsToSlice([...successfulCreations, ...failedCreations]));
-  if (successfulCreations.length > 0) {
-    yield put(
-      createColumnsSuccess({
-        columnIds: successfulCreations.map((col) => col.id),
-      })
-    );
-  }
+//     // Create new column object
+//     const newColumn = Column(tableId, index, {});
 
-  if (failedCreations.length > 0) {
-    yield put(
-      createColumnsFailure({ columnIds: failedCreations.map((c) => c.id) })
-    );
-  }
-}
+//     try {
+//       // Create a new column in the DB table at the specified index
+//       yield call(insertColumn, tableId, newColumn.id);
 
-export function* createStackColumnsWorker(action) {
-  const successfulCreations = [];
-  const failedCreations = [];
-  const { operationId } = action.payload;
+//       successfulCreations.push(newColumn);
+//     } catch (error) {
+//       console.error("Error fetching current column names:", error);
+//       failedCreations.push({ tableId, error: error.message });
+//       continue; // Skip to the next iteration
+//     }
+//   }
+//   yield put(addColumnsToSlice([...successfulCreations, ...failedCreations]));
 
-  const operation = yield select((state) =>
-    selectOperation(state, operationId)
-  );
+//   if (successfulCreations.length > 0) {
+//     // Add column to columns slice
+//     yield put(
+//       createColumnsSuccess({
+//         successfulCreations: successfulCreations.map((col) => col.id),
+//       })
+//     );
+//   }
 
-  const columnIdMatrix = select((state) =>
-    operation.children.map((childId) => {
-      if (isTableId(childId)) {
-        return selectTablesById(state, childId).columnIds;
-      } else {
-        return selectOperation(state, childId).columnIds;
-      }
-    })
-  );
-  const columnCount = Math.max(0, ...columnIdMatrix.map((ids) => ids.length));
-  for (let i = 0; i < columnCount; i++) {
-    const newColumn = Column(operation.id, i, {});
-    // try {
-    successfulCreations.push(newColumn);
-    // } catch (error) {
-    //   console.error("Error creating columns for stack operation:", error);
-    //   failedCreations.push(newColumn);
-    //   continue; // Skip to the next iteration
-    // }
-  }
-
-  yield put(addColumnsToSlice([...successfulCreations, ...failedCreations]));
-  if (successfulCreations.length > 0) {
-    yield put(
-      createColumnsSuccess({
-        columnIds: successfulCreations.map((col) => col.id),
-      })
-    );
-  }
-
-  if (failedCreations.length > 0) {
-    yield put(
-      createColumnsFailure({ columnIds: failedCreations.map((c) => c.id) })
-    );
-  }
-}
+//   if (failedCreations.length > 0) {
+//     yield put(
+//       createColumnsFailure({
+//         failedCreations: failedCreations.map((col) => col.id),
+//       })
+//     );
+//   }
+// }

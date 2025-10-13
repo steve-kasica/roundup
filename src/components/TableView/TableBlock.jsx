@@ -7,6 +7,8 @@ import withTableData from "./withTableData.jsx";
 function TableBlock({
   // props via withTableData
   table,
+  columnCount = 0,
+  columnIds = [],
   isHovered,
   isDragging,
   isPressed,
@@ -16,7 +18,6 @@ function TableBlock({
   parentOperationType,
   parentColumnCount,
 }) {
-  const columnCount = table.columnIds.length;
   const ticks = Array.from(
     {
       length:
@@ -24,7 +25,7 @@ function TableBlock({
           ? parentColumnCount
           : columnCount,
     },
-    (_, i) => (i < columnCount ? table.columnIds[i] : null)
+    (_, i) => (i < columnCount ? columnIds[i] : null)
   );
 
   const className = [

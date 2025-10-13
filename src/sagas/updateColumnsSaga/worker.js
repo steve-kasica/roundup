@@ -1,55 +1,37 @@
-import { call, put, select } from "redux-saga/effects";
+import { call, put } from "redux-saga/effects";
 import {
   addColumnsToLoading,
   removeColumnsFromLoading,
-  selectColumnById,
   updateColumns as updateColumnsSlice,
 } from "../../slices/columnsSlice";
-import { group } from "d3-array";
 import { getColumnStats } from "../../lib/duckdb";
-import { updateColumnsFailure } from "./actions";
-
-const databaseAttributes = [
-  "columnType",
-  "approxUnique",
-  "avg",
-  "count",
-  "max",
-  "min",
-  "nullPercentage",
-  "q25",
-  "q50",
-  "q75",
-  "std",
-];
+import { updateColumnsFailure, updateColumnsSuccess } from "./actions";
+import { DATABASE_ATTRIBUTES } from ".";
 
 // Worker saga
 export default function* updateColumnsWorker(action) {
-  const columnUpdates = !Array.isArray(action.payload)
-    ? [action.payload]
-    : action.payload;
+  const successfulUpdates = [];
+  const failedUpdates = [];
+  const { columnUpdates } = action.payload;
 
-  const columnIds = columnUpdates.map(({ id }) => id);
+  yield put(addColumnsToLoading(columnUpdates.map(({ id }) => id)));
 
-  const columns = yield select((state) =>
-    // TODO: make this selector name plural
-    columnIds.map((id) => selectColumnById(state, id))
-  );
-  yield put(addColumnsToLoading(columnIds));
-
-  for (let i = 0; i < columnUpdates.length; i++) {
-    let columnToUpdate = columnUpdates[i];
+  for (let columnUpdate of columnUpdates) {
     try {
-      // If any of the requested attributes are database attributes, fetch from DB
-      let stats = {};
+      let databaseAttributeValues = {};
       if (
-        Object.keys(columnToUpdate.attributes).some((key) =>
-          databaseAttributes.includes(key)
+        Object.keys(columnUpdate).some((key) =>
+          DATABASE_ATTRIBUTES.includes(key)
         )
       ) {
-        stats = yield call(getColumnStats, columns[i].tableId, [columns[i].id]);
+        databaseAttributeValues = yield call(
+          getColumnStats,
+          columnUpdate.tableId,
+          [columnUpdate.id]
+        );
+        console.log({ columnUpdate, databaseAttributeValues });
       }
-      // TODO: compute columnKeyness?
+      // TODO: compute columnKeyness? Isn't this something we can do in the HOC?
       // function* computeColumnKeynessWorker(action) {
       //   const { columnIds, tableIds } = action.payload;
       //   for (let i = 0; i < tableIds.length; i++) {
@@ -59,14 +41,30 @@ export default function* updateColumnsWorker(action) {
       //   }
       // }
 
-      columnUpdates[i] = { ...columnToUpdate, ...stats[0] };
+      successfulUpdates.push({
+        ...columnUpdate,
+        ...databaseAttributeValues[0],
+        error: null,
+      });
     } catch (error) {
       console.error("Error fetching column stats from DB:", error);
-      yield put(updateColumnsFailure({ error, columnIds: [columns[i].id] }));
-      continue; // Skip to next column
+      failedUpdates.push({ ...columnUpdate, error: JSON.stringify(error) });
     }
   }
 
-  yield put(updateColumnsSlice(columnUpdates));
-  yield put(removeColumnsFromLoading(columnIds));
+  // Update the column objects in the store (both successful and failed)
+  yield put(updateColumnsSlice([...successfulUpdates, ...failedUpdates]));
+  yield put(removeColumnsFromLoading(columnUpdates.map(({ id }) => id)));
+
+  if (successfulUpdates.length > 0) {
+    yield put(
+      updateColumnsSuccess({ columnIds: successfulUpdates.map((c) => c.id) })
+    );
+  }
+
+  if (failedUpdates.length > 0) {
+    yield put(
+      updateColumnsFailure({ columnIds: failedUpdates.map((c) => c.id) })
+    );
+  }
 }

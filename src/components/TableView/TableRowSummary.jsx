@@ -429,7 +429,7 @@ function TableRowSummary({
         percentage={(columnCount / columnMax) * 100}
         isDisabled={isDisabled}
       >
-        {`${formatNumber(table.columnIds.length)}`}
+        {`${formatNumber(columnCount)}`}
         <sup
           style={{ display: removedColumnIds.length > 0 ? "inline" : "none" }}
         >

@@ -71,12 +71,18 @@ import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
  * @param {Object} props - Component props
  * @param {Object} props.table - Table object containing schema information
  * @param {string} props.table.name - Name of the table
- * @param {string[]} props.table.columnIds - Array of column IDs in the table
+ * @param {string[]} props.columnIds - Array of column IDs in the table
  * @param {number} [props.table.rowCount] - Number of rows in the table
  * @param {string[]} [props.selectedColumnIds=[]] - Array of currently selected column IDs
  * @returns {JSX.Element} The rendered TableSchema component
  */
-const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
+const TableSchema = ({
+  table,
+  columnIds = [],
+  columnCount = 0,
+  selectedColumnIds = [],
+  swapColumns,
+}) => {
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
   const [canDragColumns, setCanDragColumns] = useState(false);
@@ -92,8 +98,8 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
    * Selects all columns in the table
    */
   const handleSelectAll = useCallback(() => {
-    dispatch(setSelectedColumns(table.columnIds));
-  }, [dispatch, table.columnIds]);
+    dispatch(setSelectedColumns(columnIds));
+  }, [dispatch, columnIds]);
 
   /**
    * Deletes the currently selected columns and clears the selection
@@ -156,7 +162,6 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
    */
   const handleColumnClick = useCallback(
     (event, columnId) => {
-      const columnIds = table.columnIds;
       const isCtrlOrCmd = event.ctrlKey || event.metaKey;
       const isShift = event.shiftKey;
       const currentColumnIndex = columnIds.indexOf(columnId);
@@ -195,7 +200,7 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
         dispatch(setSelectedColumns([columnId]));
       }
     },
-    [dispatch, table.columnIds, selectedColumnIds]
+    [dispatch, columnIds, selectedColumnIds]
   );
 
   /**
@@ -244,7 +249,7 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
             {table.name}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {table.columnIds.length} x {table.rowCount?.toLocaleString() || 0}
+            {columnIds.length} x {table.rowCount?.toLocaleString() || 0}
           </Typography>
         </Box>
 
@@ -276,7 +281,7 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
           <IconButton
             size="small"
             onClick={handleSelectAll}
-            disabled={selectedColumnIds.length === table.columnIds.length}
+            disabled={selectedColumnIds.length === columnCount}
             title="Select all columns"
           >
             <SelectAll fontSize="small" />
@@ -372,7 +377,7 @@ const TableSchema = ({ table, selectedColumnIds = [], swapColumns }) => {
         }}
       >
         {/* Individual Column Cards - Each column rendered as a numbered card with summary */}
-        {table.columnIds.map((columnId, i) => (
+        {columnIds.map((columnId, i) => (
           <Box
             key={columnId}
             sx={{

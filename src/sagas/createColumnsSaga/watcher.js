@@ -1,10 +1,5 @@
 import { put, select, takeEvery } from "redux-saga/effects";
-import {
-  createPackColumnsWorker,
-  createStackColumnsWorker,
-  initializeTableColumnsWorker,
-  insertColumnsWorker,
-} from "./worker";
+import createColumnsWorker from "./worker";
 import { createColumnsRequest } from "./actions";
 import { createTablesSuccess } from "../createTablesSaga";
 import {
@@ -13,83 +8,63 @@ import {
 } from "../createOperationsSaga/actions";
 import {
   OPERATION_TYPE_NO_OP,
-  OPERATION_TYPE_PACK,
-  OPERATION_TYPE_STACK,
   selectOperation,
 } from "../../slices/operationsSlice";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectTablesById } from "../../slices/tablesSlice";
+import { CREATION_MODE_INITIALIZATION } from ".";
+
+// Create a shared function for handling both success and failure operations
+const handleOperations = function* (action) {
+  const { operationIds } = action.payload;
+  const operations = yield select((state) =>
+    operationIds.map((id) => selectOperation(state, id))
+  );
+  for (const { id, operationType, initialColumnCount } of operations) {
+    if (operationType === OPERATION_TYPE_NO_OP) {
+      continue;
+    }
+    yield put(
+      createColumnsRequest({
+        mode: CREATION_MODE_INITIALIZATION,
+        columnInfo: Array.from({ length: initialColumnCount }).map(
+          (_, index) => ({
+            parentId: id,
+            index,
+          })
+        ),
+      })
+    );
+  }
+};
+
+const handleTables = function* (action) {
+  const { tableIds } = action.payload;
+  const tables = yield select((state) => selectTablesById(state, tableIds));
+  for (const { id, initialColumnCount } of tables) {
+    yield put(
+      createColumnsRequest({
+        mode: CREATION_MODE_INITIALIZATION,
+        columnInfo: Array.from({ length: initialColumnCount }).map(
+          (_, index) => ({
+            parentId: id, // tables and operations can be parents of columns
+            index,
+          })
+        ),
+      })
+    );
+  }
+};
 
 export default function* createColumnsWatcher() {
-  yield takeEvery(createColumnsRequest.type, function* (action) {
-    const { mode } = action.payload;
-    if (mode === "initializeTable") {
-      yield* initializeTableColumnsWorker(action);
-    } else if (mode === "initializeStack") {
-      yield* createStackColumnsWorker(action);
-    } else if (mode === "initializePack") {
-      yield* createPackColumnsWorker(action);
-    } else {
-      yield* insertColumnsWorker(action);
-    }
-  });
+  yield takeEvery(createColumnsRequest.type, createColumnsWorker);
 
-  yield takeEvery(createTablesSuccess.type, function* (action) {
-    const { tableIds } = action.payload;
-    for (const tableId of tableIds) {
-      yield put(
-        createColumnsRequest({
-          mode: "initializeTable",
-          tableId,
-        })
-      );
-    }
-  });
+  // When tables are created, create columns for them
+  yield takeEvery(createTablesSuccess.type, handleTables);
 
-  // // If an operation is created but fails, we still want to create
-  // // columns for it so the user can see the error in the UI
-  // yield takeEvery(createOperationsFailure.type, function* (action) {
-  //   const { operationIds } = action.payload;
-  //   const operations = yield select((state) =>
-  //     operationIds.map((id) => selectOperation(state, id))
-  //   );
-  //   for (const { id, operationType } of operations) {
-  //     if (operationType === OPERATION_TYPE_PACK) {
-  //       yield put(
-  //         createColumnsRequest({
-  //           mode: "initializePack",
-  //           queryDB: true,
-  //           operationId: id,
-  //         })
-  //       );
-  //     } else if (operationType === OPERATION_TYPE_STACK) {
-  //       yield put(
-  //         createColumnsRequest({
-  //           mode: "initializeStack",
-  //           queryDB: true,
-  //           operationId: id,
-  //         })
-  //       );
-  //     }
-  //   }
-  // });
+  // If an operation is successfully created, create columns for it
+  yield takeEvery(createOperationsSuccess.type, handleOperations);
 
-  // If an operation is successfully created, we can just treat it
-  // like a table since there's a DB view to pull columns from
-  yield takeEvery(createOperationsSuccess.type, function* (action) {
-    const { operationIds } = action.payload;
-    const operations = yield select((state) =>
-      operationIds.map((id) => selectOperation(state, id))
-    );
-    for (const operation of operations) {
-      if (operation.operationType === OPERATION_TYPE_NO_OP) {
-        continue;
-      }
-      yield put(
-        createColumnsRequest({
-          mode: "initializeTable",
-          tableId: operation.id,
-        })
-      );
-    }
-  });
+  // If an operation is created but fails, we still want to create
+  // columns for it so the user can see the error in the UI
+  yield takeEvery(createOperationsFailure.type, handleOperations);
 }

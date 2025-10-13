@@ -63,7 +63,6 @@ export async function getColumnStats(tableId, columnList) {
       count: serialized.count,
       max: serialized.max,
       min: serialized.min,
-      name: serialized.column_name,
       nullPercentage: serialized.null_percentage / 10000, // This is in basis points (e.g., 2500 = 25.00%)
       p25: serialized.p25,
       p50: serialized.p50,

@@ -48,9 +48,14 @@ export default function withTableData(WrappedComponent) {
         selectRemovedColumnIdsByTableId(state, id)
       );
 
-      // Use useMemo to ensure activeColumnIds updates when table.columnIds or removedColumnIds change
+      // Use useMemo to ensure activeColumnIds updates when columnIds or removedColumnIds change
       // deprecated
-      const activeColumnIds = table.columnIds;
+      const activeColumnIds = useSelector((state) => {
+        const columnIds = Object.values(state.columns.data)
+          .filter((col) => col.tableId === id)
+          .map((col) => col.id);
+        return columnIds;
+      });
 
       // Get selected columns from state
       const allSelectedColumns = useSelector(selectSelectedColumns);
@@ -62,7 +67,7 @@ export default function withTableData(WrappedComponent) {
         );
       }, [allSelectedColumns, activeColumnIds]);
       const hoveredColumnIds = useSelector((state) =>
-        state.columns.hovered.filter((colId) => table.columnIds.includes(colId))
+        state.columns.hovered.filter((colId) => activeColumnIds.includes(colId))
       );
 
       // TODO: deprecate columns
@@ -128,7 +133,7 @@ export default function withTableData(WrappedComponent) {
           hoverColumn={hoverColumn}
           unhoverColumn={unhoverColumn}
           swapColumns={(target, source) => {
-            const updatedColumnIds = [...table.columnIds];
+            const updatedColumnIds = [...activeColumnIds];
             const sourceIndex = updatedColumnIds.indexOf(source);
             const targetIndex = updatedColumnIds.indexOf(target);
             if (sourceIndex === -1 || targetIndex === -1) return; // Invalid indices

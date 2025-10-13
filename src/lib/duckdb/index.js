@@ -19,3 +19,4 @@ export * from "./getStackRows";
 export * from "./insertColumn";
 export * from "./getColumnNames";
 export * from "./dropView";
+export * from "./isColumnPresent";

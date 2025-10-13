@@ -44,6 +44,40 @@ import {
 } from "../../lib/duckdb";
 import { createOperationsSuccess, createOperationsFailure } from "./actions";
 import Operation from "../../slices/operationsSlice/Operation";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+
+const calcPackColumnCount = (childIds) => {
+  const columnCounts = childIds.map((childId) => {
+    if (isTableId(childId)) {
+      const table = select((state) => selectTablesById(state, [childId])[0]);
+      return table ? table.columnIds.length : 0;
+    } else {
+      const operation = select((state) => selectOperation(state, childId));
+      return operation ? operation.columnIds.length : 0;
+    }
+  });
+  const columnCountTotal = columnCounts.reduce((sum, count) => sum + count, 0);
+  return columnCountTotal;
+};
+
+const calcStackColumnCount = (childIds) => {
+  let maxColumns = 0;
+  for (const childId of childIds) {
+    if (isTableId(childId)) {
+      const table = select((state) => selectTablesById(state, [childId])[0]);
+      if (table && table.columnIds.length > maxColumns) {
+        maxColumns = table.columnIds.length;
+      }
+    } else {
+      const operation = select((state) => selectOperation(state, childId));
+      if (operation && operation.columnIds.length > maxColumns) {
+        maxColumns = operation.columnIds.length;
+      }
+    }
+  }
+  return maxColumns;
+};
+
 /**
  * Selector to build query data for an operation.
  * Constructs the data structure needed for database view creation.
@@ -110,8 +144,12 @@ export default function* createOperationsWorker(action) {
         );
         // Creates a unified view with columns from all child tables
         yield call(createPackView, queryData, operation.columnIds);
-        const { rowCount } = yield call(getTableDimensions, operation.id);
+        const { rowCount, columnCount } = yield call(
+          getTableDimensions,
+          operation.id
+        );
         operation.rowCount = rowCount;
+        operation.initialColumnCount = columnCount;
       } else if (operation.operationType === OPERATION_TYPE_STACK) {
         // Creates a stacked view using the first child table as template
         // Build query data structure required for view creation
@@ -119,8 +157,12 @@ export default function* createOperationsWorker(action) {
           selectQueryData(state, operation.id)
         );
         yield call(createStackView, queryData, operation.columnIds);
-        const { rowCount } = yield call(getTableDimensions, operation.id);
+        const { rowCount, columnCount } = yield call(
+          getTableDimensions,
+          operation.id
+        );
         operation.rowCount = rowCount;
+        operation.initialColumnCount = columnCount;
       }
       // Do nothing for NO_OP operations
 
@@ -131,6 +173,10 @@ export default function* createOperationsWorker(action) {
         error
       );
       operation.rowCount = undefined;
+      operation.initialColumnCount =
+        operation.operationType === OPERATION_TYPE_PACK
+          ? calcPackColumnCount(childIds)
+          : calcStackColumnCount(childIds);
       operation.error = JSON.stringify(
         error,
         Object.getOwnPropertyNames(error)

@@ -46,6 +46,8 @@ const RowBlock = styled(Box)(({ height, isHovered, isToggled, isNull }) => ({
 
 const TableRowMatches = ({
   table,
+  columnCount,
+  columnIds,
   key,
   tablePosition, // "left" or "right"
   selectedOperationColumnIds = [],
@@ -59,7 +61,7 @@ const TableRowMatches = ({
   onColumnClick = () => {},
   onTableLabelClick = () => {},
 }) => {
-  const columnWidth = (1 / table.columnIds.length) * 100 + "%";
+  const columnWidth = (1 / columnCount) * 100 + "%";
 
   const handleColumnClick = useCallback(
     (event, columnId) => {
@@ -83,7 +85,7 @@ const TableRowMatches = ({
         onClick={(event) => onTableLabelClick(event, table.id)}
       />
       <Box display="flex" width="100%" gap={"1px"}>
-        {table.columnIds.map((columnId) => (
+        {columnIds.map((columnId) => (
           <Box
             key={columnId}
             backgroundColor="#ddd"
@@ -168,11 +170,11 @@ const TableRowMatches = ({
               onMouseLeave={(event) => onBlockLeave(event, label)}
               onClick={(event) => onBlockClick(event, table.id, label)}
             >
-              {table.columnIds.map((columnId) => (
+              {columnIds.map((columnId) => (
                 <Box
                   key={columnId}
                   sx={{
-                    width: (1 / table.columnIds.length) * 100 + "%",
+                    width: (1 / columnCount) * 100 + "%",
                     height: "100%",
                     backgroundColor: "#ccc",
                   }}
