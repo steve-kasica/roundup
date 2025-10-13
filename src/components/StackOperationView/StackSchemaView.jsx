@@ -7,11 +7,7 @@ import {
   getIndexOfValue,
 } from "./selectionUtils/selectionUtils";
 import { EnhancedTableLabel } from "../TableView";
-import {
-  ColumnSummary,
-  EnhancedColumnSummary,
-  StyledColumnCard,
-} from "../ColumnViews";
+import { EnhancedColumnSummary, StyledColumnCard } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
@@ -261,8 +257,6 @@ const StackSchemaView = withStackOperationData(
                 {colIndex + 1}
               </Box>
               <Box
-                selectedColumns={selectedColumns} // Pass selected columns
-                columnIdMatrix={columnIdMatrix} // Pass the matrix
                 sx={{
                   display: "flex",
                   flexDirection: "column",
