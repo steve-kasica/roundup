@@ -6,7 +6,7 @@ import { getStackRows } from "../lib/duckdb";
  * Appends new data instead of replacing it (useful for infinite scroll)
  *
  * @param {Array<string>} tableIds - Array of table identifiers to union
- * @param {Array<Array<string>>|Array<string>} columnIds - Matrix of column names or single array for all tables
+ * @param {Array<Array<string>>|Array<string>} columnNames - Matrix of column names or single array for all tables
  * @param {number} pageSize - Number of rows per page (default: 50)
  * @param {string} sortBy - Column name to sort combined results by (default: null)
  * @param {string} sortDirection - Sort direction: 'asc' or 'desc' (default: 'asc')
@@ -15,7 +15,7 @@ import { getStackRows } from "../lib/duckdb";
  */
 export function usePaginatedStackRows(
   tableIds,
-  columnIds = null,
+  columnNames = null,
   pageSize = 50,
   sortBy = null,
   sortDirection = "asc"
@@ -39,7 +39,7 @@ export function usePaginatedStackRows(
         const offset = pageNum * pageSize;
         const rows = await getStackRows(
           tableIds,
-          columnIds,
+          columnNames,
           pageSize,
           offset,
           sortBy,
@@ -63,7 +63,7 @@ export function usePaginatedStackRows(
         setLoading(false);
       }
     },
-    [tableIds, columnIds, pageSize, sortBy, sortDirection]
+    [tableIds, columnNames, pageSize, sortBy, sortDirection]
   );
 
   const loadMore = useCallback(() => {
@@ -101,7 +101,7 @@ export function usePaginatedStackRows(
     setCurrentPage(0);
     setHasMore(true);
     setError(null);
-  }, [tableIds, columnIds, sortBy, sortDirection]);
+  }, [tableIds, columnNames, sortBy, sortDirection]);
 
   return {
     data,

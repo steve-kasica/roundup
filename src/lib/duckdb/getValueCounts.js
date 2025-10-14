@@ -4,14 +4,14 @@ import { getDuckDB } from "./duckdbClient";
  * Get unique values and their counts for a specific column from a table via DuckDB.
  *
  * @param {string} tableId - The table identifier
- * @param {string} columnId - The column identifier
+ * @param {string} columnName - The column identifier
  * @param {number} limit - Maximum number of results to return (optional)
  * @param {number} offset - Number of results to skip (optional, for pagination)
  * @returns {Promise<Object>} Object with values as keys and counts as values
  */
 export async function getValueCounts(
   tableId,
-  columnId,
+  columnName,
   limit = null,
   offset = 0
 ) {
@@ -23,11 +23,11 @@ export async function getValueCounts(
 
   const query = `
       SELECT 
-        "${columnId}" as value,
+        "${columnName}" as value,
         COUNT(*) as count
       FROM "${tableId}" 
-      WHERE "${columnId}" IS NOT NULL
-      GROUP BY "${columnId}"
+      WHERE "${columnName}" IS NOT NULL
+      GROUP BY "${columnName}"
       ORDER BY count DESC
       ${limitClause}
       ${offsetClause}
@@ -42,7 +42,7 @@ export async function getValueCounts(
     }, {});
   } catch (error) {
     throw new Error(
-      `Failed to get value counts for column ${columnId}: ${error.message}`
+      `Failed to get value counts for column ${columnName}: ${error.message}`
     );
   } finally {
     await conn.close();
@@ -53,14 +53,14 @@ export async function getValueCounts(
  * Get paginated value counts with metadata for lazy loading
  *
  * @param {string} tableId - The table identifier
- * @param {string} columnId - The column identifier
+ * @param {string} columnName - The column identifier
  * @param {number} limit - Number of results per page
  * @param {number} offset - Number of results to skip
  * @returns {Promise<Object>} Object with data, hasMore, and total count
  */
 export async function getPaginatedValueCounts(
   tableId,
-  columnId,
+  columnName,
   limit = 100,
   offset = 0
 ) {
@@ -70,9 +70,9 @@ export async function getPaginatedValueCounts(
   try {
     // Get total count of unique values
     const totalQuery = `
-      SELECT COUNT(DISTINCT "${columnId}") as total
+      SELECT COUNT(DISTINCT "${columnName}") as total
       FROM "${tableId}" 
-      WHERE "${columnId}" IS NOT NULL
+      WHERE "${columnName}" IS NOT NULL
     `;
     const totalResult = await conn.query(totalQuery);
     const total = Number(totalResult.toArray()[0].total);
@@ -80,11 +80,11 @@ export async function getPaginatedValueCounts(
     // Get paginated data
     const dataQuery = `
       SELECT 
-        "${columnId}" as value,
+        "${columnName}" as value,
         COUNT(*) as count
       FROM "${tableId}" 
-      WHERE "${columnId}" IS NOT NULL
-      GROUP BY "${columnId}"
+      WHERE "${columnName}" IS NOT NULL
+      GROUP BY "${columnName}"
       ORDER BY count DESC
       LIMIT ${limit}
       OFFSET ${offset}
@@ -107,7 +107,7 @@ export async function getPaginatedValueCounts(
     };
   } catch (error) {
     throw new Error(
-      `Failed to get paginated value counts for column ${columnId}: ${error.message}`
+      `Failed to get paginated value counts for column ${columnName}: ${error.message}`
     );
   } finally {
     await conn.close();
@@ -118,30 +118,33 @@ export async function getPaginatedValueCounts(
  * Get value counts for multiple columns at once
  *
  * @param {string} tableId - The table identifier
- * @param {Array<string>} columnIds - Array of column identifiers
+ * @param {Array<string>} columnNames - Array of column identifiers
  * @param {number} limit - Maximum number of results per column
  * @param {number} offset - Number of results to skip per column
- * @returns {Promise<Object>} Object with columnId as keys and value counts as values
+ * @returns {Promise<Object>} Object with columnName as keys and value counts as values
  */
 export async function getMultipleValueCounts(
   tableId,
-  columnIds,
+  columnNames,
   limit = 100,
   offset = 0
 ) {
   const results = {};
 
-  for (const columnId of columnIds) {
+  for (const columnName of columnNames) {
     try {
-      results[columnId] = await getValueCounts(
+      results[columnName] = await getValueCounts(
         tableId,
-        columnId,
+        columnName,
         limit,
         offset
       );
     } catch (error) {
-      console.warn(`Failed to get value counts for column ${columnId}:`, error);
-      results[columnId] = {};
+      console.warn(
+        `Failed to get value counts for column ${columnName}:`,
+        error
+      );
+      results[columnName] = {};
     }
   }
 
@@ -152,33 +155,33 @@ export async function getMultipleValueCounts(
  * Get value counts for multiple columns with pagination support
  *
  * @param {string} tableId - The table identifier
- * @param {Array<string>} columnIds - Array of column identifiers
+ * @param {Array<string>} columnNames - Array of column identifiers
  * @param {number} limit - Maximum number of results per column
  * @param {number} offset - Number of results to skip per column
- * @returns {Promise<Object>} Object with columnId as keys and paginated results as values
+ * @returns {Promise<Object>} Object with columnName as keys and paginated results as values
  */
 export async function getMultiplePaginatedValueCounts(
   tableId,
-  columnIds,
+  columnNames,
   limit = 100,
   offset = 0
 ) {
   const results = {};
 
-  for (const columnId of columnIds) {
+  for (const columnName of columnNames) {
     try {
-      results[columnId] = await getPaginatedValueCounts(
+      results[columnName] = await getPaginatedValueCounts(
         tableId,
-        columnId,
+        columnName,
         limit,
         offset
       );
     } catch (error) {
       console.warn(
-        `Failed to get paginated value counts for column ${columnId}:`,
+        `Failed to get paginated value counts for column ${columnName}:`,
         error
       );
-      results[columnId] = {
+      results[columnName] = {
         data: {},
         hasMore: false,
         total: 0,

@@ -3,27 +3,27 @@ import { getDuckDB } from "./duckdbClient";
 export async function calcPackStats(
   leftTableId,
   rightTableId,
-  leftColumnId,
-  rightColumnId,
+  leftColumnName,
+  rightColumnName,
   joinType
 ) {
   const db = await getDuckDB();
   const conn = await db.connect();
   // TODO: refactor to util file for DRY
   const predicates = {
-    EQUALS: `${leftTableId}.${leftColumnId} = ${rightTableId}.${rightColumnId}`,
-    CONTAINS: `contains(${leftTableId}.${leftColumnId}, ${rightTableId}.${rightColumnId})`,
-    STARTS_WITH: `starts_with(${leftTableId}.${leftColumnId}, ${rightTableId}.${rightColumnId})`,
-    ENDS_WITH: `ends_with(${leftTableId}.${leftColumnId}, ${rightTableId}.${rightColumnId})`,
+    EQUALS: `${leftTableId}.${leftColumnName} = ${rightTableId}.${rightColumnName}`,
+    CONTAINS: `contains(${leftTableId}.${leftColumnName}, ${rightTableId}.${rightColumnName})`,
+    STARTS_WITH: `starts_with(${leftTableId}.${leftColumnName}, ${rightTableId}.${rightColumnName})`,
+    ENDS_WITH: `ends_with(${leftTableId}.${leftColumnName}, ${rightTableId}.${rightColumnName})`,
   };
   const query = `
     -- Count output rows by join relationship type
     WITH join_analysis AS (
         SELECT 
-            ${leftTableId}.${leftColumnId} AS left_value,
-            ${rightTableId}.${rightColumnId} AS right_value,
-            COUNT(*) OVER (PARTITION BY ${leftTableId}.${leftColumnId}) as left_matches,
-            COUNT(*) OVER (PARTITION BY ${rightTableId}.${rightColumnId}) as right_matches
+            ${leftTableId}.${leftColumnName} AS left_value,
+            ${rightTableId}.${rightColumnName} AS right_value,
+            COUNT(*) OVER (PARTITION BY ${leftTableId}.${leftColumnName}) as left_matches,
+            COUNT(*) OVER (PARTITION BY ${rightTableId}.${rightColumnName}) as right_matches
         FROM ${leftTableId}
         FULL OUTER JOIN ${rightTableId}
         ON ${predicates[joinType]}

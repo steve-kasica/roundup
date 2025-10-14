@@ -17,7 +17,7 @@ const SingleColumn = withColumnData(
     };
     return (
       <Box sx={{ p: 1 }}>
-        <h2>{column.name}</h2>
+        <h2>{column.name || column.columnName || column.id}</h2>
         <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
           Stats
         </Typography>

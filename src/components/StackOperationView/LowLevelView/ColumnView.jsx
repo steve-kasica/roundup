@@ -54,7 +54,7 @@ function ColumnView({
     let isMounted = true;
     setLoading(true);
     setError(null);
-    getColumnValues(tableId, columnId, limit, offset)
+    getColumnValues(tableId, column.columnName, limit, offset)
       .then((result) => {
         if (isMounted) {
           setValues((prev) =>

@@ -29,7 +29,7 @@ const ColumnValues = ({
     let isMounted = true;
     setLoading(true);
     setError(null);
-    getColumnValues(column.tableId, column.id, limit, offset)
+    getColumnValues(column.tableId, column.columnName, limit, offset)
       .then((result) => {
         if (isMounted) {
           setValues((prev) =>

@@ -2,7 +2,7 @@ import { getDuckDB } from "./duckdbClient";
 
 export async function getStackRows(
   tableIds,
-  columnIds, // This should be a matrix where each row corresponds to tableIds by index
+  columnNames, // This should be a matrix where each row corresponds to tableIds by index
   limit = 50,
   offset = 0,
   sortBy = null,
@@ -20,13 +20,13 @@ export async function getStackRows(
   const unionClauses = tableIds.map((tableId, index) => {
     // Get columns for this specific table (matrix row)
     let columnsForTable;
-    if (Array.isArray(columnIds) && columnIds.length > 0) {
-      if (Array.isArray(columnIds[0])) {
-        // columnIds is a matrix - use the row that matches this table index
-        columnsForTable = columnIds[index] || columnIds[0]; // fallback to first row if index out of bounds
+    if (Array.isArray(columnNames) && columnNames.length > 0) {
+      if (Array.isArray(columnNames[0])) {
+        // columnNames is a matrix - use the row that matches this table index
+        columnsForTable = columnNames[index] || columnNames[0]; // fallback to first row if index out of bounds
       } else {
-        // columnIds is a simple array - use same columns for all tables
-        columnsForTable = columnIds;
+        // columnNames is a simple array - use same columns for all tables
+        columnsForTable = columnNames;
       }
     } else {
       // Use all columns

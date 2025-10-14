@@ -5,8 +5,8 @@ import { getMatchValues } from "../lib/duckdb/getMatchValues";
  * Custom hook for fetching match values between two tables
  * @param {string} leftTableId - ID of the left table
  * @param {string} rightTableId - ID of the right table
- * @param {string} leftColumnId - ID of the left column
- * @param {string} rightColumnId - ID of the right column
+ * @param {string} leftColumnName - ID of the left column
+ * @param {string} rightColumnName - ID of the right column
  * @param {string} joinPredicate - Join predicate (EQUALS, CONTAINS, STARTS_WITH, ENDS_WITH)
  * @param {string} matchType - Type of match (MATCHES, LEFT_UNJOINED, RIGHT_UNJOINED)
  * @param {object} options - Additional options
@@ -19,8 +19,8 @@ import { getMatchValues } from "../lib/duckdb/getMatchValues";
 export function useMatchValues(
   leftTableId,
   rightTableId,
-  leftColumnId,
-  rightColumnId,
+  leftColumnName,
+  rightColumnName,
   joinPredicate,
   matchType,
   options = {}
@@ -42,8 +42,8 @@ export function useMatchValues(
       !enabled ||
       !leftTableId ||
       !rightTableId ||
-      !leftColumnId ||
-      !rightColumnId ||
+      !leftColumnName ||
+      !rightColumnName ||
       !joinPredicate ||
       !matchType
     ) {
@@ -57,8 +57,8 @@ export function useMatchValues(
       const result = await getMatchValues(
         leftTableId,
         rightTableId,
-        leftColumnId,
-        rightColumnId,
+        leftColumnName,
+        rightColumnName,
         joinPredicate,
         matchType,
         limit,
@@ -77,8 +77,8 @@ export function useMatchValues(
     enabled,
     leftTableId,
     rightTableId,
-    leftColumnId,
-    rightColumnId,
+    leftColumnName,
+    rightColumnName,
     joinPredicate,
     matchType,
     limit,

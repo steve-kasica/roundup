@@ -57,15 +57,22 @@ export default function withTableData(WrappedComponent) {
         return columnIds;
       });
 
-      // Get selected columns from state
-      const allSelectedColumns = useSelector(selectSelectedColumns);
+      // Get selected columns from this table
+      const selectedTableColumns = useSelector((state) =>
+        selectSelectedColumns(state)
+          .map((columnId) => selectColumnById(state, columnId))
+          .filter(({ tableId }) => tableId === id)
+      );
 
       // The intersection of the set of columns in this table and the set of selected columns
       const selectedColumnIds = useMemo(() => {
-        return allSelectedColumns.filter((colId) =>
-          activeColumnIds.includes(colId)
-        );
-      }, [allSelectedColumns, activeColumnIds]);
+        return selectedTableColumns.map(({ id }) => id);
+      }, [selectedTableColumns]);
+
+      const selectedColumnNames = useMemo(() => {
+        return selectedTableColumns.map(({ columnName }) => columnName);
+      }, [selectedTableColumns]);
+
       const hoveredColumnIds = useSelector((state) =>
         state.columns.hovered.filter((colId) => activeColumnIds.includes(colId))
       );
@@ -120,6 +127,7 @@ export default function withTableData(WrappedComponent) {
           // Other related objects
           columnNames={columnNames} // TODO: remove this, should only pass Ids
           selectedColumnIds={selectedColumnIds}
+          selectedColumnNames={selectedColumnNames}
           hoveredColumnIds={hoveredColumnIds} // Only hovered columnIDs in this table
           parentOperation={parentOperation} // TODO: should only pass Ids
           depth={depth}

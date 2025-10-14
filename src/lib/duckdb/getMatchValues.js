@@ -4,8 +4,8 @@ import { MATCH_TYPES } from "../../components/OperationsList/PackOperationParams
 export async function getMatchValues(
   leftTableId,
   rightTableId,
-  leftColumnId,
-  rightColumnId,
+  leftColumnName,
+  rightColumnName,
   joinPredicate,
   matchType,
   limit = 100,
@@ -17,10 +17,10 @@ export async function getMatchValues(
   const conn = await db.connect();
   // TODO: refactor to util file for DRY
   const predicates = {
-    EQUALS: `${leftTableId}.${leftColumnId} = ${rightTableId}.${rightColumnId}`,
-    CONTAINS: `contains(${leftTableId}.${leftColumnId}, ${rightTableId}.${rightColumnId})`,
-    STARTS_WITH: `starts_with(${leftTableId}.${leftColumnId}, ${rightTableId}.${rightColumnId})`,
-    ENDS_WITH: `ends_with(${leftTableId}.${leftColumnId}, ${rightTableId}.${rightColumnId})`,
+    EQUALS: `${leftTableId}.${leftColumnName} = ${rightTableId}.${rightColumnName}`,
+    CONTAINS: `contains(${leftTableId}.${leftColumnName}, ${rightTableId}.${rightColumnName})`,
+    STARTS_WITH: `starts_with(${leftTableId}.${leftColumnName}, ${rightTableId}.${rightColumnName})`,
+    ENDS_WITH: `ends_with(${leftTableId}.${leftColumnName}, ${rightTableId}.${rightColumnName})`,
   };
 
   const ctePredicates = {
@@ -35,17 +35,17 @@ export async function getMatchValues(
     query = `
       WITH left_counts AS (
         SELECT 
-          ${leftColumnId} AS left_value,
+          ${leftColumnName} AS left_value,
           COUNT(*) as left_count
         FROM ${leftTableId}
-        GROUP BY ${leftColumnId}
+        GROUP BY ${leftColumnName}
       ),
       right_counts AS (
         SELECT 
-          ${rightColumnId} AS right_value,
+          ${rightColumnName} AS right_value,
           COUNT(*) as right_count
         FROM ${rightTableId}
-        GROUP BY ${rightColumnId}
+        GROUP BY ${rightColumnName}
       )
       SELECT 
         l.left_value,
@@ -60,25 +60,25 @@ export async function getMatchValues(
   } else if (matchType === MATCH_TYPES.LEFT_UNJOINED) {
     query = `
     SELECT 
-      ${leftTableId}.${leftColumnId} AS left_value,
+      ${leftTableId}.${leftColumnName} AS left_value,
       NULL AS right_value,
-      COUNT(DISTINCT ${leftTableId}.${leftColumnId}) AS left_count,
+      COUNT(DISTINCT ${leftTableId}.${leftColumnName}) AS left_count,
       0 AS right_count
     FROM ${leftTableId}
-    WHERE ${leftTableId}.${leftColumnId} NOT IN (SELECT DISTINCT ${rightTableId}.${rightColumnId} FROM ${rightTableId} WHERE ${rightTableId}.${rightColumnId} IS NOT NULL)
-    GROUP BY ${leftTableId}.${leftColumnId}
+    WHERE ${leftTableId}.${leftColumnName} NOT IN (SELECT DISTINCT ${rightTableId}.${rightColumnName} FROM ${rightTableId} WHERE ${rightTableId}.${rightColumnName} IS NOT NULL)
+    GROUP BY ${leftTableId}.${leftColumnName}
     LIMIT ${limit};
     `;
   } else if (matchType === MATCH_TYPES.RIGHT_UNJOINED) {
     query = `
     SELECT 
       NULL AS left_value,
-      ${rightTableId}.${rightColumnId} AS right_value,
+      ${rightTableId}.${rightColumnName} AS right_value,
       0 AS left_count,
-      COUNT(DISTINCT ${rightTableId}.${rightColumnId}) AS right_count
+      COUNT(DISTINCT ${rightTableId}.${rightColumnName}) AS right_count
     FROM ${rightTableId}
-    WHERE ${rightTableId}.${rightColumnId} NOT IN (SELECT DISTINCT ${leftTableId}.${leftColumnId} FROM ${leftTableId} WHERE ${leftTableId}.${leftColumnId} IS NOT NULL)
-    GROUP BY ${rightTableId}.${rightColumnId}
+    WHERE ${rightTableId}.${rightColumnName} NOT IN (SELECT DISTINCT ${leftTableId}.${leftColumnName} FROM ${leftTableId} WHERE ${leftTableId}.${leftColumnName} IS NOT NULL)
+    GROUP BY ${rightTableId}.${rightColumnName}
     LIMIT ${limit};    
     `;
   } else {

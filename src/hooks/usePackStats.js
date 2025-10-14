@@ -8,8 +8,8 @@ import { calcPackStats } from "../lib/duckdb/calcPackStats.js";
  *
  * @param {string} leftTableId - The left table identifier for the join
  * @param {string} rightTableId - The right table identifier for the join
- * @param {string} leftColumnId - The left column identifier for the join condition
- * @param {string} rightColumnId - The right column identifier for the join condition
+ * @param {string} leftColumnName - The left column identifier for the join condition
+ * @param {string} rightColumnName - The right column identifier for the join condition
  * @param {string} joinType - The type of join ('EQUALS', 'CONTAINS', 'STARTS_WITH', 'ENDS_WITH')
  * @param {boolean} autoFetch - Whether to automatically fetch data when hook mounts or dependencies change (default: true)
  *
@@ -27,8 +27,8 @@ import { calcPackStats } from "../lib/duckdb/calcPackStats.js";
 export function usePackStats(
   leftTableId,
   rightTableId,
-  leftColumnId,
-  rightColumnId,
+  leftColumnName,
+  rightColumnName,
   joinType,
   autoFetch = true
 ) {
@@ -41,8 +41,8 @@ export function usePackStats(
     if (
       !leftTableId ||
       !rightTableId ||
-      !leftColumnId ||
-      !rightColumnId ||
+      !leftColumnName ||
+      !rightColumnName ||
       !joinType
     ) {
       setData(null);
@@ -56,8 +56,8 @@ export function usePackStats(
       const stats = await calcPackStats(
         leftTableId,
         rightTableId,
-        leftColumnId,
-        rightColumnId,
+        leftColumnName,
+        rightColumnName,
         joinType
       );
       setData(stats);
@@ -67,7 +67,7 @@ export function usePackStats(
     } finally {
       setLoading(false);
     }
-  }, [leftTableId, rightTableId, leftColumnId, rightColumnId, joinType]);
+  }, [leftTableId, rightTableId, leftColumnName, rightColumnName, joinType]);
 
   const reset = useCallback(() => {
     setData(null);

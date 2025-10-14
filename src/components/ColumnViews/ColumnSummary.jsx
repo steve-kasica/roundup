@@ -127,7 +127,7 @@ const ColumnSummary = ({
                 flex: 1,
               }}
             >
-              {column.name}
+              {column.name || column.columnName || column.id}
             </h3>
             <Box
               sx={{

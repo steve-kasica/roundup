@@ -1,4 +1,4 @@
-import { select, takeEvery, takeLatest } from "redux-saga/effects";
+import { put, select, takeEvery } from "redux-saga/effects";
 import { updateColumnsRequest } from "./actions";
 import updateColumnsWorker from "./worker";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
@@ -8,7 +8,7 @@ import { DATABASE_ATTRIBUTES } from ".";
 // Watcher saga
 // payload is expected to be an array called `columnUpdates`
 export default function* updateColumnsSaga() {
-  yield takeLatest(updateColumnsRequest.type, updateColumnsWorker);
+  yield takeEvery(updateColumnsRequest.type, updateColumnsWorker);
 
   // When columns are created, we may need to fetch additional attributes
   // for those columns (e.g., stats from the DB)
@@ -18,21 +18,23 @@ export default function* updateColumnsSaga() {
     // Normalize to array
     let columnUpdates = Array.isArray(columnIds) ? columnIds : [columnIds];
 
-    // Fetch tableIds for the columns
+    // Fetch parent IDs (either table or operation) for the columns
     const parentIds = yield select((state) =>
       columnUpdates
         .map((id) => selectColumnById(state, id))
         .map((col) => col.tableId)
     );
+
+    // Prepare the columnUpdates with necessary info for the worker
+    // We want to update a newly created column with
+    // all database-dependent attributes
     columnUpdates = columnUpdates.map((id, index) => ({
       id, // columnId
       tableId: parentIds[index],
       ...Object.fromEntries(DATABASE_ATTRIBUTES.map((attr) => [attr, null])), // fetch all database-dependent attributes
     }));
 
-    console.log("Updating newly created columns:", columnUpdates);
-
     // Call the worker to update columns with fetched attributes
-    yield updateColumnsWorker({ payload: { columnUpdates } });
+    yield put(updateColumnsRequest({ columnUpdates }));
   });
 }

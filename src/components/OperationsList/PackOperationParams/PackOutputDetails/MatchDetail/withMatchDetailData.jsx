@@ -12,9 +12,9 @@ export const MATCH_TYPES = {
 export default function withMatchDetailData(WrappedComponent) {
   function EnhancedComponent({
     leftTableId,
-    leftColumnId,
+    leftColumnName,
     rightTableId,
-    rightColumnId,
+    rightColumnName,
     joinPredicate = JOIN_PREDICATES.EQUALS,
     matchType = MATCH_TYPES.MATCHES,
     ...props
@@ -29,7 +29,12 @@ export default function withMatchDetailData(WrappedComponent) {
     // Effect to execute database query when dependencies change
     useEffect(() => {
       // Failsafe: Check if required parameters are defined
-      if (!leftTableId || !rightTableId || !leftColumnId || !rightColumnId) {
+      if (
+        !leftTableId ||
+        !rightTableId ||
+        !leftColumnName ||
+        !rightColumnName
+      ) {
         setMatches(null);
         setIsLoadingStats(false);
         setError(null);
@@ -42,8 +47,8 @@ export default function withMatchDetailData(WrappedComponent) {
       getMatchValues(
         leftTableId,
         rightTableId,
-        leftColumnId,
-        rightColumnId,
+        leftColumnName,
+        rightColumnName,
         joinPredicate,
         matchType,
         100, // Default limit
@@ -71,8 +76,8 @@ export default function withMatchDetailData(WrappedComponent) {
     }, [
       leftTableId,
       rightTableId,
-      leftColumnId,
-      rightColumnId,
+      leftColumnName,
+      rightColumnName,
       joinPredicate,
       matchType,
       sortBy,
@@ -86,8 +91,8 @@ export default function withMatchDetailData(WrappedComponent) {
         // Table and column references
         leftTableId={leftTableId}
         rightTableId={rightTableId}
-        leftColumnId={leftColumnId}
-        rightColumnId={rightColumnId}
+        leftColumnName={leftColumnName}
+        rightColumnName={rightColumnName}
         // Database query results
         matches={matches}
         error={error}
@@ -104,9 +109,9 @@ export default function withMatchDetailData(WrappedComponent) {
 
   EnhancedComponent.propTypes = {
     leftTableId: PropTypes.string.isRequired,
-    leftColumnId: PropTypes.string.isRequired,
+    leftColumnName: PropTypes.string.isRequired,
     rightTableId: PropTypes.string.isRequired,
-    rightColumnId: PropTypes.string.isRequired,
+    rightColumnName: PropTypes.string.isRequired,
     joinType: PropTypes.oneOf([
       "EQUALS",
       "CONTAINS",

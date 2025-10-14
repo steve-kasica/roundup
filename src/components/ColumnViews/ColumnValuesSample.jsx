@@ -5,7 +5,7 @@ import withColumnData from "./withColumnData";
 const ColumnValuesSample = withColumnData(({ column, isNull, limit = 3 }) => {
   const { data, loading, error } = useColumnValues(
     !isNull ? column.tableId : null,
-    !isNull ? column.id : null,
+    !isNull ? column.columnName : null,
     limit
   );
   if (loading) return <Typography variant="caption">Loading...</Typography>;

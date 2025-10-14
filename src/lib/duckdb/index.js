@@ -9,14 +9,12 @@ export * from "./getColumnStats";
 export * from "./createTables";
 export * from "./registerFiles";
 export * from "./renameColumns";
-
+export * from "./calcPackStats";
 export * from "./getValueCounts";
 export * from "./getColumnNames";
-export * from "./calcPackStats";
 export * from "./getMatchValues";
 export * from "./getColumnValues";
 export * from "./getStackRows";
 export * from "./insertColumn";
 export * from "./getColumnNames";
 export * from "./dropView";
-export * from "./isColumnPresent";

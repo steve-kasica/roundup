@@ -1,18 +1,12 @@
-import { call, put, select } from "redux-saga/effects";
+import { call, put } from "redux-saga/effects";
 import {
   addColumns as addColumnsToSlice,
   Column,
 } from "../../slices/columnsSlice";
 import { createColumnsSuccess, createColumnsFailure } from "./actions";
-import {
-  getColumnStats,
-  getTableDimensions,
-  insertColumn,
-  renameColumns,
-} from "../../lib/duckdb";
+import { insertColumn, renameColumns } from "../../lib/duckdb";
 import { getTableColumnNames } from "../../lib/duckdb/getTableColumnNames";
-import { selectOperation } from "../../slices/operationsSlice";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { isTableId } from "../../slices/tablesSlice";
 import { CREATION_MODE_INSERTION, CREATION_MODE_INITIALIZATION } from ".";
 
 export default function* createColumnsWorker(action) {
@@ -35,53 +29,28 @@ export default function* createColumnsWorker(action) {
       }
       successfulCreations.push(newColumn);
     } else if (mode === CREATION_MODE_INITIALIZATION) {
+      // If mode is initialization, then database columns already exist
+      // We just need to match the column names in the DB to the column objects
       if (isTableId(parentId)) {
         if (!tableIdToColumnNames.has(parentId)) {
           const columnNames = yield call(getTableColumnNames, parentId);
           tableIdToColumnNames.set(parentId, columnNames);
         }
-        const columnNames = tableIdToColumnNames.get(parentId);
-        if (index < 0 || index >= columnNames.length) {
-          const errorMsg = `Index ${index} is out of bounds for table with ${columnNames.length} columns.`;
-          console.error(errorMsg);
-          failedCreations.push({ parentId, error: errorMsg });
-          continue; // Skip to the next iteration
-        }
-        newColumn.name = columnNames[index];
-
         try {
-          // Rename DB table columns to match the column IDs
-          yield call(
-            renameColumns,
-            parentId,
-            [newColumn.name], // old name
-            [newColumn.id] // new name
-          );
-
+          const columnName = tableIdToColumnNames.get(parentId)[index];
+          newColumn.columnName = columnName;
           successfulCreations.push(newColumn);
         } catch (error) {
-          console.error("Error renaming column:", error);
-          newColumn.error = JSON.stringify(error);
-          failedCreations.push(newColumn);
+          console.error("Error fetching current column names:", error);
+          newColumn.columnName = null;
+          failedCreations.push({ parentId, error: error.message });
+          continue; // Skip to the next iteration
         }
       } else {
-        // TODO
-        // Parent is an operation; get operation details
-        // const operation = yield select((state) =>
-        //   selectOperation(state, parentId)
-        // );
-        // if (!operation) {
-        //   const errorMsg = `Operation with ID ${parentId} not found.`;
-        //   console.error(errorMsg);
-        //   failedCreations.push({ parentId, error: errorMsg });
-        //   continue; // Skip to the next iteration
-        // }
-        // if (operation.operationType === "NO_OP") {
-        //   const errorMsg = `Operation with ID ${parentId} is a NO_OP and cannot have columns.`;
-        //   console.error(errorMsg);
-        //   failedCreations.push({ parentId, error: errorMsg });
-        //   continue; // Skip to the next iteration
-        // }
+        // If creating a column for an operation
+        // We need to assign the column object's ID as the column name
+        // in the underlying DB view of the operation
+        successfulCreations.push(newColumn);
       }
     }
   }

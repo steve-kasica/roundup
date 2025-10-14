@@ -4,9 +4,9 @@ import { getValuesCountMatrix } from "../../lib/duckdb";
 import { useEffect, useState } from "react";
 import { selectTableIdsByColumnIds } from "../../slices/columnsSlice";
 
-// HOC to provide column values for given columnIds
+// HOC to provide column values for given columnNames
 export default function withValuesCountMatrixData(WrappedComponent) {
-  function EnhancedComponent({ columnIds, ...props }) {
+  function EnhancedComponent({ columnNames, ...props }) {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -15,17 +15,17 @@ export default function withValuesCountMatrixData(WrappedComponent) {
     const [signature, setSignature] = useState(null);
 
     const tableIds = useSelector((state) =>
-      selectTableIdsByColumnIds(state, columnIds)
+      selectTableIdsByColumnIds(state, columnNames)
     );
 
     useEffect(() => {
-      // Fetch the values count matrix when component mounts or columnIds change
+      // Fetch the values count matrix when component mounts or columnNames change
       const fetchValuesCountMatrix = async () => {
         try {
           setLoading(true);
 
           // Matrix comes out sorted by degree and value alphabetically
-          const matrix = await getValuesCountMatrix(columnIds, tableIds);
+          const matrix = await getValuesCountMatrix(columnNames, tableIds);
 
           setUniqueValues(matrix.map((row) => row[0]));
           setValueDegrees(matrix.map((row) => row[row.length - 2])); // Store the degrees of each value
@@ -39,7 +39,7 @@ export default function withValuesCountMatrixData(WrappedComponent) {
       };
 
       fetchValuesCountMatrix();
-    }, [columnIds, tableIds]);
+    }, [columnNames, tableIds]);
 
     return (
       <WrappedComponent
@@ -51,13 +51,13 @@ export default function withValuesCountMatrixData(WrappedComponent) {
         tableIds={tableIds} // x-axis labels
         error={error}
         loading={loading}
-        columnIds={columnIds}
+        columnNames={columnNames}
       />
     );
   }
 
   EnhancedComponent.propTypes = {
-    columnIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+    columnNames: PropTypes.arrayOf(PropTypes.string).isRequired,
   };
 
   return EnhancedComponent;

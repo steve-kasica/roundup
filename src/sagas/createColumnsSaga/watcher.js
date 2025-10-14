@@ -1,4 +1,4 @@
-import { put, select, takeEvery } from "redux-saga/effects";
+import { call, put, select, takeEvery } from "redux-saga/effects";
 import createColumnsWorker from "./worker";
 import { createColumnsRequest } from "./actions";
 import { createTablesSuccess } from "../createTablesSaga";
@@ -12,6 +12,7 @@ import {
 } from "../../slices/operationsSlice";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { CREATION_MODE_INITIALIZATION } from ".";
+import { updateOperationsSuccess } from "../updateOperationsSaga";
 
 // Create a shared function for handling both success and failure operations
 const handleOperations = function* (action) {
@@ -19,19 +20,17 @@ const handleOperations = function* (action) {
   const operations = yield select((state) =>
     operationIds.map((id) => selectOperation(state, id))
   );
-  for (const { id, operationType, initialColumnCount } of operations) {
+  for (const { id, operationType, columnCount } of operations) {
     if (operationType === OPERATION_TYPE_NO_OP) {
       continue;
     }
     yield put(
       createColumnsRequest({
         mode: CREATION_MODE_INITIALIZATION,
-        columnInfo: Array.from({ length: initialColumnCount }).map(
-          (_, index) => ({
-            parentId: id,
-            index,
-          })
-        ),
+        columnInfo: Array.from({ length: columnCount }).map((_, index) => ({
+          parentId: id,
+          index,
+        })),
       })
     );
   }
@@ -67,4 +66,25 @@ export default function* createColumnsWatcher() {
   // If an operation is created but fails, we still want to create
   // columns for it so the user can see the error in the UI
   yield takeEvery(createOperationsFailure.type, handleOperations);
+
+  // if an operation is updated, we may need to create columns for it
+  // depending upon if the property that changes also triggered a
+  // change in the underlying database view
+  yield takeEvery(updateOperationsSuccess.type, function* (action) {
+    const { changedPropertiesByOperation } = action.payload;
+
+    const operationIdsToUpdate = Object.entries(
+      changedPropertiesByOperation
+    ).reduce((acc, [id, changedProperties]) => {
+      if (changedProperties.includes("children")) {
+        acc.push(id);
+      }
+      return acc;
+    }, []);
+    if (operationIdsToUpdate.length > 0) {
+      yield call(handleOperations, {
+        payload: { operationIds: operationIdsToUpdate },
+      });
+    }
+  });
 }

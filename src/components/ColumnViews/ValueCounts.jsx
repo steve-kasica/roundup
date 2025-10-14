@@ -11,7 +11,7 @@ import { useEffect, useState, useCallback } from "react";
 import { formatNumber } from "../../lib/utilities";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
-const ValueCounts = ({ columnId, tableId, uniqueCount, limit = 20 }) => {
+const ValueCounts = ({ columnName, tableId, uniqueCount, limit = 20 }) => {
   const [data, setData] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ const ValueCounts = ({ columnId, tableId, uniqueCount, limit = 20 }) => {
     setError(null);
 
     try {
-      const result = await getValueCounts(tableId, columnId, limit, 0);
+      const result = await getValueCounts(tableId, columnName, limit, 0);
       const count = Object.keys(result).length;
       if (result && typeof result === "object") {
         setData(result || {});
@@ -38,7 +38,7 @@ const ValueCounts = ({ columnId, tableId, uniqueCount, limit = 20 }) => {
     } finally {
       setLoading(false);
     }
-  }, [columnId, tableId, limit]);
+  }, [columnName, tableId, limit]);
 
   const loadMoreData = useCallback(async () => {
     if (total >= uniqueCount || loadingMore) return;
@@ -46,7 +46,7 @@ const ValueCounts = ({ columnId, tableId, uniqueCount, limit = 20 }) => {
     setLoadingMore(true);
 
     try {
-      const result = await getValueCounts(tableId, columnId, limit, total);
+      const result = await getValueCounts(tableId, columnName, limit, total);
       const count = Object.keys(result).length;
       if (result && typeof result === "object" && result) {
         setData((prevData) => ({ ...prevData, ...result }));
@@ -57,7 +57,7 @@ const ValueCounts = ({ columnId, tableId, uniqueCount, limit = 20 }) => {
     } finally {
       setLoadingMore(false);
     }
-  }, [columnId, tableId, limit, loadingMore, total, uniqueCount]);
+  }, [columnName, tableId, limit, loadingMore, total, uniqueCount]);
 
   // Initial load
   useEffect(() => {

@@ -33,7 +33,7 @@ const ColumnName = ({
         ...(isSelected && selectedSx ? selectedSx : {}), // Apply selected styles if isSelected is true
       }}
     >
-      {column?.name || id}
+      {column.name || column.columnName || column.id}
     </Typography>
   );
 };

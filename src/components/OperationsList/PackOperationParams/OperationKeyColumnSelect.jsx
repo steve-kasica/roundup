@@ -132,7 +132,9 @@ function OperationKeyColumnSelect({
                         width: "100%",
                       }}
                     >
-                      <Typography>{column.name}</Typography>
+                      <Typography>
+                        {column.name || column.columnName || column.id}
+                      </Typography>
                     </Box>
                   }
                   secondary={

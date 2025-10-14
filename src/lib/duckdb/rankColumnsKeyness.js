@@ -9,10 +9,10 @@ function convertBigIntsToNumbers(obj) {
   return converted;
 }
 
-export async function rankColumnsKeyness(columnIds, tableId) {
+export async function rankColumnsKeyness(columnNames, tableId) {
   const db = await getDuckDB();
   const conn = await db.connect();
-  const columnChecks = columnIds
+  const columnChecks = columnNames
     .map(
       (columnId) =>
         `SELECT 

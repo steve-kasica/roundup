@@ -1,11 +1,11 @@
 // See example here: https://observablehq.com/d/a57dc020b270136f#cell-18
 import { getDuckDB } from "./duckdbClient";
 
-export async function getValuesCountMatrix(columnIds, tableIds) {
-  if (!Array.isArray(columnIds) || !Array.isArray(tableIds)) {
-    throw new Error("Both columnIds and tableIds must be arrays");
-  } else if (columnIds.length !== tableIds.length) {
-    throw new Error("columnIds and tableIds must have the same length");
+export async function getValuesCountMatrix(columnNames, tableIds) {
+  if (!Array.isArray(columnNames) || !Array.isArray(tableIds)) {
+    throw new Error("Both columnNames and tableIds must be arrays");
+  } else if (columnNames.length !== tableIds.length) {
+    throw new Error("columnNames and tableIds must have the same length");
   }
 
   const db = await getDuckDB();
@@ -37,7 +37,7 @@ export async function getValuesCountMatrix(columnIds, tableIds) {
             ${tableIds
               .map(
                 (tableId, i) =>
-                  `SELECT ${columnIds[i]} AS VAL, '${tableId}' AS SOURCE_TABLE FROM ${tableId}`
+                  `SELECT ${columnNames[i]} AS VAL, '${tableId}' AS SOURCE_TABLE FROM ${tableId}`
               )
               .join("\n            UNION ALL\n            ")}
         ) AS combined
