@@ -88,12 +88,33 @@ const columnsSlice = createSlice({
           ...columnUpdate,
         };
 
-        if (columnUpdate.isSelected) {
-          state.selected.push(columnUpdate.id);
-        } else {
-          state.selected = state.selected.filter(
-            (id) => id !== columnUpdate.id
-          );
+        if (Object.hasOwnProperty.call(columnUpdate, "isSelected")) {
+          if (columnUpdate.isSelected === true) {
+            state.selected.push(columnUpdate.id);
+          } else if (columnUpdate.isSelected === false) {
+            state.selected = state.selected.filter(
+              (id) => id !== columnUpdate.id
+            );
+          }
+        } else if (Object.hasOwnProperty.call(columnUpdate, "index")) {
+          // If index is updated, we need to reorder the idsByTable array
+          const column = state.data[columnUpdate.id];
+          const tableId = column.tableId;
+          const currentIds = state.idsByTable[tableId] || [];
+          const currentIndex = currentIds.indexOf(columnUpdate.id);
+          if (currentIndex !== -1) {
+            // Remove from current position
+            currentIds.splice(currentIndex, 1);
+            // Insert at new position
+            const newIndex =
+              columnUpdate.index < 0
+                ? 0
+                : columnUpdate.index > currentIds.length
+                ? currentIds.length
+                : columnUpdate.index;
+            currentIds.splice(newIndex, 0, columnUpdate.id);
+            state.idsByTable[tableId] = currentIds;
+          }
         }
       });
     },

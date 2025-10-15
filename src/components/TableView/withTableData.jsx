@@ -157,18 +157,21 @@ export default function withTableData(WrappedComponent) {
           hoverColumn={hoverColumn}
           unhoverColumn={unhoverColumn}
           swapColumns={(target, source) => {
-            const updatedColumnIds = [...activeColumnIds];
-            const sourceIndex = updatedColumnIds.indexOf(source);
-            const targetIndex = updatedColumnIds.indexOf(target);
-            if (sourceIndex === -1 || targetIndex === -1) return; // Invalid indices
-
-            // Remove source columnId from its original position
-            updatedColumnIds.splice(sourceIndex, 1);
-            // Insert source columnId at the target position
-            updatedColumnIds.splice(targetIndex, 0, source);
-
-            // Update the table's columnIds in the store
-            dispatch(updateTablesRequest({ id, columnIds: updatedColumnIds }));
+            const sourceIndex = activeColumnIds.indexOf(source);
+            const targetIndex = activeColumnIds.indexOf(target);
+            if (sourceIndex === -1 || targetIndex === -1) {
+              throw new Error(
+                `Invalid column IDs for swapping: source (${source}) or target (${target}) not found in active columns of table ${id}.`
+              );
+            }
+            dispatch(
+              updateColumnsRequest({
+                columnUpdates: [
+                  { id: source, index: targetIndex },
+                  { id: target, index: sourceIndex },
+                ],
+              })
+            );
           }}
           insertColumn={(index) => {
             dispatch(createColumnsRequest({ tableId: id, index }));
