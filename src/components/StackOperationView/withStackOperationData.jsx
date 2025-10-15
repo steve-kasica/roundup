@@ -12,7 +12,6 @@ import {
   selectOperationDepth,
 } from "../../slices/operationsSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
-import { selectTablesById } from "../../slices/tablesSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 
 // TODO: how to handle the case when tableIds are actually
@@ -150,13 +149,19 @@ export default function withStackOperationData(WrappedComponent) {
         selectedTableIds={selectedTableIds}
         selection={selection}
         // Callback props to dispatch actions
-        selectColumns={(selectedColumnIds) =>
+        selectColumns={(selectedColumnIds, unselectedColumnIds = []) =>
           dispatch(
             updateColumnsRequest({
-              columnUpdates: selectedColumnIds.map((id) => ({
-                id,
-                isSelected: true,
-              })),
+              columnUpdates: [
+                ...selectedColumnIds.map((id) => ({
+                  id,
+                  isSelected: true,
+                })),
+                ...unselectedColumnIds.map((id) => ({
+                  id,
+                  isSelected: false,
+                })),
+              ],
             })
           )
         }
