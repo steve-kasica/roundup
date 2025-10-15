@@ -10,10 +10,6 @@ import {
   removeFromHoveredColumns,
   selectHoveredColumns,
   selectLoadingColumns,
-  setSelectedColumns,
-  clearSelectedColumns,
-  appendToSelectedColumns,
-  removeFromSelectedColumns,
   selectSelectedColumns,
   setFocusedColumns,
   selectDraggingColumns,
@@ -47,14 +43,14 @@ export default function withColumnData(WrappedComponent) {
       if (isNull) {
         return null;
       } else if (isTableId(column?.tableId)) {
-        return selectTablesById(state, column.tableId);
+        return selectTablesById(state, column?.tableId);
       } else {
-        return selectOperation(state, column.tableId);
+        return selectOperation(state, column?.tableId);
       }
     });
 
     // Column interaction state properties
-    const isSelected = !isNull && selectedColumns.includes(id);
+    const isSelected = column && column.isSelected;
     const isLoading = !isNull && loadingColumns.includes(id);
     const isHovered = !isNull && hoveredColumns.includes(id);
     const isDragging = !isNull && draggingColumns.includes(id);
@@ -64,7 +60,7 @@ export default function withColumnData(WrappedComponent) {
 
     const name = column?.name;
     const tableId = column?.tableId;
-    const index = isNull ? -1 : table.columnIds.indexOf(id);
+    const index = isNull ? -1 : table?.columnIds.indexOf(id);
     const columnType = column?.columnType;
     const values = column?.values;
     const error = column?.error;
@@ -127,17 +123,32 @@ export default function withColumnData(WrappedComponent) {
         }}
         excludeColumn={() => {
           if (!isNull) {
-            dispatch(deleteColumnsRequest(id));
+            dispatch(
+              updateColumnsRequest({
+                columnUpdates: [{ id, isExcluded: true }],
+              })
+            );
+          }
+        }}
+        includeColumn={() => {
+          if (!isNull) {
+            dispatch(
+              updateColumnsRequest({
+                columnUpdates: [{ id, isExcluded: false }],
+              })
+            );
           }
         }}
         addColumnToSelection={() => {
-          if (!isNull) dispatch(appendToSelectedColumns(id));
+          // TODO
         }}
         selectSingleColumn={() => {
-          if (!isNull) {
-            dispatch(clearSelectedColumns());
-            dispatch(appendToSelectedColumns(id));
-          }
+          // TODO: clear selection if already selected
+          dispatch(
+            updateColumnsRequest({
+              columnUpdates: [{ id, isSelected: true }],
+            })
+          );
         }}
         focusColumn={() => {
           if (!isNull) {
@@ -145,17 +156,17 @@ export default function withColumnData(WrappedComponent) {
           }
         }}
         unselectColumn={() => {
-          if (!isNull) dispatch(removeFromSelectedColumns(id));
+          dispatch(
+            updateColumnsRequest({ columnUpdates: [{ id, isSelected: false }] })
+          );
         }}
-        // TODO: swapping columns messes with the index property used here
-        // investigate further
+        // TODO: DELETE
         spanSelectionToColumn={() => {
-          if (!isNull && firstSelectedColumnId) {
-            const anchorIdx = tableColumnIds.indexOf(firstSelectedColumnId);
-            const [start, end] = [anchorIdx, index].sort((a, b) => a - b);
-            const selectedColumns = tableColumnIds.slice(start, end + 1);
-            dispatch(setSelectedColumns(selectedColumns));
-          }
+          // if (!isNull && firstSelectedColumnId) {
+          //   const anchorIdx = tableColumnIds.indexOf(firstSelectedColumnId);
+          //   const [start, end] = [anchorIdx, index].sort((a, b) => a - b);
+          //   const selectedColumns = tableColumnIds.slice(start, end + 1);
+          // }
         }}
         nullColumn={() => {
           if (!isNull) {
@@ -187,9 +198,9 @@ export default function withColumnData(WrappedComponent) {
     }
 
     function unfocusColumn() {
-      if (!isNull) {
-        dispatch(removeFromSelectedColumns(id));
-      }
+      dispatch(
+        updateColumnsRequest({ columnUpdates: [{ id, isSelected: false }] })
+      );
     }
 
     function hoverColumn() {

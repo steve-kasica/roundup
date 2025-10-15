@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 import { useMemo } from "react";
 import {
   selectColumnById,
+  selectColumnIdsByTableId,
   selectSelectedColumns,
   setFocusedColumns,
-  setSelectedColumns,
 } from "../../slices/columnsSlice";
 import {
   selectOperation,
@@ -13,6 +13,7 @@ import {
 } from "../../slices/operationsSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import { selectTablesById } from "../../slices/tablesSlice";
+import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 
 // TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -41,11 +42,21 @@ export default function withStackOperationData(WrappedComponent) {
     const depth = useSelector((state) => selectOperationDepth(state, id));
 
     // Get column IDs for all columns associated directly with this operation
-    const columnIds = useSelector((state) => {
-      return Object.values(state.columns.data)
-        .filter((column) => column.tableId === id)
-        .map((column) => column.id);
-    });
+    const operationColumns = useSelector((state) =>
+      selectColumnIdsByTableId(state, id).map((colId) =>
+        selectColumnById(state, colId)
+      )
+    );
+
+    const columnIds = useMemo(() => {
+      return operationColumns.map((col) => col.id);
+    }, [operationColumns]);
+
+    const activeColumnIds = useMemo(() => {
+      return operationColumns
+        .filter((col) => !col.isExcluded)
+        .map((col) => col.id);
+    }, [operationColumns]);
 
     // Column objects for all columns associated directly with this operation
     const selectedColumns = useSelector((state) =>
@@ -74,7 +85,9 @@ export default function withStackOperationData(WrappedComponent) {
       const rawColumnIds = (operation?.children || []).map(
         (childId) =>
           Object.values(state.columns.data)
-            .filter((column) => column.tableId === childId)
+            .filter(
+              (column) => column.tableId === childId && !column.isExcluded
+            )
             .map((column) => column.id) || []
       );
       const maxLength = Math.max(...rawColumnIds.map((row) => row.length), 0);
@@ -126,6 +139,7 @@ export default function withStackOperationData(WrappedComponent) {
         depth={depth}
         // Props related to the operation's columns
         columnIds={columnIds}
+        activeColumnIds={activeColumnIds}
         selectedColumnIds={selectedColumnIds}
         selectedColumnNames={selectedColumnNames}
         selectedColumnIndices={selectedColumnIndices}
@@ -136,7 +150,16 @@ export default function withStackOperationData(WrappedComponent) {
         selectedTableIds={selectedTableIds}
         selection={selection}
         // Callback props to dispatch actions
-        selectColumns={(colIds) => dispatch(setSelectedColumns(colIds))}
+        selectColumns={(selectedColumnIds) =>
+          dispatch(
+            updateColumnsRequest({
+              columnUpdates: selectedColumnIds.map((id) => ({
+                id,
+                isSelected: true,
+              })),
+            })
+          )
+        }
         swapColumns={(target, source) => {
           const updatedColumnIds = [...columnIds];
           const sourceIndex = updatedColumnIds.indexOf(source);

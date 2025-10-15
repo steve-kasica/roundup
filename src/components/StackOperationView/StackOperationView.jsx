@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useCallback, useState } from "react";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { scaleBand } from "d3";
-import { setSelectedColumns } from "../../slices/columnsSlice";
 import {
   getValuesInRange,
   getIndexOfValue,
@@ -56,31 +55,16 @@ function StackOperationView(props) {
         // Shift+Click: select range from anchor to extent
         const anchorIndex = selectionAnchorCell;
         const extentIndex = [n, index];
-        dispatch(
-          setSelectedColumns(
-            getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
-          )
-        );
       } else if (afterIndex) {
         // Click after a column: select range from anchor to this column
         const anchorIndex = [0, index];
         const extentIndex = [n, m];
-        dispatch(
-          setSelectedColumns(
-            getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
-          )
-        );
         setSelectionExtentCell(extentIndex);
         setSelectionAnchorCell(anchorIndex);
       } else {
         // Single click: select only this column, also handles initial shift clicks
         const anchorIndex = [0, index];
         const extentIndex = [n, index];
-        dispatch(
-          setSelectedColumns(
-            getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
-          )
-        );
         setSelectionExtentCell(extentIndex);
         setSelectionAnchorCell(anchorIndex);
       }
@@ -94,11 +78,6 @@ function StackOperationView(props) {
       // Shift+Click: select range from anchor to extent
       extentIndex = getIndexOfValue(columnIdMatrix, columnId);
       anchorIndex = selectionAnchorCell;
-      dispatch(
-        setSelectedColumns(
-          getValuesInRange(columnIdMatrix, anchorIndex, extentIndex)
-        )
-      );
     } else if (event.metaKey || event.ctrlKey) {
       // Cmd/Ctrl+Click: toggle selection
       // TODO: decide if we want to toggle selection
@@ -108,7 +87,6 @@ function StackOperationView(props) {
       // Single click: select only this column, also handles initial shift clicks
       anchorIndex = getIndexOfValue(columnIdMatrix, columnId);
       extentIndex = anchorIndex;
-      dispatch(setSelectedColumns(columnId));
     }
     setSelectionExtentCell(extentIndex);
     setSelectionAnchorCell(anchorIndex);

@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import {
   setHoveredColumns,
-  setSelectedColumns,
   selectSelectedColumns,
   selectColumnById,
   removeFromHoveredColumns,
@@ -51,7 +50,7 @@ export default function withColumnVectorData(WrappedComponent) {
         unhoverColumnVector={() =>
           dispatch(removeFromHoveredColumns(columnIds))
         }
-        selectColumnVector={() => dispatch(setSelectedColumns(columnIds))}
+        selectColumnVector={() => null}
         compareVectorValues={() =>
           dispatch(setDrawerContents(COLUMN_INDEX_VALUES_COMPONENT))
         }

@@ -8,7 +8,6 @@
 
 import { name as APP_NAME } from "../../../package.json";
 import { Typography, Box, styled } from "@mui/material";
-import Toolbar from "./Toolbar";
 import ModalDialog from "./ModalDialog";
 import AppDrawer from "./AppDrawer";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -20,7 +19,6 @@ import ColumnWindow from "./ColumnWindow";
 import TableWindow from "./TableWindow";
 import SchemaWindow from "./SchemaWindow";
 import {
-  OPERATION_TYPE_NO_OP,
   selectOperation,
   selectRootOperation,
 } from "../../slices/operationsSlice";
@@ -70,9 +68,6 @@ export default function SupportingPane() {
         <Typography variant="h6" component="div">
           {APP_NAME}
         </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Toolbar />
-        </Box>
       </Box>
 
       {/* Main Content Area */}

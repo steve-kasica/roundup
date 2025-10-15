@@ -8,7 +8,7 @@ function TableBlock({
   // props via withTableData
   table,
   columnCount = 0,
-  columnIds = [],
+  activeColumnIds,
   isHovered,
   isDragging,
   isPressed,
@@ -25,7 +25,7 @@ function TableBlock({
           ? parentColumnCount
           : columnCount,
     },
-    (_, i) => (i < columnCount ? columnIds[i] : null)
+    (_, i) => (i < columnCount ? activeColumnIds[i] : null)
   );
 
   const className = [

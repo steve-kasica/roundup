@@ -13,23 +13,11 @@ import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarg
 import StackSchemaView from "../../components/StackOperationView/StackSchemaView";
 import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
-import {
-  selectColumnById,
-  selectSelectedColumns,
-} from "../../slices/columnsSlice";
-import { group } from "d3";
 
 export default function SchemaWindow() {
   const focusedOperation = useSelector((state) => {
     const id = selectFocusedOperationId(state);
     return selectOperation(state, id);
-  });
-  const currentSelection = useSelector((state) => {
-    const selectedColumnIds = selectSelectedColumns(state); // TODO: rename to selectSelectedColumnIds
-    const selectedColumns = selectedColumnIds.map((colId) =>
-      selectColumnById(state, colId)
-    );
-    return group(selectedColumns, (col) => col.tableId);
   });
   const tables = useSelector(selectAllTablesData);
   const operations = useSelector(selectAllOperationIds);

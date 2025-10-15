@@ -4,7 +4,6 @@ import {
   addColumnsToLoading,
   removeColumnsFromDragging,
   removeColumnsFromLoading,
-  removeFromSelectedColumns,
 } from "../../slices/columnsSlice";
 import { deleteColumnsSuccess } from "./actions";
 
@@ -35,7 +34,6 @@ export default function* removeColumnsWorker(action) {
 
   yield put(addColumnsToLoading(columnIds));
   yield put(addColumnsToDropped(columnIds));
-  yield put(removeFromSelectedColumns(columnIds));
   yield put(removeColumnsFromDragging(columnIds));
 
   // Remove columnIds from the `table` slice, where

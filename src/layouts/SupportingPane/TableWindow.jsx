@@ -38,11 +38,6 @@ import { use } from "react";
 // };
 
 const TableWindow = () => {
-  // const [lod, setLod] = useState(TOGGLE_VALUES.LOW); // Sets low as default
-  // const [viewsSynced, setViewsSynced] = useState(true); // Default to synced views
-  // TODO: I'm not doing the selectedTableIds any more
-  // Rather this component just need to know if it show show a table, a stack table, or a
-  // pack table.
   const focusedOperation = useSelector((state) => {
     const opId = selectFocusedOperationId(state);
     return opId ? selectOperation(state, opId) : null;
@@ -71,7 +66,20 @@ const TableWindow = () => {
   }
 
   const viewMode = useSelector((state) => {
-    const { tableId } = selectedTableIds?.[0] || {};
+    const selectedColumns = state.columns.selected.map((id) =>
+      selectColumnById(state, id)
+    );
+    const tableIds = Array.from(
+      new Set(selectedColumns.map((column) => column?.tableId))
+    );
+
+    if (tableIds.length === 0) {
+      return "UNKNOWN";
+    }
+    if (tableIds.length > 1) {
+      return "UNKNOWN"; // multiple tables selected, not supported
+    }
+    const tableId = tableIds[0];
     if (isTableId(tableId)) {
       return "TABLE";
     } else if (

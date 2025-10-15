@@ -8,7 +8,6 @@ import swapColumnsSaga from "../swapColumnsSaga/swapColumnsSaga";
 import {
   addColumnsToLoading,
   removeColumnsFromLoading,
-  clearSelectedColumns,
   swapColumns,
 } from "../../slices/columnsSlice";
 import { takeEvery, put } from "redux-saga/effects";
@@ -47,7 +46,6 @@ describe("swapColumnsSaga", () => {
       put(swapColumns({ sourceIds, targetIds }))
     );
     expect(gen.next().value).toEqual(put(removeColumnsFromLoading(allIds)));
-    expect(gen.next().value).toEqual(put(clearSelectedColumns()));
     expect(gen.next().done).toBe(true);
   });
 });

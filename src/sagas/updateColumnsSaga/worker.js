@@ -70,15 +70,24 @@ export default function* updateColumnsWorker(action) {
   yield put(updateColumnsSlice([...successfulUpdates, ...failedUpdates]));
   yield put(removeColumnsFromLoading(columnUpdates.map(({ id }) => id)));
 
+  const formatUpdates = (updates) =>
+    Object.fromEntries(
+      updates.map((c) => [c.id, Object.keys(c).filter((key) => key !== "id")])
+    );
+
   if (successfulUpdates.length > 0) {
     yield put(
-      updateColumnsSuccess({ columnIds: successfulUpdates.map((c) => c.id) })
+      updateColumnsSuccess({
+        updates: formatUpdates(successfulUpdates),
+      })
     );
   }
 
   if (failedUpdates.length > 0) {
     yield put(
-      updateColumnsFailure({ columnIds: failedUpdates.map((c) => c.id) })
+      updateColumnsFailure({
+        updates: formatUpdates(failedUpdates),
+      })
     );
   }
 }

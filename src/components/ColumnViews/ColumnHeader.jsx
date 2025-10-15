@@ -22,12 +22,10 @@ const ColumnHeader = ({
   const handleMenuOpen = useCallback((event) => {
     event.stopPropagation(); // Prevent sort handler from firing
     setMenuAnchorEl(event.currentTarget);
-    // setSelectedColumnId(columnId);--- TODO
   }, []);
 
   const handleMenuClose = useCallback(() => {
     setMenuAnchorEl(null);
-    // setSelectedColumnId(null);--- TODO
   }, []);
 
   // Handle column sorting

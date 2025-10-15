@@ -86,6 +86,7 @@ const TableRows = ({
   columnWidths = {}, // Optional prop for custom column widths
 }) => {
   const tableContainerRef = useRef(null);
+  console.log({ selectedColumnNames });
 
   /**
    * Sorting configuration state

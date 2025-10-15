@@ -1,18 +1,10 @@
-import { call, put, select, takeEvery } from "redux-saga/effects";
-import { createAction } from "@reduxjs/toolkit";
+import { call, put, select } from "redux-saga/effects";
+import { dropTables, selectTablesById } from "../../slices/tablesSlice";
 import {
-  addTablesToLoading,
-  dropTables,
-  selectTablesById,
-} from "../../slices/tablesSlice";
-import {
-  dropColumns,
   removeColumnsFromLoading,
   selectLoadingColumns,
-  setSelectedColumns,
 } from "../../slices/columnsSlice";
 import { dropTable } from "../../lib/duckdb";
-import { removeChildFromOperation } from "../../slices/operationsSlice";
 import { deleteTablesFailure, deleteTablesSuccess } from "./actions";
 
 export default function* deleteTablesWorker(action) {

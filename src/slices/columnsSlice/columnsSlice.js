@@ -105,9 +105,9 @@ const columnsSlice = createSlice({
       if (!Array.isArray(columns)) {
         columns = [columns];
       }
-      columns.forEach((column) => {
-        if (!state.data[column.id]) {
-          throw new Error(`Column with id ${column.id} does not exist`);
+      columns.forEach((columnUpdate) => {
+        if (!state.data[columnUpdate.id]) {
+          throw new Error(`Column with id ${columnUpdate.id} does not exist`);
         }
         // Update the column in the data object
         // TODO: should have some kind of validation here
@@ -117,10 +117,18 @@ const columnsSlice = createSlice({
         // with the new values from the column object
         // This is useful for updating properties like name, columnType, etc.
         // If you want to ensure that certain properties are always present,
-        state.data[column.id] = {
-          ...state.data[column.id],
-          ...column,
+        state.data[columnUpdate.id] = {
+          ...state.data[columnUpdate.id],
+          ...columnUpdate,
         };
+
+        if (columnUpdate.isSelected) {
+          state.selected.push(columnUpdate.id);
+        } else {
+          state.selected = state.selected.filter(
+            (id) => id !== columnUpdate.id
+          );
+        }
       });
     },
     /**
@@ -177,9 +185,6 @@ const columnsSlice = createSlice({
             // If there are no columns left in the table, delete the entry
             delete state.idsByTable[column.tableId];
           }
-
-          // Remove the column from the selected columns if it is selected
-          state.selected = state.selected.filter((cid) => cid !== id);
 
           // Remove the column from the hovered columns if it is hovered
           state.hovered = state.hovered.filter((cid) => cid !== id);
@@ -357,35 +362,6 @@ const columnsSlice = createSlice({
         }
       });
     },
-    setSelectedColumns(state, action) {
-      const columnIds = Array.isArray(action.payload)
-        ? action.payload
-        : [action.payload];
-      const validColumnIds = columnIds.filter(Boolean); // Filter out null/undefined/empty string
-      state.selected = validColumnIds;
-    },
-    appendToSelectedColumns(state, action) {
-      const columnIds = Array.isArray(action.payload)
-        ? action.payload
-        : [action.payload];
-      const validColumnIds = columnIds.filter(Boolean); // Filter out null/undefined/empty string
-      state.selected = [...state.selected, ...validColumnIds];
-    },
-    clearSelectedColumns(state) {
-      state.selected = initialState.selected;
-    },
-    removeFromSelectedColumns(state, action) {
-      const columnIds = Array.isArray(action.payload)
-        ? action.payload
-        : [action.payload];
-      state.selected = state.selected.filter(
-        (column) => !columnIds.includes(column)
-      );
-    },
-    fetchValuesRequest(state, action) {
-      const { id } = action.payload;
-      const column = state.data[id];
-    },
     fetchValuesSuccess(state, action) {
       const { id, valueCounts } = action.payload;
       const column = state.data[id];
@@ -400,10 +376,6 @@ const columnsSlice = createSlice({
       } else {
         throw new Error(`Column with id ${id} not found`);
       }
-    },
-    fetchValuesFailure(state, action) {
-      const { id, error } = action.payload;
-      const column = state.data[id];
     },
 
     addColumnsToLoading(state, action) {
@@ -495,8 +467,6 @@ export default columnsSlice.reducer;
 
 export const {
   fetchValuesRequest,
-  fetchValuesSuccess,
-  fetchValuesFailure,
 
   updateAttribute,
   dropColumns,
@@ -522,10 +492,6 @@ export const {
   removeFromHoveredColumns,
   clearHoveredColumns,
   setColumnType,
-  setSelectedColumns,
-  appendToSelectedColumns,
-  clearSelectedColumns,
-  removeFromSelectedColumns,
   setValueCounts,
   updateColumnsArray,
 

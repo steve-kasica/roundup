@@ -37,11 +37,14 @@ const ColumnContextMenu = ({
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [newColumnName, setNewColumnName] = useState("");
 
-  const handleRenameColumn = useCallback(() => {
-    setNewColumnName(column.name || column.columnName || ""); // Pre-fill with current name
-    setRenameDialogOpen(true);
-    closeMenu();
-  }, [closeMenu, column.name, column.columnName]);
+  const handleRenameColumn = useCallback(
+    (event) => {
+      setNewColumnName(column.name || column.columnName || ""); // Pre-fill with current name
+      setRenameDialogOpen(true);
+      closeMenu(event);
+    },
+    [closeMenu, column.name, column.columnName]
+  );
 
   const handleRenameDialogClose = useCallback(() => {
     setRenameDialogOpen(false);
@@ -59,10 +62,13 @@ const ColumnContextMenu = ({
     handleRenameDialogClose();
   }, [handleRenameDialogClose]);
 
-  const handleExcludeColumn = useCallback(() => {
-    excludeColumn();
-    closeMenu();
-  }, [closeMenu, excludeColumn]);
+  const handleExcludeColumn = useCallback(
+    (event) => {
+      excludeColumn();
+      closeMenu(event);
+    },
+    [closeMenu, excludeColumn]
+  );
 
   const handleChangeColumnType = useCallback(() => {
     changeColumnType();

@@ -15,9 +15,6 @@ import columnsSlice, {
   removeFromHoveredColumns,
   clearHoveredColumns,
   setColumnType,
-  setSelectedColumns,
-  appendToSelectedColumns,
-  clearSelectedColumns,
   setValueCounts,
   addColumnsFromOpenRefine,
   setColumnsIndex,
@@ -256,20 +253,6 @@ describe("columnsSlice reducers", () => {
         setColumnType({ ids: col.id, columnTypes: COLUMN_TYPE_CATEGORICAL })
       );
       expect(nextState.data[col.id].columnType).toBe(COLUMN_TYPE_CATEGORICAL);
-    });
-  });
-
-  describe("setSelectedColumns / appendToSelectedColumns / clearSelectedColumns", () => {
-    it("manages selected state", () => {
-      const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
-      const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
-      let state = getInitialState();
-      state = columnsSlice(state, setSelectedColumns(col1.id));
-      expect(state.selected).toEqual([col1.id]);
-      state = columnsSlice(state, appendToSelectedColumns(col2.id));
-      expect(state.selected).toEqual([col1.id, col2.id]);
-      state = columnsSlice(state, clearSelectedColumns());
-      expect(state.selected).toEqual([]);
     });
   });
 

@@ -9,10 +9,9 @@ import {
 import { setPeekedTable } from "../../slices/uiSlice";
 import {
   selectColumnById,
+  selectColumnIdsByTableId,
   selectRemovedColumnIdsByTableId,
-  selectSelectedColumns,
   setHoveredColumns,
-  setSelectedColumns,
 } from "../../slices/columnsSlice";
 import {
   selectHoveredTable,
@@ -29,6 +28,7 @@ import {
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 import { createColumnsRequest } from "../../sagas/createColumnsSaga";
+import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 
 export default function withTableData(WrappedComponent) {
   const componentName =
@@ -48,41 +48,50 @@ export default function withTableData(WrappedComponent) {
         selectRemovedColumnIdsByTableId(state, id)
       );
 
-      // Use useMemo to ensure activeColumnIds updates when columnIds or removedColumnIds change
-      // deprecated
-      const activeColumnIds = useSelector((state) => {
-        const columnIds = Object.values(state.columns.data)
-          .filter((col) => col.tableId === id)
-          .map((col) => col.id);
-        return columnIds;
-      });
-
-      // Get selected columns from this table
-      const selectedTableColumns = useSelector((state) =>
-        selectSelectedColumns(state)
-          .map((columnId) => selectColumnById(state, columnId))
-          .filter(({ tableId }) => tableId === id)
-      );
-
-      // The intersection of the set of columns in this table and the set of selected columns
-      const selectedColumnIds = useMemo(() => {
-        return selectedTableColumns.map(({ id }) => id);
-      }, [selectedTableColumns]);
-
-      const selectedColumnNames = useMemo(() => {
-        return selectedTableColumns.map(({ columnName }) => columnName);
-      }, [selectedTableColumns]);
-
-      const hoveredColumnIds = useSelector((state) =>
-        state.columns.hovered.filter((colId) => activeColumnIds.includes(colId))
-      );
-
-      // TODO: deprecate columns
+      // Columns associated with this specific table
       const columns = useSelector((state) =>
-        activeColumnIds.map((columnId) => selectColumnById(state, columnId))
+        selectColumnIdsByTableId(state, id).map((colId) =>
+          selectColumnById(state, colId)
+        )
       );
-      // TODO: should not be here
-      const columnNames = columns.filter(Boolean).map((col) => col.name);
+
+      // Active columns are those that are not excluded
+      // This array is exported as props
+      const activeColumnIds = useMemo(
+        () =>
+          columns.filter(({ isExcluded }) => !isExcluded).map(({ id }) => id),
+        [columns]
+      );
+
+      // Selected columns are active columns that are also selected
+      // This array is exported as props
+      const selectedColumnIds = useMemo(
+        () =>
+          columns
+            .filter(({ isExcluded, isSelected }) => !isExcluded && isSelected)
+            .map(({ id }) => id),
+        [columns]
+      );
+
+      // Selected column names are the `columnNames` in the DB for selected columns
+      // used in some DB hooks. This array is exported as props
+      const selectedColumnNames = useMemo(
+        () =>
+          columns
+            .filter(({ isExcluded, isSelected }) => !isExcluded && isSelected)
+            .map(({ columnName }) => columnName),
+        [columns]
+      );
+
+      // Similarly, hovered columns are active columns that are also hovered
+      // This array is exported as props
+      const hoveredColumnIds = useMemo(
+        () =>
+          columns
+            .filter(({ isExcluded, isHovered }) => !isExcluded && isHovered)
+            .map(({ id }) => id),
+        [columns]
+      );
 
       // Get related operation data from the Redux store, if any
       const parentOperation = useSelector((state) =>
@@ -99,8 +108,17 @@ export default function withTableData(WrappedComponent) {
       const isSelected = selectedTables.includes(id);
 
       // Functions to handle interactions
-      const selectColumns = useCallback(
-        (columnIds) => dispatch(setSelectedColumns(columnIds)),
+      const handleSelectColumns = useCallback(
+        (selectedColumnIds, unselectedColumnIds) => {
+          dispatch(
+            updateColumnsRequest({
+              columnUpdates: [
+                ...selectedColumnIds.map((id) => ({ id, isSelected: true })),
+                ...unselectedColumnIds.map((id) => ({ id, isSelected: false })),
+              ],
+            })
+          );
+        },
         [dispatch]
       );
 
@@ -120,24 +138,22 @@ export default function withTableData(WrappedComponent) {
           {...props}
           // Table properties
           table={table}
-          removedColumnIds={removedColumnIds}
-          activeColumnIds={activeColumnIds}
-          columnIds={activeColumnIds} // deprecate
-          columnCount={activeColumnIds.length}
-          // Other related objects
-          columnNames={columnNames} // TODO: remove this, should only pass Ids
-          selectedColumnIds={selectedColumnIds}
-          selectedColumnNames={selectedColumnNames}
-          hoveredColumnIds={hoveredColumnIds} // Only hovered columnIDs in this table
           parentOperation={parentOperation} // TODO: should only pass Ids
           depth={depth}
+          columnCount={activeColumnIds.length}
+          // Properties derived from table's columns
+          activeColumnIds={activeColumnIds}
+          selectedColumnIds={selectedColumnIds}
+          selectedColumnNames={selectedColumnNames} // necessary for DB hooks
+          hoveredColumnIds={hoveredColumnIds} // Only hovered columnIDs in this table
+          removedColumnIds={removedColumnIds}
           // Interaction state
           isHovered={isHovered}
           isInSchema={isInSchema}
           isSelected={isSelected}
           isFocused={parentOperation ? true : false}
           // Interaction handlers
-          selectColumns={selectColumns}
+          selectColumns={handleSelectColumns}
           hoverColumn={hoverColumn}
           unhoverColumn={unhoverColumn}
           swapColumns={(target, source) => {
@@ -156,6 +172,17 @@ export default function withTableData(WrappedComponent) {
           }}
           insertColumn={(index) => {
             dispatch(createColumnsRequest({ tableId: id, index }));
+          }}
+          excludeColumns={(columnIds) => {
+            dispatch(
+              updateColumnsRequest({
+                columnUpdates: columnIds.map((colId) => ({
+                  id: colId,
+                  isExcluded: true,
+                  isSelected: false, // Excluding also unselects
+                })),
+              })
+            );
           }}
           // Table action handlers
           onHover={() => dispatch(setHoveredTable(id))} // TODO: remove

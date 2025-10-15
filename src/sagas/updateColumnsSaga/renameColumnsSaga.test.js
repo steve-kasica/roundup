@@ -4,7 +4,6 @@ import {
   renameColumns,
   addColumnsToLoading,
   removeColumnsFromLoading,
-  clearSelectedColumns,
 } from "../../slices/columnsSlice";
 import { renameColumnsAction } from "../renameColumnsSaga/renameColumnsSaga";
 import renameColumnSaga, {
@@ -28,7 +27,6 @@ describe("renameColumnSaga", () => {
     expect(gen.next().value).toEqual(put(addColumnsToLoading(ids)));
     expect(gen.next().value).toEqual(put(renameColumns({ ids, aliases })));
     expect(gen.next().value).toEqual(put(removeColumnsFromLoading(ids)));
-    expect(gen.next().value).toEqual(put(clearSelectedColumns()));
     expect(gen.next().done).toBe(true);
   });
 });

@@ -8,7 +8,6 @@ import Typography from "@mui/material/Typography";
 // import { selectDrawerContents } from "../slices/uiSlice/uiSliceSelectors";
 // import { useDispatch, useSelector } from "react-redux";
 // import { setDrawerContents } from "../slices/uiSlice/uiSlice";
-// import { clearSelectedColumns } from "../slices/columnsSlice";
 // import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TablePeek/TablePeek";
 // import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnIndexDetails";
 // import { Button, IconButton } from "@mui/material";
@@ -100,7 +99,6 @@ const DashboardGrid = ({
               aria-label="close drawer"
               onClick={() => {
                 dispatch(setDrawerContents(null));
-                dispatch(clearSelectedColumns());
               }}
               size="small"
             >

@@ -7,15 +7,13 @@ import {
 import PropTypes from "prop-types";
 import withOperationData from "../HOC/withOperationData";
 import { useCallback } from "react";
-import {
-  selectColumnIdsByTableId,
-  setSelectedColumns,
-} from "../../slices/columnsSlice";
+import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
 import {
   selectColumnById,
   selectSelectedColumns,
 } from "../../slices/columnsSlice/columnSelectors";
 import { selectTablesById } from "../../slices/tablesSlice";
+import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 
 export default function withPackOperationData(WrappedComponent) {
   // First wrap with the base operation data HOC
@@ -151,7 +149,13 @@ export default function withPackOperationData(WrappedComponent) {
             })
           )
         }
-        selectColumns={(columnIds) => dispatch(setSelectedColumns(columnIds))}
+        selectColumns={(columnIds) => {
+          dispatch(
+            updateColumnsRequest({
+              columnUpdates: columnIds.map((id) => ({ id, isSelected: true })),
+            })
+          );
+        }}
       />
     );
   }

@@ -39,7 +39,7 @@ import {
 import {
   ClearAll,
   SelectAll,
-  Delete,
+  Delete as ExcludeIcon,
   Visibility,
   TableChart,
   ArrowDropDown,
@@ -49,10 +49,6 @@ import withTableData from "./withTableData";
 import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
-  setSelectedColumns,
-  appendToSelectedColumns,
-  removeFromSelectedColumns,
-  clearSelectedColumns,
   dropColumns,
   setFocusedColumns,
   setColumnType,
@@ -71,17 +67,18 @@ import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
  * @param {Object} props - Component props
  * @param {Object} props.table - Table object containing schema information
  * @param {string} props.table.name - Name of the table
- * @param {string[]} props.columnIds - Array of column IDs in the table
+ * @param {string[]} props.activeColumnIds - Array of column IDs in the table
  * @param {number} [props.table.rowCount] - Number of rows in the table
  * @param {string[]} [props.selectedColumnIds=[]] - Array of currently selected column IDs
  * @returns {JSX.Element} The rendered TableSchema component
  */
 const TableSchema = ({
   table,
-  columnIds = [],
-  columnCount = 0,
-  selectedColumnIds = [],
+  activeColumnIds,
+  selectedColumnIds,
+  columnCount,
   swapColumns,
+  selectColumns,
 }) => {
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
@@ -91,23 +88,23 @@ const TableSchema = ({
    * Clears all selected columns
    */
   const handleClearSelection = useCallback(() => {
-    dispatch(clearSelectedColumns());
-  }, [dispatch]);
+    selectColumns([], selectedColumnIds);
+  }, [selectColumns, selectedColumnIds]);
 
   /**
    * Selects all columns in the table
    */
   const handleSelectAll = useCallback(() => {
-    dispatch(setSelectedColumns(columnIds));
-  }, [dispatch, columnIds]);
+    selectColumns(activeColumnIds, []);
+  }, [selectColumns, activeColumnIds]);
 
   /**
-   * Deletes the currently selected columns and clears the selection
+   * Excludes the currently selected columns and clears the selection
    */
-  const handleDeleteSelected = useCallback(() => {
+  const handleExcludeSelected = useCallback(() => {
     if (selectedColumnIds.length > 0) {
       dispatch(dropColumns(selectedColumnIds));
-      dispatch(clearSelectedColumns());
+      selectColumns([], selectedColumnIds); // Unselect all these columns
     }
   }, [dispatch, selectedColumnIds]);
 
@@ -164,43 +161,56 @@ const TableSchema = ({
     (event, columnId) => {
       const isCtrlOrCmd = event.ctrlKey || event.metaKey;
       const isShift = event.shiftKey;
-      const currentColumnIndex = columnIds.indexOf(columnId);
+      const currentColumnIndex = activeColumnIds.indexOf(columnId);
 
       if (isShift && selectedColumnIds.length > 0) {
         // Shift+click: Select range from last selected column to clicked column
         const lastSelectedColumnId =
           selectedColumnIds[selectedColumnIds.length - 1];
-        const lastSelectedIndex = columnIds.indexOf(lastSelectedColumnId);
+        const lastSelectedIndex = activeColumnIds.indexOf(lastSelectedColumnId);
 
         if (lastSelectedIndex !== -1) {
           const startIndex = Math.min(currentColumnIndex, lastSelectedIndex);
           const endIndex = Math.max(currentColumnIndex, lastSelectedIndex);
-          const rangeColumnIds = columnIds.slice(startIndex, endIndex + 1);
+          const rangeColumnIds = activeColumnIds.slice(
+            startIndex,
+            endIndex + 1
+          );
 
           // Add the range to selection (keeping existing selection)
-          dispatch(
-            setSelectedColumns([
-              ...selectedColumnIds,
-              ...rangeColumnIds.filter((id) => !selectedColumnIds.includes(id)),
-            ])
+          selectColumns(
+            rangeColumnIds,
+            activeColumnIds.filter((id) => !rangeColumnIds.includes(id))
           );
         } else {
           // Fallback to single selection if last selected column not found
-          dispatch(setSelectedColumns([columnId]));
+          selectColumns(
+            [columnId],
+            activeColumnIds.filter((id) => id !== columnId)
+          );
         }
       } else if (isCtrlOrCmd) {
         // Ctrl/Cmd+click: Toggle selection
         if (selectedColumnIds.includes(columnId)) {
-          dispatch(removeFromSelectedColumns([columnId]));
+          selectColumns(
+            activeColumnIds.filter((id) => id !== columnId),
+            [columnId]
+          );
         } else {
-          dispatch(appendToSelectedColumns([columnId]));
+          selectColumns(
+            [...selectedColumnIds, columnId],
+            activeColumnIds.filter((id) => id !== columnId)
+          );
         }
       } else {
         // Regular click: Replace selection
-        dispatch(setSelectedColumns([columnId]));
+        selectColumns(
+          [columnId],
+          activeColumnIds.filter((id) => id !== columnId)
+        );
       }
     },
-    [dispatch, columnIds, selectedColumnIds]
+    [dispatch, activeColumnIds, selectedColumnIds]
   );
 
   /**
@@ -249,7 +259,7 @@ const TableSchema = ({
             {table.name}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {columnIds.length} x {table.rowCount?.toLocaleString() || 0}
+            {activeColumnIds.length} x {table.rowCount?.toLocaleString() || 0}
           </Typography>
         </Box>
 
@@ -310,15 +320,15 @@ const TableSchema = ({
             <ArrowDropDown fontSize="small" />
           </IconButton>
 
-          {/* Delete Selected Columns */}
+          {/* Exclude Selected Columns */}
           <IconButton
             size="small"
-            onClick={handleDeleteSelected}
+            onClick={handleExcludeSelected}
             disabled={selectedColumnIds.length === 0}
-            title="Delete selected columns"
+            title="Exclude selected columns"
             color="error"
           >
-            <Delete fontSize="small" />
+            <ExcludeIcon fontSize="small" />
           </IconButton>
 
           {/* Clear Selection */}
@@ -377,7 +387,7 @@ const TableSchema = ({
         }}
       >
         {/* Individual Column Cards - Each column rendered as a numbered card with summary */}
-        {columnIds.map((columnId, i) => (
+        {activeColumnIds.map((columnId, i) => (
           <Box
             key={columnId}
             sx={{
