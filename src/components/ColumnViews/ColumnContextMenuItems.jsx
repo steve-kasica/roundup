@@ -80,10 +80,13 @@ const ColumnContextMenu = ({
     closeMenu();
   }, [closeMenu, focusColumn]);
 
-  const handleInsertColumnLeft = useCallback(() => {
-    insertColumnLeft();
-    closeMenu();
-  }, [closeMenu, insertColumnLeft]);
+  const handleInsertColumnLeft = useCallback(
+    (event) => {
+      insertColumnLeft();
+      closeMenu(event);
+    },
+    [closeMenu, insertColumnLeft]
+  );
 
   const handleInsertColumnRight = useCallback(() => {
     insertColumnRight();
@@ -104,13 +107,13 @@ const ColumnContextMenu = ({
         </ListItemIcon>
         <ListItemText>Exclude column</ListItemText>
       </MenuItem>
-      <MenuItem onClick={handleChangeColumnType}>
+      <MenuItem disabled onClick={handleChangeColumnType}>
         <ListItemIcon>
           <SwapHoriz fontSize="small" />
         </ListItemIcon>
         <ListItemText>Change column type</ListItemText>
       </MenuItem>
-      <MenuItem onClick={handleFocusColumn}>
+      <MenuItem disabled onClick={handleFocusColumn}>
         <ListItemIcon>
           <CenterFocusStrong fontSize="small" />
         </ListItemIcon>
