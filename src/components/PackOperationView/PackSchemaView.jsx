@@ -44,6 +44,7 @@ const PackSchemaView = withPackOperationData(
     // functions
     setJoinType,
   }) => {
+    const isError = operation.error !== null;
     // Add hover state for coordinating between tables
     const [hoveredMatch, setHoveredMatch] = useState(null);
 
@@ -304,11 +305,13 @@ const PackSchemaView = withPackOperationData(
               <CircularProgress size={24} />
             </Box>
           )}
-          {error && !data && (
-            <Alert severity="error">
+          {operation.error !== null && (
+            <Alert severity="error" sx={{ width: "100%" }}>
+              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                {operation.error.name}
+              </Typography>
               <Typography variant="body2">
-                Failed to load pack statistics:{" "}
-                {error.message || "Unknown error"}
+                {operation.error.description}
               </Typography>
             </Alert>
           )}

@@ -1,3 +1,8 @@
+import {
+  MissingJoinKeyError,
+  MissingJoinPredicateError,
+  MissingJoinTypeError,
+} from "../../components/Errors/PackErrors";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { getDuckDB } from "./duckdbClient";
 
@@ -16,14 +21,14 @@ export function formQuery(op, columnList = null) {
   const table2 = op.children[1].id;
   const { joinType, joinKey1, joinKey2, joinPredicate } = op;
 
-  if (!joinType) {
-    throw new Error("join type is unspecified");
-  } else if (!joinKey1) {
-    throw new Error("join key in table 1 is unspecified");
+  if (!joinKey1) {
+    throw new MissingJoinKeyError(`${table1} is missing a join key`);
   } else if (!joinKey2) {
-    throw new Error("join key in table 2 is unspecified");
+    throw new MissingJoinKeyError(`${table2} is missing a join key`);
   } else if (!joinPredicate) {
-    throw new Error("join predicate is unspecified");
+    throw new MissingJoinPredicateError();
+  } else if (!joinType) {
+    throw new MissingJoinTypeError();
   }
 
   // TODO: refactor to util file for DRY

@@ -40,19 +40,19 @@ export default function ColumnTypeIcon({
   } else if (column.columnType === undefined) {
     Icon = UndefinedIcon;
     tooltipText = "Unknown column type";
-  } else if (column.columnType === COLUMN_TYPE_VARCHAR && isKey) {
-    Icon = KeyIcon;
-    defaultSx["fontSize"] = "1rem";
-    tooltipText = "Key column (unique text)";
+    // } else if (column.columnType === COLUMN_TYPE_VARCHAR && isKey) {
+    //   Icon = KeyIcon;
+    //   defaultSx["fontSize"] = "1rem";
+    //   tooltipText = "Key column (unique text)";
   } else if (column.columnType === COLUMN_TYPE_VARCHAR) {
     Icon = CategoricalIcon;
-    tooltipText = "Text column";
+    tooltipText = "Column Type: VARCHAR";
   } else if (column.columnType === "NUMERIC") {
     Icon = NumericIcon;
-    tooltipText = "Numeric column";
+    tooltipText = "Column Type: NUMERIC";
   } else if (column.columnType === "DATE") {
     Icon = DateIcon;
-    tooltipText = "Date column";
+    tooltipText = "Column Type: DATE";
   }
 
   // Merge custom sx with default sx (custom sx takes precedence)

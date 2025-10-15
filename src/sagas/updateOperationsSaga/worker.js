@@ -14,6 +14,7 @@ import {
   getTableDimensions,
 } from "../../lib/duckdb";
 import { updateOperationsFailure, updateOperationsSuccess } from "./actions";
+import { serializeError } from "../../components/Errors/PackErrors";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
@@ -55,7 +56,7 @@ export default function* updateOperationsWorker(action) {
           successfulUpdates.push(operationUpdate);
         } catch (error) {
           console.error("Error creating stack view:", error);
-          operationUpdate.error = JSON.stringify(error);
+          operationUpdate.error = serializeError(error);
           failedUpdates.push(operationUpdate);
         }
       } else if (
@@ -78,7 +79,7 @@ export default function* updateOperationsWorker(action) {
           successfulUpdates.push(operationUpdate);
         } catch (error) {
           console.error("Error creating pack view:", error);
-          operationUpdate.error = JSON.stringify(error);
+          operationUpdate.error = serializeError(error);
           failedUpdates.push(operationUpdate);
         }
       }
