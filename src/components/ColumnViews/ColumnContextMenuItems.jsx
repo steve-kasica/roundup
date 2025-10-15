@@ -9,6 +9,9 @@ import {
   DialogActions,
   TextField,
   Button,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
 import {
   Edit,
@@ -20,12 +23,18 @@ import {
 } from "@mui/icons-material";
 import { useCallback, useState } from "react";
 import withColumnData from "./withColumnData";
+import {
+  COLUMN_TYPE_CATEGORICAL,
+  COLUMN_TYPE_DATE,
+  COLUMN_TYPE_NUMERICAL,
+  COLUMN_TYPE_VARCHAR,
+} from "../../slices/columnsSlice";
 
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
   column,
   excludeColumn,
-  changeColumnType,
+  setColumnType,
   focusColumn,
   insertColumnLeft,
   insertColumnRight,
@@ -36,14 +45,17 @@ const ColumnContextMenu = ({
 }) => {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [newColumnName, setNewColumnName] = useState("");
+  const [columnTypeDialogOpen, setColumnTypeDialogOpen] = useState(false);
+  const [selectedColumnType, setSelectedColumnType] = useState(
+    column.columnType || ""
+  );
 
   const handleRenameColumn = useCallback(
     (event) => {
       setNewColumnName(column.name || column.columnName || ""); // Pre-fill with current name
       setRenameDialogOpen(true);
-      closeMenu(event);
     },
-    [closeMenu, column.name, column.columnName]
+    [column.name, column.columnName]
   );
 
   const handleRenameDialogClose = useCallback(() => {
@@ -51,16 +63,40 @@ const ColumnContextMenu = ({
     setNewColumnName("");
   }, []);
 
-  const handleRenameConfirm = useCallback(() => {
-    if (newColumnName.trim() && renameColumn) {
-      renameColumn(newColumnName.trim());
-    }
-    handleRenameDialogClose();
-  }, [newColumnName, renameColumn, handleRenameDialogClose]);
+  const handleRenameConfirm = useCallback(
+    (event) => {
+      if (newColumnName.trim() && renameColumn) {
+        renameColumn(newColumnName.trim());
+      }
+      handleRenameDialogClose();
+      closeMenu(event);
+    },
+    [newColumnName, renameColumn, handleRenameDialogClose, closeMenu]
+  );
 
   const handleRenameCancel = useCallback(() => {
     handleRenameDialogClose();
   }, [handleRenameDialogClose]);
+
+  const handleColumnTypeDialogClose = useCallback(() => {
+    setColumnTypeDialogOpen(false);
+    setSelectedColumnType("");
+  }, []);
+
+  const handleColumnTypeConfirm = useCallback(
+    (event) => {
+      if (selectedColumnType && setColumnType) {
+        setColumnType(selectedColumnType);
+      }
+      handleColumnTypeDialogClose();
+      closeMenu(event);
+    },
+    [selectedColumnType, setColumnType, handleColumnTypeDialogClose, closeMenu]
+  );
+
+  const handleColumnTypeCancel = useCallback(() => {
+    handleColumnTypeDialogClose();
+  }, [handleColumnTypeDialogClose]);
 
   const handleExcludeColumn = useCallback(
     (event) => {
@@ -70,10 +106,10 @@ const ColumnContextMenu = ({
     [closeMenu, excludeColumn]
   );
 
-  const handleChangeColumnType = useCallback(() => {
-    changeColumnType();
-    closeMenu();
-  }, [changeColumnType, closeMenu]);
+  const handleSetColumnType = useCallback(() => {
+    setSelectedColumnType(column.columnType || "");
+    setColumnTypeDialogOpen(true);
+  }, [column.columnType]);
 
   const handleFocusColumn = useCallback(() => {
     focusColumn();
@@ -107,7 +143,7 @@ const ColumnContextMenu = ({
         </ListItemIcon>
         <ListItemText>Exclude column</ListItemText>
       </MenuItem>
-      <MenuItem disabled onClick={handleChangeColumnType}>
+      <MenuItem onClick={handleSetColumnType}>
         <ListItemIcon>
           <SwapHoriz fontSize="small" />
         </ListItemIcon>
@@ -166,6 +202,48 @@ const ColumnContextMenu = ({
             disabled={!newColumnName.trim()}
           >
             Rename
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Change Column Type Dialog */}
+      <Dialog
+        open={columnTypeDialogOpen}
+        onClose={handleColumnTypeCancel}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Change Column Type</DialogTitle>
+        <DialogContent>
+          <RadioGroup
+            value={selectedColumnType}
+            onChange={(e) => setSelectedColumnType(e.target.value)}
+          >
+            <FormControlLabel
+              value={COLUMN_TYPE_VARCHAR}
+              control={<Radio />}
+              label="VARCHAR"
+            />
+            {/* <FormControlLabel
+              value={COLUMN_TYPE_NUMERICAL}
+              control={<Radio />}
+              label="Numerical"
+            />
+            <FormControlLabel
+              value={COLUMN_TYPE_DATE}
+              control={<Radio />}
+              label="Date"
+            /> */}
+          </RadioGroup>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleColumnTypeCancel}>Cancel</Button>
+          <Button
+            onClick={handleColumnTypeConfirm}
+            variant="contained"
+            disabled={!selectedColumnType}
+          >
+            Change Type
           </Button>
         </DialogActions>
       </Dialog>

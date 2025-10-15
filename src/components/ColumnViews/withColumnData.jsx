@@ -182,11 +182,11 @@ export default function withColumnData(WrappedComponent) {
             // TODO: implement logic to nullify column
           }
         }}
-        changeColumnType={(newType) => {
-          if (!isNull) {
-            dispatch(updateColumnsRequest({ id, columnType: newType }));
-          }
-        }}
+        setColumnType={(columnType) =>
+          dispatch(
+            updateColumnsRequest({ columnUpdates: [{ id, columnType }] })
+          )
+        }
         insertColumnLeft={() =>
           dispatch(
             createColumnsRequest({
