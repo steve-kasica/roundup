@@ -1,4 +1,3 @@
-import { calcPackStats } from "../../../../lib/duckdb/calcPackStats";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
@@ -26,22 +25,6 @@ export default function withPackOutputDetailsData(WrappedComponent) {
     useEffect(() => {
       if (leftColumnId && rightColumnId) {
         setIsLoadingStats(true);
-        calcPackStats(
-          leftTableId,
-          rightTableId,
-          leftColumnId,
-          rightColumnId,
-          joinType
-        )
-          .then((result) => {
-            setStats(result);
-          })
-          .catch((error) => {
-            console.error("Error calculating pack stats:", error);
-          })
-          .finally(() => {
-            setIsLoadingStats(false);
-          });
       }
     }, [leftTableId, rightTableId, leftColumnId, rightColumnId, joinType]);
 

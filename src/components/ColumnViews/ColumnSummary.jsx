@@ -80,7 +80,7 @@ const ColumnSummary = ({
         <Menu
           anchorEl={menuAnchorEl}
           open={Boolean(menuAnchorEl)}
-          onClose={handleMenuClose}
+          onClose={(event) => handleMenuClose(event)}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "right",

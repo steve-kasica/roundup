@@ -77,7 +77,8 @@ import { EnhancedColumnHeader } from "../ColumnViews";
  */
 const TableRows = ({
   table,
-  selectedColumnIds,
+  selectedColumnIds, // IDs of selected columns in Redux
+  selectedColumnNames, // Names of selected columns in the database
   hoveredIndex = 0,
   onScrollContainerRef = null,
   onScroll = null,
@@ -101,7 +102,7 @@ const TableRows = ({
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
       table.id,
-      selectedColumnIds,
+      selectedColumnNames,
       50, // pageSize
       sortConfig.columnId, // sortBy
       sortConfig.direction // sortDirection

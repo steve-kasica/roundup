@@ -15,8 +15,9 @@ const topRowHeight = 25; // Fixed height for the top row (column headers)
 const StackSchemaView = withStackOperationData(
   ({
     operation,
-    columnIdMatrix,
-    m,
+    columnIds, // column IDs directly linked to this operation
+    columnIdMatrix, // column IDs of child tables in a matrix
+    m, // width of the matrix (# of columns)
     selectedColumnIndices,
     selectColumns,
     selectedColumns,
@@ -104,7 +105,6 @@ const StackSchemaView = withStackOperationData(
 
     const onColumnLabelClick = useCallback(
       (event, colIndex) => {
-        console.log("Column header clicked:", colIndex, event);
         if (event.shiftKey && selectionAnchorCell !== null) {
           // Shift+Click: select range of operation column indices from anchor to extent
           const anchorIndex = selectionAnchorCell;
@@ -115,15 +115,15 @@ const StackSchemaView = withStackOperationData(
           // Collect operation column IDs in the range
           const rangeOperationColumns = [];
           for (let i = startIndex; i <= endIndex; i++) {
-            if (operation.columnIds[i]) {
-              rangeOperationColumns.push(operation.columnIds[i]);
+            if (columnIds[i]) {
+              rangeOperationColumns.push(columnIds[i]);
             }
           }
 
           selectColumns(rangeOperationColumns);
         } else if (event.metaKey || event.ctrlKey) {
           // Cmd/Ctrl+Click: toggle selection of this operation column
-          const operationColumnId = operation.columnIds[colIndex];
+          const operationColumnId = columnIds[colIndex];
           const currentlySelectedColumns = selectedColumns || [];
           const isOperationColumnSelected =
             currentlySelectedColumns.includes(operationColumnId);
@@ -146,11 +146,11 @@ const StackSchemaView = withStackOperationData(
           setSelectionAnchorCell(colIndex);
         } else {
           // Single click: select only this column group, also handles initial shift clicks
-          selectColumns(operation.columnIds[colIndex]);
+          selectColumns(columnIds[colIndex]);
           setSelectionAnchorCell(colIndex);
         }
       },
-      [selectionAnchorCell, selectColumns, selectedColumns, operation.columnIds]
+      [selectionAnchorCell, selectColumns, selectedColumns, columnIds]
     );
 
     return (

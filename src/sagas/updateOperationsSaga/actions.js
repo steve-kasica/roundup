@@ -5,10 +5,6 @@ export const updateOperationsRequest = createAction(
   "sagas/updateOperations/request"
 );
 
-export const updateNoOpOperationRequest = createAction(
-  "sagas/updateOperations/request/noop"
-);
-
 export const updateOperationsSuccess = createAction(
   "sagas/updateOperations/success"
 );

@@ -115,7 +115,8 @@ export default function withColumnData(WrappedComponent) {
         unHoverColumn={unHoverColumn} // Deprecated
         unhoverColumn={unHoverColumn}
         renameColumn={(name) => {
-          if (!isNull) dispatch(updateColumnsRequest([{ id, name }]));
+          if (!isNull)
+            dispatch(updateColumnsRequest({ columnUpdates: [{ id, name }] }));
         }}
         unfocusColumn={unfocusColumn}
         dragColumn={() => (!isNull ? dispatch(addColumnsToDragging(id)) : null)}

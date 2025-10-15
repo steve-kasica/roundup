@@ -23,13 +23,14 @@ import withColumnData from "./withColumnData";
 
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
+  column,
   excludeColumn,
   changeColumnType,
   focusColumn,
   insertColumnLeft,
   insertColumnRight,
-  columnName, // Assuming this comes from withColumnData HOC
-  renameColumn, // Assuming this comes from withColumnData HOC
+  // action dispatch functions passed via `withColumnData` HOC
+  renameColumn,
   // Props passed directly from parent component
   closeMenu,
 }) => {
@@ -37,10 +38,10 @@ const ColumnContextMenu = ({
   const [newColumnName, setNewColumnName] = useState("");
 
   const handleRenameColumn = useCallback(() => {
-    setNewColumnName(columnName || ""); // Pre-fill with current name
+    setNewColumnName(column.name || column.columnName || ""); // Pre-fill with current name
     setRenameDialogOpen(true);
     closeMenu();
-  }, [closeMenu, columnName]);
+  }, [closeMenu, column.name, column.columnName]);
 
   const handleRenameDialogClose = useCallback(() => {
     setRenameDialogOpen(false);

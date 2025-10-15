@@ -8,86 +8,102 @@ import {
 } from "../../slices/operationsSlice";
 // TODO, maybe this should be in update, rather than create?
 import { selectQueryData } from "../createOperationsSaga/worker";
-import { createPackView, getTableDimensions } from "../../lib/duckdb";
+import {
+  createPackView,
+  createStackView,
+  getTableDimensions,
+} from "../../lib/duckdb";
 import { updateOperationsFailure, updateOperationsSuccess } from "./actions";
 
-export function* updatePackOperationWorker({ operationUpdate }) {
-  let isError = false;
-  const operation = yield select((state) =>
-    selectOperation(state, operationUpdate.id)
-  );
+export default function* updateOperationsWorker(action) {
+  const successfulUpdates = [];
+  const failedUpdates = [];
+  const { operationUpdates } = action.payload;
 
-  const triggerProps = [
-    "operationType",
-    "joinType",
-    "joinKey1",
-    "joinKey2",
-    "joinPredicate",
-    "children",
-  ];
-  const hasTriggerProp = Object.keys(operationUpdate).some((key) =>
-    triggerProps.includes(key)
-  );
-
-  if (hasTriggerProp) {
-    const queryData = yield select((state) =>
-      selectQueryData(state, operation.id)
+  for (let operationUpdate of operationUpdates) {
+    const keys = Object.keys(operationUpdate);
+    const operation = yield select((state) =>
+      selectOperation(state, operationUpdate.id)
     );
-    try {
-      yield call(createPackView, queryData, operation.columnIds);
-      const { rowCount } = yield call(getTableDimensions, operation.id);
-      operationUpdate.rowCount = rowCount;
-      operationUpdate.error = null;
-    } catch (error) {
-      isError = true;
-      console.error("Error creating pack view:", error);
-      operationUpdate.rowCount = null;
-      operationUpdate.error = JSON.stringify(error);
-    } finally {
-      yield put(updateOperationsSlice(operationUpdate));
+
+    // If we're changing the operationType or children, then we need to re-create the view
+    if (keys.includes("operationType") || keys.includes("children")) {
+      const queryData = yield select((state) =>
+        selectQueryData(
+          state,
+          operationUpdate.id,
+          operationUpdate.children || operation.children // if just switching type, keep existing children, children field in update will be null
+        )
+      );
+      if (
+        operationUpdate.operationType === OPERATION_TYPE_STACK ||
+        (operationUpdate.operationType === undefined &&
+          operation.operationType === OPERATION_TYPE_STACK)
+      ) {
+        try {
+          yield call(createStackView, queryData);
+          const { rowCount, columnCount } = yield call(
+            getTableDimensions,
+            operationUpdate.id
+          );
+          operationUpdate = {
+            ...operationUpdate,
+            rowCount,
+            columnCount,
+            error: null,
+          };
+          successfulUpdates.push(operationUpdate);
+        } catch (error) {
+          console.error("Error creating stack view:", error);
+          operationUpdate.error = JSON.stringify(error);
+          failedUpdates.push(operationUpdate);
+        }
+      } else if (
+        operationUpdate.operationType === OPERATION_TYPE_PACK ||
+        (operationUpdate.operationType === undefined &&
+          operation.operationType === OPERATION_TYPE_PACK)
+      ) {
+        try {
+          yield call(createPackView, queryData);
+          const { rowCount, columnCount } = yield call(
+            getTableDimensions,
+            operationUpdate.id
+          );
+          operationUpdate = {
+            ...operationUpdate,
+            rowCount,
+            columnCount,
+            error: null,
+          };
+          successfulUpdates.push(operationUpdate);
+        } catch (error) {
+          console.error("Error creating pack view:", error);
+          operationUpdate.error = JSON.stringify(error);
+          failedUpdates.push(operationUpdate);
+        }
+      }
     }
   }
 
-  if (!isError) {
-    yield put(updateOperationsSuccess({ operationId: operation.id }));
-  } else {
-    yield put(
-      updateOperationsFailure({
-        failedUpdates: [{ operationId: operation.id }],
-      })
-    );
-  }
-}
+  yield put(updateOperationsSlice([...successfulUpdates, ...failedUpdates]));
 
-export function* updateStackOperationWorker({ operationUpdate }) {
-  let isError = false;
-  const triggerProps = ["children"];
+  const formatSagaEndPayload = (updates) => ({
+    operationIds: updates.map(({ id }) => id),
+    changedPropertiesByOperation: Object.fromEntries(
+      updates.map(({ id }) => [
+        id,
+        Object.keys(
+          operationUpdates.find(({ id: updateId }) => updateId === id)
+        ).filter((key) => key !== "id"),
+      ])
+    ),
+  });
 
-  const hasTriggerProp = Object.keys(operationUpdate).some((key) =>
-    triggerProps.includes(key)
-  );
-  if (hasTriggerProp) {
-    const queryData = yield select((state) =>
-      selectQueryData(state, operationUpdate.id)
-    );
-    try {
-      // yield call(createStackView, queryData, operationUpdate.columnIds);
-    } catch (error) {
-      console.error("Error creating stack view:", error);
-      isError = true;
-      operationUpdate.error = JSON.stringify(error);
-    } finally {
-      yield put(updateOperationsSlice(operationUpdate));
-    }
+  if (successfulUpdates.length > 0) {
+    yield put(updateOperationsSuccess(formatSagaEndPayload(successfulUpdates)));
   }
 
-  if (!isError) {
-    yield put(updateOperationsSuccess({ operationId: operationUpdate.id }));
-  } else {
-    yield put(
-      updateOperationsFailure({
-        operationId: operationUpdate.id,
-      })
-    );
+  if (failedUpdates.length > 0) {
+    yield put(updateOperationsFailure(formatSagaEndPayload(failedUpdates)));
   }
 }

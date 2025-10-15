@@ -19,7 +19,8 @@ import {
   selectRootOperation,
 } from "../../slices/operationsSlice";
 import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
-import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
+import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
+import { deleteOperationsRequest } from "../../sagas/deleteOperationsSaga";
 
 const ForwardedBox = forwardRef((props, ref) => <Box ref={ref} {...props} />);
 ForwardedBox.displayName = "ForwardedBox";
@@ -150,7 +151,6 @@ export default function TableDropTarget({ operationType, children }) {
       if (monitor.didDrop()) {
         return; // Already handled by a nested drop target
       }
-      console.log(`Dropped table`, draggedTable, rootOperation, operationType);
       if (
         operationType === OPERATION_TYPE_NO_OP &&
         rootOperation === undefined
@@ -172,21 +172,25 @@ export default function TableDropTarget({ operationType, children }) {
         // This allows the operation to evolve from a NO_OP to either PACK or STACK
         dispatch(
           updateOperationsRequest({
-            operationUpdate: {
-              id: rootOperation.id,
-              operationType,
-              children: [...rootOperation.children, draggedTable.id],
-            },
+            operationUpdates: [
+              {
+                id: rootOperation.id,
+                operationType,
+                children: [...rootOperation.children, draggedTable.id],
+              },
+            ],
           })
         );
       } else if (rootOperation?.operationType === operationType) {
         // Case: tables added to an existing operation of the same type
         dispatch(
           updateOperationsRequest({
-            operationUpdate: {
-              id: rootOperation.id,
-              children: [...rootOperation.children, draggedTable.id],
-            },
+            operationUpdates: [
+              {
+                id: rootOperation.id,
+                children: [...rootOperation.children, draggedTable.id],
+              },
+            ],
           })
         );
       } else {

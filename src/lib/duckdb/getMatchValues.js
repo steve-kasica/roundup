@@ -12,7 +12,6 @@ export async function getMatchValues(
   order = "total_count",
   order_direction = "DESC"
 ) {
-  console.log("matchType:", matchType);
   const db = await getDuckDB();
   const conn = await db.connect();
   // TODO: refactor to util file for DRY

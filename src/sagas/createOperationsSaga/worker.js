@@ -45,36 +45,34 @@ import {
 import { createOperationsSuccess, createOperationsFailure } from "./actions";
 import Operation from "../../slices/operationsSlice/Operation";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { group } from "d3";
 
 const calcPackColumnCount = (childIds) => {
-  const columnCounts = childIds.map((childId) => {
-    if (isTableId(childId)) {
-      const table = select((state) => selectTablesById(state, [childId])[0]);
-      return table ? table.columnIds.length : 0;
-    } else {
-      const operation = select((state) => selectOperation(state, childId));
-      return operation ? operation.columnIds.length : 0;
-    }
-  });
-  const columnCountTotal = columnCounts.reduce((sum, count) => sum + count, 0);
+  const columnCountTotal = select(
+    (state) =>
+      Object.values(state.columns.data).filter(({ tableId }) =>
+        childIds.includes(tableId)
+      ).length
+  );
+
   return columnCountTotal;
 };
 
 const calcStackColumnCount = (childIds) => {
-  let maxColumns = 0;
-  for (const childId of childIds) {
-    if (isTableId(childId)) {
-      const table = select((state) => selectTablesById(state, [childId])[0]);
-      if (table && table.columnIds.length > maxColumns) {
-        maxColumns = table.columnIds.length;
-      }
-    } else {
-      const operation = select((state) => selectOperation(state, childId));
-      if (operation && operation.columnIds.length > maxColumns) {
-        maxColumns = operation.columnIds.length;
-      }
-    }
-  }
+  const tableColumnCounts = select((state) => {
+    Array.from(
+      group(
+        group(
+          Object.values(state.columns.data).filter(({ tableId }) =>
+            childIds.includes(tableId)
+          ),
+          (column) => column.tableId
+        )
+      ),
+      ([tableId, columns]) => columns.length
+    );
+  });
+  const maxColumns = Math.max(0, ...tableColumnCounts);
   return maxColumns;
 };
 
@@ -88,11 +86,16 @@ const calcStackColumnCount = (childIds) => {
  *
  * TODO: This could be moved to a selector in the operations slice
  */
-export const selectQueryData = (state, operationId) => {
-  const operation = selectOperation(state, operationId);
-  const parent = { ...operation };
-  parent.children = operation.children.map((id) => {
-    let child = { id, columnIds: state.columns.idsByTable[id] };
+export const selectQueryData = (state, parentId, childIds) => {
+  // const operation = selectOperation(state, operationId);
+  const parent = { id: parentId };
+  parent.children = childIds.map((id) => {
+    let child = {
+      id,
+      columnNames: Object.values(state.columns.data)
+        .filter(({ tableId }) => tableId === id)
+        .map(({ columnName }) => columnName),
+    };
     return child;
   });
   return parent;
@@ -140,10 +143,10 @@ export default function* createOperationsWorker(action) {
       if (operation.operationType === OPERATION_TYPE_PACK) {
         // Build query data structure required for view creation
         const queryData = yield select((state) =>
-          selectQueryData(state, operation.id)
+          selectQueryData(state, operation.id, childIds)
         );
         // Creates a unified view with columns from all child tables
-        yield call(createPackView, queryData, operation.columnIds);
+        yield call(createPackView, queryData);
         const { rowCount, columnCount } = yield call(
           getTableDimensions,
           operation.id
@@ -154,9 +157,9 @@ export default function* createOperationsWorker(action) {
         // Creates a stacked view using the first child table as template
         // Build query data structure required for view creation
         const queryData = yield select((state) =>
-          selectQueryData(state, operation.id)
+          selectQueryData(state, operation.id, childIds)
         );
-        yield call(createStackView, queryData, operation.columnIds);
+        yield call(createStackView, queryData);
         const { rowCount, columnCount } = yield call(
           getTableDimensions,
           operation.id

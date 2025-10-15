@@ -102,7 +102,6 @@ const columnsSlice = createSlice({
 
     updateColumns(state, action) {
       let columns = action.payload;
-      console.log("Updating columns in slice:", columns);
       if (!Array.isArray(columns)) {
         columns = [columns];
       }

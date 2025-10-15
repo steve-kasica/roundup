@@ -25,14 +25,14 @@ import { EnhancedColumnHeader } from "../ColumnViews";
  * @returns
  */
 export const StackVirtualizedTable = withStackOperationData(
-  ({ operation, selectedOperationColumnIds }) => {
+  ({ operation, selectedColumnIds, selectedColumnNames }) => {
     const tableContainerRef = useRef(null);
     const [sortBy, setSortBy] = useState(null);
     const [sortDirection, setSortDirection] = useState("asc");
 
     const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
       operation.id,
-      selectedOperationColumnIds,
+      selectedColumnNames,
       50,
       sortBy,
       sortDirection
@@ -117,7 +117,7 @@ export const StackVirtualizedTable = withStackOperationData(
           <TableHead>
             <TableRow>
               <TableCell>#</TableCell>
-              {selectedOperationColumnIds.map((colId, index) => (
+              {selectedColumnIds.map((colId, index) => (
                 <TableCell key={index} align="left">
                   <EnhancedColumnHeader
                     id={colId}
@@ -136,7 +136,7 @@ export const StackVirtualizedTable = withStackOperationData(
               Array.from({ length: 5 }).map((_, index) => (
                 <StyledAlternatingTableRow key={index} isEven={index % 2 === 0}>
                   {Array.from({
-                    length: selectedOperationColumnIds.length + 1,
+                    length: selectedColumnIds.length + 1,
                   }).map((_, colIndex) => (
                     <TableCell key={colIndex}>
                       <Skeleton variant="text" width="80%" />
@@ -181,7 +181,7 @@ export const StackVirtualizedTable = withStackOperationData(
             {loading && data.length > 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={selectedOperationColumnIds.length + 1}
+                  colSpan={selectedColumnIds.length + 1}
                   align="center"
                 >
                   <Box
@@ -203,7 +203,7 @@ export const StackVirtualizedTable = withStackOperationData(
             {!loading && !hasMore && data.length > 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={selectedOperationColumnIds.length + 1}
+                  colSpan={selectedColumnIds.length + 1}
                   align="center"
                 >
                   <Typography variant="body2" color="text.secondary" py={2}>

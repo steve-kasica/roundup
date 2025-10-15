@@ -31,26 +31,20 @@ export default function* createColumnsWorker(action) {
     } else if (mode === CREATION_MODE_INITIALIZATION) {
       // If mode is initialization, then database columns already exist
       // We just need to match the column names in the DB to the column objects
-      if (isTableId(parentId)) {
-        if (!tableIdToColumnNames.has(parentId)) {
-          const columnNames = yield call(getTableColumnNames, parentId);
-          tableIdToColumnNames.set(parentId, columnNames);
-        }
-        try {
-          const columnName = tableIdToColumnNames.get(parentId)[index];
-          newColumn.columnName = columnName;
-          successfulCreations.push(newColumn);
-        } catch (error) {
-          console.error("Error fetching current column names:", error);
-          newColumn.columnName = null;
-          failedCreations.push({ parentId, error: error.message });
-          continue; // Skip to the next iteration
-        }
-      } else {
-        // If creating a column for an operation
-        // We need to assign the column object's ID as the column name
-        // in the underlying DB view of the operation
+      if (!tableIdToColumnNames.has(parentId)) {
+        // Fetch column names for this TABLE or VIEW from the DB only once
+        const columnNames = yield call(getTableColumnNames, parentId);
+        tableIdToColumnNames.set(parentId, columnNames);
+      }
+      try {
+        const columnName = tableIdToColumnNames.get(parentId)[index];
+        newColumn.columnName = columnName;
         successfulCreations.push(newColumn);
+      } catch (error) {
+        console.error("Error fetching current column names:", error);
+        newColumn.columnName = null;
+        failedCreations.push({ parentId, error: error.message });
+        continue; // Skip to the next iteration
       }
     }
   }

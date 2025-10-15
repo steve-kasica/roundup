@@ -14,7 +14,6 @@ export * from "./getValueCounts";
 export * from "./getColumnNames";
 export * from "./getMatchValues";
 export * from "./getColumnValues";
-export * from "./getStackRows";
 export * from "./insertColumn";
 export * from "./getColumnNames";
 export * from "./dropView";

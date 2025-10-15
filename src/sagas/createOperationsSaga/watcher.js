@@ -1,4 +1,4 @@
-import { put, takeEvery, takeLatest } from "redux-saga/effects";
+import { takeEvery } from "redux-saga/effects";
 import { createOperationsRequest } from "./actions";
 import createOperationsWorker from "./worker";
 
@@ -18,24 +18,4 @@ import createOperationsWorker from "./worker";
 export default function* createOperationsWatcher() {
   // Listen for manual view creation requests
   yield takeEvery(createOperationsRequest.type, createOperationsWorker);
-
-  // Listen for updates to operations slice that may require view updates
-  // yield takeLatest(updateOperationsSlice.type, function* (action) {
-  //   const operationId = action.payload.id;
-  //   const updatedAttributes = Object.keys(action.payload);
-  //   const dependentProps = [
-  //     "children", // affects both stack and pack operations
-  //     "operationType", // affects both stack and pack operations
-  //     "joinType", // specific to pack operations
-  //     "joinKey1", // specific to pack operations
-  //     "joinKey2", // specific to pack operations
-  //     "joinPredicate", // specific to pack operations
-  //   ];
-
-  //   // If the operation has updated any of the dependent properties,
-  //   // update the view
-  //   if (updatedAttributes.some((attr) => dependentProps.includes(attr))) {
-  //     yield put(createOperations(operationId));
-  //   }
-  // });
 }

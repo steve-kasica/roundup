@@ -125,7 +125,6 @@ export function ColumnIndex({
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
         onClick={() => {
-          console.log("ColumnIndex clicked");
           onColumnClick({ shiftKey: false }, index);
         }}
         onContextMenu={(event) => {
@@ -183,7 +182,6 @@ export function ColumnIndex({
           },
         }}
         onClose={(event) => {
-          console.log("Popover onClose");
           event.stopPropagation();
           setMenuAnchorEl(null);
         }}

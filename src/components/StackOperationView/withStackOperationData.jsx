@@ -1,23 +1,18 @@
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { useMemo } from "react";
-import useOperationData from "../../hooks/useOperationData";
 import {
-  selectRemovedColumnIdsByTableId,
+  selectColumnById,
   selectSelectedColumns,
   setFocusedColumns,
   setSelectedColumns,
 } from "../../slices/columnsSlice";
 import {
-  selectFocusedOperationId,
-  selectHoveredOperation,
   selectOperation,
   selectOperationDepth,
-  updateOperations,
 } from "../../slices/operationsSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import { selectTablesById } from "../../slices/tablesSlice";
-import { group } from "d3";
 
 // TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -44,15 +39,43 @@ export default function withStackOperationData(WrappedComponent) {
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperation(state, id));
     const depth = useSelector((state) => selectOperationDepth(state, id));
-    const columnIds = useSelector((state) =>
-      selectRemovedColumnIdsByTableId(state, id)
+
+    // Get column IDs for all columns associated directly with this operation
+    const columnIds = useSelector((state) => {
+      return Object.values(state.columns.data)
+        .filter((column) => column.tableId === id)
+        .map((column) => column.id);
+    });
+
+    // Column objects for all columns associated directly with this operation
+    const selectedColumns = useSelector((state) =>
+      selectSelectedColumns(state)
+        .map((colId) => selectColumnById(state, colId))
+        .filter(({ tableId }) => tableId === id)
     );
-    const selectedColumns = useSelector(selectSelectedColumns);
+
+    // Just return the IDs of the selected columns associated directly with this operation
+    const selectedColumnIds = useMemo(() => {
+      return selectedColumns.map((col) => col.id);
+    }, [selectedColumns]);
+
+    const selectedColumnIndices = useMemo(() => {
+      return selectedColumnIds
+        .map((colId) => columnIds.indexOf(colId))
+        .filter((index) => index !== -1);
+    }, [columnIds, selectedColumnIds]);
+
+    const selectedColumnNames = useMemo(() => {
+      return selectedColumns.map(({ columnName }) => columnName);
+    }, [selectedColumns]);
 
     const columnIdMatrix = useSelector((state) => {
       // TODO: what if the childId is not a table?
       const rawColumnIds = (operation?.children || []).map(
-        (childId) => selectTablesById(state, childId).columnIds
+        (childId) =>
+          Object.values(state.columns.data)
+            .filter((column) => column.tableId === childId)
+            .map((column) => column.id) || []
       );
       const maxLength = Math.max(...rawColumnIds.map((row) => row.length), 0);
       return rawColumnIds.map((row) => {
@@ -65,16 +88,6 @@ export default function withStackOperationData(WrappedComponent) {
 
     const m = Math.max(...columnIdMatrix.map((c) => c.length), 0);
     const n = columnIdMatrix.length;
-    const selectedOperationColumnIds = useMemo(() => {
-      return operation.columnIds.filter((columnId) =>
-        selectedColumns.includes(columnId)
-      );
-    }, [operation.columnIds, selectedColumns]);
-    const selectedColumnIndices = useMemo(() => {
-      return selectedOperationColumnIds
-        .map((colId) => operation.columnIds.indexOf(colId))
-        .filter((index) => index !== -1);
-    }, [operation.columnIds, selectedOperationColumnIds]);
 
     const selection = useMemo(() => {
       return operation.children
@@ -98,29 +111,34 @@ export default function withStackOperationData(WrappedComponent) {
         .map((index) => operation.children[index]);
     }, [columnIdMatrix, operation.children, selectedColumns]);
 
-    const selectedColumnIds = useMemo(() => {
-      return columnIdMatrix
-        .map((row) =>
-          row.filter((columnId) => selectedColumns.includes(columnId))
-        )
-        .filter((columnIds) => columnIds.length > 0);
-    }, [columnIdMatrix, selectedColumns]);
+    // const selectedColumnIds = useMemo(() => {
+    //   return columnIdMatrix
+    //     .map((row) =>
+    //       row.filter((columnId) => selectedColumns.includes(columnId))
+    //     )
+    //     .filter((columnIds) => columnIds.length > 0);
+    // }, [columnIdMatrix, selectedColumns]);
 
     return (
       <WrappedComponent
+        // Props related to the operation itself
         operation={operation}
         depth={depth}
-        columnIdMatrix={columnIdMatrix}
-        selectedColumnIndices={selectedColumnIndices}
-        selectedOperationColumnIds={selectedOperationColumnIds}
-        selectedTableIds={selectedTableIds}
+        // Props related to the operation's columns
+        columnIds={columnIds}
         selectedColumnIds={selectedColumnIds}
-        selection={selection}
+        selectedColumnNames={selectedColumnNames}
+        selectedColumnIndices={selectedColumnIndices}
+        // Props related to the operation's children tables
+        columnIdMatrix={columnIdMatrix}
         m={m}
         n={n}
+        selectedTableIds={selectedTableIds}
+        selection={selection}
+        // Callback props to dispatch actions
         selectColumns={(colIds) => dispatch(setSelectedColumns(colIds))}
         swapColumns={(target, source) => {
-          const updatedColumnIds = [...operation.columnIds];
+          const updatedColumnIds = [...columnIds];
           const sourceIndex = updatedColumnIds.indexOf(source);
           const targetIndex = updatedColumnIds.indexOf(target);
           if (sourceIndex === -1 || targetIndex === -1) return; // Invalid indices
@@ -133,8 +151,12 @@ export default function withStackOperationData(WrappedComponent) {
           if (sourceIndex !== targetIndex) {
             dispatch(
               updateOperationsRequest({
-                id,
-                columnIds: updatedColumnIds,
+                operationUpdates: [
+                  {
+                    id,
+                    columnIds: updatedColumnIds,
+                  },
+                ],
               })
             );
           }
@@ -143,13 +165,21 @@ export default function withStackOperationData(WrappedComponent) {
         selectedColumns={selectedColumns}
         setOperationType={(operationType) =>
           dispatch(
-            updateOperations({
-              id,
-              operationType,
+            updateOperationsRequest({
+              operationUpdates: [
+                {
+                  id,
+                  operationType,
+                },
+              ],
             })
           )
         }
-        setName={(name) => dispatch(updateOperations({ id, name }))}
+        setName={(name) =>
+          dispatch(
+            updateOperationsRequest({ operationUpdates: [{ id, name }] })
+          )
+        }
         {...props}
       />
     );
