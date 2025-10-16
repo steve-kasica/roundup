@@ -6,13 +6,14 @@ import {
   Typography,
   CircularProgress,
   Toolbar,
+  Tooltip,
   Chip,
 } from "@mui/material";
 import PackOperationIcon from "./PackOperationIcon";
 import withPackOperationData from "./withPackOperationData";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { usePackStats } from "../../hooks/usePackStats";
-import { TableRowMatches } from "../TableView";
+import { EnhancedTableRowMatches, TableRowMatches } from "../TableView";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 
 const matchLablels = new Map([
@@ -27,24 +28,20 @@ const matchLablels = new Map([
 const PackSchemaView = withPackOperationData(
   ({
     operation,
-    tableToOpColumnMap,
+    activeColumnIds,
+    columnCount,
     selectedOperationColumnIds,
     leftTableId,
     leftHandColumns,
-    leftRowCount,
     rightTableId,
-    rightHandColumns,
-    rightRowCount,
     selectColumns,
-    selectedColumns,
-    joinPredicate,
     leftKey,
+    leftKeyColumnName,
     rightKey,
-    columnCount,
+    rightKeyColumnName,
     // functions
     setJoinType,
   }) => {
-    const isError = operation.error !== null;
     // Add hover state for coordinating between tables
     const [hoveredMatch, setHoveredMatch] = useState(null);
 
@@ -65,8 +62,8 @@ const PackSchemaView = withPackOperationData(
     const { data, loading, error } = usePackStats(
       leftTableId,
       rightTableId,
-      leftKey,
-      rightKey,
+      leftKeyColumnName,
+      rightKeyColumnName,
       operation.joinPredicate
     );
 
@@ -154,13 +151,13 @@ const PackSchemaView = withPackOperationData(
 
         if (isShiftClick && lastSelectedColumn) {
           // Shift click: Range selection
-          const currentIndex = operation.columnIds.indexOf(columnId);
-          const lastIndex = operation.columnIds.indexOf(lastSelectedColumn);
+          const currentIndex = activeColumnIds.indexOf(columnId);
+          const lastIndex = activeColumnIds.indexOf(lastSelectedColumn);
 
           if (currentIndex !== -1 && lastIndex !== -1) {
             const start = Math.min(currentIndex, lastIndex);
             const end = Math.max(currentIndex, lastIndex);
-            const rangeColumns = operation.columnIds.slice(start, end + 1);
+            const rangeColumns = activeColumnIds.slice(start, end + 1);
 
             // Merge range with existing selection, removing duplicates
             const newSelection = [
@@ -199,7 +196,7 @@ const PackSchemaView = withPackOperationData(
         setLastSelectedColumn(columnId);
       },
       [
-        operation.columnIds,
+        activeColumnIds,
         selectedOperationColumnIds,
         lastSelectedColumn,
         selectColumns,
@@ -211,9 +208,9 @@ const PackSchemaView = withPackOperationData(
         // const isCtrlClick = event.ctrlKey || event.metaKey; // Support both Ctrl and Cmd on Mac
 
         if (tableId === leftTableId) {
-          selectColumns(operation.columnIds.slice(0, leftHandColumns.length));
+          selectColumns(activeColumnIds.slice(0, leftHandColumns.length));
         } else if (tableId === rightTableId) {
-          selectColumns(operation.columnIds.slice(leftHandColumns.length));
+          selectColumns(activeColumnIds.slice(leftHandColumns.length));
         }
       },
       [
@@ -221,7 +218,7 @@ const PackSchemaView = withPackOperationData(
         rightTableId,
         leftHandColumns,
         selectColumns,
-        operation.columnIds,
+        activeColumnIds,
       ]
     );
 
@@ -264,11 +261,43 @@ const PackSchemaView = withPackOperationData(
             {operation.name}
           </Typography>
           <Box display="flex" alignItems="center" gap={1}>
-            <Typography variant="body2" color="textSecondary">
-              {operation.joinType}
-            </Typography>
+            {operation.error !== null && (
+              <Alert
+                severity="error"
+                sx={{
+                  width: "100%",
+                  paddingY: 0,
+                  paddingX: 1,
+                  borderRadius: "10px",
+                  userSelect: "none",
+                }}
+                // TODO: why does this not work?
+                // slotProps={{
+                //   icon: {
+                //     sx: {
+                //       padding: 0,
+                //       margin: 0,
+                //       marginRight: 0, // Explicitly remove right margin if needed
+                //     },
+                //   },
+                // }}
+              >
+                <Tooltip title={operation.error.message} arrow>
+                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    {operation.error.name}
+                  </Typography>
+                </Tooltip>
+              </Alert>
+            )}
+            {operation.error === null && (
+              <Typography variant="body2" color="textSecondary">
+                {operation.joinType}
+              </Typography>
+            )}
             <Chip
-              label={`${totalRows.toLocaleString()} rows`}
+              label={`${
+                operation.error ? "?" : totalRows.toLocaleString()
+              } rows`}
               size="small"
               variant="outlined"
               sx={{
@@ -305,7 +334,7 @@ const PackSchemaView = withPackOperationData(
               <CircularProgress size={24} />
             </Box>
           )}
-          {operation.error !== null && (
+          {/* {operation.error !== null && (
             <Alert severity="error" sx={{ width: "100%" }}>
               <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                 {operation.error.name}
@@ -314,7 +343,7 @@ const PackSchemaView = withPackOperationData(
                 {operation.error.description}
               </Typography>
             </Alert>
-          )}
+          )} */}
           {!loading && !error && data && (
             <>
               <Box marginTop="59px">
@@ -351,15 +380,9 @@ const PackSchemaView = withPackOperationData(
                 width="100%"
                 height={"100%"}
               >
-                <TableRowMatches
-                  table={{
-                    columnIds: operation.columnIds.slice(
-                      0,
-                      leftHandColumns.length
-                    ),
-                    id: leftTableId,
-                  }}
-                  key={leftKey}
+                <EnhancedTableRowMatches
+                  id={leftTableId}
+                  keyColumnId={leftKey}
                   tablePosition="left"
                   selectedOperationColumnIds={selectedOperationColumnIds}
                   matches={getVisibleMatches()}
@@ -372,15 +395,9 @@ const PackSchemaView = withPackOperationData(
                   onColumnClick={handleColumnClick}
                   onTableLabelClick={handleTableLabelClick}
                 />
-                <TableRowMatches
-                  table={{
-                    columnIds: operation.columnIds.slice(
-                      leftHandColumns.length,
-                      operation.columnIds.length
-                    ),
-                    id: rightTableId,
-                  }}
-                  key={rightKey}
+                <EnhancedTableRowMatches
+                  id={rightTableId}
+                  keyColumnId={rightKey}
                   tablePosition="right"
                   selectedOperationColumnIds={selectedOperationColumnIds}
                   matches={getVisibleMatches()}

@@ -7,7 +7,11 @@ import {
   updateOperations as updateOperationsSlice,
 } from "../../slices/operationsSlice";
 // TODO, maybe this should be in update, rather than create?
-import { selectQueryData } from "../createOperationsSaga/worker";
+import {
+  calcPackColumnCount,
+  calcStackColumnCount,
+  selectQueryData,
+} from "../createOperationsSaga/worker";
 import {
   createPackView,
   createStackView,
@@ -28,13 +32,16 @@ export default function* updateOperationsWorker(action) {
     );
 
     // If we're changing the operationType or children, then we need to re-create the view
-    if (keys.includes("operationType") || keys.includes("children")) {
+    if (
+      keys.includes("operationType") ||
+      keys.includes("children") ||
+      keys.includes("joinType") ||
+      keys.includes("joinKey1") ||
+      keys.includes("joinKey2") ||
+      keys.includes("joinPredicate")
+    ) {
       const queryData = yield select((state) =>
-        selectQueryData(
-          state,
-          operationUpdate.id,
-          operationUpdate.children || operation.children // if just switching type, keep existing children, children field in update will be null
-        )
+        selectQueryData(state, operationUpdate)
       );
       if (
         operationUpdate.operationType === OPERATION_TYPE_STACK ||
@@ -57,6 +64,11 @@ export default function* updateOperationsWorker(action) {
         } catch (error) {
           console.error("Error creating stack view:", error);
           operationUpdate.error = serializeError(error);
+          const children = operationUpdate.children || operation.children;
+          operationUpdate.columnCount = yield select((state) =>
+            calcStackColumnCount(state, children)
+          );
+          operationUpdate.rowCount = 0; // TODO
           failedUpdates.push(operationUpdate);
         }
       } else if (
@@ -78,8 +90,13 @@ export default function* updateOperationsWorker(action) {
           };
           successfulUpdates.push(operationUpdate);
         } catch (error) {
-          console.error("Error creating pack view:", error);
+          console.error("Error updateOperationsSaga/worker.js:", error);
           operationUpdate.error = serializeError(error);
+          const children = operationUpdate.children || operation.children;
+          operationUpdate.columnCount = yield select((state) =>
+            calcPackColumnCount(state, children)
+          );
+          operationUpdate.rowCount = undefined; // We don't actually know the row count for pack ops
           failedUpdates.push(operationUpdate);
         }
       }

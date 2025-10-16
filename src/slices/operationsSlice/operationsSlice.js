@@ -45,6 +45,10 @@ const operationsSlice = createSlice({
         state.data[operation.id] = operation;
         state.ids.push(operation.id);
         state.root = operation.id; // Set the new operation as the root
+
+        if (operation.isFocused) {
+          state.focused = operation.id;
+        }
       });
     },
 

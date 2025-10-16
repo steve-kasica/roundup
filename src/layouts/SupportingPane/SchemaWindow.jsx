@@ -2,7 +2,6 @@ import { Alert, Box, Typography } from "@mui/material";
 import {
   OPERATION_TYPE_STACK,
   OPERATION_TYPE_PACK,
-  selectFocusedOperationId,
   selectOperation,
   selectAllOperationIds,
   OPERATION_TYPE_NO_OP,
@@ -16,7 +15,6 @@ import { EnhancedTableSchema } from "../../components/TableView";
 
 export default function SchemaWindow() {
   const focusedOperationId = useSelector((state) => {
-    console.log(state.operations);
     const id = state.operations.focused;
     return id;
   });

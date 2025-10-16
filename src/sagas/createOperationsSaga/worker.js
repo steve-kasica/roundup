@@ -34,6 +34,7 @@ import {
   addOperations as addOperationsToSlice,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
+  selectOperation,
 } from "../../slices/operationsSlice";
 import {
   createStackView,
@@ -44,32 +45,35 @@ import { createOperationsSuccess, createOperationsFailure } from "./actions";
 import Operation from "../../slices/operationsSlice/Operation";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { group } from "d3";
+import {
+  selectColumnById,
+  selectColumnIdsByTableId,
+} from "../../slices/columnsSlice";
 
-const calcPackColumnCount = (childIds) => {
-  const columnCountTotal = select(
-    (state) =>
-      Object.values(state.columns.data).filter(({ tableId }) =>
-        childIds.includes(tableId)
-      ).length
+export const calcPackColumnCount = (state, childIds) => {
+  const columnCountTotal = childIds.reduce(
+    (total, id) =>
+      selectColumnIdsByTableId(state, id)
+        .map((columnId) => selectColumnById(state, columnId))
+        .filter(({ isExcluded }) => !isExcluded).length + total,
+    0
   );
 
   return columnCountTotal;
 };
 
-const calcStackColumnCount = (childIds) => {
-  const tableColumnCounts = select((state) => {
-    Array.from(
+export const calcStackColumnCount = (state, childIds) => {
+  const tableColumnCounts = Array.from(
+    group(
       group(
-        group(
-          Object.values(state.columns.data).filter(({ tableId }) =>
-            childIds.includes(tableId)
-          ),
-          (column) => column.tableId
-        )
-      ),
-      ([tableId, columns]) => columns.length
-    );
-  });
+        Object.values(state.columns.data).filter(({ tableId }) =>
+          childIds.includes(tableId)
+        ),
+        (column) => column.tableId
+      )
+    ),
+    ([tableId, columns]) => columns.length
+  );
   const maxColumns = Math.max(0, ...tableColumnCounts);
   return maxColumns;
 };
@@ -84,15 +88,24 @@ const calcStackColumnCount = (childIds) => {
  *
  * TODO: This could be moved to a selector in the operations slice
  */
-export const selectQueryData = (state, parentId, childIds) => {
-  // const operation = selectOperation(state, operationId);
-  const parent = { id: parentId };
-  parent.children = childIds.map((id) => {
+export const selectQueryData = (state, operationUpdate) => {
+  const operation = selectOperation(state, operationUpdate.id);
+  const parent = {
+    ...operation,
+    ...operationUpdate,
+  };
+  parent.joinKey1 = parent.joinKey1
+    ? selectColumnById(state, parent.joinKey1).columnName
+    : null;
+  parent.joinKey2 = parent.joinKey2
+    ? selectColumnById(state, parent.joinKey2).columnName
+    : null;
+  parent.children = parent.children.map((id) => {
     let child = {
       id,
-      columnNames: Object.values(state.columns.data)
-        .filter(({ tableId }) => tableId === id)
-        .map(({ columnName }) => columnName),
+      columnNames: selectColumnIdsByTableId(state, id).map(
+        (columnId) => selectColumnById(state, columnId).columnName
+      ),
     };
     return child;
   });
@@ -173,11 +186,13 @@ export default function* createOperationsWorker(action) {
         `Error creating database view for operation ${operation.id}:`,
         error
       );
-      operation.rowCount = undefined;
-      operation.initialColumnCount =
+      operation.rowCount = undefined; // TODO: this is calculatable
+      operation.columnCount = yield select((state) =>
         operation.operationType === OPERATION_TYPE_PACK
-          ? calcPackColumnCount(childIds)
-          : calcStackColumnCount(childIds);
+          ? calcPackColumnCount(state, childIds)
+          : calcStackColumnCount(state, childIds)
+      );
+
       operation.error = JSON.stringify(
         error,
         Object.getOwnPropertyNames(error)

@@ -1,12 +1,8 @@
 import { useSelector, useDispatch } from "react-redux";
-import {
-  selectOperation,
-  OPERATION_TYPE_PACK,
-  updateOperations,
-} from "../../slices/operationsSlice";
+import { selectOperation } from "../../slices/operationsSlice";
 import PropTypes from "prop-types";
 import withOperationData from "../HOC/withOperationData";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
 import {
   selectColumnById,
@@ -14,6 +10,7 @@ import {
 } from "../../slices/columnsSlice/columnSelectors";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
+import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 
 export default function withPackOperationData(WrappedComponent) {
   // First wrap with the base operation data HOC
@@ -23,16 +20,41 @@ export default function withPackOperationData(WrappedComponent) {
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperation(state, id));
 
-    // Pack-specific data
-    // @deprecated
-    const isPack = operation?.operationType === OPERATION_TYPE_PACK;
+    const columns = useSelector((state) =>
+      selectColumnIdsByTableId(state, id).map((colId) =>
+        selectColumnById(state, colId)
+      )
+    );
+
+    const activeColumnIds = useMemo(
+      () => columns.filter(({ isExcluded }) => !isExcluded).map(({ id }) => id),
+      [columns]
+    );
+
+    const selectedColumnIds = useMemo(
+      () =>
+        columns
+          .filter(({ isExcluded, isSelected }) => isSelected && !isExcluded)
+          .map(({ id }) => id),
+      [columns]
+    );
+
+    const [leftKeyColumnName, rightKeyColumnName] = useSelector((state) => {
+      const leftKeyColumn = selectColumnById(state, operation?.joinKey1);
+      const rightKeyColumn = selectColumnById(state, operation?.joinKey2);
+      return [leftKeyColumn?.columnName, rightKeyColumn?.columnName];
+    });
 
     const setJoinType = useCallback(
       (joinType) => {
         dispatch(
-          updateOperations({
-            id,
-            joinType, // Update join type
+          updateOperationsRequest({
+            operationUpdates: [
+              {
+                id,
+                joinType, // Update join type
+              },
+            ],
           })
         );
       },
@@ -94,18 +116,22 @@ export default function withPackOperationData(WrappedComponent) {
       <ComponentWithOperationData
         {...props}
         id={id}
+        columnCount={activeColumnIds.length}
+        activeColumnIds={activeColumnIds}
+        selectedColumnIds={selectedColumnIds}
         // Pack-specific props
         joinType={operation.joinType}
         joinPredicate={operation.joinPredicate}
         joinKey1={operation.joinKey1} // Deprecated, use leftKey
         leftKey={operation.joinKey1}
+        leftKeyColumnName={leftKeyColumnName}
         joinKey2={operation.joinKey2} // Deprecated, use rightKey
         rightKey={operation.joinKey2}
+        rightKeyColumnName={rightKeyColumnName}
         leftTableId={operation.children[0]}
         rightTableId={operation.children[1]}
         leftRowCount={leftRowCount}
         rightRowCount={rightRowCount}
-        isPack={isPack}
         tableToOpColumnMap={tableToOpColumnMap}
         leftHandColumns={leftHandColumns} // Deprecated, use leftColumns
         leftColumns={leftHandColumns}
@@ -118,36 +144,56 @@ export default function withPackOperationData(WrappedComponent) {
         setJoinType={setJoinType}
         setLeftTableJoinKey={(columnId) => {
           dispatch(
-            updateOperations({
-              id,
-              joinKey1: columnId,
+            updateOperationsRequest({
+              operationUpdates: [
+                {
+                  id,
+                  joinKey1: columnId,
+                },
+              ],
             })
           );
         }}
-        setName={(name) => dispatch(updateOperations({ id, name }))}
+        setName={(name) =>
+          dispatch(
+            updateOperationsRequest({ operationUpdates: [{ id, name }] })
+          )
+        }
         setRightTableJoinKey={(columnId) =>
           dispatch(
-            updateOperations({
-              id,
-              joinKey2: columnId,
+            updateOperationsRequest({
+              operationUpdates: [
+                {
+                  id,
+                  joinKey2: columnId,
+                },
+              ],
             })
           )
         }
         setJoinPredicate={(joinPredicate) =>
-          dispatch(updateOperations({ id, joinPredicate }))
-        }
-        setOperationType={(operationType) =>
-          dispatch(updateOperations({ id, operationType }))
-        }
-        swapTablePositions={() =>
           dispatch(
-            updateOperations({
-              id,
-              joinKey1: operation.joinKey2,
-              joinKey2: operation.joinKey1,
-              children: operation.children.slice().reverse(),
+            updateOperationsRequest({
+              operationUpdates: [{ id, joinPredicate }],
             })
           )
+        }
+        setOperationType={(operationType) =>
+          dispatch(
+            updateOperationsRequest({
+              operationUpdates: [{ id, operationType }],
+            })
+          )
+        }
+        swapTablePositions={
+          () => dispatch()
+          // TODO
+          // updateOperations({
+          //   id,
+          //   joinKey1: operation.joinKey2,
+          //   joinKey2: operation.joinKey1,
+          //   children: operation.children.slice().reverse(),
+          // })
         }
         selectColumns={(columnIds) => {
           dispatch(

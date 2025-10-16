@@ -48,7 +48,7 @@ const TableRowMatches = ({
   table,
   columnCount,
   activeColumnIds,
-  key,
+  keyColumnId,
   tablePosition, // "left" or "right"
   selectedOperationColumnIds = [],
   matches,
@@ -96,7 +96,7 @@ const TableRowMatches = ({
             height={"25px"}
             cursor="pointer"
             sx={{
-              ...(columnId === key && {
+              ...(columnId === keyColumnId && {
                 // border: "2px solid",
                 fontWeight: "bold",
                 position: "relative",
