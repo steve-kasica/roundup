@@ -34,8 +34,6 @@ import {
   addOperations as addOperationsToSlice,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  selectOperation,
-  setFocusedOperation,
 } from "../../slices/operationsSlice";
 import {
   createStackView,
@@ -189,12 +187,9 @@ export default function* createOperationsWorker(action) {
   }
 
   const combinedOperations = [...successfulCreations, ...failedCreations];
+  combinedOperations[combinedOperations.length - 1].isFocused = true;
 
   yield put(addOperationsToSlice(combinedOperations));
-
-  yield put(
-    setFocusedOperation(combinedOperations[combinedOperations.length - 1].id)
-  );
 
   if (successfulCreations.length > 0) {
     yield put(

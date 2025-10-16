@@ -3,7 +3,6 @@ import reducer, {
   addOperation,
   addChildToOperation,
   removeChildFromOperation,
-  setFocusedOperation,
   setHoveredOperation,
   updateOperations,
 } from "./operationsSlice";
@@ -80,11 +79,6 @@ describe("operationsSlice reducers", () => {
     );
     expect(state.data[opId]).toBeUndefined();
     expect(state.ids).not.toContain(opId);
-  });
-
-  it("setFocusedOperation sets focused", () => {
-    const state = reducer(initialState, setFocusedOperation({ id: "op1" }));
-    expect(state.focused).toBe("op1");
   });
 
   it("setHoveredOperation sets hovered", () => {

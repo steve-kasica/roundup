@@ -83,10 +83,16 @@ export default function* updateOperationsWorker(action) {
           failedUpdates.push(operationUpdate);
         }
       }
+    } else {
+      // Just a regular update, no need to re-create the view
+      successfulUpdates.push(operationUpdate);
     }
   }
 
-  yield put(updateOperationsSlice([...successfulUpdates, ...failedUpdates]));
+  const combinedUpdates = [...successfulUpdates, ...failedUpdates];
+  combinedUpdates[combinedUpdates.length - 1].isFocused = true;
+
+  yield put(updateOperationsSlice(combinedUpdates));
 
   const formatSagaEndPayload = (updates) => ({
     operationIds: updates.map(({ id }) => id),

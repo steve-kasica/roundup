@@ -15,9 +15,13 @@ import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
 
 export default function SchemaWindow() {
+  const focusedOperationId = useSelector((state) => {
+    console.log(state.operations);
+    const id = state.operations.focused;
+    return id;
+  });
   const focusedOperation = useSelector((state) => {
-    const id = selectFocusedOperationId(state);
-    return selectOperation(state, id);
+    return selectOperation(state, focusedOperationId);
   });
   const tables = useSelector(selectAllTablesData);
   const operations = useSelector(selectAllOperationIds);
@@ -67,7 +71,9 @@ export default function SchemaWindow() {
               <pre>
                 {JSON.stringify(
                   {
+                    focusedOperationId: focusedOperationId || null,
                     focusedOperation: focusedOperation || null,
+                    allOperations: operations || null,
                   },
                   null,
                   2

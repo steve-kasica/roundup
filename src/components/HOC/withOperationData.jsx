@@ -6,7 +6,6 @@ import {
   setHoveredOperation,
   selectHoveredOperation,
   updateOperations,
-  setFocusedOperation,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
@@ -15,6 +14,7 @@ import {
   selectColumnIdsByTableId,
   selectRemovedColumnIdsByTableId,
 } from "../../slices/columnsSlice";
+import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
 import { useMemo } from "react";
 
 export default function withOperationData(WrappedComponent) {
@@ -61,7 +61,13 @@ export default function withOperationData(WrappedComponent) {
         renameOperation={(newName) =>
           dispatch(updateOperations({ id, name: newName }))
         }
-        focusOperation={() => dispatch(setFocusedOperation({ id }))}
+        focusOperation={() =>
+          dispatch(
+            updateOperationsRequest({
+              operationUpdates: [{ id, isFocused: true }],
+            })
+          )
+        }
       />
     );
   };

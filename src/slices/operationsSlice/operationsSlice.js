@@ -95,18 +95,27 @@ const operationsSlice = createSlice({
      */
     updateOperations(state, action) {
       // Normalize input to always be an array
-      const operations = Array.isArray(action.payload)
+      const operationsUpdate = Array.isArray(action.payload)
         ? action.payload
         : action.payload.operations || [action.payload];
 
-      operations.forEach((operation) => {
-        if (!state.data[operation.id]) {
-          throw new Error(`Operation with ID ${operation.id} does not exist`);
+      operationsUpdate.forEach((update) => {
+        if (!state.data[update.id]) {
+          throw new Error(`Operation with ID ${update.id} does not exist`);
         }
-        state.data[operation.id] = {
-          ...state.data[operation.id],
-          ...operation,
+        state.data[update.id] = {
+          ...state.data[update.id],
+          ...update,
         };
+
+        if (update.isFocused === true) {
+          let prevFocused = state.focused;
+          if (prevFocused) state.data[prevFocused].isFocused = false;
+          state.focused = update.id;
+        } else if (update.isFocused === false) {
+          state.data[update.id].isFocused = false;
+          state.focused = null;
+        }
       });
     },
 
@@ -160,18 +169,6 @@ const operationsSlice = createSlice({
     },
 
     /**
-     * Sets the currently focused operation by its ID.
-     *
-     * @param {Object} state - The current state of the operations slice.
-     * @param {Object} action - The dispatched action containing the payload.
-     * @param {string|number} action.payload - The ID of the operation to focus.
-     */
-    setFocusedOperation(state, action) {
-      const id = action.payload;
-      state.focused = id;
-    },
-
-    /**
      * Sets the currently hovered operation by its ID.
      *
      * @param {Object} state - The current state of the operations slice.
@@ -191,7 +188,6 @@ export const {
   addChildToOperation,
   updateOperations,
   removeChildFromOperation,
-  setFocusedOperation,
   setHoveredOperation,
 } = operationsSlice.actions;
 
