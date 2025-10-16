@@ -30,7 +30,11 @@ const ColumnName = ({
             }
           : {},
         ...sx,
-        ...(isSelected && selectedSx ? selectedSx : {}), // Apply selected styles if isSelected is true
+        ...(column.isSelected && selectedSx
+          ? {
+              fontWeight: "bold",
+            }
+          : {}), // Apply selected styles if isSelected is true
       }}
     >
       {column.name || column.columnName || column.id}

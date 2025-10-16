@@ -13,8 +13,13 @@ import PackOperationIcon from "./PackOperationIcon";
 import withPackOperationData from "./withPackOperationData";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { usePackStats } from "../../hooks/usePackStats";
-import { EnhancedTableRowMatches, TableRowMatches } from "../TableView";
+import {
+  EnhancedTableLabel,
+  EnhancedTableRowMatches,
+  TableRowMatches,
+} from "../TableView";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
+import { EnhancedTableHeader } from "../TableView/TableHeader";
 
 const matchLablels = new Map([
   ["one_to_one_matches", "1:1"],
@@ -39,14 +44,22 @@ const PackSchemaView = withPackOperationData(
     leftKeyColumnName,
     rightKey,
     rightKeyColumnName,
+    rightHandColumns,
     // functions
     setJoinType,
   }) => {
+    const columnToTableMap = useMemo(() => {
+      const map = new Map();
+      leftHandColumns.forEach((colId) => map.set(colId, leftTableId));
+      rightHandColumns.forEach((colId) => map.set(colId, rightTableId));
+      return map;
+    }, [leftHandColumns, leftTableId, rightHandColumns, rightTableId]);
+
     // Add hover state for coordinating between tables
     const [hoveredMatch, setHoveredMatch] = useState(null);
 
     // Add state for column selection across tables
-    const [lastSelectedColumn, setLastSelectedColumn] = useState(null);
+    const [anchorColumn, setAnchorColumn] = useState(null);
 
     // Add toggle state for showing/hiding match types
     const [toggledMatches, setToggledMatches] = useState({
@@ -146,60 +159,51 @@ const PackSchemaView = withPackOperationData(
 
     const handleColumnClick = useCallback(
       (event, tableId, columnId) => {
-        const isShiftClick = event.shiftKey;
-        const isCtrlClick = event.ctrlKey || event.metaKey; // Support both Ctrl and Cmd on Mac
-
-        if (isShiftClick && lastSelectedColumn) {
+        const combinedColumns = [...leftHandColumns, ...rightHandColumns];
+        let columnsToSelect = [],
+          columnsToUnselect = [];
+        if (event.shiftKey && anchorColumn) {
           // Shift click: Range selection
-          const currentIndex = activeColumnIds.indexOf(columnId);
-          const lastIndex = activeColumnIds.indexOf(lastSelectedColumn);
-
-          if (currentIndex !== -1 && lastIndex !== -1) {
-            const start = Math.min(currentIndex, lastIndex);
-            const end = Math.max(currentIndex, lastIndex);
-            const rangeColumns = activeColumnIds.slice(start, end + 1);
-
-            // Merge range with existing selection, removing duplicates
-            const newSelection = [
-              ...new Set([...selectedOperationColumnIds, ...rangeColumns]),
-            ];
-            selectColumns(newSelection);
-          }
-        } else if (isCtrlClick) {
-          // Control click: Multi-selection toggle
+          const currentIndex = combinedColumns.indexOf(columnId);
+          const lastIndex = combinedColumns.indexOf(anchorColumn);
+          const start = Math.min(currentIndex, lastIndex);
+          const end = Math.max(currentIndex, lastIndex);
+          columnsToSelect = combinedColumns.slice(start, end + 1);
+          columnsToUnselect = combinedColumns.filter(
+            (id) => !columnsToSelect.includes(id)
+          );
+        } else if (event.ctrlKey || event.metaKey) {
+          // Control/Meta click: Multi-selection toggle
+          setAnchorColumn(columnId);
           if (selectedOperationColumnIds.includes(columnId)) {
-            // Remove from selection
-            const newSelection = selectedOperationColumnIds.filter(
-              (id) => id !== columnId
-            );
-            selectColumns(newSelection);
+            // Remove from selection (unselect)
+            columnsToUnselect = [columnId];
+            columnsToSelect = [];
           } else {
-            // Add to selection
-            const newSelection = [...selectedOperationColumnIds, columnId];
-            selectColumns(newSelection);
+            // Add to selection (select)
+            columnsToSelect = [columnId];
+            columnsToUnselect = [];
           }
         } else {
           // Single select: Replace selection with current column, or deselect if already selected
-          if (
-            selectedOperationColumnIds.length === 1 &&
-            selectedOperationColumnIds.includes(columnId)
-          ) {
-            // Deselect if this is the only selected column
-            selectColumns([]);
-          } else {
-            // Replace selection with current column
-            selectColumns([columnId]);
-          }
+          setAnchorColumn(columnId);
+          columnsToSelect = [columnId];
+          columnsToUnselect = [...leftHandColumns, ...rightHandColumns].filter(
+            (id) => id !== columnId
+          );
         }
 
+        selectColumns(columnsToSelect, columnsToUnselect);
+
         // Always update last selected column for future range operations
-        setLastSelectedColumn(columnId);
+        setAnchorColumn(columnId);
       },
       [
-        activeColumnIds,
         selectedOperationColumnIds,
-        lastSelectedColumn,
+        anchorColumn,
         selectColumns,
+        leftHandColumns,
+        rightHandColumns,
       ]
     );
 
@@ -223,6 +227,7 @@ const PackSchemaView = withPackOperationData(
     );
 
     const getVisibleMatches = () => {
+      if (operation.error || !data) return {};
       return Object.fromEntries(
         Object.entries(data).filter(([label, count]) => count > 0)
       );
@@ -344,42 +349,60 @@ const PackSchemaView = withPackOperationData(
               </Typography>
             </Alert>
           )} */}
-          {!loading && !error && data && (
-            <>
-              <Box marginTop="59px">
-                {Object.entries(getVisibleMatches()).map(([key, value]) => (
-                  <Box
-                    key={key}
-                    height={(value / totalRows) * 100 + "%"}
-                    display={"flex"}
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        height: "24px",
-                        userSelect: "none",
-                        cursor: "pointer",
-                        opacity: hoveredMatch === key ? 1 : 0.8,
-                        fontWeight: hoveredMatch === key ? "bold" : "normal",
-                      }}
-                      onMouseEnter={() => setHoveredMatch(key)}
-                      onMouseLeave={() => setHoveredMatch(null)}
-                      onClick={(event) => handleBlockClick(event, "label", key)}
-                    >
-                      {matchLablels.get(key)}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
+          <Box marginTop="59px">
+            {Object.entries(getVisibleMatches()).map(([key, value]) => (
               <Box
+                key={key}
+                height={(value / totalRows) * 100 + "%"}
                 display={"flex"}
-                justifyContent="space-evenly"
-                gap={"5px"}
-                width="100%"
-                height={"100%"}
+                alignItems="center"
+                justifyContent="center"
               >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    height: "24px",
+                    userSelect: "none",
+                    cursor: "pointer",
+                    opacity: hoveredMatch === key ? 1 : 0.8,
+                    fontWeight: hoveredMatch === key ? "bold" : "normal",
+                  }}
+                  onMouseEnter={() => setHoveredMatch(key)}
+                  onMouseLeave={() => setHoveredMatch(null)}
+                  onClick={(event) => handleBlockClick(event, "label", key)}
+                >
+                  {matchLablels.get(key)}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+          <Box
+            display={"flex"}
+            justifyContent="space-evenly"
+            gap={"5px"}
+            width="100%"
+            height={"100%"}
+          >
+            <Box
+              width={"50%"}
+              display={"flex"}
+              flexDirection="column"
+              alignItems={"center"}
+            >
+              <EnhancedTableLabel
+                id={leftTableId}
+                includeIcon={false}
+                onClick={(event) => handleTableLabelClick(event, leftTableId)}
+              />
+              <EnhancedTableHeader
+                id={leftTableId}
+                keyColumnId={leftKey}
+                columnWidth={"10px"}
+                onColumnClick={(event, columnId) =>
+                  handleColumnClick(event, leftTableId, columnId)
+                }
+              />
+              {operation.error === null ? (
                 <EnhancedTableRowMatches
                   id={leftTableId}
                   keyColumnId={leftKey}
@@ -392,9 +415,37 @@ const PackSchemaView = withPackOperationData(
                   onBlockEnter={handleBlockEnter}
                   onBlockLeave={handleBlockLeave}
                   onBlockClick={handleBlockClick}
-                  onColumnClick={handleColumnClick}
-                  onTableLabelClick={handleTableLabelClick}
                 />
+              ) : (
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "pink",
+                  }}
+                ></Box>
+              )}
+            </Box>
+            <Box
+              width="50%"
+              display={"flex"}
+              flexDirection="column"
+              alignItems={"center"}
+            >
+              <EnhancedTableLabel
+                id={rightTableId}
+                includeIcon={false}
+                onClick={(event) => handleTableLabelClick(event, rightTableId)}
+              />
+              <EnhancedTableHeader
+                id={rightTableId}
+                keyColumnId={rightKey}
+                columnWidth={"10px"}
+                onColumnClick={(event, columnId) =>
+                  handleColumnClick(event, rightTableId, columnId)
+                }
+              />
+              {operation.error === null ? (
                 <EnhancedTableRowMatches
                   id={rightTableId}
                   keyColumnId={rightKey}
@@ -407,12 +458,18 @@ const PackSchemaView = withPackOperationData(
                   onBlockEnter={handleBlockEnter}
                   onBlockLeave={handleBlockLeave}
                   onBlockClick={handleBlockClick}
-                  onColumnClick={handleColumnClick}
-                  onTableLabelClick={handleTableLabelClick}
                 />
-              </Box>
-            </>
-          )}
+              ) : (
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "pink",
+                  }}
+                ></Box>
+              )}
+            </Box>
+          </Box>
         </Box>
       </Box>
     );

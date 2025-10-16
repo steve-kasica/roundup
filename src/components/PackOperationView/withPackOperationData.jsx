@@ -195,10 +195,13 @@ export default function withPackOperationData(WrappedComponent) {
           //   children: operation.children.slice().reverse(),
           // })
         }
-        selectColumns={(columnIds) => {
+        selectColumns={(columnsToSelect, columnsToUnselect) => {
           dispatch(
             updateColumnsRequest({
-              columnUpdates: columnIds.map((id) => ({ id, isSelected: true })),
+              columnUpdates: [
+                ...columnsToSelect.map((id) => ({ id, isSelected: true })),
+                ...columnsToUnselect.map((id) => ({ id, isSelected: false })),
+              ],
             })
           );
         }}
