@@ -24,8 +24,6 @@ export const selectFirstSelectedColumn = (state) => {
   return selectedColumns[0];
 };
 
-export const selectSelectedColumns = (state) => state.ui.selectedColumns;
-
 export const selectSelectedTables = (state) => state.ui.selectedTables;
 
 export const selectHoveredTable = (state) => state.ui.hoveredTable;

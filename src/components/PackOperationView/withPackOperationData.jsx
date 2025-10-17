@@ -6,7 +6,8 @@ import { useCallback, useMemo } from "react";
 import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
 import {
   selectColumnById,
-  selectSelectedColumns,
+  selectSelectedColumnIds,
+  selectSelectedColumnIdsByTableId,
 } from "../../slices/columnsSlice/columnSelectors";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
@@ -19,6 +20,9 @@ export default function withPackOperationData(WrappedComponent) {
   function EnhancedPackComponent({ id, ...props }) {
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperation(state, id));
+
+    const leftTableId = operation?.children[0];
+    const rightTableId = operation?.children[1];
 
     const columns = useSelector((state) =>
       selectColumnIdsByTableId(state, id).map((colId) =>
@@ -82,30 +86,26 @@ export default function withPackOperationData(WrappedComponent) {
       });
     });
 
-    // Get all selected columns from Redux store
-    const allSelectedColumns = useSelector(selectSelectedColumns);
+    // Get a list of selectedColumnIds in the left table
+    const leftSelectedColumnsIds = useSelector((state) =>
+      selectSelectedColumnIdsByTableId(state, leftTableId)
+    );
 
-    // Filter selected columns by left and right table IDs
-    const leftSelectedColumns = allSelectedColumns.filter((columnId) => {
-      const leftTableColumns = leftHandColumns || [];
-      return leftTableColumns.includes(columnId);
-    });
-
-    const rightSelectedColumns = allSelectedColumns.filter((columnId) => {
-      const rightTableColumns = rightHandColumns || [];
-      return rightTableColumns.includes(columnId);
-    });
+    // Get a list of selectedColumnIds in the right table
+    const rightSelectedColumnsIds = useSelector((state) =>
+      selectSelectedColumnIdsByTableId(state, rightTableId)
+    );
 
     const selectedOperationColumnIds = operation.columnIds.filter((columnid) =>
-      allSelectedColumns.includes(columnid)
+      selectedColumnIds.includes(columnid)
     );
 
     // Get left and right table data to extract row counts
     const leftTable = useSelector((state) =>
-      selectTablesById(state, operation?.children[0])
+      selectTablesById(state, leftTableId)
     );
     const rightTable = useSelector((state) =>
-      selectTablesById(state, operation?.children[1])
+      selectTablesById(state, rightTableId)
     );
 
     // Extract row counts from table objects
@@ -128,8 +128,8 @@ export default function withPackOperationData(WrappedComponent) {
         joinKey2={operation.joinKey2} // Deprecated, use rightKey
         rightKey={operation.joinKey2}
         rightKeyColumnName={rightKeyColumnName}
-        leftTableId={operation.children[0]}
-        rightTableId={operation.children[1]}
+        leftTableId={leftTableId}
+        rightTableId={rightTableId}
         leftRowCount={leftRowCount}
         rightRowCount={rightRowCount}
         tableToOpColumnMap={tableToOpColumnMap}
@@ -137,8 +137,8 @@ export default function withPackOperationData(WrappedComponent) {
         leftColumns={leftHandColumns}
         rightHandColumns={rightHandColumns} // Deprecated, use rightColumns
         rightColumns={rightHandColumns}
-        leftSelectedColumns={leftSelectedColumns}
-        rightSelectedColumns={rightSelectedColumns}
+        leftSelectedColumns={leftSelectedColumnsIds}
+        rightSelectedColumns={rightSelectedColumnsIds}
         selectedOperationColumnIds={selectedOperationColumnIds}
         // Pack-specific join dispatchers
         setJoinType={setJoinType}

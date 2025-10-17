@@ -7,10 +7,10 @@ import {
   ID as COLUMN_INDEX_DETAILS_COMPONENT,
 } from "../../components/ColumnIndexDetails";
 import { setDrawerContents } from "../../slices/uiSlice";
-import { selectSelectedColumns } from "../../slices/columnsSlice";
+import { selectSelectedColumnIds } from "../../slices/columnsSlice";
 
 const SelectedColumnIndexDetails = () => {
-  const selectedColumnIds = useSelector(selectSelectedColumns);
+  const selectedColumnIds = useSelector(selectSelectedColumnIds);
   return <ColumnIndexDetails columnIds={selectedColumnIds} />;
 };
 

@@ -25,7 +25,6 @@ const initialState = {
   data: {},
   selected: [],
   focused: [],
-  hovered: [],
   loading: [],
   dragging: [],
   dropped: [],
@@ -59,7 +58,6 @@ const columnsSlice = createSlice({
         if (typeof column.index === "number" && column.index >= 0) {
           state.idsByTable[column.tableId].splice(column.index, 0, column.id);
         } else {
-          console.log("Invalid column index:", column.index);
           // Fallback to push if index is not specified or invalid
           state.idsByTable[column.tableId].push(column.id);
         }
@@ -71,31 +69,20 @@ const columnsSlice = createSlice({
       if (!Array.isArray(columns)) {
         columns = [columns];
       }
+
+      // Handle updates changing column selection
+      const selectedColumnIds = columns.filter(({ isSelected }) => isSelected);
+      if (selectedColumnIds.length > 0) {
+        state.selected = selectedColumnIds.map(({ id }) => id);
+      }
+
       columns.forEach((columnUpdate) => {
         if (!state.data[columnUpdate.id]) {
           throw new Error(`Column with id ${columnUpdate.id} does not exist`);
         }
-        // Update the column in the data object
-        // TODO: should have some kind of validation here
-        // to ensure that the column object has the correct structure
-        // and required properties
-        // This is a shallow merge, so it will overwrite existing properties
-        // with the new values from the column object
-        // This is useful for updating properties like name, columnType, etc.
-        // If you want to ensure that certain properties are always present,
-        state.data[columnUpdate.id] = {
-          ...state.data[columnUpdate.id],
-          ...columnUpdate,
-        };
 
         if (Object.hasOwnProperty.call(columnUpdate, "isSelected")) {
-          if (columnUpdate.isSelected === true) {
-            state.selected.push(columnUpdate.id);
-          } else if (columnUpdate.isSelected === false) {
-            state.selected = state.selected.filter(
-              (id) => id !== columnUpdate.id
-            );
-          }
+          columnUpdate.isSelected = undefined;
         } else if (Object.hasOwnProperty.call(columnUpdate, "index")) {
           // If index is updated, we need to reorder the idsByTable array
           const column = state.data[columnUpdate.id];
@@ -116,6 +103,10 @@ const columnsSlice = createSlice({
             state.idsByTable[tableId] = currentIds;
           }
         }
+        state.data[columnUpdate.id] = {
+          ...state.data[columnUpdate.id],
+          ...columnUpdate,
+        };
       });
     },
     /**
@@ -251,29 +242,6 @@ const columnsSlice = createSlice({
     },
     clearHoverTargets(state) {
       state.hoverTargets = [];
-    },
-    setHoveredColumns(state, action) {
-      const columnIds = Array.isArray(action.payload)
-        ? action.payload
-        : [action.payload];
-      state.hovered = columnIds;
-    },
-    appendToHoveredColumns(state, action) {
-      const columnIds = Array.isArray(action.payload)
-        ? action.payload
-        : [action.payload];
-      state.hovered = [...state.hovered, ...columnIds];
-    },
-    removeFromHoveredColumns(state, action) {
-      const columnIds = Array.isArray(action.payload)
-        ? action.payload
-        : [action.payload];
-      state.hovered = state.hovered.filter(
-        (column) => !columnIds.includes(column)
-      );
-    },
-    clearHoveredColumns(state) {
-      state.hovered = initialState.hovered;
     },
     setValueCounts(state, action) {
       const { values, counts, columnId } = action.payload;
@@ -473,10 +441,6 @@ export const {
   addColumnsToHoverTargets,
   removeColumnsFromHoverTargets,
   clearHoverTargets,
-  setHoveredColumns,
-  appendToHoveredColumns,
-  removeFromHoveredColumns,
-  clearHoveredColumns,
   setColumnType,
   setValueCounts,
   updateColumnsArray,

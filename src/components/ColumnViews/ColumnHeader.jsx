@@ -63,7 +63,6 @@ const ColumnHeader = ({
   //             onChange={(newName) => renameColumn(newName)}
   //             isReadOnly={isReadOnly}
   //             isEditable={isEditable}
-  //             onEditingStateChange={() => console.log("Editing state change")}
   //             fontSize="1rem"
   //           />
         */}

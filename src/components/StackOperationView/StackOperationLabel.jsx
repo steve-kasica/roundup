@@ -10,6 +10,10 @@ const StackOperationLabel = ({ operation, loading = false, error = false }) => {
   return <Typography>STACK: {operation.name || operation.id}</Typography>;
 };
 
+StackOperationLabel.displayName = "StackOperationLabel";
+
 const EnhancedStackOperationLabel = withStackOperationData(StackOperationLabel);
+
+EnhancedStackOperationLabel.displayName = "EnhancedStackOperationLabel";
 
 export { EnhancedStackOperationLabel, StackOperationLabel };

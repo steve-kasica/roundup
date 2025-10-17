@@ -51,17 +51,9 @@ export default function* updateColumnsWorker(action) {
       });
     } catch (error) {
       console.error("Error fetching column stats from DB:", error);
-      const errorMessage = {
-        message: error.message || "Unknown error",
-        name: error.name || "Error",
-        stack: error.stack,
-        timestamp: new Date().toISOString(),
-        ...(error.cause && { cause: error.cause }),
-        ...(error.code && { code: error.code }),
-      };
       failedUpdates.push({
         ...columnUpdate,
-        error: errorMessage,
+        error: error.message || "Unknown error",
       });
     }
   }

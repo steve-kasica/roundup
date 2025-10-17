@@ -2,17 +2,17 @@
 import withTableData from "./withTableData";
 import { Stack, Typography } from "@mui/material";
 import { TableChart } from "@mui/icons-material";
-import { formatNumber } from "../../lib/utilities/formaters";
 
 const TableLabel = ({
   table,
   columnCount,
+  rowCount,
+  // Props passed directly from parent component
   onClick,
   includeDimensions = true,
   includeIcon = true,
   sx = {},
 }) => {
-  const rowCount = formatNumber(table?.rowCount || 0);
   return (
     <Stack
       direction={"row"}

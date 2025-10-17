@@ -178,39 +178,24 @@ const TableSchema = ({
           );
 
           // Add the range to selection (keeping existing selection)
-          selectColumns(
-            rangeColumnIds,
-            activeColumnIds.filter((id) => !rangeColumnIds.includes(id))
-          );
+          selectColumns(rangeColumnIds);
         } else {
           // Fallback to single selection if last selected column not found
-          selectColumns(
-            [columnId],
-            activeColumnIds.filter((id) => id !== columnId)
-          );
+          selectColumns([columnId]);
         }
       } else if (isCtrlOrCmd) {
         // Ctrl/Cmd+click: Toggle selection
         if (selectedColumnIds.includes(columnId)) {
-          selectColumns(
-            activeColumnIds.filter((id) => id !== columnId),
-            [columnId]
-          );
+          selectColumns(activeColumnIds.filter((id) => id !== columnId));
         } else {
-          selectColumns(
-            [...selectedColumnIds, columnId],
-            activeColumnIds.filter((id) => id !== columnId)
-          );
+          selectColumns([...selectedColumnIds, columnId]);
         }
       } else {
         // Regular click: Replace selection
-        selectColumns(
-          [columnId],
-          activeColumnIds.filter((id) => id !== columnId)
-        );
+        selectColumns([columnId]);
       }
     },
-    [dispatch, activeColumnIds, selectedColumnIds]
+    [activeColumnIds, selectedColumnIds, selectColumns]
   );
 
   /**

@@ -22,8 +22,6 @@ import {
   selectOperation,
   selectRootOperation,
 } from "../../slices/operationsSlice";
-import { useRef } from "react";
-import { selectSelectedColumns } from "../../slices/columnsSlice";
 // Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -47,10 +45,8 @@ export default function SupportingPane() {
     const id = selectRootOperation(state);
     return id ? selectOperation(state, id) : null;
   });
-  const selectedColumns = useSelector(selectSelectedColumns);
   const focusedColumns = useSelector((state) => state.columns.focused);
   const isOpen = tables.length > 0;
-  const columnWindowRef = useRef(null);
 
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>

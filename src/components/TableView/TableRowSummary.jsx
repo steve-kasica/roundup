@@ -123,9 +123,8 @@ const StyledTableRow = styled("tr", {
 function TableRowSummary({
   // props from withTableData
   table,
-  removedColumnIds,
   columnCount,
-  isHovered,
+  removedColumnCount,
   parentOperation,
   // Props drilled down from withTableData
   rowMax,
@@ -189,21 +188,6 @@ function TableRowSummary({
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
-    end: (item, monitor) => {
-      const dropResult = monitor.getDropResult();
-
-      // Only process if we have a valid drop result and it was accepted
-      // TODO: how does the new architecture handle drops with multiple tables?
-      // if (dropResult && dropResult.accepted) {
-      //   if (item.type === "multiple-tables") {
-      //     // addSelectedTablesToSchema(dropResult.operationType);
-      //   } else if (item.type === "table") {
-      //     // addTableToSchema(dropResult.operationType);
-      //   }
-      // }
-      // If no drop result or drop was rejected, the drag operation just ends
-      // without any action - this prevents the freeze issue
-    },
   });
 
   // Remove default drag preview
@@ -278,7 +262,7 @@ function TableRowSummary({
       isDragging={isDragging}
       isDisabled={isDisabled}
       isSelected={isSelected}
-      isHovered={isHovered}
+      isHovered={false} // TODO: Implement hover state if needed
       data-tableid={table.id}
       data-selected={isSelected}
       data-multiselected={
@@ -430,9 +414,7 @@ function TableRowSummary({
         isDisabled={isDisabled}
       >
         {`${formatNumber(columnCount)}`}
-        <sup
-          style={{ display: removedColumnIds.length > 0 ? "inline" : "none" }}
-        >
+        <sup style={{ display: removedColumnCount > 0 ? "inline" : "none" }}>
           *
         </sup>
       </BarChartCell>

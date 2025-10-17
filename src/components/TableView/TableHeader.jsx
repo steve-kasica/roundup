@@ -3,8 +3,15 @@ import { Box } from "@mui/material";
 import withTableData from "./withTableData";
 import { EnhancedColumnName } from "../ColumnViews";
 
-const TableHeader = ({ activeColumnIds, keyColumnId, onColumnClick }) => {
-  const columnWidth = (1 / activeColumnIds.length) * 100 + "%";
+const TableHeader = ({
+  activeColumnIds,
+  columnCount,
+  // Props passed directly from parent component
+  keyColumnId,
+  onColumnClick,
+}) => {
+  const columnWidth = (1 / columnCount) * 100 + "%";
+
   return (
     <Box display="flex" width="100%" gap={"1px"}>
       {activeColumnIds.map((columnId) => (

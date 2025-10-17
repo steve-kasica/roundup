@@ -24,7 +24,7 @@ import { EnhancedColumnHeader } from "../ColumnViews";
  * @param {*} syncTables: if false, this component implements sequential loading of table rows. If true, it concurrently loads all tables.
  * @returns
  */
-export const StackVirtualizedTable = withStackOperationData(
+const StackVirtualizedTable = withStackOperationData(
   ({ operation, selectedColumnIds, selectedColumnNames }) => {
     const tableContainerRef = useRef(null);
     const [sortBy, setSortBy] = useState(null);
@@ -218,3 +218,5 @@ export const StackVirtualizedTable = withStackOperationData(
     );
   }
 );
+StackVirtualizedTable.displayName = "StackVirtualizedTable";
+export { StackVirtualizedTable };

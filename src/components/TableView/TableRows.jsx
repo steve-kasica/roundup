@@ -49,7 +49,6 @@ import {
   Alert,
   Button,
   Box,
-  styled,
 } from "@mui/material";
 import { usePaginatedTableRows } from "../../hooks/index.js";
 import {
@@ -59,26 +58,11 @@ import {
 } from "../ui/Table";
 import { EnhancedColumnHeader } from "../ColumnViews";
 
-/**
- * TableRows component renders paginated, sortable table data with advanced interactions
- *
- * @param {Object} props - Component props
- * @param {Object} props.table - Table object containing metadata
- * @param {string} props.table.id - Unique identifier for the table
- * @param {string[]} props.selectedColumnIds - Array of column IDs to display
- * @param {number} [props.hoveredIndex=0] - Index of currently hovered column
- * @param {Function} props.hoverColumn - Function called when column is hovered
- * @param {Function} props.unhoverColumn - Function called when column hover ends
- * @param {Function} [props.onScrollContainerRef=null] - Callback to register scroll container ref
- * @param {Function} [props.onScroll=null] - Callback for scroll events
- * @param {boolean} [props.showHeader=true] - Whether to show the table header
- * @param {Object} [props.columnWidths={}] - Custom width settings for columns
- * @returns {JSX.Element} The rendered TableRows component
- */
 const TableRows = ({
   table,
   selectedColumnIds, // IDs of selected columns in Redux
   selectedColumnNames, // Names of selected columns in the database
+  // Props passed directly from parent component
   hoveredIndex = 0,
   onScrollContainerRef = null,
   onScroll = null,

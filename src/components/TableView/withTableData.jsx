@@ -1,33 +1,25 @@
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import {
   selectOperationDepth,
   selectOperation,
 } from "../../slices/operationsSlice";
-import { setPeekedTable } from "../../slices/uiSlice";
 import {
-  selectColumnById,
+  selectActiveColumnIdsByTableId,
   selectColumnIdsByTableId,
-  selectRemovedColumnIdsByTableId,
-  setHoveredColumns,
+  selectSelectedColumnDBNamesByTableId,
+  selectSelectedColumnIdsByTableId,
 } from "../../slices/columnsSlice";
 import {
   selectHoveredTable,
-  clearHoveredTable,
-  setHoveredTable,
   selectSelectedTables,
-  changeTablesName,
   selectTablesById,
-  setSelectedTables,
-  setTablesAttribute,
-  removeFromSelectedTables,
 } from "../../slices/tablesSlice";
 
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
-import { createColumnsRequest } from "../../sagas/createColumnsSaga";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 
 export default function withTableData(WrappedComponent) {
@@ -40,57 +32,29 @@ export default function withTableData(WrappedComponent) {
     try {
       // Get table data from the Redux store
       const table = useSelector((state) => selectTablesById(state, id));
-      const selectedTables = useSelector(selectSelectedTables) || [];
-      const hoveredTable = useSelector(selectHoveredTable);
-
-      // Get columnIds associated with this table, both active and "removed"
-      const removedColumnIds = useSelector((state) =>
-        selectRemovedColumnIdsByTableId(state, id)
-      );
 
       // Columns associated with this specific table
-      const columns = useSelector((state) =>
-        selectColumnIdsByTableId(state, id).map((colId) =>
-          selectColumnById(state, colId)
-        )
+      const columnIds = useSelector(
+        (state) => selectColumnIdsByTableId(state, id),
+        shallowEqual
       );
 
-      // Active columns are those that are not excluded
-      // This array is exported as props
-      const activeColumnIds = useMemo(
-        () =>
-          columns.filter(({ isExcluded }) => !isExcluded).map(({ id }) => id),
-        [columns]
+      // Active columns (only changes when exclusion changes)
+      const activeColumnIds = useSelector(
+        (state) => selectActiveColumnIdsByTableId(state, id),
+        shallowEqual
       );
 
-      // Selected columns are active columns that are also selected
-      // This array is exported as props
-      const selectedColumnIds = useMemo(
-        () =>
-          columns
-            .filter(({ isExcluded, isSelected }) => !isExcluded && isSelected)
-            .map(({ id }) => id),
-        [columns]
+      // Selected columns (only changes when selection changes)
+      const selectedColumnIds = useSelector(
+        (state) => selectSelectedColumnIdsByTableId(state, id),
+        shallowEqual
       );
 
-      // Selected column names are the `columnNames` in the DB for selected columns
-      // used in some DB hooks. This array is exported as props
-      const selectedColumnNames = useMemo(
-        () =>
-          columns
-            .filter(({ isExcluded, isSelected }) => !isExcluded && isSelected)
-            .map(({ columnName }) => columnName),
-        [columns]
-      );
-
-      // Similarly, hovered columns are active columns that are also hovered
-      // This array is exported as props
-      const hoveredColumnIds = useMemo(
-        () =>
-          columns
-            .filter(({ isExcluded, isHovered }) => !isExcluded && isHovered)
-            .map(({ id }) => id),
-        [columns]
+      // Selected column names (only changes when selection changes)
+      const selectedColumnNames = useSelector(
+        (state) => selectSelectedColumnDBNamesByTableId(state, id),
+        shallowEqual
       );
 
       // Get related operation data from the Redux store, if any
@@ -103,131 +67,114 @@ export default function withTableData(WrappedComponent) {
           : null
       );
 
-      const isInSchema = table.operationId !== null;
-      const isHovered = hoveredTable === id;
-      const isSelected = selectedTables.includes(id);
-
       // Functions to handle interactions
       const handleSelectColumns = useCallback(
-        (selectedColumnIds, unselectedColumnIds) => {
+        (selectedColumnIds) => {
           dispatch(
             updateColumnsRequest({
-              columnUpdates: [
-                ...selectedColumnIds.map((id) => ({ id, isSelected: true })),
-                ...unselectedColumnIds.map((id) => ({ id, isSelected: false })),
-              ],
+              columnUpdates: selectedColumnIds.map((id) => ({
+                id,
+                isSelected: true,
+              })),
             })
           );
         },
         [dispatch]
       );
 
-      const hoverColumn = useCallback(
+      const swapColumns = useCallback(
+        (target, source) => {
+          const sourceIndex = activeColumnIds.indexOf(source);
+          const targetIndex = activeColumnIds.indexOf(target);
+          if (sourceIndex === -1 || targetIndex === -1) {
+            throw new Error(
+              `Invalid column IDs for swapping: source (${source}) or target (${target}) not found in active columns of table ${id}.`
+            );
+          }
+          dispatch(
+            updateColumnsRequest({
+              columnUpdates: [
+                { id: source, index: targetIndex },
+                { id: target, index: sourceIndex },
+              ],
+            })
+          );
+        },
+        [dispatch, activeColumnIds, id]
+      );
+
+      const excludeColumns = useCallback(
         (columnIds) => {
-          dispatch(setHoveredColumns(columnIds));
+          dispatch(
+            updateColumnsRequest({
+              columnUpdates: columnIds.map((colId) => ({
+                id: colId,
+                isExcluded: true,
+                isSelected: false, // Excluding also unselects
+              })),
+            })
+          );
         },
         [dispatch]
       );
 
-      const unhoverColumn = useCallback(() => {
-        dispatch(setHoveredColumns([]));
-      }, [dispatch]);
+      const setTableName = useCallback(
+        (name) => {
+          dispatch(
+            updateTablesRequest({
+              tableUpdates: [{ id, name }],
+            })
+          );
+        },
+        [dispatch, id]
+      );
+
+      const removeTableFromSchema = useCallback(() => {
+        // TODO
+      }, []);
+
+      const deleteTable = useCallback(() => {
+        dispatch(deleteTablesRequest([id]));
+      }, [dispatch, id]);
+
+      const focusTable = useCallback(() => {}, []);
+
+      // Current number of non-excluded columns
+      const columnCount = activeColumnIds.length;
+
+      // Number of columns when table was initialized
+      const initialColumnCount = columnIds.length;
+
+      // Number of columns that have been excluded
+      const removedColumnCount = initialColumnCount - columnCount;
+
+      // Determine if the table is part of the current schema (has an operation)
+      const isInSchema = table.operationId !== null;
 
       return (
         <WrappedComponent
           {...props}
           // Table properties
           table={table}
+          rowCount={table.rowCount.toLocaleString()}
           parentOperation={parentOperation} // TODO: should only pass Ids
+          isInSchema={isInSchema}
           depth={depth}
-          columnCount={activeColumnIds.length}
-          // Properties derived from table's columns
+          columnIds={columnIds}
           activeColumnIds={activeColumnIds}
+          initialColumnCount={initialColumnCount}
+          columnCount={columnCount}
+          removedColumnCount={removedColumnCount}
           selectedColumnIds={selectedColumnIds}
           selectedColumnNames={selectedColumnNames} // necessary for DB hooks
-          hoveredColumnIds={hoveredColumnIds} // Only hovered columnIDs in this table
-          removedColumnIds={removedColumnIds}
-          // Interaction state
-          isHovered={isHovered}
-          isInSchema={isInSchema}
-          isSelected={isSelected}
-          isFocused={parentOperation ? true : false}
           // Interaction handlers
           selectColumns={handleSelectColumns}
-          hoverColumn={hoverColumn}
-          unhoverColumn={unhoverColumn}
-          swapColumns={(target, source) => {
-            const sourceIndex = activeColumnIds.indexOf(source);
-            const targetIndex = activeColumnIds.indexOf(target);
-            if (sourceIndex === -1 || targetIndex === -1) {
-              throw new Error(
-                `Invalid column IDs for swapping: source (${source}) or target (${target}) not found in active columns of table ${id}.`
-              );
-            }
-            dispatch(
-              updateColumnsRequest({
-                columnUpdates: [
-                  { id: source, index: targetIndex },
-                  { id: target, index: sourceIndex },
-                ],
-              })
-            );
-          }}
-          insertColumn={(index) => {
-            dispatch(createColumnsRequest({ tableId: id, index }));
-          }}
-          excludeColumns={(columnIds) => {
-            dispatch(
-              updateColumnsRequest({
-                columnUpdates: columnIds.map((colId) => ({
-                  id: colId,
-                  isExcluded: true,
-                  isSelected: false, // Excluding also unselects
-                })),
-              })
-            );
-          }}
-          // Table action handlers
-          onHover={() => dispatch(setHoveredTable(id))} // TODO: remove
-          onUnhover={() => dispatch(clearHoveredTable())} // TODO: remove
-          hoverTable={() => dispatch(setHoveredTable(id))}
-          unhoverTable={() => dispatch(clearHoveredTable())}
-          // removeTableFromSchema={() => {
-          //   // TODO
-          //   if (isInSchema) {
-          //     dispatch(
-          //       deleteTablesRequest({
-          //         operationIds: [table.operationId],
-          //         tableIds: [id],
-          //       })
-          //     );
-          //   }
-          // }}
-          setTableSelection={(ids) => dispatch(setSelectedTables(ids))}
-          unselectTable={() => dispatch(removeFromSelectedTables(id))}
-          peekTable={() => dispatch(setPeekedTable(id))}
-          renameTable={(newNames) =>
-            dispatch(changeTablesName({ ids: id, newNames }))
-          }
-          dropTable={() => dispatch(deleteTablesRequest(id))} // @depricate
-          deleteTable={() => dispatch(deleteTablesRequest(id))}
-          setKeyColumn={(columnId) =>
-            dispatch(
-              setTablesAttribute({
-                ids: id,
-                attribute: "keyColumnId",
-                value: columnId,
-              })
-            )
-          }
-          // addSelectedTablesToSchema={(operationType) =>
-          //   dispatch(
-          //     addTablesToSchemaRequest({
-          //       tableIds: selectedTables,
-          //       operationType,
-          //     })
-          //   )
-          // }
+          swapColumns={swapColumns}
+          excludeColumns={excludeColumns}
+          setTableName={setTableName}
+          removeTableFromSchema={removeTableFromSchema}
+          focusTable={focusTable}
+          deleteTable={deleteTable}
         />
       );
     } catch (error) {

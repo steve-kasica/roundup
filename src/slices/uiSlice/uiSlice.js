@@ -11,8 +11,10 @@ export const LOD = {
 
 export const initialState = {
   drawerContents: null,
-  selectedTables: [],
+  hoveredColumn: null,
   hoveredTable: null,
+  hoveredOperation: null,
+  selectedTables: [],
   peekedTable: null,
   showColumnIndexDetails: false,
   dialogContent: null,
@@ -27,6 +29,9 @@ export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    setHoveredColumn(state, action) {
+      state.hoveredColumn = action.payload;
+    },
     setLevelOfDetail(state, action) {
       state.levelOfDetail = action.payload;
     },
@@ -114,6 +119,7 @@ export const {
   removeFromSelectedTables,
 
   setHoveredTable,
+  setHoveredColumn,
   clearHoveredTable,
   addToOpsDetailVisableColumns,
   removeFromOpsDetailVisableColumns,

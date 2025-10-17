@@ -127,7 +127,6 @@ export default function Column(
     std: summary.std,
     isExcluded: false, // Whether the column is excluded from analysis
     isSelected: false, // Whether the column is selected
-    isHovered: false, // Whether the column is hovered
     uniqueValues: null, // Unique values in the column, can be null if not computed yet
     totalRows: null, // Total number of rows in the column, can be null if not computed yet
     nonNullValues: null, // Number of non-null values in the column, can be null if not computed yet

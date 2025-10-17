@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Toolbar, Typography } from "@mui/material";
 import {
   getValuesInRange,
   getIndexOfValue,
@@ -9,6 +9,13 @@ import {
 import { EnhancedTableLabel } from "../TableView";
 import { EnhancedColumnSummary, StyledColumnCard } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
+import {
+  ArrowDropDown,
+  ClearAll,
+  SelectAll,
+  Visibility,
+  Delete as ExcludeIcon,
+} from "@mui/icons-material";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -16,25 +23,27 @@ const StackSchemaView = withStackOperationData(
   ({
     operation,
     activeColumnIds,
-    selectedColumnIds,
     columnIdMatrix, // column IDs of child tables in a matrix
     m, // width of the matrix (# of columns)
-    selectedColumnIndices,
+    // selectedColumnIndices,
     selectColumns,
-    selectedColumns,
     focusColumns,
     swapColumns,
   }) => {
     const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
+    const [selectedTableColumnIds, setSelectedTableColumnIds] = useState([]);
+
+    // Call selectColumns whenever selectedTableColumnIds changes
+    useEffect(() => {
+      selectColumns(selectedTableColumnIds);
+    }, [selectedTableColumnIds, selectColumns]);
 
     const onCellClick = useCallback(
       (event, columnId) => {
-        let columnIdsToSelect, columnIdsToUnselect;
         const currentPosition = getIndexOfValue(columnIdMatrix, columnId);
         if (!currentPosition) return; // Column not found in matrix
 
         const [currentRow] = currentPosition;
-        let anchorPosition, extentPosition;
 
         if (event.shiftKey && selectionAnchorCell) {
           // Shift+Click: select range from anchor to extent, but only within the same table (row)
@@ -42,47 +51,36 @@ const StackSchemaView = withStackOperationData(
 
           // Only allow shift selection within the same row (same table)
           if (anchorRow === currentRow) {
-            anchorPosition = selectionAnchorCell;
-            extentPosition = currentPosition;
-            const selectedColumnIds = getValuesInRange(
+            const rangeColumnIds = getValuesInRange(
               columnIdMatrix,
-              anchorPosition,
-              extentPosition
-            );
-            columnIdsToSelect = selectedColumnIds;
-            columnIdsToUnselect = columnIdMatrix
-              .flat()
-              .filter((id) => !selectedColumnIds.includes(id));
+              selectionAnchorCell,
+              currentPosition
+            ).filter((id) => id !== null);
+
+            setSelectedTableColumnIds(rangeColumnIds);
           } else {
             // Different row/table: treat as single click
-            columnIdsToSelect = [columnId];
-            columnIdsToUnselect = [
-              ...columnIdMatrix.flat().filter((id) => id !== columnId),
-              ...selectedColumnIds,
-            ];
+            setSelectedTableColumnIds([columnId]);
           }
-          anchorPosition = currentPosition;
-          extentPosition = currentPosition;
         } else if (event.metaKey || event.ctrlKey) {
-          // Cmd/Ctrl+Click: not allowed for cross-table selection
-          // Treat as single click instead
-          anchorPosition = currentPosition;
-          extentPosition = currentPosition;
-          selectColumns([columnId]);
+          // Ctrl/Meta+Click: toggle selection of this table column
+          setSelectedTableColumnIds((prev) => {
+            if (prev.includes(columnId)) {
+              // Remove from selection (unselect)
+              return prev.filter((id) => id !== columnId);
+            } else {
+              // Add to selection (select)
+              return [...prev, columnId];
+            }
+          });
         } else {
-          // Single click: select only this column, also handles initial shift clicks
-          anchorPosition = currentPosition;
-          extentPosition = currentPosition;
-          columnIdsToSelect = [columnId];
-          columnIdsToUnselect = [
-            ...columnIdMatrix.flat().filter((id) => id !== columnId),
-            ...selectedColumnIds,
-          ];
+          // Single click: select only this column from columnIdMatrix
+          setSelectedTableColumnIds([columnId]);
         }
-        selectColumns(columnIdsToSelect, columnIdsToUnselect);
-        setSelectionAnchorCell(anchorPosition);
+
+        setSelectionAnchorCell(currentPosition);
       },
-      [columnIdMatrix, selectionAnchorCell, selectColumns]
+      [columnIdMatrix, selectionAnchorCell]
     );
     const onCellDoubleClick = useCallback(
       (event, columnId) => {
@@ -99,13 +97,13 @@ const StackSchemaView = withStackOperationData(
         columnIdsToSelect = columnIdMatrix[rowIndex];
         columnIdsToUnselect = [
           ...columnIdMatrix.filter((_, i) => i !== rowIndex).flat(),
-          ...selectedColumnIds,
+          // ...selectedTableColumnIds,
         ];
         setSelectionAnchorCell(rowIndex);
 
         selectColumns(columnIdsToSelect, columnIdsToUnselect);
       },
-      [columnIdMatrix, selectedColumnIds, selectColumns]
+      [columnIdMatrix, selectColumns]
     );
 
     const onColumnLabelClick = useCallback(
@@ -118,255 +116,388 @@ const StackSchemaView = withStackOperationData(
           const startIndex = Math.min(anchorIndex, extentIndex);
           const endIndex = Math.max(anchorIndex, extentIndex);
 
-          columnIdsToSelect = activeColumnIds
-            .slice(startIndex, endIndex + 1)
-            .filter((id) => selectedColumnIds.indexOf(id) === -1); // Only select new columns
+          columnIdsToSelect = activeColumnIds.slice(startIndex, endIndex + 1);
+          // .filter((id) => selectedTableColumnIds.indexOf(id) === -1); // Only select new columns
           columnIdsToUnselect = activeColumnIds.filter(
             (_, i) => i < startIndex || i > endIndex
           );
         } else if (event.metaKey || event.ctrlKey) {
           // Cmd/Ctrl+Click: toggle selection of this operation column
-          if (selectedColumnIds.includes(activeColumnIds[colIndex])) {
-            columnIdsToSelect = []; // Don't select any new columns
-            columnIdsToUnselect = [activeColumnIds[colIndex]];
-          } else {
-            columnIdsToSelect = [activeColumnIds[colIndex]];
-            columnIdsToUnselect = [];
-          }
+          // if (selectedTableColumnIds.includes(activeColumnIds[colIndex])) {
+          //   columnIdsToSelect = []; // Don't select any new columns
+          //   columnIdsToUnselect = [activeColumnIds[colIndex]];
+          // } else {
+          //   columnIdsToSelect = [activeColumnIds[colIndex]];
+          //   columnIdsToUnselect = [];
+          // }
 
           setSelectionAnchorCell(colIndex);
         } else {
           // Single click: select only this column group, also handles initial shift clicks
-          if (selectedColumnIds.includes(activeColumnIds[colIndex])) {
-            columnIdsToSelect = []; // Don't select any new columns
-            columnIdsToUnselect = selectedColumnIds.filter(
-              (id) => id !== activeColumnIds[colIndex]
-            );
-            setSelectionAnchorCell(colIndex);
-          } else {
-            columnIdsToSelect = [activeColumnIds[colIndex]];
-            columnIdsToUnselect = [
-              ...selectedColumnIds,
-              ...columnIdMatrix.flat(), // if clicking for table column selection to opeation column selection
-            ];
-          }
+          // if (selectedTableColumnIds.includes(activeColumnIds[colIndex])) {
+          //   columnIdsToSelect = []; // Don't select any new columns
+          //   columnIdsToUnselect = selectedTableColumnIds.filter(
+          //     (id) => id !== activeColumnIds[colIndex]
+          //   );
+          //   setSelectionAnchorCell(colIndex);
+          // } else {
+          //   columnIdsToSelect = [activeColumnIds[colIndex]];
+          //   columnIdsToUnselect = [
+          //     ...selectedTableColumnIds,
+          //     ...columnIdMatrix.flat(), // if clicking for table column selection to opeation column selection
+          //   ];
+          // }
 
           setSelectionAnchorCell(colIndex);
         }
 
         selectColumns(columnIdsToSelect, columnIdsToUnselect);
       },
-      [
-        selectionAnchorCell,
-        selectColumns,
-        activeColumnIds,
-        columnIdMatrix,
-        selectedColumnIds,
-      ]
+      [selectionAnchorCell, selectColumns, activeColumnIds, columnIdMatrix]
     );
 
+    const handleToggleDrag = useCallback(() => {}, []);
+
+    const [canDragColumns, setCanDragColumns] = useState(false);
+
+    const handleSelectAll = useCallback(() => {
+      // selectColumns(activeColumnIds, []);
+    }, [activeColumnIds, selectColumns]);
+
+    const handleFocusColumns = useCallback(() => {}, []);
+
+    const handleFocusSelected = useCallback(() => {
+      // focusColumns(selectedTableColumnIds);
+    }, [focusColumns]);
+
+    const handleExcludeSelected = useCallback(() => {
+      // selectColumns([], selectedTableColumnIds);
+    }, [selectColumns]);
+
+    const handleClearSelection = useCallback(() => {
+      // selectColumns([], selectedTableColumnIds);
+      setSelectionAnchorCell(null);
+    }, [selectColumns]);
+
     return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          width: "100%",
-          minHeight: "100%", // Take full height of parent when space is available
-          gap: "4px",
-        }}
-      >
-        {/* Left Column - Row Labels */}
-        <Box
+      <Box display={"flex"} flexDirection="column" height="100%">
+        <Toolbar
+          variant="dense"
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "4px",
-            paddingLeft: 1,
-            flexShrink: 0,
-            minHeight: "100%", // Take full height
+            minHeight: 48,
+            px: 1,
+            borderBottom: 1,
+            borderColor: "divider",
+            justifyContent: "space-between",
+            gap: 1,
           }}
         >
-          {/* Empty space for top-left corner */}
-          <Box
-            sx={{
-              height: `${topRowHeight}px`,
-              flexShrink: 0,
-            }}
-          ></Box>
-          {/* Row labels container */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-evenly",
-              gap: 1,
-              flex: 1,
-            }}
-          >
-            {operation.children.map((childId, rowIndex) => (
-              <Box
-                key={childId}
-                sx={{
-                  fontWeight: "bold",
-                  minHeight: "27px", // Adjust manually to match ColumnSummary
-                  padding: "8px 0",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  height: "100%", // Match column card height
-                  cursor: "pointer",
-                }}
-              >
-                <EnhancedTableLabel
-                  id={childId}
-                  onClick={(event) => onRowLabelClick(event, rowIndex)}
-                  includeIcon={false}
-                  includeDimensions={false}
-                />
-              </Box>
-            ))}
+          {/* Stack Schema Information Section - Shows name and dimensions */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {/* <TableChart fontSize="small" color="action" /> */}
+            <Typography
+              variant="subtitle2"
+              fontWeight="bold"
+              color="text.primary"
+            >
+              {operation.name}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {activeColumnIds.length} x{" "}
+              {operation.rowCount?.toLocaleString() || 0}
+            </Typography>
           </Box>
-        </Box>
 
-        {/* Data Columns Container - Takes remaining space */}
+          {/* Action Buttons Section - Bulk operations for selected columns */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {/* Toggle Drag Mode */}
+            <IconButton
+              size="small"
+              onClick={handleToggleDrag}
+              title={
+                canDragColumns
+                  ? "Disable column dragging"
+                  : "Enable column dragging"
+              }
+              color={canDragColumns ? "primary" : "default"}
+              sx={{
+                backgroundColor: canDragColumns
+                  ? "primary.light"
+                  : "transparent",
+                "&:hover": {
+                  backgroundColor: canDragColumns
+                    ? "primary.main"
+                    : "action.hover",
+                },
+              }}
+            >
+              {/* <DragIcon fontSize="small" /> */}
+            </IconButton>
+
+            {/* Select All Columns */}
+            <IconButton
+              size="small"
+              onClick={handleSelectAll}
+              disabled={
+                selectedTableColumnIds.length === columnIdMatrix.flat().length
+              }
+              title="Select all columns"
+            >
+              <SelectAll fontSize="small" />
+            </IconButton>
+
+            {/* Focus Selected Columns (max 2 for comparison) */}
+            <IconButton
+              size="small"
+              onClick={handleFocusSelected}
+              disabled={
+                selectedTableColumnIds.length === 0 ||
+                selectedTableColumnIds.length > 1
+              }
+              title="Focus on selected columns (1-2 columns only)"
+              color="primary"
+            >
+              <Visibility fontSize="small" />
+            </IconButton>
+
+            {/* Change Column Type Dropdown */}
+            <IconButton
+              size="small"
+              // onClick={handleColumnTypeMenuOpen}
+              disabled={selectedTableColumnIds.length === 0}
+              title="Change column type"
+            >
+              <ArrowDropDown fontSize="small" />
+            </IconButton>
+
+            {/* Exclude Selected Columns */}
+            <IconButton
+              size="small"
+              onClick={handleExcludeSelected}
+              disabled={selectedTableColumnIds.length === 0}
+              title="Exclude selected columns"
+              color="error"
+            >
+              <ExcludeIcon fontSize="small" />
+            </IconButton>
+
+            {/* Clear Selection */}
+            <IconButton
+              size="small"
+              onClick={handleClearSelection}
+              disabled={selectedTableColumnIds.length === 0}
+              title="Clear selection"
+            >
+              <ClearAll fontSize="small" />
+            </IconButton>
+          </Box>
+        </Toolbar>
         <Box
           sx={{
             display: "flex",
             flexDirection: "row",
-            flex: 1,
+            width: "100%",
+            minHeight: "100%", // Take full height of parent when space is available
             gap: "4px",
-            minHeight: "100%", // Take full height
-            userSelect: "none",
           }}
         >
-          {Array.from({ length: m }).map((_, colIndex) => (
+          {/* Left Column - Row Labels */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "4px",
+              paddingLeft: 1,
+              flexShrink: 0,
+              minHeight: "100%", // Take full height
+            }}
+          >
+            {/* Empty space for top-left corner */}
             <Box
-              key={colIndex}
+              sx={{
+                height: `${topRowHeight}px`,
+                flexShrink: 0,
+              }}
+            ></Box>
+            {/* Row labels container */}
+            <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "4px",
-                padding: "2px", // This has to mach outline thickness in ColumnSummary
+                justifyContent: "space-evenly",
+                gap: 1,
                 flex: 1,
-                height: "100%", // Take full height
-                minWidth: "125px",
-                overflow: "hidden", // Prevent overflow
               }}
             >
-              {/* Column Header */}
+              {operation.children.map((childId, rowIndex) => (
+                <Box
+                  key={childId}
+                  sx={{
+                    fontWeight: "bold",
+                    minHeight: "27px", // Adjust manually to match ColumnSummary
+                    padding: "8px 0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    height: "100%", // Match column card height
+                    cursor: "pointer",
+                  }}
+                >
+                  <EnhancedTableLabel
+                    id={childId}
+                    onClick={(event) => onRowLabelClick(event, rowIndex)}
+                    includeIcon={false}
+                    includeDimensions={false}
+                  />
+                </Box>
+              ))}
+            </Box>
+          </Box>
+
+          {/* Data Columns Container - Takes remaining space */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              flex: 1,
+              gap: "4px",
+              minHeight: "100%", // Take full height
+              userSelect: "none",
+              overflowX: "auto",
+              overflowY: "auto",
+            }}
+          >
+            {Array.from({ length: m }).map((_, colIndex) => (
               <Box
-                sx={{
-                  fontWeight: "bold",
-                  display: "flex",
-                  height: `${topRowHeight}px`,
-                  flexShrink: 0,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                }}
-                onClick={(e) => onColumnLabelClick(e, colIndex)}
-              >
-                {colIndex + 1}
-              </Box>
-              <Box
+                key={colIndex}
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "space-evenly",
-                  padding: "2px", // Has to match border thickness in ColumnSummary
-                  gap: 1,
+                  gap: "4px",
+                  padding: "2px", // This has to mach outline thickness in ColumnSummary
                   flex: 1,
-                  overflow: "hidden",
-                  transition: "all 0.2s ease-in-out", // Follows ColumnSummary.jsx
-                  ...(selectedColumnIndices.includes(colIndex) && {
-                    backgroundColor: "rgba(0, 0, 0, 0.1)",
-                    outline: "2px solid blue", // This has to match padding above
-                    outlineColor: "#1976d2",
-                    borderRadius: "4px",
-                  }),
-                  // userSelect: "none",
+                  height: "100%", // Take full height
+                  minWidth: "125px",
+                  overflow: "hidden", // Prevent overflow
                 }}
               >
-                {columnIdMatrix.map((row) => {
-                  const columnId = row[colIndex];
-                  if (columnId === null) {
-                    return (
-                      <StyledColumnCard
-                        key={`empty-${colIndex}`}
-                        isError={true}
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          textAlign: "center",
-                          // minHeight: "120px",
-                        }}
-                      >
-                        <Box
+                {/* Column Header */}
+                <Box
+                  sx={{
+                    fontWeight: "bold",
+                    display: "flex",
+                    height: `${topRowHeight}px`,
+                    flexShrink: 0,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
+                  onClick={(e) => onColumnLabelClick(e, colIndex)}
+                >
+                  {colIndex + 1}
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-evenly",
+                    padding: "2px", // Has to match border thickness in ColumnSummary
+                    gap: 1,
+                    flex: 1,
+                    overflow: "hidden",
+                    transition: "all 0.2s ease-in-out", // Follows ColumnSummary.jsx
+                    // ...(selectedColumnIndices.includes(colIndex) && {
+                    //   backgroundColor: "rgba(0, 0, 0, 0.1)",
+                    //   outline: "2px solid blue", // This has to match padding above
+                    //   outlineColor: "#1976d2",
+                    //   borderRadius: "4px",
+                    // }),
+                    // userSelect: "none",
+                  }}
+                >
+                  {columnIdMatrix.map((row) => {
+                    const columnId = row[colIndex];
+                    if (columnId === null) {
+                      return (
+                        <StyledColumnCard
+                          key={`empty-${colIndex}`}
+                          isError={true}
                           sx={{
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
-                            gap: 1,
+                            justifyContent: "center",
+                            textAlign: "center",
+                            // minHeight: "120px",
                           }}
                         >
-                          <Typography
-                            variant="caption"
-                            color="error"
+                          <Box
                             sx={{
-                              fontWeight: "medium",
-                              textTransform: "uppercase",
-                              letterSpacing: "0.5px",
-                              fontSize: "0.7rem",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: 1,
                             }}
                           >
-                            Schema Mismatch
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{
-                              fontSize: "0.75rem",
-                              lineHeight: 1.3,
-                              maxWidth: "90%",
-                            }}
-                          >
-                            Column structure
-                            <br />
-                            inconsistency detected
-                          </Typography>
-                        </Box>
-                      </StyledColumnCard>
-                    );
-                  } else {
-                    return (
-                      <ColumnDragContainer
-                        key={columnId}
-                        id={columnId}
-                        columnIndex={colIndex}
-                        onDrop={(draggedItem, targetItem) =>
-                          swapColumns(targetItem.id, draggedItem.id)
-                        }
-                      >
-                        <EnhancedColumnSummary
+                            <Typography
+                              variant="caption"
+                              color="error"
+                              sx={{
+                                fontWeight: "medium",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px",
+                                fontSize: "0.7rem",
+                              }}
+                            >
+                              Schema Mismatch
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{
+                                fontSize: "0.75rem",
+                                lineHeight: 1.3,
+                                maxWidth: "90%",
+                              }}
+                            >
+                              Column structure
+                              <br />
+                              inconsistency detected
+                            </Typography>
+                          </Box>
+                        </StyledColumnCard>
+                      );
+                    } else {
+                      return (
+                        <ColumnDragContainer
+                          key={columnId}
                           id={columnId}
-                          onClick={(event) => onCellClick(event, columnId)}
-                          onDoubleClick={(event) =>
-                            onCellDoubleClick(event, columnId)
+                          columnIndex={colIndex}
+                          onDrop={(draggedItem, targetItem) =>
+                            swapColumns(targetItem, draggedItem)
                           }
-                        />
-                      </ColumnDragContainer>
-                    );
-                  }
-                })}
+                        >
+                          <EnhancedColumnSummary
+                            id={columnId}
+                            onClick={(event) => onCellClick(event, columnId)}
+                            onDoubleClick={(event) =>
+                              onCellDoubleClick(event, columnId)
+                            }
+                          />
+                        </ColumnDragContainer>
+                      );
+                    }
+                  })}
+                </Box>
               </Box>
-            </Box>
-          ))}
+            ))}
+          </Box>
         </Box>
       </Box>
     );
   }
 );
+
+StackSchemaView.displayName = "StackSchemaView";
 
 export default StackSchemaView;

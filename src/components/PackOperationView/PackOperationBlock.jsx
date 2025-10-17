@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * CompositeTableSchema/Operation.jsx
  * -----------------------------------------------------------------
@@ -26,7 +27,7 @@ const StyledBox = styled(Box, {
   }),
 }));
 
-function OperationView({
+function PackOperationBlock({
   // props via withOperationData
   operation,
   columnCount,
@@ -106,28 +107,6 @@ function OperationView({
   );
 }
 
-OperationView.propTypes = {
-  // Props via withOperationData HOC
-  operation: PropTypes.shape({
-    operationType: PropTypes.string,
-    error: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.string,
-      PropTypes.bool,
-    ]),
-  }).isRequired,
-  depth: PropTypes.number,
-  columnCount: PropTypes.number.isRequired,
-  isFocused: PropTypes.bool,
-  isHovered: PropTypes.bool,
-  childrenIds: PropTypes.arrayOf(
-    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ).isRequired,
+const EnhancedPackOperationBlock = withOperationData(PackOperationBlock);
 
-  // Props passed recursively via parent operation
-  parentColumnCount: PropTypes.number,
-};
-
-const EnhancedOperationView = withOperationData(OperationView);
-
-export default EnhancedOperationView;
+export { PackOperationBlock, EnhancedPackOperationBlock };

@@ -7,12 +7,12 @@ import withTableData from "./withTableData.jsx";
 function TableBlock({
   // props via withTableData
   table,
-  columnCount = 0,
+  columnCount,
   activeColumnIds,
-  isHovered,
-  isDragging,
-  isPressed,
-  isFocused,
+  // TODO are these still being used?
+  // isDragging,
+  // isPressed,
+  // isFocused,
 
   // props passed via OperationBlockView
   parentOperationType,
@@ -30,10 +30,9 @@ function TableBlock({
 
   const className = [
     "table",
-    isFocused ? "focused" : undefined,
-    isHovered ? "hover" : undefined,
-    isDragging ? "dragging" : undefined,
-    isPressed ? "pressed" : undefined,
+    // isFocused ? "focused" : undefined,
+    // isDragging ? "dragging" : undefined,
+    // isPressed ? "pressed" : undefined,
   ].filter(Boolean);
 
   return (

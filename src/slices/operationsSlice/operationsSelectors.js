@@ -152,3 +152,17 @@ export const selectParentOperation = createSelector(
     return null;
   }
 );
+
+export const selectOperationChildrenData = createSelector(
+  (state) => state.operations.data,
+  (_, operationId) => operationId,
+  (data, operationId) => {
+    const operation = data[operationId];
+    if (!operation || !operation.children) return [];
+
+    return operation.children.map((childId) => ({
+      id: childId,
+      operationType: data[childId]?.operationType,
+    }));
+  }
+);

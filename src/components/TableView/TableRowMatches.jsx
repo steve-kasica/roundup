@@ -48,6 +48,7 @@ const TableRowMatches = ({
   table,
   columnCount,
   activeColumnIds,
+  // Props passed directyly from parent component
   tablePosition, // "left" or "right"
   matches,
   operationRowCount,

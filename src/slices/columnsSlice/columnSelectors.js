@@ -1,23 +1,58 @@
+import { group } from "d3";
 import { createSelector } from "reselect";
+import { selectOperation } from "../operationsSlice";
 
 /**
  * Selects all column IDs for a specific table.
- *
- * @param {Object} state - The Redux state.
- * @param {string} tableId - The ID of the table.
- * @returns {Array<string>} - An array of column IDs for the table.
  */
-export function selectColumnIdsByTableId(state, tableId) {
-  // Check if the tableId exists in the state
-  if (!state.columns.idsByTable[tableId]) {
-    // If not, return an empty array
-    return [];
+export const selectColumnIdsByTableId = createSelector(
+  [(state) => state.columns.idsByTable, (_, tableId) => tableId],
+  (idsByTable, tableId) => idsByTable[tableId] || []
+);
+
+/**
+ * Selects column data objects for a specific table.
+ * Only recomputes when the actual column data changes, not other columns slice properties.
+ */
+const selectColumnDataByTableId = createSelector(
+  [
+    (state) => state.columns.data,
+    (state, tableId) => selectColumnIdsByTableId(state, tableId),
+  ],
+  (allColumnsData, columnIds) => {
+    return columnIds.map((id) => allColumnsData[id]);
   }
-  // If it exists, return the array of column IDs for that table
-  // This is a fallback to ensure that we always return an array
-  // even if the tableId is not found in the state
-  return state.columns.idsByTable[tableId];
-}
+);
+
+export const selectActiveColumnIdsByTableId = createSelector(
+  [selectColumnDataByTableId],
+  (columns) => {
+    return columns
+      .filter((column) => column && !column.isExcluded)
+      .map((column) => column.id);
+  }
+);
+
+export const selectSelectedColumnIdsByTableId = createSelector(
+  [
+    (state, tableId) => selectColumnIdsByTableId(state, tableId),
+    (state) => state.columns.selected,
+  ],
+  (columnIds, selected) => {
+    const selectedSet = new Set(selected);
+    return columnIds.filter((colId) => selectedSet.has(colId));
+  }
+);
+
+export const selectSelectedColumnDBNamesByTableId = createSelector(
+  [selectColumnDataByTableId, (state) => state.columns.selected],
+  (columns, selected) => {
+    const selectedSet = new Set(selected);
+    return columns
+      .filter((column) => column && selectedSet.has(column.id))
+      .map((column) => column.columnName);
+  }
+);
 
 /**
  * Selects a specific column by its ID.
@@ -37,9 +72,16 @@ export const selectColumnById = createSelector(
  * @param {Object} state - The Redux state.
  * @returns {Array<string>} - An array of column IDs that are currently selected.
  */
-export const selectSelectedColumns = createSelector(
+export const selectSelectedColumnIds = createSelector(
   [(state) => state.columns.selected],
   (selected) => selected
+);
+
+export const selectSelectedColumns = createSelector(
+  [selectSelectedColumnIds, (state) => state.columns.data],
+  (selectedIds, data) => {
+    return selectedIds.map((id) => data[id]);
+  }
 );
 
 /**
@@ -182,3 +224,21 @@ export const selectIsColumnHoverTarget = createSelector(
  * @returns {Array<string>} - An array of column IDs that are hover targets.
  */
 export const selectHoverTargets = (state) => state.columns.hoverTargets;
+
+export const selectColumnIdMatrixByOperationId = createSelector(
+  [
+    (state, operationId) => selectOperation(state, operationId).children,
+    (state) => state.columns.idsByTable,
+  ],
+  (children, idsByTable) => {
+    const matrix = children.map((childId) => idsByTable[childId] || []);
+    const maxLength = Math.max(...matrix.map((row) => row.length), 0);
+    const backfilledMatrix = matrix.map((row) => {
+      if (row.length < maxLength) {
+        return [...row, ...Array(maxLength - row.length).fill(null)];
+      }
+      return row;
+    });
+    return backfilledMatrix;
+  }
+);

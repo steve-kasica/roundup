@@ -12,20 +12,23 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectMaxOperationDepth,
-  selectRootOperation,
 } from "../../slices/operationsSlice";
 
 import TableDropTarget from "./TableDropTarget";
 import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
-import OperationView from "./OperationView";
+import { EnhancedStackOperationBlock } from "../StackOperationView/StackOperationBlock";
+import { EnhancedPackOperationBlock } from "../PackOperationView/PackOperationBlock";
+import { EnhancedTableBlock } from "../TableView";
 
 const gridColumns = 12;
 const gridWidth = gridColumns - 2;
 
 export default function CompositeTableSchema() {
-  const rootOperationId = useSelector(selectRootOperation);
+  const root = useSelector(
+    (state) => state.operations.data[state.operations.root]
+  );
   const maxOperationDepth = useSelector(selectMaxOperationDepth);
 
   return (
@@ -33,7 +36,13 @@ export default function CompositeTableSchema() {
       {maxOperationDepth >= 0 ? (
         <Grid container spacing={0}>
           <Grid size={gridWidth}>
-            <OperationView id={rootOperationId} />
+            {root.operationType === OPERATION_TYPE_STACK ? (
+              <EnhancedStackOperationBlock id={root.id} />
+            ) : root.operationType === OPERATION_TYPE_PACK ? (
+              <EnhancedPackOperationBlock id={root.id} />
+            ) : root.operationType === OPERATION_TYPE_NO_OP ? (
+              <EnhancedTableBlock id={root.children[0]} />
+            ) : null}
           </Grid>
           <Grid size={gridColumns - gridWidth}>
             <TableDropTarget operationType={OPERATION_TYPE_PACK}>

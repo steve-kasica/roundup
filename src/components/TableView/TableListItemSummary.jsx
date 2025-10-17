@@ -25,11 +25,11 @@ import { useSelector } from "react-redux";
 function TableListItemSummary({
   table,
   activeColumnIds,
-  removedColumnIds = [],
   parentOperation,
+  isInSchema,
+  // Props passed directly from parent component
   isDisabled = false,
   isSelected = false,
-  isInSchema = false,
   searchString,
   onHover,
   onUnhover,
@@ -45,10 +45,7 @@ function TableListItemSummary({
   // TODO: should this be in the HOC?
   const selectedTableIds = useSelector((state) => state.tables.selected || []);
 
-  const columnCount = useMemo(() => {
-    return activeColumnIds.length - removedColumnIds.length;
-  }, [activeColumnIds.length, removedColumnIds.length]);
-
+  const columnCount = activeColumnIds.length;
   // Helper functions for styling based on state
   const getBackgroundColor = () => {
     if (isSelected && isInSchema) {

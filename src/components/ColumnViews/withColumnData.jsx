@@ -6,26 +6,21 @@ import {
   selectColumnIdsByTableId,
   addColumnsToDragging,
   removeColumnsFromDragging,
-  setHoveredColumns,
-  removeFromHoveredColumns,
-  selectHoveredColumns,
   selectLoadingColumns,
-  selectSelectedColumns,
   setFocusedColumns,
   selectDraggingColumns,
   selectDropTargets,
   selectHoverTargets,
+  selectSelectedColumnIds,
 } from "../../slices/columnsSlice";
+import { setHoveredColumn } from "../../slices/uiSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
-import { selectFirstSelectedColumn } from "../../slices/uiSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperation } from "../../slices/operationsSlice";
 import { createColumnsRequest } from "../../sagas/createColumnsSaga/actions";
-import {
-  CREATION_MODE_INITIALIZATION,
-  CREATION_MODE_INSERTION,
-} from "../../sagas/createColumnsSaga";
+import { CREATION_MODE_INSERTION } from "../../sagas/createColumnsSaga";
+import { useCallback } from "react";
 
 export default function withColumnData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
@@ -34,12 +29,8 @@ export default function withColumnData(WrappedComponent) {
     let column = useSelector((state) =>
       !isNull ? selectColumnById(state, id) : null
     );
-    const tableColumnIds = useSelector((state) =>
-      column !== null ? selectColumnIdsByTableId(state, column.tableId) : []
-    );
-    const firstSelectedColumnId = useSelector(selectFirstSelectedColumn);
-    const selectedColumns = useSelector(selectSelectedColumns);
-    const hoveredColumns = useSelector(selectHoveredColumns);
+    const hoveredColumn = useSelector((state) => state.ui.hoveredColumn);
+    const selectedColumns = useSelector(selectSelectedColumnIds);
     const loadingColumns = useSelector(selectLoadingColumns);
     const draggingColumns = useSelector(selectDraggingColumns);
     const dropTargetColumns = useSelector(selectDropTargets);
@@ -59,9 +50,9 @@ export default function withColumnData(WrappedComponent) {
     );
 
     // Column interaction state properties
-    const isSelected = column && column.isSelected;
+    const isSelected = selectedColumns.includes(id);
     const isLoading = !isNull && loadingColumns.includes(id);
-    const isHovered = !isNull && hoveredColumns.includes(id);
+    const isHovered = !isNull && hoveredColumn === id;
     const isDragging = !isNull && draggingColumns.includes(id);
     const isDropTarget = !isNull && dropTargetColumns.includes(id);
     const isOver = !isNull && hoverTargetColumns.includes(id);
@@ -81,6 +72,10 @@ export default function withColumnData(WrappedComponent) {
     const uniqueCount = Object.keys(column?.values || {}).length;
     const duplicateCount = isNull ? 0 : column.count - nullCount - uniqueCount;
     const completeCount = isNull ? 0 : column.count - nullCount;
+
+    const hoverColumn = useCallback(() => {
+      dispatch(setHoveredColumn(id));
+    }, [dispatch, id]);
 
     return (
       <WrappedComponent
@@ -117,7 +112,6 @@ export default function withColumnData(WrappedComponent) {
         error={error}
         // Actions handlers
         hoverColumn={hoverColumn}
-        unHoverColumn={unHoverColumn} // Deprecated
         unhoverColumn={unHoverColumn}
         renameColumn={(name) => {
           if (!isNull)
@@ -222,16 +216,11 @@ export default function withColumnData(WrappedComponent) {
       );
     }
 
-    function hoverColumn() {
-      if (!isNull) {
-        dispatch(setHoveredColumns(id));
-      }
-    }
-
     function unHoverColumn() {
-      if (!isNull) {
-        dispatch(removeFromHoveredColumns(id));
-      }
+      // TODO: is this necessary?
+      // if (!isNull) {
+      //   dispatch(removeFromHoveredColumns(id));
+      // }
     }
   };
 }

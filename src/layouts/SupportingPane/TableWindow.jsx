@@ -1,13 +1,4 @@
-import {
-  Box,
-  Divider,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-  FormControlLabel,
-  Checkbox,
-} from "@mui/material";
+import { Box, Divider, Stack, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
   EnhancedTableLabel,
@@ -18,8 +9,6 @@ import {
   selectColumnById,
   selectSelectedColumns,
 } from "../../slices/columnsSlice";
-import { group } from "d3";
-import { useState } from "react";
 import {
   isOperationId,
   OPERATION_TYPE_PACK,
@@ -30,12 +19,7 @@ import {
 import { EnhancedPackVirtualTable } from "../../components/PackOperationView";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../components/OperationView";
-import { use } from "react";
-
-// const TOGGLE_VALUES = {
-//   LOW: "Low",
-//   HIGH: "High",
-// };
+import { useMemo } from "react";
 
 const TableWindow = () => {
   const focusedOperation = useSelector((state) => {
@@ -43,43 +27,25 @@ const TableWindow = () => {
     return opId ? selectOperation(state, opId) : null;
   });
 
-  // TODO: are these selected or focused columns?
-  // Maybe selected should me, not excluded and focus should mean
-  // selected???
-  const selectedColumnIds = useSelector(selectSelectedColumns);
-  // Group selected columns by their tableId
-  const selectedTableIds = useSelector((state) => {
-    const columns = selectedColumnIds.map((columnId) =>
-      selectColumnById(state, columnId)
-    );
-    return Array.from(
-      group(columns, (c) => c.tableId),
-      ([tableId, columns]) => ({
-        tableId,
-        columnIds: columns.map((c) => c.id),
-      })
-    );
-  });
+  // Select the whole column objects for all selected columns
+  const selectedColumns = useSelector(selectSelectedColumns);
+
+  const selectedTableIds = useMemo(() => {
+    return Array.from(new Set(selectedColumns.map(({ tableId }) => tableId)));
+  }, [selectedColumns]);
 
   if (selectedTableIds.length > 1) {
     alert("Error: multiple tables selected! This is not yet supported.");
   }
 
   const viewMode = useSelector((state) => {
-    const selectedColumns = state.columns.selected.map((id) =>
-      selectColumnById(state, id)
-    );
-    const tableIds = Array.from(
-      new Set(selectedColumns.map((column) => column?.tableId))
-    );
-
-    if (tableIds.length === 0) {
+    if (selectedTableIds.length === 0) {
       return "UNKNOWN";
     }
-    if (tableIds.length > 1) {
+    if (selectedTableIds.length > 1) {
       return "UNKNOWN"; // multiple tables selected, not supported
     }
-    const tableId = tableIds[0];
+    const tableId = selectedTableIds[0];
     if (isTableId(tableId)) {
       return "TABLE";
     } else if (
@@ -129,9 +95,9 @@ const TableWindow = () => {
                 No Table Selected
               </Typography>
             ) : viewMode === "TABLE" ? (
-              <EnhancedTableLabel id={selectedTableIds[0].tableId} />
+              <EnhancedTableLabel id={selectedTableIds[0]} />
             ) : viewMode === "STACK" || viewMode === "PACK" ? (
-              <EnhancedOperationLabel id={selectedTableIds[0].tableId} />
+              <EnhancedOperationLabel id={selectedTableIds[0]} />
             ) : (
               <Typography
                 variant="h6"
@@ -157,11 +123,11 @@ const TableWindow = () => {
             No columns selected. Please select columns from the schema window.
           </Typography>
         ) : viewMode === "TABLE" ? (
-          <EnhancedTableRows id={selectedTableIds[0].tableId} />
+          <EnhancedTableRows id={selectedTableIds[0]} />
         ) : viewMode === "STACK" ? (
-          <StackVirtualizedTable id={selectedTableIds[0].tableId} />
+          <StackVirtualizedTable id={selectedTableIds[0]} />
         ) : viewMode === "PACK" ? (
-          <EnhancedPackVirtualTable id={selectedTableIds[0].tableId} />
+          <EnhancedPackVirtualTable id={selectedTableIds[0]} />
         ) : (
           <Typography variant="h6" align="center" sx={{ mt: 2 }}>
             Error: unsupported state!
