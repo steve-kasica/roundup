@@ -13,6 +13,7 @@ import {
   excludeColumnFromTable,
   selectSelectedColumnIds,
   selectSelectedColumns,
+  setFocusedColumnIds,
   setSelectedColumnIds,
 } from "../../slices/columnsSlice";
 import { useCallback } from "react";
@@ -28,23 +29,18 @@ const SchemaToolbar = ({
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
   const areAllColumnsSelected =
     columnIds.length > 0 && selectedColumnIds.length === columnIds.length;
-  //   const handleToggleDrag = useCallback(() => {}, []);
-
-  // //   const [canDragColumns, setCanDragColumns] = useState(false);
 
   const handleSelectAll = useCallback(() => {
     dispatch(setSelectedColumnIds(columnIds));
   }, [dispatch, columnIds]);
 
-  // //   const handleFocusColumns = useCallback(() => {}, []);
-
   const handleExcludeSelected = useCallback(() => {
     dispatch(excludeColumnFromTable(selectedColumnIds));
   }, [dispatch, selectedColumnIds]);
 
-  //   const handleExcludeSelected = useCallback(() => {
-  //     // selectColumns([], selectedTableColumnIds);
-  //   }, [selectColumns]);
+  const handleFocusSelected = useCallback(() => {
+    dispatch(setFocusedColumnIds(selectedColumnIds));
+  }, [dispatch, selectedColumnIds]);
 
   const handleClearSelection = useCallback(() => {
     dispatch(setSelectedColumnIds([]));
@@ -113,12 +109,8 @@ const SchemaToolbar = ({
         {/* Focus Selected Columns (max 2 for comparison) */}
         <IconButton
           size="small"
-          //   onClick={handleFocusSelected}
-          disabled={
-            false
-            // selectedTableColumnIds.length === 0 ||
-            // selectedTableColumnIds.length > 1
-          }
+          onClick={handleFocusSelected}
+          disabled={selectedColumnIds.length === 0}
           title="Focus on selected columns (1-2 columns only)"
           color="primary"
         >

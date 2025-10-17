@@ -50,7 +50,7 @@ import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
   dropColumns,
-  setFocusedColumns,
+  setFocusedColumnIds,
   setColumnType,
 } from "../../slices/columnsSlice"; // TODO: this should be in an HOC
 import {
@@ -113,7 +113,7 @@ const TableSchema = ({
    */
   const handleFocusSelected = useCallback(() => {
     if (selectedColumnIds.length > 0 && selectedColumnIds.length <= 2) {
-      dispatch(setFocusedColumns(selectedColumnIds));
+      dispatch(setFocusedColumnIds(selectedColumnIds));
     }
   }, [dispatch, selectedColumnIds]);
 
@@ -206,7 +206,7 @@ const TableSchema = ({
   const handleColumnDoubleClick = useCallback(
     (event, columnId) => {
       // Double-click: Focus on the column (same as focus button action)
-      dispatch(setFocusedColumns([columnId]));
+      dispatch(setFocusedColumnIds([columnId]));
     },
     [dispatch]
   );

@@ -1,15 +1,15 @@
-import { useSelector, useDispatch } from "react-redux";
+/* eslint-disable react/prop-types */
+import { useDispatch } from "react-redux";
 import { SingleColumn } from "../../components/ColumnViews";
 import { clearFocusedColumns } from "../../slices/columnsSlice";
 import { Typography, IconButton, Box } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import ColumnIndexDetails from "../../components/ColumnIndexDetails";
 
-const RightSidebar = () => {
+const RightSidebar = ({ columnIds }) => {
   const dispatch = useDispatch();
-  const focusedColumns = useSelector((state) => state.columns.focused);
-  const isSingleColumn = focusedColumns && focusedColumns.length === 1;
-  const isMultipleColumnsInStack = focusedColumns && focusedColumns.length > 1;
+  const isSingleColumn = columnIds && columnIds.length === 1;
+  const isMultipleColumnsInStack = columnIds && columnIds.length > 1;
 
   const handleClose = () => {
     dispatch(clearFocusedColumns());
@@ -39,10 +39,8 @@ const RightSidebar = () => {
           <CloseIcon fontSize="small" />
         </IconButton>
       </Box>
-      {isSingleColumn && <SingleColumn id={focusedColumns[0]} />}
-      {isMultipleColumnsInStack && (
-        <ColumnIndexDetails columnIds={focusedColumns} />
-      )}
+      {isSingleColumn && <SingleColumn id={columnIds[0]} />}
+      {isMultipleColumnsInStack && <ColumnIndexDetails columnIds={columnIds} />}
     </>
   );
 };

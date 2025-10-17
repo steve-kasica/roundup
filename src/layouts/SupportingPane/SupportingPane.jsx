@@ -22,6 +22,7 @@ import {
   selectOperation,
   selectRootOperation,
 } from "../../slices/operationsSlice";
+import { selectFocusedColumnIds } from "../../slices/columnsSlice";
 // Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -45,7 +46,7 @@ export default function SupportingPane() {
     const id = selectRootOperation(state);
     return id ? selectOperation(state, id) : null;
   });
-  const focusedColumns = useSelector((state) => state.columns.focused);
+  const focusedColumns = useSelector(selectFocusedColumnIds);
   const isOpen = tables.length > 0;
 
   return (
@@ -146,12 +147,12 @@ export default function SupportingPane() {
                 <Panel
                   order={3}
                   collapsible={true}
-                  collapsed={!(focusedColumns && focusedColumns.length)}
+                  collapsed={!(focusedColumns && focusedColumns.length > 0)}
                   maxSize={50}
                   defaultSize={25}
                   style={{ padding: "5px" }}
                 >
-                  <ColumnWindow />
+                  <ColumnWindow columnIds={focusedColumns} />
                 </Panel>
               </>
             )}

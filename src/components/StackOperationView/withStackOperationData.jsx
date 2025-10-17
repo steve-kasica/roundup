@@ -8,7 +8,7 @@ import {
   selectColumnIdsByTableId,
   selectSelectedColumnDBNamesByTableId,
   selectSelectedColumnIdsByTableId,
-  setFocusedColumns,
+  setFocusedColumnIds,
 } from "../../slices/columnsSlice";
 import {
   selectOperation,
@@ -158,7 +158,7 @@ export default function withStackOperationData(WrappedComponent) {
             })
           );
         }}
-        focusColumns={(colIds) => dispatch(setFocusedColumns(colIds))}
+        focusColumns={(colIds) => dispatch(setFocusedColumnIds(colIds))}
         setOperationType={(operationType) =>
           dispatch(
             updateOperationsRequest({

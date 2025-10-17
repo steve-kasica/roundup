@@ -245,3 +245,5 @@ export const selectColumnIdMatrixByOperationId = createSelector(
     return backfilledMatrix;
   }
 );
+
+export const selectFocusedColumnIds = (state) => state.columns.focused;

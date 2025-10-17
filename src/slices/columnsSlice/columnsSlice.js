@@ -420,10 +420,11 @@ const columnsSlice = createSlice({
      * @param {Object} state - The current state
      * @param {Object} action - The action containing the column ID(s) to focus
      */
-    setFocusedColumns(state, action) {
+    setFocusedColumnIds(state, action) {
       const columnIds = Array.isArray(action.payload)
         ? action.payload
         : [action.payload];
+
       state.focused = columnIds;
     },
 
@@ -472,6 +473,6 @@ export const {
   removeColumnsFromDropped,
 
   // Focused column
-  setFocusedColumns,
+  setFocusedColumnIds,
   clearFocusedColumns,
 } = columnsSlice.actions;

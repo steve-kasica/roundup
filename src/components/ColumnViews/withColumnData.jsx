@@ -7,7 +7,7 @@ import {
   addColumnsToDragging,
   removeColumnsFromDragging,
   selectLoadingColumns,
-  setFocusedColumns,
+  setFocusedColumnIds,
   selectDraggingColumns,
   selectDropTargets,
   selectHoverTargets,
@@ -142,7 +142,7 @@ export default function withColumnData(WrappedComponent) {
         }}
         focusColumn={() => {
           if (!isNull) {
-            dispatch(setFocusedColumns(id));
+            dispatch(setFocusedColumnIds(id));
           }
         }}
         unselectColumn={() => {
