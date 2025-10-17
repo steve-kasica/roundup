@@ -63,7 +63,6 @@ const TableSchema = ({
 }) => {
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
-  const [canDragColumns, setCanDragColumns] = useState(false);
 
   /**
    * Closes the column type dropdown menu
@@ -230,10 +229,9 @@ const TableSchema = ({
             <ColumnDragContainer
               id={columnId}
               columnIndex={i}
-              canDrag={canDragColumns}
+              canDrag={selectedColumnIds.includes(columnId)}
               onDrop={(draggedItem, targetItem) => {
                 swapColumns(targetItem.id, draggedItem.id);
-                setCanDragColumns(false);
               }}
             >
               {/* Interactive Column Summary Card */}
@@ -243,7 +241,7 @@ const TableSchema = ({
                 onDoubleClick={(event) =>
                   handleColumnDoubleClick(event, columnId)
                 }
-                isDraggable={canDragColumns}
+                isDraggable={selectedColumnIds.includes(columnId)}
               />
             </ColumnDragContainer>
           </Box>

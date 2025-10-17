@@ -2,7 +2,6 @@
 import {
   ArrowDropDown,
   ClearAll,
-  PanTool as DragIcon,
   Delete as ExcludeIcon,
   SelectAll,
   Visibility,
@@ -12,12 +11,10 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   excludeColumnFromTable,
   selectSelectedColumnIds,
-  selectSelectedColumns,
   setFocusedColumnIds,
   setSelectedColumnIds,
 } from "../../slices/columnsSlice";
 import { useCallback } from "react";
-import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 
 const SchemaToolbar = ({
   columnIds,
@@ -76,26 +73,6 @@ const SchemaToolbar = ({
 
       {/* Action Buttons Section - Bulk operations for selected columns */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        {/* Toggle Drag Mode */}
-        <IconButton
-          size="small"
-          //   onClick={handleToggleDrag}
-          //   title={
-          //     canDragColumns
-          //       ? "Disable column dragging"
-          //       : "Enable column dragging"
-          //   }
-          //   color={canDragColumns ? "primary" : "default"}
-          //   sx={{
-          //     backgroundColor: canDragColumns ? "primary.light" : "transparent",
-          //     "&:hover": {
-          //       backgroundColor: canDragColumns ? "primary.main" : "action.hover",
-          //     },
-          //   }}
-        >
-          <DragIcon fontSize="small" />
-        </IconButton>
-
         {/* Select All Columns */}
         <IconButton
           size="small"
@@ -118,14 +95,15 @@ const SchemaToolbar = ({
         </IconButton>
 
         {/* Change Column Type Dropdown */}
-        <IconButton
+        {/* TODO when addressing column types */}
+        {/* <IconButton
           size="small"
           // onClick={handleColumnTypeMenuOpen}
           //   disabled={selectedTableColumnIds.length === 0}
           title="Change column type"
         >
           <ArrowDropDown fontSize="small" />
-        </IconButton>
+        </IconButton> */}
 
         {/* Exclude Selected Columns */}
         <IconButton

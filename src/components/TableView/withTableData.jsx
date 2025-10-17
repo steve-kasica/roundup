@@ -153,10 +153,10 @@ export default function withTableData(WrappedComponent) {
           depth={depth}
           columnIds={columnIds}
           activeColumnIds={activeColumnIds}
+          selectedColumnIds={selectedColumnIds}
           initialColumnCount={initialColumnCount}
           columnCount={columnCount}
           removedColumnCount={removedColumnCount}
-          selectedColumnIds={selectedColumnIds}
           selectedColumnNames={selectedColumnNames} // necessary for DB hooks
           // Interaction handlers
           selectColumns={handleSelectColumns}

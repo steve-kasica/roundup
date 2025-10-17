@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useCallback, useEffect, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
-import { Box, IconButton, Toolbar, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import {
   getValuesInRange,
   getIndexOfValue,
@@ -9,13 +9,6 @@ import {
 import { EnhancedTableLabel } from "../TableView";
 import { EnhancedColumnSummary, StyledColumnCard } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
-import {
-  ArrowDropDown,
-  ClearAll,
-  SelectAll,
-  Visibility,
-  Delete as ExcludeIcon,
-} from "@mui/icons-material";
 import SchemaToolbar from "../ui/SchemaToolbar";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
@@ -346,6 +339,7 @@ const StackSchemaView = withStackOperationData(
                           key={columnId}
                           id={columnId}
                           columnIndex={colIndex}
+                          canDrag={selectedTableColumnIds.includes(columnId)}
                           onDrop={(draggedItem, targetItem) =>
                             swapColumns(targetItem, draggedItem)
                           }
@@ -356,6 +350,9 @@ const StackSchemaView = withStackOperationData(
                             onDoubleClick={(event) =>
                               onCellDoubleClick(event, columnId)
                             }
+                            isDraggable={selectedTableColumnIds.includes(
+                              columnId
+                            )}
                           />
                         </ColumnDragContainer>
                       );
