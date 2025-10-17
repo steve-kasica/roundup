@@ -28,31 +28,11 @@
 
 /* eslint-disable react/prop-types */
 
-import {
-  Box,
-  Typography,
-  IconButton,
-  Toolbar,
-  Menu,
-  MenuItem,
-} from "@mui/material";
-import {
-  ClearAll,
-  SelectAll,
-  Delete as ExcludeIcon,
-  Visibility,
-  TableChart,
-  ArrowDropDown,
-  PanTool as DragIcon,
-} from "@mui/icons-material";
+import { Box, Typography, Menu, MenuItem } from "@mui/material";
 import withTableData from "./withTableData";
 import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
-import {
-  dropColumns,
-  setFocusedColumnIds,
-  setColumnType,
-} from "../../slices/columnsSlice"; // TODO: this should be in an HOC
+import { setFocusedColumnIds, setColumnType } from "../../slices/columnsSlice"; // TODO: this should be in an HOC
 import {
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_CATEGORICAL,
@@ -60,6 +40,7 @@ import {
 } from "../../slices/columnsSlice/Column";
 import { EnhancedColumnSummary } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
+import SchemaToolbar from "../ui/SchemaToolbar";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -83,47 +64,6 @@ const TableSchema = ({
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
   const [canDragColumns, setCanDragColumns] = useState(false);
-
-  /**
-   * Clears all selected columns
-   */
-  const handleClearSelection = useCallback(() => {
-    selectColumns([], selectedColumnIds);
-  }, [selectColumns, selectedColumnIds]);
-
-  /**
-   * Selects all columns in the table
-   */
-  const handleSelectAll = useCallback(() => {
-    selectColumns(activeColumnIds, []);
-  }, [selectColumns, activeColumnIds]);
-
-  /**
-   * Excludes the currently selected columns and clears the selection
-   */
-  const handleExcludeSelected = useCallback(() => {
-    if (selectedColumnIds.length > 0) {
-      dispatch(dropColumns(selectedColumnIds));
-      selectColumns([], selectedColumnIds); // Unselect all these columns
-    }
-  }, [dispatch, selectedColumnIds]);
-
-  /**
-   * Sets focus on selected columns for detailed view (limited to 1-2 columns)
-   */
-  const handleFocusSelected = useCallback(() => {
-    if (selectedColumnIds.length > 0 && selectedColumnIds.length <= 2) {
-      dispatch(setFocusedColumnIds(selectedColumnIds));
-    }
-  }, [dispatch, selectedColumnIds]);
-
-  /**
-   * Opens the column type dropdown menu
-   * @param {Event} event - Click event from the dropdown button
-   */
-  const handleColumnTypeMenuOpen = useCallback((event) => {
-    setColumnTypeMenuAnchor(event.currentTarget);
-  }, []);
 
   /**
    * Closes the column type dropdown menu
@@ -211,122 +151,15 @@ const TableSchema = ({
     [dispatch]
   );
 
-  /**
-   * Toggles the drag functionality for columns
-   */
-  const handleToggleDrag = useCallback(() => {
-    setCanDragColumns((prev) => !prev);
-    handleClearSelection();
-  }, [handleClearSelection]);
-
   return (
     <Box display="flex" flexDirection="column" height="100%">
       {/* Toolbar with table info and action buttons */}
-      <Toolbar
-        variant="dense"
-        sx={{
-          minHeight: 48,
-          px: 1,
-          borderBottom: 1,
-          borderColor: "divider",
-          justifyContent: "space-between",
-          gap: 1,
-        }}
-      >
-        {/* Table Information Section - Shows table name and dimensions */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <TableChart fontSize="small" color="action" />
-          <Typography
-            variant="subtitle2"
-            fontWeight="bold"
-            color="text.primary"
-          >
-            {table.name}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {activeColumnIds.length} x {table.rowCount?.toLocaleString() || 0}
-          </Typography>
-        </Box>
-
-        {/* Action Buttons Section - Bulk operations for selected columns */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          {/* Toggle Drag Mode */}
-          <IconButton
-            size="small"
-            onClick={handleToggleDrag}
-            title={
-              canDragColumns
-                ? "Disable column dragging"
-                : "Enable column dragging"
-            }
-            color={canDragColumns ? "primary" : "default"}
-            sx={{
-              backgroundColor: canDragColumns ? "primary.light" : "transparent",
-              "&:hover": {
-                backgroundColor: canDragColumns
-                  ? "primary.main"
-                  : "action.hover",
-              },
-            }}
-          >
-            <DragIcon fontSize="small" />
-          </IconButton>
-
-          {/* Select All Columns */}
-          <IconButton
-            size="small"
-            onClick={handleSelectAll}
-            disabled={selectedColumnIds.length === columnCount}
-            title="Select all columns"
-          >
-            <SelectAll fontSize="small" />
-          </IconButton>
-
-          {/* Focus Selected Columns (max 2 for comparison) */}
-          <IconButton
-            size="small"
-            onClick={handleFocusSelected}
-            disabled={
-              selectedColumnIds.length === 0 || selectedColumnIds.length > 1
-            }
-            title="Focus on selected columns (1-2 columns only)"
-            color="primary"
-          >
-            <Visibility fontSize="small" />
-          </IconButton>
-
-          {/* Change Column Type Dropdown */}
-          <IconButton
-            size="small"
-            onClick={handleColumnTypeMenuOpen}
-            disabled={selectedColumnIds.length === 0}
-            title="Change column type"
-          >
-            <ArrowDropDown fontSize="small" />
-          </IconButton>
-
-          {/* Exclude Selected Columns */}
-          <IconButton
-            size="small"
-            onClick={handleExcludeSelected}
-            disabled={selectedColumnIds.length === 0}
-            title="Exclude selected columns"
-            color="error"
-          >
-            <ExcludeIcon fontSize="small" />
-          </IconButton>
-
-          {/* Clear Selection */}
-          <IconButton
-            size="small"
-            onClick={handleClearSelection}
-            disabled={selectedColumnIds.length === 0}
-            title="Clear selection"
-          >
-            <ClearAll fontSize="small" />
-          </IconButton>
-        </Box>
-      </Toolbar>
+      <SchemaToolbar
+        columnIds={activeColumnIds}
+        columnCount={columnCount}
+        rowCount={table.rowCount}
+        name={table.name}
+      />
 
       {/* Column Type Change Menu */}
       <Menu
