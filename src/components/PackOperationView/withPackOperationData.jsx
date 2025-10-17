@@ -5,6 +5,7 @@ import withOperationData from "../HOC/withOperationData";
 import { useCallback, useMemo } from "react";
 import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
 import {
+  selectActiveColumnIdsByTableId,
   selectColumnById,
   selectSelectedColumnIds,
   selectSelectedColumnIdsByTableId,
@@ -30,17 +31,12 @@ export default function withPackOperationData(WrappedComponent) {
       )
     );
 
-    const activeColumnIds = useMemo(
-      () => columns.filter(({ isExcluded }) => !isExcluded).map(({ id }) => id),
-      [columns]
+    const activeColumnIds = useSelector((state) =>
+      selectActiveColumnIdsByTableId(state, id)
     );
 
-    const selectedColumnIds = useMemo(
-      () =>
-        columns
-          .filter(({ isExcluded, isSelected }) => isSelected && !isExcluded)
-          .map(({ id }) => id),
-      [columns]
+    const selectedColumnIds = useSelector((state) =>
+      selectSelectedColumnIdsByTableId(state, id)
     );
 
     const [leftKeyColumnName, rightKeyColumnName] = useSelector((state) => {

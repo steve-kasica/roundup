@@ -16,6 +16,7 @@ import {
   Visibility,
   Delete as ExcludeIcon,
 } from "@mui/icons-material";
+import SchemaToolbar from "../ui/SchemaToolbar";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -156,142 +157,14 @@ const StackSchemaView = withStackOperationData(
       [selectionAnchorCell, selectColumns, activeColumnIds, columnIdMatrix]
     );
 
-    const handleToggleDrag = useCallback(() => {}, []);
-
-    const [canDragColumns, setCanDragColumns] = useState(false);
-
-    const handleSelectAll = useCallback(() => {
-      // selectColumns(activeColumnIds, []);
-    }, [activeColumnIds, selectColumns]);
-
-    const handleFocusColumns = useCallback(() => {}, []);
-
-    const handleFocusSelected = useCallback(() => {
-      // focusColumns(selectedTableColumnIds);
-    }, [focusColumns]);
-
-    const handleExcludeSelected = useCallback(() => {
-      // selectColumns([], selectedTableColumnIds);
-    }, [selectColumns]);
-
-    const handleClearSelection = useCallback(() => {
-      // selectColumns([], selectedTableColumnIds);
-      setSelectionAnchorCell(null);
-    }, [selectColumns]);
-
     return (
       <Box display={"flex"} flexDirection="column" height="100%">
-        <Toolbar
-          variant="dense"
-          sx={{
-            minHeight: 48,
-            px: 1,
-            borderBottom: 1,
-            borderColor: "divider",
-            justifyContent: "space-between",
-            gap: 1,
-          }}
-        >
-          {/* Stack Schema Information Section - Shows name and dimensions */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {/* <TableChart fontSize="small" color="action" /> */}
-            <Typography
-              variant="subtitle2"
-              fontWeight="bold"
-              color="text.primary"
-            >
-              {operation.name}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {activeColumnIds.length} x{" "}
-              {operation.rowCount?.toLocaleString() || 0}
-            </Typography>
-          </Box>
-
-          {/* Action Buttons Section - Bulk operations for selected columns */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {/* Toggle Drag Mode */}
-            <IconButton
-              size="small"
-              onClick={handleToggleDrag}
-              title={
-                canDragColumns
-                  ? "Disable column dragging"
-                  : "Enable column dragging"
-              }
-              color={canDragColumns ? "primary" : "default"}
-              sx={{
-                backgroundColor: canDragColumns
-                  ? "primary.light"
-                  : "transparent",
-                "&:hover": {
-                  backgroundColor: canDragColumns
-                    ? "primary.main"
-                    : "action.hover",
-                },
-              }}
-            >
-              {/* <DragIcon fontSize="small" /> */}
-            </IconButton>
-
-            {/* Select All Columns */}
-            <IconButton
-              size="small"
-              onClick={handleSelectAll}
-              disabled={
-                selectedTableColumnIds.length === columnIdMatrix.flat().length
-              }
-              title="Select all columns"
-            >
-              <SelectAll fontSize="small" />
-            </IconButton>
-
-            {/* Focus Selected Columns (max 2 for comparison) */}
-            <IconButton
-              size="small"
-              onClick={handleFocusSelected}
-              disabled={
-                selectedTableColumnIds.length === 0 ||
-                selectedTableColumnIds.length > 1
-              }
-              title="Focus on selected columns (1-2 columns only)"
-              color="primary"
-            >
-              <Visibility fontSize="small" />
-            </IconButton>
-
-            {/* Change Column Type Dropdown */}
-            <IconButton
-              size="small"
-              // onClick={handleColumnTypeMenuOpen}
-              disabled={selectedTableColumnIds.length === 0}
-              title="Change column type"
-            >
-              <ArrowDropDown fontSize="small" />
-            </IconButton>
-
-            {/* Exclude Selected Columns */}
-            <IconButton
-              size="small"
-              onClick={handleExcludeSelected}
-              disabled={selectedTableColumnIds.length === 0}
-              title="Exclude selected columns"
-              color="error"
-            >
-              <ExcludeIcon fontSize="small" />
-            </IconButton>
-
-            {/* Clear Selection */}
-            <IconButton
-              size="small"
-              onClick={handleClearSelection}
-              disabled={selectedTableColumnIds.length === 0}
-              title="Clear selection"
-            >
-              <ClearAll fontSize="small" />
-            </IconButton>
-          </Box>
-        </Toolbar>
+        <SchemaToolbar
+          name={operation.name}
+          rowCount={operation.rowCount}
+          columnCount={activeColumnIds.length}
+          columnIds={columnIdMatrix.flat()}
+        />
         <Box
           sx={{
             display: "flex",

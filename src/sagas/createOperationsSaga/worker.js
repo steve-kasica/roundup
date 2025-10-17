@@ -43,19 +43,16 @@ import {
 } from "../../lib/duckdb";
 import { createOperationsSuccess, createOperationsFailure } from "./actions";
 import Operation from "../../slices/operationsSlice/Operation";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { group } from "d3";
 import {
+  selectActiveColumnIdsByTableId,
   selectColumnById,
   selectColumnIdsByTableId,
 } from "../../slices/columnsSlice";
 
 export const calcPackColumnCount = (state, childIds) => {
   const columnCountTotal = childIds.reduce(
-    (total, id) =>
-      selectColumnIdsByTableId(state, id)
-        .map((columnId) => selectColumnById(state, columnId))
-        .filter(({ isExcluded }) => !isExcluded).length + total,
+    (total, id) => selectActiveColumnIdsByTableId(state, id).length + total,
     0
   );
 

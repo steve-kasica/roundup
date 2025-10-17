@@ -7,6 +7,7 @@ import {
   selectOperation,
 } from "../../slices/operationsSlice";
 import {
+  excludeColumnFromTable,
   selectActiveColumnIdsByTableId,
   selectColumnIdsByTableId,
   selectSelectedColumnDBNamesByTableId,
@@ -104,17 +105,7 @@ export default function withTableData(WrappedComponent) {
       );
 
       const excludeColumns = useCallback(
-        (columnIds) => {
-          dispatch(
-            updateColumnsRequest({
-              columnUpdates: columnIds.map((colId) => ({
-                id: colId,
-                isExcluded: true,
-                isSelected: false, // Excluding also unselects
-              })),
-            })
-          );
-        },
+        (columnIds) => dispatch(excludeColumnFromTable(columnIds)),
         [dispatch]
       );
 

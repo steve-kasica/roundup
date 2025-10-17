@@ -12,6 +12,7 @@ import {
   selectDropTargets,
   selectHoverTargets,
   selectSelectedColumnIds,
+  excludeColumnFromTable,
 } from "../../slices/columnsSlice";
 import { setHoveredColumn } from "../../slices/uiSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
@@ -124,23 +125,9 @@ export default function withColumnData(WrappedComponent) {
           // @Deprecated, use excludeColumn instead
           if (!isNull) dispatch(deleteColumnsRequest(id));
         }}
-        excludeColumn={() => {
-          if (!isNull) {
-            dispatch(
-              updateColumnsRequest({
-                columnUpdates: [{ id, isExcluded: true }],
-              })
-            );
-          }
-        }}
+        excludeColumn={() => dispatch(excludeColumnFromTable(id))}
         includeColumn={() => {
-          if (!isNull) {
-            dispatch(
-              updateColumnsRequest({
-                columnUpdates: [{ id, isExcluded: false }],
-              })
-            );
-          }
+          // TODO
         }}
         addColumnToSelection={() => {
           // TODO

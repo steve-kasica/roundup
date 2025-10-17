@@ -12,6 +12,8 @@ import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarg
 import StackSchemaView from "../../components/StackOperationView/StackSchemaView";
 import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
+import SchemaToolbar from "../../components/ui/SchemaToolbar";
+import { Schema } from "@mui/icons-material";
 
 export default function SchemaWindow() {
   const focusedOperationId = useSelector((state) => {
@@ -24,9 +26,25 @@ export default function SchemaWindow() {
   const tables = useSelector(selectAllTablesData);
   const operations = useSelector(selectAllOperationIds);
 
+  const mode = (function () {
+    if (tables.length === 0) {
+      return "NO_TABLES";
+    } else if (operations.length === 0) {
+      return "NO_OPERATIONS";
+    } else if (focusedOperation?.operationType === OPERATION_TYPE_STACK) {
+      return "STACK_OPERATION";
+    } else if (focusedOperation?.operationType === OPERATION_TYPE_PACK) {
+      return "PACK_OPERATION";
+    } else if (focusedOperation?.operationType === OPERATION_TYPE_NO_OP) {
+      return "TABLE_VIEW";
+    } else {
+      return "UNSUPPORTED_OPERATION";
+    }
+  })();
+
   return (
     <>
-      {tables.length === 0 ? (
+      {mode === "NO_TABLES" ? (
         <Box
           sx={{
             width: "100%",
@@ -38,19 +56,19 @@ export default function SchemaWindow() {
         >
           <pre>No tables uploaded</pre>
         </Box>
-      ) : operations.length === 0 ? (
+      ) : mode === "NO_OPERATIONS" ? (
         <Box sx={{ flex: 1, height: "100%" }}>
           <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
             <Typography>Drag to add a source table</Typography>
           </TableDropTarget>
         </Box>
-      ) : focusedOperation?.operationType === OPERATION_TYPE_STACK ? (
+      ) : mode === "STACK_OPERATION" ? (
         <StackSchemaView id={focusedOperation.id} />
-      ) : focusedOperation?.operationType === OPERATION_TYPE_PACK ? (
+      ) : mode === "PACK_OPERATION" ? (
         <Box sx={{ flex: 1, height: "100%", overflow: "hidden" }}>
           <PackSchemaView id={focusedOperation.id} />
         </Box>
-      ) : focusedOperation?.operationType === OPERATION_TYPE_NO_OP ? (
+      ) : mode === "TABLE_VIEW" ? (
         <EnhancedTableSchema id={focusedOperation.children[0]} />
       ) : (
         <Box

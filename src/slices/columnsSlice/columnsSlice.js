@@ -13,12 +13,7 @@
  */
 
 import { createSlice } from "@reduxjs/toolkit";
-import Column, {
-  COLUMN_TYPE_CATEGORICAL,
-  COLUMN_TYPE_NUMERICAL,
-  COLUMN_TYPES,
-  InvalidColumnTypeError,
-} from "./Column";
+import { COLUMN_TYPES, InvalidColumnTypeError } from "./Column";
 
 const initialState = {
   idsByTable: {},
@@ -61,6 +56,30 @@ const columnsSlice = createSlice({
           // Fallback to push if index is not specified or invalid
           state.idsByTable[column.tableId].push(column.id);
         }
+      });
+    },
+
+    setSelectedColumnIds(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      state.selected = ids;
+    },
+
+    excludeColumnFromTable(state, action) {
+      const ids = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      ids.forEach((id) => {
+        const tableId = state.data[id].tableId;
+        // Exclude a column by removing it from idsByTable
+        // Ensure that column data is not deleted
+        state.idsByTable[tableId] = state.idsByTable[tableId].filter(
+          (cid) => cid !== id
+        );
+        // Also make sure that excluded columns are not selected
+        state.selected = state.selected.filter((cid) => cid !== id);
       });
     },
 
@@ -444,6 +463,9 @@ export const {
   setColumnType,
   setValueCounts,
   updateColumnsArray,
+
+  setSelectedColumnIds,
+  excludeColumnFromTable,
 
   // Dropping columns
   addColumnsToDropped,

@@ -125,7 +125,6 @@ export default function Column(
     q50: summary.q50,
     q75: summary.q75,
     std: summary.std,
-    isExcluded: false, // Whether the column is excluded from analysis
     isSelected: false, // Whether the column is selected
     uniqueValues: null, // Unique values in the column, can be null if not computed yet
     totalRows: null, // Total number of rows in the column, can be null if not computed yet

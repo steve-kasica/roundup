@@ -1,13 +1,36 @@
-import { group } from "d3";
 import { createSelector } from "reselect";
 import { selectOperation } from "../operationsSlice";
 
 /**
- * Selects all column IDs for a specific table.
+ * Selects all column IDs for a specific table,
+ * including columns that have been excluded, i.e.
+ * not present in idsByTable.
  */
 export const selectColumnIdsByTableId = createSelector(
+  [(state) => state.columns.data, (_, tableId) => tableId],
+  (data, tableId) =>
+    Object.values(data)
+      .filter((col) => col.tableId === tableId)
+      .map((col) => col.id)
+);
+
+/**
+ * Select column IDs for a specific table that are active (not excluded).
+ */
+export const selectActiveColumnIdsByTableId = createSelector(
   [(state) => state.columns.idsByTable, (_, tableId) => tableId],
   (idsByTable, tableId) => idsByTable[tableId] || []
+);
+
+export const selectSelectedColumnIdsByTableId = createSelector(
+  [
+    (state, tableId) => selectActiveColumnIdsByTableId(state, tableId),
+    (state) => state.columns.selected,
+  ],
+  (activeColumnIds, selected) => {
+    const selectedSet = new Set(selected);
+    return activeColumnIds.filter((colId) => selectedSet.has(colId));
+  }
 );
 
 /**
@@ -21,26 +44,6 @@ const selectColumnDataByTableId = createSelector(
   ],
   (allColumnsData, columnIds) => {
     return columnIds.map((id) => allColumnsData[id]);
-  }
-);
-
-export const selectActiveColumnIdsByTableId = createSelector(
-  [selectColumnDataByTableId],
-  (columns) => {
-    return columns
-      .filter((column) => column && !column.isExcluded)
-      .map((column) => column.id);
-  }
-);
-
-export const selectSelectedColumnIdsByTableId = createSelector(
-  [
-    (state, tableId) => selectColumnIdsByTableId(state, tableId),
-    (state) => state.columns.selected,
-  ],
-  (columnIds, selected) => {
-    const selectedSet = new Set(selected);
-    return columnIds.filter((colId) => selectedSet.has(colId));
   }
 );
 
