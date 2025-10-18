@@ -6,7 +6,7 @@ import withColumnData from "./withColumnData";
 
 const ColumnValues = ({
   column,
-  limit = 10,
+  limit = 20,
   scrollTop = 0,
   onScroll = () => null,
 }) => {
@@ -16,6 +16,7 @@ const ColumnValues = ({
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef(null);
+
   // Reset state when column.id or column.tableId changes
   useEffect(() => {
     setValues([]);
@@ -80,35 +81,46 @@ const ColumnValues = ({
   }, [hasMore, loading, limit, scrollTop, onScroll]);
   return (
     <Box
-      ref={containerRef}
       sx={{
-        padding: "0.5rem",
+        display: "flex",
+        flexDirection: "column",
         border: "1px solid #eee",
         borderRadius: "4px",
         marginBottom: "10px",
-        maxHeight: "100px",
-        overflowY: "auto",
+        height: "100%", // Fixed height to enable scrolling
       }}
     >
-      {values.map((value, i) => (
-        <Typography
-          key={i}
-          component="div"
-          sx={{
-            backgroundColor: i % 2 === 0 ? "#fafafa" : "#f0f0f0",
-            padding: "0.25rem 0.5rem",
-            borderRadius: "2px",
-          }}
-        >
-          {value}
-        </Typography>
-      ))}
-      {error && <Typography color="error">Error: {error}</Typography>}
-      {loading && <Typography>Loading values...</Typography>}
+      <Box
+        ref={containerRef}
+        sx={{
+          padding: "0.5rem",
+          overflowY: "auto",
+          flexGrow: 1,
+          minHeight: 0,
+        }}
+      >
+        {values.map((value, i) => (
+          <Typography
+            key={i}
+            component="div"
+            sx={{
+              padding: "0.25rem 0",
+            }}
+          >
+            {value}
+          </Typography>
+        ))}
+        {error && <Typography color="error">Error: {error}</Typography>}
+        {loading && <Typography>Loading values...</Typography>}
+      </Box>
     </Box>
   );
 };
 
+ColumnValues.displayName = "ColumnValues";
+
 const EnhancedColumnValues = withColumnData(ColumnValues);
 
-export { EnhancedColumnValues as ColumnValues };
+EnhancedColumnValues.displayName = "EnhancedColumnValues";
+
+export { EnhancedColumnValues, ColumnValues };

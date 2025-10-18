@@ -83,7 +83,7 @@ const BarChart = ({
     <div
       className="bar-chart-container"
       style={{
-        height: `${minHeight}px`,
+        height: "100%",
         padding: `${marginTop}px ${marginRight}px ${marginBottom}px ${marginLeft}px`,
         display: "flex",
         flexDirection: "column",
