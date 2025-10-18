@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * TableLayout.jsx
  * -------------------------------
@@ -21,6 +22,11 @@ import {
   COLUMN_TYPE_DATE,
   COLUMN_TYPE_CATEGORICAL,
 } from "../../../slices/columnsSlice";
+import {
+  EnhancedTableDragContainer,
+  TableDragContainer,
+} from "../../TableView/TableDragContainer";
+import { DRAG_TYPE_SOURCE_TABLE_ROW } from "../../CustomDragLayer";
 
 // TODO: move this to SourceColumn Type
 
@@ -78,6 +84,8 @@ export default function TableLayout({
   rowMax,
   columnMax,
   bytesMax,
+  selectedTableIds,
+  setSelectedTableIds,
 }) {
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
@@ -136,14 +144,32 @@ export default function TableLayout({
         </thead>
         <tbody>
           {tableIds.map((id) => (
-            <EnhancedTableRowSummary
+            <EnhancedTableDragContainer
               key={id}
               id={id}
-              searchString={searchString}
-              rowMax={rowMax}
-              columnMax={columnMax}
-              bytesMax={bytesMax}
-            />
+              canDrag={true}
+              dragType={DRAG_TYPE_SOURCE_TABLE_ROW}
+              tableIds={selectedTableIds}
+            >
+              <EnhancedTableRowSummary
+                id={id}
+                searchString={searchString}
+                rowMax={rowMax}
+                columnMax={columnMax}
+                bytesMax={bytesMax}
+                onCheckBoxChange={(event) => {
+                  const isChecked = event.target.checked;
+                  if (isChecked) {
+                    setSelectedTableIds([...selectedTableIds, id]);
+                  } else {
+                    setSelectedTableIds(
+                      selectedTableIds.filter((tableId) => tableId !== id)
+                    );
+                  }
+                }}
+                isSelected={selectedTableIds.includes(id)}
+              />
+            </EnhancedTableDragContainer>
           ))}
         </tbody>
       </table>

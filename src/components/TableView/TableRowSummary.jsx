@@ -126,10 +126,7 @@ function TableRowSummary({
   columnCount,
   removedColumnCount,
   parentOperation,
-  // Props drilled down from withTableData
-  rowMax,
-  columnMax,
-  bytesMax,
+
   // depth,
   // parentOperation,
   // functions to dispatch actions
@@ -140,60 +137,24 @@ function TableRowSummary({
   renameTable,
   dropTable,
   isInSchema,
+  isDisabled = false,
+
+  // props passed from TableLayout.jsx
+  searchString,
+  rowMax,
+  columnMax,
+  bytesMax,
+  onCheckBoxChange,
   isSelected,
 
-  // props from parent component
-  isDisabled = false,
-  searchString,
+  // Props from TableDragContainer
+  dragDropRef,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
   // TODO: Should this be in the HOC?
   const selectedTableIds = useSelector((state) => state.tables.selected || []);
-  const selectedTables = useSelector((state) =>
-    selectedTableIds.map((id) => state.tables.data[id]).filter(Boolean)
-  );
-
-  // Set up drag functionality for table rows
-  const [{ isDragging }, dragRef, dragPreview] = useDrag({
-    type: TABLE_ROW_VIEW_CLASS,
-    item: () => {
-      // If this table is selected and there are multiple selected tables,
-      // drag all selected tables as a group
-      const isCurrentTableSelected = selectedTableIds.includes(table.id);
-
-      if (isCurrentTableSelected && selectedTableIds.length > 1) {
-        const item = {
-          id: selectedTableIds, // Array of IDs for multi-select
-          tables: selectedTables, // Array of table objects
-          count: selectedTables.length,
-          type: "multiple-tables",
-          primaryTable: table, // The table being dragged
-        };
-        return item;
-      } else {
-        // Single table drag
-        const item = {
-          id: table.id,
-          name: table.name,
-          type: "table",
-          tables: [table], // Consistent array format
-          count: 1,
-        };
-        return item;
-      }
-    },
-    canDrag: () => !isDisabled,
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  // Remove default drag preview
-  useEffect(() => {
-    dragPreview(getEmptyImage(), { captureDraggingState: true });
-  }, [dragPreview]);
 
   const handleMenuOpen = (event) => {
     event.preventDefault(); // Prevent default context menu
@@ -259,7 +220,7 @@ function TableRowSummary({
 
   return (
     <StyledTableRow
-      isDragging={isDragging}
+      isDragging={false} // TODO
       isDisabled={isDisabled}
       isSelected={isSelected}
       isHovered={false} // TODO: Implement hover state if needed
@@ -333,7 +294,7 @@ function TableRowSummary({
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         <Stack direction="row" alignItems="center" gap="1px">
           <Box
-            ref={dragRef}
+            ref={dragDropRef}
             sx={{
               display: "flex",
               alignItems: "center",
@@ -361,9 +322,9 @@ function TableRowSummary({
           </Box>
           <Checkbox
             checked={isSelected}
-            disabled
             size="small"
             sx={{ padding: 0 }}
+            onChange={(event) => onCheckBoxChange(event, table.id)}
           />
         </Stack>
       </Typography>

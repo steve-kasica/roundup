@@ -1,11 +1,17 @@
+/* eslint-disable react/prop-types */
 import { Typography, Box } from "@mui/material";
 import { DragIndicator, TableChart } from "@mui/icons-material";
-import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
+import { selectTablesById } from "../../slices/tablesSlice";
 
 /**
  * Custom drag preview component that shows multiple tables stacked
  */
-function StackedTableDragPreview({ tables, primaryTable }) {
+function TableDragPreview({ tableIds }) {
+  const primaryTableId = tableIds[tableIds.length - 1];
+  const primaryTable = useSelector((state) =>
+    selectTablesById(state, primaryTableId)
+  );
   const maxStackCount = 3; // Maximum number of stacked previews to show
   const stackOffset = 4; // Pixels to offset each stack layer
 
@@ -13,14 +19,14 @@ function StackedTableDragPreview({ tables, primaryTable }) {
     <Box
       sx={{
         position: "relative",
-        minWidth: "300px",
+        width: "200px",
         cursor: "grabbing",
         userSelect: "none",
         pointerEvents: "none",
       }}
     >
       {/* Background stacked layers */}
-      {tables.slice(0, maxStackCount).map((_, index) => {
+      {tableIds.slice(0, maxStackCount).map((_, index) => {
         const isTopLayer = index === 0;
         const zIndex = maxStackCount - index;
         const offset = index * stackOffset;
@@ -51,22 +57,21 @@ function StackedTableDragPreview({ tables, primaryTable }) {
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  padding: "8px 12px",
-                  minHeight: "40px",
+                  minHeight: "10px",
                 }}
               >
                 <DragIndicator
                   sx={{
                     color: "#ff6f00",
                     mr: 1,
-                    fontSize: "20px",
+                    fontSize: "12px",
                   }}
                 />
                 <TableChart
                   sx={{
                     color: "#ff6f00",
                     mr: 1,
-                    fontSize: "18px",
+                    fontSize: "12px",
                   }}
                 />
                 <Box sx={{ flexGrow: 1 }}>
@@ -81,7 +86,7 @@ function StackedTableDragPreview({ tables, primaryTable }) {
                   >
                     {primaryTable.name}
                   </Typography>
-                  {tables.length > 1 && (
+                  {tableIds.length > 1 && (
                     <Typography
                       variant="caption"
                       sx={{
@@ -90,7 +95,8 @@ function StackedTableDragPreview({ tables, primaryTable }) {
                         textShadow: "0 1px 2px rgba(0,0,0,0.3)",
                       }}
                     >
-                      +{tables.length - 1} more tables
+                      +{tableIds.length - 1} more table
+                      {tableIds.length - 1 > 1 ? "s" : ""}
                     </Typography>
                   )}
                 </Box>
@@ -112,7 +118,7 @@ function StackedTableDragPreview({ tables, primaryTable }) {
                       textShadow: "0 1px 2px rgba(0,0,0,0.5)",
                     }}
                   >
-                    {tables.length}
+                    {tableIds.length}
                   </Typography>
                 </Box>
               </Box>
@@ -125,7 +131,7 @@ function StackedTableDragPreview({ tables, primaryTable }) {
       })}
 
       {/* Show additional count if more than maxStackCount */}
-      {tables.length > maxStackCount && (
+      {tableIds.length > maxStackCount && (
         <Box
           sx={{
             position: "absolute",
@@ -152,7 +158,7 @@ function StackedTableDragPreview({ tables, primaryTable }) {
               textShadow: "0 1px 2px rgba(0,0,0,0.5)",
             }}
           >
-            +{tables.length - maxStackCount}
+            +{tableIds.length - maxStackCount}
           </Typography>
         </Box>
       )}
@@ -160,17 +166,4 @@ function StackedTableDragPreview({ tables, primaryTable }) {
   );
 }
 
-StackedTableDragPreview.propTypes = {
-  tables: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  primaryTable: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-};
-
-export default StackedTableDragPreview;
+export default TableDragPreview;

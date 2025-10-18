@@ -14,6 +14,7 @@ import { Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   OPERATION_TYPE_NO_OP,
+  OPERATION_TYPE_STACK,
   selectOperation,
   selectOperationByTableId,
   selectRootOperation,
@@ -21,6 +22,11 @@ import {
 import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
 import { deleteOperationsRequest } from "../../sagas/deleteOperationsSaga";
+import {
+  DRAG_TYPE_SOURCE_TABLE_ITEM,
+  DRAG_TYPE_SOURCE_TABLE_ROW,
+} from "../CustomDragLayer";
+import { drag } from "d3";
 
 const ForwardedBox = forwardRef((props, ref) => <Box ref={ref} {...props} />);
 ForwardedBox.displayName = "ForwardedBox";
@@ -146,22 +152,27 @@ export default function TableDropTarget({ operationType, children }) {
   });
 
   const [{ isOver, canDrop }, dropRef] = useDrop({
-    accept: TABLE_ROW_VIEW_CLASS,
-    drop: (draggedTable, monitor) => {
+    accept: [DRAG_TYPE_SOURCE_TABLE_ROW, DRAG_TYPE_SOURCE_TABLE_ITEM],
+    // eslint-disable-next-line no-unused-vars
+    drop: ({ tableIds: draggedTableIds, type: dragType }, monitor) => {
       if (monitor.didDrop()) {
         return; // Already handled by a nested drop target
       }
+      console.log("TableDropTarget: dropped tables", draggedTableIds, monitor);
+      const tableCount = draggedTableIds.length;
       if (
         operationType === OPERATION_TYPE_NO_OP &&
         rootOperation === undefined
       ) {
         // Case: Initialize the first operation
+        // If there is more than one table, default to a STACK operation
         dispatch(
           createOperationsRequest({
             operationData: [
               {
-                operationType,
-                childIds: [draggedTable.id],
+                operationType:
+                  tableCount > 1 ? OPERATION_TYPE_STACK : OPERATION_TYPE_NO_OP,
+                childIds: draggedTableIds,
               },
             ],
           })
@@ -176,7 +187,7 @@ export default function TableDropTarget({ operationType, children }) {
               {
                 id: rootOperation.id,
                 operationType,
-                children: [...rootOperation.children, draggedTable.id],
+                children: [...rootOperation.children, ...draggedTableIds],
               },
             ],
           })
@@ -188,7 +199,7 @@ export default function TableDropTarget({ operationType, children }) {
             operationUpdates: [
               {
                 id: rootOperation.id,
-                children: [...rootOperation.children, draggedTable.id],
+                children: [...rootOperation.children, ...draggedTableIds],
               },
             ],
           })
@@ -201,7 +212,7 @@ export default function TableDropTarget({ operationType, children }) {
             operationData: [
               {
                 operationType,
-                childIds: [rootOperation.id, draggedTable.id],
+                childIds: [rootOperation.id, ...draggedTableIds],
               },
             ],
           })

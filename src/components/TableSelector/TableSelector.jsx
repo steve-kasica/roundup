@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  * SourceTables.jsx
  *
@@ -10,7 +11,7 @@ import TableLayout from "./TableLayout";
 import ListLayout from "./ListLayout";
 
 import DragDropFileUpload from "./DragDropFileUpload";
-import withAllTablesData from "../HOC/withAllTablesData";
+import withAllTablesData from "./withAllTablesData";
 import { createTablesRequest } from "../../sagas/createTablesSaga";
 import { registerFiles } from "../../lib/duckdb";
 
@@ -34,6 +35,7 @@ function TableSelector({
   unselectAllTables,
 }) {
   const dispatch = useDispatch();
+  const [selectedTableIds, setSelectedTableIds] = useState([]);
   const [selectedTableType, setSelectedTableType] = useState("");
   const [searchString, setSearchString] = useState("");
   const [layout, setLayout] = useState(DEFAULT_LAYOUT);
@@ -111,6 +113,8 @@ function TableSelector({
           rowMax={rowMax}
           columnMax={columnMax}
           bytesMax={bytesMax}
+          selectedTableIds={selectedTableIds}
+          setSelectedTableIds={setSelectedTableIds}
         />
       ) : (
         <TableLayout
@@ -119,6 +123,8 @@ function TableSelector({
           rowMax={rowMax}
           columnMax={columnMax}
           bytesMax={bytesMax}
+          selectedTableIds={selectedTableIds}
+          setSelectedTableIds={setSelectedTableIds}
         />
       )}
     </div>

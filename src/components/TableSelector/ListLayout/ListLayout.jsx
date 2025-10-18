@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { ErrorOutline, TableChart } from "@mui/icons-material";
 import { EnhancedTableListItemSummary } from "../../TableView";
-import withAllTablesData from "../../HOC/withAllTablesData";
+import withAllTablesData from "../withAllTablesData";
 import PropTypes from "prop-types";
 
 export const LAYOUT_ID = "list";
