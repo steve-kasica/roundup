@@ -57,6 +57,16 @@ export const selectSelectedColumnDBNamesByTableId = createSelector(
   }
 );
 
+export const selectActiveColumnDBNamesByTableId = createSelector(
+  [
+    (state, TableId) => selectActiveColumnIdsByTableId(state, TableId),
+    (state) => state.columns.data,
+  ],
+  (activeColumnIds, data) => {
+    return activeColumnIds.map((id) => data[id].columnName);
+  }
+);
+
 /**
  * Selects a specific column by its ID.
  *

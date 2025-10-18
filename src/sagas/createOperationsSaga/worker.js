@@ -34,21 +34,18 @@ import {
   addOperations as addOperationsToSlice,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  selectOperation,
 } from "../../slices/operationsSlice";
+import Operation from "../../slices/operationsSlice/Operation";
+import { createOperationsSuccess, createOperationsFailure } from "./actions";
 import {
   createStackView,
   createPackView,
   getTableDimensions,
 } from "../../lib/duckdb";
-import { createOperationsSuccess, createOperationsFailure } from "./actions";
-import Operation from "../../slices/operationsSlice/Operation";
+
 import { group } from "d3";
-import {
-  selectActiveColumnIdsByTableId,
-  selectColumnById,
-  selectColumnIdsByTableId,
-} from "../../slices/columnsSlice";
+import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
+import { selectOperationQueryData } from "../../slices/operationsSlice/operationsSelectors";
 
 export const calcPackColumnCount = (state, childIds) => {
   const columnCountTotal = childIds.reduce(
@@ -73,40 +70,6 @@ export const calcStackColumnCount = (state, childIds) => {
   );
   const maxColumns = Math.max(0, ...tableColumnCounts);
   return maxColumns;
-};
-
-/**
- * Selector to build query data for an operation.
- * Constructs the data structure needed for database view creation.
- *
- * @param {Object} state - Redux state
- * @param {string} operationId - ID of the operation to build query data for
- * @returns {Object} Query data object with operation details and child table information
- *
- * TODO: This could be moved to a selector in the operations slice
- */
-export const selectQueryData = (state, operationUpdate) => {
-  const operation = selectOperation(state, operationUpdate.id);
-  const parent = {
-    ...operation,
-    ...operationUpdate,
-  };
-  parent.joinKey1 = parent.joinKey1
-    ? selectColumnById(state, parent.joinKey1).columnName
-    : null;
-  parent.joinKey2 = parent.joinKey2
-    ? selectColumnById(state, parent.joinKey2).columnName
-    : null;
-  parent.children = parent.children.map((id) => {
-    let child = {
-      id,
-      columnNames: selectColumnIdsByTableId(state, id).map(
-        (columnId) => selectColumnById(state, columnId).columnName
-      ),
-    };
-    return child;
-  });
-  return parent;
 };
 
 /**
@@ -145,14 +108,15 @@ export default function* createOperationsWorker(action) {
   for (const { operationType, childIds } of operationData) {
     // Create operation object
     const operation = Operation(operationType, childIds);
-    // Add operation to store
+
+    // Build query data structure required for view creation
+    const queryData = yield select((state) =>
+      selectOperationQueryData(state, operation)
+    );
+
     try {
       // Create database view based on operation type
       if (operation.operationType === OPERATION_TYPE_PACK) {
-        // Build query data structure required for view creation
-        const queryData = yield select((state) =>
-          selectQueryData(state, operation.id, childIds)
-        );
         // Creates a unified view with columns from all child tables
         yield call(createPackView, queryData);
         const { rowCount, columnCount } = yield call(
@@ -163,10 +127,6 @@ export default function* createOperationsWorker(action) {
         operation.initialColumnCount = columnCount;
       } else if (operation.operationType === OPERATION_TYPE_STACK) {
         // Creates a stacked view using the first child table as template
-        // Build query data structure required for view creation
-        const queryData = yield select((state) =>
-          selectQueryData(state, operation.id, childIds)
-        );
         yield call(createStackView, queryData);
         const { rowCount, columnCount } = yield call(
           getTableDimensions,

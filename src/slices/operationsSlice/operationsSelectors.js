@@ -1,4 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
+import {
+  selectActiveColumnDBNamesByTableId,
+  selectColumnById,
+} from "../columnsSlice";
 
 /**
  * Selects an operation by its ID from the Redux state.
@@ -166,3 +170,45 @@ export const selectOperationChildrenData = createSelector(
     }));
   }
 );
+
+/**
+ * Selector to build query data for an operation.
+ * Constructs the data structure needed for database view creation.
+ *
+ * @param {Object} state - Redux state
+ * @param {string} operationData - A partially complete instance of Operation. It can be
+ *   incomplete because it is an `operationUpdate` when the updateOperationsSaga
+ *   because `operationData` is a newly instantiated Operation object in the createOperationsSaga. It
+ *   must contain at least the `id`
+ * @returns {Object} Query data object with operation details and child table information
+ */
+export const selectOperationQueryData = (state, operationData) => {
+  // Select the full operation from state, if it is present
+  // It may not be present if this is a newly created Operation
+  const operation = selectOperation(state, operationData.id);
+
+  const parent = {
+    ...operation, // can be undefined
+    ...operationData,
+  };
+
+  // Parent properties that are used by both Stack and Pack operations
+  parent.children = parent.children.map((id) => {
+    let child = {
+      id,
+      columnNames: selectActiveColumnDBNamesByTableId(state, id),
+    };
+    return child;
+  });
+
+  // parent properties that are only need for Pack operations
+  // Stack operation will not throw errors if these are undefined
+  parent.joinKey1 = parent.joinKey1
+    ? selectColumnById(state, parent.joinKey1).columnName
+    : null;
+  parent.joinKey2 = parent.joinKey2
+    ? selectColumnById(state, parent.joinKey2).columnName
+    : null;
+
+  return parent;
+};

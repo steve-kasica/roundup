@@ -50,7 +50,11 @@ export default function* updateColumnsWorker(action) {
         error: null,
       });
     } catch (error) {
-      console.error("Error fetching column stats from DB:", error);
+      console.error(
+        "Error (`updateColumnsSaga/worker.js`) fetching column stats from DB:",
+        error,
+        columnUpdate
+      );
       failedUpdates.push({
         ...columnUpdate,
         error: error.message || "Unknown error",

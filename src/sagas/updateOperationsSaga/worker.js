@@ -1,16 +1,14 @@
 import { call, put, select } from "redux-saga/effects";
 import {
-  OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectOperation,
+  selectOperationQueryData,
   updateOperations as updateOperationsSlice,
 } from "../../slices/operationsSlice";
-// TODO, maybe this should be in update, rather than create?
 import {
   calcPackColumnCount,
   calcStackColumnCount,
-  selectQueryData,
 } from "../createOperationsSaga/worker";
 import {
   createPackView,
@@ -41,7 +39,7 @@ export default function* updateOperationsWorker(action) {
       keys.includes("joinPredicate")
     ) {
       const queryData = yield select((state) =>
-        selectQueryData(state, operationUpdate)
+        selectOperationQueryData(state, operationUpdate)
       );
       if (
         operationUpdate.operationType === OPERATION_TYPE_STACK ||
