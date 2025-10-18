@@ -13,4 +13,6 @@ export const DATABASE_ATTRIBUTES = [
   "q50",
   "q75",
   "std",
+  "modeValue",
+  "modeCount",
 ];

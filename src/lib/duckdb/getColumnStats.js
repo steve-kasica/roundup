@@ -8,6 +8,32 @@ export async function getColumnStats(tableId, columnList) {
   // This allows for summarizing specific columns or the entire table
   const query = `SUMMARIZE SELECT ${columnsClause} FROM ${tableId};`;
   const response = await conn.query(query);
+
+  // Get mode (most frequent value) and its count for each column
+  const columns =
+    columnList ||
+    (await conn.query(`SELECT * FROM ${tableId} LIMIT 0`)).schema.fields.map(
+      (f) => f.name
+    );
+  const modeQueries = columns.map(
+    (col) =>
+      `SELECT '${col}' as column_name, ${col} as mode_value, COUNT(*) as mode_count 
+     FROM ${tableId} 
+     WHERE ${col} IS NOT NULL 
+     GROUP BY ${col} 
+     ORDER BY COUNT(*) DESC 
+     LIMIT 1`
+  );
+  const modeQuery = modeQueries.join(" UNION ALL ");
+  const modeResponse = await conn.query(modeQuery);
+  const modeResults = modeResponse.toArray().reduce((acc, row) => {
+    const rowData = row.toJSON();
+    acc[rowData.column_name] = {
+      value: rowData.mode_value,
+      count: Number(rowData.mode_count),
+    };
+    return acc;
+  }, {});
   await conn.close();
   const result = response.toArray().map((proxyStruct) => {
     const jsonData = proxyStruct.toJSON();
@@ -56,6 +82,10 @@ export async function getColumnStats(tableId, columnList) {
       }
     }
 
+    // Get the mode data for this column
+    const columnName = serialized.column_name;
+    const modeData = modeResults[columnName] || { value: null, count: null };
+
     return {
       approxUnique: serialized.approx_unique,
       avg: serialized.avg,
@@ -68,6 +98,8 @@ export async function getColumnStats(tableId, columnList) {
       p50: serialized.p50,
       p75: serialized.p75,
       std: serialized.std,
+      modeValue: modeData.value,
+      modeCount: modeData.count,
     };
   });
 

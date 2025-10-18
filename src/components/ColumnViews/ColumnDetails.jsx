@@ -41,8 +41,9 @@ const ColumnDetails = withColumnData(
             completeness: `${completeness * 100}%`,
             unique: uniqueCount.toLocaleString(),
             duplicate: duplicateCount.toLocaleString(),
-            // TODO
-            // top: `${mode} (${column.values[mode] || 0})`,
+            mode: `${column.modeValue || 0} (${
+              column.modeCount.toLocaleString() || 0
+            })`,
           }}
         />
         <Divider sx={{ my: 1 }} />
