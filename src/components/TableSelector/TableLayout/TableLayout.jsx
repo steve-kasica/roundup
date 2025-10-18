@@ -150,6 +150,9 @@ export default function TableLayout({
               canDrag={true}
               dragType={DRAG_TYPE_SOURCE_TABLE_ROW}
               tableIds={selectedTableIds}
+              onDragEnd={(item, dropResult) =>
+                dropResult ? setSelectedTableIds([]) : null
+              }
             >
               <EnhancedTableRowSummary
                 id={id}
