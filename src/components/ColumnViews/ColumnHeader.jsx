@@ -98,6 +98,7 @@ const ColumnHeader = ({
         <EnhancedColumnContextMenuItems
           id={column.id}
           closeMenu={handleMenuClose}
+          includeInsert={false}
         />
       </Menu>
     </>

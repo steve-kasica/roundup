@@ -23,12 +23,7 @@ import {
 } from "@mui/icons-material";
 import { useCallback, useState } from "react";
 import withColumnData from "./withColumnData";
-import {
-  COLUMN_TYPE_CATEGORICAL,
-  COLUMN_TYPE_DATE,
-  COLUMN_TYPE_NUMERICAL,
-  COLUMN_TYPE_VARCHAR,
-} from "../../slices/columnsSlice";
+import { COLUMN_TYPE_VARCHAR } from "../../slices/columnsSlice";
 
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
@@ -42,6 +37,7 @@ const ColumnContextMenu = ({
   renameColumn,
   // Props passed directly from parent component
   closeMenu,
+  includeInsert = true,
 }) => {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [newColumnName, setNewColumnName] = useState("");
@@ -155,18 +151,22 @@ const ColumnContextMenu = ({
         </ListItemIcon>
         <ListItemText>Focus column</ListItemText>
       </MenuItem>
-      <MenuItem onClick={handleInsertColumnLeft}>
-        <ListItemIcon>
-          <KeyboardArrowLeft fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Insert column to the left</ListItemText>
-      </MenuItem>
-      <MenuItem onClick={handleInsertColumnRight}>
-        <ListItemIcon>
-          <KeyboardArrowRight fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Insert column to the right</ListItemText>
-      </MenuItem>
+      {includeInsert && (
+        <>
+          <MenuItem onClick={handleInsertColumnLeft}>
+            <ListItemIcon>
+              <KeyboardArrowLeft fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Insert column to the left</ListItemText>
+          </MenuItem>
+          <MenuItem onClick={handleInsertColumnRight}>
+            <ListItemIcon>
+              <KeyboardArrowRight fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Insert column to the right</ListItemText>
+          </MenuItem>
+        </>
+      )}
 
       {/* Rename Column Dialog */}
       <Dialog
