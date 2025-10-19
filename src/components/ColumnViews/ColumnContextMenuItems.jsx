@@ -46,18 +46,19 @@ const ColumnContextMenu = ({
     column.columnType || ""
   );
 
-  const handleRenameColumn = useCallback(
-    (event) => {
-      setNewColumnName(column.name || column.columnName || ""); // Pre-fill with current name
-      setRenameDialogOpen(true);
-    },
-    [column.name, column.columnName]
-  );
+  const handleRenameColumn = useCallback(() => {
+    setNewColumnName(column.name || column.columnName || ""); // Pre-fill with current name
+    setRenameDialogOpen(true);
+  }, [column.name, column.columnName]);
 
-  const handleRenameDialogClose = useCallback(() => {
-    setRenameDialogOpen(false);
-    setNewColumnName("");
-  }, []);
+  const handleRenameDialogClose = useCallback(
+    (event) => {
+      setRenameDialogOpen(false);
+      setNewColumnName("");
+      closeMenu(event);
+    },
+    [closeMenu]
+  );
 
   const handleRenameConfirm = useCallback(
     (event) => {
@@ -70,14 +71,22 @@ const ColumnContextMenu = ({
     [newColumnName, renameColumn, handleRenameDialogClose, closeMenu]
   );
 
-  const handleRenameCancel = useCallback(() => {
-    handleRenameDialogClose();
-  }, [handleRenameDialogClose]);
+  const handleRenameCancel = useCallback(
+    (event) => {
+      handleRenameDialogClose();
+      closeMenu(event);
+    },
+    [handleRenameDialogClose, closeMenu]
+  );
 
-  const handleColumnTypeDialogClose = useCallback(() => {
-    setColumnTypeDialogOpen(false);
-    setSelectedColumnType("");
-  }, []);
+  const handleColumnTypeDialogClose = useCallback(
+    (event) => {
+      setColumnTypeDialogOpen(false);
+      setSelectedColumnType("");
+      closeMenu(event);
+    },
+    [closeMenu]
+  );
 
   const handleColumnTypeConfirm = useCallback(
     (event) => {
@@ -90,9 +99,13 @@ const ColumnContextMenu = ({
     [selectedColumnType, setColumnType, handleColumnTypeDialogClose, closeMenu]
   );
 
-  const handleColumnTypeCancel = useCallback(() => {
-    handleColumnTypeDialogClose();
-  }, [handleColumnTypeDialogClose]);
+  const handleColumnTypeCancel = useCallback(
+    (event) => {
+      handleColumnTypeDialogClose();
+      closeMenu(event);
+    },
+    [handleColumnTypeDialogClose, closeMenu]
+  );
 
   const handleExcludeColumn = useCallback(
     (event) => {
@@ -107,10 +120,13 @@ const ColumnContextMenu = ({
     setColumnTypeDialogOpen(true);
   }, [column.columnType]);
 
-  const handleFocusColumn = useCallback(() => {
-    focusColumn();
-    closeMenu();
-  }, [closeMenu, focusColumn]);
+  const handleFocusColumn = useCallback(
+    (event) => {
+      focusColumn();
+      closeMenu(event);
+    },
+    [closeMenu, focusColumn]
+  );
 
   const handleInsertColumnLeft = useCallback(
     (event) => {
@@ -120,10 +136,13 @@ const ColumnContextMenu = ({
     [closeMenu, insertColumnLeft]
   );
 
-  const handleInsertColumnRight = useCallback(() => {
-    insertColumnRight();
-    closeMenu();
-  }, [closeMenu, insertColumnRight]);
+  const handleInsertColumnRight = useCallback(
+    (event) => {
+      insertColumnRight();
+      closeMenu(event);
+    },
+    [closeMenu, insertColumnRight]
+  );
 
   return (
     <>
