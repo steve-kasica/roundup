@@ -4,6 +4,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  idsByOperationId: {}, // Map of <operationId>: [tableId, tableId, ...]
   ids: [],
   data: {},
   loading: [],
@@ -142,13 +143,14 @@ const slice = createSlice({
         state.data[id].name = newName;
       });
     },
+
     updateTables(state, action) {
       // Normalize input to always be an array
-      const tables = Array.isArray(action.payload)
+      const tableUpdates = Array.isArray(action.payload)
         ? action.payload
         : action.payload.tables || [action.payload];
 
-      tables.forEach((table) => {
+      tableUpdates.forEach((table) => {
         if (!state.data[table.id]) {
           throw new Error(`Table with ID ${table.id} does not exist`);
         }

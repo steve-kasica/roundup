@@ -41,11 +41,8 @@ import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 export default function withStackOperationData(WrappedComponent) {
   const componentName =
     WrappedComponent.displayName || WrappedComponent.name || "Component";
+
   function EnhancedComponent({ id, ...props }) {
-    console.log(
-      `withStackOperationData: Rendering ${componentName} with operation id:`,
-      id
-    );
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperation(state, id));
     const depth = useSelector((state) => selectOperationDepth(state, id));

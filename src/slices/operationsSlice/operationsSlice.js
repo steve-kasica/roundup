@@ -4,6 +4,7 @@ import { selectOperation, selectParentOperation } from "./operationsSelectors";
 
 const initialState = {
   data: {}, // Normalized operations stored by ID
+  childIds: {}, // Map of <parentOperationId>: [<OperationId>, <TableId>, etc...]
   ids: [], // Array of operation IDs
   root: null, // ID of the root operation
   focused: null, // ID of the currently focused operation

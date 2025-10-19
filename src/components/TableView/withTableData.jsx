@@ -13,11 +13,7 @@ import {
   selectSelectedColumnDBNamesByTableId,
   selectSelectedColumnIdsByTableId,
 } from "../../slices/columnsSlice";
-import {
-  selectHoveredTable,
-  selectSelectedTables,
-  selectTablesById,
-} from "../../slices/tablesSlice";
+import { selectTablesById } from "../../slices/tablesSlice";
 
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";

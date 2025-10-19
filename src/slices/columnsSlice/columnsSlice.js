@@ -78,8 +78,12 @@ const columnsSlice = createSlice({
         state.idsByTable[tableId] = state.idsByTable[tableId].filter(
           (cid) => cid !== id
         );
+
         // Also make sure that excluded columns are not selected
         state.selected = state.selected.filter((cid) => cid !== id);
+
+        // Also make sure that excluded columns are not focused
+        state.focused = state.focused.filter((cid) => cid !== id);
       });
     },
 

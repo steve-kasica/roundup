@@ -2,11 +2,89 @@
 // Unlike other sagas, this saga is only in charge of
 // syncing database views with operations in the redux store.
 
-import { takeEvery } from "redux-saga/effects";
+import { put, select, takeEvery, takeLatest, delay } from "redux-saga/effects";
 import { updateOperationsRequest } from "./actions";
 import updateOperationsWorker from "./worker";
+import {
+  excludeColumnFromTable,
+  selectActiveColumnCountByTableId,
+  selectActiveColumnIdsByTableId,
+  selectColumnById,
+} from "../../slices/columnsSlice";
+import { group } from "d3";
+import { selectTablesById } from "../../slices/tablesSlice";
+import {
+  selectOperation,
+  selectOperationByTableId,
+} from "../../slices/operationsSlice";
 
 // This it listen for actions by the operations and columns slice
 export default function* updateOperationsWatcher() {
   yield takeEvery(updateOperationsRequest.type, updateOperationsWorker);
+
+  // If excluding the last columns from a table, we need to remove that table
+  // from its parent operation, if a table is in the composite schema.
+  // The timing between Redux reducers and Sagas is important here.
+  // Action flows through middleware in order so sagas see actions
+  // after the reducers have updated state. So by the time this saga
+  // see the action, the state is already updated.
+  yield takeLatest(excludeColumnFromTable.type, function* (action) {
+    // Wait one tick to ensure all synchronous updates are done
+    console.log("updateOperationsWatcher: excludeColumnFromTable detected");
+    yield delay(0);
+
+    // Extract column IDs from the action payload
+    const columnIds = Array.isArray(action.payload)
+      ? action.payload
+      : [action.payload];
+
+    // Use yield select() to get state AFTER the reducer has run
+    const emptyTables = yield select((state) => {
+      const emptyTables = [];
+
+      // Calculate which tables will be empty after exclusion
+      const recentlyExcludedTableIds = new Set(
+        columnIds.map((id) => selectColumnById(state, id).tableId)
+      );
+      for (const tableId of recentlyExcludedTableIds) {
+        const activeColumnIds = selectActiveColumnIdsByTableId(state, tableId); // `columnIds` should be excluded already
+
+        if (activeColumnIds.length === 0) {
+          emptyTables.push(tableId);
+        }
+      }
+
+      return emptyTables; // Return the result
+    });
+
+    if (emptyTables.length > 0) {
+      const operationUpdates = yield select((state) => {
+        const updates = new Map();
+
+        emptyTables.forEach((tableId) => {
+          const operation = selectOperationByTableId(state, tableId);
+          if (updates.has(operation.id)) {
+            updates.set(
+              operation.id,
+              updates.get(operation.id).filter((tid) => tid !== tableId)
+            );
+          } else {
+            updates.set(
+              operation.id,
+              operation.children.filter((tid) => tid !== tableId)
+            );
+          }
+        });
+
+        return Array.from(updates.entries()).map(([operationId, tableIds]) => ({
+          id: operationId,
+          children: tableIds,
+        }));
+      });
+
+      if (operationUpdates.length > 0) {
+        yield put(updateOperationsRequest({ operationUpdates }));
+      }
+    }
+  });
 }
