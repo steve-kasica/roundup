@@ -145,7 +145,7 @@ const ColumnContextMenu = ({
         </ListItemIcon>
         <ListItemText>Change column type</ListItemText>
       </MenuItem>
-      <MenuItem disabled onClick={handleFocusColumn}>
+      <MenuItem onClick={handleFocusColumn}>
         <ListItemIcon>
           <CenterFocusStrong fontSize="small" />
         </ListItemIcon>
