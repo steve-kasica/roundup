@@ -105,8 +105,7 @@ const TableSchema = ({
 
       if (isShift && selectedColumnIds.length > 0) {
         // Shift+click: Select range from last selected column to clicked column
-        const lastSelectedColumnId =
-          selectedColumnIds[selectedColumnIds.length - 1];
+        const lastSelectedColumnId = selectedColumnIds[0];
         const lastSelectedIndex = activeColumnIds.indexOf(lastSelectedColumnId);
 
         if (lastSelectedIndex !== -1) {
@@ -126,7 +125,7 @@ const TableSchema = ({
       } else if (isCtrlOrCmd) {
         // Ctrl/Cmd+click: Toggle selection
         if (selectedColumnIds.includes(columnId)) {
-          selectColumns(activeColumnIds.filter((id) => id !== columnId));
+          selectColumns(selectedColumnIds.filter((id) => id !== columnId));
         } else {
           selectColumns([...selectedColumnIds, columnId]);
         }

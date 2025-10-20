@@ -12,6 +12,7 @@ import {
   selectColumnIdsByTableId,
   selectSelectedColumnDBNamesByTableId,
   selectSelectedColumnIdsByTableId,
+  setSelectedColumnIds,
 } from "../../slices/columnsSlice";
 import { selectTablesById } from "../../slices/tablesSlice";
 
@@ -70,16 +71,9 @@ export default function withTableData(WrappedComponent) {
       );
 
       // Functions to handle interactions
-      const handleSelectColumns = useCallback(
+      const selectColumns = useCallback(
         (selectedColumnIds) => {
-          dispatch(
-            updateColumnsRequest({
-              columnUpdates: selectedColumnIds.map((id) => ({
-                id,
-                isSelected: true,
-              })),
-            })
-          );
+          dispatch(setSelectedColumnIds(selectedColumnIds));
         },
         [dispatch]
       );
@@ -177,7 +171,7 @@ export default function withTableData(WrappedComponent) {
           removedColumnCount={removedColumnCount}
           selectedColumnNames={selectedColumnNames} // necessary for DB hooks
           // Interaction handlers
-          selectColumns={handleSelectColumns}
+          selectColumns={selectColumns}
           swapColumns={swapColumns}
           excludeColumns={excludeColumns}
           setTableName={setTableName}
