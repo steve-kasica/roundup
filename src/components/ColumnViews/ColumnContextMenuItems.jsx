@@ -31,8 +31,8 @@ const ColumnContextMenu = ({
   excludeColumn,
   setColumnType,
   focusColumn,
-  insertColumnLeft,
-  insertColumnRight,
+  onInsertColumnLeftClick,
+  onInsertColumnRightClick,
   // action dispatch functions passed via `withColumnData` HOC
   renameColumn,
   // Props passed directly from parent component
@@ -130,18 +130,18 @@ const ColumnContextMenu = ({
 
   const handleInsertColumnLeft = useCallback(
     (event) => {
-      insertColumnLeft();
+      onInsertColumnLeftClick();
       closeMenu(event);
     },
-    [closeMenu, insertColumnLeft]
+    [closeMenu, onInsertColumnLeftClick]
   );
 
   const handleInsertColumnRight = useCallback(
     (event) => {
-      insertColumnRight();
+      onInsertColumnRightClick();
       closeMenu(event);
     },
-    [closeMenu, insertColumnRight]
+    [closeMenu, onInsertColumnRightClick]
   );
 
   return (

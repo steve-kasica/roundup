@@ -60,6 +60,7 @@ const TableSchema = ({
   columnCount,
   swapColumns,
   selectColumns,
+  insertColumn,
 }) => {
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
@@ -242,6 +243,8 @@ const TableSchema = ({
                   handleColumnDoubleClick(event, columnId)
                 }
                 isDraggable={selectedColumnIds.includes(columnId)}
+                handleInsertColumnLeft={() => insertColumn(i)}
+                handleInsertColumnRight={() => insertColumn(i + 1)}
               />
             </ColumnDragContainer>
           </Box>

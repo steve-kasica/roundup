@@ -18,6 +18,11 @@ import { selectTablesById } from "../../slices/tablesSlice";
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
+import {
+  createColumnsRequest,
+  CREATION_MODE_INSERTION,
+} from "../../sagas/createColumnsSaga";
+import { active } from "d3";
 
 export default function withTableData(WrappedComponent) {
   const componentName =
@@ -124,6 +129,23 @@ export default function withTableData(WrappedComponent) {
         dispatch(deleteTablesRequest([id]));
       }, [dispatch, id]);
 
+      const insertColumn = useCallback(
+        (newColumnIndex) => {
+          dispatch(
+            createColumnsRequest({
+              mode: CREATION_MODE_INSERTION,
+              columnInfo: [
+                {
+                  parentId: id,
+                  index: newColumnIndex,
+                },
+              ],
+            })
+          );
+        },
+        [dispatch, id]
+      );
+
       const focusTable = useCallback(() => {}, []);
 
       // Current number of non-excluded columns
@@ -162,6 +184,7 @@ export default function withTableData(WrappedComponent) {
           removeTableFromSchema={removeTableFromSchema}
           focusTable={focusTable}
           deleteTable={deleteTable}
+          insertColumn={insertColumn}
         />
       );
     } catch (error) {

@@ -1,14 +1,6 @@
 /* eslint-disable react/prop-types */
 import withColumnData from "./withColumnData";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Menu,
-  Tooltip,
-  Card,
-  styled,
-} from "@mui/material";
+import { Box, Typography, IconButton, Menu, Tooltip } from "@mui/material";
 import { MoreVert, Info } from "@mui/icons-material";
 import { useState } from "react";
 import SingleBar from "../visualization/SingleBar";
@@ -34,6 +26,8 @@ const ColumnSummary = ({
   isDraggable = false,
   isError = false,
   dragDropRef = null,
+  handleInsertColumnLeft,
+  handleInsertColumnRight,
 }) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
@@ -93,6 +87,8 @@ const ColumnSummary = ({
           <EnhancedColumnContextMenuItems
             id={column.id}
             closeMenu={handleMenuClose}
+            onInsertColumnLeftClick={handleInsertColumnLeft}
+            onInsertColumnRightClick={handleInsertColumnRight}
           />
         </Menu>
 

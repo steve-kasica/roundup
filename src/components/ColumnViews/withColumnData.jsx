@@ -168,28 +168,6 @@ export default function withColumnData(WrappedComponent) {
             updateColumnsRequest({ columnUpdates: [{ id, columnType }] })
           )
         }
-        insertColumnLeft={() =>
-          dispatch(
-            createColumnsRequest({
-              mode: CREATION_MODE_INSERTION,
-              columnInfo: [{ parentId: tableId, index }],
-            })
-          )
-        }
-        insertColumnRight={() =>
-          dispatch(
-            createColumnsRequest({
-              mode: CREATION_MODE_INSERTION,
-              columnInfo: [{ parentId: tableId, index: index + 1 }],
-            })
-          )
-        }
-        // insertColumnRight={() => {
-        //   if (!isNull) {
-        //     dispatch(
-        //     );
-        //   }
-        // }}
       />
     );
 
