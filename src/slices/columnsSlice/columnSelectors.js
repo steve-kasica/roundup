@@ -222,6 +222,41 @@ export const selectSelectedColumnIdsByTableId = createSelector(
 );
 
 /**
+ * Select excluded column IDs for a specific table.
+ *
+ * This selector returns column IDs that exist in the table's data but have been
+ * excluded (removed from the idsByTable array) via `excludeColumnFromTable`. It
+ * provides the inverse of `selectActiveColumnIdsByTableId` - showing which columns
+ * are present in the table's data but are currently hidden from view. This is useful
+ * for features like "show excluded columns" or undo operations.
+ *
+ * Note: The order of returned columns is not guaranteed as it depends on the
+ * iteration order of `selectColumnIdsByTableId`.
+ *
+ * @function
+ * @param {Object} state - The Redux state.
+ * @param {string} tableId - The ID of the table to get excluded columns for.
+ * @returns {Array<string>} An array of column IDs that are excluded (not active) for
+ *                          the table. Returns an empty array if no columns are excluded
+ *                          or if the table doesn't exist.
+ *
+ * @example
+ * // Assuming table 't1' has all columns ['c1', 'c2', 'c3', 'c4']
+ * // but only ['c1', 'c2', 'c4'] are active (c3 is excluded)
+ * const excludedIds = selectedExcludedColumnsByTableId(state, 't1');
+ * // Returns: ['c3']
+ */
+export const selectedExcludedColumnsByTableId = createSelector(
+  [
+    (state, tableId) => selectActiveColumnIdsByTableId(state, tableId),
+    (state, tableId) => selectColumnIdsByTableId(state, tableId),
+  ],
+  (activeColumnIds, allColumnIds) => {
+    return allColumnIds.filter((colId) => !activeColumnIds.includes(colId));
+  }
+);
+
+/**
  * Select database column names for selected columns in a specific table.
  *
  * This selector returns the `columnName` property (the actual database column name)

@@ -11,16 +11,21 @@ export default function* deleteOperationsWatcher() {
   yield takeEvery(deleteOperationsRequest.type, deleteOperationsWorker);
 
   // Whenever operations are deleted, also delete their child operations
-  yield takeEvery(deleteOperationsSuccess, function* (action) {
-    const { operationIds } = action.payload;
-    const operations = yield select((state) =>
-      operationIds.map((operationId) => selectOperation(state, operationId))
-    );
-    const operationIdsToDelete = operations
-      .flatMap((op) => op.children)
-      .filter(isOperationId);
-    yield put(deleteOperationsRequest({ operationIds: operationIdsToDelete }));
-  });
+  // yield takeEvery(deleteOperationsSuccess, function* (action) {
+  //   const { operationIds } = action.payload;
+  //   const operations = yield select((state) =>
+  //     operationIds.map((operationId) => selectOperation(state, operationId))
+  //   );
+  //   // TODO
+  //   // if (operations.length > 0) {
+  //   //   const operationIdsToDelete = operations
+  //   //     .flatMap((op) => op.children)
+  //   //     .filter(isOperationId);
+  //   //   yield put(
+  //   //     deleteOperationsRequest({ operationIds: operationIdsToDelete })
+  //   //   );
+  //   // }
+  // });
 
   // If an operation successfully updates such that it has no children, then delete it
   // Note: the `changedPropertiesByOperation` payload object is in the form { operationId: [ keyUpdated, keyUpdated ]}

@@ -8,7 +8,6 @@
 import PropTypes from "prop-types";
 import { forwardRef } from "react";
 import { useDrop } from "react-dnd";
-import { TABLE_ROW_VIEW_CLASS } from "../TableView";
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,17 +15,14 @@ import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_STACK,
   selectOperation,
-  selectOperationByTableId,
   selectRootOperation,
 } from "../../slices/operationsSlice";
 import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
-import { deleteOperationsRequest } from "../../sagas/deleteOperationsSaga";
 import {
   DRAG_TYPE_SOURCE_TABLE_ITEM,
   DRAG_TYPE_SOURCE_TABLE_ROW,
 } from "../CustomDragLayer";
-import { drag } from "d3";
 
 const ForwardedBox = forwardRef((props, ref) => <Box ref={ref} {...props} />);
 ForwardedBox.displayName = "ForwardedBox";
@@ -158,7 +154,6 @@ export default function TableDropTarget({ operationType, children }) {
       if (monitor.didDrop()) {
         return; // Already handled by a nested drop target
       }
-      console.log("TableDropTarget: dropped tables", draggedTableIds, monitor);
       const tableCount = draggedTableIds.length;
       if (
         operationType === OPERATION_TYPE_NO_OP &&
