@@ -1,6 +1,6 @@
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import {
   selectOperationDepth,
@@ -165,6 +165,7 @@ export default function withTableData(WrappedComponent) {
           depth={depth}
           columnIds={columnIds}
           activeColumnIds={activeColumnIds}
+          activeColumnsCount={activeColumnIds.length}
           selectedColumnIds={selectedColumnIds}
           initialColumnCount={initialColumnCount}
           columnCount={columnCount}

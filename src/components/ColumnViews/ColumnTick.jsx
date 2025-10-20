@@ -11,6 +11,7 @@ const ColumnTick = (props) => (
     isOver={props.isOver}
     isLoading={props.isLoading}
     isFocused={props.isFocused}
+    isDraggable={props.isDraggable}
     isNull={props.isNull}
     isError={props.error}
     onMouseEnter={props.hoverColumn}
@@ -18,6 +19,8 @@ const ColumnTick = (props) => (
     sx={{
       borderRadius: 0,
       boxShadow: "none",
+      cursor: "default",
+      minWidth: "5px",
     }}
   />
 );

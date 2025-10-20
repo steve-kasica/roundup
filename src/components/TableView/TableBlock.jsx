@@ -8,12 +8,8 @@ import { Box, Typography } from "@mui/material";
 function TableBlock({
   // props via withTableData
   table,
-  columnCount,
   activeColumnIds,
-  // TODO are these still being used?
-  // isDragging,
-  // isPressed,
-  // isFocused,
+  activeColumnsCount,
 
   // props passed via OperationBlockView
   parentOperationType,
@@ -24,19 +20,23 @@ function TableBlock({
       length:
         parentOperationType === OPERATION_TYPE_STACK
           ? parentColumnCount
-          : columnCount,
+          : activeColumnsCount,
     },
-    (_, i) => (i < columnCount ? activeColumnIds[i] : null)
+    (_, i) => (i < activeColumnsCount ? activeColumnIds[i] : null)
   );
 
   return (
     <Box
+      className="table-block" // Added className for easier targeting during debugging
       sx={{
         height: "100%",
         display: "flex",
+        padding: "1px",
         flexDirection: "row",
         alignItems: "stretch",
-        flexBasis: `${(columnCount / parentColumnCount) * 100}%`,
+        flexBasis: `${
+          (activeColumnsCount / parentColumnCount || activeColumnsCount) * 100
+        }%`,
         position: "relative",
       }}
     >
