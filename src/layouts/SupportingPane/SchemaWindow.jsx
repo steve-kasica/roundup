@@ -12,8 +12,6 @@ import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarg
 import StackSchemaView from "../../components/StackOperationView/StackSchemaView";
 import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
-import SchemaToolbar from "../../components/ui/SchemaToolbar";
-import { Schema } from "@mui/icons-material";
 
 export default function SchemaWindow() {
   const focusedOperationId = useSelector((state) => {

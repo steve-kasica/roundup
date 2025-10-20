@@ -5,10 +5,7 @@ import {
   EnhancedTableRows,
 } from "../../components/TableView";
 import { StackVirtualizedTable } from "../../components/StackOperationView";
-import {
-  selectColumnById,
-  selectSelectedColumns,
-} from "../../slices/columnsSlice";
+import { selectSelectedColumns } from "../../slices/columnsSlice";
 import {
   isOperationId,
   OPERATION_TYPE_PACK,

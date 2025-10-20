@@ -159,6 +159,7 @@ const TableSchema = ({
         columnCount={columnCount}
         rowCount={table.rowCount}
         name={table.name}
+        objectId={table.id}
       />
 
       {/* Column Type Change Menu */}

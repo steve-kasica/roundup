@@ -4,6 +4,7 @@ import {
   ClearAll,
   Delete as ExcludeIcon,
   SelectAll,
+  TableView,
   Visibility,
 } from "@mui/icons-material";
 import { IconButton, Toolbar, Typography, Box } from "@mui/material";
@@ -15,12 +16,16 @@ import {
   setSelectedColumnIds,
 } from "../../slices/columnsSlice";
 import { useCallback } from "react";
+import { TableIcon } from "lucide-react";
+import { isTableId } from "../../slices/tablesSlice";
+import { EnhancedTableLabel } from "../TableView";
 
 const SchemaToolbar = ({
   columnIds,
   columnCount = 0,
   rowCount = 0,
   name = "",
+  objectId,
 }) => {
   const dispatch = useDispatch();
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
@@ -56,19 +61,7 @@ const SchemaToolbar = ({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        *{" "}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Typography
-            variant="subtitle2"
-            fontWeight="bold"
-            color="text.primary"
-          >
-            {name}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {columnCount.toLocaleString()} x {rowCount.toLocaleString() || 0}
-          </Typography>
-        </Box>
+        {isTableId(objectId) ? <EnhancedTableLabel id={objectId} /> : null}
       </Box>
 
       {/* Action Buttons Section - Bulk operations for selected columns */}

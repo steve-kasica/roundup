@@ -157,6 +157,7 @@ const StackSchemaView = withStackOperationData(
           rowCount={operation.rowCount}
           columnCount={activeColumnIds.length}
           columnIds={columnIdMatrix.flat()}
+          objectId={operation.id}
         />
         <Box
           sx={{
