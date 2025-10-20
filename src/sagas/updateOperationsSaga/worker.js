@@ -1,5 +1,6 @@
 import { call, put, select } from "redux-saga/effects";
 import {
+  OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectOperation,
@@ -97,6 +98,9 @@ export default function* updateOperationsWorker(action) {
           operationUpdate.rowCount = undefined; // We don't actually know the row count for pack ops
           failedUpdates.push(operationUpdate);
         }
+      } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
+        // No-op operations don't have views to create
+        successfulUpdates.push(operationUpdate);
       }
     } else {
       // Just a regular update, no need to re-create the view

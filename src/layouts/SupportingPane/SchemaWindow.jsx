@@ -29,6 +29,8 @@ export default function SchemaWindow() {
       return "NO_TABLES";
     } else if (operations.length === 0) {
       return "NO_OPERATIONS";
+    } else if (focusedOperation.children.length === 0) {
+      return "EMPTY_OPERATION";
     } else if (focusedOperation?.operationType === OPERATION_TYPE_STACK) {
       return "STACK_OPERATION";
     } else if (focusedOperation?.operationType === OPERATION_TYPE_PACK) {
@@ -54,7 +56,7 @@ export default function SchemaWindow() {
         >
           <pre>No tables uploaded</pre>
         </Box>
-      ) : mode === "NO_OPERATIONS" ? (
+      ) : mode === "NO_OPERATIONS" || mode === "EMPTY_OPERATION" ? (
         <Box sx={{ flex: 1, height: "100%" }}>
           <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
             <Typography>Drag to add a source table</Typography>

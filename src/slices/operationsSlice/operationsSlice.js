@@ -7,8 +7,8 @@ const initialState = {
   childIds: {}, // Map of <parentOperationId>: [<OperationId>, <TableId>, etc...]
   ids: [], // Array of operation IDs
   root: null, // ID of the root operation
-  focused: null, // ID of the currently focused operation
-  hovered: null, // ID of the currently hovered operation
+  focused: null, // ID of the currently focused operation (TODO is this deprecated?)
+  hovered: null, // ID of the currently hovered operation (TODO is this deprecated?)
 };
 
 const operationsSlice = createSlice({
@@ -68,6 +68,7 @@ const operationsSlice = createSlice({
       const id = action.payload;
 
       // If the operation to remove is the root, we need to find a new root
+      // This doesn't make sense TODO
       if (state.root === id) {
         const parentOperationId = selectParentOperation(
           { operations: state },
@@ -79,6 +80,14 @@ const operationsSlice = createSlice({
       // Remove the operation itself and other operations that have a
       // parent-child relationship with it
       removeOperationFromState(state, id);
+
+      // Remove focus/hover if needed
+      if (state.focused === id) {
+        state.focused = null;
+      }
+      if (state.hovered === id) {
+        state.hovered = null;
+      }
     },
 
     /**
@@ -108,19 +117,22 @@ const operationsSlice = createSlice({
         if (!state.data[update.id]) {
           throw new Error(`Operation with ID ${update.id} does not exist`);
         }
-        state.data[update.id] = {
-          ...state.data[update.id],
-          ...update,
-        };
 
         if (update.isFocused === true) {
           let prevFocused = state.focused;
           if (prevFocused) state.data[prevFocused].isFocused = false;
           state.focused = update.id;
+          delete update.isFocused;
         } else if (update.isFocused === false) {
           state.data[update.id].isFocused = false;
           state.focused = null;
+          delete update.isFocused;
         }
+
+        state.data[update.id] = {
+          ...state.data[update.id],
+          ...update,
+        };
       });
     },
 

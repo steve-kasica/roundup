@@ -25,6 +25,10 @@ import { EnhancedTableBlock } from "../TableView";
 const gridColumns = 12;
 const gridWidth = gridColumns - 2;
 
+// Each root operation type condition also needs to catch
+// the edge case where there are no children (e.g. all tables have been removed)
+// A watcher for deleting operations will handle this cleanup after operation update
+// request finishes.
 export default function CompositeTableSchema() {
   const root = useSelector(
     (state) => state.operations.data[state.operations.root]
@@ -36,11 +40,14 @@ export default function CompositeTableSchema() {
       {maxOperationDepth >= 0 ? (
         <Grid container spacing={0}>
           <Grid size={gridWidth}>
-            {root.operationType === OPERATION_TYPE_STACK ? (
+            {root.operationType === OPERATION_TYPE_STACK &&
+            root.children.length > 0 ? (
               <EnhancedStackOperationBlock id={root.id} />
-            ) : root.operationType === OPERATION_TYPE_PACK ? (
+            ) : root.operationType === OPERATION_TYPE_PACK &&
+              root.children.length > 0 ? (
               <EnhancedPackOperationBlock id={root.id} />
-            ) : root.operationType === OPERATION_TYPE_NO_OP ? (
+            ) : root.operationType === OPERATION_TYPE_NO_OP &&
+              root.children.length > 0 ? (
               <EnhancedTableBlock id={root.children[0]} />
             ) : null}
           </Grid>
