@@ -30,7 +30,7 @@
 
 import { Box, Typography, Menu, MenuItem } from "@mui/material";
 import withTableData from "./withTableData";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setFocusedColumnIds, setColumnType } from "../../slices/columnsSlice"; // TODO: this should be in an HOC
 import {
@@ -61,9 +61,62 @@ const TableSchema = ({
   swapColumns,
   selectColumns,
   insertColumn,
+  setVisibleColumns: setVisibleColumnsInSlice,
 }) => {
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
+  const columnContainerRef = useRef(null);
+  const [visibleColumns, setVisibleColumns] = useState([]);
+
+  /**
+   * Sync local visible columns state to parent/slice whenever it changes
+   */
+  useEffect(() => {
+    setVisibleColumnsInSlice(visibleColumns);
+  }, [visibleColumns, setVisibleColumnsInSlice]);
+
+  /**
+   * Set up scroll event listener on the column container
+   */
+  useEffect(() => {
+    const container = columnContainerRef.current;
+
+    if (!container) return;
+
+    const handleScroll = () => {
+      // Get all column elements within the container
+      const columnElements = container.querySelectorAll("[data-column-id]");
+      const containerRect = container.getBoundingClientRect();
+      const currentlyVisibleColumnIds = [];
+
+      columnElements.forEach((element) => {
+        const elementRect = element.getBoundingClientRect();
+
+        // Check if element is at least partially visible within the container
+        const isVisible =
+          elementRect.left > containerRect.left &&
+          elementRect.right < containerRect.right;
+
+        if (isVisible) {
+          const columnId = element.getAttribute("data-column-id");
+          currentlyVisibleColumnIds.push(columnId);
+        }
+      });
+
+      if (
+        JSON.stringify(currentlyVisibleColumnIds) !==
+        JSON.stringify(visibleColumns)
+      ) {
+        setVisibleColumns(currentlyVisibleColumnIds);
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll);
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [visibleColumns]);
 
   /**
    * Closes the column type dropdown menu
@@ -193,6 +246,7 @@ const TableSchema = ({
 
       {/* Column Cards Container - Horizontally scrollable grid of column summaries */}
       <Box
+        ref={columnContainerRef}
         p={1}
         display={"flex"}
         flexDirection="row"
@@ -208,6 +262,7 @@ const TableSchema = ({
         {activeColumnIds.map((columnId, i) => (
           <Box
             key={columnId}
+            data-column-id={columnId}
             sx={{
               display: "flex",
               flexDirection: "column",

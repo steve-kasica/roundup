@@ -120,6 +120,14 @@ export const selectHoverTargets = (state) => state.columns.hoverTargets;
  */
 export const selectDropTargets = (state) => state.columns.dropTargets;
 
+/**
+ * Selects all visible column IDs.
+ *
+ * @param {*} state - The Redux state.
+ * @returns {Array<string>} - An array of column IDs that are currently visible.
+ */
+export const selectVisibleColumnIds = (state) => state.columns.visible;
+
 // =============================================================================
 // Table-specific Column Selectors
 // =============================================================================

@@ -12,6 +12,8 @@ const StyledColumnCard = styled(Card, {
       "isDropTarget",
       "isSelected",
       "isOver",
+      "isVisible",
+      "isNull",
       "isDraggable",
       "isError",
     ].includes(prop),
@@ -24,6 +26,8 @@ const StyledColumnCard = styled(Card, {
     isSelected,
     isOver,
     isLoading,
+    isVisible,
+    isNull,
     isFocused,
     isDraggable,
     isError,
@@ -67,6 +71,13 @@ const StyledColumnCard = styled(Card, {
     }),
     ...(isFocused && {
       ...theme.palette.column.focused,
+    }),
+    ...(isVisible === false && {
+      ...theme.palette.column.hidden,
+    }),
+    ...(isNull && {
+      fontStyle: "italic",
+      color: theme.palette.text.disabled,
     }),
   })
 );

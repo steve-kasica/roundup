@@ -20,6 +20,7 @@ const initialState = {
   data: {},
   selected: [],
   focused: [],
+  visible: [],
   loading: [],
   dragging: [],
   dropped: [],
@@ -32,6 +33,13 @@ const columnsSlice = createSlice({
   name: "columns",
   initialState,
   reducers: {
+    setVisibleColumns(state, action) {
+      let ids = action.payload;
+      if (!Array.isArray(ids)) {
+        ids = [ids];
+      }
+      state.visible = ids;
+    },
     addColumns(state, action) {
       let columns = action.payload;
       if (!Array.isArray(columns)) {
@@ -475,6 +483,8 @@ export const {
   // Dropping columns
   addColumnsToDropped,
   removeColumnsFromDropped,
+
+  setVisibleColumns,
 
   // Focused column
   setFocusedColumnIds,

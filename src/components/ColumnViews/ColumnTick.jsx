@@ -14,6 +14,7 @@ const ColumnTick = (props) => (
     isDraggable={props.isDraggable}
     isNull={props.isNull}
     isError={props.error}
+    isVisible={props.isVisible}
     onMouseEnter={props.hoverColumn}
     onMouseLeave={props.unhoverColumn}
     sx={{

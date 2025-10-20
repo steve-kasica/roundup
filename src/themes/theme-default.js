@@ -123,6 +123,9 @@ export default createTheme(baseTheme, {
         outlineColor: baseTheme.palette.action.focusedColor,
         shadow: "rgba(251, 192, 45, 0.2)",
       },
+      hidden: {
+        opacity: 0.3,
+      },
     },
   },
   typography: {

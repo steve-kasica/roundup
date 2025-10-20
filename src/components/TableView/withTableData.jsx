@@ -13,6 +13,7 @@ import {
   selectSelectedColumnDBNamesByTableId,
   selectSelectedColumnIdsByTableId,
   setSelectedColumnIds,
+  setVisibleColumns as setVisibleColumnsAction,
 } from "../../slices/columnsSlice";
 import { selectTablesById } from "../../slices/tablesSlice";
 
@@ -104,6 +105,13 @@ export default function withTableData(WrappedComponent) {
         [dispatch]
       );
 
+      const setVisibleColumns = useCallback(
+        (columnIds) => {
+          dispatch(setVisibleColumnsAction(columnIds));
+        },
+        [dispatch]
+      );
+
       const setTableName = useCallback(
         (name) => {
           dispatch(
@@ -176,6 +184,7 @@ export default function withTableData(WrappedComponent) {
           swapColumns={swapColumns}
           excludeColumns={excludeColumns}
           setTableName={setTableName}
+          setVisibleColumns={setVisibleColumns}
           removeTableFromSchema={removeTableFromSchema}
           focusTable={focusTable}
           deleteTable={deleteTable}

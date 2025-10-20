@@ -14,6 +14,7 @@ import {
   selectSelectedColumnIds,
   excludeColumnFromTable,
   selectFocusedColumnIds,
+  selectVisibleColumnIds,
 } from "../../slices/columnsSlice";
 import { setHoveredColumn } from "../../slices/uiSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
@@ -39,6 +40,7 @@ export default function withColumnData(WrappedComponent) {
     const dropTargetColumns = useSelector(selectDropTargets);
     const hoverTargetColumns = useSelector(selectHoverTargets);
     const focusedColumns = useSelector(selectFocusedColumnIds);
+    const visibleColumns = useSelector(selectVisibleColumnIds);
     const table = useSelector((state) => {
       if (isNull) {
         return null;
@@ -62,6 +64,7 @@ export default function withColumnData(WrappedComponent) {
     const isOver = !isNull && hoverTargetColumns.includes(id);
     const isKey = !isNull && table?.keyColumnId === id;
     const isFocused = focusedColumns.includes(id);
+    const isVisible = visibleColumns.includes(id);
 
     const name = column?.name;
     const tableId = column?.tableId;
@@ -119,6 +122,7 @@ export default function withColumnData(WrappedComponent) {
         isOver={isOver}
         isFocused={isFocused}
         isKey={isKey}
+        isVisible={isVisible}
         error={error}
         // Actions handlers
         hoverColumn={hoverColumn}
