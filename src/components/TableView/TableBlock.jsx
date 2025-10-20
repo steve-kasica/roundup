@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
 
-import { EnhancedColumnTick } from "../ColumnViews";
+import { ColumnTick, EnhancedColumnTick } from "../ColumnViews";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
 import withTableData from "./withTableData.jsx";
+import { Box, Typography } from "@mui/material";
 
 function TableBlock({
   // props via withTableData
@@ -28,29 +29,45 @@ function TableBlock({
     (_, i) => (i < columnCount ? activeColumnIds[i] : null)
   );
 
-  const className = [
-    "table",
-    // isFocused ? "focused" : undefined,
-    // isDragging ? "dragging" : undefined,
-    // isPressed ? "pressed" : undefined,
-  ].filter(Boolean);
-
   return (
-    <div
-      className={className.join(" ")}
-      style={{ flexBasis: `${(columnCount / parentColumnCount) * 100}%` }}
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "stretch",
+        flexBasis: `${(columnCount / parentColumnCount) * 100}%`,
+        position: "relative",
+      }}
     >
-      <div className="label">
-        {table.name} <span className="column-count">({columnCount})</span>
-      </div>
-      {/* This should be children */}
-      {ticks.map((columnId, index) => (
-        <EnhancedColumnTick
-          key={`${columnId}-${index}`} // Ensure unique key even when columnId is null
-          id={columnId}
-        />
-      ))}
-    </div>
+      <Typography
+        variant="caption"
+        className="table-id"
+        sx={{
+          position: "absolute",
+          top: 4,
+          left: 4,
+          zIndex: 10,
+          padding: "2px 6px",
+          borderRadius: "4px",
+          fontSize: "0.7rem",
+          pointerEvents: "none",
+          backdropFilter: "blur(2px)",
+        }}
+      >
+        {table.name || table.id}
+      </Typography>
+      {ticks.map((columnId, index) =>
+        columnId === null ? (
+          <ColumnTick key={`empty-${index}`} id={null} />
+        ) : (
+          <EnhancedColumnTick
+            key={`${columnId}-${index}`} // Ensure unique key even when columnId is null
+            id={columnId}
+          />
+        )
+      )}
+    </Box>
   );
 }
 

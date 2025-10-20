@@ -30,22 +30,22 @@ import { selectOperation } from "../operationsSlice";
 export const selectSelectedColumnIds = (state) => state.columns.selected;
 
 /**
- * Select all currently hovered column IDs.
+ * Select all currently hovered column ID.
  *
- * This selector returns column IDs that are currently being hovered over by the user's
+ * This selector returns the column ID that is currently being hovered over by the user's
  * cursor. This is used for UI feedback like highlighting or showing tooltips. The hovered
  * state is typically set by mouse enter/leave events on column components.
  *
  * @function
  * @param {Object} state - The Redux state.
- * @returns {Array<string>} An array of column IDs that are currently hovered.
- *                          Returns an empty array if no columns are being hovered.
+ * @returns {String} The column ID that is currently hovered.
+ *                          Returns null if no columns are being hovered.
  *
  * @example
- * const hoveredIds = selectHoveredColumns(state);
- * // Returns: ['c3'] (typically just one column at a time)
+ * const hoveredId = selectHoveredColumnId(state);
+ * // Returns: 'c3' (Just one column at a time)
  */
-export const selectHoveredColumns = (state) => state.columns.hovered;
+export const selectHoveredColumnId = (state) => state.columns.hovered;
 
 /**
  * Select all column IDs that are currently in a loading state.

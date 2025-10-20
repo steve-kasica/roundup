@@ -1,6 +1,6 @@
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
   selectOperationDepth,
@@ -23,7 +23,6 @@ import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
-import { active } from "d3";
 
 export default function withTableData(WrappedComponent) {
   const componentName =
@@ -64,6 +63,7 @@ export default function withTableData(WrappedComponent) {
       const parentOperation = useSelector((state) =>
         table.operationId ? selectOperation(state, table.operationId) : null
       );
+
       const depth = useSelector((state) =>
         table.operationId
           ? selectOperationDepth(state, table.operationId)

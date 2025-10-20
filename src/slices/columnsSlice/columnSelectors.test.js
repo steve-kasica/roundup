@@ -3,7 +3,7 @@ import {
   selectColumnIdsByTableId,
   selectColumnById,
   selectSelectedColumns,
-  selectHoveredColumns,
+  selectHoveredColumnId,
   selectLoadingColumns,
   selectDraggingColumns,
   selectColumnsByIndex,
@@ -30,7 +30,10 @@ const mockState = {
 
 describe("columnSelectors", () => {
   it("selectColumnIdsByTableId returns column IDs for a table", () => {
-    expect(selectColumnIdsByTableId(mockState, "table1")).toEqual(["col1", "col2"]);
+    expect(selectColumnIdsByTableId(mockState, "table1")).toEqual([
+      "col1",
+      "col2",
+    ]);
     expect(selectColumnIdsByTableId(mockState, "table2")).toEqual(["col3"]);
   });
 
@@ -39,8 +42,16 @@ describe("columnSelectors", () => {
   });
 
   it("selectColumnById returns the correct column object", () => {
-    expect(selectColumnById(mockState, "col1")).toEqual({ id: "col1", name: "A", values: [1, 2] });
-    expect(selectColumnById(mockState, "col3")).toEqual({ id: "col3", name: "C", values: [5, 6] });
+    expect(selectColumnById(mockState, "col1")).toEqual({
+      id: "col1",
+      name: "A",
+      values: [1, 2],
+    });
+    expect(selectColumnById(mockState, "col3")).toEqual({
+      id: "col3",
+      name: "C",
+      values: [5, 6],
+    });
   });
 
   it("selectColumnById returns null for missing column", () => {
@@ -51,8 +62,8 @@ describe("columnSelectors", () => {
     expect(selectSelectedColumns(mockState)).toEqual(["col1"]);
   });
 
-  it("selectHoveredColumns returns hovered column IDs", () => {
-    expect(selectHoveredColumns(mockState)).toEqual(["col2"]);
+  it("selectHoveredColumnId returns hovered column IDs", () => {
+    expect(selectHoveredColumnId(mockState)).toEqual(["col2"]);
   });
 
   it("selectLoadingColumns returns loading column IDs", () => {
@@ -72,20 +83,20 @@ describe("columnSelectors", () => {
     ]);
     // index 1 for table1 and table2 (table2 only has one column)
     const result2 = selectColumnsByIndex(mockState, 1, ["table1", "table2"]);
-    expect(result2).toEqual([
-      { id: "col2", name: "B", values: [3, 4] },
-      null,
-    ]);
+    expect(result2).toEqual([{ id: "col2", name: "B", values: [3, 4] }, null]);
   });
 
   it("selectColumnValues returns values for given column IDs", () => {
-    expect(selectColumnValues(mockState, ["col1", "col3"]))
-      .toEqual({ col1: [1, 2], col3: [5, 6] });
+    expect(selectColumnValues(mockState, ["col1", "col3"])).toEqual({
+      col1: [1, 2],
+      col3: [5, 6],
+    });
   });
 
   it("selectColumnValues omits missing columns", () => {
-    expect(selectColumnValues(mockState, ["col1", "colX"]))
-      .toEqual({ col1: [1, 2] });
+    expect(selectColumnValues(mockState, ["col1", "colX"])).toEqual({
+      col1: [1, 2],
+    });
   });
 
   it("selectColumnValues returns empty object for empty input", () => {

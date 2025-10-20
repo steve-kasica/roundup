@@ -59,11 +59,12 @@ import {
 import { EnhancedColumnHeader } from "../ColumnViews";
 
 const TableRows = ({
+  // Props passed via withTableData HOC
   table,
   selectedColumnIds, // IDs of selected columns in Redux
   selectedColumnNames, // Names of selected columns in the database
+  hoveredIndex,
   // Props passed directly from parent component
-  hoveredIndex = 0,
   onScrollContainerRef = null,
   onScroll = null,
   showHeader = true,
@@ -168,7 +169,11 @@ const TableRows = ({
 
               {/* Column Headers with Sorting */}
               {selectedColumnIds.map((colId, i) => (
-                <TableCell key={`${i}-${colId}`} align="center" sx={{ p: 1 }}>
+                <TableCell
+                  key={`${i}-${colId}`}
+                  align="center"
+                  sx={{ p: "1px" }}
+                >
                   <EnhancedColumnHeader
                     id={colId}
                     isActive={sortConfig.columnId === colId}
@@ -223,7 +228,6 @@ const TableRows = ({
                   <StyledTableCell
                     key={colId}
                     align="center"
-                    isHovered={hoveredIndex === i}
                     isEven={rowIndex % 2 === 0}
                     maxWidth={columnWidths[colId] || "200px"}
                   >

@@ -6,10 +6,20 @@ import { MoreVert } from "@mui/icons-material";
 import withColumnData from "./withColumnData";
 import { EnhancedColumnName } from "./ColumnName";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
+import StyledColumnCard from "./StyledColumnCard";
 
 const ColumnHeader = ({
   // Props pass via withColumnData HOC
   column,
+  isHovered,
+  isDragging,
+  isDropTarget,
+  isSelected,
+  isOver,
+  isLoading,
+  isFocused,
+  isDraggable,
+  isError,
   // Props passed directly from parent
   isActive,
   onSort,
@@ -38,7 +48,25 @@ const ColumnHeader = ({
 
   return (
     <>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
+      <StyledColumnCard
+        isHovered={isHovered}
+        isDragging={isDragging}
+        isDropTarget={isDropTarget}
+        isSelected={isSelected}
+        isOver={isOver}
+        isLoading={isLoading}
+        isFocused={isFocused}
+        isDraggable={isDraggable}
+        isError={isError}
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderRadius: 0,
+        }}
+      >
+        {/* <Box display="flex" alignItems="center" justifyContent="space-between"> */}
         <TableSortLabel
           active={isActive}
           direction={isActive ? sortDirection : "asc"}
@@ -55,17 +83,6 @@ const ColumnHeader = ({
           }}
         >
           <EnhancedColumnName id={column.id} sx={{ cursor: "inherit" }} />
-          {/* 
-          //           <EditableText
-  //             inputRef={headerInputRef}
-  //             initialValue={column?.name}
-  //             placeholder={`Column ${column?.index + 1}`}
-  //             onChange={(newName) => renameColumn(newName)}
-  //             isReadOnly={isReadOnly}
-  //             isEditable={isEditable}
-  //             fontSize="1rem"
-  //           />
-        */}
         </TableSortLabel>
         <IconButton
           size="small"
@@ -80,7 +97,8 @@ const ColumnHeader = ({
         >
           <MoreVert fontSize="small" />
         </IconButton>
-      </Box>
+        {/* </Box> */}
+      </StyledColumnCard>
       {/* Context Menu */}
       <Menu
         anchorEl={menuAnchorEl}

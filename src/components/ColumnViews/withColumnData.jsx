@@ -13,6 +13,7 @@ import {
   selectHoverTargets,
   selectSelectedColumnIds,
   excludeColumnFromTable,
+  selectFocusedColumnIds,
 } from "../../slices/columnsSlice";
 import { setHoveredColumn } from "../../slices/uiSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
@@ -22,6 +23,7 @@ import { selectOperation } from "../../slices/operationsSlice";
 import { createColumnsRequest } from "../../sagas/createColumnsSaga/actions";
 import { CREATION_MODE_INSERTION } from "../../sagas/createColumnsSaga";
 import { useCallback } from "react";
+import { use } from "react";
 
 export default function withColumnData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
@@ -36,6 +38,7 @@ export default function withColumnData(WrappedComponent) {
     const draggingColumns = useSelector(selectDraggingColumns);
     const dropTargetColumns = useSelector(selectDropTargets);
     const hoverTargetColumns = useSelector(selectHoverTargets);
+    const focusedColumns = useSelector(selectFocusedColumnIds);
     const table = useSelector((state) => {
       if (isNull) {
         return null;
@@ -58,6 +61,7 @@ export default function withColumnData(WrappedComponent) {
     const isDropTarget = !isNull && dropTargetColumns.includes(id);
     const isOver = !isNull && hoverTargetColumns.includes(id);
     const isKey = !isNull && table?.keyColumnId === id;
+    const isFocused = focusedColumns.includes(id);
 
     const name = column?.name;
     const tableId = column?.tableId;
@@ -77,6 +81,10 @@ export default function withColumnData(WrappedComponent) {
     const hoverColumn = useCallback(() => {
       dispatch(setHoveredColumn(id));
     }, [dispatch, id]);
+
+    const unhoverColumn = useCallback(() => {
+      dispatch(setHoveredColumn(null));
+    }, [dispatch]);
 
     return (
       <WrappedComponent
@@ -109,11 +117,12 @@ export default function withColumnData(WrappedComponent) {
         isDragging={isDragging}
         isDropTarget={isDropTarget}
         isOver={isOver}
+        isFocused={isFocused}
         isKey={isKey}
         error={error}
         // Actions handlers
         hoverColumn={hoverColumn}
-        unhoverColumn={unHoverColumn}
+        unhoverColumn={unhoverColumn}
         renameColumn={(name) => {
           if (!isNull)
             dispatch(updateColumnsRequest({ columnUpdates: [{ id, name }] }));
@@ -179,13 +188,6 @@ export default function withColumnData(WrappedComponent) {
       dispatch(
         updateColumnsRequest({ columnUpdates: [{ id, isSelected: false }] })
       );
-    }
-
-    function unHoverColumn() {
-      // TODO: is this necessary?
-      // if (!isNull) {
-      //   dispatch(removeFromHoveredColumns(id));
-      // }
     }
   };
 }

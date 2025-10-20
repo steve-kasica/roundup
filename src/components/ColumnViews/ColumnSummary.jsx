@@ -22,13 +22,19 @@ const ColumnSummary = ({
   isSelected,
   isDragging,
   isOver,
-  canDropHere,
+  canDropHere: isDropTarget,
   isDraggable = false,
   isError = false,
+  isFocused,
+  isHovered,
   dragDropRef = null,
   handleInsertColumnLeft,
   handleInsertColumnRight,
 }) => {
+  if (isOver) {
+    console.log("ColumnSummary isOver true", column?.id);
+  }
+
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   if (!column) {
@@ -49,11 +55,13 @@ const ColumnSummary = ({
   return (
     <StyledColumnCard
       ref={dragDropRef}
+      isHovered={isHovered}
       isDragging={isDragging}
       isOver={isOver}
-      canDropHere={canDropHere}
+      isDropTarget={isDropTarget}
       isSelected={isSelected}
       isDraggable={isDraggable}
+      isFocused={isFocused}
       isError={isError}
       onMouseEnter={hoverColumn}
       onMouseLeave={unhoverColumn}
