@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
 import { Box, Typography } from "@mui/material";
 import {
@@ -24,9 +24,64 @@ const StackSchemaView = withStackOperationData(
     focusColumns,
     swapColumns,
     insertColumnIntoChildAtIndex,
+    setVisibleColumns: setVisibleColumnsInSlice,
   }) => {
     const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
     const [selectedTableColumnIds, setSelectedTableColumnIds] = useState([]);
+    const columnContainerRef = useRef(null);
+    const [visibleColumns, setVisibleColumns] = useState([]);
+
+    // Sync local visible columns state to parent/slice whenver it changes
+    useEffect(() => {
+      setVisibleColumnsInSlice(visibleColumns);
+    }, [visibleColumns, setVisibleColumnsInSlice]);
+
+    /**
+     * Set up scroll event listener on the column container
+     */
+    useEffect(() => {
+      const container = columnContainerRef.current;
+
+      if (!container) return;
+
+      const handleScroll = () => {
+        // Get all column elements within the container
+        const columnElements = container.querySelectorAll("[data-column-id]");
+        const containerRect = container.getBoundingClientRect();
+        const currentlyVisibleColumnIds = [];
+
+        columnElements.forEach((element) => {
+          const elementRect = element.getBoundingClientRect();
+
+          // Check if element is at least partially visible within the container (horizontal and vertical)
+          const isVisible =
+            elementRect.right > containerRect.left &&
+            elementRect.left < containerRect.right &&
+            elementRect.bottom > containerRect.top &&
+            elementRect.top < containerRect.bottom;
+
+          if (isVisible) {
+            const columnId = element.getAttribute("data-column-id");
+            currentlyVisibleColumnIds.push(columnId);
+          }
+        });
+
+        console.log({ currentlyVisibleColumnIds, visibleColumns });
+
+        if (
+          JSON.stringify(currentlyVisibleColumnIds) !==
+          JSON.stringify(visibleColumns)
+        ) {
+          setVisibleColumns(currentlyVisibleColumnIds);
+        }
+      };
+
+      container.addEventListener("scroll", handleScroll);
+
+      return () => {
+        container.removeEventListener("scroll", handleScroll);
+      };
+    }, [visibleColumns]);
 
     // Call selectColumns whenever selectedTableColumnIds changes
     useEffect(() => {
@@ -267,6 +322,8 @@ const StackSchemaView = withStackOperationData(
 
           {/* Data Columns Container - Takes remaining space */}
           <Box
+            className="column-container"
+            ref={columnContainerRef}
             sx={{
               display: "flex",
               flexDirection: "row",
@@ -317,13 +374,6 @@ const StackSchemaView = withStackOperationData(
                     flex: 1,
                     overflow: "hidden",
                     transition: "all 0.2s ease-in-out", // Follows ColumnSummary.jsx
-                    // ...(selectedColumnIndices.includes(colIndex) && {
-                    //   backgroundColor: "rgba(0, 0, 0, 0.1)",
-                    //   outline: "2px solid blue", // This has to match padding above
-                    //   outlineColor: "#1976d2",
-                    //   borderRadius: "4px",
-                    // }),
-                    // userSelect: "none",
                   }}
                 >
                   {columnIdMatrix.map((row) => {
@@ -389,6 +439,7 @@ const StackSchemaView = withStackOperationData(
                             swapColumns(targetItem, draggedItem)
                           }
                         >
+                          {/* Interactive Column Summary Card that includes [data-column-id] */}
                           <EnhancedColumnSummary
                             id={columnId}
                             onClick={(event) => onCellClick(event, columnId)}

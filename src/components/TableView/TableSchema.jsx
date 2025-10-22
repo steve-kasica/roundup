@@ -262,7 +262,6 @@ const TableSchema = ({
         {activeColumnIds.map((columnId, i) => (
           <Box
             key={columnId}
-            data-column-id={columnId}
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -290,7 +289,7 @@ const TableSchema = ({
                 swapColumns(targetItem.id, draggedItem.id);
               }}
             >
-              {/* Interactive Column Summary Card */}
+              {/* Interactive Column Summary Card that includes [data-column-id] */}
               <EnhancedColumnSummary
                 id={columnId}
                 onClick={(event) => handleColumnClick(event, columnId)}

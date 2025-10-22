@@ -54,6 +54,7 @@ const ColumnSummary = ({
 
   return (
     <StyledColumnCard
+      data-column-id={column.id}
       ref={dragDropRef}
       isHovered={isHovered}
       isDragging={isDragging}

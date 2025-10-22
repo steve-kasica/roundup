@@ -4,19 +4,11 @@ import {
   OPERATION_TYPE_STACK,
   selectOperation,
 } from "../../slices/operationsSlice";
-// import withOperationData from "../HOC/withOperationData";
-// import { PackOperationLabel } from "../PackOperationView";
-// import { StackOperationLabel } from "../StackOperationView";
-
-/* eslint-disable react/prop-types */
 import { Stack, Typography } from "@mui/material";
 import StackOperationIcon from "../StackOperationView/StackOperationIcon";
 import PackOperationIcon from "../PackOperationView/PackOperationIcon";
 import { useSelector } from "react-redux";
-import {
-  selectActiveColumnIdsByTableId,
-  selectColumnIdsByTableId,
-} from "../../slices/columnsSlice";
+import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
 
 const OperationLabel = ({
   id,
@@ -60,7 +52,6 @@ const EnhancedOperationLabel = (props) => {
   const activeColumnIds = useSelector((state) =>
     selectActiveColumnIdsByTableId(state, props.id)
   );
-  console.log("EnhancedOperationLabel operation:", operation, activeColumnIds);
   return (
     <OperationLabel
       {...props}

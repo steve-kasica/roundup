@@ -3,12 +3,12 @@ import PropTypes from "prop-types";
 import { useCallback, useMemo } from "react";
 import {
   selectActiveColumnIdsByTableId,
-  selectColumnById,
   selectColumnIdMatrixByOperationId,
   selectColumnIdsByTableId,
   selectSelectedColumnDBNamesByTableId,
   selectSelectedColumnIdsByTableId,
   setFocusedColumnIds,
+  setVisibleColumns as setVisibleColumnsAction,
 } from "../../slices/columnsSlice";
 import {
   selectOperation,
@@ -136,6 +136,13 @@ export default function withStackOperationData(WrappedComponent) {
       [dispatch]
     );
 
+    const setVisibleColumns = useCallback(
+      (columnIds) => {
+        dispatch(setVisibleColumnsAction(columnIds));
+      },
+      [dispatch]
+    );
+
     return (
       <WrappedComponent
         // Props related to the operation itself
@@ -157,6 +164,7 @@ export default function withStackOperationData(WrappedComponent) {
         selectedTableIds={selectedTableIds}
         selection={selection}
         // Callback props to dispatch actions
+        setVisibleColumns={setVisibleColumns}
         selectColumns={selectColumns}
         insertColumnIntoChildAtIndex={insertColumnIntoChildAtIndex}
         swapColumns={(target, source) => {
