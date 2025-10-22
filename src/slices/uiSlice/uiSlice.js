@@ -19,16 +19,20 @@ export const initialState = {
   showColumnIndexDetails: false,
   dialogContent: null,
   levelOfDetail: LOD.HIGH, // set HIGH as default
-
   // Used to coordinate the visibility of columns
   // in Operations Detail with the Composite Table Schema
   opsDetailVisableColumns: [],
+
+  focusedObject: null,
 };
 
 export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    setFocusedObject(state, action) {
+      state.focusedObject = action.payload;
+    },
     setHoveredColumn(state, action) {
       state.hoveredColumn = action.payload;
     },
@@ -125,6 +129,8 @@ export const {
   removeFromOpsDetailVisableColumns,
   clearOpsDetailVisableColumns,
   setShowColumnIndexDetails,
+
+  setFocusedObject,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

@@ -1,4 +1,4 @@
-import { Box, Divider, Stack, Typography } from "@mui/material";
+import { Alert, Box, Divider, Stack, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
   EnhancedTableLabel,
@@ -7,53 +7,45 @@ import {
 import { StackVirtualizedTable } from "../../components/StackOperationView";
 import { selectSelectedColumns } from "../../slices/columnsSlice";
 import {
-  isOperationId,
+  OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  selectFocusedOperationId,
   selectOperation,
 } from "../../slices/operationsSlice";
 import { EnhancedPackVirtualTable } from "../../components/PackOperationView";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../components/OperationView";
-import { useMemo } from "react";
+
+const VIEW_EMPTY = "EMPTY_SELECTION";
+const VIEW_TABLE = "TABLE";
+const VIEW_STACK = "STACK";
+const VIEW_PACK = "PACK";
+const VIEW_NO_OP = "NO_OP";
+const VIEW_UNKNOWN = "UNKNOWN";
 
 const TableWindow = () => {
-  const focusedOperation = useSelector((state) => {
-    const opId = selectFocusedOperationId(state);
-    return opId ? selectOperation(state, opId) : null;
-  });
-
-  // Select the whole column objects for all selected columns
+  const focusedObjectId = useSelector((state) => state.ui.focusedObject);
+  const isFocusedTable = isTableId(focusedObjectId);
+  const focusedOperation = useSelector((state) =>
+    isFocusedTable ? null : selectOperation(state, focusedObjectId)
+  );
   const selectedColumns = useSelector(selectSelectedColumns);
 
-  const selectedTableIds = useMemo(() => {
-    return Array.from(new Set(selectedColumns.map(({ tableId }) => tableId)));
-  }, [selectedColumns]);
-
-  const viewMode = useSelector((state) => {
-    if (selectedTableIds.length === 0) {
-      return "UNKNOWN";
-    } else if (selectedTableIds.length > 1) {
-      return "UNKNOWN"; // multiple tables selected, not supported
-    }
-    const tableId = selectedTableIds[0];
-    if (isTableId(tableId)) {
-      return "TABLE";
-    } else if (
-      isOperationId(tableId) &&
-      selectOperation(state, tableId).operationType === OPERATION_TYPE_STACK
-    ) {
-      return "STACK";
-    } else if (
-      isOperationId(tableId) &&
-      selectOperation(state, tableId).operationType === OPERATION_TYPE_PACK
-    ) {
-      return "PACK";
+  const viewMode = (function (opType, areSelectedColumns) {
+    if (!areSelectedColumns) {
+      return VIEW_EMPTY;
+    } else if (isFocusedTable) {
+      return VIEW_TABLE;
+    } else if (opType === OPERATION_TYPE_STACK) {
+      return VIEW_STACK;
+    } else if (opType === OPERATION_TYPE_PACK) {
+      return VIEW_PACK;
+    } else if (opType === OPERATION_TYPE_NO_OP) {
+      return VIEW_NO_OP;
     } else {
-      return "UNKNOWN";
+      return VIEW_UNKNOWN;
     }
-  });
+  })(focusedOperation?.operationType, selectedColumns.length > 0);
 
   return (
     <Box
@@ -78,7 +70,7 @@ const TableWindow = () => {
           padding={1}
         >
           <Stack direction="row" spacing={1} alignItems="center">
-            {viewMode === "UNKNOWN" ? (
+            {viewMode === VIEW_EMPTY ? (
               <Typography
                 variant="h6"
                 component="div"
@@ -86,18 +78,14 @@ const TableWindow = () => {
               >
                 No Table Selected
               </Typography>
-            ) : viewMode === "TABLE" ? (
-              <EnhancedTableLabel id={selectedTableIds[0]} />
-            ) : viewMode === "STACK" || viewMode === "PACK" ? (
-              <EnhancedOperationLabel id={selectedTableIds[0]} />
+            ) : viewMode === VIEW_TABLE ? (
+              <EnhancedTableLabel id={focusedObjectId} />
+            ) : viewMode === VIEW_NO_OP ? (
+              <EnhancedTableLabel id={focusedOperation.children[0]} />
+            ) : viewMode === VIEW_STACK || viewMode === VIEW_PACK ? (
+              <EnhancedOperationLabel id={focusedObjectId} />
             ) : (
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ userSelect: "none" }}
-              >
-                Error: unsupported state!
-              </Typography>
+              <Alert severity="error">Error: unsupported state!</Alert>
             )}
           </Stack>
         </Box>
@@ -110,21 +98,32 @@ const TableWindow = () => {
         display="flex"
         flexDirection="column"
       >
-        {viewMode === "UNKNOWN" ? (
+        {viewMode === VIEW_EMPTY ? (
           <Typography variant="h6" align="center" sx={{ mt: 2 }}>
             No columns selected. Please select columns from the schema window.
           </Typography>
-        ) : viewMode === "TABLE" ? (
-          <EnhancedTableRows id={selectedTableIds[0]} />
-        ) : viewMode === "STACK" ? (
-          <StackVirtualizedTable id={selectedTableIds[0]} />
-        ) : viewMode === "PACK" ? (
-          <EnhancedPackVirtualTable id={selectedTableIds[0]} />
+        ) : viewMode === VIEW_TABLE ? (
+          <EnhancedTableRows id={focusedObjectId} />
+        ) : viewMode === VIEW_NO_OP ? (
+          <EnhancedTableRows id={focusedOperation.children[0]} />
+        ) : viewMode === VIEW_STACK ? (
+          <StackVirtualizedTable id={focusedObjectId} />
+        ) : viewMode === VIEW_PACK ? (
+          <EnhancedPackVirtualTable id={focusedObjectId} />
         ) : (
-          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
-            Error: unsupported state!
-            {JSON.stringify({ selectedTableIds, focusedOperation })}
-          </Typography>
+          <Alert severity="error">
+            <pre>
+              {JSON.stringify(
+                {
+                  viewMode: viewMode || null,
+                  focusedOperation: focusedOperation || null,
+                  focusedObjectId: focusedObjectId || null,
+                },
+                null,
+                2
+              )}
+            </pre>
+          </Alert>
         )}
       </Box>
     </Box>

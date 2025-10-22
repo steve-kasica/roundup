@@ -18,6 +18,7 @@ import {
 } from "../../lib/duckdb";
 import { updateOperationsFailure, updateOperationsSuccess } from "./actions";
 import { serializeError } from "../../components/Errors/PackErrors";
+import { setFocusedObject } from "../../slices/uiSlice";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
@@ -109,9 +110,9 @@ export default function* updateOperationsWorker(action) {
   }
 
   const combinedUpdates = [...successfulUpdates, ...failedUpdates];
-  combinedUpdates[combinedUpdates.length - 1].isFocused = true;
 
   yield put(updateOperationsSlice(combinedUpdates));
+  yield put(setFocusedObject(combinedUpdates[combinedUpdates.length - 1].id)); // focus the last operation created
 
   const formatSagaEndPayload = (updates) => ({
     operationIds: updates.map(({ id }) => id),

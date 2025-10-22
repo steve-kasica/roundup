@@ -24,6 +24,7 @@ import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
+import { setFocusedObject } from "../../slices/uiSlice";
 
 export default function withTableData(WrappedComponent) {
   const componentName =
@@ -148,7 +149,9 @@ export default function withTableData(WrappedComponent) {
         [dispatch, id]
       );
 
-      const focusTable = useCallback(() => {}, []);
+      const focusTable = useCallback(() => {
+        dispatch(setFocusedObject(id));
+      }, [dispatch, id]);
 
       // Current number of non-excluded columns
       const columnCount = activeColumnIds.length;

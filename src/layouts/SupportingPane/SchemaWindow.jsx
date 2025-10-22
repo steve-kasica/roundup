@@ -7,44 +7,26 @@ import {
   OPERATION_TYPE_NO_OP,
 } from "../../slices/operationsSlice";
 import { useSelector } from "react-redux";
-import { selectAllTablesData } from "../../slices/tablesSlice";
+import { isTableId } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
 import StackSchemaView from "../../components/StackOperationView/StackSchemaView";
 import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
 
 export default function SchemaWindow() {
-  const focusedOperationId = useSelector((state) => {
-    const id = state.operations.focused;
-    return id;
-  });
-  const focusedOperation = useSelector((state) => {
-    return selectOperation(state, focusedOperationId);
-  });
-  const tables = useSelector(selectAllTablesData);
+  const areTablesUploaded = useSelector(
+    (state) => Object.keys(state.tables.data).length > 0
+  );
+  const focusedObjectId = useSelector((state) => state.ui.focusedObject);
+  const isFocusedTable = isTableId(focusedObjectId);
+  const focusedOperation = useSelector((state) =>
+    isFocusedTable ? null : selectOperation(state, focusedObjectId)
+  );
   const operations = useSelector(selectAllOperationIds);
-
-  const mode = (function () {
-    if (tables.length === 0) {
-      return "NO_TABLES";
-    } else if (operations.length === 0) {
-      return "NO_OPERATIONS";
-    } else if (focusedOperation.children.length === 0) {
-      return "EMPTY_OPERATION";
-    } else if (focusedOperation?.operationType === OPERATION_TYPE_STACK) {
-      return "STACK_OPERATION";
-    } else if (focusedOperation?.operationType === OPERATION_TYPE_PACK) {
-      return "PACK_OPERATION";
-    } else if (focusedOperation?.operationType === OPERATION_TYPE_NO_OP) {
-      return "TABLE_VIEW";
-    } else {
-      return "UNSUPPORTED_OPERATION";
-    }
-  })();
 
   return (
     <>
-      {mode === "NO_TABLES" ? (
+      {!areTablesUploaded ? (
         <Box
           sx={{
             width: "100%",
@@ -56,20 +38,22 @@ export default function SchemaWindow() {
         >
           <pre>No tables uploaded</pre>
         </Box>
-      ) : mode === "NO_OPERATIONS" || mode === "EMPTY_OPERATION" ? (
+      ) : operations.length === 0 || focusedOperation?.children.length === 0 ? (
         <Box sx={{ flex: 1, height: "100%" }}>
           <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
             <Typography>Drag to add a source table</Typography>
           </TableDropTarget>
         </Box>
-      ) : mode === "STACK_OPERATION" ? (
-        <StackSchemaView id={focusedOperation.id} />
-      ) : mode === "PACK_OPERATION" ? (
+      ) : focusedOperation?.operationType === OPERATION_TYPE_STACK ? (
+        <StackSchemaView id={focusedObjectId} />
+      ) : focusedOperation?.operationType === OPERATION_TYPE_PACK ? (
         <Box sx={{ flex: 1, height: "100%", overflow: "hidden" }}>
-          <PackSchemaView id={focusedOperation.id} />
+          <PackSchemaView id={focusedObjectId} />
         </Box>
-      ) : mode === "TABLE_VIEW" ? (
+      ) : focusedOperation?.operationType === OPERATION_TYPE_NO_OP ? (
         <EnhancedTableSchema id={focusedOperation.children[0]} />
+      ) : isFocusedTable ? (
+        <EnhancedTableSchema id={focusedObjectId} />
       ) : (
         <Box
           sx={{
@@ -87,7 +71,7 @@ export default function SchemaWindow() {
               <pre>
                 {JSON.stringify(
                   {
-                    focusedOperationId: focusedOperationId || null,
+                    focusedObjectId: focusedObjectId || null,
                     focusedOperation: focusedOperation || null,
                     allOperations: operations || null,
                   },

@@ -137,6 +137,7 @@ function TableRowSummary({
   renameTable,
   dropTable,
   isInSchema,
+  focusTable,
   isDisabled = false,
 
   // props passed from TableLayout.jsx
@@ -290,6 +291,7 @@ function TableRowSummary({
           }
         }
       }}
+      onDoubleClick={focusTable}
     >
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
         <Stack direction="row" alignItems="center" gap="1px">

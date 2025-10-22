@@ -46,6 +46,7 @@ import {
 import { group } from "d3";
 import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
 import { selectOperationQueryData } from "../../slices/operationsSlice/operationsSelectors";
+import { setFocusedObject } from "../../slices/uiSlice";
 
 export const calcPackColumnCount = (state, childIds) => {
   const columnCountTotal = childIds.reduce(
@@ -159,9 +160,11 @@ export default function* createOperationsWorker(action) {
   }
 
   const combinedOperations = [...successfulCreations, ...failedCreations];
-  combinedOperations[combinedOperations.length - 1].isFocused = true;
 
   yield put(addOperationsToSlice(combinedOperations));
+  yield put(
+    setFocusedObject(combinedOperations[combinedOperations.length - 1].id)
+  ); // focus the last operation created
 
   if (successfulCreations.length > 0) {
     yield put(
