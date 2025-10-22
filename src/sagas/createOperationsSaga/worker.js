@@ -124,7 +124,7 @@ export default function* createOperationsWorker(action) {
           operation.id
         );
         operation.rowCount = rowCount;
-        operation.initialColumnCount = columnCount;
+        operation.columnCount = columnCount; // initial column count
       } else if (operation.operationType === OPERATION_TYPE_STACK) {
         // Creates a stacked view using the first child table as template
         yield call(createStackView, queryData);
@@ -133,7 +133,7 @@ export default function* createOperationsWorker(action) {
           operation.id
         );
         operation.rowCount = rowCount;
-        operation.initialColumnCount = columnCount;
+        operation.columnCount = columnCount; // initial column count
       }
       // Do nothing for NO_OP operations
 
