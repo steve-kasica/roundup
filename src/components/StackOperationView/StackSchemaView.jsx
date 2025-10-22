@@ -79,69 +79,113 @@ const StackSchemaView = withStackOperationData(
     );
     const onRowLabelClick = useCallback(
       (event, rowIndex) => {
-        let columnIdsToSelect, columnIdsToUnselect;
+        if (
+          event.shiftKey &&
+          selectionAnchorCell !== null &&
+          Array.isArray(selectionAnchorCell)
+        ) {
+          // Shift+Click: select rectangular range from anchor row to current row (all columns in between)
+          const [anchorRow] = selectionAnchorCell;
+          const startRow = Math.min(anchorRow, rowIndex);
+          const endRow = Math.max(anchorRow, rowIndex);
 
-        // Single click: select only this row group for all tables
-        columnIdsToSelect = columnIdMatrix[rowIndex];
-        columnIdsToUnselect = [
-          ...columnIdMatrix.filter((_, i) => i !== rowIndex).flat(),
-          // ...selectedTableColumnIds,
-        ];
-        setSelectionAnchorCell(rowIndex);
+          const columnIdsToSelect = columnIdMatrix
+            .slice(startRow, endRow + 1)
+            .flat()
+            .filter((id) => id !== null);
 
-        selectColumns(columnIdsToSelect, columnIdsToUnselect);
+          setSelectedTableColumnIds(columnIdsToSelect);
+          // Don't update anchor on shift+click
+        } else if (event.metaKey || event.ctrlKey) {
+          // Ctrl/Meta+Click: toggle all cells in this row
+          const rowColumnIds = columnIdMatrix[rowIndex].filter(
+            (id) => id !== null
+          );
+
+          setSelectedTableColumnIds((prev) => {
+            // Check if all cells in this row are already selected
+            const allRowCellsSelected = rowColumnIds.every((id) =>
+              prev.includes(id)
+            );
+
+            if (allRowCellsSelected) {
+              // Remove all cells from this row
+              return prev.filter((id) => !rowColumnIds.includes(id));
+            } else {
+              // Add all cells from this row (that aren't already selected)
+              const newIds = rowColumnIds.filter((id) => !prev.includes(id));
+              return [...prev, ...newIds];
+            }
+          });
+          // Update anchor for next shift+click operation
+          setSelectionAnchorCell([rowIndex, 0]);
+        } else {
+          // Single click: select only this entire row
+          const columnIdsToSelect = columnIdMatrix[rowIndex].filter(
+            (id) => id !== null
+          );
+          setSelectedTableColumnIds(columnIdsToSelect);
+          // Update anchor for next shift+click operation
+          setSelectionAnchorCell([rowIndex, 0]);
+        }
       },
-      [columnIdMatrix, selectColumns]
+      [columnIdMatrix, selectionAnchorCell]
     );
 
     const onColumnLabelClick = useCallback(
       (event, colIndex) => {
-        let columnIdsToSelect, columnIdsToUnselect;
-        if (event.shiftKey && selectionAnchorCell !== null) {
-          // Shift+Click: select range of operation column indices from anchor to extent
-          const anchorIndex = selectionAnchorCell;
-          const extentIndex = colIndex;
-          const startIndex = Math.min(anchorIndex, extentIndex);
-          const endIndex = Math.max(anchorIndex, extentIndex);
+        if (
+          event.shiftKey &&
+          selectionAnchorCell !== null &&
+          Array.isArray(selectionAnchorCell)
+        ) {
+          // Shift+Click: select rectangular range from anchor column to current column (all rows in between)
+          const [, anchorCol] = selectionAnchorCell;
+          const startCol = Math.min(anchorCol, colIndex);
+          const endCol = Math.max(anchorCol, colIndex);
 
-          columnIdsToSelect = activeColumnIds.slice(startIndex, endIndex + 1);
-          // .filter((id) => selectedTableColumnIds.indexOf(id) === -1); // Only select new columns
-          columnIdsToUnselect = activeColumnIds.filter(
-            (_, i) => i < startIndex || i > endIndex
-          );
+          const columnIdsToSelect = columnIdMatrix
+            .map((row) => row.slice(startCol, endCol + 1))
+            .flat()
+            .filter((id) => id !== null);
+
+          setSelectedTableColumnIds(columnIdsToSelect);
+          // Don't update anchor on shift+click
         } else if (event.metaKey || event.ctrlKey) {
-          // Cmd/Ctrl+Click: toggle selection of this operation column
-          // if (selectedTableColumnIds.includes(activeColumnIds[colIndex])) {
-          //   columnIdsToSelect = []; // Don't select any new columns
-          //   columnIdsToUnselect = [activeColumnIds[colIndex]];
-          // } else {
-          //   columnIdsToSelect = [activeColumnIds[colIndex]];
-          //   columnIdsToUnselect = [];
-          // }
+          // Ctrl/Meta+Click: toggle all cells in this column
+          const colColumnIds = columnIdMatrix
+            .map((row) => row[colIndex])
+            .filter((id) => id !== null);
 
-          setSelectionAnchorCell(colIndex);
+          setSelectedTableColumnIds((prev) => {
+            // Check if all cells in this column are already selected
+            const allColCellsSelected = colColumnIds.every((id) =>
+              prev.includes(id)
+            );
+
+            if (allColCellsSelected) {
+              // Remove all cells from this column
+              return prev.filter((id) => !colColumnIds.includes(id));
+            } else {
+              // Add all cells from this column (that aren't already selected)
+              const newIds = colColumnIds.filter((id) => !prev.includes(id));
+              return [...prev, ...newIds];
+            }
+          });
+          // Update anchor for next shift+click operation
+          setSelectionAnchorCell([0, colIndex]);
         } else {
-          // Single click: select only this column group, also handles initial shift clicks
-          // if (selectedTableColumnIds.includes(activeColumnIds[colIndex])) {
-          //   columnIdsToSelect = []; // Don't select any new columns
-          //   columnIdsToUnselect = selectedTableColumnIds.filter(
-          //     (id) => id !== activeColumnIds[colIndex]
-          //   );
-          //   setSelectionAnchorCell(colIndex);
-          // } else {
-          //   columnIdsToSelect = [activeColumnIds[colIndex]];
-          //   columnIdsToUnselect = [
-          //     ...selectedTableColumnIds,
-          //     ...columnIdMatrix.flat(), // if clicking for table column selection to opeation column selection
-          //   ];
-          // }
+          // Single click: select only this entire column
+          const columnIdsToSelect = columnIdMatrix
+            .map((row) => row[colIndex])
+            .filter((id) => id !== null);
 
-          setSelectionAnchorCell(colIndex);
+          setSelectedTableColumnIds(columnIdsToSelect);
+          // Update anchor for next shift+click operation
+          setSelectionAnchorCell([0, colIndex]);
         }
-
-        selectColumns(columnIdsToSelect, columnIdsToUnselect);
       },
-      [selectionAnchorCell, selectColumns, activeColumnIds, columnIdMatrix]
+      [columnIdMatrix, selectionAnchorCell]
     );
     const onInsertColumnIntoChildTable = useCallback(
       (i, j) => {
