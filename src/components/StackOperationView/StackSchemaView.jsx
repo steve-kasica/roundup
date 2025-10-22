@@ -153,10 +153,10 @@ const StackSchemaView = withStackOperationData(
     return (
       <Box display={"flex"} flexDirection="column" height="100%">
         <SchemaToolbar
-          name={operation.name}
-          rowCount={operation.rowCount}
-          columnCount={activeColumnIds.length}
           columnIds={columnIdMatrix.flat()}
+          columnCount={activeColumnIds.length}
+          rowCount={operation.rowCount}
+          name={operation.name}
           objectId={operation.id}
         />
         <Box

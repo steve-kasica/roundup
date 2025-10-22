@@ -19,14 +19,9 @@ import { useCallback } from "react";
 import { TableIcon } from "lucide-react";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedTableLabel } from "../TableView";
+import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 
-const SchemaToolbar = ({
-  columnIds,
-  columnCount = 0,
-  rowCount = 0,
-  name = "",
-  objectId,
-}) => {
+const SchemaToolbar = ({ columnIds, objectId }) => {
   const dispatch = useDispatch();
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
   const areAllColumnsSelected =
@@ -61,7 +56,11 @@ const SchemaToolbar = ({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        {isTableId(objectId) ? <EnhancedTableLabel id={objectId} /> : null}
+        {isTableId(objectId) ? (
+          <EnhancedTableLabel id={objectId} />
+        ) : (
+          <EnhancedOperationLabel id={objectId} />
+        )}
       </Box>
 
       {/* Action Buttons Section - Bulk operations for selected columns */}

@@ -132,6 +132,8 @@ export default function withStackOperationData(WrappedComponent) {
         selectedColumnIds={selectedColumnIds}
         selectedColumnNames={selectedColumnNames}
         selectedColumnIndices={selectedColumnIndices}
+        columnCount={activeColumnIds.length}
+        rowCount={operation.rowCount}
         // Props related to the operation's children tables
         columnIdMatrix={columnIdMatrix}
         m={m}
