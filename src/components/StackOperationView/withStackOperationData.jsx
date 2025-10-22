@@ -17,6 +17,10 @@ import {
 } from "../../slices/operationsSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
+import {
+  createColumnsRequest,
+  CREATION_MODE_INSERTION,
+} from "../../sagas/createColumnsSaga";
 
 // TODO: how to handle the case when tableIds are actually
 // operation Ids? Well, I guess a operation
@@ -120,6 +124,18 @@ export default function withStackOperationData(WrappedComponent) {
       [dispatch]
     );
 
+    const insertColumnIntoChildAtIndex = useCallback(
+      (childTableId, targetIndex) => {
+        dispatch(
+          createColumnsRequest({
+            mode: CREATION_MODE_INSERTION,
+            columnInfo: [{ parentId: childTableId, index: targetIndex }],
+          })
+        );
+      },
+      [dispatch]
+    );
+
     return (
       <WrappedComponent
         // Props related to the operation itself
@@ -142,6 +158,7 @@ export default function withStackOperationData(WrappedComponent) {
         selection={selection}
         // Callback props to dispatch actions
         selectColumns={selectColumns}
+        insertColumnIntoChildAtIndex={insertColumnIntoChildAtIndex}
         swapColumns={(target, source) => {
           const tableColumnIds =
             columnIdMatrix[operation.children.indexOf(target.tableId)];

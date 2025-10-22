@@ -323,4 +323,6 @@ TableSchema.displayName = "TableSchema";
  */
 const EnhancedTableSchema = withTableData(TableSchema);
 
+EnhancedTableSchema.displayName = "EnhancedTableSchema";
+
 export { EnhancedTableSchema, TableSchema };

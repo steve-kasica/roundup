@@ -23,6 +23,7 @@ const StackSchemaView = withStackOperationData(
     selectColumns,
     focusColumns,
     swapColumns,
+    insertColumnIntoChildAtIndex,
   }) => {
     const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
     const [selectedTableColumnIds, setSelectedTableColumnIds] = useState([]);
@@ -148,6 +149,12 @@ const StackSchemaView = withStackOperationData(
         selectColumns(columnIdsToSelect, columnIdsToUnselect);
       },
       [selectionAnchorCell, selectColumns, activeColumnIds, columnIdMatrix]
+    );
+    const onInsertColumnIntoChildTable = useCallback(
+      (i, j) => {
+        insertColumnIntoChildAtIndex(operation.children[i], j);
+      },
+      [insertColumnIntoChildAtIndex, operation.children]
     );
 
     return (
@@ -354,6 +361,18 @@ const StackSchemaView = withStackOperationData(
                             isDraggable={selectedTableColumnIds.includes(
                               columnId
                             )}
+                            handleInsertColumnLeft={() =>
+                              onInsertColumnIntoChildTable(
+                                getIndexOfValue(columnIdMatrix, columnId)[0],
+                                colIndex
+                              )
+                            }
+                            handleInsertColumnRight={() =>
+                              onInsertColumnIntoChildTable(
+                                getIndexOfValue(columnIdMatrix, columnId)[0],
+                                colIndex + 1
+                              )
+                            }
                           />
                         </ColumnDragContainer>
                       );
