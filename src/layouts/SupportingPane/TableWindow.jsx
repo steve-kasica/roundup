@@ -31,15 +31,10 @@ const TableWindow = () => {
     return Array.from(new Set(selectedColumns.map(({ tableId }) => tableId)));
   }, [selectedColumns]);
 
-  if (selectedTableIds.length > 1) {
-    alert("Error: multiple tables selected! This is not yet supported.");
-  }
-
   const viewMode = useSelector((state) => {
     if (selectedTableIds.length === 0) {
       return "UNKNOWN";
-    }
-    if (selectedTableIds.length > 1) {
+    } else if (selectedTableIds.length > 1) {
       return "UNKNOWN"; // multiple tables selected, not supported
     }
     const tableId = selectedTableIds[0];

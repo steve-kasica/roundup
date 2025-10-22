@@ -38,27 +38,18 @@ const StackSchemaView = withStackOperationData(
         const currentPosition = getIndexOfValue(columnIdMatrix, columnId);
         if (!currentPosition) return; // Column not found in matrix
 
-        const [currentRow] = currentPosition;
-
         if (event.shiftKey && selectionAnchorCell) {
-          // Shift+Click: select range from anchor to extent, but only within the same table (row)
-          const [anchorRow] = selectionAnchorCell;
+          // Shift+Click: select rectangular range from anchor to current position (like Excel/Sheets)
+          const rangeColumnIds = getValuesInRange(
+            columnIdMatrix,
+            selectionAnchorCell,
+            currentPosition
+          ).filter((id) => id !== null);
 
-          // Only allow shift selection within the same row (same table)
-          if (anchorRow === currentRow) {
-            const rangeColumnIds = getValuesInRange(
-              columnIdMatrix,
-              selectionAnchorCell,
-              currentPosition
-            ).filter((id) => id !== null);
-
-            setSelectedTableColumnIds(rangeColumnIds);
-          } else {
-            // Different row/table: treat as single click
-            setSelectedTableColumnIds([columnId]);
-          }
+          setSelectedTableColumnIds(rangeColumnIds);
+          // Don't update anchor cell on shift+click - keep the original anchor
         } else if (event.metaKey || event.ctrlKey) {
-          // Ctrl/Meta+Click: toggle selection of this table column
+          // Ctrl/Meta+Click: toggle individual cell in selection (like Excel/Sheets)
           setSelectedTableColumnIds((prev) => {
             if (prev.includes(columnId)) {
               // Remove from selection (unselect)
@@ -68,12 +59,14 @@ const StackSchemaView = withStackOperationData(
               return [...prev, columnId];
             }
           });
+          // Update anchor for next shift+click operation
+          setSelectionAnchorCell(currentPosition);
         } else {
-          // Single click: select only this column from columnIdMatrix
+          // Single click: select only this cell (like Excel/Sheets)
           setSelectedTableColumnIds([columnId]);
+          // Update anchor for next shift+click operation
+          setSelectionAnchorCell(currentPosition);
         }
-
-        setSelectionAnchorCell(currentPosition);
       },
       [columnIdMatrix, selectionAnchorCell]
     );
