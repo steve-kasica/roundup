@@ -35,12 +35,13 @@ const handleOperationUpdates = function* (action) {
 export default function* deleteColumnsSaga() {
   yield takeEvery(deleteColumnsRequest.type, deleteColumnsWorker);
 
+  // If tables are deleted, we need to delete their columns as well
   yield takeLatest(deleteTablesSuccess, function* (action) {
     const { tableIds } = action.payload;
     // Extract all column IDs from the deleted tables
     const columnIdsToRemove = tableIds.flatMap((table) => table.columnIds);
     if (columnIdsToRemove.length > 0) {
-      yield deleteColumnsWorker({ payload: { columnIds: columnIdsToRemove } });
+      yield put(deleteColumnsRequest({ columnIds: columnIdsToRemove }));
     }
   });
 
