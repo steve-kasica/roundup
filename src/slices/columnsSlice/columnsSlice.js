@@ -176,7 +176,7 @@ const columnsSlice = createSlice({
         .forEach((column) => (column[attribute] = value));
     },
     // need to rename to delete columns
-    dropColumns(state, action) {
+    deleteColumns(state, action) {
       let ids = action.payload;
       if (!Array.isArray(ids)) {
         ids = [ids];
@@ -195,14 +195,29 @@ const columnsSlice = createSlice({
             delete state.idsByTable[column.tableId];
           }
 
-          // Remove the column from the hovered columns if it is hovered
-          state.hovered = state.hovered.filter((cid) => cid !== id);
+          // Remove the column from selected state
+          state.selected = state.selected.filter((cid) => cid !== id);
 
-          // Remove the column from the loading state if it is loading
+          // Remove the column from focused state
+          state.focused = state.focused.filter((cid) => cid !== id);
+
+          // Remove the column from visible state
+          state.visible = state.visible.filter((cid) => cid !== id);
+
+          // Remove the column from the loading state
           state.loading = state.loading.filter((cid) => cid !== id);
 
           // Remove the column from the dragging state
           state.dragging = state.dragging.filter((cid) => cid !== id);
+
+          // Remove the column from the dropped state
+          state.dropped = state.dropped.filter((cid) => cid !== id);
+
+          // Remove the column from the dropTargets state
+          state.dropTargets = state.dropTargets.filter((cid) => cid !== id);
+
+          // Remove the column from the hoverTargets state
+          state.hoverTargets = state.hoverTargets.filter((cid) => cid !== id);
         } else {
           throw new Error(`Column with id ${id} not found`);
         }
@@ -456,7 +471,7 @@ export const {
   fetchValuesRequest,
 
   updateAttribute,
-  dropColumns,
+  deleteColumns,
 
   addColumns,
   updateColumns,

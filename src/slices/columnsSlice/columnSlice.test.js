@@ -603,7 +603,7 @@ describe("columnsSlice reducers", () => {
     });
   });
 
-  describe("dropColumns", () => {
+  describe("deleteColumns", () => {
     it("removes a single column from all state arrays and data", () => {
       const col1 = Column("t1", 0, "A", COLUMN_TYPE_NUMERICAL);
       const col2 = Column("t1", 1, "B", COLUMN_TYPE_CATEGORICAL);
@@ -617,7 +617,7 @@ describe("columnsSlice reducers", () => {
         dragging: [col1.id, col2.id],
       };
       const nextState = columnsSlice(state, {
-        type: "columns/dropColumns",
+        type: "columns/deleteColumns",
         payload: col1.id,
       });
       expect(nextState.data[col1.id]).toBeUndefined();
@@ -643,7 +643,7 @@ describe("columnsSlice reducers", () => {
         dragging: [col1.id, col2.id],
       };
       const nextState = columnsSlice(state, {
-        type: "columns/dropColumns",
+        type: "columns/deleteColumns",
         payload: [col1.id, col2.id],
       });
       expect(nextState.data[col1.id]).toBeUndefined();
@@ -667,7 +667,7 @@ describe("columnsSlice reducers", () => {
         idsByTable: {},
       };
       expect(() =>
-        columnsSlice(state, { type: "columns/dropColumns", payload: col1.id })
+        columnsSlice(state, { type: "columns/deleteColumns", payload: col1.id })
       ).toThrow(/not found/);
     });
   });

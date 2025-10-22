@@ -10,7 +10,7 @@
 // import {
 //   Column,
 //   COLUMN_TYPE_CATEGORICAL,
-//   dropColumns,
+//   deleteColumns,
 // } from "../../slices/columnsSlice";
 // import { removeFromSelectedTables } from "../../slices/uiSlice/uiSlice";
 // import { removeChildFromOperation } from "../../slices/operationsSlice/operationsSlice";
@@ -60,7 +60,7 @@
 
 //       expect(dispatched).toEqual([
 //         addTablesToLoading([table.id]),
-//         dropColumns(table.columnIds),
+//         deleteColumns(table.columnIds),
 //         dropTables([table.id]),
 //         // Ommit DuckDB b/c it's not an action
 //       ]);
@@ -103,7 +103,7 @@
 //           operationId: table.operationId,
 //           childId: table.id,
 //         }),
-//         dropColumns(table.columnIds),
+//         deleteColumns(table.columnIds),
 //         dropTables([table.id]),
 //         // Ommit DuckDB b/c it's not an action
 //       ]);

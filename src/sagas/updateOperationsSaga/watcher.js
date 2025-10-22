@@ -17,10 +17,48 @@ import {
   selectOperation,
   selectOperationByTableId,
 } from "../../slices/operationsSlice";
+import {
+  createColumnsSuccess,
+  CREATION_MODE_INSERTION,
+} from "../createColumnsSaga";
 
 // This it listen for actions by the operations and columns slice
 export default function* updateOperationsWatcher() {
   yield takeEvery(updateOperationsRequest.type, updateOperationsWorker);
+
+  // If inserting a column into a table that is a child of an operation,
+  // then re-create the DB view associated with that operation.
+  // We don't need to actually modify the operation in Redux, just re-run the view creation,
+  // which will update the related operation columns.
+  yield takeLatest(createColumnsSuccess.type, function* (action) {
+    const { mode, columnIds } = action.payload;
+    if (mode === CREATION_MODE_INSERTION) {
+      // Group inserted columns by their parent table ID
+      const columnsByTableId = group(
+        yield select((state) =>
+          columnIds.map((id) => selectColumnById(state, id))
+        ),
+        (col) => col.tableId
+      );
+
+      // For each table, check if it's a child of an operation
+      for (const [tableId, columns] of columnsByTableId) {
+        const operation = yield select((state) =>
+          selectOperationByTableId(state, tableId)
+        );
+        if (operation) {
+          // Re-create the operation's view
+          yield put(
+            updateOperationsRequest({
+              operationUpdates: [
+                { children: operation.children, id: operation.id },
+              ], // No actual change, just trigger the worker, kind of a hack but works
+            })
+          );
+        }
+      }
+    }
+  });
 
   // If excluding the last columns from a table, we need to remove that table
   // from its parent operation, if a table is in the composite schema.
@@ -30,7 +68,6 @@ export default function* updateOperationsWatcher() {
   // see the action, the state is already updated.
   yield takeLatest(excludeColumnFromTable.type, function* (action) {
     // Wait one tick to ensure all synchronous updates are done
-    console.log("updateOperationsWatcher: excludeColumnFromTable detected");
     yield delay(0);
 
     // Extract column IDs from the action payload
