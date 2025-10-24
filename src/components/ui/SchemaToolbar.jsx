@@ -3,11 +3,12 @@ import {
   ArrowDropDown,
   ClearAll,
   Delete as ExcludeIcon,
+  FileDownload as ExportIcon,
   SelectAll,
   TableView,
   Visibility,
 } from "@mui/icons-material";
-import { IconButton, Toolbar, Typography, Box } from "@mui/material";
+import { IconButton, Toolbar, Box, Divider, Dialog } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   excludeColumnFromTable,
@@ -15,17 +16,25 @@ import {
   setFocusedColumnIds,
   setSelectedColumnIds,
 } from "../../slices/columnsSlice";
-import { useCallback } from "react";
-import { TableIcon } from "lucide-react";
+import { useCallback, useState } from "react";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedTableLabel } from "../TableView";
 import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
+import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
 
 const SchemaToolbar = ({ columnIds, objectId }) => {
   const dispatch = useDispatch();
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
+  const isError = useSelector((state) =>
+    Boolean(
+      isTableId(objectId)
+        ? state.tables.data[objectId].error
+        : state.operations.data[objectId]?.error
+    )
+  );
   const areAllColumnsSelected =
     columnIds.length > 0 && selectedColumnIds.length === columnIds.length;
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   const handleSelectAll = useCallback(() => {
     dispatch(setSelectedColumnIds(columnIds));
@@ -42,6 +51,14 @@ const SchemaToolbar = ({ columnIds, objectId }) => {
   const handleClearSelection = useCallback(() => {
     dispatch(setSelectedColumnIds([]));
   }, [dispatch]);
+
+  const handleExport = useCallback(() => {
+    setIsExportDialogOpen(true);
+  }, []);
+
+  const handleCloseExportDialog = useCallback(() => {
+    setIsExportDialogOpen(false);
+  }, []);
 
   return (
     <Toolbar
@@ -117,7 +134,37 @@ const SchemaToolbar = ({ columnIds, objectId }) => {
         >
           <ClearAll fontSize="small" />
         </IconButton>
+
+        <Divider
+          orientation="vertical"
+          flexItem
+          sx={{ mx: 1, height: 28, alignSelf: "center" }}
+        />
+
+        {/* Export */}
+        <IconButton
+          size="small"
+          disabled={isError}
+          onClick={handleExport}
+          title="Export"
+        >
+          <ExportIcon fontSize="small" />
+        </IconButton>
       </Box>
+
+      {/* Export Dialog */}
+      <Dialog
+        open={isExportDialogOpen}
+        onClose={handleCloseExportDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <EnhancedExportDialog
+          id={objectId}
+          open={isExportDialogOpen}
+          onClose={handleCloseExportDialog}
+        />
+      </Dialog>
     </Toolbar>
   );
 };

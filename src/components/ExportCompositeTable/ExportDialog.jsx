@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import PropTypes from "prop-types";
 import {
@@ -14,14 +15,14 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { ExportButton } from "./ExportButton";
-import withOperationData from "../HOC/withOperationData";
+import { useSelector } from "react-redux";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectOperation } from "../../slices/operationsSlice";
 
-function ExportDialog({ operation, onClose }) {
+function ExportDialog({ name, id, onClose }) {
   const [format, setFormat] = useState("csv");
   const [includeHeaders, setIncludeHeaders] = useState(true);
-  const [exportName, setExportName] = useState(
-    `${operation?.name || "export"}`
-  );
+  const [exportName, setExportName] = useState(`${name || "export"}`);
 
   return (
     <>
@@ -32,7 +33,7 @@ function ExportDialog({ operation, onClose }) {
           justifyContent: "space-between",
         }}
       >
-        Export Table
+        {`Export ${name || id}`}
         <IconButton aria-label="close" onClick={onClose} size="small">
           <CloseIcon fontSize="small" />
         </IconButton>
@@ -81,7 +82,7 @@ function ExportDialog({ operation, onClose }) {
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <ExportButton
-          operationId={operation?.id}
+          operationId={id}
           exportName={exportName}
           format={format}
           includeHeaders={includeHeaders}
@@ -91,13 +92,13 @@ function ExportDialog({ operation, onClose }) {
   );
 }
 
-ExportDialog.propTypes = {
-  operation: PropTypes.object.isRequired,
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onExport: PropTypes.func,
-  tableName: PropTypes.string,
+const EnhancedExportDialog = (props) => {
+  const { id } = props;
+  const { name } = useSelector((state) =>
+    isTableId(id) ? selectTablesById(state, id) : selectOperation(state, id)
+  );
+
+  return <ExportDialog {...props} name={name} />;
 };
 
-const EnhancedExportDialog = withOperationData(ExportDialog);
-export default EnhancedExportDialog;
+export { ExportDialog, EnhancedExportDialog };

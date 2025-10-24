@@ -8,7 +8,6 @@
 
 import { name as APP_NAME } from "../../../package.json";
 import { Typography, Box, styled } from "@mui/material";
-import ModalDialog from "./ModalDialog";
 import AppDrawer from "./AppDrawer";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import LeftSideBar from "./LeftSideBar";
@@ -160,7 +159,6 @@ export default function SupportingPane() {
         )}
       </Box>
 
-      <ModalDialog />
       <AppDrawer open={false} onClose={() => {}} />
     </Box>
   );
