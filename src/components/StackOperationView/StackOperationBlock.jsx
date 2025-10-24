@@ -33,7 +33,7 @@ const StyledBox = styled(Box, {
 function StackOperationBlock({
   // props via withStackOperationData
   operation,
-  children, // [{id, objectType}]
+  childObjects, // [{id, objectType}]
   columnCount,
   depth,
   isFocused,
@@ -75,7 +75,7 @@ function StackOperationBlock({
         flexBasis: `${(columnCount / parentColumnCount) * 100}%`,
       }}
     >
-      {children.map(({ id, operationType }) =>
+      {childObjects.map(({ id, operationType }) =>
         isOperationId(id) && operationType === OPERATION_TYPE_STACK ? (
           <EnhancedStackOperationBlock
             key={id}

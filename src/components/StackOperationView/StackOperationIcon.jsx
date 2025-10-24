@@ -61,6 +61,8 @@ const StackOperationIcon = React.forwardRef(function StackOperationIcon(
   );
 });
 
+StackOperationIcon.displayName = "StackOperationIcon";
+
 StackOperationIcon.propTypes = {
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   color: PropTypes.string,

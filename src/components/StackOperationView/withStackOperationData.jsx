@@ -5,6 +5,7 @@ import {
   selectActiveColumnIdsByTableId,
   selectColumnIdMatrixByOperationId,
   selectColumnIdsByTableId,
+  selectSelectedChildColumnsByOperationId,
   selectSelectedColumnDBNamesByTableId,
   selectSelectedColumnIdsByTableId,
   setFocusedColumnIds,
@@ -12,7 +13,7 @@ import {
 } from "../../slices/columnsSlice";
 import {
   selectOperation,
-  selectOperationChildrenData,
+  selectOperationChildren,
   selectOperationDepth,
 } from "../../slices/operationsSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
@@ -22,9 +23,6 @@ import {
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
 
-// TODO: how to handle the case when tableIds are actually
-// operation Ids? Well, I guess a operation
-// would just be a view?
 /**
  * This HOC produces a matrix of column IDs for each table ID provided
  * in row-major order while filling uneven rows, which represent
@@ -43,16 +41,14 @@ import {
  * @returns
  */
 export default function withStackOperationData(WrappedComponent) {
-  const componentName =
-    WrappedComponent.displayName || WrappedComponent.name || "Component";
-
   function EnhancedComponent({ id, ...props }) {
+    console.log("withStackOperationData rendering", {
+      id,
+      component: WrappedComponent.displayName || WrappedComponent.name,
+    });
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperation(state, id));
     const depth = useSelector((state) => selectOperationDepth(state, id));
-    const children = useSelector((state) =>
-      selectOperationChildrenData(state, id)
-    );
 
     const columnIds = useSelector((state) =>
       selectColumnIdsByTableId(state, id)
@@ -67,12 +63,6 @@ export default function withStackOperationData(WrappedComponent) {
       selectSelectedColumnIdsByTableId(state, id)
     );
 
-    const selectedColumnIndices = useMemo(() => {
-      return selectedColumnIds
-        .map((colId) => columnIds.indexOf(colId))
-        .filter((index) => index !== -1);
-    }, [columnIds, selectedColumnIds]);
-
     const selectedColumnNames = useSelector((state) =>
       selectSelectedColumnDBNamesByTableId(state, id)
     );
@@ -81,8 +71,32 @@ export default function withStackOperationData(WrappedComponent) {
       selectColumnIdMatrixByOperationId(state, id)
     );
 
-    const m = Math.max(...columnIdMatrix.map((c) => c.length), 0);
-    const n = columnIdMatrix.length;
+    const selectedChildColumns = useSelector((state) =>
+      selectSelectedChildColumnsByOperationId(state, id)
+    );
+
+    // TODO: we really need to know whether or not a object is
+    // a pack or stack from its ID. That'd be a good refactor.
+    const childObjects = useSelector((state) =>
+      selectOperationChildren(state, id)
+    );
+
+    // Memoized variables derived from selector results
+    // ----------------------------------------------------------------------------
+
+    const selectedColumnIndices = useMemo(() => {
+      return selectedColumnIds
+        .map((colId) => columnIds.indexOf(colId))
+        .filter((index) => index !== -1);
+    }, [columnIds, selectedColumnIds]);
+
+    const [m, n] = useMemo(
+      () => [
+        Math.max(...columnIdMatrix.map((c) => c.length), 0),
+        columnIdMatrix.length,
+      ],
+      [columnIdMatrix]
+    );
 
     const selection = useMemo(() => {
       return operation.children
@@ -109,6 +123,7 @@ export default function withStackOperationData(WrappedComponent) {
     }, [columnIdMatrix, operation.children, selectedColumnIds]);
 
     // Define callback functions
+    // -------------------------------------
     const selectColumns = useCallback(
       (selectedColumnIds) =>
         dispatch(
@@ -147,7 +162,7 @@ export default function withStackOperationData(WrappedComponent) {
       <WrappedComponent
         // Props related to the operation itself
         operation={operation}
-        children={children}
+        childObjects={childObjects}
         depth={depth}
         // Props related to the operation's columns
         columnIds={columnIds}
@@ -155,6 +170,7 @@ export default function withStackOperationData(WrappedComponent) {
         selectedColumnIds={selectedColumnIds}
         selectedColumnNames={selectedColumnNames}
         selectedColumnIndices={selectedColumnIndices}
+        selectedChildColumns={selectedChildColumns} // is map {childId: [cols]}
         columnCount={activeColumnIds.length}
         rowCount={operation.rowCount}
         // Props related to the operation's children tables

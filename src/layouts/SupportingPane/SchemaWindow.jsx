@@ -9,7 +9,7 @@ import {
 import { useSelector } from "react-redux";
 import { isTableId } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
-import StackSchemaView from "../../components/StackOperationView/StackSchemaView";
+import { EnhancedStackSchemaView } from "../../components/StackOperationView/StackSchemaView";
 import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
 
@@ -45,7 +45,7 @@ export default function SchemaWindow() {
           </TableDropTarget>
         </Box>
       ) : focusedOperation?.operationType === OPERATION_TYPE_STACK ? (
-        <StackSchemaView id={focusedObjectId} />
+        <EnhancedStackSchemaView id={focusedObjectId} />
       ) : focusedOperation?.operationType === OPERATION_TYPE_PACK ? (
         <Box sx={{ flex: 1, height: "100%", overflow: "hidden" }}>
           <PackSchemaView id={focusedObjectId} />

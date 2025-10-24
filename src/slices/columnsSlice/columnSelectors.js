@@ -230,6 +230,51 @@ export const selectSelectedColumnIdsByTableId = createSelector(
 );
 
 /**
+ * Select all selected column IDs from all child tables of an operation.
+ *
+ * This selector returns a flat array of all selected column IDs across all child tables
+ * of the specified operation. It combines the selected columns from each child table
+ * into a single array, which is useful for bulk operations that need to act on all
+ * selected columns within an operation's scope.
+ *
+ * @function
+ * @param {Object} state - The Redux state.
+ * @param {string} operationId - The ID of the operation whose child tables to check.
+ * @returns {Array<string>} A flat array of all selected column IDs from all child tables.
+ *                          Returns an empty array if the operation has no children or
+ *                          no columns are selected.
+ *
+ * @example
+ * // Assuming operation 'op1' has two child tables:
+ * // - Table 't1' with selected columns ['c1', 'c3']
+ * // - Table 't2' with selected columns ['c5']
+ * const selectedIds = selectSelectedChildColumnsByOperationId(state, 'op1');
+ * // Returns: ['c1', 'c3', 'c5']
+ */
+export const selectSelectedChildColumnsByOperationId = createSelector(
+  [
+    (state) => state.columns.idsByTable,
+    (state) => state.columns.data,
+    (state) => state.columns.selected,
+    (state, operationId) => selectOperation(state, operationId)?.children,
+  ],
+  (idsByTable, columnData, selected, children) => {
+    if (!children || children.length === 0) {
+      return [];
+    }
+
+    return Object.fromEntries(
+      children.map((childId) => [
+        childId,
+        idsByTable[childId]
+          .filter((id) => selected.includes(id))
+          .map((id) => columnData[id]),
+      ])
+    );
+  }
+);
+
+/**
  * Select excluded column IDs for a specific table.
  *
  * This selector returns column IDs that exist in the table's data but have been
@@ -350,26 +395,6 @@ export const selectSelectedColumns = createSelector(
   [selectSelectedColumnIds, (state) => state.columns.data],
   (selectedIds, data) => {
     return selectedIds.map((id) => data[id]);
-  }
-);
-
-/**
- * Memoized selector to retrieve columns by their index across multiple tables.
- *
- * @function
- * @param {Object} state - The Redux state.
- * @param {number} index - The index of the column to select from each table.
- * @param {string[]} tableIds - An array of table IDs to select columns from.
- * @returns {Array<Object|null>} An array of column objects (or null if not found) corresponding to the specified index in each table.
- */
-export const selectColumnsByIndex = createSelector(
-  [(state) => state, (_, index) => index, (_, __, tableIds) => tableIds],
-  (state, index, tableIds) => {
-    const columnIds = tableIds.map((tableId) => {
-      const columnIds = state.columns.idsByTable[tableId];
-      return columnIds && index < columnIds.length ? columnIds[index] : null;
-    });
-    return columnIds.map((id) => selectColumnById(state, id));
   }
 );
 

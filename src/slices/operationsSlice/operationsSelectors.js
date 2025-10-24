@@ -3,6 +3,7 @@ import {
   selectActiveColumnDBNamesByTableId,
   selectColumnById,
 } from "../columnsSlice";
+import { isTableId } from "../tablesSlice";
 
 /**
  * Selects an operation by its ID from the Redux state.
@@ -12,10 +13,25 @@ import {
  * @returns {Object} The operation object corresponding to the given ID.
  * @throws {Error} Throws an error if the operation is not found in the state.
  */
-export function selectOperation(state, operationId) {
-  const operation = state.operations.data[operationId];
-  return operation;
-}
+export const selectOperation = createSelector(
+  [(state) => state.operations.data, (state, operationId) => operationId],
+  (data, operationId) => {
+    return data[operationId];
+  }
+);
+
+export const selectOperationChildren = createSelector(
+  [
+    (state) => state.operations.data,
+    (state, operationId) => selectOperation(state, operationId)?.children,
+  ],
+  (data, children) => {
+    if (!children) return [];
+    return children.map((childId) =>
+      !isTableId(childId) ? data[childId] : { id: childId, operationType: null }
+    );
+  }
+);
 
 /**
  * Selector to retrieve all operation IDs from the state.

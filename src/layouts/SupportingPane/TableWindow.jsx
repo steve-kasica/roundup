@@ -4,7 +4,6 @@ import {
   EnhancedTableLabel,
   EnhancedTableRows,
 } from "../../components/TableView";
-import { StackVirtualizedTable } from "../../components/StackOperationView";
 import { selectSelectedColumns } from "../../slices/columnsSlice";
 import {
   OPERATION_TYPE_NO_OP,
@@ -15,6 +14,7 @@ import {
 import { EnhancedPackVirtualTable } from "../../components/PackOperationView";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../components/OperationView";
+import { EnhancedStackVirtualizedTable } from "../../components/StackOperationView/StackVirtualizedTable";
 
 const VIEW_EMPTY = "EMPTY_SELECTION";
 const VIEW_TABLE = "TABLE";
@@ -107,7 +107,7 @@ const TableWindow = () => {
         ) : viewMode === VIEW_NO_OP ? (
           <EnhancedTableRows id={focusedOperation.children[0]} />
         ) : viewMode === VIEW_STACK ? (
-          <StackVirtualizedTable id={focusedObjectId} />
+          <EnhancedStackVirtualizedTable id={focusedObjectId} />
         ) : viewMode === VIEW_PACK ? (
           <EnhancedPackVirtualTable id={focusedObjectId} />
         ) : (
