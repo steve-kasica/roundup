@@ -2,13 +2,11 @@
 import { DragIndicator } from "@mui/icons-material";
 import HighlightText from "../ui/HighlightText";
 import { styled, Typography, Checkbox, Stack, Box } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Menu, MenuItem } from "@mui/material";
 import { formatDate, formatNumber, formatBytes } from "../../lib/utilities";
 import withTableData from "./withTableData";
-import { useDrag } from "react-dnd";
-import { getEmptyImage } from "react-dnd-html5-backend";
 
 export const TABLE_ROW_VIEW_CLASS = "TableRowSummary";
 
@@ -51,7 +49,7 @@ const StyledTableRow = styled("tr", {
 })(({ isDragging, isDisabled, isSelected, isHovered }) => {
   let styles = {
     transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
-    cursor: "context-menu",
+    cursor: "pointer",
     borderRadius: "6px",
     position: "relative",
     margin: "1px 0",
@@ -133,7 +131,6 @@ function TableRowSummary({
   peekTable,
   hoverTable,
   unhoverTable,
-  setTableSelection,
   renameTable,
   dropTable,
   isInSchema,
@@ -141,6 +138,7 @@ function TableRowSummary({
   isDisabled = false,
 
   // props passed from TableLayout.jsx
+  onTrClick,
   searchString,
   rowMax,
   columnMax,
@@ -197,7 +195,7 @@ function TableRowSummary({
       label: "Add to selection",
       isDisabled: isSelected || isDisabled || isInSchema,
       onClick: (event) => {
-        setTableSelection();
+        console.log("Adding to selection (TODO)");
         handleMenuClose(event);
       },
     },
@@ -234,63 +232,7 @@ function TableRowSummary({
       onMouseEnter={hoverTable}
       onMouseLeave={unhoverTable}
       onContextMenu={handleMenuOpen}
-      onClick={(event) => {
-        event.stopPropagation();
-
-        if (event.shiftKey) {
-          const tr = event.currentTarget;
-          const rows = Array.from(tr.parentNode.children);
-          const ids = rows.map((row) => row.getAttribute("data-tableid"));
-          const clickedIndex = ids.indexOf(table.id);
-          // Find all selected rows in DOM order
-          const selectedRows = rows.filter(
-            (row) => row.getAttribute("data-selected") === "true"
-          );
-          const selectedIndices = selectedRows.map((row) =>
-            ids.indexOf(row.getAttribute("data-tableid"))
-          );
-
-          let anchorIndex;
-          if (selectedIndices.length > 0) {
-            // Use the last selected row as the anchor
-            anchorIndex = selectedIndices[selectedIndices.length - 1];
-          } else {
-            anchorIndex = clickedIndex;
-          }
-
-          const [start, end] = [
-            Math.min(anchorIndex, clickedIndex),
-            Math.max(anchorIndex, clickedIndex),
-          ];
-
-          const rangeIds = ids.slice(start, end + 1);
-          setTableSelection(rangeIds);
-        } else if (event.ctrlKey || event.metaKey) {
-          // Ctrl/Cmd click for multi-selection toggle
-          if (isSelected) {
-            // If already selected, remove from selection
-            const currentSelection = selectedTableIds.filter(
-              (id) => id !== table.id
-            );
-            setTableSelection(currentSelection);
-          } else {
-            // If not selected, add to selection
-            setTableSelection([...selectedTableIds, table.id]);
-          }
-        } else {
-          // Regular click - toggle selection if already selected, otherwise select
-          if (isSelected && selectedTableIds.length === 1) {
-            // If this is the only selected row, deselect it
-            setTableSelection([]);
-          } else if (isSelected && selectedTableIds.length > 1) {
-            // If multiple rows are selected and this is one of them, select only this one
-            setTableSelection(table.id);
-          } else {
-            // If not selected, select it
-            setTableSelection(table.id);
-          }
-        }
-      }}
+      onClick={onTrClick}
       onDoubleClick={focusTable}
     >
       <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
@@ -343,13 +285,6 @@ function TableRowSummary({
         color={isDisabled ? "textDisabled" : "normal"}
       >
         {table.mimeType || "N/A"}
-      </Typography>
-      <Typography
-        component="td"
-        sx={{ fontSize: "13px" }}
-        color={isDisabled ? "textDisabled" : "normal"}
-      >
-        {parentOperation?.name || "N/A"}
       </Typography>
       <BarChartCell
         component="td"

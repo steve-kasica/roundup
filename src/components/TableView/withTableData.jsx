@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import {
   selectOperationDepth,
   selectOperation,
+  selectOperationByTableId,
 } from "../../slices/operationsSlice";
 import {
   excludeColumnFromTable,
@@ -163,7 +164,9 @@ export default function withTableData(WrappedComponent) {
       const removedColumnCount = initialColumnCount - columnCount;
 
       // Determine if the table is part of the current schema (has an operation)
-      const isInSchema = table.operationId !== null;
+      const isInSchema = useSelector(
+        (state) => selectOperationByTableId(state, id) !== undefined
+      );
 
       return (
         <WrappedComponent

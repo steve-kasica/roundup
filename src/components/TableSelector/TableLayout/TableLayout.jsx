@@ -3,7 +3,7 @@
  * TableLayout.jsx
  * -------------------------------
  */
-import { Box, Button, Tooltip } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import {
   ArrowDown01,
   ArrowDownAZ,
@@ -22,10 +22,7 @@ import {
   COLUMN_TYPE_DATE,
   COLUMN_TYPE_CATEGORICAL,
 } from "../../../slices/columnsSlice";
-import {
-  EnhancedTableDragContainer,
-  TableDragContainer,
-} from "../../TableView/TableDragContainer";
+import { EnhancedTableDragContainer } from "../../TableView/TableDragContainer";
 import { DRAG_TYPE_SOURCE_TABLE_ROW } from "../../CustomDragLayer";
 
 // TODO: move this to SourceColumn Type
@@ -43,13 +40,6 @@ const headers = [
     attr: "mimeType",
     label: "Type",
     tooltip: "Sort by file type",
-    attrType: COLUMN_TYPE_CATEGORICAL,
-  },
-  // TODO: grouping by group is not implemented yet
-  {
-    attr: "??",
-    label: "Group",
-    tooltip: "Sort by group",
     attrType: COLUMN_TYPE_CATEGORICAL,
   },
   {
@@ -89,6 +79,7 @@ export default function TableLayout({
 }) {
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
+  const [lastClickedIndex, setLastClickedIndex] = useState(null);
 
   const tableIds = tables
     .toSorted((a, b) =>
@@ -160,6 +151,45 @@ export default function TableLayout({
                 rowMax={rowMax}
                 columnMax={columnMax}
                 bytesMax={bytesMax}
+                onTrClick={(event) => {
+                  const currentIndex = tableIds.indexOf(id);
+                  const isCurrentlySelected = selectedTableIds.includes(id);
+
+                  // Ctrl/Cmd + click: Toggle individual selection
+                  if (event.ctrlKey || event.metaKey) {
+                    if (isCurrentlySelected) {
+                      setSelectedTableIds(
+                        selectedTableIds.filter((tableId) => tableId !== id)
+                      );
+                    } else {
+                      setSelectedTableIds([...selectedTableIds, id]);
+                    }
+                    setLastClickedIndex(currentIndex);
+                  }
+                  // Shift + click: Select range
+                  else if (event.shiftKey && lastClickedIndex !== null) {
+                    const start = Math.min(lastClickedIndex, currentIndex);
+                    const end = Math.max(lastClickedIndex, currentIndex);
+                    const rangeIds = tableIds.slice(start, end + 1);
+
+                    // Combine existing selection with range
+                    const newSelection = [
+                      ...new Set([...selectedTableIds, ...rangeIds]),
+                    ];
+                    setSelectedTableIds(newSelection);
+                  }
+                  // Simple click: Toggle single item
+                  else {
+                    if (isCurrentlySelected) {
+                      setSelectedTableIds(
+                        selectedTableIds.filter((tableId) => tableId !== id)
+                      );
+                    } else {
+                      setSelectedTableIds([...selectedTableIds, id]);
+                    }
+                    setLastClickedIndex(currentIndex);
+                  }
+                }}
                 onCheckBoxChange={(event) => {
                   const isChecked = event.target.checked;
                   if (isChecked) {
