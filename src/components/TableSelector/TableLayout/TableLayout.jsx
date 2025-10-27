@@ -90,7 +90,14 @@ export default function TableLayout({
     .map((table) => table.id);
 
   return (
-    <Box sx={{ overflowX: "auto", width: "100%" }}>
+    <Box
+      sx={{
+        overflowX: "auto",
+        width: "100%",
+        containerType: "inline-size",
+        containerName: "tableLayout",
+      }}
+    >
       <table
         style={{
           width: "100%",
@@ -105,7 +112,7 @@ export default function TableLayout({
           >
             <th></th>
             {headers.map((header) => (
-              <th key={header.attr}>
+              <th key={header.attr} data-column={header.attr}>
                 <Button
                   color="inherit"
                   fullWidth
@@ -188,16 +195,6 @@ export default function TableLayout({
                       setSelectedTableIds([...selectedTableIds, id]);
                     }
                     setLastClickedIndex(currentIndex);
-                  }
-                }}
-                onCheckBoxChange={(event) => {
-                  const isChecked = event.target.checked;
-                  if (isChecked) {
-                    setSelectedTableIds([...selectedTableIds, id]);
-                  } else {
-                    setSelectedTableIds(
-                      selectedTableIds.filter((tableId) => tableId !== id)
-                    );
                   }
                 }}
                 isSelected={selectedTableIds.includes(id)}

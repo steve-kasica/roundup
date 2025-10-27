@@ -123,7 +123,7 @@ function TableRowSummary({
   table,
   columnCount,
   removedColumnCount,
-  parentOperation,
+  isInSchema,
 
   // depth,
   // parentOperation,
@@ -133,7 +133,6 @@ function TableRowSummary({
   unhoverTable,
   renameTable,
   dropTable,
-  isInSchema,
   focusTable,
   isDisabled = false,
 
@@ -143,7 +142,6 @@ function TableRowSummary({
   rowMax,
   columnMax,
   bytesMax,
-  onCheckBoxChange,
   isSelected,
 
   // Props from TableDragContainer
@@ -154,15 +152,6 @@ function TableRowSummary({
 
   // TODO: Should this be in the HOC?
   const selectedTableIds = useSelector((state) => state.tables.selected || []);
-
-  const handleMenuOpen = (event) => {
-    event.preventDefault(); // Prevent default context menu
-    event.stopPropagation(); // Prevent row click from firing
-    setAnchorEl({
-      clientX: event.clientX,
-      clientY: event.clientY,
-    });
-  };
 
   const handleMenuClose = (event) => {
     if (event) {
@@ -231,11 +220,15 @@ function TableRowSummary({
       data-selection-count={selectedTableIds.length}
       onMouseEnter={hoverTable}
       onMouseLeave={unhoverTable}
-      onContextMenu={handleMenuOpen}
+      // onContextMenu={handleMenuOpen}
       onClick={onTrClick}
       onDoubleClick={focusTable}
     >
-      <Typography component="td" color={isDisabled ? "textDisabled" : "normal"}>
+      <Typography
+        component="td"
+        color={isDisabled ? "textDisabled" : "normal"}
+        data-column="checkbox"
+      >
         <Stack direction="row" alignItems="center" gap="1px">
           <Box
             ref={dragDropRef}
@@ -265,10 +258,13 @@ function TableRowSummary({
             />
           </Box>
           <Checkbox
-            checked={isSelected}
+            checked={isInSchema}
             size="small"
-            sx={{ padding: 0 }}
-            onChange={(event) => onCheckBoxChange(event, table.id)}
+            disabled
+            sx={{
+              padding: 0,
+              pointerEvents: "none",
+            }}
           />
         </Stack>
       </Typography>
@@ -276,6 +272,7 @@ function TableRowSummary({
         component="td"
         sx={{ fontSize: "13px" }}
         color={isDisabled ? "textDisabled" : "normal"}
+        data-column="name"
       >
         <HighlightText pattern={searchString} text={table.name} />
       </Typography>
@@ -283,6 +280,7 @@ function TableRowSummary({
         component="td"
         sx={{ fontSize: "13px" }}
         color={isDisabled ? "textDisabled" : "normal"}
+        data-column="mimeType"
       >
         {table.mimeType || "N/A"}
       </Typography>
@@ -292,6 +290,7 @@ function TableRowSummary({
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(table.size / bytesMax) * 100}
         isDisabled={isDisabled}
+        data-column="size"
       >
         {formatBytes(table.size)}
       </BarChartCell>
@@ -301,6 +300,7 @@ function TableRowSummary({
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(table.rowCount / rowMax) * 100}
         isDisabled={isDisabled}
+        data-column="rowCount"
       >
         {formatNumber(table.rowCount)}
       </BarChartCell>
@@ -310,6 +310,7 @@ function TableRowSummary({
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(columnCount / columnMax) * 100}
         isDisabled={isDisabled}
+        data-column="columnCount"
       >
         {`${formatNumber(columnCount)}`}
         <sup style={{ display: removedColumnCount > 0 ? "inline" : "none" }}>
@@ -320,6 +321,7 @@ function TableRowSummary({
         component="td"
         sx={{ fontSize: "13px" }}
         color={isDisabled ? "textDisabled" : "normal"}
+        data-column="dateLastModified"
       >
         {formatDate(new Date(table.dateLastModified))}
       </Typography>
