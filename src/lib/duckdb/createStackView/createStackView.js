@@ -1,20 +1,12 @@
-import { IncongruentTablesError } from "../../../components/Errors/StackErrors";
+import { validateIncongruentTables } from "../../../slices/alertsSlice/Alerts/StackOperationAlerts/IncongruentTables";
 import { getDuckDB } from "../duckdbClient";
 
 // With these UNION ALL query, the view will take on the column names of the first child.
 export async function createStackView(operation, columnList = null) {
-  const columnCount = operation.children.map(
-    (child) => child.columnNames.length
-  );
-  const allColumnCountsEqual = columnCount.every(
-    (count) => count === columnCount[0]
-  );
-  if (!allColumnCountsEqual) {
-    throw new IncongruentTablesError(
-      `Child tables have differing column counts`
-    );
-  }
+  // Perform schema validation, each function throws errors if validation fails
+  validateIncongruentTables(operation);
 
+  // Validation passed, create the view
   const db = await getDuckDB();
   const conn = await db.connect();
   const query = formQuery(operation, columnList);

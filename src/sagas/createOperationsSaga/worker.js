@@ -47,6 +47,7 @@ import { group } from "d3";
 import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
 import { selectOperationQueryData } from "../../slices/operationsSlice/operationsSelectors";
 import { setFocusedObject } from "../../slices/uiSlice";
+import { serializeError } from "../../slices/alertsSlice/utilities/serializers";
 
 export const calcPackColumnCount = (state, childIds) => {
   const columnCountTotal = childIds.reduce(
@@ -150,16 +151,15 @@ export default function* createOperationsWorker(action) {
           ? calcPackColumnCount(state, childIds)
           : calcStackColumnCount(state, childIds)
       );
-
-      operation.error = JSON.stringify(
-        error,
-        Object.getOwnPropertyNames(error)
-      );
-      failedCreations.push(operation);
+      failedCreations.push({ ...operation, error: serializeError(error) });
     }
   }
 
-  const combinedOperations = [...successfulCreations, ...failedCreations];
+  // Exclude errors raised during creation from the operation objects
+  const combinedOperations = [...successfulCreations, ...failedCreations].map(
+    // eslint-disable-next-line no-unused-vars
+    ({ error, ...operation }) => operation
+  );
 
   yield put(addOperationsToSlice(combinedOperations));
   yield put(
@@ -169,14 +169,14 @@ export default function* createOperationsWorker(action) {
   if (successfulCreations.length > 0) {
     yield put(
       createOperationsSuccess({
-        operationIds: successfulCreations.map((op) => op.id),
+        successfulCreations,
       })
     );
   }
   if (failedCreations.length > 0) {
     yield put(
       createOperationsFailure({
-        operationIds: failedCreations.map((op) => op.id),
+        failedCreations,
       })
     );
   }

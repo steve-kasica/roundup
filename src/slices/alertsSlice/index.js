@@ -1,0 +1,6 @@
+export * from "./alertsSlice.js"; // exports all actions
+export * from "./Alerts";
+export * from "./alertsSelectors.js";
+import reducer from "./alertsSlice.js";
+
+export default reducer;

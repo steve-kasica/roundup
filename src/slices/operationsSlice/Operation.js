@@ -49,7 +49,6 @@ export default function Operation(operationType, children, columnIds = []) {
     rowCount: null,
     operationType,
     children,
-    error: null, // Error state for the operation
 
     // TODO: should there be different factors for stack and pack operations
     // since they have similar but different schema?
@@ -62,7 +61,7 @@ export default function Operation(operationType, children, columnIds = []) {
   };
 }
 
-const attributes = ["name", "rowCount", "operationType", "children", "error"];
+const attributes = ["name", "rowCount", "operationType", "children"];
 
 export const isOperation = (obj) =>
   obj !== null &&

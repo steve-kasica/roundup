@@ -84,11 +84,21 @@ export default function* createColumnsWatcher() {
   yield takeEvery(createTablesSuccess.type, handleTables);
 
   // If an operation is successfully created, create columns for it
-  yield takeEvery(createOperationsSuccess.type, handleOperations);
+  yield takeEvery(createOperationsSuccess.type, function* (action) {
+    const { successfulCreations } = action.payload;
+    yield call(handleOperations, {
+      payload: { operationIds: successfulCreations.map(({ id }) => id) },
+    });
+  });
 
   // If an operation is created but fails, we still want to create
   // columns for it so the user can see the error in the UI
-  yield takeEvery(createOperationsFailure.type, handleOperations);
+  yield takeEvery(createOperationsFailure.type, function* (action) {
+    const { failedCreations } = action.payload;
+    yield call(handleOperations, {
+      payload: { operationIds: failedCreations.map(({ id }) => id) },
+    });
+  });
 
   // if an operation is updated, we may need to create columns for it
   // depending upon if the property that changes also triggered a

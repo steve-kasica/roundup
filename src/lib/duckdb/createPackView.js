@@ -1,8 +1,9 @@
 import {
-  MissingJoinKeyError,
-  MissingJoinPredicateError,
-  MissingJoinTypeError,
-} from "../../components/Errors/PackErrors";
+  validateMissingLeftJoinKey,
+  validateMissingRightJoinKey,
+} from "../../slices/alertsSlice/Alerts/PackOperationAlerts/MissingJoinKey";
+import { validateMissingJoinPredicate } from "../../slices/alertsSlice/Alerts/PackOperationAlerts/MissingJoinPredicate";
+import { validateMissingJoinType } from "../../slices/alertsSlice/Alerts/PackOperationAlerts/MissingJoinType";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { getDuckDB } from "./duckdbClient";
 
@@ -21,15 +22,11 @@ export function formQuery(op, columnList = null) {
   const table2 = op.children[1].id;
   const { joinType, joinKey1, joinKey2, joinPredicate } = op;
 
-  if (!joinKey1) {
-    throw new MissingJoinKeyError(`${table1} is missing a join key`);
-  } else if (!joinKey2) {
-    throw new MissingJoinKeyError(`${table2} is missing a join key`);
-  } else if (!joinPredicate) {
-    throw new MissingJoinPredicateError();
-  } else if (!joinType) {
-    throw new MissingJoinTypeError();
-  }
+  // These are fatal errors - we cannot proceed
+  validateMissingLeftJoinKey(op);
+  validateMissingRightJoinKey(op);
+  validateMissingJoinPredicate(op);
+  validateMissingJoinType(op);
 
   // TODO: refactor to util file for DRY
   const predicates = {

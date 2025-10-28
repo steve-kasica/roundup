@@ -17,7 +17,7 @@ import {
   getTableDimensions,
 } from "../../lib/duckdb";
 import { updateOperationsFailure, updateOperationsSuccess } from "./actions";
-import { serializeError } from "../../components/Errors/PackErrors";
+import { serializeError } from "../../slices/alertsSlice/utilities/serializers";
 import { setFocusedObject } from "../../slices/uiSlice";
 
 export default function* updateOperationsWorker(action) {
@@ -58,18 +58,19 @@ export default function* updateOperationsWorker(action) {
             ...operationUpdate,
             rowCount,
             columnCount,
-            error: null,
           };
           successfulUpdates.push(operationUpdate);
         } catch (error) {
           console.error("Error creating stack view:", error);
-          operationUpdate.error = serializeError(error);
           const children = operationUpdate.children || operation.children;
           operationUpdate.columnCount = yield select((state) =>
             calcStackColumnCount(state, children)
           );
           operationUpdate.rowCount = 0; // TODO
-          failedUpdates.push(operationUpdate);
+          failedUpdates.push({
+            ...operationUpdate,
+            error: serializeError(error),
+          });
         }
       } else if (
         operationUpdate.operationType === OPERATION_TYPE_PACK ||
@@ -91,13 +92,15 @@ export default function* updateOperationsWorker(action) {
           successfulUpdates.push(operationUpdate);
         } catch (error) {
           console.error("Error updateOperationsSaga/worker.js:", error);
-          operationUpdate.error = serializeError(error);
           const children = operationUpdate.children || operation.children;
           operationUpdate.columnCount = yield select((state) =>
             calcPackColumnCount(state, children)
           );
           operationUpdate.rowCount = undefined; // We don't actually know the row count for pack ops
-          failedUpdates.push(operationUpdate);
+          failedUpdates.push({
+            ...operationUpdate,
+            error: serializeError(error),
+          });
         }
       } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
         // No-op operations don't have views to create
@@ -109,7 +112,10 @@ export default function* updateOperationsWorker(action) {
     }
   }
 
-  const combinedUpdates = [...successfulUpdates, ...failedUpdates];
+  const combinedUpdates = [...successfulUpdates, ...failedUpdates].map(
+    // eslint-disable-next-line no-unused-vars
+    ({ error, ...operation }) => operation
+  );
 
   yield put(updateOperationsSlice(combinedUpdates));
   yield put(setFocusedObject(combinedUpdates[combinedUpdates.length - 1].id)); // focus the last operation created

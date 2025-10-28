@@ -44,7 +44,6 @@ export function Table(
     rowCount: null, // This will be set later when the table is created in DuckDB
     dateLastModified,
     operationId: null, // Parent operation ID if this table is derived from an operation
-    error: null, // Error message if there was an error loading or processing the table
   };
 }
 

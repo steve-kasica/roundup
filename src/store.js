@@ -4,7 +4,7 @@ import uiReducer from "./slices/uiSlice";
 import tablesReducer from "./slices/tablesSlice";
 import columnsReducer from "./slices/columnsSlice";
 import operationsReducer from "./slices/operationsSlice";
-import valuesReducer from "./slices/valuesSlices";
+import alertsReducer from "./slices/alertsSlice";
 
 import createSagaMiddleware from "redux-saga";
 import rootSaga from "./sagas";
@@ -17,7 +17,7 @@ const store = configureStore({
     operations: operationsReducer,
     tables: tablesReducer,
     columns: columnsReducer,
-    values: valuesReducer,
+    alerts: alertsReducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
