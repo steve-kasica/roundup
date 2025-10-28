@@ -38,6 +38,7 @@ const ColumnContextMenu = ({
   // Props passed directly from parent component
   closeMenu,
   includeInsert = true,
+  isError = false,
 }) => {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [newColumnName, setNewColumnName] = useState("");
@@ -144,42 +145,58 @@ const ColumnContextMenu = ({
     [closeMenu, onInsertColumnRightClick]
   );
 
+  const menuItemSx = isError
+    ? {
+        color: "error.main",
+        backgroundColor: "error.lighter",
+        "&:hover": {
+          backgroundColor: "error.light",
+        },
+      }
+    : {};
+
+  const iconSx = isError
+    ? {
+        color: "error.main",
+      }
+    : {};
+
   return (
     <>
-      <MenuItem onClick={handleRenameColumn}>
-        <ListItemIcon>
+      <MenuItem onClick={handleRenameColumn} sx={menuItemSx}>
+        <ListItemIcon sx={iconSx}>
           <Edit fontSize="small" />
         </ListItemIcon>
         <ListItemText>Rename column</ListItemText>
       </MenuItem>
-      <MenuItem onClick={handleExcludeColumn}>
-        <ListItemIcon>
+      <MenuItem onClick={handleExcludeColumn} sx={menuItemSx}>
+        <ListItemIcon sx={iconSx}>
           <Delete fontSize="small" />
         </ListItemIcon>
         <ListItemText>Exclude column</ListItemText>
       </MenuItem>
-      <MenuItem onClick={handleSetColumnType}>
-        <ListItemIcon>
+      <MenuItem onClick={handleSetColumnType} sx={menuItemSx}>
+        <ListItemIcon sx={iconSx}>
           <SwapHoriz fontSize="small" />
         </ListItemIcon>
         <ListItemText>Change column type</ListItemText>
       </MenuItem>
-      <MenuItem onClick={handleFocusColumn}>
-        <ListItemIcon>
+      <MenuItem onClick={handleFocusColumn} sx={menuItemSx}>
+        <ListItemIcon sx={iconSx}>
           <CenterFocusStrong fontSize="small" />
         </ListItemIcon>
         <ListItemText>Focus column</ListItemText>
       </MenuItem>
       {includeInsert && (
         <>
-          <MenuItem onClick={handleInsertColumnLeft}>
-            <ListItemIcon>
+          <MenuItem onClick={handleInsertColumnLeft} sx={menuItemSx}>
+            <ListItemIcon sx={iconSx}>
               <KeyboardArrowLeft fontSize="small" />
             </ListItemIcon>
             <ListItemText>Insert column to the left</ListItemText>
           </MenuItem>
-          <MenuItem onClick={handleInsertColumnRight}>
-            <ListItemIcon>
+          <MenuItem onClick={handleInsertColumnRight} sx={menuItemSx}>
+            <ListItemIcon sx={iconSx}>
               <KeyboardArrowRight fontSize="small" />
             </ListItemIcon>
             <ListItemText>Insert column to the right</ListItemText>

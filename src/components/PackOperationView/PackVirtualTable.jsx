@@ -24,7 +24,12 @@ import { EnhancedTableLabel } from "../TableView";
  * @param {*} syncTables: if false, this component implements sequential loading of table rows. If true, it concurrently loads all tables.
  * @returns
  */
-const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
+const PackVirtualTable = ({
+  operation,
+  selectedOperationColumnIds,
+  alerts = [],
+}) => {
+  const hasAlerts = alerts.length > 0;
   const [sortBy, setSortBy] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
@@ -77,6 +82,10 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
       sx={{
         maxHeight: "400px",
         overflowY: "auto",
+        border: hasAlerts ? "2px solid" : "none",
+        borderColor: hasAlerts ? "error.main" : "transparent",
+        borderRadius: hasAlerts ? 1 : 0,
+        backgroundColor: hasAlerts ? "error.lighter" : "transparent",
         "&::-webkit-scrollbar": {
           width: "8px",
         },
@@ -108,7 +117,15 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
         <TableHead>
           {/* First row: Table names */}
           <TableRow>
-            <TableCell rowSpan={2} sx={{ verticalAlign: "middle" }}>
+            <TableCell
+              rowSpan={2}
+              sx={{
+                verticalAlign: "middle",
+                backgroundColor: hasAlerts ? "error.lighter" : "inherit",
+                color: hasAlerts ? "error.main" : "inherit",
+                fontWeight: hasAlerts ? 600 : "inherit",
+              }}
+            >
               #
             </TableCell>
             {operation?.children?.map((tableId, tableIndex) => {
@@ -131,7 +148,10 @@ const PackVirtualTable = ({ operation, selectedOperationColumnIds }) => {
                   sx={{
                     borderBottom: "1px solid rgba(224, 224, 224, 1)",
                     fontWeight: "bold",
-                    backgroundColor: "rgba(0, 0, 0, 0.04)",
+                    backgroundColor: hasAlerts
+                      ? "error.lighter"
+                      : "rgba(0, 0, 0, 0.04)",
+                    color: hasAlerts ? "error.main" : "inherit",
                   }}
                 >
                   <EnhancedTableLabel

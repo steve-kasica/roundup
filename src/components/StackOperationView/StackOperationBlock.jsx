@@ -22,9 +22,9 @@ import { EnhancedTableBlock } from "../TableView/TableBlock";
 // TODO: when addressing this layout, consider using
 // styled components, but module SCSS will overwrite
 const StyledBox = styled(Box, {
-  shouldForwardProp: (prop) => prop !== "hasError",
-})(({ theme, hasError }) => ({
-  ...(hasError && {
+  shouldForwardProp: (prop) => prop !== "isError",
+})(({ theme, isError }) => ({
+  ...(isError && {
     backgroundColor: theme.palette.error.main,
     borderLeft: `4px solid ${theme.palette.error.dark}`,
   }),
@@ -38,6 +38,7 @@ function StackOperationBlock({
   depth,
   isFocused,
   isHovered,
+  isError = false,
 
   // Props passed recusrively via parent operation
   parentColumnCount = 0,
@@ -69,7 +70,7 @@ function StackOperationBlock({
 
   const operationContent = (
     <StyledBox
-      hasError={Boolean(operation.error)}
+      isError={isError}
       className={className.join(" ")}
       sx={{
         flexBasis: `${(columnCount / parentColumnCount) * 100}%`,

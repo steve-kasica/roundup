@@ -13,7 +13,6 @@ import { EnhancedTableBlock } from "../TableView";
 import withOperationData from "../HOC/withOperationData";
 import { isOperationId } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
-import PropTypes from "prop-types";
 import { Box, Tooltip, styled } from "@mui/material";
 
 // TODO: when addressing this layout, consider using
@@ -35,10 +34,12 @@ function PackOperationBlock({
   isFocused,
   isHovered,
   childrenIds,
+  alerts = [],
 
   // Props passed recusrively via parent operation
   parentColumnCount = 0,
 }) {
+  const hasAlerts = alerts.length > 0;
   const childOperationIds = childrenIds.filter(isOperationId);
   const childTableIds = childrenIds.filter(isTableId);
 
@@ -48,7 +49,6 @@ function PackOperationBlock({
     `depth-${depth}`,
     isFocused ? "focused" : "",
     isHovered ? "hover" : "",
-    operation.error ? "error" : "",
   ].filter(Boolean);
 
   // Parse error message if it's a JSON string
@@ -69,20 +69,21 @@ function PackOperationBlock({
 
   const operationContent = (
     <StyledBox
-      hasError={Boolean(operation.error)}
+      hasError={hasAlerts}
       className={className.join(" ")}
       sx={{
         flexBasis: `${(columnCount / parentColumnCount) * 100}%`,
       }}
     >
       {childOperationIds.length > 0
-        ? childOperationIds.map((childOperationId) => (
-            <EnhancedOperationView
-              key={childOperationId}
-              id={childOperationId}
-              parentColumnCount={columnCount}
-            />
-          ))
+        ? childOperationIds.map(
+            (childOperationId) => null
+            // <EnhancedOperationView
+            //   key={childOperationId}
+            //   id={childOperationId}
+            //   parentColumnCount={columnCount}
+            // />
+          )
         : null}
       {childTableIds.length > 0
         ? childTableIds.map((tableId) => (

@@ -15,7 +15,6 @@ import {
 import { useCallback, useMemo, useRef, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
 import { StickyTableCell, StyledAlternatingTableRow } from "../ui/Table";
-import { EnhancedColumnHeader } from "../ColumnViews";
 import useVirtualStackRows from "../../hooks/useVirtualStackRows";
 import { transpose } from "d3";
 
@@ -30,7 +29,9 @@ const StackVirtualizedTable = ({
   columnIdMatrix,
   selectedColumnIds,
   selectedChildColumns,
+  alerts = [],
 }) => {
+  const hasAlerts = alerts.length > 0;
   const tableContainerRef = useRef(null);
   const [sortBy, setSortBy] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -146,8 +147,6 @@ const StackVirtualizedTable = ({
     return transpose(Object.values(selectedChildColumns));
   }, [selectedChildColumns]);
 
-  console.log({ displayColumns });
-
   return (
     <TableContainer
       ref={tableContainerRef}
@@ -155,6 +154,10 @@ const StackVirtualizedTable = ({
       sx={{
         maxHeight: "400px",
         overflowY: "auto",
+        border: hasAlerts ? "2px solid" : "none",
+        borderColor: hasAlerts ? "error.main" : "transparent",
+        borderRadius: hasAlerts ? 1 : 0,
+        backgroundColor: hasAlerts ? "error.lighter" : "transparent",
         "&::-webkit-scrollbar": {
           width: "8px",
         },

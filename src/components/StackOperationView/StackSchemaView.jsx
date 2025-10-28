@@ -24,7 +24,9 @@ const StackSchemaView = ({
   swapColumns,
   insertColumnIntoChildAtIndex,
   setVisibleColumns: setVisibleColumnsInSlice,
+  alerts = [],
 }) => {
+  const hasAlerts = alerts.length > 0 || true;
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
   const [selectedTableColumnIds, setSelectedTableColumnIds] = useState([]);
   const columnContainerRef = useRef(null);
@@ -249,7 +251,18 @@ const StackSchemaView = ({
   );
 
   return (
-    <Box display={"flex"} flexDirection="column" height="100%">
+    <Box
+      display={"flex"}
+      flexDirection="column"
+      height="100%"
+      sx={{
+        border: hasAlerts ? "2px solid" : "none",
+        borderColor: hasAlerts ? "error.main" : "transparent",
+        borderRadius: hasAlerts ? 1 : 0,
+        backgroundColor: hasAlerts ? "error.lighter" : "transparent",
+        padding: hasAlerts ? 1 : 0,
+      }}
+    >
       <SchemaToolbar
         columnIds={columnIdMatrix.flat()}
         columnCount={activeColumnIds.length}

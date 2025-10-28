@@ -21,7 +21,10 @@ const StackParametersForm = ({
   isLoading,
   setOperationType,
   setName,
+  alerts = [],
 }) => {
+  const hasAlerts = alerts.length > 0;
+
   if (isLoading) {
     return (
       <Box
@@ -38,7 +41,16 @@ const StackParametersForm = ({
   return (
     <Box
       component="form"
-      sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+        border: hasAlerts ? "2px solid" : "none",
+        borderColor: hasAlerts ? "error.main" : "transparent",
+        borderRadius: hasAlerts ? 1 : 0,
+        backgroundColor: hasAlerts ? "error.lighter" : "transparent",
+        padding: hasAlerts ? 2 : 0,
+      }}
     >
       <TextField
         fullWidth
@@ -46,14 +58,16 @@ const StackParametersForm = ({
         value={operation.name}
         onChange={(event) => setName(event.target.value)}
         placeholder={operation?.name}
+        error={hasAlerts}
       />
 
-      <FormControl fullWidth>
+      <FormControl fullWidth error={hasAlerts}>
         <InputLabel>Operation Type</InputLabel>
         <Select
           value={operation.operationType}
           onChange={(event) => setOperationType(event.target.value)}
           label="Operation Type"
+          error={hasAlerts}
         >
           <MenuItem value={OPERATION_TYPE_PACK}>Pack</MenuItem>
           <MenuItem value={OPERATION_TYPE_STACK}>Stack</MenuItem>

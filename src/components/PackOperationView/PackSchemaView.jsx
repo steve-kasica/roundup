@@ -13,11 +13,7 @@ import PackOperationIcon from "./PackOperationIcon";
 import withPackOperationData from "./withPackOperationData";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { usePackStats } from "../../hooks/usePackStats";
-import {
-  EnhancedTableLabel,
-  EnhancedTableRowMatches,
-  TableRowMatches,
-} from "../TableView";
+import { EnhancedTableLabel, EnhancedTableRowMatches } from "../TableView";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { EnhancedTableHeader } from "../TableView/TableHeader";
 
@@ -45,9 +41,11 @@ const PackSchemaView = withPackOperationData(
     rightKey,
     rightKeyColumnName,
     rightHandColumns,
+    alerts = [],
     // functions
     setJoinType,
   }) => {
+    const hasAlerts = alerts.length > 0;
     const columnToTableMap = useMemo(() => {
       const map = new Map();
       leftHandColumns.forEach((colId) => map.set(colId, leftTableId));
@@ -227,7 +225,7 @@ const PackSchemaView = withPackOperationData(
     );
 
     const getVisibleMatches = () => {
-      if (operation.error || !data) return {};
+      if (hasAlerts || !data) return {};
       return Object.fromEntries(
         Object.entries(data).filter(([label, count]) => count > 0)
       );
@@ -245,7 +243,7 @@ const PackSchemaView = withPackOperationData(
           variant="dense"
           sx={{
             minHeight: "auto",
-            backgroundColor: "grey.50",
+            backgroundColor: hasAlerts ? "error.lighter" : "grey.50",
             borderRadius: 0.5,
             mb: 0.5,
             px: 1,
@@ -260,13 +258,18 @@ const PackSchemaView = withPackOperationData(
               display: "flex",
               alignItems: "center",
               gap: 0.5,
+              color: hasAlerts ? "error.main" : "inherit",
+              fontWeight: hasAlerts ? 600 : "inherit",
             }}
           >
-            <PackOperationIcon fontSize="small" sx={{ color: "grey.600" }} />
+            <PackOperationIcon
+              fontSize="small"
+              sx={{ color: hasAlerts ? "error.main" : "grey.600" }}
+            />
             {operation.name}
           </Typography>
           <Box display="flex" alignItems="center" gap={1}>
-            {operation.error !== null && (
+            {hasAlerts && (
               <Alert
                 severity="error"
                 sx={{
@@ -287,29 +290,31 @@ const PackSchemaView = withPackOperationData(
                 //   },
                 // }}
               >
-                <Tooltip title={operation.error.message} arrow>
-                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                    {operation.error.name}
-                  </Typography>
-                </Tooltip>
+                {/** TODO: update to handle multiple */}
+                {hasAlerts && (
+                  <Tooltip title={alerts[0].message} arrow>
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                      {alerts[0].name}
+                    </Typography>
+                  </Tooltip>
+                )}
               </Alert>
             )}
-            {operation.error === null && (
+            {hasAlerts && (
               <Typography variant="body2" color="textSecondary">
                 {operation.joinType}
               </Typography>
             )}
             <Chip
-              label={`${
-                operation.error ? "?" : totalRows.toLocaleString()
-              } rows`}
+              label={`${hasAlerts ? "?" : totalRows.toLocaleString()} rows`}
               size="small"
               variant="outlined"
               sx={{
-                borderColor: "grey.400",
-                color: "grey.700",
+                borderColor: hasAlerts ? "error.main" : "grey.400",
+                color: hasAlerts ? "error.main" : "grey.700",
+                backgroundColor: hasAlerts ? "error.lighter" : "transparent",
                 "&:hover": {
-                  borderColor: "grey.500",
+                  borderColor: hasAlerts ? "error.dark" : "grey.500",
                 },
               }}
             />
@@ -318,17 +323,29 @@ const PackSchemaView = withPackOperationData(
               size="small"
               variant="outlined"
               sx={{
-                borderColor: "grey.500",
-                color: "grey.800",
+                borderColor: hasAlerts ? "error.main" : "grey.500",
+                color: hasAlerts ? "error.main" : "grey.800",
+                backgroundColor: hasAlerts ? "error.lighter" : "transparent",
                 "&:hover": {
-                  borderColor: "grey.600",
+                  borderColor: hasAlerts ? "error.dark" : "grey.600",
                 },
               }}
             />
           </Box>
         </Toolbar>
 
-        <Box display={"flex"} flex={1} gap={0.5}>
+        <Box
+          display={"flex"}
+          flex={1}
+          gap={0.5}
+          sx={{
+            border: hasAlerts ? "2px solid" : "none",
+            borderColor: hasAlerts ? "error.main" : "transparent",
+            borderRadius: hasAlerts ? 1 : 0,
+            backgroundColor: hasAlerts ? "error.lighter" : "transparent",
+            padding: hasAlerts ? 1 : 0,
+          }}
+        >
           {loading && !data && (
             <Box
               display="flex"
@@ -421,7 +438,6 @@ const PackSchemaView = withPackOperationData(
                   sx={{
                     width: "100%",
                     height: "100%",
-                    backgroundColor: "pink",
                   }}
                 ></Box>
               )}
@@ -464,7 +480,6 @@ const PackSchemaView = withPackOperationData(
                   sx={{
                     width: "100%",
                     height: "100%",
-                    backgroundColor: "pink",
                   }}
                 ></Box>
               )}

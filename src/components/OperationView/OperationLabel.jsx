@@ -17,12 +17,12 @@ const OperationLabel = ({
   columnCount = 0,
   rowCount = 0,
   loading = false,
-  error = false,
+  alerts = [],
   includeIcon = true,
   includeDimensions = true,
 }) => {
+  const isAlert = alerts.length > 0;
   if (loading) return <span>Loading...</span>;
-  if (error) return <span>Error: {error.message}</span>;
   if (!id) return <span>No data</span>;
 
   return (
@@ -33,10 +33,18 @@ const OperationLabel = ({
       {includeIcon && operationType === OPERATION_TYPE_PACK && (
         <PackOperationIcon />
       )}
-      <Typography variant="h6" component="div" sx={{ userSelect: "none" }}>
+      <Typography
+        variant="h6"
+        component="div"
+        sx={{
+          userSelect: "none",
+          color: isAlert ? "error.main" : "inherit",
+          fontWeight: isAlert ? 600 : "inherit",
+        }}
+      >
         {name || id}{" "}
         {includeDimensions && (
-          <small>
+          <small style={{ color: isAlert ? "inherit" : undefined }}>
             ({columnCount.toLocaleString()} x {rowCount.toLocaleString()})
           </small>
         )}
