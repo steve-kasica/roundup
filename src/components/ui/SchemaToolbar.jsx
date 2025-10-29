@@ -7,8 +7,21 @@ import {
   SelectAll,
   TableView,
   Visibility,
+  ErrorOutline as AlertIcon,
 } from "@mui/icons-material";
-import { IconButton, Toolbar, Box, Divider, Dialog } from "@mui/material";
+import {
+  IconButton,
+  Toolbar,
+  Box,
+  Divider,
+  Dialog,
+  Popover,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  Badge,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   excludeColumnFromTable,
@@ -21,10 +34,12 @@ import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedTableLabel } from "../TableView";
 import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
+import { selectAlertsById } from "../../slices/alertsSlice/alertsSelectors";
 
-const SchemaToolbar = ({ columnIds, objectId }) => {
+const SchemaToolbar = ({ columnIds, objectId, alertIds = [] }) => {
   const dispatch = useDispatch();
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
+  const alerts = useSelector((state) => selectAlertsById(state, alertIds));
   const isError = useSelector((state) =>
     Boolean(
       isTableId(objectId)
@@ -35,6 +50,7 @@ const SchemaToolbar = ({ columnIds, objectId }) => {
   const areAllColumnsSelected =
     columnIds.length > 0 && selectedColumnIds.length === columnIds.length;
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [alertAnchorEl, setAlertAnchorEl] = useState(null);
 
   const handleSelectAll = useCallback(() => {
     dispatch(setSelectedColumnIds(columnIds));
@@ -59,6 +75,16 @@ const SchemaToolbar = ({ columnIds, objectId }) => {
   const handleCloseExportDialog = useCallback(() => {
     setIsExportDialogOpen(false);
   }, []);
+
+  const handleOpenAlerts = useCallback((event) => {
+    setAlertAnchorEl(event.currentTarget);
+  }, []);
+
+  const handleCloseAlerts = useCallback(() => {
+    setAlertAnchorEl(null);
+  }, []);
+
+  const isAlertPopoverOpen = Boolean(alertAnchorEl);
 
   return (
     <Toolbar
@@ -141,6 +167,19 @@ const SchemaToolbar = ({ columnIds, objectId }) => {
           sx={{ mx: 1, height: 28, alignSelf: "center" }}
         />
 
+        {/* Alerts */}
+        <IconButton
+          size="small"
+          onClick={handleOpenAlerts}
+          disabled={alerts.length === 0}
+          title={`View alerts (${alerts.length})`}
+          color={alerts.length > 0 ? "warning" : "default"}
+        >
+          <Badge badgeContent={alerts.length} color="warning">
+            <AlertIcon fontSize="small" />
+          </Badge>
+        </IconButton>
+
         {/* Export */}
         <IconButton
           size="small"
@@ -165,6 +204,60 @@ const SchemaToolbar = ({ columnIds, objectId }) => {
           onClose={handleCloseExportDialog}
         />
       </Dialog>
+
+      {/* Alerts Popover */}
+      <Popover
+        open={isAlertPopoverOpen}
+        anchorEl={alertAnchorEl}
+        onClose={handleCloseAlerts}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <Box sx={{ maxWidth: 400, maxHeight: 400 }}>
+          <Box
+            sx={{
+              p: 2,
+              borderBottom: 1,
+              borderColor: "divider",
+              bgcolor: "warning.light",
+            }}
+          >
+            <Typography variant="subtitle2" fontWeight="bold">
+              Alerts ({alerts.length})
+            </Typography>
+          </Box>
+          <List sx={{ maxHeight: 320, overflow: "auto", p: 0 }}>
+            {alerts.map((alert, index) => (
+              <ListItem
+                key={alert?.id || index}
+                divider={index < alerts.length - 1}
+                sx={{ py: 1.5, px: 2 }}
+              >
+                <ListItemText
+                  primary={
+                    <Typography variant="body2" fontWeight="medium">
+                      {alert?.title || alert?.message || "Alert"}
+                    </Typography>
+                  }
+                  secondary={
+                    alert?.description || alert?.details ? (
+                      <Typography variant="caption" color="text.secondary">
+                        {alert?.description || alert?.details}
+                      </Typography>
+                    ) : null
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Popover>
     </Toolbar>
   );
 };

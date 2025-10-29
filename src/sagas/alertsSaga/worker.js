@@ -9,7 +9,11 @@ import {
   selectOperation,
 } from "../../slices/operationsSlice";
 import { selectColumnById } from "../../slices/columnsSlice";
-import { addAlerts } from "../../slices/alertsSlice/alertsSlice";
+import {
+  addAlerts,
+  removeAlertsBySourceIds,
+} from "../../slices/alertsSlice/alertsSlice";
+import { selectAllSourceIdsWithAlerts } from "../../slices/alertsSlice/alertsSelectors";
 
 const validatePackOperation = (operation) => {
   const warnings = [];
@@ -30,25 +34,39 @@ const validatePackOperation = (operation) => {
 
 export default function* alertsSagaWorker(items) {
   const alerts = [];
+  const idsToClear = [];
+  const itemsWithAlerts = yield select(selectAllSourceIdsWithAlerts);
 
   for (const item of items) {
+    const itemAlerts = [];
     if (Object.hasOwnProperty.call(item, "error")) {
       // Fatal error alert for failed operations
-      alerts.push(item.error);
+      itemAlerts.push(item.error);
     }
 
     // Validate operations in warnings
     if (isOperationId(item.id)) {
       const operation = select((state) => selectOperation(state, item.id));
       if (operation.operationType === OPERATION_TYPE_PACK) {
-        alerts.push(...validatePackOperation(operation));
+        itemAlerts.push(...validatePackOperation(operation));
       }
     }
-  }
+
+    if (itemAlerts.length > 0) {
+      alerts.push(...itemAlerts);
+    } else if (itemsWithAlerts.includes(item.id)) {
+      // itemAlerts is empty now, but there were existing alerts
+      // for this item, so we need to clear them.
+      idsToClear.push(item.id);
+    }
+  } // end for loop
 
   if (alerts.length > 0) {
     yield put(addAlerts(alerts));
   }
 
-  yield null;
+  // If any objects were validation and no alerts were raised, clear existing alerts
+  if (idsToClear.length > 0) {
+    yield put(removeAlertsBySourceIds(idsToClear));
+  }
 }

@@ -21,7 +21,6 @@ const PackOperationParams = ({
   setLeftTableJoinKey,
   setRightTableJoinKey,
   swapTablePositions,
-  renameOperation,
   setJoinType,
 }) => {
   const [selectedPredicate, setSelectedPredicate] = useState(

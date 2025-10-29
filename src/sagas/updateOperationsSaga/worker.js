@@ -130,6 +130,7 @@ export default function* updateOperationsWorker(action) {
         ).filter((key) => key !== "id"),
       ])
     ),
+    raisedAlerts: updates.map(({ error }) => error),
   });
 
   if (successfulUpdates.length > 0) {

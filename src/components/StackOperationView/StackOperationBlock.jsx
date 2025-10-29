@@ -22,11 +22,15 @@ import { EnhancedTableBlock } from "../TableView/TableBlock";
 // TODO: when addressing this layout, consider using
 // styled components, but module SCSS will overwrite
 const StyledBox = styled(Box, {
-  shouldForwardProp: (prop) => prop !== "isError",
-})(({ theme, isError }) => ({
+  shouldForwardProp: (prop) =>
+    ["isError", "isFocused"].includes(prop) === false,
+})(({ theme, isError, isFocused }) => ({
   ...(isError && {
     backgroundColor: theme.palette.error.main,
     borderLeft: `4px solid ${theme.palette.error.dark}`,
+  }),
+  ...(isFocused && {
+    boxShadow: `0 0 0 2px ${theme.palette.primary.main}`,
   }),
 }));
 
@@ -38,40 +42,24 @@ function StackOperationBlock({
   depth,
   isFocused,
   isHovered,
+  alerts = [],
+  hasAlerts = false,
   isError = false,
 
   // Props passed recusrively via parent operation
   parentColumnCount = 0,
 }) {
-  const className = [
-    "operation",
-    operation.operationType || "no-op",
-    `depth-${depth}`,
-    isFocused ? "focused" : "",
-    isHovered ? "hover" : "",
-    operation.error ? "error" : "",
-  ].filter(Boolean);
-
   // Parse error message if it's a JSON string
   const getErrorMessage = () => {
-    if (!operation.error) return "";
+    if (!hasAlerts) return "";
 
-    if (typeof operation.error === "string") {
-      try {
-        const parsedError = JSON.parse(operation.error);
-        return parsedError.message || operation.error;
-      } catch {
-        return operation.error;
-      }
-    }
-
-    return operation.error.message || "An error occurred";
+    return alerts.map((alert) => alert.message).join("\n");
   };
 
   const operationContent = (
     <StyledBox
-      isError={isError}
-      className={className.join(" ")}
+      isError={hasAlerts}
+      isFocused={isFocused}
       sx={{
         flexBasis: `${(columnCount / parentColumnCount) * 100}%`,
       }}

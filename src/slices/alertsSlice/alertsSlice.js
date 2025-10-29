@@ -1,7 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// This functional essentially implement a _composite key_ strategy for
+// detect duplicate alerts, which preserving a _primary key_ alert ID.
+function getAlertSignature(alert) {
+  // Combine type + sourceId + any other discriminating fields
+  const parts = [
+    alert.type || alert.alertType,
+    alert.sourceId,
+    // Add other fields that make the alert unique
+    alert.columnId, // if relevant
+    alert.severity, // if two warnings of same type but different severity are distinct
+  ].filter(Boolean); // Remove undefined values
+
+  return parts.join("::");
+}
+
 const initialState = {
   bySourceId: {},
+  bySignature: {}, // New index for O(1) duplicate detection
   ids: [],
   data: {},
 };
@@ -15,17 +31,26 @@ const alertsSlice = createSlice({
       if (!Array.isArray(alerts)) {
         alerts = [alerts];
       }
-      alerts.forEach((error) => {
-        if (!state.data[error.id]) {
-          // Only add if the error is not already present
-          // This prevents duplicates in the state
-          state.ids.push(error.id);
-          state.data[error.id] = error;
-          if (!state.bySourceId[error.sourceId]) {
-            state.bySourceId[error.sourceId] = [];
-          }
-          state.bySourceId[error.sourceId].push(error.id);
+      alerts.forEach((alert) => {
+        const signature = getAlertSignature(alert);
+
+        // Check if alert with this signature already exists
+        if (state.bySignature[signature]) {
+          // Optionally update the existing alert instead of skipping
+          const existingId = state.bySignature[signature];
+          state.data[existingId] = { ...state.data[existingId], ...alert };
+          return;
         }
+
+        // Add new alert
+        state.ids.push(alert.id);
+        state.data[alert.id] = alert;
+        state.bySignature[signature] = alert.id;
+
+        if (!state.bySourceId[alert.sourceId]) {
+          state.bySourceId[alert.sourceId] = [];
+        }
+        state.bySourceId[alert.sourceId].push(alert.id);
       });
     },
     removeAlerts(state, action) {
@@ -35,17 +60,38 @@ const alertsSlice = createSlice({
       }
       ids.forEach((id) => {
         if (state.data[id]) {
-          // Remove the error from error ids by sourceId
-          state.bySourceId[state.data[id].sourceId] = state.bySourceId[
-            state.data[id].sourceId
+          const alert = state.data[id];
+          const signature = getAlertSignature(alert);
+
+          // Remove from bySignature index
+          delete state.bySignature[signature];
+
+          // Remove from bySourceId
+          state.bySourceId[alert.sourceId] = state.bySourceId[
+            alert.sourceId
           ].filter((valueId) => valueId !== id);
 
+          delete state.data[id];
+          state.ids = state.ids.filter((valueId) => valueId !== id);
+        }
+      });
+    },
+    removeAlertsBySourceIds(state, action) {
+      let sourceIds = action.payload;
+      if (!Array.isArray(sourceIds)) {
+        sourceIds = [sourceIds];
+      }
+      sourceIds.forEach((sourceId) => {
+        const alertIds = state.bySourceId[sourceId] || [];
+        alertIds.forEach((id) => {
           // Remove error from state data
           delete state.data[id];
 
           // Remove error id from state ids
           state.ids = state.ids.filter((valueId) => valueId !== id);
-        }
+        });
+        // Remove the sourceId entry
+        delete state.bySourceId[sourceId];
       });
     },
     clearData(state) {
@@ -55,5 +101,6 @@ const alertsSlice = createSlice({
   },
 });
 
-export const { addAlerts, removeAlerts, clearData } = alertsSlice.actions;
+export const { addAlerts, removeAlerts, clearData, removeAlertsBySourceIds } =
+  alertsSlice.actions;
 export default alertsSlice.reducer;

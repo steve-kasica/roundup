@@ -26,7 +26,7 @@ const StackSchemaView = ({
   setVisibleColumns: setVisibleColumnsInSlice,
   alerts = [],
 }) => {
-  const hasAlerts = alerts.length > 0 || true;
+  const hasAlerts = alerts.length > 0;
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
   const [selectedTableColumnIds, setSelectedTableColumnIds] = useState([]);
   const columnContainerRef = useRef(null);
@@ -269,6 +269,7 @@ const StackSchemaView = ({
         rowCount={operation.rowCount}
         name={operation.name}
         objectId={operation.id}
+        alertIds={alerts}
       />
       <Box
         sx={{

@@ -142,6 +142,7 @@ export default function withOperationData(WrappedComponent) {
         rowCount={operation.rowCount}
         // Directly associated alerts
         alerts={alerts} // All alerts associted with this operation
+        hasAlerts={alerts.length > 0}
         // Interaction props (TODO, is this deprecated?)
         isFocused={isFocused}
         isHovered={isHovered}
