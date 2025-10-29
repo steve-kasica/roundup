@@ -62,6 +62,10 @@ const TableSchema = ({
   selectColumns,
   insertColumn,
   setVisibleColumns: setVisibleColumnsInSlice,
+
+  // Props from withAssociatedAlerts via withTableData
+  alertIds, // eslint-disable-line no-unused-vars
+  hasAlerts,
 }) => {
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
@@ -204,7 +208,19 @@ const TableSchema = ({
   );
 
   return (
-    <Box display="flex" flexDirection="column" height="100%">
+    <Box
+      display="flex"
+      flexDirection="column"
+      height="100%"
+      sx={{
+        ...(hasAlerts && {
+          border: "3px solid",
+          borderColor: "warning.main",
+          backgroundColor: "warning.light",
+          borderRadius: 1,
+        }),
+      }}
+    >
       {/* Toolbar with table info and action buttons */}
       <SchemaToolbar
         columnIds={activeColumnIds}

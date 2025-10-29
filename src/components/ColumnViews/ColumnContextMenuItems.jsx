@@ -33,6 +33,9 @@ const ColumnContextMenu = ({
   focusColumn,
   onInsertColumnLeftClick,
   onInsertColumnRightClick,
+  // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
+  alertIds,
+  hasAlerts,
   // action dispatch functions passed via `withColumnData` HOC
   renameColumn,
   // Props passed directly from parent component

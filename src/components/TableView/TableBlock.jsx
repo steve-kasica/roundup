@@ -6,6 +6,10 @@ import withTableData from "./withTableData.jsx";
 import { Box, Typography } from "@mui/material";
 
 function TableBlock({
+  // Props from withAssociatedAlerts via withTableData
+  id, // eslint-disable-line no-unused-vars
+  alertIds,
+  hasAlerts,
   // props via withTableData
   table,
   activeColumnIds,
@@ -38,6 +42,13 @@ function TableBlock({
           (activeColumnsCount / parentColumnCount || activeColumnsCount) * 100
         }%`,
         position: "relative",
+        // Visual indication of alerts
+        ...(hasAlerts && {
+          border: "2px solid",
+          borderColor: "warning.main",
+          backgroundColor: "warning.light",
+          opacity: 0.9,
+        }),
       }}
     >
       <Typography
@@ -53,9 +64,15 @@ function TableBlock({
           fontSize: "0.7rem",
           pointerEvents: "none",
           backdropFilter: "blur(2px)",
+          ...(hasAlerts && {
+            color: "warning.dark",
+            backgroundColor: "warning.light",
+            fontWeight: "bold",
+          }),
         }}
       >
         {table.name || table.id}
+        {hasAlerts && ` ⚠ ${alertIds.length}`}
       </Typography>
       {ticks.map((columnId, index) =>
         columnId === null ? (

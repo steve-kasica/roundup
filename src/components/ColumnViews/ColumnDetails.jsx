@@ -10,7 +10,8 @@
  * data work.
  */
 import withColumnData from "./withColumnData";
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Divider, Typography, Alert, Chip } from "@mui/material";
+import { Warning } from "@mui/icons-material";
 import DescriptionList from "../ui/DescriptionList";
 import { EnhancedColumnValues } from "./ColumnValues";
 import ColumnValueCounts from "./ColumnValueCounts";
@@ -18,7 +19,17 @@ import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useState } from "react";
 
 const ColumnDetails = withColumnData(
-  ({ column, uniqueCount, duplicateCount, mode, nullCount, completeness }) => {
+  ({
+    column,
+    uniqueCount,
+    duplicateCount,
+    mode,
+    nullCount,
+    completeness,
+    // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
+    alertIds,
+    hasAlerts,
+  }) => {
     const [view, setView] = useState("value counts");
 
     const handleViewChange = (event, newView) => {
@@ -28,11 +39,37 @@ const ColumnDetails = withColumnData(
     };
     return (
       <Box
-        sx={{ p: 1, display: "flex", flexDirection: "column", height: "100%" }}
+        sx={{
+          p: 1,
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          ...(hasAlerts && {
+            border: "2px solid",
+            borderColor: "warning.main",
+            backgroundColor: "warning.light",
+            borderRadius: 1,
+          }),
+        }}
       >
-        <Typography variant="h5">
-          {column.name || column.columnName || column.id}
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography
+            variant="h5"
+            sx={{ ...(hasAlerts && { color: "warning.dark" }) }}
+          >
+            {column.name || column.columnName || column.id}
+          </Typography>
+          {hasAlerts && (
+            <Chip
+              icon={<Warning />}
+              label={`${alertIds.length} alert${
+                alertIds.length !== 1 ? "s" : ""
+              }`}
+              color="warning"
+              size="small"
+            />
+          )}
+        </Box>
         <Divider sx={{ my: 1 }} />
         <DescriptionList
           data={{

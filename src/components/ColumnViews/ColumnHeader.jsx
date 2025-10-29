@@ -20,6 +20,9 @@ const ColumnHeader = ({
   isFocused,
   isDraggable,
   isError,
+  // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
+  alertIds,
+  hasAlerts,
   // Props passed directly from parent
   isActive,
   onSort,
@@ -57,13 +60,18 @@ const ColumnHeader = ({
         isLoading={isLoading}
         isFocused={isFocused}
         isDraggable={isDraggable}
-        isError={isError}
+        isError={hasAlerts}
         sx={{
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
           borderRadius: 0,
+          ...(hasAlerts && {
+            backgroundColor: "warning.light",
+            borderBottom: "2px solid",
+            borderBottomColor: "warning.main",
+          }),
         }}
       >
         {/* <Box display="flex" alignItems="center" justifyContent="space-between"> */}

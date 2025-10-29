@@ -26,12 +26,22 @@ import {
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
 import { setFocusedObject } from "../../slices/uiSlice";
+import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 
 export default function withTableData(WrappedComponent) {
   const componentName =
     WrappedComponent.displayName || WrappedComponent.name || "Component";
 
-  function EnhancedComponent({ id, ...props }) {
+  function EnhancedComponent({
+    // Props passed from withAssociatedAlerts
+    alertIds,
+    hasAlerts,
+    removeAlerts,
+    silenceAlerts,
+    // Props passed directly from parent
+    id,
+    ...props
+  }) {
     const dispatch = useDispatch();
 
     try {
@@ -171,6 +181,12 @@ export default function withTableData(WrappedComponent) {
       return (
         <WrappedComponent
           {...props}
+          id={id}
+          // Props from withAssociatedAlerts
+          alertIds={alertIds}
+          hasAlerts={hasAlerts}
+          removeAlerts={removeAlerts}
+          silenceAlerts={silenceAlerts}
           // Table properties
           table={table}
           rowCount={table.rowCount.toLocaleString()}
@@ -220,13 +236,17 @@ export default function withTableData(WrappedComponent) {
 
   EnhancedComponent.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    isDraggable: PropTypes.bool,
+    alertIds: PropTypes.array.isRequired,
+    hasAlerts: PropTypes.bool.isRequired,
+    removeAlerts: PropTypes.func.isRequired,
+    silenceAlerts: PropTypes.func.isRequired,
   };
 
   // Set display name for better debugging in React DevTools
   EnhancedComponent.displayName = `withTableData(${componentName})`;
 
-  return EnhancedComponent;
+  // Wrap EnhancedComponent with withAssociatedAlerts
+  return withAssociatedAlerts(EnhancedComponent);
 }
 
 withTableData.propTypes = {

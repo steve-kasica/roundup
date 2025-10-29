@@ -48,6 +48,9 @@ const TableRowMatches = ({
   table,
   columnCount,
   activeColumnIds,
+  // Props from withAssociatedAlerts via withTableData
+  alertIds, // eslint-disable-line no-unused-vars
+  hasAlerts,
   // Props passed directyly from parent component
   tablePosition, // "left" or "right"
   matches,
@@ -66,6 +69,15 @@ const TableRowMatches = ({
       flex={1}
       height="100%"
       width="100%"
+      sx={{
+        ...(hasAlerts && {
+          border: "2px solid",
+          borderColor: "warning.main",
+          backgroundColor: "warning.light",
+          borderRadius: 1,
+          padding: "2px",
+        }),
+      }}
     >
       <Box
         height={"100%"}

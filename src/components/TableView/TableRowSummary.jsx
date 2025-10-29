@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import { DragIndicator } from "@mui/icons-material";
+import { DragIndicator, Warning } from "@mui/icons-material";
 import HighlightText from "../ui/HighlightText";
-import { styled, Typography, Checkbox, Stack, Box } from "@mui/material";
+import { styled, Typography, Checkbox, Stack, Box, Badge } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Menu, MenuItem } from "@mui/material";
@@ -45,8 +45,14 @@ const BarChartCell = styled(Typography, {
 // Styled table row component that handles all drag and drop states
 const StyledTableRow = styled("tr", {
   shouldForwardProp: (prop) =>
-    !["isDragging", "isDisabled", "isSelected", "isHovered"].includes(prop),
-})(({ isDragging, isDisabled, isSelected, isHovered }) => {
+    ![
+      "isDragging",
+      "isDisabled",
+      "isSelected",
+      "isHovered",
+      "hasAlerts",
+    ].includes(prop),
+})(({ isDragging, isDisabled, isSelected, isHovered, hasAlerts }) => {
   let styles = {
     transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
     cursor: "pointer",
@@ -62,8 +68,18 @@ const StyledTableRow = styled("tr", {
     },
   };
 
+  // Alert styles - orange/warning theme (highest priority after disabled)
+  if (hasAlerts && !isDisabled) {
+    styles = {
+      ...styles,
+      backgroundColor: "rgba(255, 152, 0, 0.12)",
+      boxShadow: "inset 3px 0 0 #ff9800, 0 1px 3px rgba(255, 152, 0, 0.2)",
+      borderLeft: "3px solid #ff9800",
+    };
+  }
+
   // Base selected styles - blue theme for selection
-  if (isSelected) {
+  if (isSelected && !hasAlerts) {
     styles = {
       ...styles,
       backgroundColor: "rgba(25, 118, 210, 0.12)",
@@ -72,7 +88,7 @@ const StyledTableRow = styled("tr", {
   }
 
   // Hover styles - subtle gray with shadow
-  if (isHovered && !isDragging && !isSelected) {
+  if (isHovered && !isDragging && !isSelected && !hasAlerts) {
     styles = {
       ...styles,
       backgroundColor: "rgba(0, 0, 0, 0.02)",
@@ -82,11 +98,21 @@ const StyledTableRow = styled("tr", {
   }
 
   // Selected + Hovered - enhanced selected state
-  if (isSelected && isHovered && !isDragging) {
+  if (isSelected && isHovered && !isDragging && !hasAlerts) {
     styles = {
       ...styles,
       backgroundColor: "rgba(25, 118, 210, 0.16)",
       boxShadow: "inset 3px 0 0 #1976d2, 0 2px 6px rgba(25, 118, 210, 0.2)",
+      transform: "translateY(-1px)",
+    };
+  }
+
+  // Alert + Hovered - enhanced alert state
+  if (hasAlerts && isHovered && !isDragging && !isDisabled) {
+    styles = {
+      ...styles,
+      backgroundColor: "rgba(255, 152, 0, 0.2)",
+      boxShadow: "inset 3px 0 0 #ff9800, 0 2px 6px rgba(255, 152, 0, 0.3)",
       transform: "translateY(-1px)",
     };
   }
@@ -124,6 +150,10 @@ function TableRowSummary({
   columnCount,
   removedColumnCount,
   isInSchema,
+
+  // Props from withAssociatedAlerts via withTableData
+  alertIds,
+  hasAlerts,
 
   // depth,
   // parentOperation,
@@ -212,6 +242,7 @@ function TableRowSummary({
       isDisabled={isDisabled}
       isSelected={isSelected}
       isHovered={false} // TODO: Implement hover state if needed
+      hasAlerts={hasAlerts}
       data-tableid={table.id}
       data-selected={isSelected}
       data-multiselected={
@@ -271,10 +302,23 @@ function TableRowSummary({
       <Typography
         component="td"
         sx={{ fontSize: "13px" }}
-        color={isDisabled ? "textDisabled" : "normal"}
+        color={
+          isDisabled ? "textDisabled" : hasAlerts ? "warning.dark" : "normal"
+        }
         data-column="name"
       >
-        <HighlightText pattern={searchString} text={table.name} />
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <HighlightText pattern={searchString} text={table.name} />
+          {hasAlerts && (
+            <Badge
+              badgeContent={alertIds.length}
+              color="warning"
+              sx={{ ml: 0.5 }}
+            >
+              <Warning color="warning" fontSize="small" />
+            </Badge>
+          )}
+        </Stack>
       </Typography>
       <Typography
         component="td"

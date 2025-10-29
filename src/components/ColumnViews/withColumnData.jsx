@@ -21,13 +21,20 @@ import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperation } from "../../slices/operationsSlice";
-import { createColumnsRequest } from "../../sagas/createColumnsSaga/actions";
-import { CREATION_MODE_INSERTION } from "../../sagas/createColumnsSaga";
 import { useCallback } from "react";
-import { use } from "react";
+import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 
 export default function withColumnData(WrappedComponent) {
-  return function EnhancedComponent({ id, ...props }) {
+  function EnhancedComponent({
+    // Props passed from withAssociatedAlerts
+    alertIds,
+    hasAlerts,
+    removeAlerts,
+    silenceAlerts,
+    // Props passed directly from parent
+    id,
+    ...props
+  }) {
     const dispatch = useDispatch();
     const isNull = id === null;
     let column = useSelector((state) =>
@@ -92,6 +99,13 @@ export default function withColumnData(WrappedComponent) {
     return (
       <WrappedComponent
         {...props}
+        // Props from withAssociatedAlerts
+        id={id}
+        alertIds={alertIds}
+        hasAlerts={hasAlerts}
+        removeAlerts={removeAlerts}
+        silenceAlerts={silenceAlerts}
+        // Column data props
         column={column}
         nullCount={nullCount} // Total number of null values
         completeness={completeness} // Percentage of non-null values
@@ -104,8 +118,6 @@ export default function withColumnData(WrappedComponent) {
             ["", 0]
           )[0]
         }
-        // Column data props
-        id={id}
         tableId={tableId}
         name={name}
         alias={alias}
@@ -193,7 +205,18 @@ export default function withColumnData(WrappedComponent) {
         updateColumnsRequest({ columnUpdates: [{ id, isSelected: false }] })
       );
     }
+  }
+
+  EnhancedComponent.propTypes = {
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    alertIds: PropTypes.array.isRequired,
+    hasAlerts: PropTypes.bool.isRequired,
+    removeAlerts: PropTypes.func.isRequired,
+    silenceAlerts: PropTypes.func.isRequired,
   };
+
+  // Wrap EnhancedComponent with withAssociatedAlerts
+  return withAssociatedAlerts(EnhancedComponent);
 }
 
 withColumnData.propTypes = {

@@ -1,7 +1,14 @@
 /* eslint-disable react/prop-types */
 import withColumnData from "./withColumnData";
-import { Box, Typography, IconButton, Menu, Tooltip } from "@mui/material";
-import { MoreVert, Info } from "@mui/icons-material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Menu,
+  Tooltip,
+  Badge,
+} from "@mui/material";
+import { MoreVert, Info, Warning } from "@mui/icons-material";
 import { useState } from "react";
 import SingleBar from "../visualization/SingleBar";
 import { scaleLinear } from "d3";
@@ -30,11 +37,10 @@ const ColumnSummary = ({
   dragDropRef = null,
   handleInsertColumnLeft,
   handleInsertColumnRight,
+  // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
+  alertIds,
+  hasAlerts,
 }) => {
-  if (isOver) {
-    console.log("ColumnSummary isOver true", column?.id);
-  }
-
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   if (!column) {
@@ -63,11 +69,19 @@ const ColumnSummary = ({
       isSelected={isSelected}
       isDraggable={isDraggable}
       isFocused={isFocused}
-      isError={isError}
+      isError={isError || hasAlerts}
       onMouseEnter={hoverColumn}
       onMouseLeave={unhoverColumn}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      sx={{
+        ...(hasAlerts && {
+          borderColor: "warning.main",
+          borderWidth: 2,
+          backgroundColor: "warning.light",
+          opacity: 0.95,
+        }),
+      }}
     >
       <Box
         sx={{
@@ -130,10 +144,22 @@ const ColumnSummary = ({
                 textOverflow: "ellipsis",
                 minWidth: 0,
                 flex: 1,
+                ...(hasAlerts && {
+                  color: "#e65100", // warning.dark
+                }),
               }}
             >
               {column.name || column.columnName || column.id}
             </h3>
+            {hasAlerts && (
+              <Badge
+                badgeContent={alertIds.length}
+                color="warning"
+                sx={{ mr: 0.5 }}
+              >
+                <Warning color="warning" fontSize="small" />
+              </Badge>
+            )}
             <Box
               sx={{
                 "@container (min-width: 150px)": {

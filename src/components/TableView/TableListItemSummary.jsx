@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import { useState, useMemo } from "react";
-import { DragIndicator, CheckCircle } from "@mui/icons-material";
+import { useState } from "react";
+import { DragIndicator, CheckCircle, Warning } from "@mui/icons-material";
 import {
   ListItem,
   ListItemIcon,
@@ -12,6 +12,7 @@ import {
   Menu,
   MenuItem,
   Checkbox,
+  Badge,
 } from "@mui/material";
 import HighlightText from "../ui/HighlightText";
 import {
@@ -27,6 +28,11 @@ function TableListItemSummary({
   activeColumnIds,
   parentOperation,
   isInSchema,
+  // Props passed from withAssociatedAlerts via withTableData
+  alertIds,
+  hasAlerts,
+  // Removed columns
+  removedColumnIds = [],
   // Props passed directly from parent component
   isDisabled = false,
   isSelected = false,
@@ -48,6 +54,9 @@ function TableListItemSummary({
   const columnCount = activeColumnIds.length;
   // Helper functions for styling based on state
   const getBackgroundColor = () => {
+    if (hasAlerts) {
+      return isSelected ? "rgba(255, 152, 0, 0.2)" : "rgba(255, 152, 0, 0.08)";
+    }
     if (isSelected && isInSchema) {
       return "rgba(76, 175, 80, 0.1)"; // Light green for both
     } else if (isSelected) {
@@ -59,12 +68,25 @@ function TableListItemSummary({
   };
 
   const getHoverBackgroundColor = () => {
+    if (hasAlerts) {
+      return "rgba(255, 152, 0, 0.15)";
+    }
     if (isInSchema) {
       return "rgba(76, 175, 80, 0.15)";
     } else if (isSelected) {
       return "rgba(25, 118, 210, 0.12)";
     }
     return "action.hover";
+  };
+
+  const getBorderColor = () => {
+    if (hasAlerts) {
+      return "warning.main";
+    }
+    if (isInSchema) {
+      return "success.main";
+    }
+    return "transparent";
   };
 
   const handleContextMenu = (event) => {
@@ -216,9 +238,10 @@ function TableListItemSummary({
           userSelect: "none",
           // Background colors for different states
           backgroundColor: getBackgroundColor(),
-          // Border for schema inclusion (green left border)
-          borderLeft: isInSchema ? "4px solid" : "1px solid transparent",
-          borderColor: isInSchema ? "success.main" : "transparent",
+          // Border for schema inclusion (green left border) or alerts (orange)
+          borderLeft:
+            hasAlerts || isInSchema ? "4px solid" : "1px solid transparent",
+          borderColor: getBorderColor(),
           // Selection outline (blue outline)
           outline: isSelected ? "2px solid" : "none",
           outlineColor: isSelected ? "primary.main" : "transparent",
@@ -230,9 +253,13 @@ function TableListItemSummary({
           borderRadius: 1,
           mb: 0.5,
           // Additional visual feedback
-          boxShadow: isSelected ? 1 : 0,
+          boxShadow: isSelected
+            ? 1
+            : hasAlerts
+            ? "0 1px 3px rgba(255, 152, 0, 0.3)"
+            : 0,
           // Ensure proper border spacing
-          marginLeft: isInSchema ? 0 : "4px",
+          marginLeft: hasAlerts || isInSchema ? 0 : "4px",
           transition: "all 0.2s ease-in-out",
         }}
       >
@@ -278,10 +305,24 @@ function TableListItemSummary({
                 sx={{
                   fontWeight: isSelected ? 600 : 500,
                   transition: "font-weight 0.2s ease-in-out",
+                  ...(hasAlerts && {
+                    color: "warning.dark",
+                  }),
                 }}
               >
                 <HighlightText pattern={searchString} text={table.name} />
               </Typography>
+
+              {/* Alert Badge */}
+              {hasAlerts && (
+                <Badge
+                  badgeContent={alertIds.length}
+                  color="warning"
+                  sx={{ ml: 1 }}
+                >
+                  <Warning color="warning" fontSize="small" />
+                </Badge>
+              )}
 
               {/* Table Type Chip */}
               <Chip

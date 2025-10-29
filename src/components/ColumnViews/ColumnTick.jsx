@@ -2,21 +2,38 @@
 import StyledColumnCard from "./StyledColumnCard";
 import withColumnData from "./withColumnData";
 
-const ColumnTick = (props) => (
+const ColumnTick = ({
+  isHovered,
+  isDragging,
+  isDropTarget,
+  isSelected,
+  isOver,
+  isLoading,
+  isFocused,
+  isDraggable,
+  isNull,
+  isVisible,
+  error,
+  hoverColumn,
+  unhoverColumn,
+  // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
+  alertIds,
+  hasAlerts,
+}) => (
   <StyledColumnCard
-    isHovered={props.isHovered}
-    isDragging={props.isDragging}
-    isDropTarget={props.isDropTarget}
-    isSelected={props.isSelected}
-    isOver={props.isOver}
-    isLoading={props.isLoading}
-    isFocused={props.isFocused}
-    isDraggable={props.isDraggable}
-    isNull={props.isNull}
-    isError={props.error}
-    isVisible={props.isVisible}
-    onMouseEnter={props.hoverColumn}
-    onMouseLeave={props.unhoverColumn}
+    isHovered={isHovered}
+    isDragging={isDragging}
+    isDropTarget={isDropTarget}
+    isSelected={isSelected}
+    isOver={isOver}
+    isLoading={isLoading}
+    isFocused={isFocused}
+    isDraggable={isDraggable}
+    isNull={isNull}
+    isError={error}
+    isVisible={isVisible}
+    onMouseEnter={hoverColumn}
+    onMouseLeave={unhoverColumn}
     sx={{
       borderRadius: 0,
       boxShadow: "none",
