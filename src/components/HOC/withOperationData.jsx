@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useSelector } from "react-redux";
 import {
   selectOperation,
@@ -8,14 +9,24 @@ import {
   updateOperations,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
-import PropTypes from "prop-types";
 import { setPeekedTable } from "../../slices/uiSlice";
 import {
   selectColumnIdsByTableId,
   selectRemovedColumnIdsByTableId,
+  selectSelectedChildColumnsByOperationId,
+  selectSelectedColumnDBNamesByTableId,
+  selectSelectedColumnIdsByTableId,
+  setFocusedColumnIds,
+  setVisibleColumns as setVisibleColumnsAction,
 } from "../../slices/columnsSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { selectAlertIdsBySourceId } from "../../slices/alertsSlice/alertsSelectors";
+import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
+import {
+  createColumnsRequest,
+  CREATION_MODE_INSERTION,
+} from "../../sagas/createColumnsSaga";
 
 export default function withOperationData(WrappedComponent) {
   return function EnhancedComponent({ id, ...props }) {
@@ -33,6 +44,21 @@ export default function withOperationData(WrappedComponent) {
       (state) => selectRemovedColumnIdsByTableId(state, id) // TODO, generalize name for operations too
     );
 
+    const selectedChildColumns = useSelector((state) =>
+      selectSelectedChildColumnsByOperationId(state, id)
+    );
+
+    // Column objects for all columns associated directly with this operation
+    const selectedColumnIds = useSelector((state) =>
+      selectSelectedColumnIdsByTableId(state, id)
+    );
+
+    const selectedColumnNames = useSelector((state) =>
+      selectSelectedColumnDBNamesByTableId(state, id)
+    );
+
+    const alerts = useSelector((state) => selectAlertIdsBySourceId(state, id));
+
     // Use useMemo to ensure activeColumnIds updates when table.columnIds or removedColumnIds change
     const activeColumnIds = useMemo(
       () =>
@@ -40,26 +66,98 @@ export default function withOperationData(WrappedComponent) {
       [columnIds, removedColumnIds]
     );
 
+    const isFocused = operation.id === focusedOperationId;
+    const isHovered = operation.id === hoveredOperationId;
+
+    // Define callback functions used by all operation types
+    // ----------------------------------------------------------------------------
+    const swapTablePositions = useCallback(
+      () => dispatch(),
+      // TODO
+      // updateOperations({
+      //   id,
+      //   joinKey1: operation.joinKey2,
+      //   joinKey2: operation.joinKey1,
+      //   children: operation.children.slice().reverse(),
+      // })
+      [dispatch]
+    );
+    const setVisibleColumns = useCallback(
+      (columnIds) => {
+        dispatch(setVisibleColumnsAction(columnIds));
+      },
+      [dispatch]
+    );
+
+    const selectColumns = useCallback(
+      (selectedColumnIds) =>
+        dispatch(
+          updateColumnsRequest({
+            columnUpdates: [
+              ...selectedColumnIds.filter(Boolean).map((id) => ({
+                id,
+                isSelected: true,
+              })),
+            ],
+          })
+        ),
+      [dispatch]
+    );
+
+    const insertColumnIntoChildAtIndex = useCallback(
+      (childTableId, targetIndex) => {
+        dispatch(
+          createColumnsRequest({
+            mode: CREATION_MODE_INSERTION,
+            columnInfo: [{ parentId: childTableId, index: targetIndex }],
+          })
+        );
+      },
+      [dispatch]
+    );
+
+    const focusColumns = useCallback(
+      (colIds) => dispatch(setFocusedColumnIds(colIds)),
+      [dispatch]
+    );
+
     return (
       <WrappedComponent
+        // Pass along props directly from the parent component
         {...props}
+        id={id} // Need to pass id explicitly
+        // Props derived in this HOC
         operation={operation}
-        id={id}
         depth={depth}
-        columnCount={columnIds.length}
-        columnIds={columnIds}
-        removedColumnIds={removedColumnIds}
-        activeColumnIds={activeColumnIds}
-        rowCount={operation?.rowCount}
-        isFocused={operation?.id === focusedOperationId}
-        isHovered={operation?.id === hoveredOperationId}
-        operationType={operation?.operationType}
-        childrenIds={operation?.children || []}
+        // Directly associated columns
+        columnIds={columnIds} // All column IDs associated with this operation
+        activeColumnIds={activeColumnIds} // columns not excluded
+        columnCount={activeColumnIds.length}
+        selectedColumnIds={selectedColumnIds}
+        selectedColumnNames={selectedColumnNames}
+        removedColumnIds={removedColumnIds} // TODO: @deprecated?
+        // Columns that belong to the child tables
+        selectedChildColumns={selectedChildColumns}
+        // Row stuff
+        rowCount={operation.rowCount}
+        // Directly associated alerts
+        alerts={alerts} // All alerts associted with this operation
+        // Interaction props (TODO, is this deprecated?)
+        isFocused={isFocused}
+        isHovered={isHovered}
+        // Interaction handlers
         onHover={() => dispatch(setHoveredOperation(id))}
         onUnhover={() => dispatch(setHoveredOperation(null))}
-        peekTable={() => dispatch(setPeekedTable(id))}
+        peekTable={() => dispatch(setPeekedTable(id))} // todo is this deprecated?
+        // Operation specific callbacks
+        swapTablePositions={swapTablePositions}
         renameOperation={(newName) =>
           dispatch(updateOperations({ id, name: newName }))
+        }
+        setName={(name) =>
+          dispatch(
+            updateOperationsRequest({ operationUpdates: [{ id, name }] })
+          )
         }
         focusOperation={() =>
           dispatch(
@@ -68,16 +166,24 @@ export default function withOperationData(WrappedComponent) {
             })
           )
         }
+        setOperationType={(operationType) =>
+          dispatch(
+            updateOperationsRequest({
+              operationUpdates: [
+                {
+                  id,
+                  operationType,
+                },
+              ],
+            })
+          )
+        }
+        // Callback function related to columns
+        selectColumns={selectColumns}
+        insertColumnIntoChildAtIndex={insertColumnIntoChildAtIndex}
+        setVisibleColumns={setVisibleColumns}
+        focusColumns={focusColumns}
       />
     );
   };
 }
-
-withOperationData.propTypes = {
-  WrappedComponent: PropTypes.elementType,
-};
-
-// Add prop types for the EnhancedComponent returned by withOperationData
-withOperationData.EnhancedComponentPropTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-};

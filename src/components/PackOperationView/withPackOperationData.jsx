@@ -1,13 +1,10 @@
+/* eslint-disable react/prop-types */
 import { useSelector, useDispatch } from "react-redux";
-import { selectOperation } from "../../slices/operationsSlice";
-import PropTypes from "prop-types";
 import withOperationData from "../HOC/withOperationData";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
 import {
-  selectActiveColumnIdsByTableId,
   selectColumnById,
-  selectSelectedColumnIds,
   selectSelectedColumnIdsByTableId,
 } from "../../slices/columnsSlice/columnSelectors";
 import { selectTablesById } from "../../slices/tablesSlice";
@@ -15,29 +12,19 @@ import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 
 export default function withPackOperationData(WrappedComponent) {
-  // First wrap with the base operation data HOC
-  const ComponentWithOperationData = withOperationData(WrappedComponent);
-
-  function EnhancedPackComponent({ id, ...props }) {
+  function EnhancedPackComponent({
+    // Props passed from withOperationData
+    operation,
+    activeColumnIds,
+    selectedColumnIds,
+    // Props passed directly from parent
+    id,
+    ...props
+  }) {
     const dispatch = useDispatch();
-    const operation = useSelector((state) => selectOperation(state, id));
 
     const leftTableId = operation?.children[0];
     const rightTableId = operation?.children[1];
-
-    const columns = useSelector((state) =>
-      selectColumnIdsByTableId(state, id).map((colId) =>
-        selectColumnById(state, colId)
-      )
-    );
-
-    const activeColumnIds = useSelector((state) =>
-      selectActiveColumnIdsByTableId(state, id)
-    );
-
-    const selectedColumnIds = useSelector((state) =>
-      selectSelectedColumnIdsByTableId(state, id)
-    );
 
     const [leftKeyColumnName, rightKeyColumnName] = useSelector((state) => {
       const leftKeyColumn = selectColumnById(state, operation?.joinKey1);
@@ -109,12 +96,8 @@ export default function withPackOperationData(WrappedComponent) {
     const rightRowCount = rightTable?.rowCount || 0;
 
     return (
-      <ComponentWithOperationData
+      <WrappedComponent
         {...props}
-        id={id}
-        columnCount={activeColumnIds.length}
-        activeColumnIds={activeColumnIds}
-        selectedColumnIds={selectedColumnIds}
         // Pack-specific props
         joinType={operation.joinType}
         joinPredicate={operation.joinPredicate}
@@ -126,8 +109,8 @@ export default function withPackOperationData(WrappedComponent) {
         rightKeyColumnName={rightKeyColumnName}
         leftTableId={leftTableId}
         rightTableId={rightTableId}
-        leftRowCount={leftRowCount}
-        rightRowCount={rightRowCount}
+        leftRowCount={leftRowCount} // TODO: are these needed, seems like table property
+        rightRowCount={rightRowCount} // TODO: are these needed, seems like table property
         tableToOpColumnMap={tableToOpColumnMap}
         leftHandColumns={leftHandColumns} // Deprecated, use leftColumns
         leftColumns={leftHandColumns}
@@ -150,11 +133,6 @@ export default function withPackOperationData(WrappedComponent) {
             })
           );
         }}
-        setName={(name) =>
-          dispatch(
-            updateOperationsRequest({ operationUpdates: [{ id, name }] })
-          )
-        }
         setRightTableJoinKey={(columnId) =>
           dispatch(
             updateOperationsRequest({
@@ -174,44 +152,10 @@ export default function withPackOperationData(WrappedComponent) {
             })
           )
         }
-        setOperationType={(operationType) =>
-          dispatch(
-            updateOperationsRequest({
-              operationUpdates: [{ id, operationType }],
-            })
-          )
-        }
-        swapTablePositions={
-          () => dispatch()
-          // TODO
-          // updateOperations({
-          //   id,
-          //   joinKey1: operation.joinKey2,
-          //   joinKey2: operation.joinKey1,
-          //   children: operation.children.slice().reverse(),
-          // })
-        }
-        selectColumns={(columnsToSelect, columnsToUnselect) => {
-          dispatch(
-            updateColumnsRequest({
-              columnUpdates: [
-                ...columnsToSelect.map((id) => ({ id, isSelected: true })),
-                ...columnsToUnselect.map((id) => ({ id, isSelected: false })),
-              ],
-            })
-          );
-        }}
       />
     );
   }
 
-  EnhancedPackComponent.propTypes = {
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  };
-
-  return EnhancedPackComponent;
+  // Wrap EnhancedPackComponent with withOperationData
+  return withOperationData(EnhancedPackComponent);
 }
-
-withPackOperationData.propTypes = {
-  WrappedComponent: PropTypes.elementType.isRequired,
-};
