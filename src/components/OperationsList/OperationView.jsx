@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Accordion,
   AccordionDetails,
@@ -21,7 +22,6 @@ export const LAYOUT_ID = "operationListItem";
 
 function OperationView({
   operation,
-  childrenIds,
   columnCount,
   isFocused,
   index,
@@ -29,6 +29,7 @@ function OperationView({
   // renameOperation,
   focusOperation,
 }) {
+  const childrenIds = operation.children;
   const label =
     operation.operationType.charAt(0).toUpperCase() +
     operation.operationType.slice(1);
@@ -127,76 +128,5 @@ function OperationView({
   );
 }
 
-OperationView.propTypes = {
-  operation: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    name: PropTypes.string.isRequired,
-    columnCount: PropTypes.number,
-    operationType: PropTypes.string.isRequired,
-    error: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.string,
-      PropTypes.bool,
-    ]),
-  }).isRequired,
-  childrenIds: PropTypes.arrayOf(
-    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ).isRequired,
-  columnCount: PropTypes.number,
-  isFocused: PropTypes.bool,
-  index: PropTypes.number.isRequired,
-  peekTable: PropTypes.func.isRequired,
-  renameOperation: PropTypes.func.isRequired,
-  focusOperation: PropTypes.func.isRequired,
-};
-
 const EnhancedOperationView = withOperationData(OperationView);
 export default EnhancedOperationView;
-
-/**
- *     // <StyledListItem
-    //   hasError={Boolean(operation.error)}
-    //   secondaryAction={
-    //     <>
-    //       {/* <IconButton edge="end" aria-label="menu" onClick={handleMenuOpen}>
-    //         <MoreVertIcon />
-    //       </IconButton>
-    //       <Menu
-    //         anchorEl={anchorEl}
-    //         open={open}
-    //         onClose={handleMenuClose}
-    //         anchorOrigin={{ vertical: "top", horizontal: "right" }}
-    //         transformOrigin={{ vertical: "top", horizontal: "left" }}
-    //       >
-    //         <MenuItem
-    //           onClick={(event) => {
-    //             peekTable();
-    //             handleMenuClose(event);
-    //           }}
-    //         >
-    //           Peek at table
-    //         </MenuItem>
-    //         <MenuItem
-    //           onClick={() => {
-    //             const newName = prompt(
-    //               "Enter new operation name:",
-    //               operation.name
-    //             );
-    //             if (
-    //               newName &&
-    //               newName.trim() &&
-    //               newName.trim() !== operation.name
-    //             ) {
-    //               renameOperation(newName.trim());
-    //             }
-    //             handleMenuClose();
-    //           }}
-    //         >
-    //           Rename
-    //         </MenuItem>
-    //       </Menu> 
-    //     </>
-    //   }
-    //   disablePadding
-    // >
- */
