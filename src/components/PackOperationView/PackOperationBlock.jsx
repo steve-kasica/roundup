@@ -33,15 +33,14 @@ function PackOperationBlock({
   depth,
   isFocused,
   isHovered,
-  childrenIds,
   alerts = [],
 
   // Props passed recusrively via parent operation
   parentColumnCount = 0,
 }) {
   const hasAlerts = alerts.length > 0;
-  const childOperationIds = childrenIds.filter(isOperationId);
-  const childTableIds = childrenIds.filter(isTableId);
+  const childOperationIds = operation.children.filter(isOperationId);
+  const childTableIds = operation.children.filter(isTableId);
 
   const className = [
     "operation",

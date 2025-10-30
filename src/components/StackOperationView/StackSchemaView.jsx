@@ -10,6 +10,7 @@ import { EnhancedTableLabel } from "../TableView";
 import { EnhancedColumnSummary, StyledColumnCard } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
+import { EnhancedStackOperationLabel } from "./StackOperationLabel";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -270,7 +271,9 @@ const StackSchemaView = ({
         name={operation.name}
         objectId={operation.id}
         alertIds={alerts}
-      />
+      >
+        <EnhancedStackOperationLabel id={operation.id} />
+      </SchemaToolbar>
       <Box
         sx={{
           display: "flex",

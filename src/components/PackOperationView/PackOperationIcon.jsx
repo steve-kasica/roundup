@@ -1,31 +1,21 @@
-import { SvgIcon } from "@mui/material";
-import PropTypes from "prop-types";
+/* eslint-disable react/prop-types */
+import { Columns2 } from "lucide-react";
+import { styled } from "@mui/material/styles";
 
 /**
- * Custom SVG icon representing pack operation with a "P"
+ * Styled Lucide icon with access to MUI theme
  */
-const PackOperationIcon = ({ fontSize = "medium", sx = {}, ...props }) => {
-  return (
-    <SvgIcon fontSize={fontSize} sx={sx} {...props} viewBox="0 0 24 24">
-      {/* Letter P for Pack */}
-      <text
-        x="12"
-        y="16"
-        textAnchor="middle"
-        fontSize="14"
-        fontWeight="bold"
-        fill="currentColor"
-        fontFamily="Arial, sans-serif"
-      >
-        P
-      </text>
-    </SvgIcon>
-  );
-};
+const StyledColumns2 = styled(Columns2, {
+  shouldForwardProp: (prop) => prop !== 'hasAlerts',
+})(({ theme, hasAlerts }) => ({
+  color: hasAlerts ? theme.palette.warning.main : 'inherit',
+}));
 
-PackOperationIcon.propTypes = {
-  fontSize: PropTypes.oneOf(["inherit", "large", "medium", "small"]),
-  sx: PropTypes.object,
+/**
+ * Custom SVG icon representing pack operation
+ */
+const PackOperationIcon = (props) => {
+  return <StyledColumns2 {...props} />;
 };
 
 export default PackOperationIcon;

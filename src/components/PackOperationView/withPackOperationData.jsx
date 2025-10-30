@@ -99,6 +99,8 @@ export default function withPackOperationData(WrappedComponent) {
       <WrappedComponent
         {...props}
         // Pack-specific props
+        id={id}
+        name={operation.name}
         joinType={operation.joinType}
         joinPredicate={operation.joinPredicate}
         joinKey1={operation.joinKey1} // Deprecated, use leftKey

@@ -22,6 +22,12 @@ import { EnhancedColumnName } from "../ColumnViews";
 
 const PackParametersForm = ({
   operation,
+  name,
+  joinPredicate,
+  leftKey,
+  rightKey,
+  joinType,
+  operationType,
   rightHandColumns,
   leftHandColumns,
   isLoading,
@@ -72,17 +78,17 @@ const PackParametersForm = ({
       <TextField
         fullWidth
         label="Operation Name"
-        value={operation.name}
+        value={name}
         onChange={(event) => setName(event.target.value)}
         helperText={errors.name}
-        placeholder={operation?.name}
+        placeholder={name}
         error={hasAlerts}
       />
 
       <FormControl fullWidth error={!!errors.rightJoinKey || hasAlerts}>
         <InputLabel>Operation Type</InputLabel>
         <Select
-          value={operation.operationType}
+          value={operationType}
           onChange={(event) => setOperationType(event.target.value)}
           label="Operation Type"
           error={hasAlerts}
@@ -95,7 +101,7 @@ const PackParametersForm = ({
       <FormControl fullWidth error={!!errors.rightJoinKey || hasAlerts}>
         <InputLabel>Join Predicate</InputLabel>
         <Select
-          value={operation?.joinPredicate}
+          value={joinPredicate}
           onChange={(event) => setJoinPredicate(event.target.value)}
           label="Join Predicate"
           error={hasAlerts}
@@ -110,11 +116,11 @@ const PackParametersForm = ({
 
       <FormControl
         fullWidth
-        error={!!errors.leftJoinKey || !operation?.joinKey1 || hasAlerts}
+        error={!!errors.leftJoinKey || !leftKey || hasAlerts}
       >
         <InputLabel>Left Join Key</InputLabel>
         <Select
-          value={operation?.joinKey1 || ""}
+          value={leftKey || ""}
           onChange={(event) => setLeftTableJoinKey(event.target.value)}
           label="Left Join Key"
           error={hasAlerts}
@@ -126,18 +132,18 @@ const PackParametersForm = ({
               </MenuItem>
             ))}
         </Select>
-        {!operation?.joinKey1 && (
+        {!leftKey && (
           <FormHelperText>{"Left join key is required"}</FormHelperText>
         )}
       </FormControl>
 
       <FormControl
         fullWidth
-        error={!!errors.rightJoinKey || !operation?.joinKey2 || hasAlerts}
+        error={!!errors.rightJoinKey || !rightKey || hasAlerts}
       >
         <InputLabel>Right Join Key</InputLabel>
         <Select
-          value={operation?.joinKey2 || ""}
+          value={rightKey || ""}
           onChange={(event) => setRightTableJoinKey(event.target.value)}
           label="Right Join Key"
           error={hasAlerts}
@@ -149,7 +155,7 @@ const PackParametersForm = ({
               </MenuItem>
             ))}
         </Select>
-        {!operation?.joinKey2 && (
+        {!rightKey && (
           <FormHelperText>{"Right join key is required"}</FormHelperText>
         )}
       </FormControl>

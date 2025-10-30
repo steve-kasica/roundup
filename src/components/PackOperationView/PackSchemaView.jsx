@@ -16,6 +16,11 @@ import { usePackStats } from "../../hooks/usePackStats";
 import { EnhancedTableLabel, EnhancedTableRowMatches } from "../TableView";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { EnhancedTableHeader } from "../TableView/TableHeader";
+import { isTableId } from "../../slices/tablesSlice";
+import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
+import { EnhancedOperationHeader } from "../OperationView/OperationHeader";
+import SchemaToolbar from "../ui/SchemaToolbar";
+import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 
 const matchLablels = new Map([
   ["one_to_one_matches", "1:1"],
@@ -28,7 +33,7 @@ const matchLablels = new Map([
 
 const PackSchemaView = withPackOperationData(
   ({
-    operation,
+    id,
     activeColumnIds,
     columnCount,
     selectedOperationColumnIds,
@@ -41,18 +46,15 @@ const PackSchemaView = withPackOperationData(
     rightKey,
     rightKeyColumnName,
     rightHandColumns,
-    alerts = [],
+    joinPredicate,
+    joinType,
+    // Props defined in `withAssociatedAlerts`
+    alertIds,
+    hasAlerts,
+    silenceAlerts,
     // functions
     setJoinType,
   }) => {
-    const hasAlerts = alerts.length > 0;
-    const columnToTableMap = useMemo(() => {
-      const map = new Map();
-      leftHandColumns.forEach((colId) => map.set(colId, leftTableId));
-      rightHandColumns.forEach((colId) => map.set(colId, rightTableId));
-      return map;
-    }, [leftHandColumns, leftTableId, rightHandColumns, rightTableId]);
-
     // Add hover state for coordinating between tables
     const [hoveredMatch, setHoveredMatch] = useState(null);
 
@@ -69,13 +71,20 @@ const PackSchemaView = withPackOperationData(
       zero_to_one_matches: true,
     });
 
+    const columnToTableMap = useMemo(() => {
+      const map = new Map();
+      leftHandColumns.forEach((colId) => map.set(colId, leftTableId));
+      rightHandColumns.forEach((colId) => map.set(colId, rightTableId));
+      return map;
+    }, [leftHandColumns, leftTableId, rightHandColumns, rightTableId]);
+
     // Call usePackStats hook and log results
     const { data, loading, error } = usePackStats(
       leftTableId,
       rightTableId,
       leftKeyColumnName,
       rightKeyColumnName,
-      operation.joinPredicate
+      joinPredicate
     );
 
     // Update toggle state when data changes
@@ -238,134 +247,28 @@ const PackSchemaView = withPackOperationData(
 
     return (
       <Box display={"flex"} flexDirection="column" height="100%">
-        {/* Operation info toolbar */}
-        <Toolbar
-          variant="dense"
-          sx={{
-            minHeight: "auto",
-            backgroundColor: hasAlerts ? "error.lighter" : "grey.50",
-            borderRadius: 0.5,
-            mb: 0.5,
-            px: 1,
-            py: 0.5,
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            component="div"
-            sx={{
-              flexGrow: 1,
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-              color: hasAlerts ? "error.main" : "inherit",
-              fontWeight: hasAlerts ? 600 : "inherit",
-            }}
-          >
-            <PackOperationIcon
-              fontSize="small"
-              sx={{ color: hasAlerts ? "error.main" : "grey.600" }}
-            />
-            {operation.name}
-          </Typography>
-          <Box display="flex" alignItems="center" gap={1}>
-            {hasAlerts && (
-              <Alert
-                severity="error"
-                sx={{
-                  width: "100%",
-                  paddingY: 0,
-                  paddingX: 1,
-                  borderRadius: "10px",
-                  userSelect: "none",
-                }}
-                // TODO: why does this not work?
-                // slotProps={{
-                //   icon: {
-                //     sx: {
-                //       padding: 0,
-                //       margin: 0,
-                //       marginRight: 0, // Explicitly remove right margin if needed
-                //     },
-                //   },
-                // }}
-              >
-                {/** TODO: update to handle multiple */}
-                {hasAlerts && (
-                  <Tooltip title={alerts[0].message} arrow>
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                      {alerts[0].name}
-                    </Typography>
-                  </Tooltip>
-                )}
-              </Alert>
-            )}
-            {hasAlerts && (
-              <Typography variant="body2" color="textSecondary">
-                {operation.joinType}
-              </Typography>
-            )}
-            <Chip
-              label={`${hasAlerts ? "?" : totalRows.toLocaleString()} rows`}
-              size="small"
-              variant="outlined"
-              sx={{
-                borderColor: hasAlerts ? "error.main" : "grey.400",
-                color: hasAlerts ? "error.main" : "grey.700",
-                backgroundColor: hasAlerts ? "error.lighter" : "transparent",
-                "&:hover": {
-                  borderColor: hasAlerts ? "error.dark" : "grey.500",
-                },
-              }}
-            />
-            <Chip
-              label={`${columnCount} columns`}
-              size="small"
-              variant="outlined"
-              sx={{
-                borderColor: hasAlerts ? "error.main" : "grey.500",
-                color: hasAlerts ? "error.main" : "grey.800",
-                backgroundColor: hasAlerts ? "error.lighter" : "transparent",
-                "&:hover": {
-                  borderColor: hasAlerts ? "error.dark" : "grey.600",
-                },
-              }}
-            />
-          </Box>
-        </Toolbar>
-
+        <SchemaToolbar objectId={id} columnIds={[]} alertIds={alertIds}>
+          <EnhancedPackOperationLabel id={id} />
+        </SchemaToolbar>
         <Box
           display={"flex"}
           flex={1}
           gap={0.5}
           sx={{
-            border: hasAlerts ? "2px solid" : "none",
-            borderColor: hasAlerts ? "error.main" : "transparent",
-            borderRadius: hasAlerts ? 1 : 0,
             backgroundColor: hasAlerts ? "error.lighter" : "transparent",
-            padding: hasAlerts ? 1 : 0,
           }}
         >
+          {/* This loading state should be reflected in the table blocks themselves */}
           {loading && !data && (
             <Box
               display="flex"
               alignItems="center"
               justifyContent="center"
-              width="100%"
+              width="10%"
             >
               <CircularProgress size={24} />
             </Box>
           )}
-          {/* {operation.error !== null && (
-            <Alert severity="error" sx={{ width: "100%" }}>
-              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                {operation.error.name}
-              </Typography>
-              <Typography variant="body2">
-                {operation.error.description}
-              </Typography>
-            </Alert>
-          )} */}
           <Box marginTop="59px">
             {Object.entries(getVisibleMatches()).map(([key, value]) => (
               <Box
@@ -400,90 +303,66 @@ const PackSchemaView = withPackOperationData(
             width="100%"
             height={"100%"}
           >
-            <Box
-              width={"50%"}
-              display={"flex"}
-              flexDirection="column"
-              alignItems={"center"}
-            >
-              <EnhancedTableLabel
-                id={leftTableId}
-                includeIcon={false}
-                onClick={(event) => handleTableLabelClick(event, leftTableId)}
-              />
-              <EnhancedTableHeader
-                id={leftTableId}
-                keyColumnId={leftKey}
-                columnWidth={"10px"}
-                onColumnClick={(event, columnId) =>
-                  handleColumnClick(event, leftTableId, columnId)
-                }
-              />
-              {operation.error === null ? (
-                <EnhancedTableRowMatches
-                  id={leftTableId}
-                  keyColumnId={leftKey}
-                  tablePosition="left"
-                  selectedOperationColumnIds={selectedOperationColumnIds}
-                  matches={getVisibleMatches()}
-                  operationRowCount={totalRows}
-                  hoveredRowLabel={hoveredMatch}
-                  toggledMatches={toggledMatches}
-                  onBlockEnter={handleBlockEnter}
-                  onBlockLeave={handleBlockLeave}
-                  onBlockClick={handleBlockClick}
-                />
-              ) : (
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                  }}
-                ></Box>
-              )}
-            </Box>
-            <Box
-              width="50%"
-              display={"flex"}
-              flexDirection="column"
-              alignItems={"center"}
-            >
-              <EnhancedTableLabel
-                id={rightTableId}
-                includeIcon={false}
-                onClick={(event) => handleTableLabelClick(event, rightTableId)}
-              />
-              <EnhancedTableHeader
-                id={rightTableId}
-                keyColumnId={rightKey}
-                columnWidth={"10px"}
-                onColumnClick={(event, columnId) =>
-                  handleColumnClick(event, rightTableId, columnId)
-                }
-              />
-              {operation.error === null ? (
-                <EnhancedTableRowMatches
-                  id={rightTableId}
-                  keyColumnId={rightKey}
-                  tablePosition="right"
-                  selectedOperationColumnIds={selectedOperationColumnIds}
-                  matches={getVisibleMatches()}
-                  operationRowCount={totalRows}
-                  hoveredRowLabel={hoveredMatch}
-                  toggledMatches={toggledMatches}
-                  onBlockEnter={handleBlockEnter}
-                  onBlockLeave={handleBlockLeave}
-                  onBlockClick={handleBlockClick}
-                />
-              ) : (
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                  }}
-                ></Box>
-              )}
-            </Box>
+            {[
+              { tableId: leftTableId, key: leftKey },
+              { tableId: rightTableId, key: rightKey },
+            ].map(({ tableId, keyColumn }, index) => (
+              <Box
+                key={tableId + index}
+                width={"50%"}
+                display={"flex"}
+                flexDirection="column"
+                alignItems={"center"}
+              >
+                {isTableId(tableId) ? (
+                  <EnhancedTableLabel
+                    id={tableId}
+                    includeIcon={false}
+                    onClick={(event) => handleTableLabelClick(event, tableId)}
+                  />
+                ) : (
+                  <EnhancedOperationLabel
+                    id={tableId}
+                    includeIcon={false}
+                    onClick={(event) => handleTableLabelClick(event, tableId)}
+                  />
+                )}
+                {isTableId(tableId) ? (
+                  <EnhancedTableHeader
+                    id={tableId}
+                    keyColumnId={keyColumn}
+                    columnWidth={"10px"}
+                    onColumnClick={(event, columnId) =>
+                      handleColumnClick(event, tableId, columnId)
+                    }
+                  />
+                ) : (
+                  <EnhancedOperationHeader
+                    id={tableId}
+                    keyColumnId={keyColumn}
+                    columnWidth={"10px"}
+                    onColumnClick={(event, columnId) =>
+                      handleColumnClick(event, tableId, columnId)
+                    }
+                  />
+                )}
+                {isTableId(tableId) ? (
+                  <EnhancedTableRowMatches
+                    id={tableId}
+                    keyColumnId={keyColumn}
+                    tablePosition="left"
+                    selectedOperationColumnIds={selectedOperationColumnIds}
+                    matches={getVisibleMatches()}
+                    operationRowCount={totalRows}
+                    hoveredRowLabel={hoveredMatch}
+                    toggledMatches={toggledMatches}
+                    onBlockEnter={handleBlockEnter}
+                    onBlockLeave={handleBlockLeave}
+                    onBlockClick={handleBlockClick}
+                  />
+                ) : null}
+              </Box>
+            ))}
           </Box>
         </Box>
       </Box>

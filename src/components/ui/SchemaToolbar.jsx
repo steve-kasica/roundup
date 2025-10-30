@@ -36,7 +36,7 @@ import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
 import { selectAlertsById } from "../../slices/alertsSlice/alertsSelectors";
 
-const SchemaToolbar = ({ columnIds, objectId, alertIds = [] }) => {
+const SchemaToolbar = ({ columnIds, objectId, alertIds = [], children }) => {
   const dispatch = useDispatch();
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
   const alerts = useSelector((state) => selectAlertsById(state, alertIds));
@@ -99,11 +99,7 @@ const SchemaToolbar = ({ columnIds, objectId, alertIds = [] }) => {
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        {isTableId(objectId) ? (
-          <EnhancedTableLabel id={objectId} />
-        ) : (
-          <EnhancedOperationLabel id={objectId} />
-        )}
+        {children}
       </Box>
 
       {/* Action Buttons Section - Bulk operations for selected columns */}

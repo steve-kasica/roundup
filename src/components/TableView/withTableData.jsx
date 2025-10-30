@@ -73,14 +73,12 @@ export default function withTableData(WrappedComponent) {
       );
 
       // Get related operation data from the Redux store, if any
-      const parentOperation = useSelector((state) =>
-        table.operationId ? selectOperation(state, table.operationId) : null
+      const parentOperationId = useSelector((state) =>
+        selectOperationByTableId(state, id)
       );
 
       const depth = useSelector((state) =>
-        table.operationId
-          ? selectOperationDepth(state, table.operationId)
-          : null
+        selectOperationDepth(state, parentOperationId)
       );
 
       // Functions to handle interactions
@@ -190,7 +188,7 @@ export default function withTableData(WrappedComponent) {
           // Table properties
           table={table}
           rowCount={table.rowCount.toLocaleString()}
-          parentOperation={parentOperation} // TODO: should only pass Ids
+          parentOperationId={parentOperationId} // TODO: should only pass Ids
           isInSchema={isInSchema}
           depth={depth}
           columnIds={columnIds}

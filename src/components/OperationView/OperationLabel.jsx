@@ -9,6 +9,7 @@ import StackOperationIcon from "../StackOperationView/StackOperationIcon";
 import PackOperationIcon from "../PackOperationView/PackOperationIcon";
 import { useSelector } from "react-redux";
 import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
+import withOperationData from "../HOC/withOperationData";
 
 const OperationLabel = ({
   id,
@@ -17,34 +18,34 @@ const OperationLabel = ({
   columnCount = 0,
   rowCount = 0,
   loading = false,
-  alerts = [],
+  // Props defined in `withAssociatedAlerts`
+  hasAlerts,
   includeIcon = true,
   includeDimensions = true,
 }) => {
-  const isAlert = alerts.length > 0;
   if (loading) return <span>Loading...</span>;
   if (!id) return <span>No data</span>;
 
   return (
     <Stack direction={"row"} spacing={1} alignItems="center">
       {includeIcon && operationType === OPERATION_TYPE_STACK && (
-        <StackOperationIcon />
+        <StackOperationIcon hasAlerts={hasAlerts} />
       )}
       {includeIcon && operationType === OPERATION_TYPE_PACK && (
-        <PackOperationIcon />
+        <PackOperationIcon hasAlerts={hasAlerts} />
       )}
       <Typography
         variant="h6"
         component="div"
         sx={{
           userSelect: "none",
-          color: isAlert ? "error.main" : "inherit",
-          fontWeight: isAlert ? 600 : "inherit",
+          color: hasAlerts ? "error.main" : "inherit",
+          fontWeight: hasAlerts ? 600 : "inherit",
         }}
       >
         {name || id}{" "}
         {includeDimensions && (
-          <small style={{ color: isAlert ? "inherit" : undefined }}>
+          <small style={{ color: hasAlerts ? "inherit" : undefined }}>
             ({columnCount.toLocaleString()} x {rowCount.toLocaleString()})
           </small>
         )}
@@ -55,21 +56,23 @@ const OperationLabel = ({
 
 OperationLabel.displayName = "OperationLabel";
 
-const EnhancedOperationLabel = (props) => {
-  const operation = useSelector((state) => selectOperation(state, props.id));
-  const activeColumnIds = useSelector((state) =>
-    selectActiveColumnIdsByTableId(state, props.id)
-  );
-  return (
-    <OperationLabel
-      {...props}
-      operationType={operation ? operation.operationType : null}
-      name={operation ? operation.name : null}
-      rowCount={operation.rowCount}
-      columnCount={activeColumnIds.length}
-    />
-  );
-};
+const EnhancedOperationLabel = withOperationData(OperationLabel);
+
+// const EnhancedOperationLabel = (props) => {
+//   const operation = useSelector((state) => selectOperation(state, props.id));
+//   const activeColumnIds = useSelector((state) =>
+//     selectActiveColumnIdsByTableId(state, props.id)
+//   );
+//   return (
+//     <OperationLabel
+//       {...props}
+//       operationType={operation ? operation.operationType : null}
+//       name={operation ? operation.name : null}
+//       rowCount={props.rowCount}
+//       columnCount={activeColumnIds.length}
+//     />
+//   );
+// };
 
 EnhancedOperationLabel.displayName = "EnhancedOperationLabel";
 

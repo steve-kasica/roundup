@@ -21,15 +21,22 @@ import {
 } from "../../slices/columnsSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
 import { useCallback, useMemo } from "react";
-import { selectAlertIdsBySourceId } from "../../slices/alertsSlice/alertsSelectors";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
+import withAssociatedAlerts from "./withAssociatedAlerts";
 
 export default function withOperationData(WrappedComponent) {
-  return function EnhancedComponent({ id, ...props }) {
+  function EnhancedComponent({
+    id,
+    alertIds,
+    hasAlerts,
+    removeAlerts,
+    silenceAlerts,
+    ...props
+  }) {
     const dispatch = useDispatch();
 
     const operation = useSelector((state) => selectOperation(state, id));
@@ -56,8 +63,6 @@ export default function withOperationData(WrappedComponent) {
     const selectedColumnNames = useSelector((state) =>
       selectSelectedColumnDBNamesByTableId(state, id)
     );
-
-    const alerts = useSelector((state) => selectAlertIdsBySourceId(state, id));
 
     // Use useMemo to ensure activeColumnIds updates when table.columnIds or removedColumnIds change
     const activeColumnIds = useMemo(
@@ -128,6 +133,8 @@ export default function withOperationData(WrappedComponent) {
         id={id} // Need to pass id explicitly
         // Props derived in this HOC
         operation={operation}
+        name={operation.name}
+        operationType={operation.operationType}
         depth={depth}
         // Directly associated columns
         columnIds={columnIds} // All column IDs associated with this operation
@@ -140,9 +147,11 @@ export default function withOperationData(WrappedComponent) {
         selectedChildColumns={selectedChildColumns}
         // Row stuff
         rowCount={operation.rowCount}
-        // Directly associated alerts
-        alerts={alerts} // All alerts associted with this operation
-        hasAlerts={alerts.length > 0}
+        // Directly associated alerts (from withAssociatedAlerts)
+        alertIds={alertIds}
+        hasAlerts={hasAlerts}
+        removeAlerts={removeAlerts}
+        silenceAlerts={silenceAlerts}
         // Interaction props (TODO, is this deprecated?)
         isFocused={isFocused}
         isHovered={isHovered}
@@ -186,5 +195,8 @@ export default function withOperationData(WrappedComponent) {
         focusColumns={focusColumns}
       />
     );
-  };
+  }
+
+  // Wrap the EnhancedComponent with withAssociatedAlerts to inject alert props
+  return withAssociatedAlerts(EnhancedComponent);
 }
