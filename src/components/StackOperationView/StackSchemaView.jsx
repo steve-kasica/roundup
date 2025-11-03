@@ -20,14 +20,18 @@ const StackSchemaView = ({
   columnIdMatrix, // column IDs of child tables in a matrix
   m, // width of the matrix (# of columns)
   // selectedColumnIndices,
+  // Props passed via withAssociatedAlerts
+  alertIds,
+  hasAlerts,
+  removeAlerts,
+  silenceAlerts,
+  //
   selectColumns,
   focusColumns,
   swapColumns,
   insertColumnIntoChildAtIndex,
   setVisibleColumns: setVisibleColumnsInSlice,
-  alerts = [],
 }) => {
-  const hasAlerts = alerts.length > 0;
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
   const [selectedTableColumnIds, setSelectedTableColumnIds] = useState([]);
   const columnContainerRef = useRef(null);
@@ -270,7 +274,7 @@ const StackSchemaView = ({
         rowCount={operation.rowCount}
         name={operation.name}
         objectId={operation.id}
-        alertIds={alerts}
+        alertIds={alertIds}
       >
         <EnhancedStackOperationLabel id={operation.id} />
       </SchemaToolbar>

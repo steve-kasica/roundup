@@ -1,20 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// This functional essentially implement a _composite key_ strategy for
-// detect duplicate alerts, which preserving a _primary key_ alert ID.
-function getAlertSignature(alert) {
-  // Combine type + sourceId + any other discriminating fields
-  const parts = [
-    alert.type || alert.alertType,
-    alert.sourceId,
-    // Add other fields that make the alert unique
-    alert.columnId, // if relevant
-    alert.severity, // if two warnings of same type but different severity are distinct
-  ].filter(Boolean); // Remove undefined values
-
-  return parts.join("::");
-}
-
 const initialState = {
   bySourceId: {},
   bySignature: {}, // New index for O(1) duplicate detection
@@ -32,12 +17,10 @@ const alertsSlice = createSlice({
         alerts = [alerts];
       }
       alerts.forEach((alert) => {
-        const signature = getAlertSignature(alert);
-
         // Check if alert with this signature already exists
-        if (state.bySignature[signature]) {
+        if (state.bySignature[alert.signature]) {
           // Optionally update the existing alert instead of skipping
-          const existingId = state.bySignature[signature];
+          const existingId = state.bySignature[alert.signature];
           state.data[existingId] = { ...state.data[existingId], ...alert };
           return;
         }
@@ -45,7 +28,7 @@ const alertsSlice = createSlice({
         // Add new alert
         state.ids.push(alert.id);
         state.data[alert.id] = alert;
-        state.bySignature[signature] = alert.id;
+        state.bySignature[alert.signature] = alert.id;
 
         if (!state.bySourceId[alert.sourceId]) {
           state.bySourceId[alert.sourceId] = [];
@@ -61,10 +44,9 @@ const alertsSlice = createSlice({
       ids.forEach((id) => {
         if (state.data[id]) {
           const alert = state.data[id];
-          const signature = getAlertSignature(alert);
 
           // Remove from bySignature index
-          delete state.bySignature[signature];
+          delete state.bySignature[alert.signature];
 
           // Remove from bySourceId
           state.bySourceId[alert.sourceId] = state.bySourceId[
@@ -98,9 +80,48 @@ const alertsSlice = createSlice({
       state = initialState;
       return state;
     },
+    removeAlertsBySignature(state, action) {
+      let signatures = action.payload;
+      if (!Array.isArray(signatures)) {
+        signatures = [signatures];
+      }
+      signatures.forEach((signature) => {
+        if (state.bySignature[signature]) {
+          const id = state.bySignature[signature];
+          const alert = state.data[id];
+
+          // Remove signature index
+          delete state.bySignature[signature];
+
+          if (alert) {
+            // Remove alert data
+            delete state.data[alert.id];
+
+            // Remove id from ids array
+            state.ids = state.ids.filter((valueId) => valueId !== alert.id);
+
+            // Remove id from bySourceId and clean up empty arrays
+            if (alert.sourceId && state.bySourceId[alert.sourceId]) {
+              state.bySourceId[alert.sourceId] = state.bySourceId[
+                alert.sourceId
+              ].filter((valueId) => valueId !== alert.id);
+
+              if (state.bySourceId[alert.sourceId].length === 0) {
+                delete state.bySourceId[alert.sourceId];
+              }
+            }
+          }
+        }
+      });
+    },
   },
 });
 
-export const { addAlerts, removeAlerts, clearData, removeAlertsBySourceIds } =
-  alertsSlice.actions;
+export const {
+  addAlerts,
+  removeAlerts,
+  clearData,
+  removeAlertsBySourceIds,
+  removeAlertsBySignature,
+} = alertsSlice.actions;
 export default alertsSlice.reducer;

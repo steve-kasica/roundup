@@ -4,7 +4,6 @@ import updateColumnsWorker from "./worker";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
 import {
   selectColumnById,
-  selectColumnIdsByTableId,
   selectedExcludedColumnsByTableId,
 } from "../../slices/columnsSlice";
 import { DATABASE_ATTRIBUTES } from ".";
@@ -48,7 +47,6 @@ export default function* updateColumnsSaga() {
   // a user removes all the columns from the table (thus excluding the
   // table), but then re-adds the table to a new operation.
   yield takeEvery(createOperationsRequest.type, function* (action) {
-    console.log("updateColumnsSaga: createOperationsRequest detected");
     const { operationData } = action.payload;
     const columnIdsToUpdate = [];
     for (const { childIds } of operationData) {

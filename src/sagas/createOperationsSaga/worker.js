@@ -35,7 +35,9 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
-import Operation from "../../slices/operationsSlice/Operation";
+import Operation, {
+  OPERATION_TYPE_NO_OP,
+} from "../../slices/operationsSlice/Operation";
 import { createOperationsSuccess, createOperationsFailure } from "./actions";
 import {
   createStackView,
@@ -47,7 +49,10 @@ import { group } from "d3";
 import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
 import { selectOperationQueryData } from "../../slices/operationsSlice/operationsSelectors";
 import { setFocusedObject } from "../../slices/uiSlice";
-import { serializeError } from "../../slices/alertsSlice/utilities/serializers";
+import {
+  testPackOperationForFatalErrors,
+  testStackOperationForFatalErrors,
+} from "../../slices/alertsSlice/Alerts/Errors/utilities";
 
 export const calcPackColumnCount = (state, childIds) => {
   const columnCountTotal = childIds.reduce(
@@ -101,6 +106,7 @@ export const calcStackColumnCount = (state, childIds) => {
 export default function* createOperationsWorker(action) {
   const successfulCreations = [];
   const failedCreations = [];
+  const raisedAlerts = [];
   let { operationData } = action.payload;
 
   operationData = Array.isArray(operationData)
@@ -116,10 +122,12 @@ export default function* createOperationsWorker(action) {
       selectOperationQueryData(state, operation)
     );
 
-    try {
-      // Create database view based on operation type
-      if (operation.operationType === OPERATION_TYPE_PACK) {
-        // Creates a unified view with columns from all child tables
+    // Create database view based on operation type
+    if (operation.operationType === OPERATION_TYPE_PACK) {
+      // Creates a unified view with columns from all child tables
+      const { isAllPassing, fatalErrors, warnings } =
+        testPackOperationForFatalErrors(operation);
+      if (isAllPassing) {
         yield call(createPackView, queryData);
         const { rowCount, columnCount } = yield call(
           getTableDimensions,
@@ -127,7 +135,20 @@ export default function* createOperationsWorker(action) {
         );
         operation.rowCount = rowCount;
         operation.columnCount = columnCount; // initial column count
-      } else if (operation.operationType === OPERATION_TYPE_STACK) {
+        successfulCreations.push(operation);
+      } else {
+        console.warn(`Fatal alert creating Pack operation ${operation.id}:`);
+        operation.rowCount = undefined; // TODO: this is calculatable
+        operation.columnCount = yield select((state) =>
+          calcPackColumnCount(state, childIds)
+        );
+        failedCreations.push(operation);
+      }
+      raisedAlerts.push(...fatalErrors, ...warnings);
+    } else if (operation.operationType === OPERATION_TYPE_STACK) {
+      const { isAllPassing, fatalErrors, warnings } =
+        testStackOperationForFatalErrors(operation);
+      if (isAllPassing) {
         // Creates a stacked view using the first child table as template
         yield call(createStackView, queryData);
         const { rowCount, columnCount } = yield call(
@@ -136,30 +157,28 @@ export default function* createOperationsWorker(action) {
         );
         operation.rowCount = rowCount;
         operation.columnCount = columnCount; // initial column count
+        successfulCreations.push(operation);
+      } else {
+        console.warn(`Fatal alert creating Stack operation ${operation.id}:`);
+        operation.rowCount = undefined; // TODO: this is calculatable
+        operation.columnCount = yield select((state) =>
+          calcStackColumnCount(state, childIds)
+        );
+        failedCreations.push(operation);
       }
-      // Do nothing for NO_OP operations
-
-      successfulCreations.push(operation);
-    } catch (error) {
-      console.error(
-        `Error creating database view for operation ${operation.id}:`,
-        error
-      );
+      raisedAlerts.push(...fatalErrors, ...warnings);
+    } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
+      // NO_OP operations do not require a database view
       operation.rowCount = undefined; // TODO: this is calculatable
       operation.columnCount = yield select((state) =>
-        operation.operationType === OPERATION_TYPE_PACK
-          ? calcPackColumnCount(state, childIds)
-          : calcStackColumnCount(state, childIds)
+        calcStackColumnCount(state, childIds)
       );
-      failedCreations.push({ ...operation, error: serializeError(error) });
+      successfulCreations.push(operation);
     }
   }
 
   // Exclude errors raised during creation from the operation objects
-  const combinedOperations = [...successfulCreations, ...failedCreations].map(
-    // eslint-disable-next-line no-unused-vars
-    ({ error, ...operation }) => operation
-  );
+  const combinedOperations = [...successfulCreations, ...failedCreations];
 
   yield put(addOperationsToSlice(combinedOperations));
   yield put(
@@ -170,6 +189,7 @@ export default function* createOperationsWorker(action) {
     yield put(
       createOperationsSuccess({
         successfulCreations,
+        raisedAlerts,
       })
     );
   }
@@ -177,6 +197,7 @@ export default function* createOperationsWorker(action) {
     yield put(
       createOperationsFailure({
         failedCreations,
+        raisedAlerts,
       })
     );
   }

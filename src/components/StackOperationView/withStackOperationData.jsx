@@ -32,6 +32,11 @@ export default function withStackOperationData(WrappedComponent) {
     operation,
     columnIds,
     selectedColumnIds,
+    // Props passed from withAssociatedAlerts
+    alertIds,
+    hasAlerts,
+    removeAlerts,
+    silenceAlerts,
     // Props passed directly from parent
     id,
     ...props
@@ -112,6 +117,11 @@ export default function withStackOperationData(WrappedComponent) {
         n={n}
         selectedTableIds={selectedTableIds}
         selection={selection}
+        // Props related to associated alerts
+        alertIds={alertIds}
+        hasAlerts={hasAlerts}
+        removeAlerts={removeAlerts}
+        silenceAlerts={silenceAlerts}
         // Callback props to dispatch actions
         swapColumns={(target, source) => {
           const tableColumnIds =

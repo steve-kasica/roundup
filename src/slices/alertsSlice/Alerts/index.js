@@ -1,2 +1,2 @@
-export * from "./PackOperationAlerts";
-export * from "./StackOperationAlerts";
+export const SEVERITY_ERROR = "error";
+export const SEVERITY_WARNING = "warning";

@@ -17,3 +17,7 @@ export const selectAllSourceIdsWithAlerts = createSelector(
     return Object.keys(bySourceId);
   }
 );
+
+export const selectIsAlertRaised = (state, { signature }) => {
+  return !!state.alerts.bySignature[signature];
+};

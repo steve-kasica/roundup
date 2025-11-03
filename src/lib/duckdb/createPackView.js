@@ -1,9 +1,3 @@
-import {
-  validateMissingLeftJoinKey,
-  validateMissingRightJoinKey,
-} from "../../slices/alertsSlice/Alerts/PackOperationAlerts/MissingJoinKey";
-import { validateMissingJoinPredicate } from "../../slices/alertsSlice/Alerts/PackOperationAlerts/MissingJoinPredicate";
-import { validateMissingJoinType } from "../../slices/alertsSlice/Alerts/PackOperationAlerts/MissingJoinType";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { getDuckDB } from "./duckdbClient";
 
@@ -21,12 +15,6 @@ export function formQuery(op, columnList = null) {
   const table1 = op.children[0].id;
   const table2 = op.children[1].id;
   const { joinType, joinKey1, joinKey2, joinPredicate } = op;
-
-  // These are fatal errors - we cannot proceed
-  validateMissingLeftJoinKey(op);
-  validateMissingRightJoinKey(op);
-  validateMissingJoinPredicate(op);
-  validateMissingJoinType(op);
 
   // TODO: refactor to util file for DRY
   const predicates = {

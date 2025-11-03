@@ -17,12 +17,17 @@ import {
   getTableDimensions,
 } from "../../lib/duckdb";
 import { updateOperationsFailure, updateOperationsSuccess } from "./actions";
-import { serializeError } from "../../slices/alertsSlice/utilities/serializers";
 import { setFocusedObject } from "../../slices/uiSlice";
+import {
+  testPackOperationForFatalErrors,
+  testStackOperationForFatalErrors,
+} from "../../slices/alertsSlice/Alerts/Errors/utilities";
+import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
   const failedUpdates = [];
+  const raisedAlerts = [];
   const { operationUpdates } = action.payload;
 
   for (let operationUpdate of operationUpdates) {
@@ -48,7 +53,21 @@ export default function* updateOperationsWorker(action) {
         (operationUpdate.operationType === undefined &&
           operation.operationType === OPERATION_TYPE_STACK)
       ) {
-        try {
+        const childColumnCounts = yield select((state) => {
+          const children = operationUpdate.children || operation.children;
+          return children.map(
+            (childId) => selectColumnIdsByTableId(state, childId).length
+          );
+        });
+        const { isAllPassing, fatalErrors, warnings } =
+          testStackOperationForFatalErrors(
+            {
+              ...operation,
+              ...operationUpdate,
+            },
+            childColumnCounts
+          );
+        if (isAllPassing) {
           yield call(createStackView, queryData);
           const { rowCount, columnCount } = yield call(
             getTableDimensions,
@@ -60,24 +79,27 @@ export default function* updateOperationsWorker(action) {
             columnCount,
           };
           successfulUpdates.push(operationUpdate);
-        } catch (error) {
-          console.error("Error creating stack view:", error);
+        } else {
+          console.warn("Fatal alerts raised creating stack view");
           const children = operationUpdate.children || operation.children;
           operationUpdate.columnCount = yield select((state) =>
             calcStackColumnCount(state, children)
           );
           operationUpdate.rowCount = 0; // TODO
-          failedUpdates.push({
-            ...operationUpdate,
-            error: serializeError(error),
-          });
+          failedUpdates.push(operationUpdate);
         }
+        raisedAlerts.push(...fatalErrors, ...warnings);
       } else if (
         operationUpdate.operationType === OPERATION_TYPE_PACK ||
         (operationUpdate.operationType === undefined &&
           operation.operationType === OPERATION_TYPE_PACK)
       ) {
-        try {
+        const { isAllPassing, fatalErrors, warnings } =
+          testPackOperationForFatalErrors({
+            ...operation,
+            ...operationUpdate,
+          });
+        if (isAllPassing) {
           yield call(createPackView, queryData);
           const { rowCount, columnCount } = yield call(
             getTableDimensions,
@@ -87,11 +109,10 @@ export default function* updateOperationsWorker(action) {
             ...operationUpdate,
             rowCount,
             columnCount,
-            error: null,
           };
           successfulUpdates.push(operationUpdate);
-        } catch (error) {
-          console.error("Error updateOperationsSaga/worker.js:", error);
+        } else {
+          console.warn("Error updateOperationsSaga/worker.js:", fatalErrors);
           const children = operationUpdate.children || operation.children;
           operationUpdate.columnCount = yield select((state) =>
             calcPackColumnCount(state, children)
@@ -99,9 +120,9 @@ export default function* updateOperationsWorker(action) {
           operationUpdate.rowCount = undefined; // We don't actually know the row count for pack ops
           failedUpdates.push({
             ...operationUpdate,
-            error: serializeError(error),
           });
         }
+        raisedAlerts.push(...fatalErrors, ...warnings);
       } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
         // No-op operations don't have views to create
         successfulUpdates.push(operationUpdate);
@@ -112,10 +133,7 @@ export default function* updateOperationsWorker(action) {
     }
   }
 
-  const combinedUpdates = [...successfulUpdates, ...failedUpdates].map(
-    // eslint-disable-next-line no-unused-vars
-    ({ error, ...operation }) => operation
-  );
+  const combinedUpdates = [...successfulUpdates, ...failedUpdates];
 
   yield put(updateOperationsSlice(combinedUpdates));
   yield put(setFocusedObject(combinedUpdates[combinedUpdates.length - 1].id)); // focus the last operation created
@@ -130,7 +148,7 @@ export default function* updateOperationsWorker(action) {
         ).filter((key) => key !== "id"),
       ])
     ),
-    raisedAlerts: updates.map(({ error }) => error),
+    raisedAlerts,
   });
 
   if (successfulUpdates.length > 0) {

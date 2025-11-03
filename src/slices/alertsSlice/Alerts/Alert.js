@@ -1,9 +1,26 @@
 let counter = 0;
 
-export default class Alert extends Error {
-  constructor(message, sourceId) {
-    super(message);
-    this.sourceId = sourceId;
-    this.id = `e${counter++}`;
-  }
-}
+export const Alert = (
+  code,
+  name,
+  description,
+  severity,
+
+  sourceId,
+  isPassing = false,
+  message = null
+) => ({
+  // Auto-generate unique ID for each alert
+  id: `e${counter++}`,
+  timeStamp: Date.now(),
+
+  code,
+  name,
+  description,
+  severity,
+
+  sourceId,
+  isPassing,
+  message,
+  signature: [sourceId, code].join("|"),
+});
