@@ -1,9 +1,10 @@
 import { put, select, takeEvery } from "redux-saga/effects";
-import { updateColumnsRequest } from "./actions";
+import { updateColumnsRequest, updateColumnsSuccess } from "./actions";
 import updateColumnsWorker from "./worker";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
 import {
   selectColumnById,
+  selectColumnIdsByTableId,
   selectedExcludedColumnsByTableId,
 } from "../../slices/columnsSlice";
 import { DATABASE_ATTRIBUTES } from ".";
@@ -40,6 +41,24 @@ export default function* updateColumnsSaga() {
 
     // Call the worker to update columns with fetched attributes
     yield put(updateColumnsRequest({ columnUpdates }));
+  });
+
+  // When columns are excluded, we may need to also exclude operation
+  // columns.
+  yield takeEvery(updateColumnsSuccess.type, function* (action) {
+    const { updates } = action.payload;
+
+    // Find all table IDs that have had columns excluded
+    const excludedTableIds = new Set();
+    for (const [id, updatedFields] of Object.entries(updates)) {
+      const column = yield select((state) => selectColumnById(state, id));
+      const isExcluded = yield select((state) => {
+        return selectColumnIdsByTableId(state, column.tableId).includes(id);
+      });
+      if (isExcluded) {
+        excludedTableIds.add(column.tableId);
+      }
+    }
   });
 
   // When an operation is created, we need to ensure that its columns

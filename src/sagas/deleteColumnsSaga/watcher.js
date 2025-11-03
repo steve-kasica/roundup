@@ -7,30 +7,7 @@ import {
   updateOperationsSuccess,
 } from "../updateOperationsSaga";
 import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
-
-const handleOperationUpdates = function* (action) {
-  const { changedPropertiesByOperation } = action.payload;
-  console.log({ changedPropertiesByOperation });
-
-  const operationIdsToUpdate = Object.entries(
-    changedPropertiesByOperation
-  ).reduce((acc, [id, changedProperties]) => {
-    if (changedProperties.includes("children")) {
-      acc.push(id);
-    }
-    return acc;
-  }, []);
-
-  if (operationIdsToUpdate.length > 0) {
-    const columnsToDelete = yield select((state) =>
-      operationIdsToUpdate.flatMap((id) => selectColumnIdsByTableId(state, id))
-    );
-    if (columnsToDelete.length > 0) {
-      yield put(deleteColumnsRequest({ columnIds: columnsToDelete }));
-    }
-    // Note that if the operation was previously NO-OP, there won't be any columns to delete
-  }
-};
+import { createOperationsFailure } from "../createOperationsSaga/actions";
 
 export default function* deleteColumnsSaga() {
   yield takeEvery(deleteColumnsRequest.type, deleteColumnsWorker);
@@ -45,7 +22,43 @@ export default function* deleteColumnsSaga() {
     }
   });
 
-  // If an operation is updated regardless if it succeeded or failed, we may need to create columns for it depending upon if the property that changes also triggered a change in the underlying database view. Those kind of changes depend upon certain properties changing, e.g. `operation.children`. Note that createColumns also listens for updateOperationsSuccess to create columns for new operations, so we don't need to do that here.
-  yield takeEvery(updateOperationsSuccess.type, handleOperationUpdates);
-  yield takeEvery(updateOperationsFailure.type, handleOperationUpdates);
+  // If an operation `children` property update has failed, just
+  // delete any columns associated with that operation
+  yield takeEvery(updateOperationsFailure.type, function* (action) {
+    const { changedPropertiesByOperation } = action.payload;
+
+    const operationIdsToUpdate = Object.entries(
+      changedPropertiesByOperation
+    ).reduce((acc, [id, changedProperties]) => {
+      if (changedProperties.includes("children")) {
+        acc.push(id);
+      }
+      return acc;
+    }, []);
+
+    if (operationIdsToUpdate.length > 0) {
+      const columnsToDelete = yield select((state) =>
+        operationIdsToUpdate.flatMap((id) =>
+          selectColumnIdsByTableId(state, id)
+        )
+      );
+      if (columnsToDelete.length > 0) {
+        yield put(deleteColumnsRequest({ columnIds: columnsToDelete }));
+      }
+      // Note that if the operation was previously NO-OP, there won't be any columns to delete
+    }
+  });
+
+  // If an operation creation has failed, delete any columns associated with that operation
+  yield takeEvery(createOperationsFailure.type, function* (action) {
+    const { failedCreations } = action.payload;
+    if (failedCreations.length > 0) {
+      const columnsToDelete = yield select((state) =>
+        failedCreations.flatMap(({ id }) => selectColumnIdsByTableId(state, id))
+      );
+      if (columnsToDelete.length > 0) {
+        yield put(deleteColumnsRequest({ columnIds: columnsToDelete }));
+      }
+    }
+  });
 }

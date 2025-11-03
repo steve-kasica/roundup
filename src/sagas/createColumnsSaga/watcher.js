@@ -57,26 +57,6 @@ const handleTables = function* (action) {
   }
 };
 
-// Handle operation updates by checking if 'children' property changed
-const handleOperationUpdates = function* (action) {
-  const { changedPropertiesByOperation } = action.payload;
-
-  const operationIdsToUpdate = Object.entries(
-    changedPropertiesByOperation
-  ).reduce((acc, [id, changedProperties]) => {
-    if (changedProperties.includes("children")) {
-      acc.push(id);
-    }
-    return acc;
-  }, []);
-
-  if (operationIdsToUpdate.length > 0) {
-    yield call(handleOperations, {
-      payload: { operationIds: operationIdsToUpdate },
-    });
-  }
-};
-
 export default function* createColumnsWatcher() {
   yield takeEvery(createColumnsRequest.type, createColumnsWorker);
 
@@ -91,21 +71,38 @@ export default function* createColumnsWatcher() {
     });
   });
 
-  // If an operation is created but fails, we still want to create
-  // columns for it so the user can see the error in the UI
-  yield takeEvery(createOperationsFailure.type, function* (action) {
-    const { failedCreations } = action.payload;
-    yield call(handleOperations, {
-      payload: { operationIds: failedCreations.map(({ id }) => id) },
-    });
+  // // If an operation is created but fails, we still want to create
+  // // columns for it so the user can see the error in the UI
+  // yield takeEvery(createOperationsFailure.type, function* (action) {
+  //   const { failedCreations } = action.payload;
+  //   yield call(handleOperations, {
+  //     payload: { operationIds: failedCreations.map(({ id }) => id) },
+  //   });
+  // });
+
+  // If an operation's child property is updated, we need
+  // to create columns for it
+  yield takeEvery(updateOperationsSuccess.type, function* (action) {
+    const { changedPropertiesByOperation } = action.payload;
+
+    const operationIdsToUpdate = Object.entries(
+      changedPropertiesByOperation
+    ).reduce((acc, [id, changedProperties]) => {
+      if (changedProperties.includes("children")) {
+        acc.push(id);
+      }
+      return acc;
+    }, []);
+
+    if (operationIdsToUpdate.length > 0) {
+      // Hand off to the shared handler for createOperationsSuccess
+      yield call(handleOperations, {
+        payload: { operationIds: operationIdsToUpdate },
+      });
+    }
   });
 
-  // if an operation is updated, we may need to create columns for it
-  // depending upon if the property that changes also triggered a
-  // change in the underlying database view
-  yield takeEvery(updateOperationsSuccess.type, handleOperationUpdates);
-
-  // If an operation update fails, we still want to create columns for it
-  // so the user can see the error in the UI
-  yield takeEvery(updateOperationsFailure.type, handleOperationUpdates);
+  // // If an operation update fails, we still want to create columns for it
+  // // so the user can see the error in the UI
+  // yield takeEvery(updateOperationsFailure.type, handleOperationUpdates);
 }

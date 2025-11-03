@@ -1,17 +1,7 @@
 /* eslint-disable no-unused-vars */
-import {
-  Box,
-  Alert,
-  Button,
-  Typography,
-  CircularProgress,
-  Toolbar,
-  Tooltip,
-  Chip,
-} from "@mui/material";
-import PackOperationIcon from "./PackOperationIcon";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import withPackOperationData from "./withPackOperationData";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePackStats } from "../../hooks/usePackStats";
 import { EnhancedTableLabel, EnhancedTableRowMatches } from "../TableView";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
@@ -33,27 +23,27 @@ const matchLablels = new Map([
 
 const PackSchemaView = withPackOperationData(
   ({
+    // General operation props
     id,
     activeColumnIds,
-    columnCount,
     selectedOperationColumnIds,
-    leftTableId,
-    leftHandColumns,
-    rightTableId,
     selectColumns,
+    // Pack-specific props
+    joinPredicate,
+    setJoinType,
+    // Left table props (via withPackOperationData)
+    leftTableId,
+    leftColumns,
     leftKey,
     leftKeyColumnName,
+    // Right table props (via withPackOperationData)
+    rightTableId,
     rightKey,
     rightKeyColumnName,
-    rightHandColumns,
-    joinPredicate,
-    joinType,
+    rightColumns,
     // Props defined in `withAssociatedAlerts`
     alertIds,
     hasAlerts,
-    silenceAlerts,
-    // functions
-    setJoinType,
   }) => {
     // Add hover state for coordinating between tables
     const [hoveredMatch, setHoveredMatch] = useState(null);
@@ -70,13 +60,6 @@ const PackSchemaView = withPackOperationData(
       one_to_zero_matches: true,
       zero_to_one_matches: true,
     });
-
-    const columnToTableMap = useMemo(() => {
-      const map = new Map();
-      leftHandColumns.forEach((colId) => map.set(colId, leftTableId));
-      rightHandColumns.forEach((colId) => map.set(colId, rightTableId));
-      return map;
-    }, [leftHandColumns, leftTableId, rightHandColumns, rightTableId]);
 
     // Call usePackStats hook and log results
     const { data, loading, error } = usePackStats(
@@ -166,7 +149,7 @@ const PackSchemaView = withPackOperationData(
 
     const handleColumnClick = useCallback(
       (event, tableId, columnId) => {
-        const combinedColumns = [...leftHandColumns, ...rightHandColumns];
+        const combinedColumns = [...leftColumns, ...rightColumns];
         let columnsToSelect = [],
           columnsToUnselect = [];
         if (event.shiftKey && anchorColumn) {
@@ -195,7 +178,7 @@ const PackSchemaView = withPackOperationData(
           // Single select: Replace selection with current column, or deselect if already selected
           setAnchorColumn(columnId);
           columnsToSelect = [columnId];
-          columnsToUnselect = [...leftHandColumns, ...rightHandColumns].filter(
+          columnsToUnselect = [...leftColumns, ...rightColumns].filter(
             (id) => id !== columnId
           );
         }
@@ -209,8 +192,8 @@ const PackSchemaView = withPackOperationData(
         selectedOperationColumnIds,
         anchorColumn,
         selectColumns,
-        leftHandColumns,
-        rightHandColumns,
+        leftColumns,
+        rightColumns,
       ]
     );
 
@@ -219,18 +202,12 @@ const PackSchemaView = withPackOperationData(
         // const isCtrlClick = event.ctrlKey || event.metaKey; // Support both Ctrl and Cmd on Mac
 
         if (tableId === leftTableId) {
-          selectColumns(activeColumnIds.slice(0, leftHandColumns.length));
+          selectColumns(activeColumnIds.slice(0, leftColumns.length));
         } else if (tableId === rightTableId) {
-          selectColumns(activeColumnIds.slice(leftHandColumns.length));
+          selectColumns(activeColumnIds.slice(leftColumns.length));
         }
       },
-      [
-        leftTableId,
-        rightTableId,
-        leftHandColumns,
-        selectColumns,
-        activeColumnIds,
-      ]
+      [leftTableId, rightTableId, leftColumns, selectColumns, activeColumnIds]
     );
 
     const getVisibleMatches = () => {

@@ -98,29 +98,32 @@ export default function withPackOperationData(WrappedComponent) {
     return (
       <WrappedComponent
         {...props}
-        // Pack-specific props
+        // General operation props
         id={id}
         name={operation.name}
+        selectedOperationColumnIds={selectedOperationColumnIds} // Should this be in an operation above? (TODO)
+        // Props specific to Pack operations
         joinType={operation.joinType}
         joinPredicate={operation.joinPredicate}
+        // Left table props
+        leftTableId={leftTableId}
         joinKey1={operation.joinKey1} // Deprecated, use leftKey
         leftKey={operation.joinKey1}
         leftKeyColumnName={leftKeyColumnName}
+        leftRowCount={leftRowCount} // TODO: are these needed, seems like table property
+        leftHandColumns={leftHandColumns} // Deprecated, use leftColumns
+        leftColumns={leftHandColumns}
+        leftSelectedColumns={leftSelectedColumnsIds}
+        // Right table props
         joinKey2={operation.joinKey2} // Deprecated, use rightKey
         rightKey={operation.joinKey2}
         rightKeyColumnName={rightKeyColumnName}
-        leftTableId={leftTableId}
         rightTableId={rightTableId}
-        leftRowCount={leftRowCount} // TODO: are these needed, seems like table property
         rightRowCount={rightRowCount} // TODO: are these needed, seems like table property
         tableToOpColumnMap={tableToOpColumnMap}
-        leftHandColumns={leftHandColumns} // Deprecated, use leftColumns
-        leftColumns={leftHandColumns}
         rightHandColumns={rightHandColumns} // Deprecated, use rightColumns
         rightColumns={rightHandColumns}
-        leftSelectedColumns={leftSelectedColumnsIds}
         rightSelectedColumns={rightSelectedColumnsIds}
-        selectedOperationColumnIds={selectedOperationColumnIds}
         // Pack-specific join dispatchers
         setJoinType={setJoinType}
         setLeftTableJoinKey={(columnId) => {
