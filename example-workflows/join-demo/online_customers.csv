@@ -1,0 +1,11 @@
+customer_id,full_name,location,purchase_category,signup_date
+9,Iris Wang,Seattle,electronics,2023-01-15
+10,Jack Miller,Portland,books,2023-02-20
+11,Karen Lee,Phoenix,sports,2023-03-10
+12,Liam Brown,New York,music,2023-04-05
+13,Maya Patel,Chicago,electronics,2023-05-12
+14,Noah Davis,Los Angeles,books,2023-06-18
+15,Olivia Wilson,Miami,electronics,2023-07-22
+16,Paul Anderson,Seattle,sports,2023-08-30
+17,Quinn Taylor,Portland,books,2023-09-14
+18,Rachel Moore,Phoenix,electronics,2023-10-25

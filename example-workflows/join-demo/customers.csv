@@ -1,9 +1,9 @@
 customer_id,name,city,age,email,interests
-1,Alice,New York,28,alice@gmail.com,electronics music
-2,Bob,New York,35,bob@yahoo.com,books sports
-3,Charlie,Los Angeles,42,charlie@company.com,electronics books
-4,Diana,Los Angeles,29,diana@gmail.com,music fitness
-5,Eve,Chicago,31,eve@outlook.com,books electronics
-6,Frank,Miami,45,frank@gmail.com,sports music
-7,Grace,Miami,33,grace@company.com,books fitness
-8,Henry,Seattle,38,henry@yahoo.com,electronics sports
+1,Alice,New York,28,alice@gmail.com,electronics
+2,Bob,New York,35,bob@yahoo.com,books
+3,Charlie,Los Angeles,42,charlie@company.com,electronics
+4,Diana,Los Angeles,29,diana@gmail.com,music
+5,Eve,Chicago,31,eve@outlook.com,books
+6,Frank,Miami,45,frank@gmail.com,sports
+7,Grace,Miami,33,grace@company.com,books
+8,Henry,Seattle,38,henry@yahoo.com,electronics
