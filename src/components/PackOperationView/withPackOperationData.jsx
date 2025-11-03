@@ -8,7 +8,6 @@ import {
   selectSelectedColumnIdsByTableId,
 } from "../../slices/columnsSlice/columnSelectors";
 import { selectTablesById } from "../../slices/tablesSlice";
-import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 
 export default function withPackOperationData(WrappedComponent) {

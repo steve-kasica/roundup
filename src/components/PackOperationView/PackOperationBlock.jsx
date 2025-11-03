@@ -20,9 +20,13 @@ import { Box, Tooltip, styled } from "@mui/material";
 const StyledBox = styled(Box, {
   shouldForwardProp: (prop) => prop !== "hasError",
 })(({ theme, hasError }) => ({
+  display: "flex",
+  flexDirection: "row",
+  borderWidth: "4px",
+  borderStyle: "solid",
+  borderColor: theme.palette.divider,
   ...(hasError && {
-    backgroundColor: theme.palette.error.main,
-    borderLeft: `4px solid ${theme.palette.error.dark}`,
+    borderColor: theme.palette.error.dark,
   }),
 }));
 
@@ -33,47 +37,18 @@ function PackOperationBlock({
   depth,
   isFocused,
   isHovered,
-  alerts = [],
 
-  // Props passed recusrively via parent operation
+  // Props via withAssociatedAlerts HOC
+  hasAlerts,
+
+  // Props passed via parent
   parentColumnCount = 0,
 }) {
-  const hasAlerts = alerts.length > 0;
   const childOperationIds = operation.children.filter(isOperationId);
   const childTableIds = operation.children.filter(isTableId);
 
-  const className = [
-    "operation",
-    operation.operationType || "no-op",
-    `depth-${depth}`,
-    isFocused ? "focused" : "",
-    isHovered ? "hover" : "",
-  ].filter(Boolean);
-
-  // Parse error message if it's a JSON string
-  const getErrorMessage = () => {
-    if (!operation.error) return "";
-
-    if (typeof operation.error === "string") {
-      try {
-        const parsedError = JSON.parse(operation.error);
-        return parsedError.message || operation.error;
-      } catch {
-        return operation.error;
-      }
-    }
-
-    return operation.error.message || "An error occurred";
-  };
-
-  const operationContent = (
-    <StyledBox
-      hasError={hasAlerts}
-      className={className.join(" ")}
-      sx={{
-        flexBasis: `${(columnCount / parentColumnCount) * 100}%`,
-      }}
-    >
+  return (
+    <StyledBox className="pack-operation-block" hasError={hasAlerts}>
       {childOperationIds.length > 0
         ? childOperationIds.map(
             (childOperationId) => null
@@ -85,25 +60,22 @@ function PackOperationBlock({
           )
         : null}
       {childTableIds.length > 0
-        ? childTableIds.map((tableId) => (
+        ? childTableIds.map((tableId, index) => (
             <EnhancedTableBlock
               key={tableId}
               id={tableId}
               isDraggable={false}
               parentOperationType={operation.operationType}
               parentColumnCount={columnCount}
+              sx={{
+                ...(index === childTableIds.length - 1 && {
+                  borderLeft: "none",
+                }),
+              }}
             />
           ))
         : null}
     </StyledBox>
-  );
-
-  return operation.error ? (
-    <Tooltip title={getErrorMessage()} arrow placement="top">
-      {operationContent}
-    </Tooltip>
-  ) : (
-    operationContent
   );
 }
 

@@ -18,6 +18,9 @@ function TableBlock({
   // props passed via OperationBlockView
   parentOperationType,
   parentColumnCount,
+
+  // Props passed directly from parent
+  sx = {},
 }) {
   const ticks = Array.from(
     {
@@ -35,7 +38,7 @@ function TableBlock({
       sx={{
         height: "100%",
         display: "flex",
-        padding: "1px",
+        border: "5px solid #ddd",
         flexDirection: "row",
         alignItems: "stretch",
         flexBasis: `${
@@ -49,9 +52,10 @@ function TableBlock({
           backgroundColor: "warning.light",
           opacity: 0.9,
         }),
+        ...sx,
       }}
     >
-      <Typography
+      {/* <Typography
         variant="caption"
         className="table-id"
         sx={{
@@ -73,14 +77,22 @@ function TableBlock({
       >
         {table.name || table.id}
         {hasAlerts && ` ⚠ ${alertIds.length}`}
-      </Typography>
+      </Typography> */}
       {ticks.map((columnId, index) =>
         columnId === null ? (
-          <ColumnTick key={`empty-${index}`} id={null} />
+          <ColumnTick
+            key={`empty-${index}`}
+            id={null}
+            sx={{
+              outlineColor: "#f44336",
+              backgroundColor: "rgb(253, 226, 224)",
+            }}
+          />
         ) : (
           <EnhancedColumnTick
             key={`${columnId}-${index}`} // Ensure unique key even when columnId is null
             id={columnId}
+            sx={{ width: `${1}%` }}
           />
         )
       )}

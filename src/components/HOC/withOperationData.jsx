@@ -139,7 +139,7 @@ export default function withOperationData(WrappedComponent) {
         // Directly associated columns
         columnIds={columnIds} // All column IDs associated with this operation
         activeColumnIds={activeColumnIds} // columns not excluded
-        columnCount={activeColumnIds.length}
+        columnCount={activeColumnIds.length || operation.columnCount}
         selectedColumnIds={selectedColumnIds}
         selectedColumnNames={selectedColumnNames}
         removedColumnIds={removedColumnIds} // TODO: @deprecated?

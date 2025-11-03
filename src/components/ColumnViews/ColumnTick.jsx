@@ -13,12 +13,11 @@ const ColumnTick = ({
   isDraggable,
   isNull,
   isVisible,
-  error,
   hoverColumn,
   unhoverColumn,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
-  alertIds,
   hasAlerts,
+  sx = {},
 }) => (
   <StyledColumnCard
     isHovered={isHovered}
@@ -30,7 +29,7 @@ const ColumnTick = ({
     isFocused={isFocused}
     isDraggable={isDraggable}
     isNull={isNull}
-    isError={error}
+    isError={hasAlerts}
     isVisible={isVisible}
     onMouseEnter={hoverColumn}
     onMouseLeave={unhoverColumn}
@@ -38,7 +37,8 @@ const ColumnTick = ({
       borderRadius: 0,
       boxShadow: "none",
       cursor: "default",
-      minWidth: "5px",
+      minWidth: 0,
+      ...sx,
     }}
   />
 );

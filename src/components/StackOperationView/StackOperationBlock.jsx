@@ -15,7 +15,7 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
-import { Box, Tooltip, styled } from "@mui/material";
+import { Box, Tooltip, Typography, styled } from "@mui/material";
 import { EnhancedPackOperationBlock } from "../PackOperationView/PackOperationBlock.jsx";
 import { EnhancedTableBlock } from "../TableView/TableBlock";
 
@@ -25,9 +25,12 @@ const StyledBox = styled(Box, {
   shouldForwardProp: (prop) =>
     ["isError", "isFocused"].includes(prop) === false,
 })(({ theme, isError, isFocused }) => ({
+  borderWidth: "4px",
+  borderStyle: "solid",
+  borderColor: theme.palette.divider,
   ...(isError && {
-    backgroundColor: theme.palette.error.main,
-    borderLeft: `4px solid ${theme.palette.error.dark}`,
+    // backgroundColor: theme.palette.error.main,
+    borderColor: theme.palette.error.dark,
   }),
   ...(isFocused && {
     boxShadow: `0 0 0 2px ${theme.palette.primary.main}`,
@@ -64,29 +67,42 @@ function StackOperationBlock({
         flexBasis: `${(columnCount / parentColumnCount) * 100}%`,
       }}
     >
-      {childObjects.map(({ id, operationType }) =>
-        isOperationId(id) && operationType === OPERATION_TYPE_STACK ? (
-          <EnhancedStackOperationBlock
-            key={id}
-            id={id}
-            parentColumnCount={columnCount}
-          />
-        ) : isOperationId(id) && operationType === OPERATION_TYPE_PACK ? (
-          <EnhancedPackOperationBlock
-            key={id}
-            id={id}
-            parentColumnCount={columnCount}
-          />
-        ) : (
-          <EnhancedTableBlock
-            key={id}
-            id={id}
-            isDraggable={false}
-            parentOperationType={operation.operationType}
-            parentColumnCount={columnCount}
-          />
-        )
-      )}
+      {/* Render child operations and tables */}
+      {childObjects.map(({ id, operationType }, index) => {
+        const isFirst = index === 0;
+        const childSx = !isFirst ? { borderTop: "none" } : {};
+
+        if (isOperationId(id) && operationType === OPERATION_TYPE_STACK) {
+          return (
+            <EnhancedStackOperationBlock
+              key={id}
+              id={id}
+              parentColumnCount={columnCount}
+              sx={childSx}
+            />
+          );
+        } else if (isOperationId(id) && operationType === OPERATION_TYPE_PACK) {
+          return (
+            <EnhancedPackOperationBlock
+              key={id}
+              id={id}
+              parentColumnCount={columnCount}
+              sx={childSx}
+            />
+          );
+        } else {
+          return (
+            <EnhancedTableBlock
+              key={id}
+              id={id}
+              isDraggable={false}
+              parentOperationType={operation.operationType}
+              parentColumnCount={columnCount}
+              sx={childSx}
+            />
+          );
+        }
+      })}
     </StyledBox>
   );
 
