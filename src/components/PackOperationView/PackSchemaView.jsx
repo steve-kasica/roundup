@@ -3,14 +3,11 @@ import { Box, Typography, CircularProgress } from "@mui/material";
 import withPackOperationData from "./withPackOperationData";
 import { useCallback, useEffect, useState } from "react";
 import { usePackStats } from "../../hooks/usePackStats";
-import { EnhancedTableLabel, EnhancedTableRowMatches } from "../TableView";
+import { EnhancedTableLabel } from "../TableView";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
-import { EnhancedTableHeader } from "../TableView/TableHeader";
-import { isTableId } from "../../slices/tablesSlice";
-import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
-import { EnhancedOperationHeader } from "../OperationView/OperationHeader";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
+import { EnhancedColumnName } from "../ColumnViews";
 
 const matchLablels = new Map([
   ["one_to_one_matches", "1:1"],
@@ -25,9 +22,6 @@ const PackSchemaView = withPackOperationData(
   ({
     // General operation props
     id,
-    activeColumnIds,
-    selectedOperationColumnIds,
-    selectColumns,
     // Pack-specific props
     joinPredicate,
     setJoinType,
@@ -60,6 +54,19 @@ const PackSchemaView = withPackOperationData(
       one_to_zero_matches: true,
       zero_to_one_matches: true,
     });
+
+    // Track which block cells have been clicked
+    // Key format: `${tableId}:${columnId}:${matchLabel}`
+    const [clickedBlockCells, setClickedBlockCells] = useState(new Set());
+
+    // Track the last clicked cell for range selection
+    const [lastClickedCell, setLastClickedCell] = useState(null);
+
+    // Track the last clicked match label for range selection
+    const [lastClickedMatch, setLastClickedMatch] = useState(null);
+
+    // Track the last clicked column for range selection
+    const [lastClickedColumn, setLastClickedColumn] = useState(null);
 
     // Call usePackStats hook and log results
     const { data, loading, error } = usePackStats(
@@ -131,83 +138,354 @@ const PackSchemaView = withPackOperationData(
       setJoinType(joinType);
     }, [setJoinType, toggledMatches]);
 
-    // Coordinated hover handlers
-    const handleBlockEnter = useCallback((event, key) => {
-      setHoveredMatch(key);
-    }, []);
+    const handleBlockCellClick = useCallback(
+      (event, tableId, columnId, matchLabel) => {
+        event.stopPropagation();
 
-    const handleBlockLeave = useCallback(() => {
-      setHoveredMatch(null);
-    }, []);
+        const cellKey = `${tableId}:${columnId}:${matchLabel}`;
 
-    const handleBlockClick = useCallback((event, tableId, key) => {
-      setToggledMatches((prev) => ({
-        ...prev,
-        [key]: !prev[key],
-      }));
-    }, []);
+        if (event.shiftKey && lastClickedCell) {
+          // Shift click: Rectangular selection like a spreadsheet
+          const visibleMatches =
+            hasAlerts || !data
+              ? {}
+              : Object.fromEntries(
+                  Object.entries(data).filter(([label, count]) => count > 0)
+                );
+          const matchTypes = Object.keys(visibleMatches);
 
-    const handleColumnClick = useCallback(
-      (event, tableId, columnId) => {
-        const combinedColumns = [...leftColumns, ...rightColumns];
-        let columnsToSelect = [],
-          columnsToUnselect = [];
-        if (event.shiftKey && anchorColumn) {
-          // Shift click: Range selection
-          const currentIndex = combinedColumns.indexOf(columnId);
-          const lastIndex = combinedColumns.indexOf(anchorColumn);
-          const start = Math.min(currentIndex, lastIndex);
-          const end = Math.max(currentIndex, lastIndex);
-          columnsToSelect = combinedColumns.slice(start, end + 1);
-          columnsToUnselect = combinedColumns.filter(
-            (id) => !columnsToSelect.includes(id)
-          );
-        } else if (event.ctrlKey || event.metaKey) {
-          // Control/Meta click: Multi-selection toggle
-          setAnchorColumn(columnId);
-          if (selectedOperationColumnIds.includes(columnId)) {
-            // Remove from selection (unselect)
-            columnsToUnselect = [columnId];
-            columnsToSelect = [];
+          // Parse the last clicked cell
+          const [lastTableId, lastColumnId, lastMatchLabel] =
+            lastClickedCell.split(":");
+
+          // Determine the bounds of the rectangle
+          const leftTableColumns = leftColumns;
+          const rightTableColumns = rightColumns;
+
+          // Find column indices within each table
+          const getColumnIndex = (tId, colId) => {
+            return tId === leftTableId
+              ? leftTableColumns.indexOf(colId)
+              : rightTableColumns.indexOf(colId);
+          };
+
+          // Find match type indices
+          const lastMatchIndex = matchTypes.indexOf(lastMatchLabel);
+          const currentMatchIndex = matchTypes.indexOf(matchLabel);
+
+          // Calculate match type range
+          const matchStart = Math.min(lastMatchIndex, currentMatchIndex);
+          const matchEnd = Math.max(lastMatchIndex, currentMatchIndex);
+
+          // Determine if we're selecting within one table or across tables
+          const cellsInRange = new Set();
+
+          if (lastTableId === tableId) {
+            // Selection within the same table
+            const lastColIndex = getColumnIndex(lastTableId, lastColumnId);
+            const currentColIndex = getColumnIndex(tableId, columnId);
+            const colStart = Math.min(lastColIndex, currentColIndex);
+            const colEnd = Math.max(lastColIndex, currentColIndex);
+
+            const columns =
+              tableId === leftTableId ? leftTableColumns : rightTableColumns;
+
+            for (let m = matchStart; m <= matchEnd; m++) {
+              const match = matchTypes[m];
+              for (let c = colStart; c <= colEnd; c++) {
+                cellsInRange.add(`${tableId}:${columns[c]}:${match}`);
+              }
+            }
           } else {
-            // Add to selection (select)
-            columnsToSelect = [columnId];
-            columnsToUnselect = [];
+            // Selection across tables - select from first cell to end of first table,
+            // then all of second table up to current cell
+            const lastColIndex = getColumnIndex(lastTableId, lastColumnId);
+            const currentColIndex = getColumnIndex(tableId, columnId);
+
+            // Determine which table comes first
+            const isLeftToRight = lastTableId === leftTableId;
+
+            if (isLeftToRight) {
+              // From left table to right table
+              const leftCols = leftTableColumns;
+              const rightCols = rightTableColumns;
+
+              for (let m = matchStart; m <= matchEnd; m++) {
+                const match = matchTypes[m];
+
+                // All columns from lastColIndex to end in left table
+                for (let c = lastColIndex; c < leftCols.length; c++) {
+                  cellsInRange.add(`${leftTableId}:${leftCols[c]}:${match}`);
+                }
+
+                // All columns from start to currentColIndex in right table
+                for (let c = 0; c <= currentColIndex; c++) {
+                  cellsInRange.add(`${rightTableId}:${rightCols[c]}:${match}`);
+                }
+              }
+            } else {
+              // From right table to left table
+              const leftCols = leftTableColumns;
+              const rightCols = rightTableColumns;
+
+              for (let m = matchStart; m <= matchEnd; m++) {
+                const match = matchTypes[m];
+
+                // All columns from lastColIndex to end in right table
+                for (let c = lastColIndex; c < rightCols.length; c++) {
+                  cellsInRange.add(`${rightTableId}:${rightCols[c]}:${match}`);
+                }
+
+                // All columns from start to currentColIndex in left table
+                for (let c = 0; c <= currentColIndex; c++) {
+                  cellsInRange.add(`${leftTableId}:${leftCols[c]}:${match}`);
+                }
+              }
+            }
           }
+
+          setClickedBlockCells((prev) => {
+            const newSet = new Set(prev);
+            cellsInRange.forEach((key) => newSet.add(key));
+            return newSet;
+          });
+        } else if (event.ctrlKey || event.metaKey) {
+          // Ctrl/Cmd click: Toggle selection without clearing others
+          setClickedBlockCells((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(cellKey)) {
+              newSet.delete(cellKey);
+            } else {
+              newSet.add(cellKey);
+            }
+            return newSet;
+          });
+          setLastClickedCell(cellKey);
         } else {
-          // Single select: Replace selection with current column, or deselect if already selected
-          setAnchorColumn(columnId);
-          columnsToSelect = [columnId];
-          columnsToUnselect = [...leftColumns, ...rightColumns].filter(
-            (id) => id !== columnId
-          );
+          // Regular click: Toggle single cell, clear others
+          setClickedBlockCells((prev) => {
+            const newSet = new Set();
+            if (!prev.has(cellKey)) {
+              newSet.add(cellKey);
+            }
+            return newSet;
+          });
+          setLastClickedCell(cellKey);
         }
-
-        selectColumns(columnsToSelect, columnsToUnselect);
-
-        // Always update last selected column for future range operations
-        setAnchorColumn(columnId);
       },
       [
-        selectedOperationColumnIds,
-        anchorColumn,
-        selectColumns,
+        lastClickedCell,
+        leftTableId,
+        rightTableId,
         leftColumns,
         rightColumns,
+        data,
+        hasAlerts,
       ]
     );
 
-    const handleTableLabelClick = useCallback(
-      (event, tableId) => {
-        // const isCtrlClick = event.ctrlKey || event.metaKey; // Support both Ctrl and Cmd on Mac
+    const handleMatchLabelClick = useCallback(
+      (event, matchLabel) => {
+        event.stopPropagation();
 
-        if (tableId === leftTableId) {
-          selectColumns(activeColumnIds.slice(0, leftColumns.length));
-        } else if (tableId === rightTableId) {
-          selectColumns(activeColumnIds.slice(leftColumns.length));
+        const visibleMatches =
+          hasAlerts || !data
+            ? {}
+            : Object.fromEntries(
+                Object.entries(data).filter(([label, count]) => count > 0)
+              );
+        const matchTypes = Object.keys(visibleMatches);
+
+        if (event.shiftKey && lastClickedMatch) {
+          // Shift click: Select range of match categories
+          const lastMatchIndex = matchTypes.indexOf(lastClickedMatch);
+          const currentMatchIndex = matchTypes.indexOf(matchLabel);
+
+          if (lastMatchIndex !== -1 && currentMatchIndex !== -1) {
+            const matchStart = Math.min(lastMatchIndex, currentMatchIndex);
+            const matchEnd = Math.max(lastMatchIndex, currentMatchIndex);
+
+            const cellsToSelect = new Set();
+
+            // Select all cells for all matches in the range
+            for (let m = matchStart; m <= matchEnd; m++) {
+              const match = matchTypes[m];
+
+              // Add all left table columns for this match
+              leftColumns.forEach((columnId) => {
+                cellsToSelect.add(`${leftTableId}:${columnId}:${match}`);
+              });
+
+              // Add all right table columns for this match
+              rightColumns.forEach((columnId) => {
+                cellsToSelect.add(`${rightTableId}:${columnId}:${match}`);
+              });
+            }
+
+            // Add to existing selection
+            setClickedBlockCells((prev) => {
+              const newSet = new Set(prev);
+              cellsToSelect.forEach((cell) => newSet.add(cell));
+              return newSet;
+            });
+          }
+        } else {
+          // Regular click: Replace selection with this match category
+          const cellsToSelect = new Set();
+
+          // Add all left table columns for this match
+          leftColumns.forEach((columnId) => {
+            cellsToSelect.add(`${leftTableId}:${columnId}:${matchLabel}`);
+          });
+
+          // Add all right table columns for this match
+          rightColumns.forEach((columnId) => {
+            cellsToSelect.add(`${rightTableId}:${columnId}:${matchLabel}`);
+          });
+
+          setClickedBlockCells(cellsToSelect);
         }
+
+        // Set last clicked match for future range operations
+        setLastClickedMatch(matchLabel);
+
+        // Set last clicked cell to first cell in this match
+        setLastClickedCell(`${leftTableId}:${leftColumns[0]}:${matchLabel}`);
       },
-      [leftTableId, rightTableId, leftColumns, selectColumns, activeColumnIds]
+      [
+        leftTableId,
+        rightTableId,
+        leftColumns,
+        rightColumns,
+        lastClickedMatch,
+        data,
+        hasAlerts,
+      ]
+    );
+
+    const handleColumnClick = useCallback(
+      (event, tableId, columnId) => {
+        event.stopPropagation();
+
+        const visibleMatches =
+          hasAlerts || !data
+            ? {}
+            : Object.fromEntries(
+                Object.entries(data).filter(([label, count]) => count > 0)
+              );
+        const matchTypes = Object.keys(visibleMatches);
+
+        // Create a unique key for the column click
+        const columnKey = `${tableId}:${columnId}`;
+
+        if (event.shiftKey && lastClickedColumn) {
+          // Shift click: Select range of columns
+          const [lastTableId, lastColumnId] = lastClickedColumn.split(":");
+
+          // Get the appropriate column arrays
+          const leftCols = leftColumns;
+          const rightCols = rightColumns;
+
+          let columnsToSelect = [];
+
+          if (lastTableId === tableId) {
+            // Range within the same table
+            const columns = tableId === leftTableId ? leftCols : rightCols;
+            const lastColIndex = columns.indexOf(lastColumnId);
+            const currentColIndex = columns.indexOf(columnId);
+
+            const colStart = Math.min(lastColIndex, currentColIndex);
+            const colEnd = Math.max(lastColIndex, currentColIndex);
+
+            columnsToSelect = columns
+              .slice(colStart, colEnd + 1)
+              .map((colId) => ({
+                tableId,
+                columnId: colId,
+              }));
+          } else {
+            // Range across tables - wrap around
+            const isLeftToRight = lastTableId === leftTableId;
+
+            if (isLeftToRight) {
+              // From left to right table
+              const lastColIndex = leftCols.indexOf(lastColumnId);
+              const currentColIndex = rightCols.indexOf(columnId);
+
+              // All columns from lastColIndex to end in left table
+              for (let i = lastColIndex; i < leftCols.length; i++) {
+                columnsToSelect.push({
+                  tableId: leftTableId,
+                  columnId: leftCols[i],
+                });
+              }
+
+              // All columns from start to currentColIndex in right table
+              for (let i = 0; i <= currentColIndex; i++) {
+                columnsToSelect.push({
+                  tableId: rightTableId,
+                  columnId: rightCols[i],
+                });
+              }
+            } else {
+              // From right to left table
+              const lastColIndex = rightCols.indexOf(lastColumnId);
+              const currentColIndex = leftCols.indexOf(columnId);
+
+              // All columns from lastColIndex to end in right table
+              for (let i = lastColIndex; i < rightCols.length; i++) {
+                columnsToSelect.push({
+                  tableId: rightTableId,
+                  columnId: rightCols[i],
+                });
+              }
+
+              // All columns from start to currentColIndex in left table
+              for (let i = 0; i <= currentColIndex; i++) {
+                columnsToSelect.push({
+                  tableId: leftTableId,
+                  columnId: leftCols[i],
+                });
+              }
+            }
+          }
+
+          // Add all cells for selected columns across all match types
+          setClickedBlockCells((prev) => {
+            const newSet = new Set(prev);
+            columnsToSelect.forEach(({ tableId: tId, columnId: colId }) => {
+              matchTypes.forEach((match) => {
+                newSet.add(`${tId}:${colId}:${match}`);
+              });
+            });
+            return newSet;
+          });
+        } else {
+          // Regular click: Select all cells in this column across all match types
+          const cellsToSelect = new Set();
+
+          matchTypes.forEach((match) => {
+            cellsToSelect.add(`${tableId}:${columnId}:${match}`);
+          });
+
+          setClickedBlockCells(cellsToSelect);
+        }
+
+        // Set last clicked column for future range operations
+        setLastClickedColumn(columnKey);
+
+        // Set last clicked cell to first cell in this column
+        setLastClickedCell(`${tableId}:${columnId}:${matchTypes[0]}`);
+      },
+      [
+        leftTableId,
+        rightTableId,
+        leftColumns,
+        rightColumns,
+        lastClickedColumn,
+        data,
+        hasAlerts,
+      ]
     );
 
     const getVisibleMatches = () => {
@@ -247,97 +525,210 @@ const PackSchemaView = withPackOperationData(
             </Box>
           )}
           <Box marginTop="59px">
-            {Object.entries(getVisibleMatches()).map(([key, value]) => (
-              <Box
-                key={key}
-                height={(value / totalRows) * 100 + "%"}
-                display={"flex"}
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    height: "24px",
-                    userSelect: "none",
-                    cursor: "pointer",
-                    opacity: hoveredMatch === key ? 1 : 0.8,
-                    fontWeight: hoveredMatch === key ? "bold" : "normal",
-                  }}
-                  onMouseEnter={() => setHoveredMatch(key)}
-                  onMouseLeave={() => setHoveredMatch(null)}
-                  onClick={(event) => handleBlockClick(event, "label", key)}
+            {Object.entries(getVisibleMatches()).map(([key, value]) => {
+              // Check if any cells in this match category are selected
+              const hasSelectedCells = Array.from(clickedBlockCells).some(
+                (cellKey) => {
+                  const [, , matchLabel] = cellKey.split(":");
+                  return matchLabel === key;
+                }
+              );
+
+              return (
+                <Box
+                  key={key}
+                  height={(value / totalRows) * 100 + "%"}
+                  display={"flex"}
+                  alignItems="center"
+                  justifyContent="center"
                 >
-                  {matchLablels.get(key)}
-                </Typography>
-              </Box>
-            ))}
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      height: "24px",
+                      userSelect: "none",
+                      cursor: "pointer",
+                      opacity: hoveredMatch === key ? 1 : 0.8,
+                      fontWeight:
+                        hasSelectedCells || hoveredMatch === key
+                          ? "bold"
+                          : "normal",
+                      color: hasSelectedCells ? "primary.dark" : "text.primary",
+                    }}
+                    onMouseEnter={() => setHoveredMatch(key)}
+                    onMouseLeave={() => setHoveredMatch(null)}
+                    onClick={(event) => handleMatchLabelClick(event, key)}
+                  >
+                    {matchLablels.get(key)}
+                  </Typography>
+                </Box>
+              );
+            })}
           </Box>
           <Box
             display={"flex"}
-            justifyContent="space-evenly"
-            gap={"5px"}
+            flexDirection="column"
             width="100%"
             height={"100%"}
           >
-            {[
-              { tableId: leftTableId, key: leftKey },
-              { tableId: rightTableId, key: rightKey },
-            ].map(({ tableId, keyColumn }, index) => (
+            {/* Table headers */}
+            <Box display="flex" width="100%">
+              {[leftTableId, rightTableId].map((tableId) => (
+                <Box
+                  key={tableId}
+                  width="50%"
+                  marginRight="2.5px"
+                  display={"flex"}
+                  flexDirection={"column"}
+                  justifyContent={"flex-end"}
+                >
+                  <Box display="flex" justifyContent="center">
+                    <EnhancedTableLabel
+                      id={tableId}
+                      includeIcon={false}
+                      sx={{ fontSize: "0.875rem" }}
+                    />
+                  </Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    overflow="hidden"
+                    borderBottom={"1px solid black"}
+                  >
+                    {(tableId === leftTableId ? leftColumns : rightColumns).map(
+                      (columnId, index, array) => {
+                        // Check if any cells in this column are selected
+                        const hasSelectedCells = Array.from(
+                          clickedBlockCells
+                        ).some((cellKey) => {
+                          const [tId, colId] = cellKey.split(":");
+                          return tId === tableId && colId === columnId;
+                        });
+
+                        return (
+                          <Box
+                            key={columnId}
+                            sx={{
+                              width: (1 / array.length) * 100 + "%",
+                              cursor: "pointer",
+                              // backgroundColor: hasSelectedCells
+                              //   ? "primary.light"
+                              //   : "transparent",
+                              "&:hover": {
+                                backgroundColor: hasSelectedCells
+                                  ? "primary.main"
+                                  : "action.hover",
+                              },
+                            }}
+                            onClick={(event) =>
+                              handleColumnClick(event, tableId, columnId)
+                            }
+                          >
+                            <EnhancedColumnName
+                              id={columnId}
+                              sx={{
+                                fontSize: "0.75rem",
+                                fontWeight: hasSelectedCells ? "700" : "600",
+                                cursor: "pointer",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px",
+                                padding: "0px 1px",
+                                color: hasSelectedCells
+                                  ? "primary.dark"
+                                  : "text.primary",
+                                userSelect: "none",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            />
+                          </Box>
+                        );
+                      }
+                    )}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+
+            {/* Iterate by match type first */}
+            {Object.entries(getVisibleMatches()).map(([label, matchCount]) => (
               <Box
-                key={tableId + index}
-                width={"50%"}
-                display={"flex"}
-                flexDirection="column"
-                alignItems={"center"}
+                key={label}
+                display="flex"
+                flex={matchCount / totalRows}
+                width="100%"
+                borderTop="1px solid #ccc"
               >
-                {isTableId(tableId) ? (
-                  <EnhancedTableLabel
-                    id={tableId}
-                    includeIcon={false}
-                    onClick={(event) => handleTableLabelClick(event, tableId)}
-                  />
-                ) : (
-                  <EnhancedOperationLabel
-                    id={tableId}
-                    includeIcon={false}
-                    onClick={(event) => handleTableLabelClick(event, tableId)}
-                  />
-                )}
-                {isTableId(tableId) ? (
-                  <EnhancedTableHeader
-                    id={tableId}
-                    keyColumnId={keyColumn}
-                    columnWidth={"10px"}
-                    onColumnClick={(event, columnId) =>
-                      handleColumnClick(event, tableId, columnId)
-                    }
-                  />
-                ) : (
-                  <EnhancedOperationHeader
-                    id={tableId}
-                    keyColumnId={keyColumn}
-                    columnWidth={"10px"}
-                    onColumnClick={(event, columnId) =>
-                      handleColumnClick(event, tableId, columnId)
-                    }
-                  />
-                )}
-                {isTableId(tableId) ? (
-                  <EnhancedTableRowMatches
-                    id={tableId}
-                    keyColumnId={keyColumn}
-                    tablePosition="left"
-                    selectedOperationColumnIds={selectedOperationColumnIds}
-                    matches={getVisibleMatches()}
-                    operationRowCount={totalRows}
-                    hoveredRowLabel={hoveredMatch}
-                    toggledMatches={toggledMatches}
-                    onBlockEnter={handleBlockEnter}
-                    onBlockLeave={handleBlockLeave}
-                    onBlockClick={handleBlockClick}
-                  />
-                ) : null}
+                {/* Left table columns for this match type */}
+                <Box display="flex" width="50%" marginRight="2.5px">
+                  {leftColumns.map((columnId) => {
+                    const cellKey = `${leftTableId}:${columnId}:${label}`;
+                    const isClicked = clickedBlockCells.has(cellKey);
+
+                    return (
+                      <Box
+                        key={columnId}
+                        sx={{
+                          width: (1 / leftColumns.length) * 100 + "%",
+                          height: "100%",
+                          border: "1px solid #fff",
+                          backgroundColor: isClicked ? "primary.main" : "#ccc",
+                          cursor: "pointer",
+                          opacity: isClicked ? 0.8 : 1,
+                          "&:hover": {
+                            backgroundColor: isClicked
+                              ? "primary.dark"
+                              : "#999",
+                          },
+                        }}
+                        onClick={(event) =>
+                          handleBlockCellClick(
+                            event,
+                            leftTableId,
+                            columnId,
+                            label
+                          )
+                        }
+                      ></Box>
+                    );
+                  })}
+                </Box>
+
+                {/* Right table columns for this match type */}
+                <Box display="flex" width="50%" marginLeft="2.5px">
+                  {rightColumns.map((columnId) => {
+                    const cellKey = `${rightTableId}:${columnId}:${label}`;
+                    const isClicked = clickedBlockCells.has(cellKey);
+
+                    return (
+                      <Box
+                        key={columnId}
+                        sx={{
+                          width: (1 / rightColumns.length) * 100 + "%",
+                          height: "100%",
+                          border: "1px solid #fff",
+                          backgroundColor: isClicked ? "primary.main" : "#ccc",
+                          cursor: "pointer",
+                          opacity: isClicked ? 0.8 : 1,
+                          "&:hover": {
+                            backgroundColor: isClicked
+                              ? "primary.dark"
+                              : "#999",
+                          },
+                        }}
+                        onClick={(event) =>
+                          handleBlockCellClick(
+                            event,
+                            rightTableId,
+                            columnId,
+                            label
+                          )
+                        }
+                      ></Box>
+                    );
+                  })}
+                </Box>
               </Box>
             ))}
           </Box>

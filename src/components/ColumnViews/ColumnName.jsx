@@ -21,13 +21,24 @@ const ColumnName = ({
   };
 
   return (
-    <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+    <Box
+      sx={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 0.5,
+        minWidth: 0,
+        maxWidth: "100%",
+      }}
+    >
       <Typography
         onClick={handleClick}
         sx={{
           cursor: onClick ? "pointer" : "default",
           transition: "color 0.2s ease, text-decoration 0.2s ease",
           userSelect: "none",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
           "&:hover": onClick
             ? {
                 color: "primary.main",

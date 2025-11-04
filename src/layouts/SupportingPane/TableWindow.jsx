@@ -56,41 +56,6 @@ const TableWindow = () => {
       width="100%"
       sx={{ overflowX: "auto" }}
     >
-      {/* Fixed header section */}
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignContent="center"
-        flexShrink={0}
-      >
-        <Box
-          display={"flex"}
-          justifyContent="space-between"
-          alignContent="center"
-          padding={1}
-        >
-          <Stack direction="row" spacing={1} alignItems="center">
-            {viewMode === VIEW_EMPTY ? (
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ userSelect: "none" }}
-              >
-                No Table Selected
-              </Typography>
-            ) : viewMode === VIEW_TABLE ? (
-              <EnhancedTableLabel id={focusedObjectId} />
-            ) : viewMode === VIEW_NO_OP ? (
-              <EnhancedTableLabel id={focusedOperation.children[0]} />
-            ) : viewMode === VIEW_STACK || viewMode === VIEW_PACK ? (
-              <EnhancedOperationLabel id={focusedObjectId} />
-            ) : (
-              <Alert severity="error">Error: unsupported state!</Alert>
-            )}
-          </Stack>
-        </Box>
-      </Box>
-      <Divider />
       <Box
         flexGrow={1}
         minHeight={0}

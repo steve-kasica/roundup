@@ -29,9 +29,9 @@ const RowBlock = styled(Box)(({ height, isHovered, isToggled, isNull }) => ({
     !isNull && {
       boxShadow: "0 1px 4px rgba(0, 0, 0, 0.15)",
       zIndex: 1,
-      "& > *": {
-        backgroundColor: "#aaa !important",
-      },
+      // "& > *": {
+      //   backgroundColor: "#aaa !important",
+      // },
     }),
   //   "&:hover": {
   //     boxShadow: "0 1px 4px rgba(0, 0, 0, 0.15)",
@@ -60,6 +60,7 @@ const TableRowMatches = ({
   onBlockEnter = () => {},
   onBlockLeave = () => {},
   onBlockClick = () => {},
+  onBlockCellClick = () => {},
 }) => {
   return (
     <Box
@@ -110,6 +111,11 @@ const TableRowMatches = ({
                     width: (1 / columnCount) * 100 + "%",
                     height: "100%",
                     backgroundColor: "#ccc",
+                    "&:hover": {
+                      backgroundColor: "#999",
+                    },
+                    onClick: (event) =>
+                      onBlockCellClick(event, table.id, columnId, label),
                   }}
                 ></Box>
               ))}

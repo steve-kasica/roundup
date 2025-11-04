@@ -2,20 +2,14 @@ import { call, put, select, takeEvery } from "redux-saga/effects";
 import createColumnsWorker from "./worker";
 import { createColumnsRequest } from "./actions";
 import { createTablesSuccess } from "../createTablesSaga";
-import {
-  createOperationsFailure,
-  createOperationsSuccess,
-} from "../createOperationsSaga/actions";
+import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import {
   OPERATION_TYPE_NO_OP,
   selectOperation,
 } from "../../slices/operationsSlice";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { CREATION_MODE_INITIALIZATION } from ".";
-import {
-  updateOperationsSuccess,
-  updateOperationsFailure,
-} from "../updateOperationsSaga";
+import { updateOperationsSuccess } from "../updateOperationsSaga";
 
 // Create a shared function for handling both success and failure operations
 const handleOperations = function* (action) {
