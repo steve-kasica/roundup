@@ -19,6 +19,8 @@ import { EnhancedColumnName } from "../ColumnViews";
 import {
   IceCream as SelectAllIcon,
   Baby as DeselectAllIcon,
+  Delete as ExcludeIcon,
+  Eye as FocusIcon,
 } from "lucide-react";
 
 const matchLablels = new Map([
@@ -53,6 +55,9 @@ const PackSchemaView = withPackOperationData(
   }) => {
     // Add hover state for coordinating between tables
     const [hoveredMatch, setHoveredMatch] = useState(null);
+
+    // Add hover state for columns
+    const [hoveredColumn, setHoveredColumn] = useState(null);
 
     // Add state for column selection across tables
     const [anchorColumn, setAnchorColumn] = useState(null);
@@ -560,6 +565,10 @@ const PackSchemaView = withPackOperationData(
       });
     }, []);
 
+    const handleExcludeColumns = useCallback(() => {}, []);
+
+    const handleFocusColumns = useCallback(() => {}, []);
+
     const totalRows = Object.values(data || {}).reduce(
       (sum, count) => sum + (count || 0),
       0
@@ -576,6 +585,43 @@ const PackSchemaView = withPackOperationData(
       leftColumns.length,
       rightColumns.length,
       clickedBlockCells.size,
+    ]);
+
+    // Check if at least one complete column is selected
+    const hasCompleteColumnSelected = useMemo(() => {
+      const visibleMatches = getVisibleMatches();
+      const matchTypes = Object.keys(visibleMatches);
+
+      // Check each column in left table
+      for (const columnId of leftColumns) {
+        const allCellsSelected = matchTypes.every((matchLabel) => {
+          const cellKey = `${leftTableId}:${columnId}:${matchLabel}`;
+          return clickedBlockCells.has(cellKey);
+        });
+        if (allCellsSelected && matchTypes.length > 0) {
+          return true;
+        }
+      }
+
+      // Check each column in right table
+      for (const columnId of rightColumns) {
+        const allCellsSelected = matchTypes.every((matchLabel) => {
+          const cellKey = `${rightTableId}:${columnId}:${matchLabel}`;
+          return clickedBlockCells.has(cellKey);
+        });
+        if (allCellsSelected && matchTypes.length > 0) {
+          return true;
+        }
+      }
+
+      return false;
+    }, [
+      getVisibleMatches,
+      leftColumns,
+      rightColumns,
+      leftTableId,
+      rightTableId,
+      clickedBlockCells,
     ]);
 
     return (
@@ -605,7 +651,25 @@ const PackSchemaView = withPackOperationData(
                 ))}
               </Box>
               <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-
+              {/* Focus columns */}
+              <IconButton
+                size="small"
+                disabled={!hasCompleteColumnSelected}
+                onClick={handleFocusColumns}
+                title="Focus columns"
+              >
+                <FocusIcon fontSize="small" />
+              </IconButton>{" "}
+              {/* Exclude columns */}
+              <IconButton
+                size="small"
+                disabled={!hasCompleteColumnSelected}
+                onClick={handleExcludeColumns}
+                title="Exclude columns"
+                color="error"
+              >
+                <ExcludeIcon fontSize="small" />
+              </IconButton>{" "}
               {/* Select/Deselect All */}
               {!areAllSelected ? (
                 <IconButton
@@ -747,6 +811,10 @@ const PackSchemaView = withPackOperationData(
                             onClick={(event) =>
                               handleColumnClick(event, tableId, columnId)
                             }
+                            onMouseEnter={() =>
+                              setHoveredColumn(`${tableId}:${columnId}`)
+                            }
+                            onMouseLeave={() => setHoveredColumn(null)}
                           >
                             <EnhancedColumnName
                               id={columnId}
@@ -792,6 +860,11 @@ const PackSchemaView = withPackOperationData(
                     {leftColumns.map((columnId) => {
                       const cellKey = `${leftTableId}:${columnId}:${label}`;
                       const isClicked = clickedBlockCells.has(cellKey);
+                      const isColumnHovered =
+                        hoveredColumn === `${leftTableId}:${columnId}`;
+                      const isRowHovered = hoveredMatch === label;
+                      // Left side is empty for 0:1 matches
+                      const isEmpty = label === "zero_to_one_matches";
 
                       return (
                         <Box
@@ -799,20 +872,42 @@ const PackSchemaView = withPackOperationData(
                           sx={{
                             width: (1 / leftColumns.length) * 100 + "%",
                             height: "100%",
-                            border: "1px solid #fff",
-                            backgroundColor: isMatchDisabled
+                            border: isEmpty
+                              ? "1px dashed #ccc"
+                              : "1px solid #fff",
+                            backgroundColor: isEmpty
+                              ? isClicked
+                                ? "primary.light"
+                                : isColumnHovered || isRowHovered
+                                ? "#999"
+                                : "transparent"
+                              : isMatchDisabled
                               ? "#e0e0e0"
                               : isClicked
                               ? "primary.main"
+                              : isColumnHovered || isRowHovered
+                              ? "#999"
                               : "#ccc",
-                            cursor: isMatchDisabled ? "not-allowed" : "pointer",
-                            opacity: isMatchDisabled
+                            cursor: isEmpty
+                              ? "pointer"
+                              : isMatchDisabled
+                              ? "not-allowed"
+                              : "pointer",
+                            opacity: isEmpty
+                              ? isClicked
+                                ? 0.6
+                                : 0.3
+                              : isMatchDisabled
                               ? 0.5
                               : isClicked
                               ? 0.8
                               : 1,
                             "&:hover": {
-                              backgroundColor: isMatchDisabled
+                              backgroundColor: isEmpty
+                                ? isClicked
+                                  ? "primary.dark"
+                                  : "#999"
+                                : isMatchDisabled
                                 ? "#e0e0e0"
                                 : isClicked
                                 ? "primary.dark"
@@ -839,6 +934,11 @@ const PackSchemaView = withPackOperationData(
                     {rightColumns.map((columnId) => {
                       const cellKey = `${rightTableId}:${columnId}:${label}`;
                       const isClicked = clickedBlockCells.has(cellKey);
+                      const isColumnHovered =
+                        hoveredColumn === `${rightTableId}:${columnId}`;
+                      const isRowHovered = hoveredMatch === label;
+                      // Right side is empty for 1:0 matches
+                      const isEmpty = label === "one_to_zero_matches";
 
                       return (
                         <Box
@@ -846,20 +946,42 @@ const PackSchemaView = withPackOperationData(
                           sx={{
                             width: (1 / rightColumns.length) * 100 + "%",
                             height: "100%",
-                            border: "1px solid #fff",
-                            backgroundColor: isMatchDisabled
+                            border: isEmpty
+                              ? "1px dashed #ccc"
+                              : "1px solid #fff",
+                            backgroundColor: isEmpty
+                              ? isClicked
+                                ? "primary.light"
+                                : isColumnHovered || isRowHovered
+                                ? "#999"
+                                : "transparent"
+                              : isMatchDisabled
                               ? "#e0e0e0"
                               : isClicked
                               ? "primary.main"
+                              : isColumnHovered || isRowHovered
+                              ? "#999"
                               : "#ccc",
-                            cursor: isMatchDisabled ? "not-allowed" : "pointer",
-                            opacity: isMatchDisabled
+                            cursor: isEmpty
+                              ? "pointer"
+                              : isMatchDisabled
+                              ? "not-allowed"
+                              : "pointer",
+                            opacity: isEmpty
+                              ? isClicked
+                                ? 0.6
+                                : 0.3
+                              : isMatchDisabled
                               ? 0.5
                               : isClicked
                               ? 0.8
                               : 1,
                             "&:hover": {
-                              backgroundColor: isMatchDisabled
+                              backgroundColor: isEmpty
+                                ? isClicked
+                                  ? "primary.dark"
+                                  : "#999"
+                                : isMatchDisabled
                                 ? "#e0e0e0"
                                 : isClicked
                                 ? "primary.dark"
