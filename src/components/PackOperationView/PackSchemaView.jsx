@@ -17,11 +17,11 @@ import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 import { EnhancedColumnName } from "../ColumnViews";
 import {
-  IceCream as SelectAllIcon,
-  Baby as DeselectAllIcon,
-  Delete as ExcludeIcon,
-  Eye as FocusIcon,
-} from "lucide-react";
+  CenterFocusStrong as FocusIcon,
+  VisibilityOff as ExcludeIcon,
+  Deselect as DeselectAllIcon,
+  SelectAll as SelectAllIcon,
+} from "@mui/icons-material";
 
 const matchLablels = new Map([
   ["one_to_one_matches", "1:1"],
@@ -574,18 +574,9 @@ const PackSchemaView = withPackOperationData(
       0
     );
 
-    const areAllSelected = useMemo(() => {
-      const visibleMatches = getVisibleMatches();
-      const totalBlockCells =
-        Object.keys(visibleMatches).length *
-        (leftColumns.length + rightColumns.length);
-      return clickedBlockCells.size === totalBlockCells;
-    }, [
-      getVisibleMatches,
-      leftColumns.length,
-      rightColumns.length,
-      clickedBlockCells.size,
-    ]);
+    const areAnySelected = useMemo(() => {
+      return clickedBlockCells.size > 0;
+    }, [clickedBlockCells.size]);
 
     // Check if at least one complete column is selected
     const hasCompleteColumnSelected = useMemo(() => {
@@ -671,7 +662,7 @@ const PackSchemaView = withPackOperationData(
                 <ExcludeIcon fontSize="small" />
               </IconButton>{" "}
               {/* Select/Deselect All */}
-              {!areAllSelected ? (
+              {!areAnySelected ? (
                 <IconButton
                   size="small"
                   onClick={handleSelectAll}
