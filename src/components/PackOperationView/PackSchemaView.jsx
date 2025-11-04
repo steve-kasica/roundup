@@ -1,13 +1,25 @@
 /* eslint-disable no-unused-vars */
-import { Box, Typography, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Toolbar,
+  IconButton,
+  Chip,
+  Divider,
+} from "@mui/material";
 import withPackOperationData from "./withPackOperationData";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { usePackStats } from "../../hooks/usePackStats";
 import { EnhancedTableLabel } from "../TableView";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 import { EnhancedColumnName } from "../ColumnViews";
+import {
+  IceCream as SelectAllIcon,
+  Baby as DeselectAllIcon,
+} from "lucide-react";
 
 const matchLablels = new Map([
   ["one_to_one_matches", "1:1"],
@@ -137,6 +149,13 @@ const PackSchemaView = withPackOperationData(
 
       setJoinType(joinType);
     }, [setJoinType, toggledMatches]);
+
+    const getVisibleMatches = useCallback(() => {
+      if (hasAlerts || !data) return {};
+      return Object.fromEntries(
+        Object.entries(data).filter(([label, count]) => count > 0)
+      );
+    }, [hasAlerts, data]);
 
     const handleBlockCellClick = useCallback(
       (event, tableId, columnId, matchLabel) => {
@@ -488,21 +507,126 @@ const PackSchemaView = withPackOperationData(
       ]
     );
 
-    const getVisibleMatches = () => {
-      if (hasAlerts || !data) return {};
-      return Object.fromEntries(
-        Object.entries(data).filter(([label, count]) => count > 0)
-      );
-    };
+    const handleSelectAll = useCallback(() => {
+      const visibleMatches = getVisibleMatches();
+      const matchTypes = Object.keys(visibleMatches);
+      const allCells = new Set();
+
+      // Select all cells across all tables, columns, and match types
+      matchTypes.forEach((match) => {
+        leftColumns.forEach((columnId) => {
+          allCells.add(`${leftTableId}:${columnId}:${match}`);
+        });
+        rightColumns.forEach((columnId) => {
+          allCells.add(`${rightTableId}:${columnId}:${match}`);
+        });
+      });
+
+      setClickedBlockCells(allCells);
+    }, [
+      getVisibleMatches,
+      leftColumns,
+      rightColumns,
+      leftTableId,
+      rightTableId,
+    ]);
+
+    const handleDeselectAll = useCallback(() => {
+      setClickedBlockCells(new Set());
+    }, []);
+
+    const handleToggleMatch = useCallback((matchKey) => {
+      setToggledMatches((prev) => {
+        const newState = {
+          ...prev,
+          [matchKey]: !prev[matchKey],
+        };
+
+        // If toggling off, deselect all cells for this match type
+        if (!newState[matchKey]) {
+          setClickedBlockCells((prevCells) => {
+            const newCells = new Set(prevCells);
+            Array.from(newCells).forEach((cellKey) => {
+              const [, , matchLabel] = cellKey.split(":");
+              if (matchLabel === matchKey) {
+                newCells.delete(cellKey);
+              }
+            });
+            return newCells;
+          });
+        }
+
+        return newState;
+      });
+    }, []);
 
     const totalRows = Object.values(data || {}).reduce(
       (sum, count) => sum + (count || 0),
       0
     );
 
+    const areAllSelected = useMemo(() => {
+      const visibleMatches = getVisibleMatches();
+      const totalBlockCells =
+        Object.keys(visibleMatches).length *
+        (leftColumns.length + rightColumns.length);
+      return clickedBlockCells.size === totalBlockCells;
+    }, [
+      getVisibleMatches,
+      leftColumns.length,
+      rightColumns.length,
+      clickedBlockCells.size,
+    ]);
+
     return (
       <Box display={"flex"} flexDirection="column" height="100%">
-        <SchemaToolbar objectId={id} columnIds={[]} alertIds={alertIds}>
+        <SchemaToolbar
+          objectId={id}
+          columnIds={[]}
+          alertIds={alertIds}
+          customMenuItems={
+            <>
+              {/* Match category filter chips */}
+              <Box display="flex" gap={0.5} alignItems="center">
+                {Object.entries(getVisibleMatches()).map(([key, count]) => (
+                  <Chip
+                    key={key}
+                    label={matchLablels.get(key)}
+                    size="small"
+                    onClick={() => handleToggleMatch(key)}
+                    color={toggledMatches[key] ? "primary" : "default"}
+                    variant={toggledMatches[key] ? "filled" : "outlined"}
+                    sx={{
+                      height: 24,
+                      fontSize: "0.75rem",
+                      cursor: "pointer",
+                    }}
+                  />
+                ))}
+              </Box>
+              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+
+              {/* Select/Deselect All */}
+              {!areAllSelected ? (
+                <IconButton
+                  size="small"
+                  onClick={handleSelectAll}
+                  title="Select all"
+                >
+                  <SelectAllIcon fontSize="small" />
+                </IconButton>
+              ) : (
+                <IconButton
+                  size="small"
+                  onClick={handleDeselectAll}
+                  title="Deselect all"
+                >
+                  <DeselectAllIcon fontSize="small" />
+                </IconButton>
+              )}
+            </>
+          }
+        >
           <EnhancedPackOperationLabel id={id} />
         </SchemaToolbar>
         <Box
@@ -652,85 +776,113 @@ const PackSchemaView = withPackOperationData(
             </Box>
 
             {/* Iterate by match type first */}
-            {Object.entries(getVisibleMatches()).map(([label, matchCount]) => (
-              <Box
-                key={label}
-                display="flex"
-                flex={matchCount / totalRows}
-                width="100%"
-                borderTop="1px solid #ccc"
-              >
-                {/* Left table columns for this match type */}
-                <Box display="flex" width="50%" marginRight="2.5px">
-                  {leftColumns.map((columnId) => {
-                    const cellKey = `${leftTableId}:${columnId}:${label}`;
-                    const isClicked = clickedBlockCells.has(cellKey);
+            {Object.entries(getVisibleMatches()).map(([label, matchCount]) => {
+              const isMatchDisabled = !toggledMatches[label];
 
-                    return (
-                      <Box
-                        key={columnId}
-                        sx={{
-                          width: (1 / leftColumns.length) * 100 + "%",
-                          height: "100%",
-                          border: "1px solid #fff",
-                          backgroundColor: isClicked ? "primary.main" : "#ccc",
-                          cursor: "pointer",
-                          opacity: isClicked ? 0.8 : 1,
-                          "&:hover": {
-                            backgroundColor: isClicked
-                              ? "primary.dark"
-                              : "#999",
-                          },
-                        }}
-                        onClick={(event) =>
-                          handleBlockCellClick(
-                            event,
-                            leftTableId,
-                            columnId,
-                            label
-                          )
-                        }
-                      ></Box>
-                    );
-                  })}
+              return (
+                <Box
+                  key={label}
+                  display="flex"
+                  flex={matchCount / totalRows}
+                  width="100%"
+                  borderTop="1px solid #ccc"
+                >
+                  {/* Left table columns for this match type */}
+                  <Box display="flex" width="50%" marginRight="2.5px">
+                    {leftColumns.map((columnId) => {
+                      const cellKey = `${leftTableId}:${columnId}:${label}`;
+                      const isClicked = clickedBlockCells.has(cellKey);
+
+                      return (
+                        <Box
+                          key={columnId}
+                          sx={{
+                            width: (1 / leftColumns.length) * 100 + "%",
+                            height: "100%",
+                            border: "1px solid #fff",
+                            backgroundColor: isMatchDisabled
+                              ? "#e0e0e0"
+                              : isClicked
+                              ? "primary.main"
+                              : "#ccc",
+                            cursor: isMatchDisabled ? "not-allowed" : "pointer",
+                            opacity: isMatchDisabled
+                              ? 0.5
+                              : isClicked
+                              ? 0.8
+                              : 1,
+                            "&:hover": {
+                              backgroundColor: isMatchDisabled
+                                ? "#e0e0e0"
+                                : isClicked
+                                ? "primary.dark"
+                                : "#999",
+                            },
+                          }}
+                          onClick={(event) => {
+                            if (!isMatchDisabled) {
+                              handleBlockCellClick(
+                                event,
+                                leftTableId,
+                                columnId,
+                                label
+                              );
+                            }
+                          }}
+                        ></Box>
+                      );
+                    })}
+                  </Box>
+
+                  {/* Right table columns for this match type */}
+                  <Box display="flex" width="50%" marginLeft="2.5px">
+                    {rightColumns.map((columnId) => {
+                      const cellKey = `${rightTableId}:${columnId}:${label}`;
+                      const isClicked = clickedBlockCells.has(cellKey);
+
+                      return (
+                        <Box
+                          key={columnId}
+                          sx={{
+                            width: (1 / rightColumns.length) * 100 + "%",
+                            height: "100%",
+                            border: "1px solid #fff",
+                            backgroundColor: isMatchDisabled
+                              ? "#e0e0e0"
+                              : isClicked
+                              ? "primary.main"
+                              : "#ccc",
+                            cursor: isMatchDisabled ? "not-allowed" : "pointer",
+                            opacity: isMatchDisabled
+                              ? 0.5
+                              : isClicked
+                              ? 0.8
+                              : 1,
+                            "&:hover": {
+                              backgroundColor: isMatchDisabled
+                                ? "#e0e0e0"
+                                : isClicked
+                                ? "primary.dark"
+                                : "#999",
+                            },
+                          }}
+                          onClick={(event) => {
+                            if (!isMatchDisabled) {
+                              handleBlockCellClick(
+                                event,
+                                rightTableId,
+                                columnId,
+                                label
+                              );
+                            }
+                          }}
+                        ></Box>
+                      );
+                    })}
+                  </Box>
                 </Box>
-
-                {/* Right table columns for this match type */}
-                <Box display="flex" width="50%" marginLeft="2.5px">
-                  {rightColumns.map((columnId) => {
-                    const cellKey = `${rightTableId}:${columnId}:${label}`;
-                    const isClicked = clickedBlockCells.has(cellKey);
-
-                    return (
-                      <Box
-                        key={columnId}
-                        sx={{
-                          width: (1 / rightColumns.length) * 100 + "%",
-                          height: "100%",
-                          border: "1px solid #fff",
-                          backgroundColor: isClicked ? "primary.main" : "#ccc",
-                          cursor: "pointer",
-                          opacity: isClicked ? 0.8 : 1,
-                          "&:hover": {
-                            backgroundColor: isClicked
-                              ? "primary.dark"
-                              : "#999",
-                          },
-                        }}
-                        onClick={(event) =>
-                          handleBlockCellClick(
-                            event,
-                            rightTableId,
-                            columnId,
-                            label
-                          )
-                        }
-                      ></Box>
-                    );
-                  })}
-                </Box>
-              </Box>
-            ))}
+              );
+            })}
           </Box>
         </Box>
       </Box>

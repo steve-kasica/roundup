@@ -36,7 +36,13 @@ import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
 import { selectAlertsById } from "../../slices/alertsSlice/alertsSelectors";
 
-const SchemaToolbar = ({ columnIds, objectId, alertIds = [], children }) => {
+const SchemaToolbar = ({
+  // columnIds,
+  objectId,
+  alertIds = [],
+  children,
+  customMenuItems = null,
+}) => {
   const dispatch = useDispatch();
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
   const alerts = useSelector((state) => selectAlertsById(state, alertIds));
@@ -47,14 +53,16 @@ const SchemaToolbar = ({ columnIds, objectId, alertIds = [], children }) => {
         : state.operations.data[objectId]?.error
     )
   );
-  const areAllColumnsSelected =
-    columnIds.length > 0 && selectedColumnIds.length === columnIds.length;
+  // const areAllColumnsSelected =
+  //   columnIds.length > 0 && selectedColumnIds.length === columnIds.length;
+
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [alertAnchorEl, setAlertAnchorEl] = useState(null);
 
-  const handleSelectAll = useCallback(() => {
-    dispatch(setSelectedColumnIds(columnIds));
-  }, [dispatch, columnIds]);
+  // const handleSelectAll = useCallback(() => {
+  //   onSelectAllClick();
+  //   dispatch(setSelectedColumnIds(columnIds));
+  // }, [onSelectAllClick, dispatch, columnIds]);
 
   const handleExcludeSelected = useCallback(() => {
     dispatch(excludeColumnFromTable(selectedColumnIds));
@@ -105,17 +113,17 @@ const SchemaToolbar = ({ columnIds, objectId, alertIds = [], children }) => {
       {/* Action Buttons Section - Bulk operations for selected columns */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         {/* Select All Columns */}
-        <IconButton
+        {/* <IconButton
           size="small"
           onClick={handleSelectAll}
-          disabled={areAllColumnsSelected}
+          disabled={areAllSelected}
           title="Select all columns"
         >
           <SelectAll fontSize="small" />
-        </IconButton>
+        </IconButton> */}
 
         {/* Focus Selected Columns (max 2 for comparison) */}
-        <IconButton
+        {/* <IconButton
           size="small"
           onClick={handleFocusSelected}
           disabled={selectedColumnIds.length === 0}
@@ -123,7 +131,7 @@ const SchemaToolbar = ({ columnIds, objectId, alertIds = [], children }) => {
           color="primary"
         >
           <Visibility fontSize="small" />
-        </IconButton>
+        </IconButton> */}
 
         {/* Change Column Type Dropdown */}
         {/* TODO when addressing column types */}
@@ -137,7 +145,7 @@ const SchemaToolbar = ({ columnIds, objectId, alertIds = [], children }) => {
         </IconButton> */}
 
         {/* Exclude Selected Columns */}
-        <IconButton
+        {/* <IconButton
           size="small"
           onClick={handleExcludeSelected}
           disabled={selectedColumnIds.length === 0}
@@ -145,17 +153,20 @@ const SchemaToolbar = ({ columnIds, objectId, alertIds = [], children }) => {
           color="error"
         >
           <ExcludeIcon fontSize="small" />
-        </IconButton>
+        </IconButton> */}
 
         {/* Clear Selection */}
-        <IconButton
+        {/* <IconButton
           size="small"
           onClick={handleClearSelection}
           disabled={selectedColumnIds.length === 0}
           title="Clear selection"
         >
           <ClearAll fontSize="small" />
-        </IconButton>
+        </IconButton> */}
+
+        {/* Custom Menu Items */}
+        {customMenuItems}
 
         <Divider
           orientation="vertical"
