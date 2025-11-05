@@ -1,10 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
-import {
-  selectColumnIdMatrixByOperationId,
-  setFocusedColumnIds,
-} from "../../slices/columnsSlice";
+import { selectColumnIdMatrixByOperationId } from "../../slices/columnsSlice";
 import { selectOperationChildren } from "../../slices/operationsSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import withOperationData from "../HOC/withOperationData";

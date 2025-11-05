@@ -41,6 +41,10 @@ import {
 import { EnhancedColumnSummary } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
+import { FocusIcon } from "lucide-react";
+import FocusIconButton from "../ui/FocusIconButton";
+import ExcludeIconButton from "../ui/ExcludeIconButton";
+import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -60,6 +64,8 @@ const TableSchema = ({
   columnCount,
   swapColumns,
   selectColumns,
+  excludeColumns,
+  focusColumns,
   insertColumn,
   setVisibleColumns: setVisibleColumnsInSlice,
 
@@ -207,6 +213,24 @@ const TableSchema = ({
     [dispatch]
   );
 
+  const handleFocusColumns = useCallback(() => {
+    focusColumns(selectedColumnIds);
+  }, [focusColumns, selectedColumnIds]);
+
+  const handleExcludeColumns = useCallback(() => {
+    excludeColumns(selectedColumnIds);
+  }, [excludeColumns, selectedColumnIds]);
+
+  const handleSelectAllColumns = useCallback(() => {
+    if (selectedColumnIds.length > 0) {
+      // All selected - deselect all
+      selectColumns([]);
+    } else {
+      // Not all selected - select all
+      selectColumns(activeColumnIds);
+    }
+  }, [activeColumnIds, selectedColumnIds, selectColumns]);
+
   return (
     <Box
       display="flex"
@@ -228,6 +252,22 @@ const TableSchema = ({
         rowCount={table.rowCount}
         name={table.name}
         objectId={table.id}
+        customMenuItems={
+          <>
+            <FocusIconButton
+              disabled={selectedColumnIds.length === 0}
+              onClick={handleFocusColumns}
+            />
+            <ExcludeIconButton
+              disabled={selectedColumnIds.length === 0}
+              onClick={handleExcludeColumns}
+            />
+            <SelectToggleIconButton
+              isSelected={selectedColumnIds.length > 0}
+              onClick={handleSelectAllColumns}
+            />
+          </>
+        }
       />
 
       {/* Column Type Change Menu */}

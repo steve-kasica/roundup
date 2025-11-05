@@ -68,10 +68,6 @@ const SchemaToolbar = ({
     dispatch(excludeColumnFromTable(selectedColumnIds));
   }, [dispatch, selectedColumnIds]);
 
-  const handleFocusSelected = useCallback(() => {
-    dispatch(setFocusedColumnIds(selectedColumnIds));
-  }, [dispatch, selectedColumnIds]);
-
   const handleClearSelection = useCallback(() => {
     dispatch(setSelectedColumnIds([]));
   }, [dispatch]);
@@ -112,59 +108,6 @@ const SchemaToolbar = ({
 
       {/* Action Buttons Section - Bulk operations for selected columns */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        {/* Select All Columns */}
-        {/* <IconButton
-          size="small"
-          onClick={handleSelectAll}
-          disabled={areAllSelected}
-          title="Select all columns"
-        >
-          <SelectAll fontSize="small" />
-        </IconButton> */}
-
-        {/* Focus Selected Columns (max 2 for comparison) */}
-        {/* <IconButton
-          size="small"
-          onClick={handleFocusSelected}
-          disabled={selectedColumnIds.length === 0}
-          title="Focus on selected columns (1-2 columns only)"
-          color="primary"
-        >
-          <Visibility fontSize="small" />
-        </IconButton> */}
-
-        {/* Change Column Type Dropdown */}
-        {/* TODO when addressing column types */}
-        {/* <IconButton
-          size="small"
-          // onClick={handleColumnTypeMenuOpen}
-          //   disabled={selectedTableColumnIds.length === 0}
-          title="Change column type"
-        >
-          <ArrowDropDown fontSize="small" />
-        </IconButton> */}
-
-        {/* Exclude Selected Columns */}
-        {/* <IconButton
-          size="small"
-          onClick={handleExcludeSelected}
-          disabled={selectedColumnIds.length === 0}
-          title="Exclude selected columns"
-          color="error"
-        >
-          <ExcludeIcon fontSize="small" />
-        </IconButton> */}
-
-        {/* Clear Selection */}
-        {/* <IconButton
-          size="small"
-          onClick={handleClearSelection}
-          disabled={selectedColumnIds.length === 0}
-          title="Clear selection"
-        >
-          <ClearAll fontSize="small" />
-        </IconButton> */}
-
         {/* Custom Menu Items */}
         {customMenuItems}
 

@@ -23,6 +23,9 @@ import {
   SelectAll as SelectAllIcon,
   SwapHoriz as SwapIcon,
 } from "@mui/icons-material";
+import ExcludeIconButton from "../ui/ExcludeIconButton";
+import FocusIconButton from "../ui/FocusIconButton";
+import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 
 const matchLabels = new Map([
   ["matches", "Match"],
@@ -534,6 +537,10 @@ const PackSchemaView = withPackOperationData(
     );
 
     const handleSelectAll = useCallback(() => {
+      if (areAnySelected) {
+        setClickedBlockCells(new Set());
+        return;
+      }
       const visibleMatches = getVisibleMatches();
       const matchTypes = Object.keys(visibleMatches);
       const allCells = new Set();
@@ -550,16 +557,13 @@ const PackSchemaView = withPackOperationData(
 
       setClickedBlockCells(allCells);
     }, [
+      areAnySelected,
       getVisibleMatches,
       leftColumns,
       rightColumns,
       leftTableId,
       rightTableId,
     ]);
-
-    const handleDeselectAll = useCallback(() => {
-      setClickedBlockCells(new Set());
-    }, []);
 
     const handleToggleMatch = useCallback((matchKey) => {
       setToggledMatches((prev) => {
@@ -675,43 +679,18 @@ const PackSchemaView = withPackOperationData(
               >
                 <SwapIcon fontSize="small" />
               </IconButton>
-              {/* Focus columns */}
-              <IconButton
-                size="small"
+              <FocusIconButton
                 disabled={!hasCompleteColumnSelected}
                 onClick={handleFocusColumns}
-                title="Focus columns"
-              >
-                <FocusIcon fontSize="small" />
-              </IconButton>{" "}
-              {/* Exclude columns */}
-              <IconButton
-                size="small"
+              />
+              <ExcludeIconButton
                 disabled={!hasCompleteColumnSelected}
                 onClick={handleExcludeColumns}
-                title="Exclude columns"
-                color="error"
-              >
-                <ExcludeIcon fontSize="small" />
-              </IconButton>{" "}
-              {/* Select/Deselect All */}
-              {!areAnySelected ? (
-                <IconButton
-                  size="small"
-                  onClick={handleSelectAll}
-                  title="Select all"
-                >
-                  <SelectAllIcon fontSize="small" />
-                </IconButton>
-              ) : (
-                <IconButton
-                  size="small"
-                  onClick={handleDeselectAll}
-                  title="Deselect all"
-                >
-                  <DeselectAllIcon fontSize="small" />
-                </IconButton>
-              )}
+              />
+              <SelectToggleIconButton
+                onClick={handleSelectAll}
+                isSelected={areAnySelected}
+              />
             </>
           }
         >

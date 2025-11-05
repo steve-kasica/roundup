@@ -4,7 +4,6 @@ import { useCallback } from "react";
 
 import {
   selectOperationDepth,
-  selectOperation,
   selectOperationByTableId,
 } from "../../slices/operationsSlice";
 import {
@@ -13,6 +12,7 @@ import {
   selectColumnIdsByTableId,
   selectSelectedColumnDBNamesByTableId,
   selectSelectedColumnIdsByTableId,
+  setFocusedColumnIds,
   setSelectedColumnIds,
   setVisibleColumns as setVisibleColumnsAction,
 } from "../../slices/columnsSlice";
@@ -162,6 +162,11 @@ export default function withTableData(WrappedComponent) {
         dispatch(setFocusedObject(id));
       }, [dispatch, id]);
 
+      const focusColumns = useCallback(
+        (colIds) => dispatch(setFocusedColumnIds(colIds)),
+        [dispatch]
+      );
+
       // Current number of non-excluded columns
       const columnCount = activeColumnIds.length;
 
@@ -203,6 +208,7 @@ export default function withTableData(WrappedComponent) {
           selectColumns={selectColumns}
           swapColumns={swapColumns}
           excludeColumns={excludeColumns}
+          focusColumns={focusColumns}
           setTableName={setTableName}
           setVisibleColumns={setVisibleColumns}
           removeTableFromSchema={removeTableFromSchema}

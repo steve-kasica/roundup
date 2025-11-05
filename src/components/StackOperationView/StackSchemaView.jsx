@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useCallback, useEffect, useRef, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import {
   getValuesInRange,
   getIndexOfValue,
@@ -11,6 +11,16 @@ import { EnhancedColumnSummary, StyledColumnCard } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedStackOperationLabel } from "./StackOperationLabel";
+import {
+  CenterFocusStrong as FocusIcon,
+  VisibilityOff as ExcludeIcon,
+  Deselect as DeselectAllIcon,
+  SelectAll as SelectAllIcon,
+  SwapHoriz as SwapIcon,
+} from "@mui/icons-material";
+import FocusIconButton from "../ui/FocusIconButton";
+import ExcludeIconButton from "../ui/ExcludeIconButton";
+import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -26,8 +36,10 @@ const StackSchemaView = ({
   removeAlerts,
   silenceAlerts,
   //
-  selectColumns,
-  focusColumns,
+  selectColumns, // Sets global set of selected column IDs
+  clearSelectedColumns, // Clears global set of selected column IDs
+  focusColumns, // Sets global set of focused column IDs
+  excludeColumns,
   swapColumns,
   insertColumnIntoChildAtIndex,
   setVisibleColumns: setVisibleColumnsInSlice,
@@ -91,8 +103,12 @@ const StackSchemaView = ({
 
   // Call selectColumns whenever selectedTableColumnIds changes
   useEffect(() => {
-    selectColumns(selectedTableColumnIds);
-  }, [selectedTableColumnIds, selectColumns]);
+    if (selectedTableColumnIds.length > 0) {
+      selectColumns(selectedTableColumnIds);
+    } else {
+      clearSelectedColumns();
+    }
+  }, [selectedTableColumnIds, selectColumns, clearSelectedColumns]);
 
   const onCellClick = useCallback(
     (event, columnId) => {
@@ -255,6 +271,25 @@ const StackSchemaView = ({
     [insertColumnIntoChildAtIndex, operation.children]
   );
 
+  const handleFocusColumns = useCallback(() => {
+    focusColumns(selectedTableColumnIds);
+  }, [focusColumns, selectedTableColumnIds]);
+
+  const handleExcludeColumns = useCallback(
+    () => excludeColumns(selectedTableColumnIds),
+    [excludeColumns, selectedTableColumnIds]
+  );
+
+  const handleSelectionAllColumns = useCallback(() => {
+    if (selectedTableColumnIds.length > 0) {
+      // Some selected - deselect all
+      setSelectedTableColumnIds([]);
+    } else {
+      // None selected - select all
+      setSelectedTableColumnIds(columnIdMatrix.flat());
+    }
+  }, [columnIdMatrix, selectedTableColumnIds.length]);
+
   return (
     <Box
       display={"flex"}
@@ -275,6 +310,22 @@ const StackSchemaView = ({
         name={operation.name}
         objectId={operation.id}
         alertIds={alertIds}
+        customMenuItems={
+          <>
+            <FocusIconButton
+              onClick={handleFocusColumns}
+              disabled={selectedTableColumnIds.length === 0}
+            />
+            <ExcludeIconButton
+              onClick={handleExcludeColumns}
+              disabled={selectedTableColumnIds.length === 0}
+            />
+            <SelectToggleIconButton
+              onClick={handleSelectionAllColumns}
+              isSelected={selectedTableColumnIds.length > 0}
+            />
+          </>
+        }
       >
         <EnhancedStackOperationLabel id={operation.id} />
       </SchemaToolbar>
