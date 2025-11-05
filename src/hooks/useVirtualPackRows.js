@@ -17,7 +17,7 @@ import { selectColumnById } from "../slices/columnsSlice";
  * @param {string} leftKeyColumnId - ID of the key column in the left table used for joining
  * @param {string} rightKeyColumnId - ID of the key column in the right table used for joining
  * @param {string} joinPredicate - Type of join predicate: "EQUALS", "CONTAINS", "STARTS_WITH", or "ENDS_WITH"
- * @param {string} matchType - The type of match to filter by: "oneToOne", "oneToMany", "manyToOne", "manyToMany", "oneToZero", or "zeroToOne"
+ * @param {Array<string>} matchSelection - The type of match to filter by: "matches", "left_unmatched", "right_unmatched"
  * @param {number} [pageSize=50] - Number of rows per page
  *
  * @returns {Object} Hook state and methods
@@ -52,7 +52,7 @@ export function useVirtualPackRows(
   leftKeyColumnId,
   rightKeyColumnId,
   joinPredicate,
-  matchType,
+  matchSelection,
   pageSize = 50
 ) {
   const [data, setData] = useState([]);
@@ -93,12 +93,13 @@ export function useVirtualPackRows(
         !rightTableId ||
         !leftColumnNames ||
         !rightColumnNames ||
-        leftColumnNames.length === 0 ||
-        rightColumnNames.length === 0 ||
+        !Array.isArray(leftColumnNames) ||
+        !Array.isArray(rightColumnNames) ||
         !leftKeyColumn ||
         !rightKeyColumn ||
         !joinPredicate ||
-        !matchType
+        !matchSelection ||
+        !matchSelection.length
       ) {
         setData([]);
         return;
@@ -117,7 +118,7 @@ export function useVirtualPackRows(
           leftKeyColumn,
           rightKeyColumn,
           joinPredicate,
-          matchType,
+          matchSelection,
           pageSize,
           offset
         );
@@ -151,7 +152,7 @@ export function useVirtualPackRows(
       leftKeyColumn,
       rightKeyColumn,
       joinPredicate,
-      matchType,
+      matchSelection,
       pageSize,
     ]
   );

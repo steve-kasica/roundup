@@ -9,7 +9,7 @@ import {
 } from "../../slices/columnsSlice/columnSelectors";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
-
+import { setSelectedMatches } from "../../slices/uiSlice";
 export default function withPackOperationData(WrappedComponent) {
   function EnhancedPackComponent({
     // Props passed from withOperationData
@@ -90,9 +90,18 @@ export default function withPackOperationData(WrappedComponent) {
       selectTablesById(state, rightTableId)
     );
 
+    const selectedMatchTypes = useSelector((state) => state.ui.selectedMatches);
+
     // Extract row counts from table objects
     const leftRowCount = leftTable?.rowCount || 0;
     const rightRowCount = rightTable?.rowCount || 0;
+
+    const setMatchSelection = useCallback(
+      (selectedMatches) => {
+        dispatch(setSelectedMatches(selectedMatches));
+      },
+      [dispatch]
+    );
 
     return (
       <WrappedComponent
@@ -104,6 +113,7 @@ export default function withPackOperationData(WrappedComponent) {
         // Props specific to Pack operations
         joinType={operation.joinType}
         joinPredicate={operation.joinPredicate}
+        selectedMatchTypes={selectedMatchTypes}
         // Left table props
         leftTableId={leftTableId}
         joinKey1={operation.joinKey1} // Deprecated, use leftKey
@@ -156,6 +166,7 @@ export default function withPackOperationData(WrappedComponent) {
             })
           )
         }
+        setMatchSelection={setMatchSelection}
       />
     );
   }

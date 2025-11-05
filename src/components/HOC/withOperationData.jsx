@@ -17,6 +17,7 @@ import {
   selectSelectedColumnDBNamesByTableId,
   selectSelectedColumnIdsByTableId,
   setFocusedColumnIds,
+  setSelectedColumnIds,
   setVisibleColumns as setVisibleColumnsAction,
 } from "../../slices/columnsSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
@@ -76,17 +77,6 @@ export default function withOperationData(WrappedComponent) {
 
     // Define callback functions used by all operation types
     // ----------------------------------------------------------------------------
-    const swapTablePositions = useCallback(
-      () => dispatch(),
-      // TODO
-      // updateOperations({
-      //   id,
-      //   joinKey1: operation.joinKey2,
-      //   joinKey2: operation.joinKey1,
-      //   children: operation.children.slice().reverse(),
-      // })
-      [dispatch]
-    );
     const setVisibleColumns = useCallback(
       (columnIds) => {
         dispatch(setVisibleColumnsAction(columnIds));
@@ -95,11 +85,11 @@ export default function withOperationData(WrappedComponent) {
     );
 
     const selectColumns = useCallback(
-      (selectedColumnIds) =>
+      (columnIds) =>
         dispatch(
           updateColumnsRequest({
             columnUpdates: [
-              ...selectedColumnIds.filter(Boolean).map((id) => ({
+              ...columnIds.filter(Boolean).map((id) => ({
                 id,
                 isSelected: true,
               })),
@@ -108,6 +98,10 @@ export default function withOperationData(WrappedComponent) {
         ),
       [dispatch]
     );
+
+    const clearSelectedColumns = useCallback(() => {
+      dispatch(setSelectedColumnIds([]));
+    }, [dispatch]);
 
     const insertColumnIntoChildAtIndex = useCallback(
       (childTableId, targetIndex) => {
@@ -124,6 +118,24 @@ export default function withOperationData(WrappedComponent) {
     const focusColumns = useCallback(
       (colIds) => dispatch(setFocusedColumnIds(colIds)),
       [dispatch]
+    );
+
+    const swapTablePositions = useCallback(
+      (aIndex, bIndex) => {
+        const updatedChildren = [...(operation.children || [])];
+        // Swap the two table IDs
+        [updatedChildren[aIndex], updatedChildren[bIndex]] = [
+          updatedChildren[bIndex],
+          updatedChildren[aIndex],
+        ];
+        dispatch(
+          updateOperations({
+            id,
+            children: updatedChildren,
+          })
+        );
+      },
+      [dispatch, id, operation.children]
     );
 
     return (
@@ -190,6 +202,7 @@ export default function withOperationData(WrappedComponent) {
         }
         // Callback function related to columns
         selectColumns={selectColumns}
+        clearSelectedColumns={clearSelectedColumns}
         insertColumnIntoChildAtIndex={insertColumnIntoChildAtIndex}
         setVisibleColumns={setVisibleColumns}
         focusColumns={focusColumns}

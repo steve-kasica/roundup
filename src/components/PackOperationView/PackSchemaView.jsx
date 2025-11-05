@@ -21,24 +21,26 @@ import {
   VisibilityOff as ExcludeIcon,
   Deselect as DeselectAllIcon,
   SelectAll as SelectAllIcon,
+  SwapHoriz as SwapIcon,
 } from "@mui/icons-material";
 
-const matchLablels = new Map([
-  ["one_to_one_matches", "1:1"],
-  ["one_to_many_matches", "1:N"],
-  ["many_to_one_matches", "N:1"],
-  ["many_to_many_matches", "N:N"],
-  ["one_to_zero_matches", "1:0"],
-  ["zero_to_one_matches", "0:1"],
+const matchLabels = new Map([
+  ["matches", "Match"],
+  ["left_unmatched", "Left Only"],
+  ["right_unmatched", "Right Only"],
 ]);
 
 const PackSchemaView = withPackOperationData(
   ({
     // General operation props
     id,
+    selectColumns,
+    clearSelectedColumns,
+    swapTablePositions,
     // Pack-specific props
     joinPredicate,
     setJoinType,
+    setMatchSelection,
     // Left table props (via withPackOperationData)
     leftTableId,
     leftColumns,
@@ -64,12 +66,9 @@ const PackSchemaView = withPackOperationData(
 
     // Add toggle state for showing/hiding match types
     const [toggledMatches, setToggledMatches] = useState({
-      one_to_one_matches: true,
-      one_to_many_matches: true,
-      many_to_one_matches: true,
-      many_to_many_matches: true,
-      one_to_zero_matches: true,
-      zero_to_one_matches: true,
+      matches: true,
+      left_unmatched: true,
+      right_unmatched: true,
     });
 
     // Track which block cells have been clicked
@@ -106,28 +105,50 @@ const PackSchemaView = withPackOperationData(
       });
     }, [data]);
 
+    // Update column selection when block cells change
+    useEffect(() => {
+      const selectedColumnIds = new Set();
+
+      // Extract unique column IDs from clicked block cells
+      clickedBlockCells.forEach((cellKey) => {
+        const [tableId, columnId] = cellKey.split(":");
+        selectedColumnIds.add(columnId);
+      });
+
+      // Call selectColumns with array of column IDs
+      if (selectedColumnIds.size > 0) {
+        selectColumns(Array.from(selectedColumnIds));
+      } else {
+        clearSelectedColumns();
+      }
+    }, [clearSelectedColumns, clickedBlockCells, selectColumns]);
+
+    // Update match selection when block cells change
+    useEffect(() => {
+      const selectedMatchCategories = new Set();
+
+      // Extract unique match categories from clicked block cells
+      clickedBlockCells.forEach((cellKey) => {
+        const [, , matchLabel] = cellKey.split(":");
+        selectedMatchCategories.add(matchLabel);
+      });
+
+      // Call setMatchSelection with array of match categories
+      setMatchSelection(Array.from(selectedMatchCategories));
+    }, [clickedBlockCells, setMatchSelection]);
+
     // Calculate join type based on toggled matches
     useEffect(() => {
-      const signature = (function (
-        one_to_one,
-        one_to_n,
-        n_to_one,
-        n_to_n,
-        one_to_zero,
-        zero_to_one
-      ) {
+      const signature = (function (matches, left_unmatched, right_unmatched) {
         let sig = "";
-        sig += one_to_zero ? "1" : "0";
-        sig += one_to_one || one_to_n || n_to_one || n_to_n ? "1" : "0";
-        sig += zero_to_one ? "1" : "0";
+        sig += left_unmatched ? "1" : "0";
+        sig += matches ? "1" : "0";
+        sig += right_unmatched ? "1" : "0";
         return sig;
       })(
-        toggledMatches.one_to_one_matches,
-        toggledMatches.one_to_many_matches,
-        toggledMatches.many_to_one_matches,
-        toggledMatches.many_to_many_matches,
-        toggledMatches.one_to_zero_matches,
-        toggledMatches.zero_to_one_matches
+        toggledMatches.matches,
+        toggledMatches.left_unmatched,
+        toggledMatches.right_unmatched
       );
 
       const joinType = (function (sig) {
@@ -569,6 +590,10 @@ const PackSchemaView = withPackOperationData(
 
     const handleFocusColumns = useCallback(() => {}, []);
 
+    const handleSwapTables = useCallback(() => {
+      swapTablePositions(0, 1);
+    }, [swapTablePositions]);
+
     const totalRows = Object.values(data || {}).reduce(
       (sum, count) => sum + (count || 0),
       0
@@ -628,7 +653,7 @@ const PackSchemaView = withPackOperationData(
                 {Object.entries(getVisibleMatches()).map(([key, count]) => (
                   <Chip
                     key={key}
-                    label={matchLablels.get(key)}
+                    label={matchLabels.get(key)}
                     size="small"
                     onClick={() => handleToggleMatch(key)}
                     color={toggledMatches[key] ? "primary" : "default"}
@@ -642,6 +667,14 @@ const PackSchemaView = withPackOperationData(
                 ))}
               </Box>
               <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+              {/* Swap tables */}
+              <IconButton
+                size="small"
+                onClick={handleSwapTables}
+                title="Swap table positions"
+              >
+                <SwapIcon fontSize="small" />
+              </IconButton>
               {/* Focus columns */}
               <IconButton
                 size="small"
@@ -738,7 +771,7 @@ const PackSchemaView = withPackOperationData(
                     onMouseLeave={() => setHoveredMatch(null)}
                     onClick={(event) => handleMatchLabelClick(event, key)}
                   >
-                    {matchLablels.get(key)}
+                    {matchLabels.get(key)}
                   </Typography>
                 </Box>
               );
@@ -784,15 +817,17 @@ const PackSchemaView = withPackOperationData(
                           return tId === tableId && colId === columnId;
                         });
 
+                        // Check if this is a key column
+                        const isKeyColumn =
+                          (tableId === leftTableId && columnId === leftKey) ||
+                          (tableId === rightTableId && columnId === rightKey);
+
                         return (
                           <Box
                             key={columnId}
                             sx={{
                               width: (1 / array.length) * 100 + "%",
                               cursor: "pointer",
-                              // backgroundColor: hasSelectedCells
-                              //   ? "primary.light"
-                              //   : "transparent",
                               "&:hover": {
                                 backgroundColor: hasSelectedCells
                                   ? "primary.main"
@@ -811,18 +846,28 @@ const PackSchemaView = withPackOperationData(
                               id={columnId}
                               sx={{
                                 fontSize: "0.75rem",
-                                fontWeight: hasSelectedCells ? "700" : "600",
+                                fontWeight: hasSelectedCells
+                                  ? "700"
+                                  : isKeyColumn
+                                  ? "700"
+                                  : "600",
                                 cursor: "pointer",
                                 textTransform: "uppercase",
                                 letterSpacing: "0.5px",
                                 padding: "0px 1px",
                                 color: hasSelectedCells
                                   ? "primary.dark"
+                                  : isKeyColumn
+                                  ? "primary.main"
                                   : "text.primary",
                                 userSelect: "none",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                                 whiteSpace: "nowrap",
+                                fontStyle: isKeyColumn ? "italic" : "normal",
+                                textDecoration: isKeyColumn
+                                  ? "underline"
+                                  : "none",
                               }}
                             />
                           </Box>
@@ -854,8 +899,8 @@ const PackSchemaView = withPackOperationData(
                       const isColumnHovered =
                         hoveredColumn === `${leftTableId}:${columnId}`;
                       const isRowHovered = hoveredMatch === label;
-                      // Left side is empty for 0:1 matches
-                      const isEmpty = label === "zero_to_one_matches";
+                      // Left side is empty for right_unmatched
+                      const isEmpty = label === "right_unmatched";
 
                       return (
                         <Box
@@ -928,8 +973,8 @@ const PackSchemaView = withPackOperationData(
                       const isColumnHovered =
                         hoveredColumn === `${rightTableId}:${columnId}`;
                       const isRowHovered = hoveredMatch === label;
-                      // Right side is empty for 1:0 matches
-                      const isEmpty = label === "one_to_zero_matches";
+                      // Right side is empty for left_unmatched
+                      const isEmpty = label === "left_unmatched";
 
                       return (
                         <Box

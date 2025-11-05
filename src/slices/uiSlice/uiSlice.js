@@ -24,12 +24,16 @@ export const initialState = {
   opsDetailVisableColumns: [],
 
   focusedObject: null,
+  selectedMatches: [],
 };
 
 export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    setSelectedMatches(state, action) {
+      state.selectedMatches = action.payload;
+    },
     setFocusedObject(state, action) {
       state.focusedObject = action.payload;
     },
@@ -131,6 +135,7 @@ export const {
   setShowColumnIndexDetails,
 
   setFocusedObject,
+  setSelectedMatches,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

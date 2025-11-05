@@ -21,6 +21,8 @@ import withPackOperationData from "./withPackOperationData";
 import { StickyTableCell, StyledAlternatingTableRow } from "../ui/Table";
 import { EnhancedTableLabel } from "../TableView";
 import useVirtualPackRows from "../../hooks/useVirtualPackRows";
+import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
+import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 /**
  * Virtualized table view for stack operations
  * Supports synchronized or sequential scrolling/loading of multiple tables
@@ -29,10 +31,12 @@ import useVirtualPackRows from "../../hooks/useVirtualPackRows";
  */
 const PackVirtualTable = ({
   operation,
+  id,
+  name,
   selectedOperationColumnIds,
   // Props passed from withAssociatedAlerts HOC
   hasAlerts,
-  // Props passed directyl from wtihOperationData HOC
+  // Props passed directyl from withPackOperationData HOC
   joinPredicate,
   leftTableId,
   leftKey,
@@ -40,31 +44,17 @@ const PackVirtualTable = ({
   rightTableId,
   rightKey,
   rightSelectedColumns,
+  selectedMatchTypes,
 }) => {
-  const [matchType, setMatchType] = useState("oneToOne");
-
-  const matchOptions = [
-    { value: "oneToOne", label: "One-to-One Matches" },
-    { value: "oneToMany", label: "One-to-Many Matches" },
-    { value: "manyToOne", label: "Many-to-One Matches" },
-    { value: "manyToMany", label: "Many-to-Many Matches" },
-    { value: "oneToZero", label: "Left Unmatched (One-to-Zero)" },
-    { value: "zeroToOne", label: "Right Unmatched (Zero-to-One)" },
-  ];
-
-  const handleMatchTypeChange = (event) => {
-    setMatchType(event.target.value);
-  };
-
   // Memoize column arrays to prevent infinite re-renders
   const leftColumnIds = useMemo(
-    () => [...leftSelectedColumns, leftKey],
-    [leftSelectedColumns, leftKey]
+    () => [...leftSelectedColumns],
+    [leftSelectedColumns]
   );
 
   const rightColumnIds = useMemo(
-    () => [...rightSelectedColumns, rightKey],
-    [rightSelectedColumns, rightKey]
+    () => [...rightSelectedColumns],
+    [rightSelectedColumns]
   );
 
   // const [sortBy, setSortBy] = useState(null);
@@ -77,36 +67,15 @@ const PackVirtualTable = ({
     leftKey, // column id
     rightKey, // column id
     joinPredicate,
-    matchType,
+    selectedMatchTypes,
     50 // page size
   );
   const { data, loading, error, hasMore, loadMore } = results;
   const tableContainerRef = useRef(null);
-  console.log("PackVirtualTable render", { results });
   return (
     <Box>
       <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ flexGrow: 1 }}
-        ></Typography>
-        <FormControl size="small" sx={{ minWidth: 250 }}>
-          <InputLabel id="match-type-label">Match Type</InputLabel>
-          <Select
-            labelId="match-type-label"
-            id="match-type-select"
-            value={matchType}
-            label="Match Type"
-            onChange={handleMatchTypeChange}
-          >
-            {matchOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <EnhancedPackOperationLabel id={id} />
       </Toolbar>
       <TableContainer
         ref={tableContainerRef}
