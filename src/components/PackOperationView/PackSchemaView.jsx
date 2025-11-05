@@ -779,16 +779,40 @@ const PackSchemaView = withPackOperationData(
           </Box>
           <Box
             display={"flex"}
-            flexDirection="column"
+            flexDirection="row"
             width="100%"
             height={"100%"}
           >
             {/* Table headers */}
-            <Box display="flex" width="100%">
+            {/* <Box display="flex" width="100%">
               {[leftTableId, rightTableId].map((tableId) => (
+
+            </Box> */}
+
+            {/* Iterate by table */}
+            {[
+              {
+                tableId: leftTableId,
+                columns: leftColumns,
+                margin: "marginRight",
+              },
+              {
+                tableId: rightTableId,
+                columns: rightColumns,
+                margin: "marginLeft",
+              },
+            ].map(({ tableId, columns, margin }) => (
+              <Box
+                key={tableId}
+                display="flex"
+                flexDirection="column"
+                overflow="auto"
+                width="50%"
+                {...{ [margin]: "2.5px" }}
+              >
+                {/* Table header */}
                 <Box
                   key={tableId}
-                  width="50%"
                   marginRight="2.5px"
                   display={"flex"}
                   flexDirection={"column"}
@@ -801,246 +825,169 @@ const PackSchemaView = withPackOperationData(
                       sx={{ fontSize: "0.875rem" }}
                     />
                   </Box>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    overflow="hidden"
-                    borderBottom={"1px solid black"}
-                  >
-                    {(tableId === leftTableId ? leftColumns : rightColumns).map(
-                      (columnId, index, array) => {
-                        // Check if any cells in this column are selected
-                        const hasSelectedCells = Array.from(
-                          clickedBlockCells
-                        ).some((cellKey) => {
-                          const [tId, colId] = cellKey.split(":");
-                          return tId === tableId && colId === columnId;
-                        });
+                  <Box display="flex" alignItems="center">
+                    {columns.map((columnId) => {
+                      // Check if any cells in this column are selected
+                      const hasSelectedCells = Array.from(
+                        clickedBlockCells
+                      ).some((cellKey) => {
+                        const [tId, colId] = cellKey.split(":");
+                        return tId === tableId && colId === columnId;
+                      });
 
-                        // Check if this is a key column
-                        const isKeyColumn =
-                          (tableId === leftTableId && columnId === leftKey) ||
-                          (tableId === rightTableId && columnId === rightKey);
+                      // Check if this is a key column
+                      const isKeyColumn =
+                        (tableId === leftTableId && columnId === leftKey) ||
+                        (tableId === rightTableId && columnId === rightKey);
 
-                        return (
-                          <Box
-                            key={columnId}
+                      return (
+                        <Box
+                          key={columnId}
+                          sx={{
+                            width: (1 / columns.length) * 100 + "%",
+                            minWidth: "50px",
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor: hasSelectedCells
+                                ? "primary.main"
+                                : "action.hover",
+                            },
+                          }}
+                          onClick={(event) =>
+                            handleColumnClick(event, tableId, columnId)
+                          }
+                          onMouseEnter={() =>
+                            setHoveredColumn(`${tableId}:${columnId}`)
+                          }
+                          onMouseLeave={() => setHoveredColumn(null)}
+                        >
+                          <EnhancedColumnName
+                            id={columnId}
                             sx={{
-                              width: (1 / array.length) * 100 + "%",
+                              fontSize: "0.75rem",
+                              fontWeight: hasSelectedCells
+                                ? "700"
+                                : isKeyColumn
+                                ? "700"
+                                : "600",
                               cursor: "pointer",
-                              "&:hover": {
-                                backgroundColor: hasSelectedCells
-                                  ? "primary.main"
-                                  : "action.hover",
-                              },
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                              padding: "0px 1px",
+                              color: hasSelectedCells
+                                ? "primary.dark"
+                                : isKeyColumn
+                                ? "primary.main"
+                                : "text.primary",
+                              userSelect: "none",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              fontStyle: isKeyColumn ? "italic" : "normal",
+                              textDecoration: isKeyColumn
+                                ? "underline"
+                                : "none",
                             }}
-                            onClick={(event) =>
-                              handleColumnClick(event, tableId, columnId)
-                            }
-                            onMouseEnter={() =>
-                              setHoveredColumn(`${tableId}:${columnId}`)
-                            }
-                            onMouseLeave={() => setHoveredColumn(null)}
-                          >
-                            <EnhancedColumnName
-                              id={columnId}
+                          />
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
+                {/* Iterate by match type within each table */}
+                {Object.entries(getVisibleMatches()).map(
+                  ([label, matchCount]) => {
+                    const isMatchDisabled = !toggledMatches[label];
+
+                    return (
+                      <Box
+                        key={label}
+                        display="flex"
+                        flex={matchCount / totalRows}
+                        width="100%"
+                        borderTop="1px solid #ccc"
+                      >
+                        {columns.map((columnId) => {
+                          const cellKey = `${tableId}:${columnId}:${label}`;
+                          const isClicked = clickedBlockCells.has(cellKey);
+                          const isColumnHovered =
+                            hoveredColumn === `${tableId}:${columnId}`;
+                          const isRowHovered = hoveredMatch === label;
+                          // Determine if cell is empty based on table and match type
+                          const isEmpty =
+                            (tableId === leftTableId &&
+                              label === "right_unmatched") ||
+                            (tableId === rightTableId &&
+                              label === "left_unmatched");
+
+                          return (
+                            <Box
+                              key={columnId}
                               sx={{
-                                fontSize: "0.75rem",
-                                fontWeight: hasSelectedCells
-                                  ? "700"
-                                  : isKeyColumn
-                                  ? "700"
-                                  : "600",
-                                cursor: "pointer",
-                                textTransform: "uppercase",
-                                letterSpacing: "0.5px",
-                                padding: "0px 1px",
-                                color: hasSelectedCells
-                                  ? "primary.dark"
-                                  : isKeyColumn
+                                width: (1 / columns.length) * 100 + "%",
+                                minWidth: "50px",
+                                height: "100%",
+                                border: isEmpty
+                                  ? "1px dashed #ccc"
+                                  : "1px solid #fff",
+                                backgroundColor: isEmpty
+                                  ? isClicked
+                                    ? "primary.light"
+                                    : isColumnHovered || isRowHovered
+                                    ? "#999"
+                                    : "transparent"
+                                  : isMatchDisabled
+                                  ? "#e0e0e0"
+                                  : isClicked
                                   ? "primary.main"
-                                  : "text.primary",
-                                userSelect: "none",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                                fontStyle: isKeyColumn ? "italic" : "normal",
-                                textDecoration: isKeyColumn
-                                  ? "underline"
-                                  : "none",
+                                  : isColumnHovered || isRowHovered
+                                  ? "#999"
+                                  : "#ccc",
+                                cursor: isEmpty
+                                  ? "pointer"
+                                  : isMatchDisabled
+                                  ? "not-allowed"
+                                  : "pointer",
+                                opacity: isEmpty
+                                  ? isClicked
+                                    ? 0.6
+                                    : 0.3
+                                  : isMatchDisabled
+                                  ? 0.5
+                                  : isClicked
+                                  ? 0.8
+                                  : 1,
+                                "&:hover": {
+                                  backgroundColor: isEmpty
+                                    ? isClicked
+                                      ? "primary.dark"
+                                      : "#999"
+                                    : isMatchDisabled
+                                    ? "#e0e0e0"
+                                    : isClicked
+                                    ? "primary.dark"
+                                    : "#999",
+                                },
                               }}
-                            />
-                          </Box>
-                        );
-                      }
-                    )}
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-
-            {/* Iterate by match type first */}
-            {Object.entries(getVisibleMatches()).map(([label, matchCount]) => {
-              const isMatchDisabled = !toggledMatches[label];
-
-              return (
-                <Box
-                  key={label}
-                  display="flex"
-                  flex={matchCount / totalRows}
-                  width="100%"
-                  borderTop="1px solid #ccc"
-                >
-                  {/* Left table columns for this match type */}
-                  <Box display="flex" width="50%" marginRight="2.5px">
-                    {leftColumns.map((columnId) => {
-                      const cellKey = `${leftTableId}:${columnId}:${label}`;
-                      const isClicked = clickedBlockCells.has(cellKey);
-                      const isColumnHovered =
-                        hoveredColumn === `${leftTableId}:${columnId}`;
-                      const isRowHovered = hoveredMatch === label;
-                      // Left side is empty for right_unmatched
-                      const isEmpty = label === "right_unmatched";
-
-                      return (
-                        <Box
-                          key={columnId}
-                          sx={{
-                            width: (1 / leftColumns.length) * 100 + "%",
-                            height: "100%",
-                            border: isEmpty
-                              ? "1px dashed #ccc"
-                              : "1px solid #fff",
-                            backgroundColor: isEmpty
-                              ? isClicked
-                                ? "primary.light"
-                                : isColumnHovered || isRowHovered
-                                ? "#999"
-                                : "transparent"
-                              : isMatchDisabled
-                              ? "#e0e0e0"
-                              : isClicked
-                              ? "primary.main"
-                              : isColumnHovered || isRowHovered
-                              ? "#999"
-                              : "#ccc",
-                            cursor: isEmpty
-                              ? "pointer"
-                              : isMatchDisabled
-                              ? "not-allowed"
-                              : "pointer",
-                            opacity: isEmpty
-                              ? isClicked
-                                ? 0.6
-                                : 0.3
-                              : isMatchDisabled
-                              ? 0.5
-                              : isClicked
-                              ? 0.8
-                              : 1,
-                            "&:hover": {
-                              backgroundColor: isEmpty
-                                ? isClicked
-                                  ? "primary.dark"
-                                  : "#999"
-                                : isMatchDisabled
-                                ? "#e0e0e0"
-                                : isClicked
-                                ? "primary.dark"
-                                : "#999",
-                            },
-                          }}
-                          onClick={(event) => {
-                            if (!isMatchDisabled) {
-                              handleBlockCellClick(
-                                event,
-                                leftTableId,
-                                columnId,
-                                label
-                              );
-                            }
-                          }}
-                        ></Box>
-                      );
-                    })}
-                  </Box>
-
-                  {/* Right table columns for this match type */}
-                  <Box display="flex" width="50%" marginLeft="2.5px">
-                    {rightColumns.map((columnId) => {
-                      const cellKey = `${rightTableId}:${columnId}:${label}`;
-                      const isClicked = clickedBlockCells.has(cellKey);
-                      const isColumnHovered =
-                        hoveredColumn === `${rightTableId}:${columnId}`;
-                      const isRowHovered = hoveredMatch === label;
-                      // Right side is empty for left_unmatched
-                      const isEmpty = label === "left_unmatched";
-
-                      return (
-                        <Box
-                          key={columnId}
-                          sx={{
-                            width: (1 / rightColumns.length) * 100 + "%",
-                            height: "100%",
-                            border: isEmpty
-                              ? "1px dashed #ccc"
-                              : "1px solid #fff",
-                            backgroundColor: isEmpty
-                              ? isClicked
-                                ? "primary.light"
-                                : isColumnHovered || isRowHovered
-                                ? "#999"
-                                : "transparent"
-                              : isMatchDisabled
-                              ? "#e0e0e0"
-                              : isClicked
-                              ? "primary.main"
-                              : isColumnHovered || isRowHovered
-                              ? "#999"
-                              : "#ccc",
-                            cursor: isEmpty
-                              ? "pointer"
-                              : isMatchDisabled
-                              ? "not-allowed"
-                              : "pointer",
-                            opacity: isEmpty
-                              ? isClicked
-                                ? 0.6
-                                : 0.3
-                              : isMatchDisabled
-                              ? 0.5
-                              : isClicked
-                              ? 0.8
-                              : 1,
-                            "&:hover": {
-                              backgroundColor: isEmpty
-                                ? isClicked
-                                  ? "primary.dark"
-                                  : "#999"
-                                : isMatchDisabled
-                                ? "#e0e0e0"
-                                : isClicked
-                                ? "primary.dark"
-                                : "#999",
-                            },
-                          }}
-                          onClick={(event) => {
-                            if (!isMatchDisabled) {
-                              handleBlockCellClick(
-                                event,
-                                rightTableId,
-                                columnId,
-                                label
-                              );
-                            }
-                          }}
-                        ></Box>
-                      );
-                    })}
-                  </Box>
-                </Box>
-              );
-            })}
+                              onClick={(event) => {
+                                if (!isMatchDisabled) {
+                                  handleBlockCellClick(
+                                    event,
+                                    tableId,
+                                    columnId,
+                                    label
+                                  );
+                                }
+                              }}
+                            ></Box>
+                          );
+                        })}
+                      </Box>
+                    );
+                  }
+                )}
+              </Box>
+            ))}
           </Box>
         </Box>
       </Box>
