@@ -4,6 +4,7 @@ import {
   selectColumnById,
 } from "../columnsSlice";
 import { isTableId } from "../tablesSlice";
+import { selectColumnIdMatrixByOperationId } from "../columnsSlice/columnSelectors";
 
 /**
  * Selects an operation by its ID from the Redux state.
@@ -322,24 +323,19 @@ export const selectPackOperationColumnCount = createSelector(
  */
 export const selectStackOperationColumnCount = createSelector(
   [
-    (state, operationId) => selectOperation(state, operationId)?.children,
-    (state) => state.columns.data,
+    (state, operationId) =>
+      selectColumnIdMatrixByOperationId(state, operationId),
   ],
-  (childIds, columnsData) => {
-    if (!childIds || childIds.length === 0) return 0;
+  (columnIdMatrix) => {
+    if (!columnIdMatrix) return 0;
 
     // Group columns by tableId and count columns per table
-    const columnCountsByTable = new Map();
-
-    Object.values(columnsData).forEach((column) => {
-      if (childIds.includes(column.tableId)) {
-        const currentCount = columnCountsByTable.get(column.tableId) || 0;
-        columnCountsByTable.set(column.tableId, currentCount + 1);
-      }
-    });
+    const counts = columnIdMatrix.reduce(
+      (max, tableIds) => (tableIds.length > max ? tableIds.length : max),
+      0
+    );
 
     // Return the maximum column count across all tables
-    const counts = Array.from(columnCountsByTable.values());
-    return counts.length > 0 ? Math.max(...counts) : 0;
+    return counts;
   }
 );

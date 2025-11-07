@@ -156,7 +156,7 @@ export default function* updateOperationsWatcher() {
     yield handleEmptyTable(columnIds);
 
     // If excluding columns from tables that are children of operations,
-    // we need to re-create the DB views associated with those operations.
+    // we may need to re-calculate
     yield handleChildTableColumnExclusion(columnIds);
   });
 }
