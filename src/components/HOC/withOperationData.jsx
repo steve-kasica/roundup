@@ -28,6 +28,7 @@ import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
+import { materializeOperationRequest } from "../../sagas/materializeOperationSaga/actions";
 import withAssociatedAlerts from "./withAssociatedAlerts";
 
 export default function withOperationData(WrappedComponent) {
@@ -144,6 +145,11 @@ export default function withOperationData(WrappedComponent) {
       [dispatch]
     );
 
+    const materializeOperation = useCallback(
+      () => dispatch(materializeOperationRequest({ operationId: id })),
+      [dispatch, id]
+    );
+
     return (
       <WrappedComponent
         // Pass along props directly from the parent component
@@ -206,6 +212,7 @@ export default function withOperationData(WrappedComponent) {
             })
           )
         }
+        materializeOperation={materializeOperation}
         // Callback function related to columns
         selectColumns={selectColumns}
         excludeColumns={excludeColumns}

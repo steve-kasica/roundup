@@ -58,6 +58,7 @@ export default function Operation(operationType, children, columnIds = []) {
     joinPredicate: OPERATION_TYPE_PACK ? JOIN_PREDICATES.EQUALS : undefined,
     joinKey1: null,
     joinKey2: null,
+    doesViewExist: false, // whether the materialized view for this operation exists
   };
 }
 

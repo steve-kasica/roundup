@@ -15,7 +15,7 @@ import {
 import { EnhancedPackVirtualTable } from "../../components/PackOperationView";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../components/OperationView";
-import { EnhancedStackVirtualizedTable } from "../../components/StackOperationView/StackVirtualizedTable";
+import { EnhancedStackRows } from "../../components/StackOperationView/StackRows";
 
 const VIEW_TABLE = "TABLE";
 const VIEW_STACK = "STACK";
@@ -64,7 +64,7 @@ const TableWindow = ({ id }) => {
         ) : viewMode === VIEW_NO_OP ? (
           <EnhancedTableRows id={focusedOperation.children[0]} />
         ) : viewMode === VIEW_STACK ? (
-          <EnhancedStackVirtualizedTable id={id} />
+          <EnhancedStackRows id={id} />
         ) : viewMode === VIEW_PACK ? (
           <EnhancedPackVirtualTable id={id} />
         ) : (

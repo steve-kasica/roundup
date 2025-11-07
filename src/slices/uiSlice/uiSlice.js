@@ -25,12 +25,25 @@ export const initialState = {
 
   focusedObject: null,
   selectedMatches: [],
+  selectedColumnIndices: [],
 };
 
 export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    setSelectedTables(state, action) {
+      const tableIds = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.selectedTables = tableIds;
+    },
+    setSelectedColumnIndices(state, action) {
+      const columnIndices = Array.isArray(action.payload)
+        ? action.payload
+        : [action.payload];
+      state.selectedColumnIndices = columnIndices;
+    },
     setSelectedMatches(state, action) {
       state.selectedMatches = action.payload;
     },
@@ -62,13 +75,6 @@ export const uiSlice = createSlice({
     },
     clearPeekedTable(state) {
       state.peekedTable = initialState.peekedTable;
-    },
-
-    setSelectedTables(state, action) {
-      const tableIds = Array.isArray(action.payload)
-        ? action.payload
-        : [action.payload];
-      state.selectedTables = tableIds;
     },
     appendToSelectedTables(state, action) {
       const tableIds = Array.isArray(action.payload)
@@ -117,6 +123,7 @@ export const {
   setDrawerContents,
   setDialogContent,
   setLevelOfDetail,
+  setSelectedColumnIndices,
 
   setPeekedTable,
   clearPeekedTable,

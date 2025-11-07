@@ -10,6 +10,7 @@ import {
 import { selectTablesById } from "../../slices/tablesSlice";
 import { CREATION_MODE_INITIALIZATION } from ".";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
+import { materializeOperationSuccess } from "../materializeOperationSaga/actions";
 
 // Create a shared function for handling both success and failure operations
 const handleOperations = function* (action) {
@@ -96,7 +97,24 @@ export default function* createColumnsWatcher() {
     }
   });
 
-  // // If an operation update fails, we still want to create columns for it
-  // // so the user can see the error in the UI
-  // yield takeEvery(updateOperationsFailure.type, handleOperationUpdates);
+  yield takeEvery(materializeOperationSuccess.type, function* (action) {
+    const { operationId } = action.payload;
+    const operation = yield select((state) =>
+      selectOperation(state, operationId)
+    );
+    if (operation.operationType === OPERATION_TYPE_NO_OP) {
+      return; // No columns to create for NO-OP operations
+    }
+    yield put(
+      createColumnsRequest({
+        mode: CREATION_MODE_INITIALIZATION,
+        columnInfo: Array.from({ length: operation.columnCount }).map(
+          (_, index) => ({
+            parentId: operationId,
+            index,
+          })
+        ),
+      })
+    );
+  });
 }

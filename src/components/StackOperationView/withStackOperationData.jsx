@@ -2,7 +2,10 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
 import { selectColumnIdMatrixByOperationId } from "../../slices/columnsSlice";
-import { selectOperationChildren } from "../../slices/operationsSlice";
+import {
+  selectOperationChildren,
+  selectStackOperationRowRanges,
+} from "../../slices/operationsSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import withOperationData from "../HOC/withOperationData";
 import {
@@ -86,11 +89,18 @@ export default function withStackOperationData(WrappedComponent) {
         .filter(({ columnIds }) => columnIds.length > 0);
     }, [operation.children, columnIdMatrix, selectedColumnIds]);
 
-    const columnCount = useSelector((state) =>
-      selectStackOperationColumnCount(state, id)
-    );
-    const rowCount = useSelector((state) =>
-      selectStackOperationRowCount(state, id)
+    const columnCount = useSelector((state) => {
+      return (
+        operation.columnCount || selectStackOperationColumnCount(state, id)
+      );
+    });
+
+    const rowCount = useSelector((state) => {
+      return operation.rowCount || selectStackOperationRowCount(state, id);
+    });
+
+    const rowRanges = useSelector((state) =>
+      selectStackOperationRowRanges(state, id)
     );
 
     const selectedTableIds = useMemo(() => {
@@ -119,6 +129,7 @@ export default function withStackOperationData(WrappedComponent) {
         childObjects={childObjects}
         rowCount={rowCount}
         columnCount={columnCount}
+        rowRanges={rowRanges}
         // Props related to the operation's columns
         selectedColumnIndices={selectedColumnIndices}
         // Props related to the operation's children tables

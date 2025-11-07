@@ -16,6 +16,10 @@ import {
   createColumnsSuccess,
   CREATION_MODE_INSERTION,
 } from "../createColumnsSaga";
+import {
+  materializeOperationSuccess,
+  materializeOperationFailure,
+} from "../materializeOperationSaga/actions";
 
 const handleChildTableColumnExclusion = function* (columnIds) {
   const tableIds = yield select((state) => {
@@ -158,5 +162,34 @@ export default function* updateOperationsWatcher() {
     // If excluding columns from tables that are children of operations,
     // we may need to re-calculate
     yield handleChildTableColumnExclusion(columnIds);
+  });
+
+  yield takeLatest(materializeOperationSuccess.type, function* (action) {
+    const { operationId, dimensions } = action.payload;
+    yield put(
+      updateOperationsRequest({
+        operationUpdates: [
+          {
+            id: operationId,
+            rowCount: dimensions.rowCount,
+            columnCount: dimensions.columnCount,
+            doesViewExist: true,
+          },
+        ],
+      })
+    );
+  });
+  yield takeLatest(materializeOperationFailure.type, function* (action) {
+    const { operationId } = action.payload;
+    yield put(
+      updateOperationsRequest({
+        operationUpdates: [
+          {
+            id: operationId,
+            doesViewExist: true,
+          },
+        ],
+      })
+    );
   });
 }

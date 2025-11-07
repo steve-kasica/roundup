@@ -339,3 +339,43 @@ export const selectStackOperationColumnCount = createSelector(
     return counts;
   }
 );
+
+/**
+ * Memoized selector to calculate row ranges for each child in a stack operation.
+ *
+ * Returns a Map where each key is a child ID and each value is a tuple [start, end]
+ * representing the row range for that child in the stacked result.
+ *
+ * This selector is memoized using createSelector, which means the calculation is
+ * cached and only recomputed when dependencies change. Importantly, this memoization
+ * is shared across all component instances that use this selector - if multiple
+ * components call this selector with the same arguments, they will receive the same
+ * cached result without triggering a recalculation.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {string|number} operationId - The unique identifier of the stack operation.
+ * @returns {Map} A Map of child IDs to their [start, end] row ranges.
+ */
+export const selectStackOperationRowRanges = createSelector(
+  [
+    (state, operationId) => selectOperation(state, operationId)?.children,
+    (state) => state.tables.data,
+    (state) => state.operations.data,
+  ],
+  (children, tablesData, operationsData) => {
+    if (!children) return new Map();
+
+    const rowRanges = [];
+    for (let i = 0; i < children.length; i++) {
+      const childId = children[i];
+      const rowCount =
+        (isTableId(childId)
+          ? tablesData[childId]?.rowCount
+          : operationsData[childId]?.rowCount) || 0;
+      const start = i === 0 ? 0 : rowRanges[i - 1][1][1];
+      const end = start + rowCount;
+      rowRanges.push([childId, [start, end]]);
+    }
+    return new Map(rowRanges);
+  }
+);

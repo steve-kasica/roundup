@@ -1,5 +1,8 @@
 import { call, put, select } from "redux-saga/effects";
-import { instantiateViewFailure, instantiateViewSuccess } from "./actions";
+import {
+  materializeOperationFailure,
+  materializeOperationSuccess,
+} from "./actions";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
@@ -12,7 +15,7 @@ import {
   getTableDimensions,
 } from "../../lib/duckdb";
 
-export default function* instantiateViewWorker(action) {
+export default function* materializeOperationWorker(action) {
   let { operationId } = action.payload;
 
   const operation = yield select((state) =>
@@ -29,7 +32,7 @@ export default function* instantiateViewWorker(action) {
     }
   } catch (error) {
     yield put(
-      instantiateViewFailure({
+      materializeOperationFailure({
         operationId,
         error: error.message,
       })
@@ -40,7 +43,7 @@ export default function* instantiateViewWorker(action) {
   const dimensions = yield call(getTableDimensions, operation.id);
 
   yield put(
-    instantiateViewSuccess({
+    materializeOperationSuccess({
       operationId,
       dimensions,
     })

@@ -8,6 +8,7 @@ import {
 } from "../updateOperationsSaga";
 import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
 import { createOperationsFailure } from "../createOperationsSaga/actions";
+import { materializeOperationFailure } from "../materializeOperationSaga/actions";
 
 export default function* deleteColumnsSaga() {
   yield takeEvery(deleteColumnsRequest.type, deleteColumnsWorker);
@@ -49,16 +50,14 @@ export default function* deleteColumnsSaga() {
     }
   });
 
-  // If an operation creation has failed, delete any columns associated with that operation
-  yield takeEvery(createOperationsFailure.type, function* (action) {
-    const { failedCreations } = action.payload;
-    if (failedCreations.length > 0) {
-      const columnsToDelete = yield select((state) =>
-        failedCreations.flatMap(({ id }) => selectColumnIdsByTableId(state, id))
-      );
-      if (columnsToDelete.length > 0) {
-        yield put(deleteColumnsRequest({ columnIds: columnsToDelete }));
-      }
+  // If an operation has failed to materialize, delete any columns associated with that operation
+  yield takeEvery(materializeOperationFailure.type, function* (action) {
+    const { operationId } = action.payload;
+    const columnsToDelete = yield select((state) =>
+      selectColumnIdsByTableId(state, operationId)
+    );
+    if (columnsToDelete.length > 0) {
+      yield put(deleteColumnsRequest({ columnIds: columnsToDelete }));
     }
   });
 }
