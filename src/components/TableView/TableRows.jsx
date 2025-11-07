@@ -70,6 +70,9 @@ const TableRows = ({
   showHeader = true,
   columnWidths = {}, // Optional prop for custom column widths
 }) => {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableRows for table:", table?.id);
+  }
   const tableContainerRef = useRef(null);
 
   /**

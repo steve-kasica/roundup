@@ -11,6 +11,13 @@ const TableHeader = ({
   keyColumnId,
   onColumnClick,
 }) => {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableHeader:", {
+      keyColumnId,
+      columnCount,
+      activeColumnIds,
+    });
+  }
   const columnWidth = (1 / columnCount) * 100 + "%";
 
   return (

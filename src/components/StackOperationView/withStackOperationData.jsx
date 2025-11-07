@@ -106,6 +106,7 @@ export default function withStackOperationData(WrappedComponent) {
         selectedColumnIds={selectedColumnIds}
         // Props specific to Stack operations
         childObjects={childObjects}
+        rowCount={operation.rowCount.toLocaleString()}
         // Props related to the operation's columns
         selectedColumnIndices={selectedColumnIndices}
         // Props related to the operation's children tables

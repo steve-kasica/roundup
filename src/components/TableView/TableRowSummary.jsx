@@ -177,6 +177,9 @@ function TableRowSummary({
   // Props from TableDragContainer
   dragDropRef,
 }) {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableRowSummary for table:", table?.id);
+  }
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 

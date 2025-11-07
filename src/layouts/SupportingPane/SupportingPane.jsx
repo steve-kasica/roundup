@@ -22,6 +22,7 @@ import {
   selectRootOperation,
 } from "../../slices/operationsSlice";
 import { selectFocusedColumnIds } from "../../slices/columnsSlice";
+import { selectFocusedObject } from "../../slices/uiSlice/uiSliceSelectors";
 // Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -45,6 +46,7 @@ export default function SupportingPane() {
     const id = selectRootOperation(state);
     return id ? selectOperation(state, id) : null;
   });
+  const focusedObject = useSelector(selectFocusedObject);
   const focusedColumns = useSelector(selectFocusedColumnIds);
   const isOpen = tables.length > 0;
 
@@ -76,6 +78,7 @@ export default function SupportingPane() {
         ) : (
           <PanelGroup autoSaveId="SupportingPane" direction="horizontal">
             <Panel
+              id="left-sidebar-panel"
               collapsible={true}
               minSize={10}
               defaultSize={25}
@@ -84,10 +87,11 @@ export default function SupportingPane() {
             >
               <PanelGroup autoSaveId="LeftSidebarPane" direction="vertical">
                 <Panel
+                  id="left-sidebar-main"
                   collapsible={true}
                   minSize={10}
-                  defaultSize={rootOperation ? 75 : 100}
-                  maxSize={90}
+                  defaultSize={rootOperation ? 70 : 100}
+                  maxSize={100}
                   order={1}
                   style={{ padding: "5px" }}
                 >
@@ -99,8 +103,11 @@ export default function SupportingPane() {
                       sx={{ height: "2px", width: "100%" }}
                     />
                     <Panel
+                      id="composite-table-schema-panel"
                       minSize={10}
+                      defaultSize={30}
                       collapsible={false}
+                      order={2}
                       style={{ padding: "5px" }}
                     >
                       <Typography variant="window-label">
@@ -113,29 +120,38 @@ export default function SupportingPane() {
               </PanelGroup>
             </Panel>
             <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
-            <Panel order={2}>
+            <Panel id="main-content-panel" order={2}>
               <PanelGroup autoSaveId="MainContentPane" direction="vertical">
                 <Panel
+                  id="schema-window-panel"
                   collapsible={true}
-                  minSize={10}
                   defaultSize={25}
-                  // defaultSize={25}
-                  maxSize={75}
+                  maxSize={100}
                   order={1}
                   style={{ padding: "5px", overflow: "auto" }}
                 >
                   <SchemaWindow />
                 </Panel>
-                <StyledPanelResizeHandle
-                  sx={{ height: "2px", width: "100%" }}
-                />
-                <Panel
-                  order={2}
-                  collapsible={true}
-                  style={{ display: "flex", padding: "5px" }}
-                >
-                  <TableWindow />
-                </Panel>
+                {focusedObject && (
+                  <>
+                    <StyledPanelResizeHandle
+                      sx={{ height: "2px", width: "100%" }}
+                    />
+                    <Panel
+                      id="table-window-panel"
+                      order={2}
+                      collapsible={true}
+                      defaultSize={75}
+                      style={{
+                        display: "flex",
+                        padding: "5px",
+                        overflow: "auto",
+                      }}
+                    >
+                      <TableWindow id={focusedObject} />
+                    </Panel>
+                  </>
+                )}
               </PanelGroup>
             </Panel>
             {focusedColumns && focusedColumns.length > 0 && (
@@ -144,6 +160,7 @@ export default function SupportingPane() {
                   sx={{ width: "2px", height: "100%" }}
                 />
                 <Panel
+                  id="column-window-panel"
                   order={3}
                   collapsible={true}
                   collapsed={!(focusedColumns && focusedColumns.length > 0)}

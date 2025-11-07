@@ -38,10 +38,6 @@ export default function* createColumnsWorker(action) {
       if (!tableIdToColumnNames.has(parentId)) {
         // Fetch column names for this TABLE or VIEW from the DB only once
         const columnNames = yield call(getTableColumnNames, parentId);
-        console.log(
-          `Fetched column names for table/view ${parentId}:`,
-          columnNames
-        );
         tableIdToColumnNames.set(parentId, columnNames);
       }
       try {

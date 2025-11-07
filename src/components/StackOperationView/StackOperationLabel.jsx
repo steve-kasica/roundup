@@ -6,8 +6,8 @@ import withStackOperationData from "./withStackOperationData";
 const StackOperationLabel = ({
   id,
   name,
+  rowCount,
   columnCount = 0,
-  rowCount = 0,
   loading = false,
 
   // Props defined in `withAssociatedAlerts`
@@ -33,7 +33,8 @@ const StackOperationLabel = ({
         {name || id}{" "}
         {includeDimensions && (
           <small style={{ color: hasAlerts ? "inherit" : undefined }}>
-            ({columnCount.toLocaleString()} x {rowCount.toLocaleString()})
+            ({columnCount.toLocaleString()} x{" "}
+            {rowCount?.toLocaleString() || "??"})
           </small>
         )}
         {" | "}

@@ -19,6 +19,9 @@ const TableDragContainer = ({
   dragType,
   canDrag = true,
 }) => {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableDragContainer for table:", table?.id);
+  }
   const dispatch = useDispatch();
   const ref = useRef(null);
 

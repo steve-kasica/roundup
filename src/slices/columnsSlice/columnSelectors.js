@@ -480,6 +480,22 @@ export const selectIsColumnHoverTarget = createSelector(
 );
 
 /**
+ * Selects all sibling column IDs for a given column (all columns in the same table except the specified column).
+ *
+ * @param {Object} state - The Redux state.
+ * @param {string} tableId - The ID of the table.
+ * @param {string} columnId - The ID of the column to exclude.
+ * @returns {Array<string>} - An array of sibling column IDs.
+ */
+export const selectSiblingColumnIds = createSelector(
+  [
+    (state, tableId) => selectColumnIdsByTableId(state, tableId),
+    (_, __, columnId) => columnId,
+  ],
+  (allColumnIds, columnId) => allColumnIds.filter((id) => id !== columnId)
+);
+
+/**
  * Select a matrix of column IDs for all tables in an operation.
  *
  * This selector creates a 2D array (matrix) where each row represents a table's column IDs,

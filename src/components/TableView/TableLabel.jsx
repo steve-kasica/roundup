@@ -16,6 +16,9 @@ const TableLabel = ({
   includeIcon = true,
   sx = {},
 }) => {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableLabel for table:", table?.id);
+  }
   return (
     <Stack
       direction={"row"}

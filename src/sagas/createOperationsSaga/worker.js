@@ -42,6 +42,7 @@ import { createOperationsSuccess, createOperationsFailure } from "./actions";
 
 import { group } from "d3";
 import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
+import { selectStackOperationRowCount } from "../../slices/operationsSlice/operationsSelectors";
 import { setFocusedObject } from "../../slices/uiSlice";
 import {
   testPackOperationForFatalErrors,
@@ -122,7 +123,7 @@ export default function* createOperationsWorker(action) {
         console.warn(`Fatal alert creating Pack operation ${operation.id}:`);
         failedCreations.push(operation);
       }
-      operation.rowCount = null; // TODO: this is calculatable
+      operation.rowCount = null; // TODO: is this calculatable?
       operation.columnCount = yield select((state) =>
         calcPackColumnCount(state, childIds)
       );
@@ -136,14 +137,16 @@ export default function* createOperationsWorker(action) {
         console.warn(`Fatal alert creating Stack operation ${operation.id}:`);
         failedCreations.push(operation);
       }
-      operation.rowCount = undefined; // TODO: this is calculatable
+      operation.rowCount = yield select((state) =>
+        selectStackOperationRowCount(state, operation.id)
+      );
       operation.columnCount = yield select((state) =>
         calcStackColumnCount(state, childIds)
       );
       raisedAlerts.push(...fatalErrors, ...warnings);
     } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
       // NO_OP operations do not require a database view
-      operation.rowCount = undefined; // TODO: this is calculatable
+      operation.rowCount = null; // TODO: this is calculatable
       operation.columnCount = yield select((state) =>
         calcStackColumnCount(state, childIds)
       );
@@ -155,9 +158,8 @@ export default function* createOperationsWorker(action) {
   const combinedOperations = [...successfulCreations, ...failedCreations];
 
   yield put(addOperationsToSlice(combinedOperations));
-  yield put(
-    setFocusedObject(combinedOperations[combinedOperations.length - 1].id)
-  ); // focus the last operation created
+  const focusedObjectId = combinedOperations[combinedOperations.length - 1].id;
+  yield put(setFocusedObject(focusedObjectId)); // focus the last operation created
 
   if (successfulCreations.length > 0) {
     yield put(

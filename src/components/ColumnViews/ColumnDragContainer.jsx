@@ -1,12 +1,6 @@
 /* eslint-disable react/prop-types */
 
-import {
-  useRef,
-  cloneElement,
-  isValidElement,
-  useMemo,
-  useEffect,
-} from "react";
+import { useRef, cloneElement, isValidElement, useEffect } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import withColumnData from "./withColumnData";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,7 +15,7 @@ import {
 } from "../../slices/columnsSlice/columnsSlice";
 import {
   selectIsColumnDropTarget,
-  selectColumnIdsByTableId,
+  selectSiblingColumnIds,
 } from "../../slices/columnsSlice/columnSelectors";
 
 /**
@@ -35,10 +29,9 @@ const ColumnDragContainer = withColumnData(
     const dragType = `${column.tableId}_Column`; // Unique drag type per table
 
     // Get sibling column IDs (all columns in table except current one)
-    const siblingColumnIds = useSelector((state) => {
-      const allColumnIds = selectColumnIdsByTableId(state, column?.tableId);
-      return allColumnIds.filter((id) => id !== column?.id);
-    });
+    const siblingColumnIds = useSelector((state) =>
+      selectSiblingColumnIds(state, column?.tableId, column?.id)
+    );
 
     // Check if this column is a drop target
     const canDropHere = useSelector((state) =>

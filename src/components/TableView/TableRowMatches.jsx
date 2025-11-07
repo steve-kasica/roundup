@@ -62,6 +62,9 @@ const TableRowMatches = ({
   onBlockClick = () => {},
   onBlockCellClick = () => {},
 }) => {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableBlock for table:", table?.id);
+  }
   return (
     <Box
       display="flex"

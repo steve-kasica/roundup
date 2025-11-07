@@ -17,6 +17,7 @@ import {
   testStackOperationForFatalErrors,
 } from "../../slices/alertsSlice/Alerts/Errors/utilities";
 import { selectActiveColumnCountByTableId } from "../../slices/columnsSlice";
+import { selectStackOperationRowCount } from "../../slices/operationsSlice/operationsSelectors";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
@@ -25,10 +26,9 @@ export default function* updateOperationsWorker(action) {
   const { operationUpdates } = action.payload;
 
   for (let operationUpdate of operationUpdates) {
+    const { id } = operationUpdate;
     const keys = Object.keys(operationUpdate);
-    const operation = yield select((state) =>
-      selectOperation(state, operationUpdate.id)
-    );
+    const operation = yield select((state) => selectOperation(state, id));
 
     // If we're changing the operationType or children, then we need to re-create the view
     if (
@@ -53,7 +53,9 @@ export default function* updateOperationsWorker(action) {
         operationUpdate.columnCount = yield select((state) =>
           calcStackColumnCount(state, children)
         );
-        operationUpdate.rowCount = null;
+        operationUpdate.rowCount = yield select((state) =>
+          selectStackOperationRowCount(state, id, children)
+        );
         const { isAllPassing, fatalErrors, warnings } =
           testStackOperationForFatalErrors(
             {

@@ -73,6 +73,9 @@ const TableSchema = ({
   alertIds, // eslint-disable-line no-unused-vars
   hasAlerts,
 }) => {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableSchema for table:", table?.id);
+  }
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
   const columnContainerRef = useRef(null);

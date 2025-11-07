@@ -22,6 +22,9 @@ function TableBlock({
   // Props passed directly from parent
   sx = {},
 }) {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableBlock for table:", table?.id);
+  }
   const ticks = Array.from(
     {
       length:

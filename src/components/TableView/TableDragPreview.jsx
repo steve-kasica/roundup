@@ -8,6 +8,9 @@ import { selectTablesById } from "../../slices/tablesSlice";
  * Custom drag preview component that shows multiple tables stacked
  */
 function TableDragPreview({ tableIds }) {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableDragPreview for tables:", tableIds);
+  }
   const primaryTableId = tableIds[tableIds.length - 1];
   const primaryTable = useSelector((state) =>
     selectTablesById(state, primaryTableId)

@@ -228,3 +228,25 @@ export const selectOperationQueryData = (state, operationData) => {
 
   return parent;
 };
+
+export const selectStackOperationRowCount = createSelector(
+  [
+    (state, operationId, children) =>
+      children || selectOperation(state, operationId)?.children,
+    (state) => state.tables.data,
+    (state) => state.operations.data,
+  ],
+  (children, tablesData, operationsData) => {
+    if (!children) return 0;
+
+    return children.reduce((total, id) => {
+      let childRowCount = 0;
+      if (isTableId(id)) {
+        childRowCount = tablesData[id]?.rowCount || 0;
+      } else {
+        childRowCount = operationsData[id]?.rowCount || 0;
+      }
+      return total + childRowCount;
+    }, 0);
+  }
+);

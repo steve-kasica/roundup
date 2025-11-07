@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Alert, Box, Divider, Stack, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
@@ -16,22 +17,19 @@ import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../components/OperationView";
 import { EnhancedStackVirtualizedTable } from "../../components/StackOperationView/StackVirtualizedTable";
 
-const VIEW_EMPTY = "EMPTY_SELECTION";
 const VIEW_TABLE = "TABLE";
 const VIEW_STACK = "STACK";
 const VIEW_PACK = "PACK";
 const VIEW_NO_OP = "NO_OP";
 const VIEW_UNKNOWN = "UNKNOWN";
 
-const TableWindow = () => {
-  const focusedObjectId = useSelector((state) => state.ui.focusedObject);
-  const isFocusedTable = isTableId(focusedObjectId);
+const TableWindow = ({ id }) => {
+  const isFocusedTable = isTableId(id);
   const focusedOperation = useSelector((state) =>
-    isFocusedTable ? null : selectOperation(state, focusedObjectId)
+    isFocusedTable ? null : selectOperation(state, id)
   );
-  const selectedColumns = useSelector(selectSelectedColumns);
 
-  const viewMode = (function (opType, areSelectedColumns) {
+  const viewMode = (function (opType) {
     if (isFocusedTable) {
       return VIEW_TABLE;
     } else if (opType === OPERATION_TYPE_STACK) {
@@ -43,7 +41,7 @@ const TableWindow = () => {
     } else {
       return VIEW_UNKNOWN;
     }
-  })(focusedOperation?.operationType, selectedColumns.length > 0);
+  })(focusedOperation?.operationType);
 
   return (
     <Box
@@ -62,13 +60,13 @@ const TableWindow = () => {
         flexDirection="column"
       >
         {viewMode === VIEW_TABLE ? (
-          <EnhancedTableRows id={focusedObjectId} />
+          <EnhancedTableRows id={id} />
         ) : viewMode === VIEW_NO_OP ? (
           <EnhancedTableRows id={focusedOperation.children[0]} />
         ) : viewMode === VIEW_STACK ? (
-          <EnhancedStackVirtualizedTable id={focusedObjectId} />
+          <EnhancedStackVirtualizedTable id={id} />
         ) : viewMode === VIEW_PACK ? (
-          <EnhancedPackVirtualTable id={focusedObjectId} />
+          <EnhancedPackVirtualTable id={id} />
         ) : (
           <Alert severity="error">
             <pre>
@@ -76,7 +74,7 @@ const TableWindow = () => {
                 {
                   viewMode: viewMode || null,
                   focusedOperation: focusedOperation || null,
-                  focusedObjectId: focusedObjectId || null,
+                  id: id || null,
                 },
                 null,
                 2
