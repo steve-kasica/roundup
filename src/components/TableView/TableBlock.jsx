@@ -93,7 +93,6 @@ function TableBlock({
           <EnhancedColumnTick
             key={`${columnId}-${index}`} // Ensure unique key even when columnId is null
             id={columnId}
-            sx={{ width: `${1}%` }}
           />
         )
       )}
