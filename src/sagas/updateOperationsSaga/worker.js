@@ -6,10 +6,6 @@ import {
   selectOperation,
   updateOperations as updateOperationsSlice,
 } from "../../slices/operationsSlice";
-import {
-  calcPackColumnCount,
-  calcStackColumnCount,
-} from "../createOperationsSaga/worker";
 import { updateOperationsFailure, updateOperationsSuccess } from "./actions";
 import { setFocusedObject } from "../../slices/uiSlice";
 import {
@@ -17,7 +13,6 @@ import {
   testStackOperationForFatalErrors,
 } from "../../slices/alertsSlice/Alerts/Errors/utilities";
 import { selectActiveColumnCountByTableId } from "../../slices/columnsSlice";
-import { selectStackOperationRowCount } from "../../slices/operationsSlice/operationsSelectors";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
@@ -50,12 +45,6 @@ export default function* updateOperationsWorker(action) {
             selectActiveColumnCountByTableId(state, childId)
           );
         });
-        operationUpdate.columnCount = yield select((state) =>
-          calcStackColumnCount(state, children)
-        );
-        operationUpdate.rowCount = yield select((state) =>
-          selectStackOperationRowCount(state, id, children)
-        );
         const { isAllPassing, fatalErrors, warnings } =
           testStackOperationForFatalErrors(
             {
@@ -81,11 +70,6 @@ export default function* updateOperationsWorker(action) {
             ...operation,
             ...operationUpdate,
           });
-        const children = operationUpdate.children || operation.children;
-        operationUpdate.columnCount = yield select((state) =>
-          calcPackColumnCount(state, children)
-        );
-        operationUpdate.rowCount = null; // We don't actually know the row count for pack ops
         if (isAllPassing) {
           successfulUpdates.push(operationUpdate);
         } else {
@@ -106,6 +90,7 @@ export default function* updateOperationsWorker(action) {
   const combinedUpdates = [...successfulUpdates, ...failedUpdates];
 
   yield put(updateOperationsSlice(combinedUpdates));
+  // TODO add to watcher for a UI Saga
   yield put(setFocusedObject(combinedUpdates[combinedUpdates.length - 1].id)); // focus the last operation created
 
   const formatSagaEndPayload = (updates) => ({

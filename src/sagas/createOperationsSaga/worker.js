@@ -39,40 +39,11 @@ import Operation, {
   OPERATION_TYPE_NO_OP,
 } from "../../slices/operationsSlice/Operation";
 import { createOperationsSuccess, createOperationsFailure } from "./actions";
-
-import { group } from "d3";
-import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
-import { selectStackOperationRowCount } from "../../slices/operationsSlice/operationsSelectors";
 import { setFocusedObject } from "../../slices/uiSlice";
 import {
   testPackOperationForFatalErrors,
   testStackOperationForFatalErrors,
 } from "../../slices/alertsSlice/Alerts/Errors/utilities";
-
-export const calcPackColumnCount = (state, childIds) => {
-  const columnCountTotal = childIds.reduce(
-    (total, id) => selectActiveColumnIdsByTableId(state, id).length + total,
-    0
-  );
-
-  return columnCountTotal;
-};
-
-export const calcStackColumnCount = (state, childIds) => {
-  const tableColumnCounts = Array.from(
-    group(
-      group(
-        Object.values(state.columns.data).filter(({ tableId }) =>
-          childIds.includes(tableId)
-        ),
-        (column) => column.tableId
-      )
-    ),
-    ([tableId, columns]) => columns.length
-  );
-  const maxColumns = Math.max(0, ...tableColumnCounts);
-  return maxColumns;
-};
 
 /**
  * Worker saga that creates or replaces database views based on operation type.
@@ -124,9 +95,6 @@ export default function* createOperationsWorker(action) {
         failedCreations.push(operation);
       }
       operation.rowCount = null; // TODO: is this calculatable?
-      operation.columnCount = yield select((state) =>
-        calcPackColumnCount(state, childIds)
-      );
       raisedAlerts.push(...fatalErrors, ...warnings);
     } else if (operation.operationType === OPERATION_TYPE_STACK) {
       const { isAllPassing, fatalErrors, warnings } =
@@ -137,19 +105,10 @@ export default function* createOperationsWorker(action) {
         console.warn(`Fatal alert creating Stack operation ${operation.id}:`);
         failedCreations.push(operation);
       }
-      operation.rowCount = yield select((state) =>
-        selectStackOperationRowCount(state, operation.id)
-      );
-      operation.columnCount = yield select((state) =>
-        calcStackColumnCount(state, childIds)
-      );
       raisedAlerts.push(...fatalErrors, ...warnings);
     } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
       // NO_OP operations do not require a database view
       operation.rowCount = null; // TODO: this is calculatable
-      operation.columnCount = yield select((state) =>
-        calcStackColumnCount(state, childIds)
-      );
       successfulCreations.push(operation);
     }
   }

@@ -42,14 +42,11 @@ function StackOperationBlock({
   operation,
   childObjects, // [{id, objectType}]
   columnCount,
-  depth,
   isFocused,
-  isHovered,
   alerts = [],
   hasAlerts = false,
-  isError = false,
 
-  // Props passed recusrively via parent operation
+  // Optional props passed recursively via parent operation
   parentColumnCount = 0,
 }) {
   // Parse error message if it's a JSON string

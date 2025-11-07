@@ -5,6 +5,10 @@ import { selectColumnIdMatrixByOperationId } from "../../slices/columnsSlice";
 import { selectOperationChildren } from "../../slices/operationsSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import withOperationData from "../HOC/withOperationData";
+import {
+  selectStackOperationRowCount,
+  selectStackOperationColumnCount,
+} from "../../slices/operationsSlice/operationsSelectors";
 
 /**
  * This HOC produces a matrix of column IDs for each table ID provided
@@ -82,6 +86,13 @@ export default function withStackOperationData(WrappedComponent) {
         .filter(({ columnIds }) => columnIds.length > 0);
     }, [operation.children, columnIdMatrix, selectedColumnIds]);
 
+    const columnCount = useSelector((state) =>
+      selectStackOperationColumnCount(state, id)
+    );
+    const rowCount = useSelector((state) =>
+      selectStackOperationRowCount(state, id)
+    );
+
     const selectedTableIds = useMemo(() => {
       return columnIdMatrix
         .map((row, rowIndex) =>
@@ -106,7 +117,8 @@ export default function withStackOperationData(WrappedComponent) {
         selectedColumnIds={selectedColumnIds}
         // Props specific to Stack operations
         childObjects={childObjects}
-        rowCount={operation.rowCount.toLocaleString()}
+        rowCount={rowCount}
+        columnCount={columnCount}
         // Props related to the operation's columns
         selectedColumnIndices={selectedColumnIndices}
         // Props related to the operation's children tables

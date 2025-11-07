@@ -229,6 +229,25 @@ export const selectOperationQueryData = (state, operationData) => {
   return parent;
 };
 
+/**
+ * Memoized selector to calculate the total row count for a stack operation.
+ *
+ * Sums the row counts of all child tables and operations. For table children,
+ * uses the table's rowCount property. For operation children, uses the operation's
+ * rowCount property.
+ *
+ * This selector is memoized using createSelector, which means the calculation is
+ * cached and only recomputed when dependencies change. Importantly, this memoization
+ * is shared across all component instances that use this selector - if multiple
+ * components call this selector with the same arguments, they will receive the same
+ * cached result without triggering a recalculation.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {string|number} operationId - The unique identifier of the stack operation.
+ * @param {Array<string|number>} [children] - Optional array of child IDs. If not provided,
+ *   will be retrieved from the operation's children property.
+ * @returns {number} The total row count of all children, or 0 if no children exist.
+ */
 export const selectStackOperationRowCount = createSelector(
   [
     (state, operationId, children) =>
@@ -248,5 +267,79 @@ export const selectStackOperationRowCount = createSelector(
       }
       return total + childRowCount;
     }, 0);
+  }
+);
+
+/**
+ * Memoized selector to calculate the total column count for a pack operation.
+ *
+ * Sums the number of active columns across all child tables in the pack operation.
+ * Only counts active (non-hidden) columns.
+ *
+ * This selector is memoized using createSelector, which means the calculation is
+ * cached and only recomputed when dependencies change. Importantly, this memoization
+ * is shared across all component instances that use this selector - if multiple
+ * components call this selector with the same arguments, they will receive the same
+ * cached result without triggering a recalculation.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {string|number} operationId - The unique identifier of the pack operation.
+ * @returns {number} The total count of active columns across all child tables.
+ */
+export const selectPackOperationColumnCount = createSelector(
+  [
+    (state, operationId) => selectOperation(state, operationId)?.children,
+    (state) => state.columns.data,
+  ],
+  (childIds, columnsData) => {
+    if (!childIds) return 0;
+
+    return childIds.reduce((total, tableId) => {
+      const activeColumns = Object.values(columnsData).filter(
+        (column) => column.tableId === tableId && column.isActive !== false
+      );
+      return total + activeColumns.length;
+    }, 0);
+  }
+);
+
+/**
+ * Memoized selector to calculate the maximum column count for a stack operation.
+ *
+ * Determines the maximum number of columns across all child tables in the stack.
+ * This represents the width of the stack operation's matrix, where some tables may
+ * have fewer columns and will be padded with null values.
+ *
+ * This selector is memoized using createSelector, which means the calculation is
+ * cached and only recomputed when dependencies change. Importantly, this memoization
+ * is shared across all component instances that use this selector - if multiple
+ * components call this selector with the same arguments, they will receive the same
+ * cached result without triggering a recalculation.
+ *
+ * @param {Object} state - The Redux state object.
+ * @param {string|number} operationId - The unique identifier of the stack operation.
+ * @returns {number} The maximum column count among all child tables, or 0 if no children.
+ */
+export const selectStackOperationColumnCount = createSelector(
+  [
+    (state, operationId) => selectOperation(state, operationId)?.children,
+    (state) => state.columns.data,
+  ],
+  (childIds, columnsData) => {
+    if (!childIds || childIds.length === 0) return 0;
+
+    // Group columns by tableId and count columns per table
+    const columnCountsByTable = new Map();
+
+    Object.values(columnsData).forEach((column) => {
+      if (childIds.includes(column.tableId)) {
+        const currentCount = columnCountsByTable.get(column.tableId) || 0;
+        columnCountsByTable.set(column.tableId, currentCount + 1);
+      }
+    });
+
+    // Return the maximum column count across all tables
+    const counts = Array.from(columnCountsByTable.values());
+    return counts.length > 0 ? Math.max(...counts) : 0;
   }
 );

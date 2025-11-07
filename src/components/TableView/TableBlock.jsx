@@ -3,12 +3,10 @@
 import { ColumnTick, EnhancedColumnTick } from "../ColumnViews";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
 import withTableData from "./withTableData.jsx";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
 function TableBlock({
   // Props from withAssociatedAlerts via withTableData
-  id, // eslint-disable-line no-unused-vars
-  alertIds,
   hasAlerts,
   // props via withTableData
   table,

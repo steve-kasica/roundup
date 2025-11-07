@@ -7,8 +7,8 @@ const PackOperationLabel = ({
   id,
   name,
   joinType,
-  columnCount = 0,
-  rowCount = 0,
+  columnCount,
+  rowCount,
   loading = false,
 
   // Props defined in `withAssociatedAlerts`
@@ -34,7 +34,8 @@ const PackOperationLabel = ({
         {name || id}{" "}
         {includeDimensions && (
           <small style={{ color: hasAlerts ? "inherit" : undefined }}>
-            ({columnCount.toLocaleString()} x {rowCount.toLocaleString()})
+            ({columnCount.toLocaleString()} x{" "}
+            {rowCount?.toLocaleString() || "???"})
           </small>
         )}
         {" | "}

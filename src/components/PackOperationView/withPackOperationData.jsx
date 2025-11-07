@@ -10,11 +10,11 @@ import {
 import { selectTablesById } from "../../slices/tablesSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import { setSelectedMatches } from "../../slices/uiSlice";
+import { selectPackOperationColumnCount } from "../../slices/operationsSlice/operationsSelectors";
 export default function withPackOperationData(WrappedComponent) {
   function EnhancedPackComponent({
     // Props passed from withOperationData
     operation,
-    activeColumnIds,
     selectedColumnIds,
     // Props passed directly from parent
     id,
@@ -53,6 +53,12 @@ export default function withPackOperationData(WrappedComponent) {
     const rightHandColumns = useSelector((state) =>
       selectColumnIdsByTableId(state, operation?.children[1])
     );
+
+    const columnCount = useSelector((state) =>
+      selectPackOperationColumnCount(state, id)
+    );
+
+    const rowCount = operation.rowCount;
 
     const tableToOpColumnMap = new Map();
     leftHandColumns.forEach((colId, i) => {
@@ -114,6 +120,8 @@ export default function withPackOperationData(WrappedComponent) {
         joinType={operation.joinType}
         joinPredicate={operation.joinPredicate}
         selectedMatchTypes={selectedMatchTypes}
+        columnCount={columnCount}
+        rowCount={rowCount}
         // Left table props
         leftTableId={leftTableId}
         joinKey1={operation.joinKey1} // Deprecated, use leftKey

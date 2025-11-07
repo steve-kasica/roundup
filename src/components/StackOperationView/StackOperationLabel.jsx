@@ -34,7 +34,7 @@ const StackOperationLabel = ({
         {includeDimensions && (
           <small style={{ color: hasAlerts ? "inherit" : undefined }}>
             ({columnCount.toLocaleString()} x{" "}
-            {rowCount?.toLocaleString() || "??"})
+            {rowCount?.toLocaleString() || "???"})
           </small>
         )}
         {" | "}
