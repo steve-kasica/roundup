@@ -12,7 +12,6 @@ import { MoreVert, Info, Warning } from "@mui/icons-material";
 import { useState } from "react";
 import SingleBar from "../visualization/SingleBar";
 import { scaleLinear } from "d3";
-import ColumnValuesSample from "./ColumnValuesSample";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
 import StyledColumnCard from "./StyledColumnCard";
@@ -201,7 +200,26 @@ const ColumnSummary = ({
             },
           }}
         >
-          <ColumnValuesSample id={column.id} />
+          <Typography
+            variant="caption"
+            component="div"
+            sx={{
+              fontSize: "0.7rem",
+              fontStyle: "italic",
+              fontWeight: 300,
+              overflow: "hidden",
+              textAlign: "left",
+              textOverflow: "ellipsis",
+              color: "text.secondary",
+              whiteSpace: "nowrap",
+              maxWidth: "100%",
+              width: "100%",
+            }}
+          >
+            {/* TODO: should I use Chips instead of comma b/c values may include commas */}
+            {column.topValues.map(({ value }) => value).join(", ")}
+            {(column?.topValues.length || 0) <= 10 ? "" : ", ..."}
+          </Typography>
         </Box>
 
         {/* Null Values - Hidden when height < 150px */}

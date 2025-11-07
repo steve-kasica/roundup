@@ -1,5 +1,4 @@
 export { default as ValueCounts } from "./ColumnValueCounts";
-export { default as ColumnDetails } from "./ColumnDetails";
 export { ColumnValues } from "./ColumnValues";
 export * from "./ColumnName";
 export * from "./ColumnTick";

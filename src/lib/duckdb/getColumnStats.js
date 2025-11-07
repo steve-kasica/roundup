@@ -9,29 +9,36 @@ export async function getColumnStats(tableId, columnList) {
   const query = `SUMMARIZE SELECT ${columnsClause} FROM ${tableId};`;
   const response = await conn.query(query);
 
-  // Get mode (most frequent value) and its count for each column
+  // Get top 10 most frequent values and their counts for each column
   const columns =
     columnList ||
     (await conn.query(`SELECT * FROM ${tableId} LIMIT 0`)).schema.fields.map(
       (f) => f.name
     );
-  const modeQueries = columns.map(
+  const topValuesQueries = columns.map(
     (col) =>
-      `SELECT '${col}' as column_name, ${col} as mode_value, COUNT(*) as mode_count 
+      `SELECT '${col}' as column_name, ${col} as value, COUNT(*) as count 
      FROM ${tableId} 
      WHERE ${col} IS NOT NULL 
      GROUP BY ${col} 
      ORDER BY COUNT(*) DESC 
-     LIMIT 1`
+     LIMIT 10`
   );
-  const modeQuery = modeQueries.join(" UNION ALL ");
-  const modeResponse = await conn.query(modeQuery);
-  const modeResults = modeResponse.toArray().reduce((acc, row) => {
+  const topValuesQuery = topValuesQueries.join(" UNION ALL ");
+  const topValuesResponse = await conn.query(topValuesQuery);
+  const topValuesResults = topValuesResponse.toArray().reduce((acc, row) => {
     const rowData = row.toJSON();
-    acc[rowData.column_name] = {
-      value: rowData.mode_value,
-      count: Number(rowData.mode_count),
-    };
+    const columnName = rowData.column_name;
+
+    if (!acc[columnName]) {
+      acc[columnName] = [];
+    }
+
+    acc[columnName].push({
+      value: rowData.value,
+      count: Number(rowData.count),
+    });
+
     return acc;
   }, {});
   await conn.close();
@@ -82,9 +89,10 @@ export async function getColumnStats(tableId, columnList) {
       }
     }
 
-    // Get the mode data for this column
+    // Get the top 10 most frequent values for this column
     const columnName = serialized.column_name;
-    const modeData = modeResults[columnName] || { value: null, count: null };
+    const topValues = topValuesResults[columnName] || [];
+    const modeData = topValues[0] || { value: null, count: null };
 
     return {
       approxUnique: serialized.approx_unique,
@@ -100,6 +108,7 @@ export async function getColumnStats(tableId, columnList) {
       std: serialized.std,
       modeValue: modeData.value,
       modeCount: modeData.count,
+      topValues: topValues,
     };
   });
 
