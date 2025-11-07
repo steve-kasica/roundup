@@ -11,6 +11,7 @@ import {
 import { useDispatch } from "react-redux";
 import { setPeekedTable } from "../../slices/uiSlice";
 import {
+  excludeColumnFromTable,
   selectColumnIdsByTableId,
   selectRemovedColumnIdsByTableId,
   selectSelectedChildColumnsByOperationId,
@@ -138,6 +139,11 @@ export default function withOperationData(WrappedComponent) {
       [dispatch, id, operation.children]
     );
 
+    const excludeColumns = useCallback(
+      (columnIds) => dispatch(excludeColumnFromTable(columnIds)),
+      [dispatch]
+    );
+
     return (
       <WrappedComponent
         // Pass along props directly from the parent component
@@ -202,6 +208,7 @@ export default function withOperationData(WrappedComponent) {
         }
         // Callback function related to columns
         selectColumns={selectColumns}
+        excludeColumns={excludeColumns}
         clearSelectedColumns={clearSelectedColumns}
         insertColumnIntoChildAtIndex={insertColumnIntoChildAtIndex}
         setVisibleColumns={setVisibleColumns}

@@ -7,6 +7,7 @@ import {
   IconButton,
   Chip,
   Divider,
+  Badge,
 } from "@mui/material";
 import withPackOperationData from "./withPackOperationData";
 import { useCallback, useEffect, useState, useMemo } from "react";
@@ -16,16 +17,12 @@ import { JOIN_TYPES } from "../../slices/operationsSlice";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 import { EnhancedColumnName } from "../ColumnViews";
-import {
-  CenterFocusStrong as FocusIcon,
-  VisibilityOff as ExcludeIcon,
-  Deselect as DeselectAllIcon,
-  SelectAll as SelectAllIcon,
-  SwapHoriz as SwapIcon,
-} from "@mui/icons-material";
+import { SwapHoriz as SwapIcon } from "@mui/icons-material";
 import ExcludeIconButton from "../ui/ExcludeIconButton";
 import FocusIconButton from "../ui/FocusIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
+import { isTableId } from "../../slices/tablesSlice";
+import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 
 const matchLabels = new Map([
   ["matches", "Match"],
@@ -95,6 +92,10 @@ const PackSchemaView = withPackOperationData(
       rightKeyColumnName,
       joinPredicate
     );
+
+    const areAnySelected = useMemo(() => {
+      return clickedBlockCells.size > 0;
+    }, [clickedBlockCells.size]);
 
     // Update toggle state when data changes
     useEffect(() => {
@@ -603,10 +604,6 @@ const PackSchemaView = withPackOperationData(
       0
     );
 
-    const areAnySelected = useMemo(() => {
-      return clickedBlockCells.size > 0;
-    }, [clickedBlockCells.size]);
-
     // Check if at least one complete column is selected
     const hasCompleteColumnSelected = useMemo(() => {
       const visibleMatches = getVisibleMatches();
@@ -655,19 +652,33 @@ const PackSchemaView = withPackOperationData(
               {/* Match category filter chips */}
               <Box display="flex" gap={0.5} alignItems="center">
                 {Object.entries(getVisibleMatches()).map(([key, count]) => (
-                  <Chip
+                  <Badge
                     key={key}
-                    label={matchLabels.get(key)}
-                    size="small"
-                    onClick={() => handleToggleMatch(key)}
-                    color={toggledMatches[key] ? "primary" : "default"}
-                    variant={toggledMatches[key] ? "filled" : "outlined"}
+                    badgeContent={count}
+                    color="primary"
+                    max={999999}
                     sx={{
-                      height: 24,
-                      fontSize: "0.75rem",
-                      cursor: "pointer",
+                      "& .MuiBadge-badge": {
+                        fontSize: "0.65rem",
+                        height: "18px",
+                        minWidth: "18px",
+                        padding: "0 4px",
+                      },
                     }}
-                  />
+                  >
+                    <Chip
+                      label={matchLabels.get(key)}
+                      size="small"
+                      onClick={() => handleToggleMatch(key)}
+                      color={toggledMatches[key] ? "primary" : "default"}
+                      variant={toggledMatches[key] ? "filled" : "outlined"}
+                      sx={{
+                        height: 24,
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </Badge>
                 ))}
               </Box>
               <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
@@ -729,6 +740,7 @@ const PackSchemaView = withPackOperationData(
                 <Box
                   key={key}
                   height={(value / totalRows) * 100 + "%"}
+                  minHeight={"20px"}
                   display={"flex"}
                   alignItems="center"
                   justifyContent="center"
@@ -762,13 +774,6 @@ const PackSchemaView = withPackOperationData(
             width="100%"
             height={"100%"}
           >
-            {/* Table headers */}
-            {/* <Box display="flex" width="100%">
-              {[leftTableId, rightTableId].map((tableId) => (
-
-            </Box> */}
-
-            {/* Iterate by table */}
             {[
               {
                 tableId: leftTableId,
@@ -798,11 +803,19 @@ const PackSchemaView = withPackOperationData(
                   justifyContent={"flex-end"}
                 >
                   <Box display="flex" justifyContent="center">
-                    <EnhancedTableLabel
-                      id={tableId}
-                      includeIcon={false}
-                      sx={{ fontSize: "0.875rem" }}
-                    />
+                    {isTableId(tableId) ? (
+                      <EnhancedTableLabel
+                        id={tableId}
+                        includeIcon={false}
+                        sx={{ fontSize: "0.875rem" }}
+                      />
+                    ) : (
+                      <EnhancedOperationLabel
+                        id={tableId}
+                        includeIcon={false}
+                        sx={{ fontSize: "0.875rem" }}
+                      />
+                    )}
                   </Box>
                   <Box display="flex" alignItems="center">
                     {columns.map((columnId) => {
@@ -884,6 +897,7 @@ const PackSchemaView = withPackOperationData(
                         display="flex"
                         flex={matchCount / totalRows}
                         width="100%"
+                        minHeight="20px"
                         borderTop="1px solid #ccc"
                       >
                         {columns.map((columnId) => {

@@ -32,9 +32,7 @@ const TableWindow = () => {
   const selectedColumns = useSelector(selectSelectedColumns);
 
   const viewMode = (function (opType, areSelectedColumns) {
-    if (!areSelectedColumns) {
-      return VIEW_EMPTY;
-    } else if (isFocusedTable) {
+    if (isFocusedTable) {
       return VIEW_TABLE;
     } else if (opType === OPERATION_TYPE_STACK) {
       return VIEW_STACK;
@@ -63,11 +61,7 @@ const TableWindow = () => {
         display="flex"
         flexDirection="column"
       >
-        {viewMode === VIEW_EMPTY ? (
-          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
-            No columns selected. Please select columns from the schema window.
-          </Typography>
-        ) : viewMode === VIEW_TABLE ? (
+        {viewMode === VIEW_TABLE ? (
           <EnhancedTableRows id={focusedObjectId} />
         ) : viewMode === VIEW_NO_OP ? (
           <EnhancedTableRows id={focusedOperation.children[0]} />

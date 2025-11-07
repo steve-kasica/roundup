@@ -1,31 +1,22 @@
-import { call, put, select } from "redux-saga/effects";
+import { put, select } from "redux-saga/effects";
 import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectOperation,
-  selectOperationQueryData,
   updateOperations as updateOperationsSlice,
 } from "../../slices/operationsSlice";
 import {
   calcPackColumnCount,
   calcStackColumnCount,
 } from "../createOperationsSaga/worker";
-import {
-  createPackView,
-  createStackView,
-  getTableDimensions,
-} from "../../lib/duckdb";
 import { updateOperationsFailure, updateOperationsSuccess } from "./actions";
 import { setFocusedObject } from "../../slices/uiSlice";
 import {
   testPackOperationForFatalErrors,
   testStackOperationForFatalErrors,
 } from "../../slices/alertsSlice/Alerts/Errors/utilities";
-import {
-  selectActiveColumnCountByTableId,
-  selectColumnIdsByTableId,
-} from "../../slices/columnsSlice";
+import { selectActiveColumnCountByTableId } from "../../slices/columnsSlice";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
@@ -48,20 +39,21 @@ export default function* updateOperationsWorker(action) {
       keys.includes("joinKey2") ||
       keys.includes("joinPredicate")
     ) {
-      const queryData = yield select((state) =>
-        selectOperationQueryData(state, operationUpdate)
-      );
       if (
         operationUpdate.operationType === OPERATION_TYPE_STACK ||
         (operationUpdate.operationType === undefined &&
           operation.operationType === OPERATION_TYPE_STACK)
       ) {
+        const children = operationUpdate.children || operation.children;
         const childColumnCounts = yield select((state) => {
-          const children = operationUpdate.children || operation.children;
           return children.map((childId) =>
             selectActiveColumnCountByTableId(state, childId)
           );
         });
+        operationUpdate.columnCount = yield select((state) =>
+          calcStackColumnCount(state, children)
+        );
+        operationUpdate.rowCount = null;
         const { isAllPassing, fatalErrors, warnings } =
           testStackOperationForFatalErrors(
             {
@@ -71,24 +63,9 @@ export default function* updateOperationsWorker(action) {
             childColumnCounts
           );
         if (isAllPassing) {
-          yield call(createStackView, queryData);
-          const { rowCount, columnCount } = yield call(
-            getTableDimensions,
-            operationUpdate.id
-          );
-          operationUpdate = {
-            ...operationUpdate,
-            rowCount,
-            columnCount,
-          };
           successfulUpdates.push(operationUpdate);
         } else {
           console.warn("Fatal alerts raised creating stack view");
-          const children = operationUpdate.children || operation.children;
-          operationUpdate.columnCount = yield select((state) =>
-            calcStackColumnCount(state, children)
-          );
-          operationUpdate.rowCount = 0; // TODO
           failedUpdates.push(operationUpdate);
         }
         raisedAlerts.push(...fatalErrors, ...warnings);
@@ -102,28 +79,16 @@ export default function* updateOperationsWorker(action) {
             ...operation,
             ...operationUpdate,
           });
+        const children = operationUpdate.children || operation.children;
+        operationUpdate.columnCount = yield select((state) =>
+          calcPackColumnCount(state, children)
+        );
+        operationUpdate.rowCount = null; // We don't actually know the row count for pack ops
         if (isAllPassing) {
-          yield call(createPackView, queryData);
-          const { rowCount, columnCount } = yield call(
-            getTableDimensions,
-            operationUpdate.id
-          );
-          operationUpdate = {
-            ...operationUpdate,
-            rowCount,
-            columnCount,
-          };
           successfulUpdates.push(operationUpdate);
         } else {
           console.warn("Error updateOperationsSaga/worker.js:", fatalErrors);
-          const children = operationUpdate.children || operation.children;
-          operationUpdate.columnCount = yield select((state) =>
-            calcPackColumnCount(state, children)
-          );
-          operationUpdate.rowCount = undefined; // We don't actually know the row count for pack ops
-          failedUpdates.push({
-            ...operationUpdate,
-          });
+          failedUpdates.push(operationUpdate);
         }
         raisedAlerts.push(...fatalErrors, ...warnings);
       } else if (operation.operationType === OPERATION_TYPE_NO_OP) {

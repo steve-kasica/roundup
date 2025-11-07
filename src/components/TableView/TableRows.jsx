@@ -250,7 +250,7 @@ const TableRows = ({
                   {/* Data Cells with proper formatting for different data types */}
                   {row.map((value, i) => (
                     <StyledTableCell
-                      key={selectedColumnIds[i]}
+                      key={i}
                       isHovered={hoveredIndex === i}
                       isEven={rowIndex % 2 === 0}
                       maxWidth={columnWidths[selectedColumnIds[i]] || "200px"}

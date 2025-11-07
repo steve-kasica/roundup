@@ -29,7 +29,7 @@
  * - createOperationsSaga: Main watcher saga that handles view creation workflows
  */
 
-import { call, put, select } from "redux-saga/effects";
+import { put, select } from "redux-saga/effects";
 import {
   addOperations as addOperationsToSlice,
   OPERATION_TYPE_PACK,
@@ -39,15 +39,9 @@ import Operation, {
   OPERATION_TYPE_NO_OP,
 } from "../../slices/operationsSlice/Operation";
 import { createOperationsSuccess, createOperationsFailure } from "./actions";
-import {
-  createStackView,
-  createPackView,
-  getTableDimensions,
-} from "../../lib/duckdb";
 
 import { group } from "d3";
 import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
-import { selectOperationQueryData } from "../../slices/operationsSlice/operationsSelectors";
 import { setFocusedObject } from "../../slices/uiSlice";
 import {
   testPackOperationForFatalErrors,
@@ -117,55 +111,35 @@ export default function* createOperationsWorker(action) {
     // Create operation object
     const operation = Operation(operationType, childIds);
 
-    // Build query data structure required for view creation
-    const queryData = yield select((state) =>
-      selectOperationQueryData(state, operation)
-    );
-
     // Create database view based on operation type
     if (operation.operationType === OPERATION_TYPE_PACK) {
       // Creates a unified view with columns from all child tables
       const { isAllPassing, fatalErrors, warnings } =
         testPackOperationForFatalErrors(operation);
       if (isAllPassing) {
-        yield call(createPackView, queryData);
-        const { rowCount, columnCount } = yield call(
-          getTableDimensions,
-          operation.id
-        );
-        operation.rowCount = rowCount;
-        operation.columnCount = columnCount; // initial column count
         successfulCreations.push(operation);
       } else {
         console.warn(`Fatal alert creating Pack operation ${operation.id}:`);
-        operation.rowCount = undefined; // TODO: this is calculatable
-        operation.columnCount = yield select((state) =>
-          calcPackColumnCount(state, childIds)
-        );
         failedCreations.push(operation);
       }
+      operation.rowCount = null; // TODO: this is calculatable
+      operation.columnCount = yield select((state) =>
+        calcPackColumnCount(state, childIds)
+      );
       raisedAlerts.push(...fatalErrors, ...warnings);
     } else if (operation.operationType === OPERATION_TYPE_STACK) {
       const { isAllPassing, fatalErrors, warnings } =
         testStackOperationForFatalErrors(operation);
       if (isAllPassing) {
-        // Creates a stacked view using the first child table as template
-        yield call(createStackView, queryData);
-        const { rowCount, columnCount } = yield call(
-          getTableDimensions,
-          operation.id
-        );
-        operation.rowCount = rowCount;
-        operation.columnCount = columnCount; // initial column count
         successfulCreations.push(operation);
       } else {
         console.warn(`Fatal alert creating Stack operation ${operation.id}:`);
-        operation.rowCount = undefined; // TODO: this is calculatable
-        operation.columnCount = yield select((state) =>
-          calcStackColumnCount(state, childIds)
-        );
         failedCreations.push(operation);
       }
+      operation.rowCount = undefined; // TODO: this is calculatable
+      operation.columnCount = yield select((state) =>
+        calcStackColumnCount(state, childIds)
+      );
       raisedAlerts.push(...fatalErrors, ...warnings);
     } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
       // NO_OP operations do not require a database view

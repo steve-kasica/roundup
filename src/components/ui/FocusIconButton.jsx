@@ -1,5 +1,5 @@
 import { IconButton } from "@mui/material";
-import { Visibility } from "@mui/icons-material";
+import { CenterFocusStrong } from "@mui/icons-material";
 const FocusIconButton = (props) => (
   <IconButton
     size="small"
@@ -7,7 +7,7 @@ const FocusIconButton = (props) => (
     title="Focus on selected columns (1-2 columns only)"
     color="primary"
   >
-    <Visibility fontSize="small" />
+    <CenterFocusStrong fontSize="small" />
   </IconButton>
 );
 
