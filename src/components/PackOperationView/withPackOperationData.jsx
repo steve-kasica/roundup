@@ -10,7 +10,10 @@ import {
 import { selectTablesById } from "../../slices/tablesSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import { setSelectedMatches } from "../../slices/uiSlice";
-import { selectPackOperationColumnCount } from "../../slices/operationsSlice/operationsSelectors";
+import {
+  selectPackOperationColumnCount,
+  selectPackOperationMatchStats,
+} from "../../slices/operationsSlice/operationsSelectors";
 export default function withPackOperationData(WrappedComponent) {
   function EnhancedPackComponent({
     // Props passed from withOperationData
@@ -30,22 +33,6 @@ export default function withPackOperationData(WrappedComponent) {
       const rightKeyColumn = selectColumnById(state, operation?.joinKey2);
       return [leftKeyColumn?.columnName, rightKeyColumn?.columnName];
     });
-
-    const setJoinType = useCallback(
-      (joinType) => {
-        dispatch(
-          updateOperationsRequest({
-            operationUpdates: [
-              {
-                id,
-                joinType, // Update join type
-              },
-            ],
-          })
-        );
-      },
-      [dispatch, id]
-    );
 
     const leftHandColumns = useSelector((state) =>
       selectColumnIdsByTableId(state, operation?.children[0])
@@ -92,15 +79,41 @@ export default function withPackOperationData(WrappedComponent) {
     const leftTable = useSelector((state) =>
       selectTablesById(state, leftTableId)
     );
+
     const rightTable = useSelector((state) =>
       selectTablesById(state, rightTableId)
     );
 
-    const selectedMatchTypes = useSelector((state) => state.ui.selectedMatches);
+    const matchStats = useSelector((state) =>
+      selectPackOperationMatchStats(state, id)
+    );
+
+    // Props derived form selector results
+    // -------------------------------------------------------
 
     // Extract row counts from table objects
     const leftRowCount = leftTable?.rowCount || 0;
     const rightRowCount = rightTable?.rowCount || 0;
+
+    const selectedMatchTypes = useSelector((state) => state.ui.selectedMatches);
+
+    // Define callback functions
+    // -------------------------------------------------------
+    const setJoinType = useCallback(
+      (joinType) => {
+        dispatch(
+          updateOperationsRequest({
+            operationUpdates: [
+              {
+                id,
+                joinType, // Update join type
+              },
+            ],
+          })
+        );
+      },
+      [dispatch, id]
+    );
 
     const setMatchSelection = useCallback(
       (selectedMatches) => {
@@ -109,11 +122,56 @@ export default function withPackOperationData(WrappedComponent) {
       [dispatch]
     );
 
+    const setLeftTableJoinKey = useCallback(
+      (columnId) => {
+        dispatch(
+          updateOperationsRequest({
+            operationUpdates: [
+              {
+                id,
+                joinKey1: columnId,
+              },
+            ],
+          })
+        );
+      },
+      [dispatch, id]
+    );
+
+    const setRightTableJoinKey = useCallback(
+      (columnId) => {
+        dispatch(
+          updateOperationsRequest({
+            operationUpdates: [
+              {
+                id,
+                joinKey2: columnId,
+              },
+            ],
+          })
+        );
+      },
+      [dispatch, id]
+    );
+
+    const setJoinPredicateCallback = useCallback(
+      (joinPredicate) => {
+        dispatch(
+          updateOperationsRequest({
+            operationUpdates: [{ id, joinPredicate }],
+          })
+        );
+      },
+      [dispatch, id]
+    );
+
     return (
       <WrappedComponent
         {...props}
         // General operation props
         id={id}
+        operation={operation}
+        childIds={operation.children}
         name={operation.name}
         selectedOperationColumnIds={selectedOperationColumnIds} // Should this be in an operation above? (TODO)
         // Props specific to Pack operations
@@ -122,6 +180,7 @@ export default function withPackOperationData(WrappedComponent) {
         selectedMatchTypes={selectedMatchTypes}
         columnCount={columnCount}
         rowCount={rowCount}
+        matchStats={matchStats}
         // Left table props
         leftTableId={leftTableId}
         joinKey1={operation.joinKey1} // Deprecated, use leftKey
@@ -143,37 +202,9 @@ export default function withPackOperationData(WrappedComponent) {
         rightSelectedColumns={rightSelectedColumnsIds}
         // Pack-specific join dispatchers
         setJoinType={setJoinType}
-        setLeftTableJoinKey={(columnId) => {
-          dispatch(
-            updateOperationsRequest({
-              operationUpdates: [
-                {
-                  id,
-                  joinKey1: columnId,
-                },
-              ],
-            })
-          );
-        }}
-        setRightTableJoinKey={(columnId) =>
-          dispatch(
-            updateOperationsRequest({
-              operationUpdates: [
-                {
-                  id,
-                  joinKey2: columnId,
-                },
-              ],
-            })
-          )
-        }
-        setJoinPredicate={(joinPredicate) =>
-          dispatch(
-            updateOperationsRequest({
-              operationUpdates: [{ id, joinPredicate }],
-            })
-          )
-        }
+        setLeftTableJoinKey={setLeftTableJoinKey}
+        setRightTableJoinKey={setRightTableJoinKey}
+        setJoinPredicate={setJoinPredicateCallback}
         setMatchSelection={setMatchSelection}
       />
     );

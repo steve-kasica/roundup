@@ -11,7 +11,10 @@
 
 import { EnhancedTableBlock } from "../TableView";
 import withOperationData from "../HOC/withOperationData";
-import { isOperationId } from "../../slices/operationsSlice";
+import {
+  isOperationId,
+  OPERATION_TYPE_PACK,
+} from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
 import { Box, Tooltip, styled } from "@mui/material";
 
@@ -32,20 +35,15 @@ const StyledBox = styled(Box, {
 
 function PackOperationBlock({
   // props via withOperationData
-  operation,
+  childIds,
   columnCount,
-  depth,
-  isFocused,
-  isHovered,
-
   // Props via withAssociatedAlerts HOC
   hasAlerts,
-
   // Props passed via parent
   parentColumnCount = 0,
 }) {
-  const childOperationIds = operation.children.filter(isOperationId);
-  const childTableIds = operation.children.filter(isTableId);
+  const childOperationIds = childIds.filter(isOperationId);
+  const childTableIds = childIds.filter(isTableId);
 
   return (
     <StyledBox className="pack-operation-block" hasError={hasAlerts}>
@@ -65,7 +63,7 @@ function PackOperationBlock({
               key={tableId}
               id={tableId}
               isDraggable={false}
-              parentOperationType={operation.operationType}
+              parentOperationType={OPERATION_TYPE_PACK}
               parentColumnCount={columnCount}
               sx={{
                 ...(index === childTableIds.length - 1 && {

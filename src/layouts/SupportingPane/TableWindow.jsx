@@ -12,7 +12,7 @@ import {
   OPERATION_TYPE_STACK,
   selectOperation,
 } from "../../slices/operationsSlice";
-import { EnhancedPackVirtualTable } from "../../components/PackOperationView";
+import { EnhancedPackRows } from "../../components/PackOperationView";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../components/OperationView";
 import { EnhancedStackRows } from "../../components/StackOperationView/StackRows";
@@ -66,7 +66,7 @@ const TableWindow = ({ id }) => {
         ) : viewMode === VIEW_STACK ? (
           <EnhancedStackRows id={id} />
         ) : viewMode === VIEW_PACK ? (
-          <EnhancedPackVirtualTable id={id} />
+          <EnhancedPackRows id={id} />
         ) : (
           <Alert severity="error">
             <pre>

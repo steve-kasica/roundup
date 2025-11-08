@@ -159,6 +159,8 @@ export default function withOperationData(WrappedComponent) {
         operation={operation}
         name={operation.name}
         operationType={operation.operationType}
+        childIds={operation.children}
+        doesViewExist={operation.doesViewExist}
         depth={depth}
         // Directly associated columns
         columnIds={columnIds} // All column IDs associated with this operation

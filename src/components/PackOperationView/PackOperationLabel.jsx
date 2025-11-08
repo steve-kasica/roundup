@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Divider, Stack, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import PackOperationIcon from "./PackOperationIcon";
 import withPackOperationData from "./withPackOperationData";
 

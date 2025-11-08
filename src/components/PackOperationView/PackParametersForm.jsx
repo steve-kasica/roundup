@@ -21,12 +21,10 @@ import { EnhancedColumnName } from "../ColumnViews";
 /* eslint-disable react/prop-types */
 
 const PackParametersForm = ({
-  operation,
   name,
   joinPredicate,
   leftKey,
   rightKey,
-  joinType,
   operationType,
   rightHandColumns,
   leftHandColumns,

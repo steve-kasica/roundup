@@ -192,6 +192,7 @@ export default function withTableData(WrappedComponent) {
           silenceAlerts={silenceAlerts}
           // Table properties
           table={table}
+          name={table.name}
           rowCount={table.rowCount.toLocaleString()}
           parentOperationId={parentOperationId} // TODO: should only pass Ids
           isInSchema={isInSchema}
