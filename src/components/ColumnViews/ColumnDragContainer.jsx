@@ -1,22 +1,24 @@
 /* eslint-disable react/prop-types */
 
-import { useRef, cloneElement, isValidElement, useEffect } from "react";
+import {
+  useRef,
+  cloneElement,
+  isValidElement,
+  useEffect,
+  useMemo,
+} from "react";
 import { useDrag, useDrop } from "react-dnd";
 import withColumnData from "./withColumnData";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addColumnsToDragging,
-  removeColumnsFromDragging,
-  addColumnsToDropTargets,
-  clearDropTargets,
-  addColumnsToHoverTargets,
-  removeColumnsFromHoverTargets,
-  clearHoverTargets,
-} from "../../slices/columnsSlice/columnsSlice";
-import {
-  selectIsColumnDropTarget,
-  selectSiblingColumnIds,
-} from "../../slices/columnsSlice/columnSelectors";
+  addToHoveredColumnIds,
+  removeFromHoveredColumnIds,
+  setDraggingColumnIds,
+  setDropTargetColumnIds,
+  selectDropTargetColumnIds,
+  setHoveredColumnIds,
+} from "../../slices/uiSlice";
+import { selectTableColumnIds } from "../../slices/tablesSlice";
 
 /**
  * ColumnDragContainer - A container component that handles drag functionality for columns
@@ -26,16 +28,24 @@ const ColumnDragContainer = withColumnData(
   ({ column, children, onDragEnd, onDrop, canDrag = true }) => {
     const dispatch = useDispatch();
     const ref = useRef(null);
-    const dragType = `${column.tableId}_Column`; // Unique drag type per table
+    const dragType = `${column.parentId}_Column`; // Unique drag type per table
 
     // Get sibling column IDs (all columns in table except current one)
-    const siblingColumnIds = useSelector((state) =>
-      selectSiblingColumnIds(state, column?.tableId, column?.id)
+    const tableColumnIds = useSelector((state) =>
+      selectTableColumnIds(state, column.parentId)
+    );
+    const siblingColumnIds = useMemo(() => {
+      return tableColumnIds.filter((id) => id !== column.id);
+    }, [tableColumnIds, column.id]);
+
+    const dropTargetColumnIds = useSelector((state) =>
+      selectDropTargetColumnIds(state)
     );
 
     // Check if this column is a drop target
-    const canDropHere = useSelector((state) =>
-      selectIsColumnDropTarget(state, column?.id)
+    const canDropHere = useMemo(
+      () => dropTargetColumnIds.includes(column?.id),
+      [dropTargetColumnIds, column?.id]
     );
 
     // Drag functionality
@@ -44,11 +54,11 @@ const ColumnDragContainer = withColumnData(
       item: () => {
         // Dispatch action to add column to dragging state when item is created
         if (column?.id) {
-          dispatch(addColumnsToDragging(column.id));
+          dispatch(setDraggingColumnIds(column.id));
 
           // Set all sibling columns as drop targets
           if (siblingColumnIds.length > 0) {
-            dispatch(addColumnsToDropTargets(siblingColumnIds));
+            dispatch(setDropTargetColumnIds(siblingColumnIds));
           }
         }
 
@@ -64,12 +74,12 @@ const ColumnDragContainer = withColumnData(
       end: (item, monitor) => {
         // Remove from dragging state when drag ends
         if (column?.id) {
-          dispatch(removeColumnsFromDragging(column.id));
+          dispatch(setDraggingColumnIds([]));
         }
 
         // Clear all drop targets and hover targets when drag ends
-        dispatch(clearDropTargets());
-        dispatch(clearHoverTargets());
+        dispatch(setDropTargetColumnIds([]));
+        dispatch(setHoveredColumnIds([]));
 
         const dropResult = monitor.getDropResult();
         if (onDragEnd) {
@@ -96,12 +106,6 @@ const ColumnDragContainer = withColumnData(
         return { ...dropResult, droppedOn: column };
       },
       canDrop: (item) => item.id !== column?.id, // Can't drop on self
-      hover: (draggedItem) => {
-        // Add this column to hover targets when hovered over
-        if (draggedItem.id !== column?.id && column?.id) {
-          //   dispatch(addColumnsToHoverTargets(column.id));
-        }
-      },
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
       }),
@@ -110,9 +114,10 @@ const ColumnDragContainer = withColumnData(
     useEffect(() => {
       // This effect runs whenever isOver changes
       if (isOver && column?.id) {
-        dispatch(addColumnsToHoverTargets(column.id));
+        dispatch(addToHoveredColumnIds(column.id));
       } else if (!isOver && column?.id) {
-        dispatch(removeColumnsFromHoverTargets(column.id));
+        // TODO: remove column from hover targets
+        dispatch(removeFromHoveredColumnIds(column.id));
       }
     }, [isOver, column?.id, dispatch]);
 

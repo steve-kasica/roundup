@@ -29,7 +29,7 @@
  * - createOperationsSaga: Main watcher saga that handles view creation workflows
  */
 
-import { put, select } from "redux-saga/effects";
+import { put } from "redux-saga/effects";
 import {
   addOperations as addOperationsToSlice,
   OPERATION_TYPE_PACK,
@@ -81,7 +81,7 @@ export default function* createOperationsWorker(action) {
 
   for (const { operationType, childIds } of operationData) {
     // Create operation object
-    const operation = Operation(operationType, childIds);
+    const operation = Operation(operationType);
 
     // Create database view based on operation type
     if (operation.operationType === OPERATION_TYPE_PACK) {
@@ -89,10 +89,9 @@ export default function* createOperationsWorker(action) {
       const { isAllPassing, fatalErrors, warnings } =
         testPackOperationForFatalErrors(operation);
       if (isAllPassing) {
-        successfulCreations.push(operation);
+        successfulCreations.push({ operation, childIds });
       } else {
-        console.warn(`Fatal alert creating Pack operation ${operation.id}:`);
-        failedCreations.push(operation);
+        failedCreations.push({ operation, childIds });
       }
       operation.rowCount = null; // TODO: is this calculatable?
       raisedAlerts.push(...fatalErrors, ...warnings);
@@ -100,16 +99,15 @@ export default function* createOperationsWorker(action) {
       const { isAllPassing, fatalErrors, warnings } =
         testStackOperationForFatalErrors(operation);
       if (isAllPassing) {
-        successfulCreations.push(operation);
+        successfulCreations.push({ operation, childIds });
       } else {
-        console.warn(`Fatal alert creating Stack operation ${operation.id}:`);
-        failedCreations.push(operation);
+        failedCreations.push({ operation, childIds });
       }
       raisedAlerts.push(...fatalErrors, ...warnings);
     } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
       // NO_OP operations do not require a database view
       operation.rowCount = null; // TODO: this is calculatable
-      successfulCreations.push(operation);
+      successfulCreations.push({ operation, childIds });
     }
   }
 

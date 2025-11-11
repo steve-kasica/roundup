@@ -16,7 +16,7 @@ export default function* createColumnsWorker(action) {
 
   for (const { parentId, index } of columnInfo) {
     // Create new column object
-    const newColumn = Column(parentId, index, {});
+    const newColumn = Column(parentId, index);
 
     if (mode === CREATION_MODE_INSERTION) {
       const randomColumnName = `col_${Math.random()

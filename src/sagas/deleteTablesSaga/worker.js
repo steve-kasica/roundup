@@ -1,9 +1,5 @@
 import { call, put, select } from "redux-saga/effects";
-import { dropTables, selectTablesById } from "../../slices/tablesSlice";
-import {
-  removeColumnsFromLoading,
-  selectLoadingColumns,
-} from "../../slices/columnsSlice";
+import { deleteTables, selectTablesById } from "../../slices/tablesSlice";
 import { dropTable } from "../../lib/duckdb";
 import { deleteTablesFailure, deleteTablesSuccess } from "./actions";
 
@@ -18,20 +14,17 @@ export default function* deleteTablesWorker(action) {
   const tables = yield select((state) => selectTablesById(state, tableIds));
 
   for (const table of tables) {
-    yield put(selectLoadingColumns(table.columnIds));
     try {
       // Remove table from DuckDB
       yield call(dropTable, table.id);
 
       // Remove table from state
-      yield put(dropTables(table.id));
+      yield put(deleteTables(table.id));
 
       successfulDeletions.push(table);
     } catch (error) {
       console.error("Error dropping table from DuckDB:", error);
       failedDeletions.push(table);
-    } finally {
-      yield put(removeColumnsFromLoading(table.columnIds));
     }
     if (failedDeletions.length > 0) {
       yield put(
@@ -49,6 +42,7 @@ export default function* deleteTablesWorker(action) {
         })
       );
     }
+    // TODO: address via updateOperation
     // if (table.operationId) {
     //   yield put(
     //     removeChildFromOperation({

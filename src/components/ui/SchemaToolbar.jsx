@@ -24,11 +24,10 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  excludeColumnFromTable,
-  selectSelectedColumnIds,
-  setFocusedColumnIds,
   setSelectedColumnIds,
-} from "../../slices/columnsSlice";
+  setFocusedColumnIds,
+  selectSelectedColumnIds,
+} from "../../slices/uiSlice";
 import { useCallback, useState } from "react";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedTableLabel } from "../TableView";
@@ -42,6 +41,7 @@ const SchemaToolbar = ({
   alertIds = [],
   children,
   customMenuItems = null,
+  handleExcludeSelected = () => {},
 }) => {
   const dispatch = useDispatch();
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
@@ -58,19 +58,6 @@ const SchemaToolbar = ({
 
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [alertAnchorEl, setAlertAnchorEl] = useState(null);
-
-  // const handleSelectAll = useCallback(() => {
-  //   onSelectAllClick();
-  //   dispatch(setSelectedColumnIds(columnIds));
-  // }, [onSelectAllClick, dispatch, columnIds]);
-
-  const handleExcludeSelected = useCallback(() => {
-    dispatch(excludeColumnFromTable(selectedColumnIds));
-  }, [dispatch, selectedColumnIds]);
-
-  const handleClearSelection = useCallback(() => {
-    dispatch(setSelectedColumnIds([]));
-  }, [dispatch]);
 
   const handleExport = useCallback(() => {
     setIsExportDialogOpen(true);

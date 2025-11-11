@@ -12,7 +12,7 @@ import {
   testPackOperationForFatalErrors,
   testStackOperationForFatalErrors,
 } from "../../slices/alertsSlice/Alerts/Errors/utilities";
-import { selectActiveColumnCountByTableId } from "../../slices/columnsSlice";
+import { selectTableColumnIds } from "../../slices/tablesSlice";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
@@ -41,9 +41,9 @@ export default function* updateOperationsWorker(action) {
       ) {
         const children = operationUpdate.children || operation.children;
         const childColumnCounts = yield select((state) => {
-          return children.map((childId) =>
-            selectActiveColumnCountByTableId(state, childId)
-          );
+          return children.map((childId) => {
+            return selectTableColumnIds(state, childId).length;
+          });
         });
         const { isAllPassing, fatalErrors, warnings } =
           testStackOperationForFatalErrors(

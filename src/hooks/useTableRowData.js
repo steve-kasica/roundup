@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getTableRows } from "../lib/duckdb/getTableRows.js";
+import { useSelector } from "react-redux";
+import { selectColumnNamesById } from "../slices/columnsSlice/selectors.js";
 
 /**
  * Custom React Hook for querying DuckDB database rows
@@ -85,7 +87,7 @@ export function useTableRowData(
  * Appends new data instead of replacing it (useful for infinite scroll)
  *
  * @param {string} tableId - The table identifier to query
- * @param {Array<string>} columnsList - Array of column names to select
+ * @param {Array<string>} columnIds - Array of column IDs to select
  * @param {number} pageSize - Number of rows per page (default: 50)
  * @param {string} sortBy - Column name to sort by (default: null)
  * @param {string} sortDirection - Sort direction: 'asc' or 'desc' (default: 'asc')
@@ -94,11 +96,14 @@ export function useTableRowData(
  */
 export function usePaginatedTableRows(
   tableId,
-  columnsList = null,
+  columnIds = null,
   pageSize = 50,
   sortBy = null,
   sortDirection = "asc"
 ) {
+  const columnsList = useSelector((state) =>
+    selectColumnNamesById(state, columnIds)
+  );
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

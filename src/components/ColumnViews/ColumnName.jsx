@@ -5,18 +5,20 @@ import withColumnData from "./withColumnData";
 
 const ColumnName = ({
   id,
-  column,
+  name,
+  columnName,
   onClick,
   sx = {},
-  selectedSx = {},
   isSelected,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
   alertIds,
   hasAlerts,
+  // Props passed from parent component
+  selectedSx = {},
 }) => {
   const handleClick = (event) => {
     if (onClick) {
-      onClick(event, column?.id);
+      onClick(event, id);
     }
   };
 
@@ -46,7 +48,7 @@ const ColumnName = ({
               }
             : {},
           ...sx,
-          ...(column.isSelected && selectedSx
+          ...(isSelected && selectedSx
             ? {
                 fontWeight: "bold",
               }
@@ -57,7 +59,7 @@ const ColumnName = ({
           }),
         }}
       >
-        {column.name || column.columnName || column.id}
+        {name || columnName || id}
       </Typography>
       {hasAlerts && (
         <Tooltip

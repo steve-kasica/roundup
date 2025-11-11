@@ -62,7 +62,6 @@ const TableRows = ({
   // Props passed via withTableData HOC
   table,
   selectedColumnIds, // IDs of selected columns in Redux
-  selectedColumnNames, // Names of selected columns in the database
   hoveredIndex,
   // Props passed directly from parent component
   onScrollContainerRef = null,
@@ -90,7 +89,7 @@ const TableRows = ({
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
       table.id,
-      selectedColumnNames,
+      selectedColumnIds,
       50, // pageSize
       sortConfig.columnId, // sortBy
       sortConfig.direction // sortDirection

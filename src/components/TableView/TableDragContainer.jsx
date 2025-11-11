@@ -70,25 +70,10 @@ const TableDragContainer = ({
       return { ...dropResult, droppedOn: table };
     },
     canDrop: (item) => item.id !== table?.id, // Can't drop on self
-    hover: (draggedItem) => {
-      // Add this column to hover targets when hovered over
-      if (draggedItem.id !== table?.id && table?.id) {
-        //   dispatch(addColumnsToHoverTargets(table.id));
-      }
-    },
     collect: (monitor) => ({
       isOver: monitor.isOver({ shallow: true }),
     }),
   });
-
-  useEffect(() => {
-    // This effect runs whenever isOver changes
-    // if (isOver && table?.id) {
-    //   dispatch(addColumnsToHoverTargets(table.id));
-    // } else if (!isOver && table?.id) {
-    //   dispatch(removeColumnsFromHoverTargets(table.id));
-    // }
-  }, [isOver, table?.id, dispatch]);
 
   // Combine drag and drop refs
   const dragDropRef = (node) => {

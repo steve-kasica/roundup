@@ -1,5 +1,4 @@
 import { createSelector } from "reselect";
-import { selectColumnById } from "../columnsSlice";
 
 /**
  * Memoized selector to retrieve table data by ID or an array of IDs from the Redux state.
@@ -19,29 +18,29 @@ export const selectTablesById = createSelector(
 );
 
 /**
- * Selector to retrieve table(s) associated with the given column ID(s).
+ * Select active column IDs (not excluded) for a specific table.
+ *
+ * This selector returns only the columns that are currently included in the table's
+ * idsByTable array. When columns are excluded via `setTablesColumnIds`, they are
+ * removed from this array but remain in the columns.data object. This selector is
+ * used to determine which columns should be displayed and operated on.
  *
  * @function
  * @param {Object} state - The Redux state.
- * @param {string|string[]} columnIds - A single column ID or an array of column IDs.
- * @returns {Object|Object[]} The table object(s) corresponding to the provided column ID(s).
+ * @param {string} tableId - The ID of the table to get active columns for.
+ * @returns {Array<string>} An array of column IDs that are active (not excluded) for the table.
+ *                          Returns an empty array if the table has no columns or doesn't exist.
  *
+ * @example
+ * const activeColumnIds = selectTableColumnIds(state, 't1');
+ * // Returns: ['c1', 'c2', 'c3']
  */
-export const selectTableByColumnId = createSelector(
-  // Input selectors
-  (state, columnIds) => (Array.isArray(columnIds) ? columnIds : [columnIds]),
-  (state) => state,
-  // Result function
-  (columnIds, state) => {
-    const tableIds = columnIds.map(
-      (columnId) => selectColumnById(state, columnId).tableId
-    );
-    return selectTablesById(
-      state,
-      tableIds.length === 1 ? tableIds[0] : tableIds
-    );
+export const selectTableColumnIds = (state, tableId) => {
+  if (!state.tables.byId[tableId]) {
+    throw new Error(`No columns found for table ID ${tableId}`);
   }
-);
+  return state.tables.byId[tableId].columnIds;
+};
 
 /**
  * Selector to retrieve all table data as an array.
@@ -54,8 +53,3 @@ export const selectAllTablesData = createSelector(
   [(state) => state.tables.data],
   (data) => Object.values(data)
 );
-
-export const selectSelectedTables = (state) => state.tables.selected;
-export const selectHoveredTable = (state) => state.tables.hovered;
-
-export const selectFocusedTableId = (state) => state.tables.focused;

@@ -2,7 +2,6 @@ import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { getValuesCountMatrix } from "../../lib/duckdb";
 import { useEffect, useState } from "react";
-import { selectTableIdsByColumnIds } from "../../slices/columnsSlice";
 
 // HOC to provide column values for given columnNames
 export default function withValuesCountMatrixData(WrappedComponent) {
@@ -14,9 +13,10 @@ export default function withValuesCountMatrixData(WrappedComponent) {
     const [valueDegrees, setValueDegrees] = useState(null);
     const [signature, setSignature] = useState(null);
 
-    const tableIds = useSelector((state) =>
-      selectTableIdsByColumnIds(state, columnNames)
-    );
+    // TODO: address later
+    // const tableIds = useSelector((state) =>
+    //   selectTableIdsByColumnIds(state, columnNames)
+    // );
 
     useEffect(() => {
       // Fetch the values count matrix when component mounts or columnNames change

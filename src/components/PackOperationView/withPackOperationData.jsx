@@ -4,9 +4,9 @@ import withOperationData from "../HOC/withOperationData";
 import { useCallback } from "react";
 import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
 import {
-  selectColumnById,
-  selectSelectedColumnIdsByTableId,
-} from "../../slices/columnsSlice/columnSelectors";
+  selectColumnsById,
+  selectSelectedColumnIdsByParentId,
+} from "../../slices/columnsSlice/selectors";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import { setSelectedMatches } from "../../slices/uiSlice";
@@ -29,8 +29,8 @@ export default function withPackOperationData(WrappedComponent) {
     const rightTableId = operation?.children[1];
 
     const [leftKeyColumnName, rightKeyColumnName] = useSelector((state) => {
-      const leftKeyColumn = selectColumnById(state, operation?.joinKey1);
-      const rightKeyColumn = selectColumnById(state, operation?.joinKey2);
+      const leftKeyColumn = selectColumnsById(state, operation?.joinKey1);
+      const rightKeyColumn = selectColumnsById(state, operation?.joinKey2);
       return [leftKeyColumn?.columnName, rightKeyColumn?.columnName];
     });
 
@@ -63,12 +63,12 @@ export default function withPackOperationData(WrappedComponent) {
 
     // Get a list of selectedColumnIds in the left table
     const leftSelectedColumnsIds = useSelector((state) =>
-      selectSelectedColumnIdsByTableId(state, leftTableId)
+      selectSelectedColumnIdsByParentId(state, leftTableId)
     );
 
     // Get a list of selectedColumnIds in the right table
     const rightSelectedColumnsIds = useSelector((state) =>
-      selectSelectedColumnIdsByTableId(state, rightTableId)
+      selectSelectedColumnIdsByParentId(state, rightTableId)
     );
 
     const selectedOperationColumnIds = operation.columnIds.filter((columnid) =>

@@ -1,6 +1,6 @@
 export * from "./columnsSlice.js"; // exports all actions
 export * from "./Column.js";
-export * from "./columnSelectors.js";
+export * from "./selectors.js";
 import Column from "./Column.js";
 import reducer from "./columnsSlice.js";
 

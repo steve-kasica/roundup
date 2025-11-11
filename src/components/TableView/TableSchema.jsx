@@ -32,7 +32,7 @@ import { Box, Typography, Menu, MenuItem } from "@mui/material";
 import withTableData from "./withTableData";
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setFocusedColumnIds, setColumnType } from "../../slices/columnsSlice"; // TODO: this should be in an HOC
+import { setFocusedColumnIds } from "../../slices/uiSlice"; // TODO: this should be in HOC
 import {
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_CATEGORICAL,
@@ -145,9 +145,10 @@ const TableSchema = ({
   const handleColumnTypeChange = useCallback(
     (columnType) => {
       if (selectedColumnIds.length > 0) {
-        dispatch(
-          setColumnType({ ids: selectedColumnIds, columnTypes: columnType })
-        );
+        // TODO: why is this here? shouldn't it be in columns
+        // dispatch(
+        //   setColumnType({ ids: selectedColumnIds, columnTypes: columnType })
+        // );
       }
       handleColumnTypeMenuClose();
     },

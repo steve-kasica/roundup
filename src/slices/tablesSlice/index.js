@@ -1,5 +1,5 @@
 import slice from "./tablesSlice";
 export * from "./Table";
 export * from "./tablesSlice"; // export actions
-export * from "./tableSelectors";
+export * from "./selectors";
 export default slice.reducer;

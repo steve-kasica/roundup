@@ -5,7 +5,9 @@ import { getColumnValues } from "../../lib/duckdb";
 import withColumnData from "./withColumnData";
 
 const ColumnValues = ({
-  column,
+  id,
+  columnName,
+  parentId,
   limit = 20,
   scrollTop = 0,
   onScroll = () => null,
@@ -17,20 +19,20 @@ const ColumnValues = ({
   const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef(null);
 
-  // Reset state when column.id or column.tableId changes
+  // Reset state when id or parentId changes
   useEffect(() => {
     setValues([]);
     setOffset(0);
     setHasMore(true);
     setError(null);
-  }, [column.id, column.tableId]);
+  }, [id, parentId]);
 
   // Load values when offset changes or initial load
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
     setError(null);
-    getColumnValues(column.tableId, column.columnName, limit, offset)
+    getColumnValues(parentId, columnName, limit, offset)
       .then((result) => {
         if (isMounted) {
           setValues((prev) =>
@@ -48,7 +50,7 @@ const ColumnValues = ({
     return () => {
       isMounted = false;
     };
-  }, [column.id, column.tableId, offset, limit]);
+  }, [id, parentId, offset, limit]);
 
   // Remove handleLoadMore and inline logic in scroll handler to avoid dependency warning
 

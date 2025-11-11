@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useDispatch } from "react-redux";
 import { EnhancedColumnDetails } from "../../components/ColumnViews/ColumnDetails";
-import { clearFocusedColumns } from "../../slices/columnsSlice";
 import { Typography, IconButton, Box } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import ColumnIndexDetails from "../../components/ColumnIndexDetails";
+import { setFocusedColumnIds } from "../../slices/uiSlice";
 
 const RightSidebar = ({ columnIds }) => {
   const dispatch = useDispatch();
@@ -12,7 +12,7 @@ const RightSidebar = ({ columnIds }) => {
   const isMultipleColumnsInStack = columnIds && columnIds.length > 1;
 
   const handleClose = () => {
-    dispatch(clearFocusedColumns());
+    dispatch(setFocusedColumnIds([]));
   };
 
   // TODO: implement

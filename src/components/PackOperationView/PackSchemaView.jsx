@@ -865,9 +865,6 @@ const PackSchemaView = withPackOperationData(
                           onClick={(event) =>
                             handleColumnClick(event, tableId, columnId)
                           }
-                          onMouseEnter={() =>
-                            setHoveredColumn(`${tableId}:${columnId}`)
-                          }
                           onMouseLeave={() => setHoveredColumn(null)}
                         >
                           <EnhancedColumnName

@@ -2,13 +2,10 @@
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  selectOperation,
 } from "../../slices/operationsSlice";
 import { Stack, Typography } from "@mui/material";
 import StackOperationIcon from "../StackOperationView/StackOperationIcon";
 import PackOperationIcon from "../PackOperationView/PackOperationIcon";
-import { useSelector } from "react-redux";
-import { selectActiveColumnIdsByTableId } from "../../slices/columnsSlice";
 import withOperationData from "../HOC/withOperationData";
 
 const OperationLabel = ({
@@ -57,22 +54,6 @@ const OperationLabel = ({
 OperationLabel.displayName = "OperationLabel";
 
 const EnhancedOperationLabel = withOperationData(OperationLabel);
-
-// const EnhancedOperationLabel = (props) => {
-//   const operation = useSelector((state) => selectOperation(state, props.id));
-//   const activeColumnIds = useSelector((state) =>
-//     selectActiveColumnIdsByTableId(state, props.id)
-//   );
-//   return (
-//     <OperationLabel
-//       {...props}
-//       operationType={operation ? operation.operationType : null}
-//       name={operation ? operation.name : null}
-//       rowCount={props.rowCount}
-//       columnCount={activeColumnIds.length}
-//     />
-//   );
-// };
 
 EnhancedOperationLabel.displayName = "EnhancedOperationLabel";
 

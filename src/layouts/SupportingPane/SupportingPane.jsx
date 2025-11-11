@@ -1,14 +1,5 @@
-// /**
-//  * SuppotingPane.jsx
-//  *
-//  * This file handles component position in the suppoting pane layout
-//  * See:
-//  *  - [Canonical layouts, Suppoting pane](https://m3.material.io/foundations/layout/canonical-layouts/supporting-pane)
-//  */
-
 import { name as APP_NAME } from "../../../package.json";
 import { Typography, Box, styled } from "@mui/material";
-import AppDrawer from "./AppDrawer";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import LeftSideBar from "./LeftSideBar";
 import { useSelector } from "react-redux";
@@ -19,10 +10,12 @@ import TableWindow from "./TableWindow";
 import SchemaWindow from "./SchemaWindow";
 import {
   selectOperation,
-  selectRootOperation,
+  selectRootOperationId,
 } from "../../slices/operationsSlice";
-import { selectFocusedColumnIds } from "../../slices/columnsSlice";
-import { selectFocusedObject } from "../../slices/uiSlice/uiSliceSelectors";
+import {
+  selectFocusedColumnIds,
+  selectFocusedObject,
+} from "../../slices/uiSlice";
 // Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -43,11 +36,12 @@ const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
 export default function SupportingPane() {
   const tables = useSelector(selectAllTablesData);
   const rootOperation = useSelector((state) => {
-    const id = selectRootOperation(state);
+    const id = selectRootOperationId(state);
     return id ? selectOperation(state, id) : null;
   });
   const focusedObject = useSelector(selectFocusedObject);
-  const focusedColumns = useSelector(selectFocusedColumnIds);
+  const focusedColumnIds = useSelector(selectFocusedColumnIds);
+  console.log("SupportingPane render: focusedColumnIds=", focusedColumnIds);
   const isOpen = tables.length > 0;
 
   return (
@@ -153,7 +147,7 @@ export default function SupportingPane() {
                 )}
               </PanelGroup>
             </Panel>
-            {focusedColumns && focusedColumns.length > 0 && (
+            {focusedColumnIds && focusedColumnIds.length > 0 && (
               <>
                 <StyledPanelResizeHandle
                   sx={{ width: "2px", height: "100%" }}
@@ -162,20 +156,18 @@ export default function SupportingPane() {
                   id="column-window-panel"
                   order={3}
                   collapsible={true}
-                  collapsed={!(focusedColumns && focusedColumns.length > 0)}
+                  collapsed={!(focusedColumnIds && focusedColumnIds.length > 0)}
                   maxSize={50}
                   defaultSize={25}
                   style={{ padding: "5px" }}
                 >
-                  <ColumnWindow columnIds={focusedColumns} />
+                  <ColumnWindow columnIds={focusedColumnIds} />
                 </Panel>
               </>
             )}
           </PanelGroup>
         )}
       </Box>
-
-      <AppDrawer open={false} onClose={() => {}} />
     </Box>
   );
 }

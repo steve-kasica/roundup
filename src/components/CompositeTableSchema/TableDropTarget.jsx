@@ -14,8 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_STACK,
-  selectOperation,
-  selectRootOperation,
+  selectOperations,
+  selectRootOperationId,
 } from "../../slices/operationsSlice";
 import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
@@ -143,8 +143,8 @@ const DropZone = styled(ForwardedBox, {
 export default function TableDropTarget({ operationType, children }) {
   const dispatch = useDispatch();
   const rootOperation = useSelector((state) => {
-    const rootId = selectRootOperation(state);
-    return selectOperation(state, rootId);
+    const rootId = selectRootOperationId(state);
+    return selectOperations(state, rootId);
   });
 
   const [{ isOver, canDrop }, dropRef] = useDrop({

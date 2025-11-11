@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
  *
  *
@@ -10,7 +11,7 @@
  * data work.
  */
 import withColumnData from "./withColumnData";
-import { Box, Divider, Typography, Alert, Chip } from "@mui/material";
+import { Box, Divider, Typography, Chip } from "@mui/material";
 import { Warning } from "@mui/icons-material";
 import DescriptionList from "../ui/DescriptionList";
 import { EnhancedColumnValues } from "./ColumnValues";
@@ -19,10 +20,16 @@ import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useState } from "react";
 
 const ColumnDetails = ({
-  column,
+  // Props passed via `withColumnData` HOC
+  name,
+  columnType,
+  id,
+  parentId,
+  modeValue,
+  modeCount,
+  columnName,
   uniqueCount,
   duplicateCount,
-  mode,
   nullCount,
   completeness,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
@@ -56,7 +63,7 @@ const ColumnDetails = ({
           variant="h5"
           sx={{ ...(hasAlerts && { color: "warning.dark" }) }}
         >
-          {column.name || column.columnName || column.id}
+          {name || columnName || id}
         </Typography>
         {hasAlerts && (
           <Chip
@@ -72,14 +79,12 @@ const ColumnDetails = ({
       <Divider sx={{ my: 1 }} />
       <DescriptionList
         data={{
-          type: column.columnType,
+          type: columnType,
           null: nullCount.toLocaleString(),
           completeness: `${completeness * 100}%`,
           unique: uniqueCount.toLocaleString(),
           duplicate: duplicateCount.toLocaleString(),
-          mode: `${column.modeValue || 0} (${
-            column.modeCount.toLocaleString() || 0
-          })`,
+          mode: `${modeValue || 0} (${modeCount.toLocaleString() || 0})`,
         }}
       />
       <Divider sx={{ my: 1 }} />
@@ -100,12 +105,12 @@ const ColumnDetails = ({
       <Box sx={{ mt: "10px", flexGrow: 1, overflow: "auto" }}>
         {view === "value counts" && (
           <ColumnValueCounts
-            columnName={column.columnName}
-            tableId={column.tableId}
+            columnName={columnName}
+            tableId={parentId}
             uniqueCount={uniqueCount}
           />
         )}
-        {view === "raw values" && <EnhancedColumnValues id={column.id} />}
+        {view === "raw values" && <EnhancedColumnValues id={id} />}
       </Box>
     </Box>
   );

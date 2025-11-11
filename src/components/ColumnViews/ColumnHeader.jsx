@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Box, IconButton, Menu, TableSortLabel } from "@mui/material";
+import { IconButton, Menu, TableSortLabel } from "@mui/material";
 // import EditableText from "../ui/EditableText";
 import { useCallback, useState } from "react";
 import { MoreVert } from "@mui/icons-material";
@@ -10,7 +10,7 @@ import StyledColumnCard from "./StyledColumnCard";
 
 const ColumnHeader = ({
   // Props pass via withColumnData HOC
-  column,
+  id,
   isHovered,
   isDragging,
   isDropTarget,
@@ -19,9 +19,7 @@ const ColumnHeader = ({
   isLoading,
   isFocused,
   isDraggable,
-  isError,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
-  alertIds,
   hasAlerts,
   // Props passed directly from parent
   isActive,
@@ -44,9 +42,9 @@ const ColumnHeader = ({
   // Handle column sorting
   const handleSort = useCallback(
     (event) => {
-      onSort(event, column.id);
+      onSort(event, id);
     },
-    [onSort, column.id]
+    [onSort, id]
   );
 
   return (
@@ -90,11 +88,11 @@ const ColumnHeader = ({
             },
           }}
         >
-          <EnhancedColumnName id={column.id} sx={{ cursor: "inherit" }} />
+          <EnhancedColumnName id={id} sx={{ cursor: "inherit" }} />
         </TableSortLabel>
         <IconButton
           size="small"
-          onClick={(event) => handleMenuOpen(event, column.id)}
+          onClick={(event) => handleMenuOpen(event, id)}
           sx={{
             ml: 1,
             opacity: 0.6,
@@ -122,7 +120,7 @@ const ColumnHeader = ({
         }}
       >
         <EnhancedColumnContextMenuItems
-          id={column.id}
+          id={id}
           closeMenu={handleMenuClose}
           includeInsert={false}
         />

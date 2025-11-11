@@ -34,78 +34,12 @@ const StackRows = ({
   // Props passed directly from withStackoperationData
   columnIdMatrix,
   selectedColumnIds,
-  selectedChildColumns,
   // Props passed from withAssociatedAlerts
   hasAlerts,
 }) => {
   const tableContainerRef = useRef(null);
   const [sortBy, setSortBy] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
-
-  // This should update whenever columnIdMatrix changes or
-  // the selected columns within a child table changes
-  const { selectedChildColumnNameMatrix, childIdToRowIndex } = useMemo(() => {
-    let columnNameMatrixWithChildIds = columnIdMatrix.map((columnIds, i) => {
-      const childSelectedColumns =
-        selectedChildColumns[operation.children[i]] || [];
-
-      const childSelectedColumnIds = childSelectedColumns.map((col) => col.id);
-      return {
-        childId: operation.children[i],
-        columns: columnIds.map((id) => {
-          return childSelectedColumnIds.includes(id)
-            ? childSelectedColumns.find((col) => col.id === id)?.columnName
-            : null;
-        }),
-      };
-    });
-
-    // Remove rows (child tables) where ALL values are null
-    columnNameMatrixWithChildIds = columnNameMatrixWithChildIds.filter((row) =>
-      row.columns.some((value) => value !== null)
-    );
-
-    // Extract just the column arrays for filtering logic
-    let columnNameMatrix = columnNameMatrixWithChildIds.map(
-      (row) => row.columns
-    );
-
-    // Remove columns where ALL values are null
-    if (columnNameMatrix.length === 0) {
-      return { selectedChildColumnNameMatrix: [], childIdToRowIndex: {} };
-    }
-
-    const numColumns = columnNameMatrix[0]?.length || 0;
-    const columnsToKeep = [];
-
-    for (let colIndex = 0; colIndex < numColumns; colIndex++) {
-      const hasNonNullValue = columnNameMatrix.some(
-        (row) => row[colIndex] !== null
-      );
-      if (hasNonNullValue) {
-        columnsToKeep.push(colIndex);
-      }
-    }
-
-    // Filter out the all-null columns
-    const filteredMatrix = columnNameMatrix.map((row) =>
-      columnsToKeep.map((colIndex) => row[colIndex])
-    );
-
-    // Create mapping from childId to row index in filtered matrix
-    const childIdToRowIndex = columnNameMatrixWithChildIds.reduce(
-      (map, row, index) => {
-        map[index] = row.childId;
-        return map;
-      },
-      Array(filteredMatrix.length).fill(null)
-    );
-
-    return {
-      selectedChildColumnNameMatrix: filteredMatrix,
-      childIdToRowIndex,
-    };
-  }, [columnIdMatrix, operation.children, selectedChildColumns]);
 
   const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
     id,

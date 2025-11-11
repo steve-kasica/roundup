@@ -27,16 +27,14 @@ import { COLUMN_TYPE_VARCHAR } from "../../slices/columnsSlice";
 
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
-  column,
+  columnType,
+  name,
+  columnName,
   excludeColumn,
   setColumnType,
   focusColumn,
   onInsertColumnLeftClick,
   onInsertColumnRightClick,
-  // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
-  alertIds,
-  hasAlerts,
-  // action dispatch functions passed via `withColumnData` HOC
   renameColumn,
   // Props passed directly from parent component
   closeMenu,
@@ -47,13 +45,13 @@ const ColumnContextMenu = ({
   const [newColumnName, setNewColumnName] = useState("");
   const [columnTypeDialogOpen, setColumnTypeDialogOpen] = useState(false);
   const [selectedColumnType, setSelectedColumnType] = useState(
-    column.columnType || ""
+    columnType || ""
   );
 
   const handleRenameColumn = useCallback(() => {
-    setNewColumnName(column.name || column.columnName || ""); // Pre-fill with current name
+    setNewColumnName(name || columnName || ""); // Pre-fill with current name
     setRenameDialogOpen(true);
-  }, [column.name, column.columnName]);
+  }, [name, columnName]);
 
   const handleRenameDialogClose = useCallback(
     (event) => {
@@ -120,9 +118,9 @@ const ColumnContextMenu = ({
   );
 
   const handleSetColumnType = useCallback(() => {
-    setSelectedColumnType(column.columnType || "");
+    setSelectedColumnType(columnType || "");
     setColumnTypeDialogOpen(true);
-  }, [column.columnType]);
+  }, [columnType]);
 
   const handleFocusColumn = useCallback(
     (event) => {

@@ -2,15 +2,11 @@
  * @name tablesSlice
  */
 import { createSlice } from "@reduxjs/toolkit";
+import { normalizeInputToArray } from "../utilities";
 
-const initialState = {
-  idsByOperationId: {}, // Map of <operationId>: [tableId, tableId, ...]
+export const initialState = {
   ids: [],
-  data: {},
-  loading: [],
-  hovered: null, // ID of the table currently hovered over
-  selected: [], // IDs of the tables currently selected, may include one or more columns
-  error: null,
+  byId: {}, // Map of <tableId>: tableObject
 };
 
 const slice = createSlice({
@@ -18,30 +14,53 @@ const slice = createSlice({
   initialState,
   reducers: {
     /**
-     * Adds one or more new tables to the state. Mapping data from remote
+     * Adds one or more new tables to the state. Mapping byId from remote
      * sources to Open Roundup's table structure is handled upstream.
      *
-     * @param {Object} state - The current Redux slice state, containing `ids` (array of table IDs) and `data` (object mapping IDs to table objects).
+     * @param {Object} state - The current Redux slice state, containing `ids` (array of table IDs) and `byId` (object mapping IDs to table objects).
      * @param {Object} action - The Redux action object.
      * @param {Object|Object[]} action.payload - A single table object or an array of table objects to add.
      * @throws {Error} If a table with the same ID already exists in the state.
      */
     addTables(state, action) {
-      let tables = action.payload;
-      if (!Array.isArray(tables)) {
-        tables = [tables];
-      }
+      let tables = normalizeInputToArray(action.payload);
       tables.forEach((table) => {
-        if (state.ids.includes(table.id)) {
+        if (state.byId[table.id]) {
           throw new Error(`Table with ID ${table.id} already exists`);
         }
         state.ids.push(table.id);
-        state.data[table.id] = table;
+        state.byId[table.id] = table;
       });
     },
 
     /**
-     * Removes one or more tables from the state by their IDs.
+     * Updates existing tables in the state with new metadata about tables.
+     *
+     * Normalizes the input payload to an array and updates each table in the state
+     * whose ID matches the provided update. Throws an error if a table with the given
+     * ID does not exist in the state.
+     *
+     * @param {Object} state - The current Redux slice state containing table metadata.
+     * @param {Object} action - The Redux action containing the payload.
+     * @param {Object|Object[]} action.payload - The table update(s) to apply. Can be a single object or an array of objects.
+     * @throws {Error} If a table with the specified ID does not exist in the state.
+     */
+    updateTables(state, action) {
+      const tableUpdates = normalizeInputToArray(action.payload);
+
+      tableUpdates.forEach((table) => {
+        if (!state.byId[table.id]) {
+          throw new Error(`Table with ID ${table.id} does not exist`);
+        }
+        state.byId[table.id] = {
+          ...state.byId[table.id],
+          ...table,
+        };
+      });
+    },
+
+    /**
+     * Delete one or more tables from the state by their IDs.
      *
      * @param {Object} state - The current state of the tables slice.
      * @param {Object} action - The Redux action object.
@@ -52,237 +71,51 @@ const slice = createSlice({
      * - Accepts a single table ID or an array of table IDs in the action payload.
      * - Throws an error if any specified table ID does not exist in the state.
      * - Removes the specified table IDs from the `ids` array.
-     * - Deletes the corresponding entries from the `data` object.
+     * - Deletes the corresponding entries from the `byId` object.
      */
-    dropTables(state, action) {
-      let tableIds = action.payload;
-      if (!Array.isArray(tableIds)) {
-        tableIds = [tableIds];
-      }
-      tableIds.forEach((tableId) => {
+    deleteTables(state, action) {
+      const tableIdsToDelete = normalizeInputToArray(action.payload);
+      tableIdsToDelete.forEach((tableId) => {
         // Check if the table exists
-        if (!state.data[tableId]) {
+        if (!state.byId[tableId]) {
           throw new Error(`Table with ID ${tableId} does not exist`);
         }
         // Remove the table from the list of IDs
         state.ids = state.ids.filter((id) => id !== tableId);
 
-        // Remove the table from the loading state if it is there
-        state.loading = state.loading.filter((id) => id !== tableId);
-
-        // Remove the table from the data object
-        delete state.data[tableId];
+        // Remove the table from the byId object
+        delete state.byId[tableId];
       });
     },
 
     /**
-     * Reducer to add one or more table IDs to the loading state.
+     * Updates the column IDs for one or more tables in the state.
      *
-     * @param {Object} state - The current state of the tables slice.
-     * @param {Object} action - The Redux action object.
-     * @param {string|string[]} action.payload - A single table ID or an array of table IDs to add to the loading array.
-     *
-     * @returns {void}
-     */
-    addTablesToLoading(state, action) {
-      let tableIds = action.payload;
-      if (!Array.isArray(tableIds)) {
-        tableIds = [tableIds];
-      }
-      // Add the table IDs to the loading array
-      state.loading = state.loading.concat(tableIds);
-    },
-
-    /**
-     * Removes one or more table IDs from the loading array in the state.
+     * Accepts an array or single object mapping table IDs to their new column ID arrays.
+     * Throws an error if a specified table does not exist in the state.
      *
      * @param {Object} state - The current Redux slice state.
-     * @param {Object} action - The Redux action object.
-     * @param {string|string[]} action.payload - A single table ID or an array of table IDs to remove from the loading array.
+     * @param {Object} action - The Redux action containing the payload.
+     * @param {Array<{tableId: string, columnIds: string[]}>|{tableId: string, columnIds: string[]}} action.payload
+     *   - An array or single object specifying table IDs and their new column IDs.
+     * @throws {Error} If a table with the specified ID does not exist in the state.
      */
-    removeTablesFromLoading(state, action) {
-      let tableIds = action.payload;
-      if (!Array.isArray(tableIds)) {
-        tableIds = [tableIds];
-      }
-      // Remove the table IDs from the loading array
-      state.loading = state.loading.filter((id) => !tableIds.includes(id));
-    },
+    setTablesColumnIds(state, action) {
+      const tableColumnMappings = normalizeInputToArray(action.payload);
 
-    /**
-     * Redux reducer to change the name of a table.
-     *
-     * @param {Object} state - The current state of the tables slice.
-     * @param {Object} action - The dispatched action containing payload.
-     * @param {Object} action.payload - The payload object.
-     * @param {string|array} action.payload.tableId - The unique identifier of the table to rename.
-     * @param {string|array} action.payload.newName - The new name to assign to the table.
-     * @throws {Error} Throws an error if the table with the specified ID does not exist.
-     */
-    changeTablesName(state, action) {
-      let { ids, newNames } = action.payload;
-      // Ensure tableIds is an array
-      ids = Array.isArray(ids) ? ids : [ids];
-      newNames = Array.isArray(newNames) ? newNames : [newNames];
-
-      // Check if the number of tableIds matches the number of new names
-      if (ids.length !== newNames.length) {
-        throw new Error(
-          "Number of table IDs must match the number of new names"
-        );
-      }
-      // Iterate over each table ID and update its new name
-      ids.forEach((id, index) => {
-        const newName = newNames[index].trim();
-
+      tableColumnMappings.forEach(({ tableId, columnIds }) => {
         // Check if the table exists
-        if (!state.data[id]) {
-          throw new Error(`Table with ID ${id} does not exist`);
+        if (!state.byId[tableId]) {
+          throw new Error(`Table with ID ${tableId} does not exist`);
         }
-        // Update the table name
-        state.data[id].name = newName;
-      });
-    },
-
-    updateTables(state, action) {
-      // Normalize input to always be an array
-      const tableUpdates = Array.isArray(action.payload)
-        ? action.payload
-        : action.payload.tables || [action.payload];
-
-      tableUpdates.forEach((table) => {
-        if (!state.data[table.id]) {
-          throw new Error(`Table with ID ${table.id} does not exist`);
-        }
-        state.data[table.id] = {
-          ...state.data[table.id],
-          ...table,
-        };
-      });
-    },
-    setTablesAttribute(state, action) {
-      let { ids, attribute, value } = action.payload;
-      // Ensure ids is an array
-      ids = Array.isArray(ids) ? ids : [ids];
-
-      ids.forEach((id) => {
-        // Check if the table exists
-        if (!state.data[id]) {
-          throw new Error(`Table with ID ${id} does not exist`);
-        }
-        // Update the table's attributes
-        state.data[id][attribute] = value;
-      });
-    },
-
-    incrementRowsExplored: (state, action) => {
-      const { tableId, rowsExplored } = action.payload;
-      const table = state.data[tableId];
-      if (table) {
-        table.rowsExplored += rowsExplored;
-      } else {
-        throw new Error(`Table with ID ${tableId} not found`);
-      }
-    },
-
-    setTableColumnIds(state, action) {
-      const { tableId, columnIds } = action.payload;
-      // Check if the table exists
-      if (!state.data[tableId]) {
-        throw new Error(`Table with ID ${tableId} does not exist`);
-      } else {
         // Update the table's column IDs
-        state.data[tableId].columnIds = columnIds;
-      }
-    },
-    swapTableColumnIds(state, action) {
-      const { tableId, sourceIndex, targetIndex } = action.payload;
-      // Check if the table exists
-      if (!state.data[tableId]) {
-        throw new Error(`Table with ID ${tableId} does not exist`);
-      }
-      const table = state.data[tableId];
-      // Swap the column IDs at the specified indices
-      const columnIds = [...table.columnIds];
-      [columnIds[sourceIndex], columnIds[targetIndex]] = [
-        columnIds[targetIndex],
-        columnIds[sourceIndex],
-      ];
-      table.columnIds = columnIds;
-    },
-    removeTableColumnId(state, action) {
-      const { tableId, columnId } = action.payload;
-      // Check if the table exists
-      if (!state.data[tableId]) {
-        throw new Error(`Table with ID ${tableId} does not exist`);
-      }
-      const table = state.data[tableId];
-      // Support single or multiple column IDs
-      let columnIdsToRemove = columnId;
-      if (!Array.isArray(columnIdsToRemove)) {
-        columnIdsToRemove = [columnIdsToRemove];
-      }
-      // Remove the specified column IDs from the table's columnIds
-      table.columnIds = table.columnIds.filter(
-        (id) => !columnIdsToRemove.includes(id)
-      );
-    },
-    setSelectedTables(state, action) {
-      const tableIds = action.payload;
-      // Ensure tableIds is an array
-      state.selected = Array.isArray(tableIds) ? tableIds : [tableIds];
-    },
-    appendToSelectedTables(state, action) {
-      const tableId = action.payload;
-      // Ensure tableId is an array
-      if (state.selected.includes(tableId)) {
-        throw new Error(`Table with ID ${tableId} is already selected`);
-      }
-      state.selected.push(tableId);
-    },
-    removeFromSelectedTables(state, action) {
-      let tableIds = action.payload;
-      // Normalize to array
-      tableIds = Array.isArray(tableIds) ? tableIds : [tableIds];
-      // Ensure tableIds is an array
-      state.selected = state.selected.filter((id) => !tableIds.includes(id));
-    },
-    clearSelectedTables(state) {
-      // Clear the selected tables
-      state.selected = initialState.selected;
-    },
-    setHoveredTable(state, action) {
-      const tableId = action.payload;
-      // Set the hovered table ID
-      state.hovered = tableId;
-    },
-    clearHoveredTable(state) {
-      // Clear the hovered table ID
-      state.hovered = null;
+        state.byId[tableId].columnIds = columnIds;
+      });
     },
   }, // end reducers
 });
 
-export const {
-  addTables,
-  dropTables,
-  updateTables,
-  setTablesAttribute,
-  addTablesToLoading,
-  removeTablesFromLoading,
-  changeTablesName,
-  incrementRowsExplored,
-  setTableColumnIds,
-  swapTableColumnIds,
-  removeTableColumnId,
-
-  setSelectedTables,
-  appendToSelectedTables,
-  removeFromSelectedTables,
-  clearSelectedTables,
-
-  setHoveredTable,
-  clearHoveredTable,
-} = slice.actions;
+export const { addTables, updateTables, deleteTables, setTablesColumnIds } =
+  slice.actions;
 
 export default slice;

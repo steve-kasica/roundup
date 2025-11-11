@@ -1,8 +1,6 @@
 import { call, put, select } from "redux-saga/effects";
 import {
-  addColumnsToLoading,
-  removeColumnsFromLoading,
-  selectColumnById,
+  selectColumnsById,
   updateColumns as updateColumnsSlice,
 } from "../../slices/columnsSlice";
 import { getColumnStats } from "../../lib/duckdb";
@@ -15,11 +13,9 @@ export default function* updateColumnsWorker(action) {
   const failedUpdates = [];
   const { columnUpdates } = action.payload;
 
-  yield put(addColumnsToLoading(columnUpdates.map(({ id }) => id)));
-
   for (let columnUpdate of columnUpdates) {
     const column = yield select((state) =>
-      selectColumnById(state, columnUpdate.id)
+      selectColumnsById(state, columnUpdate.id)
     );
     try {
       let databaseAttributeValues = {};
@@ -34,15 +30,6 @@ export default function* updateColumnsWorker(action) {
           [column.columnName]
         );
       }
-      // TODO: compute columnKeyness? Isn't this something we can do in the HOC?
-      // function* computeColumnKeynessWorker(action) {
-      //   const { columnIds, tableIds } = action.payload;
-      //   for (let i = 0; i < tableIds.length; i++) {
-      //     const tableId = tableIds[i];
-      //     const columnUpdates = yield rankColumnsKeyness(columnIds[i], tableId);
-      //     yield put(updateColumns(columnUpdates)); // {id, totalRows, uniqueValues, nonNullValues}
-      //   }
-      // }
 
       successfulUpdates.push({
         ...columnUpdate,
@@ -64,7 +51,6 @@ export default function* updateColumnsWorker(action) {
 
   // Update the column objects in the store (both successful and failed)
   yield put(updateColumnsSlice([...successfulUpdates, ...failedUpdates]));
-  yield put(removeColumnsFromLoading(columnUpdates.map(({ id }) => id)));
 
   const formatUpdates = (updates) =>
     Object.fromEntries(

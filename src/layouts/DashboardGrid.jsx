@@ -5,9 +5,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 // import Drawer from "@mui/material/Drawer";
-// import { selectDrawerContents } from "../slices/uiSlice/uiSliceSelectors";
 // import { useDispatch, useSelector } from "react-redux";
-// import { setDrawerContents } from "../slices/uiSlice/uiSlice";
 // import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TablePeek/TablePeek";
 // import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnIndexDetails";
 // import { Button, IconButton } from "@mui/material";
@@ -46,13 +44,7 @@ const DashboardGrid = ({
   cardElevation = 1,
 }) => {
   // let drawer;
-  // const dispatch = useDispatch();
-
-  // const drawerContents = useSelector(selectDrawerContents);
-  // Check if drawerContents is in the componentMap
-  // if (drawerContents) {
-  //   drawer = drawerComponentMap[drawerContents];
-  // }
+  // const dispatch = useDispatch();}
 
   // Use provided titles or generate placeholders
   const gridTitles = [...titles];
@@ -71,8 +63,6 @@ const DashboardGrid = ({
     >
       {/* <Drawer
         anchor={drawer ? drawer.anchor : undefined}
-        open={Boolean(drawerContents)}
-        onClose={() => dispatch(setDrawerContents(null))}
       >
         <Box
           sx={{
@@ -98,7 +88,6 @@ const DashboardGrid = ({
             <IconButton
               aria-label="close drawer"
               onClick={() => {
-                dispatch(setDrawerContents(null));
               }}
               size="small"
             >

@@ -3,7 +3,7 @@ import { updateColumnsRequest, updateColumnsSuccess } from "./actions";
 import updateColumnsWorker from "./worker";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
 import {
-  selectColumnById,
+  selectColumnsById,
   selectColumnIdsByTableId,
   selectedExcludedColumnsByTableId,
 } from "../../slices/columnsSlice";
@@ -26,7 +26,7 @@ export default function* updateColumnsSaga() {
     // Fetch parent IDs (either table or operation) for the columns
     const parentIds = yield select((state) =>
       columnUpdates
-        .map((id) => selectColumnById(state, id))
+        .map((id) => selectColumnsById(state, id))
         .map((col) => col.tableId)
     );
 
@@ -51,7 +51,7 @@ export default function* updateColumnsSaga() {
     // Find all table IDs that have had columns excluded
     const excludedTableIds = new Set();
     for (const [id, updatedFields] of Object.entries(updates)) {
-      const column = yield select((state) => selectColumnById(state, id));
+      const column = yield select((state) => selectColumnsById(state, id));
       const isExcluded = yield select((state) => {
         return selectColumnIdsByTableId(state, column.tableId).includes(id);
       });

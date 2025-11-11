@@ -4,7 +4,7 @@ import { Typography, MenuItem, Box, Chip, ListItemText } from "@mui/material";
 import withTableData from "../../TableView/withTableData";
 import { descending } from "d3";
 import { useSelector } from "react-redux";
-import { selectColumnById } from "../../../slices/columnsSlice";
+import { selectColumnsById } from "../../../slices/columnsSlice";
 
 const colors = ["#e6550d", "#fdae6b", "#fee6ce"]; // Colors for high, medium, low uniqueness
 const thresholds = [0.75, 0.5]; // Uniqueness ratio thresholds for color coding
@@ -16,7 +16,7 @@ function OperationKeyColumnSelect({
   onChange,
 }) {
   const columns = useSelector((state) =>
-    activeColumnIds.map((id) => selectColumnById(state, id))
+    activeColumnIds.map((id) => selectColumnsById(state, id))
   );
 
   const sortedColumns = [...columns].sort((a, b) =>

@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
-import { selectColumnIdMatrixByOperationId } from "../../slices/columnsSlice";
+import { selectColumnIdsByTableIds } from "../../slices/columnsSlice";
 import {
   selectOperationChildren,
   selectStackOperationRowRanges,
@@ -36,6 +36,7 @@ export default function withStackOperationData(WrappedComponent) {
     operation,
     columnIds,
     selectedColumnIds,
+    childIds,
     // Props passed from withAssociatedAlerts
     alertIds,
     hasAlerts,
@@ -47,10 +48,21 @@ export default function withStackOperationData(WrappedComponent) {
   }) {
     const dispatch = useDispatch();
 
-    // Derive props specific to Stack operations
-    const columnIdMatrix = useSelector((state) =>
-      selectColumnIdMatrixByOperationId(state, id)
+    // Returns a matrix of columnIDs, ordered by child table IDs
+    const childColumnIds = useSelector((state) =>
+      selectColumnIdsByTableIds(state, childIds)
     );
+
+    const columnIdMatrix = useMemo(() => {
+      const maxLength = Math.max(...childColumnIds.map((row) => row.length), 0);
+      const backfilledMatrix = childColumnIds.map((row) => {
+        if (row.length < maxLength) {
+          return [...row, ...Array(maxLength - row.length).fill(null)];
+        }
+        return row;
+      });
+      return backfilledMatrix;
+    }, [childColumnIds]);
 
     // TODO: we really need to know whether or not a object is
     // a pack or stack from its ID. That'd be a good refactor.

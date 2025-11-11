@@ -1,22 +1,25 @@
+/* eslint-disable react/prop-types */
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import PropTypes from "prop-types";
 import { useCallback } from "react";
 
 import {
-  selectOperationDepth,
-  selectOperationByTableId,
+  selectOperationDepthById,
+  selectOperationIdByChildId,
 } from "../../slices/operationsSlice";
 import {
-  excludeColumnFromTable,
-  selectActiveColumnIdsByTableId,
   selectColumnIdsByTableId,
-  selectSelectedColumnDBNamesByTableId,
-  selectSelectedColumnIdsByTableId,
-  setFocusedColumnIds,
-  setSelectedColumnIds,
-  setVisibleColumns as setVisibleColumnsAction,
+  selectSelectedColumnIdsByParentId,
 } from "../../slices/columnsSlice";
-import { selectTablesById } from "../../slices/tablesSlice";
+import {
+  setSelectedColumnIds,
+  setFocusedColumnIds,
+} from "../../slices/uiSlice";
+import { setVisibleColumnIds as setVisibleColumnsAction } from "../../slices/uiSlice/uiSlice";
+import {
+  selectTableColumnIds,
+  selectTablesById,
+  setTablesColumnIds,
+} from "../../slices/tablesSlice";
 
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
@@ -44,208 +47,179 @@ export default function withTableData(WrappedComponent) {
   }) {
     const dispatch = useDispatch();
 
-    try {
-      // Get table data from the Redux store
-      const table = useSelector((state) => selectTablesById(state, id));
+    // Get table data from the Redux store
+    const table = useSelector((state) => selectTablesById(state, id));
 
-      // Columns associated with this specific table
-      const columnIds = useSelector(
-        (state) => selectColumnIdsByTableId(state, id),
-        shallowEqual
-      );
+    // Get IDs of all columns associated with this specific table
+    const columnIds = useSelector(
+      (state) => selectColumnIdsByTableId(state, id),
+      shallowEqual
+    );
 
-      // Active columns (only changes when exclusion changes)
-      const activeColumnIds = useSelector(
-        (state) => selectActiveColumnIdsByTableId(state, id),
-        shallowEqual
-      );
+    // Active columns (only changes when exclusion changes)
+    const activeColumnIds = useSelector(
+      (state) => selectTableColumnIds(state, id),
+      shallowEqual
+    );
 
-      // Selected columns (only changes when selection changes)
-      const selectedColumnIds = useSelector(
-        (state) => selectSelectedColumnIdsByTableId(state, id),
-        shallowEqual
-      );
+    // Selected columns (only changes when selection changes)
+    const selectedColumnIds = useSelector(
+      (state) => selectSelectedColumnIdsByParentId(state, id),
+      shallowEqual
+    );
 
-      // Selected column names (only changes when selection changes)
-      const selectedColumnNames = useSelector(
-        (state) => selectSelectedColumnDBNamesByTableId(state, id),
-        shallowEqual
-      );
+    // Get related operation data from the Redux store, if any
+    const parentOperationId = useSelector((state) =>
+      selectOperationIdByChildId(state, id)
+    );
 
-      // Get related operation data from the Redux store, if any
-      const parentOperationId = useSelector((state) =>
-        selectOperationByTableId(state, id)
-      );
+    const depth = useSelector((state) =>
+      selectOperationDepthById(state, parentOperationId)
+    );
 
-      const depth = useSelector((state) =>
-        selectOperationDepth(state, parentOperationId)
-      );
+    // Callback functions to handle interactions
+    // ===========================================
+    const selectColumns = useCallback(
+      (selectedColumnIds) => {
+        dispatch(setSelectedColumnIds(selectedColumnIds));
+      },
+      [dispatch]
+    );
 
-      // Functions to handle interactions
-      const selectColumns = useCallback(
-        (selectedColumnIds) => {
-          dispatch(setSelectedColumnIds(selectedColumnIds));
-        },
-        [dispatch]
-      );
-
-      const swapColumns = useCallback(
-        (target, source) => {
-          const sourceIndex = activeColumnIds.indexOf(source);
-          const targetIndex = activeColumnIds.indexOf(target);
-          if (sourceIndex === -1 || targetIndex === -1) {
-            throw new Error(
-              `Invalid column IDs for swapping: source (${source}) or target (${target}) not found in active columns of table ${id}.`
-            );
-          }
-          dispatch(
-            updateColumnsRequest({
-              columnUpdates: [
-                { id: source, index: targetIndex },
-                { id: target, index: sourceIndex },
-              ],
-            })
+    const swapColumns = useCallback(
+      (target, source) => {
+        const sourceIndex = activeColumnIds.indexOf(source);
+        const targetIndex = activeColumnIds.indexOf(target);
+        if (sourceIndex === -1 || targetIndex === -1) {
+          throw new Error(
+            `Invalid column IDs for swapping: source (${source}) or target (${target}) not found in active columns of table ${id}.`
           );
-        },
-        [dispatch, activeColumnIds, id]
-      );
+        }
+        dispatch(
+          updateColumnsRequest({
+            columnUpdates: [
+              { id: source, index: targetIndex },
+              { id: target, index: sourceIndex },
+            ],
+          })
+        );
+      },
+      [dispatch, activeColumnIds, id]
+    );
 
-      const excludeColumns = useCallback(
-        (columnIds) => dispatch(excludeColumnFromTable(columnIds)),
-        [dispatch]
-      );
+    const excludeColumns = useCallback(
+      (columnIdsToExclude) => {
+        const columnIds = activeColumnIds.filter(
+          (colId) => !columnIdsToExclude.includes(colId)
+        );
+        dispatch(setTablesColumnIds({ id, columnIds }));
+      },
+      [activeColumnIds, dispatch, id]
+    );
 
-      const setVisibleColumns = useCallback(
-        (columnIds) => {
-          dispatch(setVisibleColumnsAction(columnIds));
-        },
-        [dispatch]
-      );
+    const setVisibleColumns = useCallback(
+      (columnIds) => {
+        dispatch(setVisibleColumnsAction(columnIds));
+      },
+      [dispatch]
+    );
 
-      const setTableName = useCallback(
-        (name) => {
-          dispatch(
-            updateTablesRequest({
-              tableUpdates: [{ id, name }],
-            })
-          );
-        },
-        [dispatch, id]
-      );
+    const setTableName = useCallback(
+      (name) => {
+        dispatch(
+          updateTablesRequest({
+            tableUpdates: [{ id, name }],
+          })
+        );
+      },
+      [dispatch, id]
+    );
 
-      const removeTableFromSchema = useCallback(() => {
-        // TODO
-      }, []);
+    const removeTableFromSchema = useCallback(() => {
+      // TODO
+    }, []);
 
-      const deleteTable = useCallback(() => {
-        dispatch(deleteTablesRequest([id]));
-      }, [dispatch, id]);
+    const deleteTable = useCallback(() => {
+      dispatch(deleteTablesRequest([id]));
+    }, [dispatch, id]);
 
-      const insertColumn = useCallback(
-        (newColumnIndex) => {
-          dispatch(
-            createColumnsRequest({
-              mode: CREATION_MODE_INSERTION,
-              columnInfo: [
-                {
-                  parentId: id,
-                  index: newColumnIndex,
-                },
-              ],
-            })
-          );
-        },
-        [dispatch, id]
-      );
+    const insertColumn = useCallback(
+      (newColumnIndex) => {
+        dispatch(
+          createColumnsRequest({
+            mode: CREATION_MODE_INSERTION,
+            columnInfo: [
+              {
+                parentId: id,
+                index: newColumnIndex,
+              },
+            ],
+          })
+        );
+      },
+      [dispatch, id]
+    );
 
-      const focusTable = useCallback(() => {
-        dispatch(setFocusedObject(id));
-      }, [dispatch, id]);
+    const focusTable = useCallback(() => {
+      dispatch(setFocusedObject(id));
+    }, [dispatch, id]);
 
-      const focusColumns = useCallback(
-        (colIds) => dispatch(setFocusedColumnIds(colIds)),
-        [dispatch]
-      );
+    const focusColumns = useCallback(
+      (colIds) => dispatch(setFocusedColumnIds(colIds)),
+      [dispatch]
+    );
 
-      // Current number of non-excluded columns
-      const columnCount = activeColumnIds.length;
+    // Current number of non-excluded columns
+    const columnCount = activeColumnIds.length;
 
-      // Number of columns when table was initialized
-      const initialColumnCount = columnIds.length;
+    // Number of columns when table was initialized
+    const initialColumnCount = columnIds.length;
 
-      // Number of columns that have been excluded
-      const removedColumnCount = initialColumnCount - columnCount;
+    // Number of columns that have been excluded
+    const removedColumnCount = initialColumnCount - columnCount;
 
-      // Determine if the table is part of the current schema (has an operation)
-      const isInSchema = useSelector(
-        (state) => selectOperationByTableId(state, id) !== undefined
-      );
+    // Determine if the table is part of the current schema (has an operation)
+    const isInSchema = useSelector(
+      (state) => selectOperationIdByChildId(state, id) !== undefined
+    );
 
-      return (
-        <WrappedComponent
-          {...props}
-          id={id}
-          // Props from withAssociatedAlerts
-          alertIds={alertIds}
-          hasAlerts={hasAlerts}
-          removeAlerts={removeAlerts}
-          silenceAlerts={silenceAlerts}
-          // Table properties
-          table={table}
-          name={table.name}
-          rowCount={table.rowCount.toLocaleString()}
-          parentOperationId={parentOperationId} // TODO: should only pass Ids
-          isInSchema={isInSchema}
-          depth={depth}
-          columnIds={columnIds}
-          activeColumnIds={activeColumnIds}
-          activeColumnsCount={activeColumnIds.length}
-          selectedColumnIds={selectedColumnIds}
-          initialColumnCount={initialColumnCount}
-          columnCount={columnCount}
-          removedColumnCount={removedColumnCount}
-          selectedColumnNames={selectedColumnNames} // necessary for DB hooks
-          // Interaction handlers
-          selectColumns={selectColumns}
-          swapColumns={swapColumns}
-          excludeColumns={excludeColumns}
-          focusColumns={focusColumns}
-          setTableName={setTableName}
-          setVisibleColumns={setVisibleColumns}
-          removeTableFromSchema={removeTableFromSchema}
-          focusTable={focusTable}
-          deleteTable={deleteTable}
-          insertColumn={insertColumn}
-        />
-      );
-    } catch (error) {
-      // Enhanced error with component context
-      const enhancedError = new Error(
-        `Error in withTableData HOC wrapping ${componentName} (table id: ${id}): ${error.message}`
-      );
-      enhancedError.originalError = error;
-      enhancedError.componentName = componentName;
-      enhancedError.tableId = id;
-      enhancedError.stack = error.stack;
-
-      console.error(`[withTableData HOC] Error in ${componentName}:`, {
-        componentName,
-        tableId: id,
-        originalError: error,
-        props: props,
-      });
-
-      throw enhancedError;
-    }
+    return (
+      <WrappedComponent
+        {...props}
+        id={id}
+        // Props from withAssociatedAlerts
+        alertIds={alertIds}
+        hasAlerts={hasAlerts}
+        removeAlerts={removeAlerts}
+        silenceAlerts={silenceAlerts}
+        // Table properties
+        table={table}
+        name={table.name}
+        rowCount={table.rowCount.toLocaleString()}
+        parentOperationId={parentOperationId} // TODO: should only pass Ids
+        isInSchema={isInSchema}
+        depth={depth}
+        columnIds={columnIds}
+        activeColumnIds={activeColumnIds}
+        activeColumnsCount={activeColumnIds.length}
+        selectedColumnIds={selectedColumnIds}
+        initialColumnCount={initialColumnCount}
+        columnCount={columnCount}
+        removedColumnCount={removedColumnCount}
+        // Interaction handlers
+        selectColumns={selectColumns}
+        swapColumns={swapColumns}
+        excludeColumns={excludeColumns}
+        focusColumns={focusColumns}
+        setTableName={setTableName}
+        setVisibleColumns={setVisibleColumns}
+        removeTableFromSchema={removeTableFromSchema}
+        focusTable={focusTable}
+        deleteTable={deleteTable}
+        insertColumn={insertColumn}
+      />
+    );
   }
-
-  EnhancedComponent.propTypes = {
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    alertIds: PropTypes.array.isRequired,
-    hasAlerts: PropTypes.bool.isRequired,
-    removeAlerts: PropTypes.func.isRequired,
-    silenceAlerts: PropTypes.func.isRequired,
-  };
 
   // Set display name for better debugging in React DevTools
   EnhancedComponent.displayName = `withTableData(${componentName})`;
@@ -253,12 +227,3 @@ export default function withTableData(WrappedComponent) {
   // Wrap EnhancedComponent with withAssociatedAlerts
   return withAssociatedAlerts(EnhancedComponent);
 }
-
-withTableData.propTypes = {
-  WrappedComponent: PropTypes.elementType.isRequired,
-};
-
-// EnhancedComponent prop types
-export const EnhancedComponentPropTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-};

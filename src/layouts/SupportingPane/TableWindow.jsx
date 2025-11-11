@@ -1,11 +1,7 @@
 /* eslint-disable react/prop-types */
-import { Alert, Box, Divider, Stack, Typography } from "@mui/material";
+import { Alert, Box } from "@mui/material";
 import { useSelector } from "react-redux";
-import {
-  EnhancedTableLabel,
-  EnhancedTableRows,
-} from "../../components/TableView";
-import { selectSelectedColumns } from "../../slices/columnsSlice";
+import { EnhancedTableRows } from "../../components/TableView";
 import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
@@ -14,7 +10,6 @@ import {
 } from "../../slices/operationsSlice";
 import { EnhancedPackRows } from "../../components/PackOperationView";
 import { isTableId } from "../../slices/tablesSlice";
-import { EnhancedOperationLabel } from "../../components/OperationView";
 import { EnhancedStackRows } from "../../components/StackOperationView/StackRows";
 
 const VIEW_TABLE = "TABLE";

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getPackVirtualRows } from "../lib/duckdb/getPackVirtualRows";
 import { useSelector, shallowEqual } from "react-redux";
-import { selectColumnById } from "../slices/columnsSlice";
+import { selectColumnsById } from "../slices/columnsSlice";
 
 /**
  * React hook for fetching and managing packed (joined) table rows from DuckDB.
@@ -64,22 +64,22 @@ export function useVirtualPackRows(
   // Use useSelector with custom equality to prevent unnecessary re-renders
   const leftColumnNames = useSelector((state) => {
     return leftColumnIds
-      .map((id) => selectColumnById(state, id)?.columnName)
+      .map((id) => selectColumnsById(state, id)?.columnName)
       .filter((name) => name);
   }, shallowEqual);
 
   const rightColumnNames = useSelector((state) => {
     return rightColumnIds
-      .map((id) => selectColumnById(state, id)?.columnName)
+      .map((id) => selectColumnsById(state, id)?.columnName)
       .filter((name) => name);
   }, shallowEqual);
 
   const leftKeyColumn = useSelector(
-    (state) => selectColumnById(state, leftKeyColumnId)?.columnName
+    (state) => selectColumnsById(state, leftKeyColumnId)?.columnName
   );
 
   const rightKeyColumn = useSelector(
-    (state) => selectColumnById(state, rightKeyColumnId)?.columnName
+    (state) => selectColumnsById(state, rightKeyColumnId)?.columnName
   );
 
   /**

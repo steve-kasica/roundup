@@ -2,25 +2,21 @@
 import { useSelector } from "react-redux";
 import {
   selectOperation,
-  selectOperationDepth,
-  selectFocusedOperationId,
-  setHoveredOperation,
-  selectHoveredOperation,
+  selectOperationChildrenByIds,
+  selectOperationDepthById,
   updateOperations,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
-import { setPeekedTable } from "../../slices/uiSlice";
 import {
-  excludeColumnFromTable,
   selectColumnIdsByTableId,
-  selectRemovedColumnIdsByTableId,
   selectSelectedChildColumnsByOperationId,
-  selectSelectedColumnDBNamesByTableId,
-  selectSelectedColumnIdsByTableId,
+  selectSelectedColumnIdsByParentId,
+} from "../../slices/columnsSlice";
+import {
   setFocusedColumnIds,
   setSelectedColumnIds,
-  setVisibleColumns as setVisibleColumnsAction,
-} from "../../slices/columnsSlice";
+  setVisibleColumnIds as setVisibleColumnsAction,
+} from "../../slices/uiSlice/uiSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
 import { useCallback, useMemo } from "react";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
@@ -43,39 +39,26 @@ export default function withOperationData(WrappedComponent) {
     const dispatch = useDispatch();
 
     const operation = useSelector((state) => selectOperation(state, id));
-    const depth = useSelector((state) => selectOperationDepth(state, id));
-    const focusedOperationId = useSelector(selectFocusedOperationId);
-    const hoveredOperationId = useSelector(selectHoveredOperation);
-    const columnIds = useSelector(
-      (state) => selectColumnIdsByTableId(state, id) // TODO, generalize name for operations too
-    );
+    const depth = useSelector((state) => selectOperationDepthById(state, id));
+    const childIds = useSelector((state) => selectOperationChildrenByIds(state, id));
+
     // Get columnIds associated with this table, both active and "removed"
-    const removedColumnIds = useSelector(
-      (state) => selectRemovedColumnIdsByTableId(state, id) // TODO, generalize name for operations too
+    const columnIds = useSelector((state) =>
+      selectColumnIdsByTableId(state, id)
     );
 
-    const selectedChildColumns = useSelector((state) =>
-      selectSelectedChildColumnsByOperationId(state, id)
-    );
+    const activeColumnIds = useSelector((state) => )
+
+    const removedColumnIds = useSelector(); // TODO
 
     // Column objects for all columns associated directly with this operation
     const selectedColumnIds = useSelector((state) =>
-      selectSelectedColumnIdsByTableId(state, id)
+      selectSelectedColumnIdsByParentId(state, id)
     );
 
-    const selectedColumnNames = useSelector((state) =>
-      selectSelectedColumnDBNamesByTableId(state, id)
-    );
 
-    // Use useMemo to ensure activeColumnIds updates when table.columnIds or removedColumnIds change
-    const activeColumnIds = useMemo(
-      () =>
-        columnIds.filter((columnId) => !removedColumnIds.includes(columnId)),
-      [columnIds, removedColumnIds]
-    );
-
-    const isFocused = operation.id === focusedOperationId;
-    const isHovered = operation.id === hoveredOperationId;
+    const isFocused = false; // TODO
+    const isHovered = false; // TODO
 
     // Define callback functions used by all operation types
     // ----------------------------------------------------------------------------
@@ -140,10 +123,8 @@ export default function withOperationData(WrappedComponent) {
       [dispatch, id, operation.children]
     );
 
-    const excludeColumns = useCallback(
-      (columnIds) => dispatch(excludeColumnFromTable(columnIds)),
-      [dispatch]
-    );
+    // TODO
+    const excludeColumns = useCallback((columnIds) => null, [dispatch]);
 
     const materializeOperation = useCallback(
       () => dispatch(materializeOperationRequest({ operationId: id })),
@@ -159,7 +140,7 @@ export default function withOperationData(WrappedComponent) {
         operation={operation}
         name={operation.name}
         operationType={operation.operationType}
-        childIds={operation.children}
+        childIds={childIds}
         doesViewExist={operation.doesViewExist}
         depth={depth}
         // Directly associated columns
@@ -167,10 +148,7 @@ export default function withOperationData(WrappedComponent) {
         activeColumnIds={activeColumnIds} // columns not excluded
         columnCount={activeColumnIds.length || operation.columnCount}
         selectedColumnIds={selectedColumnIds}
-        selectedColumnNames={selectedColumnNames}
         removedColumnIds={removedColumnIds} // TODO: @deprecated?
-        // Columns that belong to the child tables
-        selectedChildColumns={selectedChildColumns}
         // Row stuff
         rowCount={operation.rowCount}
         // Directly associated alerts (from withAssociatedAlerts)
@@ -182,9 +160,8 @@ export default function withOperationData(WrappedComponent) {
         isFocused={isFocused}
         isHovered={isHovered}
         // Interaction handlers
-        onHover={() => dispatch(setHoveredOperation(id))}
-        onUnhover={() => dispatch(setHoveredOperation(null))}
-        peekTable={() => dispatch(setPeekedTable(id))} // todo is this deprecated?
+        onHover={() => {}} // TODO
+        onUnhover={() => {}} // TODO
         // Operation specific callbacks
         swapTablePositions={swapTablePositions}
         renameOperation={(newName) =>

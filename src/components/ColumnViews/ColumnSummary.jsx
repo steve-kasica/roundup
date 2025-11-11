@@ -17,7 +17,10 @@ import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
 import StyledColumnCard from "./StyledColumnCard";
 
 const ColumnSummary = ({
-  column,
+  topValues,
+  name,
+  columnName,
+  id,
   nullCount,
   uniqueCount,
   completeCount,
@@ -42,10 +45,6 @@ const ColumnSummary = ({
 }) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
-  if (!column) {
-    return <div>No column data available.</div>;
-  }
-
   const handleMenuClick = (event) => {
     event.stopPropagation();
     setMenuAnchorEl(event.currentTarget);
@@ -59,7 +58,7 @@ const ColumnSummary = ({
 
   return (
     <StyledColumnCard
-      data-column-id={column.id}
+      data-column-id={id}
       ref={dragDropRef}
       isHovered={isHovered}
       isDragging={isDragging}
@@ -107,7 +106,7 @@ const ColumnSummary = ({
           }}
         >
           <EnhancedColumnContextMenuItems
-            id={column.id}
+            id={id}
             closeMenu={handleMenuClose}
             onInsertColumnLeftClick={handleInsertColumnLeft}
             onInsertColumnRightClick={handleInsertColumnRight}
@@ -148,7 +147,7 @@ const ColumnSummary = ({
                 }),
               }}
             >
-              {column.name || column.columnName || column.id}
+              {name || columnName || id}
             </h3>
             {hasAlerts && (
               <Badge
@@ -169,7 +168,8 @@ const ColumnSummary = ({
                 },
               }}
             >
-              <ColumnTypeIcon column={column} />
+              {/* TODO */}
+              {/* <ColumnTypeIcon column={column} /> */}
             </Box>
           </Box>
           <IconButton
@@ -217,8 +217,8 @@ const ColumnSummary = ({
             }}
           >
             {/* TODO: should I use Chips instead of comma b/c values may include commas */}
-            {column.topValues.map(({ value }) => value).join(", ")}
-            {(column?.topValues.length || 0) <= 10 ? "" : ", ..."}
+            {topValues.map(({ value }) => value).join(", ")}
+            {(topValues.length || 0) <= 10 ? "" : ", ..."}
           </Typography>
         </Box>
 

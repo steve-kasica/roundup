@@ -5,13 +5,9 @@
 import { put, select, takeEvery, takeLatest, delay } from "redux-saga/effects";
 import { updateOperationsRequest } from "./actions";
 import updateOperationsWorker from "./worker";
-import {
-  excludeColumnFromTable,
-  selectActiveColumnIdsByTableId,
-  selectColumnById,
-} from "../../slices/columnsSlice";
+import { selectColumnsById } from "../../slices/columnsSlice";
 import { group } from "d3";
-import { selectOperationByTableId } from "../../slices/operationsSlice";
+import { selectOperationIdByChildId } from "../../slices/operationsSlice";
 import {
   createColumnsSuccess,
   CREATION_MODE_INSERTION,
@@ -20,12 +16,16 @@ import {
   materializeOperationSuccess,
   materializeOperationFailure,
 } from "../materializeOperationSaga/actions";
+import {
+  selectTableColumnIds,
+  setTablesColumnIds,
+} from "../../slices/tablesSlice";
 
 const handleChildTableColumnExclusion = function* (columnIds) {
   const tableIds = yield select((state) => {
     const ids = new Set();
     columnIds.forEach((id) => {
-      const column = selectColumnById(state, id);
+      const column = selectColumnsById(state, id);
       if (column) {
         ids.add(column.tableId);
       }
@@ -35,7 +35,7 @@ const handleChildTableColumnExclusion = function* (columnIds) {
 
   const operationUpdates = yield select((state) => {
     return tableIds
-      .map((tableId) => selectOperationByTableId(state, tableId))
+      .map((tableId) => selectOperationIdByChildId(state, tableId))
       .filter(Boolean);
   });
 
@@ -63,10 +63,10 @@ const handleEmptyTable = function* (columnIds) {
 
     // Calculate which tables will be empty after exclusion
     const recentlyExcludedTableIds = new Set(
-      columnIds.map((id) => selectColumnById(state, id).tableId)
+      columnIds.map((id) => selectColumnsById(state, id).tableId)
     );
     for (const tableId of recentlyExcludedTableIds) {
-      const activeColumnIds = selectActiveColumnIdsByTableId(state, tableId); // `columnIds` should be excluded already
+      const activeColumnIds = selectTableColumnIds(state, tableId); // `columnIds` should be excluded already
 
       if (activeColumnIds.length === 0) {
         emptyTables.push(tableId);
@@ -81,7 +81,7 @@ const handleEmptyTable = function* (columnIds) {
       const updates = new Map();
 
       emptyTables.forEach((tableId) => {
-        const operation = selectOperationByTableId(state, tableId);
+        const operation = selectOperationIdByChildId(state, tableId);
         if (updates.has(operation.id)) {
           updates.set(
             operation.id,
@@ -121,7 +121,7 @@ export default function* updateOperationsWatcher() {
       // Group inserted columns by their parent table ID
       const columnsByTableId = group(
         yield select((state) =>
-          columnIds.map((id) => selectColumnById(state, id))
+          columnIds.map((id) => selectColumnsById(state, id))
         ),
         (col) => col.tableId
       );
@@ -129,7 +129,7 @@ export default function* updateOperationsWatcher() {
       // For each table, check if it's a child of an operation
       for (const [tableId, columns] of columnsByTableId) {
         const operation = yield select((state) =>
-          selectOperationByTableId(state, tableId)
+          selectOperationIdByChildId(state, tableId)
         );
         if (operation) {
           // Re-create the operation's view
@@ -145,7 +145,7 @@ export default function* updateOperationsWatcher() {
     }
   });
 
-  yield takeLatest(excludeColumnFromTable.type, function* (action) {
+  yield takeLatest(setTablesColumnIds.type, function* (action) {
     // Extract column IDs from the action payload
     const columnIds = Array.isArray(action.payload)
       ? action.payload

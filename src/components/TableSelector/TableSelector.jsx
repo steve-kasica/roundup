@@ -21,7 +21,6 @@ import Toolbar from "./Toolbar";
 
 import { LAYOUT_ID as listLayout } from "./ListLayout";
 import { LAYOUT_ID as tableLayout } from "./TableLayout";
-import { setSelectedTables } from "../../slices/tablesSlice";
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga/actions";
 
 const DEFAULT_LAYOUT = tableLayout; // Default layout can be set to either 'table' or 'list'
@@ -101,9 +100,8 @@ function TableSelector({
         }}
         onDeleteAll={() => dispatch(deleteTablesRequest(selectedTables))}
         onClearSelection={() => unselectAllTables()}
-        onSelectAll={() =>
-          dispatch(setSelectedTables(filteredTables.map(({ id }) => id)))
-        }
+        // TODO: does this need to be global?
+        onSelectAll={() => null}
         onLayoutChange={(event, newValue) => setLayout(newValue)}
       />
       {layout === listLayout ? (
