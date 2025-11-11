@@ -1,5 +1,4 @@
 import { createSelector } from "reselect";
-import { selectOperation } from "../operationsSlice";
 import { selectSelectedColumnIds } from "../uiSlice";
 import { selectTableColumnIds } from "../tablesSlice";
 

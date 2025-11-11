@@ -1,11 +1,10 @@
 /*
  * Column.js
  *
- * This module defines the structure for handling column metadata within a table data context. It provides a serializable factory function for creating columns, constants for column types, a type-checking utility.
+ * This module defines the structure for handling column metadata within a table data context. It provides a serializable factory function for creating column objects in Redux,
  *
  * Exports:
  *
- * - DATA_TYPE: Identifies the data type as "COLUMN".
  * - COLUMN_TYPE_CATEGORICAL: String constant "CATEGORICAL" for categorical columns.
  * - COLUMN_TYPE_NUMERICAL: String constant "NUMERICAL" for numerical columns.
  * - COLUMN_TYPES: Array of valid column types (["NUMERICAL", "CATEGORICAL"]).
@@ -14,16 +13,8 @@
  * Usage:
  *
  * - Use the Column function to create new serializable column objects for storing data in Redux.
- * - Use isColumn to verify if an object is a valid column.
  * - Use the constants to ensure type safety and consistency across the codebase.
  */
-
-/**
- * @constant {string} DATA_TYPE
- * Represents the data type of the object returned by the Column factory function.
- * This is used to identify the type of data being handled, elsewhere in the codebase.
- */
-export const DATA_TYPE = "COLUMN";
 
 export const COLUMN_TYPE_CATEGORICAL = "CATEGORICAL";
 export const COLUMN_TYPE_NUMERICAL = "NUMERICAL";
@@ -125,8 +116,4 @@ function Column(
   };
 }
 
-const mutableAttributes = ["name", "columnType"];
-const immutableAttributes = ["parentId", "id"];
-
-export { mutableAttributes, immutableAttributes };
 export default Column;
