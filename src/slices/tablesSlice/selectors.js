@@ -1,14 +1,14 @@
 import { createSelector } from "reselect";
 
 /**
- * Memoized selector to retrieve table data by ID or an array of IDs from the Redux state.
+ * Memoized selector to retrieve table metadata by ID or an array of IDs from the Redux state.
  *
  * @param {Object} state - The Redux state object.
  * @param {string|string[]} tableIds - A single table ID or an array of table IDs.
- * @returns {Object|Object[]} The table data object if a single ID is provided, or an array of table data objects if an array of IDs is provided.
+ * @returns {Object|Object[]} The table metadata object if a single ID is provided, or an array of table metadata objects if an array of IDs is provided.
  */
 export const selectTablesById = createSelector(
-  [(state) => state.tables.data, (state, tableIds) => tableIds],
+  [(state) => state.tables.byId, (state, tableIds) => tableIds],
   (tablesData, tableIds) => {
     if (Array.isArray(tableIds)) {
       return tableIds.map((id) => tablesData[id]);
@@ -22,7 +22,7 @@ export const selectTablesById = createSelector(
  *
  * This selector returns only the columns that are currently included in the table's
  * idsByTable array. When columns are excluded via `setTablesColumnIds`, they are
- * removed from this array but remain in the columns.data object. This selector is
+ * removed from this array but remain in the columns.byId object. This selector is
  * used to determine which columns should be displayed and operated on.
  *
  * @function
@@ -43,13 +43,13 @@ export const selectTableColumnIds = (state, tableId) => {
 };
 
 /**
- * Selector to retrieve all table data as an array.
+ * Selector to retrieve all table metadata as an array.
  *
  * @function
  * @param {Object} state - The Redux state object.
- * @returns {Array<Object>} An array containing all table data objects.
+ * @returns {Array<Object>} An array containing all table metadata objects.
  */
 export const selectAllTablesData = createSelector(
-  [(state) => state.tables.data],
-  (data) => Object.values(data)
+  [(state) => state.tables.byId],
+  (byId) => Object.values(byId)
 );

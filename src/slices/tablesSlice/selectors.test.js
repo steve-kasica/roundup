@@ -1,28 +1,24 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   selectTablesById,
-  selectTableByColumnId,
   selectAllTablesData,
   selectTableColumnIds,
 } from "./selectors";
 import { initialState, Table } from "../tablesSlice";
-import { selectColumnsById } from "../columnsSlice";
 
 describe("tableSelectors", () => {
   let mockState, table1, table2;
   beforeEach(() => {
     table1 = Table();
+    table1.columnIds = ["c1", "c2"];
     table2 = Table();
+    table2.columnIds = ["c3", "c4"];
     mockState = {
       tables: {
         ...initialState,
-        data: {
+        byId: {
           [table1.id]: table1,
           [table2.id]: table2,
-        },
-        childIds: {
-          [table1.id]: ["c1", "c2"],
-          [table2.id]: ["c3", "c4"],
         },
       },
     };
