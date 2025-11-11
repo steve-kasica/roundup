@@ -7,67 +7,72 @@ import { createColumnsSuccess, createColumnsFailure } from "./actions";
 import { insertColumn } from "../../lib/duckdb";
 import { getTableColumnNames } from "../../lib/duckdb/getTableColumnNames";
 import { CREATION_MODE_INSERTION, CREATION_MODE_INITIALIZATION } from ".";
+import { updateTables } from "../../slices/tablesSlice";
+
+/**
+ * The create columns saga assumes that an underlying database table exists
+ * and that at a given index in that table, a column exists.
+ * The saga creates column objects in the Redux state that map to those
+ * underlying database columns.
+ * @param {*} action
+ */
 
 export default function* createColumnsWorker(action) {
-  const { columnInfo, mode } = action.payload;
+  const { columnInfo } = action.payload;
   const successfulCreations = [];
-  const failedCreations = [];
   const tableIdToColumnNames = new Map();
+  const tableUpdates = {};
 
   for (const { parentId, index } of columnInfo) {
     // Create new column object
-    const newColumn = Column(parentId, index);
-
-    if (mode === CREATION_MODE_INSERTION) {
-      const randomColumnName = `col_${Math.random()
-        .toString(36)
-        .substring(2, 8)}_${Date.now().toString(36)}`;
-      newColumn.columnName = randomColumnName;
-      newColumn.name = "New Column";
-      try {
-        yield call(insertColumn, parentId, newColumn.columnName, index);
-        successfulCreations.push(newColumn);
-      } catch (error) {
-        console.error("Error inserting column:", error);
-        newColumn.error = JSON.stringify(error);
-        failedCreations.push(newColumn);
-      }
-    } else if (mode === CREATION_MODE_INITIALIZATION) {
-      // If mode is initialization, then database columns already exist
-      // We just need to match the column names in the DB to the column objects
-      if (!tableIdToColumnNames.has(parentId)) {
-        // Fetch column names for this TABLE or VIEW from the DB only once
-        const columnNames = yield call(getTableColumnNames, parentId);
-        tableIdToColumnNames.set(parentId, columnNames);
-      }
-      try {
-        const columnName = tableIdToColumnNames.get(parentId)[index];
-        newColumn.columnName = columnName;
-        successfulCreations.push(newColumn);
-      } catch (error) {
-        console.error("Error fetching current column names:", error);
-        newColumn.columnName = null;
-        failedCreations.push({ parentId, error: error.message });
-      }
+    if (!tableIdToColumnNames.has(parentId)) {
+      // Fetch column names for this TABLE or VIEW from the DB only once
+      const columnDBNames = yield call(getTableColumnNames, parentId);
+      tableIdToColumnNames.set(parentId, columnDBNames);
     }
-  }
+    const newColumn = Column({
+      parentId,
+      columnName: tableIdToColumnNames.get(parentId)[index],
+    });
+    tableUpdates[parentId] = tableUpdates[parentId] || [];
+    tableUpdates[parentId].push(newColumn.id);
 
-  yield put(addColumnsToSlice([...successfulCreations, ...failedCreations]));
+    // if (mode === CREATION_MODE_INSERTION) {
+    // columnName: `col_${Math.random()
+    //   .toString(36)
+    //   .substring(2, 8)}_${Date.now().toString(36)}`,
+    // try {
+    //   yield call(insertColumn, parentId, newColumn.columnName, index);
+    //   successfulCreations.push(newColumn);
+    // } catch (error) {
+    //   console.error("Error inserting column:", error);
+    //   newColumn.error = JSON.stringify(error);
+    //   failedCreations.push(newColumn);
+    // }
+    // } else if (mode === CREATION_MODE_INITIALIZATION) {
+    // If mode is initialization, then database columns already exist
+    // We just need to match the column names in the DB to the column objects
+
+    successfulCreations.push(newColumn);
+    // }
+  }
+  // Add new columns to the database slice
+  yield put(addColumnsToSlice(successfulCreations));
+
+  // Update tables with new column IDs
+  yield put(
+    updateTables(
+      Object.entries(tableUpdates).map(([tableId, columnIds]) => ({
+        id: tableId,
+        columnIds,
+      }))
+    )
+  );
 
   if (successfulCreations.length > 0) {
     yield put(
       createColumnsSuccess({
         columnIds: successfulCreations.map((col) => col.id),
-        mode,
-      })
-    );
-  }
-
-  if (failedCreations.length > 0) {
-    yield put(
-      createColumnsFailure({
-        columnIds: failedCreations.map((c) => c.id),
-        mode,
       })
     );
   }
