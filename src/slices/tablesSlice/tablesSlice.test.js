@@ -14,24 +14,23 @@ describe("tablesSlice reducers", () => {
       const state = initialState;
       const table = Table();
       const nextState = tablesSlice.reducer(state, addTables(table));
-      expect(nextState.ids).toContain(table.id);
-      expect(nextState.data[table.id]).toEqual(table);
-      expect(nextState.childIds[table.id]).toEqual([]);
+      expect(nextState.allIds).toContain(table.id);
+      expect(nextState.byId[table.id]).toEqual(table);
     });
     it("adds multiple tables", () => {
       const state = initialState;
       const tables = [Table(), Table()];
       const nextState = tablesSlice.reducer(state, addTables(tables));
-      expect(nextState.ids).toEqual([tables[0].id, tables[1].id]);
-      expect(nextState.data[tables[0].id]).toEqual(tables[0]);
-      expect(nextState.data[tables[1].id]).toEqual(tables[1]);
+      expect(nextState.allIds).toEqual([tables[0].id, tables[1].id]);
+      expect(nextState.byId[tables[0].id]).toEqual(tables[0]);
+      expect(nextState.byId[tables[1].id]).toEqual(tables[1]);
     });
     it("throws if table already exists", () => {
       const table = Table();
       const state = {
         ...initialState,
-        ids: [table.id],
-        data: { [table.id]: table },
+        allIds: [table.id],
+        byId: { [table.id]: table },
       };
       expect(() => tablesSlice.reducer(state, addTables(table))).toThrow();
     });
@@ -41,12 +40,12 @@ describe("tablesSlice reducers", () => {
       const table = Table();
       const state = {
         ...initialState,
-        ids: [table.id],
-        data: { [table.id]: table },
+        allIds: [table.id],
+        byId: { [table.id]: table },
       };
       const updatedTable = { ...table, name: "New Name" };
       const nextState = tablesSlice.reducer(state, updateTables(updatedTable));
-      expect(nextState.data[table.id].name).toBe("New Name");
+      expect(nextState.byId[table.id].name).toBe("New Name");
     });
 
     it("updates multiple tables", () => {
@@ -54,8 +53,8 @@ describe("tablesSlice reducers", () => {
       const table2 = Table();
       const state = {
         ...initialState,
-        ids: [table1.id, table2.id],
-        data: { [table1.id]: table1, [table2.id]: table2 },
+        allIds: [table1.id, table2.id],
+        byId: { [table1.id]: table1, [table2.id]: table2 },
       };
       const updatedTable1 = { ...table1, name: "New Name 1" };
       const updatedTable2 = { ...table2, name: "New Name 2" };
@@ -63,8 +62,8 @@ describe("tablesSlice reducers", () => {
         state,
         updateTables([updatedTable1, updatedTable2])
       );
-      expect(nextState.data[table1.id].name).toBe("New Name 1");
-      expect(nextState.data[table2.id].name).toBe("New Name 2");
+      expect(nextState.byId[table1.id].name).toBe("New Name 1");
+      expect(nextState.byId[table2.id].name).toBe("New Name 2");
     });
 
     it("throws if table does not exist", () => {
@@ -80,12 +79,12 @@ describe("tablesSlice reducers", () => {
       const table = Table();
       const state = {
         ...initialState,
-        ids: [table.id],
-        data: { [table.id]: table },
+        allIds: [table.id],
+        byId: { [table.id]: table },
       };
       const nextState = tablesSlice.reducer(state, deleteTables(table.id));
-      expect(nextState.ids).not.toContain(table.id);
-      expect(nextState.data[table.id]).toBeUndefined();
+      expect(nextState.allIds).not.toContain(table.id);
+      expect(nextState.byId[table.id]).toBeUndefined();
     });
 
     it("deletes multiple tables", () => {
@@ -93,69 +92,23 @@ describe("tablesSlice reducers", () => {
       const table2 = Table();
       const state = {
         ...initialState,
-        ids: [table1.id, table2.id],
-        data: { [table1.id]: table1, [table2.id]: table2 },
+        allIds: [table1.id, table2.id],
+        byId: { [table1.id]: table1, [table2.id]: table2 },
       };
       const nextState = tablesSlice.reducer(
         state,
         deleteTables([table1.id, table2.id])
       );
-      expect(nextState.ids).not.toContain(table1.id);
-      expect(nextState.ids).not.toContain(table2.id);
-      expect(nextState.data[table1.id]).toBeUndefined();
-      expect(nextState.data[table2.id]).toBeUndefined();
+      expect(nextState.allIds).not.toContain(table1.id);
+      expect(nextState.allIds).not.toContain(table2.id);
+      expect(nextState.byId[table1.id]).toBeUndefined();
+      expect(nextState.byId[table2.id]).toBeUndefined();
     });
 
     it("throws if table does not exist", () => {
       const state = initialState;
       expect(() =>
         tablesSlice.reducer(state, deleteTables("non-existent-id"))
-      ).toThrow();
-    });
-  });
-  describe("setTablesColumnIds", () => {
-    it("sets column IDs for a single table", () => {
-      const table = Table();
-      const state = {
-        ...initialState,
-        ids: [table.id],
-        data: { [table.id]: table },
-      };
-      const columnIds = ["col1", "col2", "col3"];
-      const nextState = tablesSlice.reducer(
-        state,
-        setTablesColumnIds({ tableId: table.id, columnIds })
-      );
-      expect(nextState.data[table.id].columnIds).toEqual(columnIds);
-    });
-
-    it("sets column IDs for multiple tables", () => {
-      const table1 = Table();
-      const table2 = Table();
-      const state = {
-        ...initialState,
-        ids: [table1.id, table2.id],
-        data: { [table1.id]: table1, [table2.id]: table2 },
-      };
-      const mappings = [
-        { tableId: table1.id, columnIds: ["a", "b"] },
-        { tableId: table2.id, columnIds: ["c", "d", "e"] },
-      ];
-      const nextState = tablesSlice.reducer(
-        state,
-        setTablesColumnIds(mappings)
-      );
-      expect(nextState.data[table1.id].columnIds).toEqual(["a", "b"]);
-      expect(nextState.data[table2.id].columnIds).toEqual(["c", "d", "e"]);
-    });
-
-    it("throws if table does not exist", () => {
-      const state = initialState;
-      expect(() =>
-        tablesSlice.reducer(
-          state,
-          setTablesColumnIds({ tableId: "non-existent-id", columnIds: ["x"] })
-        )
       ).toThrow();
     });
   });

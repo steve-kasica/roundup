@@ -5,7 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { normalizeInputToArray } from "../utilities";
 
 export const initialState = {
-  ids: [],
+  allIds: [],
   byId: {}, // Map of <tableId>: tableObject
 };
 
@@ -17,7 +17,7 @@ const slice = createSlice({
      * Adds one or more new tables to the state. Mapping byId from remote
      * sources to Open Roundup's table structure is handled upstream.
      *
-     * @param {Object} state - The current Redux slice state, containing `ids` (array of table IDs) and `byId` (object mapping IDs to table objects).
+     * @param {Object} state - The current Redux slice state, containing `allIds` (array of table IDs) and `byId` (object mapping IDs to table objects).
      * @param {Object} action - The Redux action object.
      * @param {Object|Object[]} action.payload - A single table object or an array of table objects to add.
      * @throws {Error} If a table with the same ID already exists in the state.
@@ -28,7 +28,7 @@ const slice = createSlice({
         if (state.byId[table.id]) {
           throw new Error(`Table with ID ${table.id} already exists`);
         }
-        state.ids.push(table.id);
+        state.allIds.push(table.id);
         state.byId[table.id] = table;
       });
     },
@@ -70,7 +70,7 @@ const slice = createSlice({
      * This reducer:
      * - Accepts a single table ID or an array of table IDs in the action payload.
      * - Throws an error if any specified table ID does not exist in the state.
-     * - Removes the specified table IDs from the `ids` array.
+     * - Removes the specified table IDs from the `allIds` array.
      * - Deletes the corresponding entries from the `byId` object.
      */
     deleteTables(state, action) {
@@ -81,7 +81,7 @@ const slice = createSlice({
           throw new Error(`Table with ID ${tableId} does not exist`);
         }
         // Remove the table from the list of IDs
-        state.ids = state.ids.filter((id) => id !== tableId);
+        state.allIds = state.allIds.filter((id) => id !== tableId);
 
         // Remove the table from the byId object
         delete state.byId[tableId];
