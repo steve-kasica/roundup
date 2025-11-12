@@ -10,12 +10,9 @@ export default function OperationsList() {
 
   return (
     <Box>
-      {operationIds
-        .slice()
-        .reverse()
-        .map((operationId, i) => (
-          <OperationView key={operationId} id={operationId} index={i} />
-        ))}
+      {operationIds.map((operationId, i) => (
+        <OperationView key={operationId} id={operationId} index={i} />
+      ))}
     </Box>
   );
 }

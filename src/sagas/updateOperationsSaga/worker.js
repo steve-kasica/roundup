@@ -7,7 +7,7 @@ import {
   updateOperations as updateOperationsSlice,
 } from "../../slices/operationsSlice";
 import { updateOperationsFailure, updateOperationsSuccess } from "./actions";
-import { setFocusedObject } from "../../slices/uiSlice";
+import { setFocusedObjectId } from "../../slices/uiSlice";
 import {
   testPackOperationForFatalErrors,
   testStackOperationForFatalErrors,
@@ -91,7 +91,7 @@ export default function* updateOperationsWorker(action) {
 
   yield put(updateOperationsSlice(combinedUpdates));
   // TODO add to watcher for a UI Saga
-  yield put(setFocusedObject(combinedUpdates[combinedUpdates.length - 1].id)); // focus the last operation created
+  yield put(setFocusedObjectId(combinedUpdates[combinedUpdates.length - 1].id)); // focus the last operation created
 
   const formatSagaEndPayload = (updates) => ({
     operationIds: updates.map(({ id }) => id),

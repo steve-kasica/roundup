@@ -27,7 +27,7 @@ import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
-import { setFocusedObject } from "../../slices/uiSlice";
+import { setFocusedObjectId } from "../../slices/uiSlice";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 
 export default function withTableData(WrappedComponent) {
@@ -160,7 +160,7 @@ export default function withTableData(WrappedComponent) {
     );
 
     const focusTable = useCallback(() => {
-      dispatch(setFocusedObject(id));
+      dispatch(setFocusedObjectId(id));
     }, [dispatch, id]);
 
     const focusColumns = useCallback(

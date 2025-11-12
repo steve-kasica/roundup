@@ -13,7 +13,7 @@ export const initialState = {
   visibleColumnIds: [], // array of column ids
   draggingColumnIds: [], // array of column ids
   dropTargetColumnIds: [], // array of column ids
-  focusedObject: null, // either a table id or sucessfully created operation id
+  focusedObjectId: null, // either a table id or sucessfully created operation id
   selectedMatches: [], // array of match types
 };
 
@@ -147,8 +147,8 @@ export const uiSlice = createSlice({
      * @param {Object} action - The Redux action object.
      * @param {*} action.payload - The object to set as focused.
      */
-    setFocusedObject(state, action) {
-      state.focusedObject = action.payload;
+    setFocusedObjectId(state, action) {
+      state.focusedObjectId = action.payload;
     },
   },
 });
@@ -163,7 +163,7 @@ export const {
   setVisibleColumnIds,
   setDraggingColumnIds,
   setDropTargetColumnIds,
-  setFocusedObject,
+  setFocusedObjectId,
   setSelectedMatches,
 } = uiSlice.actions;
 

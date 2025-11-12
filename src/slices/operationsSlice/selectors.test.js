@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { initialState } from "./operationsSlice";
 import {
   selectOperationsById,
-  selectOperationChildrenByIds,
   selectAllOperationIds,
   selectOperationIdByChildId,
   selectOperationDepthById,
@@ -47,22 +46,6 @@ describe("operationsSelectors", () => {
       expect(
         selectOperationsById(state, [operation1.id, operation2.id])
       ).toEqual([operation1, operation2]);
-    });
-  });
-  describe("selectOperationChildrenByIds", () => {
-    it("should return child IDs for a given operation ID", () => {
-      expect(selectOperationChildrenByIds(state, operation1.id)).toEqual([
-        operation2.id,
-        operation3.id,
-      ]);
-    });
-    it("should return arrays of child IDs for given operation IDs", () => {
-      expect(
-        selectOperationChildrenByIds(state, [operation1.id, operation2.id])
-      ).toEqual([
-        [operation2.id, operation3.id],
-        ["t1", operation4.id],
-      ]);
     });
   });
   describe("selectAllOperationIds", () => {

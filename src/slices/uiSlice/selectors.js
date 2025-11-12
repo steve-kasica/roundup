@@ -108,7 +108,7 @@ export const selectVisibleColumnIds = (state) => state.ui.visibleColumnIds;
  * @param {Object} state - The Redux state object.
  * @returns {*} The currently focused object from the UI state.
  */
-export const selectFocusedObject = (state) => state.ui.focusedObject;
+export const selectFocusedObjectId = (state) => state.ui.focusedObjectId;
 
 /**
  * Selector to determine if a specific column ID is currently hovered.

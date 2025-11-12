@@ -2,13 +2,16 @@ import { describe, it, expect } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
 import updateColumnsWorker from "./worker";
 import { Column, updateColumns } from "../../slices/columnsSlice";
+import { Table } from "../../slices/tablesSlice";
 
 describe("updateColumnsWorker saga", () => {
   describe("updates via user-supplied metadata", () => {
     it("updates a single column", async () => {
       const mockColumnC1 = Column({
         name: "bar",
+        parentId: "t1",
       });
+      const mockTable1 = Table({ databaseName: "foo" });
 
       const action = {
         payload: {
@@ -20,9 +23,13 @@ describe("updateColumnsWorker saga", () => {
         .withState({
           columns: {
             byId: {
-              col1: mockColumnC1,
+              [mockColumnC1.id]: mockColumnC1,
             },
             allIds: [mockColumnC1.id],
+          },
+          tables: {
+            byId: { [mockTable1.id]: mockTable1 },
+            allIds: [mockTable1.id],
           },
         })
         .run();

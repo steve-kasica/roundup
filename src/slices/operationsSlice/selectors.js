@@ -23,23 +23,6 @@ export const selectOperationsById = createSelector(
 );
 
 /**
- * Selector to retrieve the children of one or more operations by their IDs.
- *
- * @function
- * @param {Object} state - The Redux state.
- * @param {string|string[]} operationIds - A single operation ID or an array of operation IDs.
- * @returns {any|any[]} The child IDs corresponding to the given operation ID(s).
- */
-export const selectOperationChildrenByIds = createSelector(
-  [(state) => state.operations.byId, (state, operationIds) => operationIds],
-  (operationsData, operationIds) => {
-    return Array.isArray(operationIds)
-      ? operationIds.map((operationId) => operationsData[operationId].childIds)
-      : operationsData[operationIds].childIds;
-  }
-);
-
-/**
  * Selector to retrieve all operation IDs from the state.
  *
  * @param {Object} state - The Redux state object.

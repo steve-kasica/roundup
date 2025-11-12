@@ -12,10 +12,11 @@ import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarg
 import { EnhancedStackSchemaView } from "../../components/StackOperationView/StackSchemaView";
 import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
+import { selectFocusedObjectId } from "../../slices/uiSlice";
 
 export default function SchemaWindow() {
-  const tablesUploaded = useSelector((state) => selectAllTableIds(state));
-  const focusedObjectId = useSelector((state) => state.ui.focusedObject);
+  const tablesUploaded = useSelector(selectAllTableIds);
+  const focusedObjectId = useSelector(selectFocusedObjectId);
   const isFocusedTable = isTableId(focusedObjectId);
   const focusedOperation = useSelector((state) =>
     isFocusedTable ? null : selectOperationsById(state, focusedObjectId)

@@ -14,7 +14,7 @@ import {
 } from "../../slices/operationsSlice";
 import {
   selectFocusedColumnIds,
-  selectFocusedObject,
+  selectFocusedObjectId,
 } from "../../slices/uiSlice";
 // Add this import for operations
 
@@ -39,7 +39,7 @@ export default function SupportingPane() {
     const id = selectRootOperationId(state);
     return id ? selectOperationsById(state, id) : null;
   });
-  const focusedObject = useSelector(selectFocusedObject);
+  const focusedObject = useSelector(selectFocusedObjectId);
   const focusedColumnIds = useSelector(selectFocusedColumnIds);
   console.log("SupportingPane render: focusedColumnIds=", focusedColumnIds);
   const isOpen = tables.length > 0;

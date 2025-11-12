@@ -2,7 +2,6 @@
 import { useSelector } from "react-redux";
 import {
   selectOperationsById,
-  selectOperationChildrenByIds,
   selectOperationDepthById,
   updateOperations,
 } from "../../slices/operationsSlice";
@@ -17,7 +16,7 @@ import {
   setVisibleColumnIds as setVisibleColumnsAction,
 } from "../../slices/uiSlice/uiSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import {
   createColumnsRequest,
@@ -25,6 +24,7 @@ import {
 } from "../../sagas/createColumnsSaga";
 import { materializeOperationRequest } from "../../sagas/materializeOperationSaga/actions";
 import withAssociatedAlerts from "./withAssociatedAlerts";
+import { selectFocusedObjectId } from "../../slices/uiSlice";
 
 export default function withOperationData(WrappedComponent) {
   function EnhancedComponent({
@@ -36,28 +36,28 @@ export default function withOperationData(WrappedComponent) {
     ...props
   }) {
     const dispatch = useDispatch();
-
     const operation = useSelector((state) => selectOperationsById(state, id));
     const depth = useSelector((state) => selectOperationDepthById(state, id));
-    const childIds = useSelector((state) =>
-      selectOperationChildrenByIds(state, id)
-    );
 
     // Get columnIds associated with this table, both active and "removed"
     const columnIds = useSelector((state) =>
       selectColumnIdsByTableId(state, id)
     );
 
-    const activeColumnIds = useSelector((state) => []); // TODO
+    const activeColumnIds = operation.columnIds;
 
-    const removedColumnIds = useSelector(); // TODO
+    const removedColumnIds = useMemo(() => {
+      return columnIds.filter((colId) => !activeColumnIds.includes(colId));
+    }, [columnIds, activeColumnIds]);
 
     // Column objects for all columns associated directly with this operation
     const selectedColumnIds = useSelector((state) =>
       selectSelectedColumnIdsByParentId(state, id)
     );
 
-    const isFocused = false; // TODO
+    const focusedObjectId = useSelector(selectFocusedObjectId);
+
+    const isFocused = focusedObjectId === id;
     const isHovered = false; // TODO
 
     // Define callback functions used by all operation types
@@ -140,7 +140,7 @@ export default function withOperationData(WrappedComponent) {
         operation={operation}
         name={operation.name}
         operationType={operation.operationType}
-        childIds={childIds}
+        childIds={operation.childIds}
         doesViewExist={operation.doesViewExist}
         depth={depth}
         // Directly associated columns

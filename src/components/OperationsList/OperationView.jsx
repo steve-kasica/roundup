@@ -9,7 +9,6 @@ import {
   Typography,
 } from "@mui/material";
 import withOperationData from "../HOC/withOperationData";
-import PropTypes from "prop-types";
 import { ExpandMore } from "@mui/icons-material";
 import {
   OPERATION_TYPE_PACK,

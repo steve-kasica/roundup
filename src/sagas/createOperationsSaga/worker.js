@@ -39,7 +39,7 @@ import Operation, {
   OPERATION_TYPE_NO_OP,
 } from "../../slices/operationsSlice/Operation";
 import { createOperationsSuccess, createOperationsFailure } from "./actions";
-import { setFocusedObject } from "../../slices/uiSlice";
+import { setFocusedObjectId } from "../../slices/uiSlice";
 import {
   testPackOperationForFatalErrors,
   testStackOperationForFatalErrors,
@@ -118,7 +118,7 @@ export default function* createOperationsWorker(action) {
 
   yield put(addOperationsToSlice(combinedOperations));
   const focusedObjectId = combinedOperations[combinedOperations.length - 1].id;
-  yield put(setFocusedObject(focusedObjectId)); // focus the last operation created
+  yield put(setFocusedObjectId(focusedObjectId)); // focus the last operation created
 
   if (successfulCreations.length > 0) {
     yield put(
