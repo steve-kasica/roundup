@@ -27,7 +27,7 @@ const ColumnDetails = ({
   parentId,
   modeValue,
   modeCount,
-  columnName,
+  databaseName,
   uniqueCount,
   duplicateCount,
   nullCount,
@@ -63,7 +63,7 @@ const ColumnDetails = ({
           variant="h5"
           sx={{ ...(hasAlerts && { color: "warning.dark" }) }}
         >
-          {name || columnName || id}
+          {name || databaseName || id}
         </Typography>
         {hasAlerts && (
           <Chip
@@ -105,7 +105,7 @@ const ColumnDetails = ({
       <Box sx={{ mt: "10px", flexGrow: 1, overflow: "auto" }}>
         {view === "value counts" && (
           <ColumnValueCounts
-            columnName={columnName}
+            databaseName={databaseName}
             tableId={parentId}
             uniqueCount={uniqueCount}
           />

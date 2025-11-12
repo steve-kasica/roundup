@@ -29,12 +29,13 @@ export const JOIN_PREDICATES = {
 let idCounter = 0; // each node gets a unique ID, regardless if it's a table vs operation node
 
 export default function Operation({
+  operationType = null,
   name = null,
   databaseName = null,
   parentId = null,
   childIds = [],
   columnIds = [],
-  operationType = null,
+  rowCount = null,
 } = {}) {
   const id = `o${++idCounter}`; // Each operation has a unique ID
 
@@ -45,14 +46,19 @@ export default function Operation({
     parentId,
     childIds,
     columnIds,
+    rowCount,
     operationType,
 
     // Properties specific to PACK operations
-    joinType: OPERATION_TYPE_PACK ? JOIN_TYPES.FULL_OUTER : undefined,
-    joinPredicate: OPERATION_TYPE_PACK ? JOIN_PREDICATES.EQUALS : undefined,
-    joinKey1: null,
-    joinKey2: null,
-    doesViewExist: false, // whether the materialized view for this operation exists
+    joinType:
+      operationType === OPERATION_TYPE_PACK ? JOIN_TYPES.FULL_OUTER : undefined,
+    joinPredicate:
+      operationType === OPERATION_TYPE_PACK
+        ? JOIN_PREDICATES.EQUALS
+        : undefined,
+    joinKey1: operationType === OPERATION_TYPE_PACK ? null : undefined,
+    joinKey2: operationType === OPERATION_TYPE_PACK ? null : undefined,
+    isViewMaterialized: false, // Initially false, can be updated later
   };
 }
 

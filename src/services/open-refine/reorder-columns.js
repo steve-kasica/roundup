@@ -2,12 +2,12 @@ export const endpoint = "command/core/reorder-columns";
 
 export default async function reorderColumns(
   projectId,
-  columnNames,
+  databaseNames,
   csrf_token
 ) {
   if (!projectId) {
     throw new Error("Project ID is required");
-  } else if (!columnNames || columnNames.length === 0) {
+  } else if (!databaseNames || databaseNames.length === 0) {
     throw new Error("Column names are required");
   } else if (csrf_token === undefined) {
     throw new Error("CSRF token is required");
@@ -23,7 +23,7 @@ export default async function reorderColumns(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      columnNames,
+      databaseNames,
       engine: { facets: [], mode: "row-based" },
       csrf_token: csrf_token,
     }),

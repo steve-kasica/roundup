@@ -5,12 +5,12 @@ import duckdb from "@duckdb/duckdb-wasm";
  *
  * @param {} db
  * @param {*} tableName
- * @param {*} columnName
+ * @param {*} databaseName
  */
-async function getColumnUniqueValues(db, tableId, columnName) {
+async function getColumnUniqueValues(db, tableId, databaseName) {
   const conn = await db.connect();
   const result = await conn.query(
-    `select distinct ${columnName} from ${tableId}`
+    `select distinct ${databaseName} from ${tableId}`
   );
 
   await conn.close();

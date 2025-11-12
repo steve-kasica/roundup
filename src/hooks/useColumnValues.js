@@ -5,7 +5,7 @@ import { getColumnValues } from "../lib/duckdb/getColumnValues.js";
  * Custom React Hook for querying DuckDB database column values
  *
  * @param {string} tableId - The table identifier to query
- * @param {string} columnName - The column identifier to get values from
+ * @param {string} databaseName - The column identifier to get values from
  * @param {number} limit - Maximum number of values to fetch (default: null for all values)
  * @param {number} offset - Number of values to skip (default: 0)
  * @param {boolean} autoFetch - Whether to automatically fetch data when hook mounts or dependencies change (default: true)
@@ -19,7 +19,7 @@ import { getColumnValues } from "../lib/duckdb/getColumnValues.js";
  */
 export function useColumnValues(
   tableId,
-  columnName,
+  databaseName,
   limit = null,
   offset = 0,
   autoFetch = true
@@ -29,8 +29,8 @@ export function useColumnValues(
   const [error, setError] = useState(null);
 
   const fetchData = useCallback(async () => {
-    if (!tableId || !columnName) {
-      setData(Array.from({ length: limit || 0 }, () => "null")); // Return array of nulls if no tableId or columnName
+    if (!tableId || !databaseName) {
+      setData(Array.from({ length: limit || 0 }, () => "null")); // Return array of nulls if no tableId or databaseName
       return;
     }
 
@@ -38,7 +38,12 @@ export function useColumnValues(
     setError(null);
 
     try {
-      const values = await getColumnValues(tableId, columnName, limit, offset);
+      const values = await getColumnValues(
+        tableId,
+        databaseName,
+        limit,
+        offset
+      );
       setData(values);
     } catch (err) {
       setError(err);
@@ -46,7 +51,7 @@ export function useColumnValues(
     } finally {
       setLoading(false);
     }
-  }, [tableId, columnName, limit, offset]);
+  }, [tableId, databaseName, limit, offset]);
 
   const reset = useCallback(() => {
     setData([]);
@@ -75,12 +80,12 @@ export function useColumnValues(
  * Appends new data instead of replacing it (useful for infinite scroll)
  *
  * @param {string} tableId - The table identifier to query
- * @param {string} columnName - The column identifier to get values from
+ * @param {string} databaseName - The column identifier to get values from
  * @param {number} pageSize - Number of values per page (default: 50)
  *
  * @returns {Object} Hook state and methods for pagination
  */
-export function usePaginatedColumnValues(tableId, columnName, pageSize = 50) {
+export function usePaginatedColumnValues(tableId, databaseName, pageSize = 50) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -89,7 +94,7 @@ export function usePaginatedColumnValues(tableId, columnName, pageSize = 50) {
 
   const fetchPage = useCallback(
     async (pageNum = 0, reset = false) => {
-      if (!tableId || !columnName) {
+      if (!tableId || !databaseName) {
         return;
       }
 
@@ -100,7 +105,7 @@ export function usePaginatedColumnValues(tableId, columnName, pageSize = 50) {
         const offset = pageNum * pageSize;
         const values = await getColumnValues(
           tableId,
-          columnName,
+          databaseName,
           pageSize,
           offset
         );
@@ -122,7 +127,7 @@ export function usePaginatedColumnValues(tableId, columnName, pageSize = 50) {
         setLoading(false);
       }
     },
-    [tableId, columnName, pageSize]
+    [tableId, databaseName, pageSize]
   );
 
   const loadMore = useCallback(() => {

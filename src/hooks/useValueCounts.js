@@ -9,7 +9,7 @@ import {
  * Returns an object with values as keys and their occurrence counts as values
  *
  * @param {string} tableId - The table identifier to query
- * @param {string} columnName - The column identifier to get value counts from
+ * @param {string} databaseName - The column identifier to get value counts from
  * @param {number} limit - Maximum number of unique values to fetch (default: null for all values)
  * @param {number} offset - Number of unique values to skip (default: 0)
  * @param {boolean} autoFetch - Whether to automatically fetch data when hook mounts or dependencies change (default: true)
@@ -23,7 +23,7 @@ import {
  */
 export function useValueCounts(
   tableId,
-  columnName,
+  databaseName,
   limit = null,
   offset = 0,
   autoFetch = true
@@ -33,7 +33,7 @@ export function useValueCounts(
   const [error, setError] = useState(null);
 
   const fetchData = useCallback(async () => {
-    if (!tableId || !columnName) {
+    if (!tableId || !databaseName) {
       setData({});
       return;
     }
@@ -42,7 +42,7 @@ export function useValueCounts(
     setError(null);
 
     try {
-      const counts = await getValueCounts(tableId, columnName, limit, offset);
+      const counts = await getValueCounts(tableId, databaseName, limit, offset);
       setData(counts);
     } catch (err) {
       setError(err);
@@ -50,7 +50,7 @@ export function useValueCounts(
     } finally {
       setLoading(false);
     }
-  }, [tableId, columnName, limit, offset]);
+  }, [tableId, databaseName, limit, offset]);
 
   const reset = useCallback(() => {
     setData({});
@@ -79,7 +79,7 @@ export function useValueCounts(
  * Merges new data with existing data (useful for infinite scroll)
  *
  * @param {string} tableId - The table identifier to query
- * @param {string} columnName - The column identifier to get value counts from
+ * @param {string} databaseName - The column identifier to get value counts from
  * @param {number} pageSize - Number of unique values per page (default: 100)
  *
  * @returns {Object} Hook state and methods for pagination
@@ -93,7 +93,7 @@ export function useValueCounts(
  * @returns {Function} refresh - Function to refresh data from start
  * @returns {Function} reset - Function to reset state to initial values
  */
-export function usePaginatedValueCounts(tableId, columnName, pageSize = 100) {
+export function usePaginatedValueCounts(tableId, databaseName, pageSize = 100) {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -103,7 +103,7 @@ export function usePaginatedValueCounts(tableId, columnName, pageSize = 100) {
 
   const fetchPage = useCallback(
     async (pageNum = 0, reset = false) => {
-      if (!tableId || !columnName) {
+      if (!tableId || !databaseName) {
         return;
       }
 
@@ -114,7 +114,7 @@ export function usePaginatedValueCounts(tableId, columnName, pageSize = 100) {
         const offset = pageNum * pageSize;
         const result = await getPaginatedValueCounts(
           tableId,
-          columnName,
+          databaseName,
           pageSize,
           offset
         );
@@ -136,7 +136,7 @@ export function usePaginatedValueCounts(tableId, columnName, pageSize = 100) {
         setLoading(false);
       }
     },
-    [tableId, columnName, pageSize]
+    [tableId, databaseName, pageSize]
   );
 
   const loadMore = useCallback(() => {

@@ -15,12 +15,7 @@ import {
 } from "@mui/icons-material";
 import PropTypes from "prop-types";
 
-import ToggleButtonGroup, {
-  toggleButtonGroupClasses,
-} from "@mui/material/ToggleButtonGroup";
-
 import { LAYOUT_ID as tableLayout } from "./TableLayout";
-import { LAYOUT_ID as listLayout } from "./ListLayout";
 
 export default function Toolbar({
   searchString,
@@ -147,25 +142,6 @@ export default function Toolbar({
           }}
         >
           Upload more files
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          disabled={layout === tableLayout}
-          onClick={() => {
-            onLayoutChange(null, tableLayout);
-            handleMenuClose();
-          }}
-        >
-          Table view
-        </MenuItem>
-        <MenuItem
-          disabled={layout === listLayout}
-          onClick={() => {
-            onLayoutChange(null, listLayout);
-            handleMenuClose();
-          }}
-        >
-          List view
         </MenuItem>
       </Menu>
 

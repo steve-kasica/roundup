@@ -11,14 +11,14 @@ import { formatNumber } from "../../lib/utilities";
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
 
 const ColumnValuesCounts = ({
-  columnName,
+  databaseName,
   tableId,
   uniqueCount,
   limit = 20,
 }) => {
   const { data, loading, error, total, loadMore } = usePaginatedValueCounts(
     tableId,
-    columnName,
+    databaseName,
     limit
   );
 

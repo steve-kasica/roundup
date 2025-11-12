@@ -3,7 +3,8 @@ import { selectSelectedColumnIds } from "../../slices/uiSlice";
 import ColumnIndexDetails from "./ColumnIndexDetails";
 
 export default function SelectedColumns() {
-  const isOpen = useSelector((state) => state.ui.showColumnIndexDetails);
+  // const isOpen = useSelector((state) => state.ui.showColumnIndexDetails);
+  const isOpen = false; // For testing purposes, we assume the details are always open
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
   if (!isOpen) {
     return <div>Column Index Details is closed</div>;

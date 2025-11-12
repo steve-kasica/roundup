@@ -6,9 +6,7 @@
  */
 
 import { useState } from "react";
-import PropTypes from "prop-types";
 import TableLayout from "./TableLayout";
-import ListLayout from "./ListLayout";
 
 import DragDropFileUpload from "./DragDropFileUpload";
 import withAllTablesData from "./withAllTablesData";
@@ -19,11 +17,7 @@ import "./SourceTables.scss";
 import { useDispatch } from "react-redux";
 import Toolbar from "./Toolbar";
 
-import { LAYOUT_ID as listLayout } from "./ListLayout";
-import { LAYOUT_ID as tableLayout } from "./TableLayout";
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga/actions";
-
-const DEFAULT_LAYOUT = tableLayout; // Default layout can be set to either 'table' or 'list'
 
 function TableSelector({
   tables,
@@ -37,7 +31,7 @@ function TableSelector({
   const [selectedTableIds, setSelectedTableIds] = useState([]);
   const [selectedTableType, setSelectedTableType] = useState("");
   const [searchString, setSearchString] = useState("");
-  const [layout, setLayout] = useState(DEFAULT_LAYOUT);
+  const [layout, setLayout] = useState(null);
 
   const filteredTables = tables
     .filter((table) => table.name.toLowerCase().includes(searchString))
@@ -104,42 +98,19 @@ function TableSelector({
         onSelectAll={() => null}
         onLayoutChange={(event, newValue) => setLayout(newValue)}
       />
-      {layout === listLayout ? (
-        <ListLayout
-          searchString={searchString}
-          tables={filteredTables}
-          rowMax={rowMax}
-          columnMax={columnMax}
-          bytesMax={bytesMax}
-          selectedTableIds={selectedTableIds}
-          setSelectedTableIds={setSelectedTableIds}
-        />
-      ) : (
-        <TableLayout
-          searchString={searchString}
-          tables={filteredTables}
-          rowMax={rowMax}
-          columnMax={columnMax}
-          bytesMax={bytesMax}
-          selectedTableIds={selectedTableIds}
-          setSelectedTableIds={setSelectedTableIds}
-        />
-      )}
+
+      <TableLayout
+        searchString={searchString}
+        tables={filteredTables}
+        rowMax={rowMax}
+        columnMax={columnMax}
+        bytesMax={bytesMax}
+        selectedTableIds={selectedTableIds}
+        setSelectedTableIds={setSelectedTableIds}
+      />
     </div>
   );
 }
-
-TableSelector.propTypes = {
-  tables: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      mimeType: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  selectedTables: PropTypes.array.isRequired,
-  rowMax: PropTypes.number.isRequired,
-  unselectAllTables: PropTypes.func.isRequired,
-};
 
 const EnhancedTableSelector = withAllTablesData(TableSelector);
 export default EnhancedTableSelector;

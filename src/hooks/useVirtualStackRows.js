@@ -9,7 +9,7 @@ import { getTableRows } from "../lib/duckdb/getVirtualStackRows";
  * matching the API of usePaginatedTableRows.
  *
  * @param {Array<String>} tableIds - Array of table identifiers to query
- * @param {Array<Array<String|null>>} columnNameMatrix - 2D array mapping columns for each table
+ * @param {Array<Array<String|null>>} databaseNameMatrix - 2D array mapping columns for each table
  * @param {number} [pageSize=50] - Number of rows per page
  * @param {number|null} [sortBy=null] - Column index to sort by
  * @param {string} [sortDirection="asc"] - Sort direction
@@ -38,7 +38,7 @@ import { getTableRows } from "../lib/duckdb/getVirtualStackRows";
  */
 export function useVirtualStackRows(
   tableIds,
-  columnNameMatrix,
+  databaseNameMatrix,
   pageSize = 50,
   sortBy = null,
   sortDirection = "asc"
@@ -55,7 +55,7 @@ export function useVirtualStackRows(
   const fetchPage = useCallback(
     async (pageNum = 0, reset = false) => {
       // Don't fetch if we don't have valid inputs
-      if (!tableIds || tableIds.length === 0 || !columnNameMatrix) {
+      if (!tableIds || tableIds.length === 0 || !databaseNameMatrix) {
         setData([]);
         return;
       }
@@ -67,7 +67,7 @@ export function useVirtualStackRows(
         const offset = pageNum * pageSize;
         const rows = await getTableRows(
           tableIds,
-          columnNameMatrix,
+          databaseNameMatrix,
           pageSize,
           offset,
           sortBy,
@@ -94,7 +94,7 @@ export function useVirtualStackRows(
         setLoading(false);
       }
     },
-    [tableIds, columnNameMatrix, pageSize, sortBy, sortDirection]
+    [tableIds, databaseNameMatrix, pageSize, sortBy, sortDirection]
   );
 
   /**

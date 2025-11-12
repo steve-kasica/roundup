@@ -4,7 +4,9 @@ import { Stack, Typography, Badge } from "@mui/material";
 import { TableChart, Warning } from "@mui/icons-material";
 
 const TableLabel = ({
-  table,
+  // props via withTableData
+  id,
+  name,
   columnCount,
   rowCount,
   // Props passed from withAssociatedAlerts via withTableData
@@ -17,7 +19,7 @@ const TableLabel = ({
   sx = {},
 }) => {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
-    console.debug("Rendering TableLabel for table:", table?.id);
+    console.debug("Rendering TableLabel for table:", id);
   }
   return (
     <Stack
@@ -57,7 +59,7 @@ const TableLabel = ({
           }),
         }}
       >
-        {table?.name}{" "}
+        {name}{" "}
         {includeDimensions && (
           <small>
             ({columnCount} x {rowCount})

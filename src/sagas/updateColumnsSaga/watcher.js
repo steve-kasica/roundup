@@ -27,14 +27,14 @@ export default function* updateColumnsSaga() {
     // Prepare the columnUpdates with necessary info for the worker
     // We want to update a newly created column with
     // all database-dependent attributes
-    columnUpdates = columnUpdates.map((id, index) => ({
-      id, // columnId
-      tableId: parentIds[index],
-      ...Object.fromEntries(DATABASE_ATTRIBUTES.map((attr) => [attr, null])), // fetch all database-dependent attributes
-    }));
+    // columnUpdates = columnUpdates.map((id, index) => ({
+    //   id, // columnId
+    //   tableId: parentIds[index],
+    //   ...Object.fromEntries(DATABASE_ATTRIBUTES.map((attr) => [attr, null])), // fetch all database-dependent attributes
+    // }));
 
     // Call the worker to update columns with fetched attributes
-    yield put(updateColumnsRequest({ columnUpdates }));
+    // yield put(updateColumnsRequest({ columnUpdates }));
   });
 
   // When columns are excluded, we may need to also exclude operation

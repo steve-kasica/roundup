@@ -9,7 +9,7 @@ function TableBlock({
   // Props from withAssociatedAlerts via withTableData
   hasAlerts,
   // props via withTableData
-  table,
+  id,
   activeColumnIds,
   activeColumnsCount,
 
@@ -21,7 +21,7 @@ function TableBlock({
   sx = {},
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
-    console.debug("Rendering TableBlock for table:", table?.id);
+    console.debug("Rendering TableBlock for table:", id);
   }
   const ticks = Array.from(
     {
@@ -76,7 +76,7 @@ function TableBlock({
           }),
         }}
       >
-        {table.name || table.id}
+        {name || id}
         {hasAlerts && ` ⚠ ${alertIds.length}`}
       </Typography> */}
       {ticks.map((columnId, index) =>

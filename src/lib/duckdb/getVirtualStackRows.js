@@ -10,11 +10,11 @@ import { getDuckDB } from "./duckdbClient";
  * Edge cases handled:
  * - Single column: Works correctly with one column selected
  * - No columns: Returns empty array if no columns selected (numColumns === 0)
- * - Empty inputs: Returns empty array if tableIds or columnNameMatrix is empty/null
+ * - Empty inputs: Returns empty array if tableIds or databaseNameMatrix is empty/null
  * - Connection cleanup: Always closes database connection, even on early returns
  *
  * @param {Array<String>} tableIds - Array of table identifiers to query (e.g., ["t1", "t2", "t3"])
- * @param {Array<Array<String|null>>} columnNameMatrix - 2D array where each row represents a table's column mapping.
+ * @param {Array<Array<String|null>>} databaseNameMatrix - 2D array where each row represents a table's column mapping.
  *   Each column index across all tables should align to the same logical column in the result.
  *   Use null when a table doesn't have a column at that position.
  *   Example:
@@ -63,7 +63,7 @@ import { getDuckDB } from "./duckdbClient";
  */
 export async function getTableRows(
   tableIds,
-  columnNameMatrix,
+  databaseNameMatrix,
   limit = 50,
   offset = 0,
   sortBy = null,
@@ -76,15 +76,15 @@ export async function getTableRows(
   if (
     !tableIds ||
     tableIds.length === 0 ||
-    !columnNameMatrix ||
-    columnNameMatrix.length === 0
+    !databaseNameMatrix ||
+    databaseNameMatrix.length === 0
   ) {
     await conn.close();
     return [];
   }
 
   // Determine the number of columns in the result (width of the matrix)
-  const numColumns = columnNameMatrix[0]?.length || 0;
+  const numColumns = databaseNameMatrix[0]?.length || 0;
 
   // Handle case where no columns are selected
   if (numColumns === 0) {
@@ -94,10 +94,10 @@ export async function getTableRows(
 
   // Build SELECT statements for each table
   const selectStatements = tableIds.map((tableId, tableIndex) => {
-    const columnNames = columnNameMatrix[tableIndex];
+    const databaseNames = databaseNameMatrix[tableIndex];
 
     // Build the column list for this table's SELECT
-    const columns = columnNames
+    const columns = databaseNames
       .map((colName, colIndex) => {
         if (colName === null) {
           // If column is null, select NULL with an alias

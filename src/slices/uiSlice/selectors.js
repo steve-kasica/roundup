@@ -155,3 +155,5 @@ export const selectColumnIndexById = createSelector(
   ],
   (tableColumns, columnId) => tableColumns.indexOf(columnId)
 );
+
+export const selectSelectedMatches = (state) => state.ui.selectedMatches;

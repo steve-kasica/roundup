@@ -60,7 +60,7 @@ import { EnhancedColumnHeader } from "../ColumnViews";
 
 const TableRows = ({
   // Props passed via withTableData HOC
-  table,
+  id,
   selectedColumnIds, // IDs of selected columns in Redux
   hoveredIndex,
   // Props passed directly from parent component
@@ -70,7 +70,7 @@ const TableRows = ({
   columnWidths = {}, // Optional prop for custom column widths
 }) => {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
-    console.debug("Rendering TableRows for table:", table?.id);
+    console.debug("Rendering TableRows for table:", id);
   }
   const tableContainerRef = useRef(null);
 
@@ -88,7 +88,7 @@ const TableRows = ({
   // Hook for managing paginated data with sorting
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
-      table.id,
+      id,
       selectedColumnIds,
       50, // pageSize
       sortConfig.columnId, // sortBy

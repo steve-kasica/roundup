@@ -55,7 +55,7 @@ let idCounter = 0;
  * @param {string|number} params.parentId - The unique identifier of the table this column belongs to.
  * @param {number} params.index - The index/position of the column in the table.
  * @param {string|null} [params.name=null] - The display name of the column. This property is mutable.
- * @param {string|null} [params.columnName=null] - The original column name from the data source.
+ * @param {string|null} [params.databaseName=null] - The original column name from the data source.
  * @param {number|null} [params.approxUnique=null] - Approximate number of unique values in the column.
  * @param {number|null} [params.avg=null] - Average value for numerical columns.
  * @param {string|null} [params.columnType=null] - The type of the column. Must be one of the values in COLUMN_TYPES.
@@ -75,7 +75,7 @@ let idCounter = 0;
 function Column({
   parentId,
   name = null,
-  columnName = null,
+  databaseName = null,
   approxUnique = null,
   avg = null,
   columnType = null,
@@ -97,7 +97,7 @@ function Column({
     id,
     parentId,
     name,
-    columnName,
+    databaseName,
     approxUnique,
     avg,
     columnType,

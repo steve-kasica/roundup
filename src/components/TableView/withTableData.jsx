@@ -193,14 +193,21 @@ export default function withTableData(WrappedComponent) {
         removeAlerts={removeAlerts}
         silenceAlerts={silenceAlerts}
         // Table properties
-        table={table}
+        parentId={table.parentId}
+        source={table.source}
+        databaseName={table.databaseName}
         name={table.name}
-        rowCount={table.rowCount.toLocaleString()}
+        fileName={table.fileName}
+        extension={table.extension}
+        size={table.size}
+        mimeType={table.mimeType}
+        dateLastModified={table.dateLastModified}
+        rowCount={table.rowCount}
+        activeColumnIds={activeColumnIds}
         parentOperationId={parentOperationId} // TODO: should only pass Ids
         isInSchema={isInSchema}
         depth={depth}
         columnIds={columnIds}
-        activeColumnIds={activeColumnIds}
         activeColumnsCount={activeColumnIds.length}
         selectedColumnIds={selectedColumnIds}
         initialColumnCount={initialColumnCount}

@@ -172,8 +172,8 @@ export const selectOperationQueryData = (state, operationData) => {
   parent.children = parent.children.map((id) => {
     let child = {
       id,
-      // columnNames: selectActiveColumnDBNamesByTableId(state, id),
-      columnNames: [], // TODO: re-add this selector
+      // databaseNames: selectActiveColumnDBNamesByTableId(state, id),
+      databaseNames: [], // TODO: re-add this selector
     };
     return child;
   });
@@ -181,10 +181,10 @@ export const selectOperationQueryData = (state, operationData) => {
   // parent properties that are only need for Pack operations
   // Stack operation will not throw errors if these are undefined
   parent.joinKey1 = parent.joinKey1
-    ? selectColumnsById(state, parent.joinKey1).columnName
+    ? selectColumnsById(state, parent.joinKey1).databaseName
     : null;
   parent.joinKey2 = parent.joinKey2
-    ? selectColumnsById(state, parent.joinKey2).columnName
+    ? selectColumnsById(state, parent.joinKey2).databaseName
     : null;
 
   return parent;

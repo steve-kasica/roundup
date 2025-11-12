@@ -38,7 +38,8 @@ import { selectAlertsById } from "../../slices/alertsSlice/alertsSelectors";
 const SchemaToolbar = ({
   // columnIds,
   objectId,
-  alertIds = [],
+  alertIds,
+  hasAlerts,
   children,
   customMenuItems = null,
   handleExcludeSelected = () => {},
@@ -46,13 +47,6 @@ const SchemaToolbar = ({
   const dispatch = useDispatch();
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
   const alerts = useSelector((state) => selectAlertsById(state, alertIds));
-  const isError = useSelector((state) =>
-    Boolean(
-      isTableId(objectId)
-        ? state.tables.data[objectId].error
-        : state.operations.data[objectId]?.error
-    )
-  );
   // const areAllColumnsSelected =
   //   columnIds.length > 0 && selectedColumnIds.length === columnIds.length;
 
@@ -120,7 +114,7 @@ const SchemaToolbar = ({
         {/* Export */}
         <IconButton
           size="small"
-          disabled={isError}
+          disabled={hasAlerts}
           onClick={handleExport}
           title="Export"
         >

@@ -25,7 +25,7 @@ export default function* updateColumnsWorker(action) {
         )
       ) {
         databaseUpdates = yield call(getColumnStats, column.parentId, [
-          column.columnName,
+          column.databaseName,
         ]);
       }
 

@@ -11,7 +11,7 @@ import { useDispatch } from "react-redux";
  * Passes dragDropRef to its children instead of wrapping them
  */
 const TableDragContainer = ({
-  table,
+  id,
   children,
   tableIds = [],
   onDragEnd,
@@ -20,9 +20,8 @@ const TableDragContainer = ({
   canDrag = true,
 }) => {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
-    console.debug("Rendering TableDragContainer for table:", table?.id);
+    console.debug("Rendering TableDragContainer for table:", id);
   }
-  const dispatch = useDispatch();
   const ref = useRef(null);
 
   // Drag functionality
@@ -30,7 +29,7 @@ const TableDragContainer = ({
     type: dragType,
     item: () => {
       return {
-        tableIds: Array.from(new Set([table.id, ...tableIds])),
+        tableIds: Array.from(new Set([id, ...tableIds])),
         type: dragType,
       };
     },

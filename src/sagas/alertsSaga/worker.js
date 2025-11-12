@@ -1,18 +1,17 @@
 // Worker saga
 
-import { put, select } from "redux-saga/effects";
+import { put } from "redux-saga/effects";
 import {
   addAlerts as addAlertsSliceRequest,
   removeAlertsBySignature as removeAlertsBySignatureSliceRequest,
 } from "../../slices/alertsSlice/alertsSlice";
-import { selectIsAlertRaised } from "../../slices/alertsSlice";
 
 export default function* alertsSagaWorker(raisedAlerts) {
   const alertsToAdd = [];
   const alertsToClear = [];
 
   for (const alert of raisedAlerts) {
-    const isRaised = yield select((state) => selectIsAlertRaised(state, alert));
+    const isRaised = true; // TODO
     if (isRaised && !alert.isPassing) {
       // Alert already exists, skip
       continue;

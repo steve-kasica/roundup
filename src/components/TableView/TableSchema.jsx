@@ -26,8 +26,6 @@
  * ```
  */
 
-/* eslint-disable react/prop-types */
-
 import { Box, Typography, Menu, MenuItem } from "@mui/material";
 import withTableData from "./withTableData";
 import { useCallback, useRef, useState, useEffect } from "react";
@@ -41,7 +39,6 @@ import {
 import { EnhancedColumnSummary } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
-import { FocusIcon } from "lucide-react";
 import FocusIconButton from "../ui/FocusIconButton";
 import ExcludeIconButton from "../ui/ExcludeIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
@@ -51,14 +48,16 @@ import SelectToggleIconButton from "../ui/SelectToggleIconButton";
  *
  * @param {Object} props - Component props
  * @param {Object} props.table - Table object containing schema information
- * @param {string} props.table.name - Name of the table
+ * @param {string} props.name - Name of the table
  * @param {string[]} props.activeColumnIds - Array of column IDs in the table
- * @param {number} [props.table.rowCount] - Number of rows in the table
+ * @param {number} [props.rowCount] - Number of rows in the table
  * @param {string[]} [props.selectedColumnIds=[]] - Array of currently selected column IDs
  * @returns {JSX.Element} The rendered TableSchema component
  */
 const TableSchema = ({
-  table,
+  id,
+  rowCount,
+  name,
   activeColumnIds,
   selectedColumnIds,
   columnCount,
@@ -74,7 +73,7 @@ const TableSchema = ({
   hasAlerts,
 }) => {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
-    console.debug("Rendering TableSchema for table:", table?.id);
+    console.debug("Rendering TableSchema for table:", id);
   }
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
@@ -142,18 +141,15 @@ const TableSchema = ({
    * Changes the type of selected columns
    * @param {string|null} columnType - The new column type to apply, or null for auto-detect
    */
-  const handleColumnTypeChange = useCallback(
-    (columnType) => {
-      if (selectedColumnIds.length > 0) {
-        // TODO: why is this here? shouldn't it be in columns
-        // dispatch(
-        //   setColumnType({ ids: selectedColumnIds, columnTypes: columnType })
-        // );
-      }
-      handleColumnTypeMenuClose();
-    },
-    [dispatch, selectedColumnIds, handleColumnTypeMenuClose]
-  );
+  const handleColumnTypeChange = useCallback(() => {
+    if (selectedColumnIds.length > 0) {
+      // TODO: why is this here? shouldn't it be in columns
+      // dispatch(
+      //   setColumnType({ ids: selectedColumnIds, columnTypes: columnType })
+      // );
+    }
+    handleColumnTypeMenuClose();
+  }, [selectedColumnIds, handleColumnTypeMenuClose]);
 
   /**
    * Handles column selection with support for multiple selection modes:
@@ -253,9 +249,9 @@ const TableSchema = ({
       <SchemaToolbar
         columnIds={activeColumnIds}
         columnCount={columnCount}
-        rowCount={table.rowCount}
-        name={table.name}
-        objectId={table.id}
+        rowCount={rowCount}
+        name={name}
+        objectId={id}
         customMenuItems={
           <>
             <FocusIconButton

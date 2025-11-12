@@ -29,7 +29,7 @@ const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
   columnType,
   name,
-  columnName,
+  databaseName,
   excludeColumn,
   setColumnType,
   focusColumn,
@@ -49,9 +49,9 @@ const ColumnContextMenu = ({
   );
 
   const handleRenameColumn = useCallback(() => {
-    setNewColumnName(name || columnName || ""); // Pre-fill with current name
+    setNewColumnName(name || databaseName || ""); // Pre-fill with current name
     setRenameDialogOpen(true);
-  }, [name, columnName]);
+  }, [name, databaseName]);
 
   const handleRenameDialogClose = useCallback(
     (event) => {

@@ -146,7 +146,12 @@ const StyledTableRow = styled("tr", {
 
 function TableRowSummary({
   // props from withTableData
-  table,
+  id,
+  name,
+  mimeType,
+  size,
+  dateLastModified,
+  rowCount,
   columnCount,
   removedColumnCount,
   isInSchema,
@@ -178,7 +183,7 @@ function TableRowSummary({
   dragDropRef,
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
-    console.debug("Rendering TableRowSummary for table:", table?.id);
+    console.debug("Rendering TableRowSummary for table:", id);
   }
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -198,7 +203,7 @@ function TableRowSummary({
       label: "Rename table",
       isDisabled: false,
       onClick: (event) => {
-        const newName = prompt("Enter new table name:", table.name);
+        const newName = prompt("Enter new table name:", name);
         if (newName && newName.trim() !== "") {
           renameTable(newName);
         }
@@ -246,10 +251,10 @@ function TableRowSummary({
       isSelected={isSelected}
       isHovered={false} // TODO: Implement hover state if needed
       hasAlerts={hasAlerts}
-      data-tableid={table.id}
+      data-tableid={id}
       data-selected={isSelected}
       data-multiselected={
-        selectedTableIds.includes(table.id) && selectedTableIds.length > 1
+        selectedTableIds.includes(id) && selectedTableIds.length > 1
       }
       data-selection-count={selectedTableIds.length}
       onMouseEnter={hoverTable}
@@ -311,7 +316,7 @@ function TableRowSummary({
         data-column="name"
       >
         <Stack direction="row" alignItems="center" spacing={0.5}>
-          <HighlightText pattern={searchString} text={table.name} />
+          <HighlightText pattern={searchString} text={name} />
           {hasAlerts && (
             <Badge
               badgeContent={alertIds.length}
@@ -329,27 +334,27 @@ function TableRowSummary({
         color={isDisabled ? "textDisabled" : "normal"}
         data-column="mimeType"
       >
-        {table.mimeType || "N/A"}
+        {mimeType || "N/A"}
       </Typography>
       <BarChartCell
         component="td"
         sx={{ fontSize: "13px" }}
         color={isDisabled ? "textDisabled" : "normal"}
-        percentage={(table.size / bytesMax) * 100}
+        percentage={(size / bytesMax) * 100}
         isDisabled={isDisabled}
         data-column="size"
       >
-        {formatBytes(table.size)}
+        {formatBytes(size)}
       </BarChartCell>
       <BarChartCell
         component="td"
         sx={{ fontSize: "13px" }}
         color={isDisabled ? "textDisabled" : "normal"}
-        percentage={(table.rowCount / rowMax) * 100}
+        percentage={(rowCount / rowMax) * 100}
         isDisabled={isDisabled}
         data-column="rowCount"
       >
-        {formatNumber(table.rowCount)}
+        {formatNumber(rowCount)}
       </BarChartCell>
       <BarChartCell
         component="td"
@@ -370,7 +375,7 @@ function TableRowSummary({
         color={isDisabled ? "textDisabled" : "normal"}
         data-column="dateLastModified"
       >
-        {formatDate(new Date(table.dateLastModified))}
+        {formatDate(new Date(dateLastModified))}
       </Typography>
       <td className="more-options">
         <Menu

@@ -45,7 +45,7 @@ const RowBlock = styled(Box)(({ height, isHovered, isToggled, isNull }) => ({
 }));
 
 const TableRowMatches = ({
-  table,
+  id,
   columnCount,
   activeColumnIds,
   // Props from withAssociatedAlerts via withTableData
@@ -63,7 +63,7 @@ const TableRowMatches = ({
   onBlockCellClick = () => {},
 }) => {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
-    console.debug("Rendering TableBlock for table:", table?.id);
+    console.debug("Rendering TableBlock for table:", id);
   }
   return (
     <Box
@@ -105,7 +105,7 @@ const TableRowMatches = ({
               }
               onMouseEnter={(event) => onBlockEnter(event, label)}
               onMouseLeave={(event) => onBlockLeave(event, label)}
-              onClick={(event) => onBlockClick(event, table.id, label)}
+              onClick={(event) => onBlockClick(event, id, label)}
             >
               {activeColumnIds.map((columnId) => (
                 <Box
@@ -118,7 +118,7 @@ const TableRowMatches = ({
                       backgroundColor: "#999",
                     },
                     onClick: (event) =>
-                      onBlockCellClick(event, table.id, columnId, label),
+                      onBlockCellClick(event, id, columnId, label),
                   }}
                 ></Box>
               ))}

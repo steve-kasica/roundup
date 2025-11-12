@@ -33,7 +33,7 @@ export const selectColumnsById = createSelector(
 /**
  * Select column names for given column ID(s).
  *
- * This selector retrieves the `columnName` property (the actual database
+ * This selector retrieves the `databaseName` property (the actual database
  * column name) for one or more specified column IDs. It can handle both
  * single ID strings and arrays of IDs, returning either a single column name
  * or an array of names accordingly. This is useful when you need to map from
@@ -53,8 +53,8 @@ export const selectColumnNamesById = createSelector(
     !ids
       ? null
       : Array.isArray(ids)
-      ? ids.map((id) => byId[id]?.columnName)
-      : byId[ids]?.columnName
+      ? ids.map((id) => byId[id]?.databaseName)
+      : byId[ids]?.databaseName
 );
 
 /**

@@ -9,7 +9,10 @@ import {
 } from "../../slices/columnsSlice/selectors";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
-import { setSelectedMatches } from "../../slices/uiSlice";
+import {
+  setSelectedMatches,
+  selectSelectedMatches,
+} from "../../slices/uiSlice";
 import {
   selectPackOperationColumnCount,
   selectPackOperationMatchStats,
@@ -31,7 +34,7 @@ export default function withPackOperationData(WrappedComponent) {
     const [leftKeyColumnName, rightKeyColumnName] = useSelector((state) => {
       const leftKeyColumn = selectColumnsById(state, operation?.joinKey1);
       const rightKeyColumn = selectColumnsById(state, operation?.joinKey2);
-      return [leftKeyColumn?.columnName, rightKeyColumn?.columnName];
+      return [leftKeyColumn?.databaseName, rightKeyColumn?.databaseName];
     });
 
     const leftHandColumns = useSelector((state) =>
@@ -95,7 +98,7 @@ export default function withPackOperationData(WrappedComponent) {
     const leftRowCount = leftTable?.rowCount || 0;
     const rightRowCount = rightTable?.rowCount || 0;
 
-    const selectedMatchTypes = useSelector((state) => state.ui.selectedMatches);
+    const selectedMatchTypes = useSelector(selectSelectedMatches);
 
     // Define callback functions
     // -------------------------------------------------------

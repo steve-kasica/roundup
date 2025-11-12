@@ -133,7 +133,7 @@ function OperationKeyColumnSelect({
                       }}
                     >
                       <Typography>
-                        {column.name || column.columnName || column.id}
+                        {column.name || column.databaseName || column.id}
                       </Typography>
                     </Box>
                   }

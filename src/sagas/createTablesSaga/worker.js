@@ -5,6 +5,7 @@ import {
   getTableDimensions,
 } from "../../lib/duckdb";
 import { createTablesFailure, createTablesSuccess } from "./actions";
+import generateUUID from "../../lib/utilities/generateUUID";
 
 export default function* createTablesWorker(action) {
   const successfulCreations = [];
@@ -13,9 +14,7 @@ export default function* createTablesWorker(action) {
 
   for (const info of tablesInfo) {
     try {
-      const databaseName =
-        Math.random().toString(36).substring(2, 10) +
-        new Date().getTime().toString(36);
+      const databaseName = generateUUID("t");
       yield call(createDBTables, databaseName, info.fileName);
       const { rowCount, columnCount } = yield call(
         getTableDimensions,

@@ -13,8 +13,9 @@ describe("createColumnsWorker saga", () => {
     it("creates a single column and updates both columns and tables slices", async () => {
       const action = {
         payload: {
-          columnInfo: [{ parentId: "t1", index: 0 }],
-          mode: CREATION_MODE_INITIALIZATION,
+          columnLocations: [
+            { parentId: "t1", parentDatabaseName: "foo", index: 0 },
+          ],
         },
       };
 
@@ -33,7 +34,7 @@ describe("createColumnsWorker saga", () => {
       expect(columns).toHaveLength(1);
       expect(columns[0]).toMatchObject({
         parentId: "t1",
-        columnName: "column_a",
+        databaseName: "column_a",
       });
 
       // Verify updateTables was called with correct structure
@@ -53,12 +54,11 @@ describe("createColumnsWorker saga", () => {
     it("creates multiple columns from the same table", async () => {
       const action = {
         payload: {
-          columnInfo: [
-            { parentId: "t1", index: 0 },
-            { parentId: "t1", index: 1 },
-            { parentId: "t1", index: 2 },
+          columnLocations: [
+            { parentId: "t1", databaseName: "foo", index: 0 },
+            { parentId: "t1", databaseName: "foo", index: 1 },
+            { parentId: "t1", databasename: "foo", index: 2 },
           ],
-          mode: CREATION_MODE_INITIALIZATION,
         },
       };
 
@@ -77,15 +77,15 @@ describe("createColumnsWorker saga", () => {
       expect(columns).toHaveLength(3);
       expect(columns[0]).toMatchObject({
         parentId: "t1",
-        columnName: "col_a",
+        databaseName: "col_a",
       });
       expect(columns[1]).toMatchObject({
         parentId: "t1",
-        columnName: "col_b",
+        databaseName: "col_b",
       });
       expect(columns[2]).toMatchObject({
         parentId: "t1",
-        columnName: "col_c",
+        databaseName: "col_c",
       });
 
       // Verify the table update contains 3 column IDs
@@ -100,11 +100,11 @@ describe("createColumnsWorker saga", () => {
     it("creates columns from multiple tables and updates each table correctly", async () => {
       const action = {
         payload: {
-          columnInfo: [
-            { parentId: "t1", index: 0 },
-            { parentId: "t1", index: 1 },
-            { parentId: "t2", index: 0 },
-            { parentId: "t3", index: 0 },
+          columnLocations: [
+            { parentId: "t1", parentDatabaseName: "foo", index: 0 },
+            { parentId: "t1", parentDatabaseName: "foo", index: 1 },
+            { parentId: "t2", parentDatabaseName: "bar", index: 0 },
+            { parentId: "t3", parentDatabaseName: "baz", index: 0 },
           ],
         },
       };
@@ -115,9 +115,9 @@ describe("createColumnsWorker saga", () => {
 
       const { effects } = await expectSaga(createColumnsWorker, action)
         .provide([
-          [matchers.call(getTableColumnNames, "t1"), mockColumnNamesT1],
-          [matchers.call(getTableColumnNames, "t2"), mockColumnNamesT2],
-          [matchers.call(getTableColumnNames, "t3"), mockColumnNamesT3],
+          [matchers.call(getTableColumnNames, "foo"), mockColumnNamesT1],
+          [matchers.call(getTableColumnNames, "bar"), mockColumnNamesT2],
+          [matchers.call(getTableColumnNames, "baz"), mockColumnNamesT3],
         ])
         .run();
 
@@ -132,19 +132,19 @@ describe("createColumnsWorker saga", () => {
       // Verify column names
       expect(columns[0]).toMatchObject({
         parentId: "t1",
-        columnName: "table1_col_a",
+        databaseName: "table1_col_a",
       });
       expect(columns[1]).toMatchObject({
         parentId: "t1",
-        columnName: "table1_col_b",
+        databaseName: "table1_col_b",
       });
       expect(columns[2]).toMatchObject({
         parentId: "t2",
-        columnName: "table2_col_a",
+        databaseName: "table2_col_a",
       });
       expect(columns[3]).toMatchObject({
         parentId: "t3",
-        columnName: "table3_col_a",
+        databaseName: "table3_col_a",
       });
       // Verify 3 table updates (one for each table)
       const updateTablesAction = effects.put.find(
@@ -173,10 +173,10 @@ describe("createColumnsWorker saga", () => {
     it("fetches column names from DB only once per table", async () => {
       const action = {
         payload: {
-          columnInfo: [
-            { parentId: "t1", index: 0 },
-            { parentId: "t1", index: 1 },
-            { parentId: "t1", index: 2 },
+          columnLocations: [
+            { parentId: "t1", databaseName: "foo", index: 0 },
+            { parentId: "t1", databaseName: "foo", index: 1 },
+            { parentId: "t1", databaseName: "foo", index: 2 },
           ],
         },
       };
@@ -184,12 +184,12 @@ describe("createColumnsWorker saga", () => {
       const mockColumnNames = ["col_a", "col_b", "col_c"];
 
       const { effects } = await expectSaga(createColumnsWorker, action)
-        .provide([[matchers.call(getTableColumnNames, "t1"), mockColumnNames]])
+        .provide([[matchers.call.fn(getTableColumnNames), mockColumnNames]])
         .run();
 
-      // Count how many times getTableColumnNames was called with t1
+      // Count how many times getTableColumnNames was called with foo
       const getTableColumnNamesCalls = effects.call.filter(
-        (effect) => effect.payload.args[0] === "t1"
+        (effect) => effect.payload.fn === getTableColumnNames
       );
       // Should only be called once even though we're creating 3 columns
       expect(getTableColumnNamesCalls).toHaveLength(1);

@@ -64,22 +64,22 @@ export function useVirtualPackRows(
   // Use useSelector with custom equality to prevent unnecessary re-renders
   const leftColumnNames = useSelector((state) => {
     return leftColumnIds
-      .map((id) => selectColumnsById(state, id)?.columnName)
+      .map((id) => selectColumnsById(state, id)?.databaseName)
       .filter((name) => name);
   }, shallowEqual);
 
   const rightColumnNames = useSelector((state) => {
     return rightColumnIds
-      .map((id) => selectColumnsById(state, id)?.columnName)
+      .map((id) => selectColumnsById(state, id)?.databaseName)
       .filter((name) => name);
   }, shallowEqual);
 
   const leftKeyColumn = useSelector(
-    (state) => selectColumnsById(state, leftKeyColumnId)?.columnName
+    (state) => selectColumnsById(state, leftKeyColumnId)?.databaseName
   );
 
   const rightKeyColumn = useSelector(
-    (state) => selectColumnsById(state, rightKeyColumnId)?.columnName
+    (state) => selectColumnsById(state, rightKeyColumnId)?.databaseName
   );
 
   /**

@@ -19,7 +19,7 @@ import StyledColumnCard from "./StyledColumnCard";
 const ColumnSummary = ({
   topValues,
   name,
-  columnName,
+  databaseName,
   id,
   nullCount,
   uniqueCount,
@@ -147,7 +147,7 @@ const ColumnSummary = ({
                 }),
               }}
             >
-              {name || columnName || id}
+              {name || databaseName || id}
             </h3>
             {hasAlerts && (
               <Badge

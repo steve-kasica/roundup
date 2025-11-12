@@ -1,6 +1,6 @@
 import withColumnData from "../../../../ColumnViews/withColumnData";
 function ColumnView({ column }) {
-  return column.name || column.columnName || column.id;
+  return column.name || column.databaseName || column.id;
 }
 
 const EnhancedColumnView = withColumnData(ColumnView);

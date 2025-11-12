@@ -18,7 +18,7 @@
  * Quick Start:
  *   import { getTableStats } from './getTableStats';
  *   const stats = await getTableStats(['users', 'orders']);
- *   // Returns: [{ tableId, rowCount, columnNames }, ...]
+ *   // Returns: [{ tableId, rowCount, databaseNames }, ...]
  */
 
 import { getDuckDB } from "./duckdbClient";
@@ -27,28 +27,28 @@ import { getDuckDB } from "./duckdbClient";
  * Get statistics for multiple tables including row count and column names.
  *
  * @param {string|string[]} tableIds - Single table ID or array of table IDs
- * @returns {Promise<Array>} Array of objects with tableId, rowCount, and columnNames
+ * @returns {Promise<Array>} Array of objects with tableId, rowCount, and databaseNames
  *
  * @example
  * // Get stats for a single table
  * const singleTableStats = await getTableStats("customers");
- * // Returns: [{ tableId: "customers", rowCount: 1500, columnNames: ["id", "name", "email"] }]
+ * // Returns: [{ tableId: "customers", rowCount: 1500, databaseNames: ["id", "name", "email"] }]
  *
  * @example
  * // Get stats for multiple tables
  * const multiTableStats = await getTableStats(["customers", "orders", "products"]);
  * // Returns: [
- * //   { tableId: "customers", rowCount: 1500, columnNames: ["id", "name", "email", "created_at"] },
- * //   { tableId: "orders", rowCount: 3200, columnNames: ["order_id", "customer_id", "amount", "order_date"] },
- * //   { tableId: "products", rowCount: 850, columnNames: ["product_id", "name", "price", "category"] }
+ * //   { tableId: "customers", rowCount: 1500, databaseNames: ["id", "name", "email", "created_at"] },
+ * //   { tableId: "orders", rowCount: 3200, databaseNames: ["order_id", "customer_id", "amount", "order_date"] },
+ * //   { tableId: "products", rowCount: 850, databaseNames: ["product_id", "name", "price", "category"] }
  * // ]
  *
  * @example
  * // Handle tables that might not exist (graceful error handling)
  * const statsWithErrors = await getTableStats(["valid_table", "nonexistent_table"]);
  * // Returns: [
- * //   { tableId: "valid_table", rowCount: 100, columnNames: ["col1", "col2"] },
- * //   { tableId: "nonexistent_table", rowCount: 0, columnNames: [], error: "Table not found" }
+ * //   { tableId: "valid_table", rowCount: 100, databaseNames: ["col1", "col2"] },
+ * //   { tableId: "nonexistent_table", rowCount: 0, databaseNames: [], error: "Table not found" }
  * // ]
  *
  * @example
@@ -60,7 +60,7 @@ import { getDuckDB } from "./duckdbClient";
  *   if (stat.error) {
  *     console.warn(`Failed to get stats for ${stat.tableId}: ${stat.error}`);
  *   } else {
- *     console.log(`Table ${stat.tableId} has ${stat.rowCount} rows and ${stat.columnNames.length} columns`);
+ *     console.log(`Table ${stat.tableId} has ${stat.rowCount} rows and ${stat.databaseNames.length} columns`);
  *   }
  * });
  */
@@ -114,7 +114,7 @@ export async function getTableStats(tableIds) {
           results.push({
             tableId: tableData.table_id,
             rowCount: Number(tableData.row_count), // Ensure it's a JavaScript number
-            columnNames: Array.isArray(tableData.column_names)
+            databaseNames: Array.isArray(tableData.column_names)
               ? tableData.column_names
               : Array.from(tableData.column_names), // Ensure it's a JS array
           });
@@ -129,7 +129,7 @@ export async function getTableStats(tableIds) {
         results.push({
           tableId: tableId,
           rowCount: 0,
-          columnNames: [],
+          databaseNames: [],
           error: tableError.message,
         });
       }
@@ -149,15 +149,15 @@ export async function getTableStats(tableIds) {
  * This is more efficient for large numbers of tables but less error-resilient.
  *
  * @param {string[]} tableIds - Array of table IDs
- * @returns {Promise<Array>} Array of objects with tableId, rowCount, and columnNames
+ * @returns {Promise<Array>} Array of objects with tableId, rowCount, and databaseNames
  *
  * @example
  * // Efficiently process many tables at once
  * const manyTables = ["table1", "table2", "table3", "table4", "table5"];
  * const batchStats = await getTableStatsBatch(manyTables);
  * // Returns: [
- * //   { tableId: "table1", rowCount: 1000, columnNames: ["id", "data"] },
- * //   { tableId: "table2", rowCount: 2500, columnNames: ["key", "value", "timestamp"] },
+ * //   { tableId: "table1", rowCount: 1000, databaseNames: ["id", "data"] },
+ * //   { tableId: "table2", rowCount: 2500, databaseNames: ["key", "value", "timestamp"] },
  * //   ... // results for all tables
  * // ]
  *
@@ -168,7 +168,7 @@ export async function getTableStats(tableIds) {
  *
  * // Process results
  * const totalRows = allStats.reduce((sum, stat) => sum + stat.rowCount, 0);
- * const avgColumnsPerTable = allStats.reduce((sum, stat) => sum + stat.columnNames.length, 0) / allStats.length;
+ * const avgColumnsPerTable = allStats.reduce((sum, stat) => sum + stat.databaseNames.length, 0) / allStats.length;
  *
  * console.log(`Total rows across all tables: ${totalRows}`);
  * console.log(`Average columns per table: ${avgColumnsPerTable.toFixed(1)}`);
@@ -230,7 +230,7 @@ export async function getTableStatsBatch(tableIds) {
       return {
         tableId: colInfo.table_id,
         rowCount: rowInfo ? Number(rowInfo.row_count) : 0,
-        columnNames: colInfo.column_names || [], // Fallback to empty array
+        databaseNames: colInfo.column_names || [], // Fallback to empty array
       };
     });
 

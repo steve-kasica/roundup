@@ -28,13 +28,13 @@ export async function getColumnStats(tableId, columnList) {
   const topValuesResponse = await conn.query(topValuesQuery);
   const topValuesResults = topValuesResponse.toArray().reduce((acc, row) => {
     const rowData = row.toJSON();
-    const columnName = rowData.column_name;
+    const databaseName = rowData.column_name;
 
-    if (!acc[columnName]) {
-      acc[columnName] = [];
+    if (!acc[databaseName]) {
+      acc[databaseName] = [];
     }
 
-    acc[columnName].push({
+    acc[databaseName].push({
       value: rowData.value,
       count: Number(rowData.count),
     });
@@ -90,8 +90,8 @@ export async function getColumnStats(tableId, columnList) {
     }
 
     // Get the top 10 most frequent values for this column
-    const columnName = serialized.column_name;
-    const topValues = topValuesResults[columnName] || [];
+    const databaseName = serialized.column_name;
+    const topValues = topValuesResults[databaseName] || [];
     const modeData = topValues[0] || { value: null, count: null };
 
     return {

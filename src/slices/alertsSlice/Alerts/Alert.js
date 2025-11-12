@@ -1,5 +1,3 @@
-let counter = 0;
-
 export const Alert = (
   code,
   name,
@@ -11,7 +9,6 @@ export const Alert = (
   message = null
 ) => ({
   // Auto-generate unique ID for each alert
-  id: `e${counter++}`,
   timeStamp: Date.now(),
 
   code,
@@ -22,5 +19,5 @@ export const Alert = (
   sourceId,
   isPassing,
   message,
-  signature: [sourceId, code].join("|"),
+  id: [sourceId, code].join("_"),
 });

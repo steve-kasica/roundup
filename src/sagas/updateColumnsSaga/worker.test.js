@@ -67,15 +67,15 @@ describe("updateColumnsWorker saga", () => {
     //       expect(columns).toHaveLength(3);
     //       expect(columns[0]).toMatchObject({
     //         parentId: "t1",
-    //         columnName: "col_a",
+    //         databaseName: "col_a",
     //       });
     //       expect(columns[1]).toMatchObject({
     //         parentId: "t1",
-    //         columnName: "col_b",
+    //         databaseName: "col_b",
     //       });
     //       expect(columns[2]).toMatchObject({
     //         parentId: "t1",
-    //         columnName: "col_c",
+    //         databaseName: "col_c",
     //       });
 
     //       // Verify the table update contains 3 column IDs
@@ -122,19 +122,19 @@ describe("updateColumnsWorker saga", () => {
     //       // Verify column names
     //       expect(columns[0]).toMatchObject({
     //         parentId: "t1",
-    //         columnName: "table1_col_a",
+    //         databaseName: "table1_col_a",
     //       });
     //       expect(columns[1]).toMatchObject({
     //         parentId: "t1",
-    //         columnName: "table1_col_b",
+    //         databaseName: "table1_col_b",
     //       });
     //       expect(columns[2]).toMatchObject({
     //         parentId: "t2",
-    //         columnName: "table2_col_a",
+    //         databaseName: "table2_col_a",
     //       });
     //       expect(columns[3]).toMatchObject({
     //         parentId: "t3",
-    //         columnName: "table3_col_a",
+    //         databaseName: "table3_col_a",
     //       });
     //       // Verify 3 table updates (one for each table)
     //       const updateTablesAction = effects.put.find(

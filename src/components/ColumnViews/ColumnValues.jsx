@@ -6,7 +6,7 @@ import withColumnData from "./withColumnData";
 
 const ColumnValues = ({
   id,
-  columnName,
+  databaseName,
   parentId,
   limit = 20,
   scrollTop = 0,
@@ -32,7 +32,7 @@ const ColumnValues = ({
     let isMounted = true;
     setLoading(true);
     setError(null);
-    getColumnValues(parentId, columnName, limit, offset)
+    getColumnValues(parentId, databaseName, limit, offset)
       .then((result) => {
         if (isMounted) {
           setValues((prev) =>

@@ -44,6 +44,8 @@ import {
   testPackOperationForFatalErrors,
   testStackOperationForFatalErrors,
 } from "../../slices/alertsSlice/Alerts/Errors/utilities";
+import { normalizeInputToArray } from "../../slices/utilities";
+import generateUUID from "../../lib/utilities/generateUUID";
 
 /**
  * Worker saga that creates or replaces database views based on operation type.
@@ -75,13 +77,15 @@ export default function* createOperationsWorker(action) {
   const raisedAlerts = [];
   let { operationData } = action.payload;
 
-  operationData = Array.isArray(operationData)
-    ? operationData
-    : [operationData];
+  operationData = normalizeInputToArray(operationData);
 
   for (const { operationType, childIds } of operationData) {
     // Create operation object
-    const operation = Operation(operationType);
+    const operation = Operation({
+      operationType,
+      childIds,
+      databaseName: `${generateUUID("o_")}`,
+    });
 
     // Create database view based on operation type
     if (operation.operationType === OPERATION_TYPE_PACK) {
@@ -89,25 +93,23 @@ export default function* createOperationsWorker(action) {
       const { isAllPassing, fatalErrors, warnings } =
         testPackOperationForFatalErrors(operation);
       if (isAllPassing) {
-        successfulCreations.push({ operation, childIds });
+        successfulCreations.push(operation);
       } else {
-        failedCreations.push({ operation, childIds });
+        failedCreations.push(operation);
       }
-      operation.rowCount = null; // TODO: is this calculatable?
       raisedAlerts.push(...fatalErrors, ...warnings);
     } else if (operation.operationType === OPERATION_TYPE_STACK) {
       const { isAllPassing, fatalErrors, warnings } =
         testStackOperationForFatalErrors(operation);
       if (isAllPassing) {
-        successfulCreations.push({ operation, childIds });
+        successfulCreations.push(operation);
       } else {
-        failedCreations.push({ operation, childIds });
+        failedCreations.push(operation);
       }
       raisedAlerts.push(...fatalErrors, ...warnings);
     } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
       // NO_OP operations do not require a database view
-      operation.rowCount = null; // TODO: this is calculatable
-      successfulCreations.push({ operation, childIds });
+      successfulCreations.push(operation);
     }
   }
 

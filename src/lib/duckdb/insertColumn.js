@@ -2,7 +2,7 @@ import { getDuckDB } from "./duckdbClient";
 
 export async function insertColumn(
   tableId,
-  columnName,
+  databaseName,
   insertionIndex = null,
   columnType = "TEXT",
   defaultValue = null
@@ -11,7 +11,7 @@ export async function insertColumn(
   const conn = await db.connect();
 
   // First, add the column to the table
-  let query = `ALTER TABLE "${tableId}" ADD COLUMN "${columnName}" ${columnType}`;
+  let query = `ALTER TABLE "${tableId}" ADD COLUMN "${databaseName}" ${columnType}`;
 
   // Set default value if provided
   if (defaultValue !== null) {
@@ -46,5 +46,5 @@ export async function insertColumn(
   }
 
   await conn.close();
-  return { success: true, columnName, columnType };
+  return { success: true, databaseName, columnType };
 }

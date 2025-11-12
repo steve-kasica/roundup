@@ -15,7 +15,8 @@ export function formQuery(operation, columnList = null) {
   return `CREATE OR REPLACE VIEW ${operation.id}${columnSpec} AS SELECT * FROM (
     ${operation.children
       .map(
-        (child) => `\nSELECT ${child.columnNames.join(", ")} FROM ${child.id}\n`
+        (child) =>
+          `\nSELECT ${child.databaseNames.join(", ")} FROM ${child.id}\n`
       )
       .join(" UNION ALL ")}
   )`;

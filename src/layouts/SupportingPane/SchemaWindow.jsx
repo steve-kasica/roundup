@@ -38,7 +38,7 @@ export default function SchemaWindow() {
         >
           <pre>No tables uploaded</pre>
         </Box>
-      ) : operations.length === 0 || focusedOperation?.children.length === 0 ? (
+      ) : operations.length === 0 || focusedOperation?.childIds.length === 0 ? (
         <Box sx={{ flex: 1, height: "100%" }}>
           <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
             <Typography>Drag to add a source table</Typography>
@@ -51,7 +51,7 @@ export default function SchemaWindow() {
           <PackSchemaView id={focusedObjectId} />
         </Box>
       ) : focusedOperation?.operationType === OPERATION_TYPE_NO_OP ? (
-        <EnhancedTableSchema id={focusedOperation.children[0]} />
+        <EnhancedTableSchema id={focusedOperation.childIds[0]} />
       ) : isFocusedTable ? (
         <EnhancedTableSchema id={focusedObjectId} />
       ) : (

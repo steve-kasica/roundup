@@ -56,7 +56,23 @@ export default function* createColumnsWatcher() {
   yield takeEvery(createColumnsRequest.type, createColumnsWorker);
 
   // When tables are created, create columns for them
-  yield takeEvery(createTablesSuccess.type, handleTables);
+  yield takeEvery(createTablesSuccess.type, function* (action) {
+    const { tableIds } = action.payload;
+    const tables = yield select((state) => selectTablesById(state, tableIds));
+    for (const table of tables) {
+      yield put(
+        createColumnsRequest({
+          columnLocations: Array.from({ length: table.columnIds.length }).map(
+            (_, index) => ({
+              parentId: table.id, // tables and operations can be parents of columns
+              parentDatabaseName: table.databaseName,
+              index,
+            })
+          ),
+        })
+      );
+    }
+  });
 
   // If an operation is successfully created, create columns for it
   yield takeEvery(createOperationsSuccess.type, function* (action) {

@@ -6,7 +6,7 @@ import withColumnData from "./withColumnData";
 const ColumnName = ({
   id,
   name,
-  columnName,
+  databaseName,
   onClick,
   sx = {},
   isSelected,
@@ -59,7 +59,7 @@ const ColumnName = ({
           }),
         }}
       >
-        {name || columnName || id}
+        {name || databaseName || id}
       </Typography>
       {hasAlerts && (
         <Tooltip

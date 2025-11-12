@@ -18,31 +18,28 @@ import { updateTables } from "../../slices/tablesSlice";
  */
 
 export default function* createColumnsWorker(action) {
-  const { columnInfo } = action.payload;
+  const { columnLocations } = action.payload;
   const successfulCreations = [];
   const tableIdToColumnNames = new Map();
   const tableUpdates = {};
 
-  for (const { parentId, index } of columnInfo) {
+  for (const { parentId, parentDatabaseName, index } of columnLocations) {
     // Create new column object
     if (!tableIdToColumnNames.has(parentId)) {
       // Fetch column names for this TABLE or VIEW from the DB only once
-      const columnDBNames = yield call(getTableColumnNames, parentId);
+      const columnDBNames = yield call(getTableColumnNames, parentDatabaseName);
       tableIdToColumnNames.set(parentId, columnDBNames);
     }
     const newColumn = Column({
       parentId,
-      columnName: tableIdToColumnNames.get(parentId)[index],
+      databaseName: tableIdToColumnNames.get(parentId)[index],
     });
     tableUpdates[parentId] = tableUpdates[parentId] || [];
     tableUpdates[parentId].push(newColumn.id);
 
     // if (mode === CREATION_MODE_INSERTION) {
-    // columnName: `col_${Math.random()
-    //   .toString(36)
-    //   .substring(2, 8)}_${Date.now().toString(36)}`,
     // try {
-    //   yield call(insertColumn, parentId, newColumn.columnName, index);
+    //   yield call(insertColumn, parentId, newColumn.databaseName, index);
     //   successfulCreations.push(newColumn);
     // } catch (error) {
     //   console.error("Error inserting column:", error);
