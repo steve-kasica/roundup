@@ -33,6 +33,8 @@ function TableBlock({
     (_, i) => (i < activeColumnsCount ? activeColumnIds[i] : null)
   );
 
+  console.log("TableBlock ticks:", ticks);
+
   return (
     <Box
       className="table-block" // Added className for easier targeting during debugging
@@ -82,7 +84,7 @@ function TableBlock({
       {ticks.map((columnId, index) =>
         columnId === null ? (
           <ColumnTick
-            key={`empty-${index}`}
+            key={`empty-${index}`} // Ensure unique key even when columnId is null
             id={null}
             sx={{
               outlineColor: "#f44336",
@@ -90,10 +92,7 @@ function TableBlock({
             }}
           />
         ) : (
-          <EnhancedColumnTick
-            key={`${columnId}-${index}`} // Ensure unique key even when columnId is null
-            id={columnId}
-          />
+          <EnhancedColumnTick key={`${columnId}-${index}`} id={columnId} />
         )
       )}
     </Box>

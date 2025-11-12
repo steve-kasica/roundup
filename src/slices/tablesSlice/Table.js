@@ -58,4 +58,6 @@ export function Table({
   };
 }
 
+export const DATABASE_ATTRIBUTES = ["rowCount"];
+
 export const isTableId = (id) => typeof id === "string" && id.startsWith("t");

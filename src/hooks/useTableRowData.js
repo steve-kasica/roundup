@@ -116,6 +116,13 @@ export function usePaginatedTableRows(
         return;
       }
 
+      if (!columnIds || columnIds.length === 0) {
+        const noColumnsError = new Error("No columns have been selected");
+        setError(noColumnsError);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
@@ -147,7 +154,7 @@ export function usePaginatedTableRows(
         setLoading(false);
       }
     },
-    [tableId, columnsList, pageSize, sortBy, sortDirection]
+    [tableId, columnIds, columnsList, pageSize, sortBy, sortDirection]
   );
 
   const loadMore = useCallback(() => {

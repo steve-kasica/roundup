@@ -16,10 +16,7 @@ import {
   materializeOperationSuccess,
   materializeOperationFailure,
 } from "../materializeOperationSaga/actions";
-import {
-  selectTableColumnIds,
-  setTablesColumnIds,
-} from "../../slices/tablesSlice";
+import { selectTableColumnIds } from "../../slices/tablesSlice";
 
 const handleChildTableColumnExclusion = function* (columnIds) {
   const tableIds = yield select((state) => {
@@ -145,24 +142,24 @@ export default function* updateOperationsWatcher() {
     }
   });
 
-  yield takeLatest(setTablesColumnIds.type, function* (action) {
-    // Extract column IDs from the action payload
-    const columnIds = Array.isArray(action.payload)
-      ? action.payload
-      : [action.payload];
+  // yield takeLatest(setTablesColumnIds.type, function* (action) {
+  //   // Extract column IDs from the action payload
+  //   const columnIds = Array.isArray(action.payload)
+  //     ? action.payload
+  //     : [action.payload];
 
-    // If excluding the last columns from a table, we need to remove that table
-    // from its parent operation, if a table is in the composite schema.
-    // The timing between Redux reducers and Sagas is important here.
-    // Action flows through middleware in order so sagas see actions
-    // after the reducers have updated state. So by the time this saga
-    // see the action, the state is already updated.
-    yield handleEmptyTable(columnIds);
+  //   // If excluding the last columns from a table, we need to remove that table
+  //   // from its parent operation, if a table is in the composite schema.
+  //   // The timing between Redux reducers and Sagas is important here.
+  //   // Action flows through middleware in order so sagas see actions
+  //   // after the reducers have updated state. So by the time this saga
+  //   // see the action, the state is already updated.
+  //   yield handleEmptyTable(columnIds);
 
-    // If excluding columns from tables that are children of operations,
-    // we may need to re-calculate
-    yield handleChildTableColumnExclusion(columnIds);
-  });
+  //   // If excluding columns from tables that are children of operations,
+  //   // we may need to re-calculate
+  //   yield handleChildTableColumnExclusion(columnIds);
+  // });
 
   yield takeLatest(materializeOperationSuccess.type, function* (action) {
     const { operationId, dimensions } = action.payload;

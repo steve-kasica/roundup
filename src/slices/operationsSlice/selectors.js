@@ -147,6 +147,11 @@ export function selectRootOperationId(state) {
   return state.operations.rootOperationId;
 }
 
+export const selectRootOperation = (state) => {
+  const rootId = selectRootOperationId(state);
+  return rootId ? selectOperationsById(state, rootId) : null;
+};
+
 /**
  * Selector to build query data for an operation.
  * Constructs the data structure needed for database view creation.

@@ -93,6 +93,7 @@ export default function withColumnData(WrappedComponent) {
         parentId={parentId}
         // Column data props
         name={column.name}
+        databaseName={column.databaseName}
         approxUnique={column.approxUnique}
         avg={column.avg}
         columnType={column.columnType}

@@ -20,12 +20,14 @@
  * - Updates the application state based on the table update results.
  */
 
-import { put, call } from "redux-saga/effects";
-import { updateTables as updateTablesSlice } from "../../slices/tablesSlice";
+import { put, call, select } from "redux-saga/effects";
+import {
+  selectTablesById,
+  updateTables as updateTablesSlice,
+} from "../../slices/tablesSlice";
 import { getTableStats } from "../../lib/duckdb";
 import { updateTablesFailure, updateTablesSuccess } from "./actions";
-
-const databaseAttributes = ["rowCount"];
+import { DATABASE_ATTRIBUTES } from "../../slices/tablesSlice";
 
 /**
  * Saga worker to handle the logic of updating tables.
@@ -42,28 +44,30 @@ export default function* updateTablesWorker(action) {
   const failedUpdates = [];
   let { tableUpdates } = action.payload;
 
-  // Normalize tableIds to always be an array
-  tableUpdates = Array.isArray(tableUpdates) ? tableUpdates : [tableUpdates];
-
   for (let tableUpdate of tableUpdates) {
-    if (
-      databaseAttributes.some((attr) =>
-        Object.prototype.hasOwnProperty.call(tableUpdate, attr)
-      )
-    ) {
-      try {
-        const stats = yield call(getTableStats, tableUpdate.id);
-        tableUpdate = { ...tableUpdate, ...stats[0] };
-        successfulUpdates.push(tableUpdate);
-      } catch (error) {
-        tableUpdate.error = JSON.stringify(error);
-        failedUpdates.push(tableUpdate);
+    const table = yield select((state) =>
+      selectTablesById(state, tableUpdate.id)
+    );
+
+    try {
+      let databaseUpdates = {};
+      if (
+        Object.keys(tableUpdate).some((key) =>
+          DATABASE_ATTRIBUTES.includes(key)
+        )
+      ) {
+        databaseUpdates = yield call(getTableStats, table.databaseName);
+        tableUpdate = { ...tableUpdate, ...databaseUpdates[0] };
       }
+      successfulUpdates.push(tableUpdate);
+    } catch (error) {
+      tableUpdate.error = JSON.stringify(error);
+      failedUpdates.push(tableUpdate);
     }
   }
 
   // Update the Redux state with the results
-  yield put(updateTablesSlice(tableUpdates));
+  yield put(updateTablesSlice(successfulUpdates));
 
   if (failedUpdates.length > 0) {
     yield put(

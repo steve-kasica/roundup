@@ -2,8 +2,10 @@ import { put, select, takeEvery } from "redux-saga/effects";
 import { updateColumnsRequest } from "./actions";
 import updateColumnsWorker from "./worker";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
-import { selectColumnsById } from "../../slices/columnsSlice";
-import { DATABASE_ATTRIBUTES } from "../../slices/columnsSlice";
+import {
+  DATABASE_ATTRIBUTES,
+  selectColumnsById,
+} from "../../slices/columnsSlice";
 import { normalizeInputToArray } from "../../slices/utilities";
 
 // Watcher saga
@@ -15,26 +17,13 @@ export default function* updateColumnsSaga() {
   yield takeEvery(createColumnsSuccess.type, function* (action) {
     const { columnIds } = action.payload;
 
-    const columnUpdates = normalizeInputToArray(columnIds);
-
-    // Fetch parent IDs (either table or operation) for the columns
-    const parentIds = yield select((state) =>
-      columnUpdates
-        .map((id) => selectColumnsById(state, id))
-        .map((col) => col.tableId)
-    );
-
-    // Prepare the columnUpdates with necessary info for the worker
-    // We want to update a newly created column with
-    // all database-dependent attributes
-    // columnUpdates = columnUpdates.map((id, index) => ({
-    //   id, // columnId
-    //   tableId: parentIds[index],
-    //   ...Object.fromEntries(DATABASE_ATTRIBUTES.map((attr) => [attr, null])), // fetch all database-dependent attributes
-    // }));
+    const columnUpdates = normalizeInputToArray(columnIds).map((id) => ({
+      id,
+      ...Object.fromEntries(DATABASE_ATTRIBUTES.map((attr) => [attr, null])),
+    }));
 
     // Call the worker to update columns with fetched attributes
-    // yield put(updateColumnsRequest({ columnUpdates }));
+    yield put(updateColumnsRequest({ columnUpdates }));
   });
 
   // When columns are excluded, we may need to also exclude operation

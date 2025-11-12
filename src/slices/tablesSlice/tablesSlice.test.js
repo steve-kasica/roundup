@@ -4,7 +4,6 @@ import tablesSlice, {
   addTables,
   updateTables,
   deleteTables,
-  setTablesColumnIds,
 } from "./tablesSlice";
 import { Table } from "./Table";
 

@@ -58,9 +58,12 @@ import {
 } from "../ui/Table";
 import { EnhancedColumnHeader } from "../ColumnViews";
 
+const placeHolderColumnLength = 10; // Number of placeholder columns when none are selected
+
 const TableRows = ({
   // Props passed via withTableData HOC
   id,
+  databaseName,
   selectedColumnIds, // IDs of selected columns in Redux
   hoveredIndex,
   // Props passed directly from parent component
@@ -88,7 +91,7 @@ const TableRows = ({
   // Hook for managing paginated data with sorting
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
-      id,
+      databaseName,
       selectedColumnIds,
       50, // pageSize
       sortConfig.columnId, // sortBy
@@ -154,154 +157,197 @@ const TableRows = ({
   );
 
   return (
-    <TableContainer
-      ref={tableContainerRef}
-      onScroll={handleScroll}
-      sx={{ height: "100%", overflow: "auto" }}
-    >
-      <Table size="small" stickyHeader sx={{ width: "auto" }}>
-        {/* Table Header - Sortable column headers with hover effects */}
-        {showHeader && (
-          <TableHead>
-            <TableRow>
-              {/* Sticky Row Number Header */}
-              <StickyTableCell sx={{ zIndex: 3, backgroundColor: "#f5f5f5" }}>
-                #
-              </StickyTableCell>
+    <>
+      {selectedColumnIds.length === 0 ? (
+        <Alert severity="info" sx={{ borderBottom: "1px solid #ccc" }}>
+          No columns selected. Please select columns to display data.
+        </Alert>
+      ) : error ? (
+        <Alert
+          severity="error"
+          sx={{
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+          }}
+          action={
+            <Button color="inherit" size="small" onClick={refresh}>
+              Retry
+            </Button>
+          }
+        >
+          Error loading table data: {error?.message || "Unknown error"}
+        </Alert>
+      ) : null}
+      <TableContainer
+        ref={tableContainerRef}
+        onScroll={handleScroll}
+        sx={{ height: "100%", overflow: "auto" }}
+      >
+        <Table size="small" stickyHeader sx={{ width: "auto" }}>
+          {/* Table Header - Sortable column headers with hover effects */}
+          {showHeader && (
+            <TableHead>
+              <TableRow>
+                {/* Sticky Row Number Header */}
+                <StickyTableCell sx={{ zIndex: 3, backgroundColor: "#f5f5f5" }}>
+                  #
+                </StickyTableCell>
 
-              {/* Column Headers with Sorting */}
-              {selectedColumnIds.map((colId, i) => (
-                <TableCell
-                  key={`${i}-${colId}`}
-                  align="center"
-                  sx={{ p: "1px" }}
-                >
-                  <EnhancedColumnHeader
-                    id={colId}
-                    isActive={sortConfig.columnId === colId}
-                    onSort={handleColumnSort}
-                    sortDirection={sortConfig.direction}
-                  />
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-        )}
+                {/* Column Headers with Sorting */}
+                {selectedColumnIds.length === 0
+                  ? Array.from({ length: placeHolderColumnLength }).map(
+                      (_, i) => (
+                        <TableCell key={i} align="center" sx={{ p: "1px" }}>
+                          <Typography
+                            color="text.secondary"
+                            sx={{
+                              fontStyle: "italic",
+                              fontWeight: 600,
+                              opacity: 0.6,
+                            }}
+                          >
+                            Column {i + 1}
+                          </Typography>
+                        </TableCell>
+                      )
+                    )
+                  : selectedColumnIds.map((colId, i) => (
+                      <TableCell
+                        key={`${i}-${colId}`}
+                        align="center"
+                        sx={{ p: "1px" }}
+                      >
+                        <EnhancedColumnHeader
+                          id={colId}
+                          isActive={sortConfig.columnId === colId}
+                          onSort={handleColumnSort}
+                          sortDirection={sortConfig.direction}
+                        />
+                      </TableCell>
+                    ))}
+              </TableRow>
+            </TableHead>
+          )}
 
-        {/* Table Body - Data rows with loading, error, and pagination states */}
-        <TableBody>
-          {/* Error State - Full-width error message with retry option */}
-          {error ? (
-            <TableRow sx={{ height: "100%" }}>
-              <TableCell
-                colSpan={selectedColumnIds.length + 1}
-                sx={{
-                  height: "100%",
-                  verticalAlign: "middle",
-                  padding: 2,
-                }}
-              >
-                <Alert
-                  severity="error"
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  action={
-                    <Button color="inherit" size="small" onClick={refresh}>
-                      Retry
-                    </Button>
-                  }
-                >
-                  Error loading table data: {error?.message || "Unknown error"}
-                </Alert>
-              </TableCell>
-            </TableRow>
-          ) : loading && data.length === 0 ? (
-            /* Initial Loading State - Skeleton rows with loading indicators */
-            Array.from({ length: 10 }).map((_, rowIndex) => (
-              <StyledAlternatingTableRow
-                key={`loading-${rowIndex}`}
-                isEven={rowIndex % 2 === 0}
-              >
-                <StickyTableCell>{rowIndex + 1}</StickyTableCell>
-                {selectedColumnIds.map((colId, i) => (
-                  <StyledTableCell
-                    key={colId}
-                    align="center"
-                    isEven={rowIndex % 2 === 0}
-                    maxWidth={columnWidths[colId] || "200px"}
-                  >
-                    <CircularProgress size={16} />
-                  </StyledTableCell>
-                ))}
-              </StyledAlternatingTableRow>
-            ))
-          ) : (
-            /* Data Rows - Actual table content with alternating colors and hover effects */
-            <>
-              {data.map((row, rowIndex) => (
+          {/* Table Body - Data rows with loading, error, and pagination states */}
+          <TableBody>
+            {/* Error State - Full-width error message with retry option */}
+            {selectedColumnIds.length === 0 ? (
+              <>
+                {Array.from({ length: placeHolderColumnLength }).map(
+                  (_, rowIndex) => (
+                    <StyledAlternatingTableRow
+                      key={`no-columns-${rowIndex}`}
+                      isEven={rowIndex % 2 === 0}
+                    >
+                      <StickyTableCell>{rowIndex + 1}</StickyTableCell>
+                      {Array.from({ length: placeHolderColumnLength }).map(
+                        (colId, i) => (
+                          <StyledTableCell
+                            key={i}
+                            align="center"
+                            isEven={rowIndex % 2 === 0}
+                            maxWidth={columnWidths[colId] || "200px"}
+                          >
+                            <Typography
+                              color="text.secondary"
+                              sx={{ fontStyle: "italic", opacity: 0.6 }}
+                            >
+                              No Data
+                            </Typography>
+                          </StyledTableCell>
+                        )
+                      )}
+                    </StyledAlternatingTableRow>
+                  )
+                )}
+              </>
+            ) : loading && data.length === 0 ? (
+              /* Initial Loading State - Skeleton rows with loading indicators */
+              Array.from({ length: 10 }).map((_, rowIndex) => (
                 <StyledAlternatingTableRow
-                  key={rowIndex}
+                  key={`loading-${rowIndex}`}
                   isEven={rowIndex % 2 === 0}
                 >
-                  {/* Row Number Cell */}
                   <StickyTableCell>{rowIndex + 1}</StickyTableCell>
-
-                  {/* Data Cells with proper formatting for different data types */}
-                  {row.map((value, i) => (
+                  {selectedColumnIds.map((colId, i) => (
                     <StyledTableCell
-                      key={i}
-                      isHovered={hoveredIndex === i}
+                      key={colId}
+                      align="center"
                       isEven={rowIndex % 2 === 0}
-                      maxWidth={columnWidths[selectedColumnIds[i]] || "200px"}
+                      maxWidth={columnWidths[colId] || "200px"}
                     >
-                      {value === null ? (
-                        <Typography
-                          color="text.secondary"
-                          sx={{ fontStyle: "italic", opacity: 0.6 }}
-                        >
-                          NULL
-                        </Typography>
-                      ) : typeof value === "number" ? (
-                        value.toLocaleString()
-                      ) : (
-                        value
-                      )}
+                      <CircularProgress size={16} />
                     </StyledTableCell>
                   ))}
                 </StyledAlternatingTableRow>
-              ))}
-
-              {/* Pagination Loading Indicator - Shows when loading more data */}
-              {loading && data.length > 0 && (
-                <StyledAlternatingTableRow isEven={data.length % 2 === 0}>
-                  <TableCell
-                    colSpan={selectedColumnIds.length + 1}
-                    align="center"
+              ))
+            ) : (
+              /* Data Rows - Actual table content with alternating colors and hover effects */
+              <>
+                {data.map((row, rowIndex) => (
+                  <StyledAlternatingTableRow
+                    key={rowIndex}
+                    isEven={rowIndex % 2 === 0}
                   >
-                    <Box
-                      sx={{
-                        py: 2,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                    {/* Row Number Cell */}
+                    <StickyTableCell>{rowIndex + 1}</StickyTableCell>
+
+                    {/* Data Cells with proper formatting for different data types */}
+                    {row.map((value, i) => (
+                      <StyledTableCell
+                        key={i}
+                        isHovered={hoveredIndex === i}
+                        isEven={rowIndex % 2 === 0}
+                        maxWidth={columnWidths[selectedColumnIds[i]] || "200px"}
+                      >
+                        {value === null ? (
+                          <Typography
+                            color="text.secondary"
+                            sx={{ fontStyle: "italic", opacity: 0.6 }}
+                          >
+                            NULL
+                          </Typography>
+                        ) : typeof value === "number" ? (
+                          value.toLocaleString()
+                        ) : (
+                          value
+                        )}
+                      </StyledTableCell>
+                    ))}
+                  </StyledAlternatingTableRow>
+                ))}
+
+                {/* Pagination Loading Indicator - Shows when loading more data */}
+                {loading && data.length > 0 && (
+                  <StyledAlternatingTableRow isEven={data.length % 2 === 0}>
+                    <TableCell
+                      colSpan={selectedColumnIds.length + 1}
+                      align="center"
                     >
-                      <CircularProgress size={20} />
-                      <Typography variant="body2" sx={{ ml: 1 }}>
-                        Loading more rows...
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                </StyledAlternatingTableRow>
-              )}
-            </>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                      <Box
+                        sx={{
+                          py: 2,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <CircularProgress size={20} />
+                        <Typography variant="body2" sx={{ ml: 1 }}>
+                          Loading more rows...
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </StyledAlternatingTableRow>
+                )}
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 };
 

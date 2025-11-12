@@ -87,35 +87,9 @@ const slice = createSlice({
         delete state.byId[tableId];
       });
     },
-
-    /**
-     * Updates the column IDs for one or more tables in the state.
-     *
-     * Accepts an array or single object mapping table IDs to their new column ID arrays.
-     * Throws an error if a specified table does not exist in the state.
-     *
-     * @param {Object} state - The current Redux slice state.
-     * @param {Object} action - The Redux action containing the payload.
-     * @param {Array<{tableId: string, columnIds: string[]}>|{tableId: string, columnIds: string[]}} action.payload
-     *   - An array or single object specifying table IDs and their new column IDs.
-     * @throws {Error} If a table with the specified ID does not exist in the state.
-     */
-    setTablesColumnIds(state, action) {
-      const tableColumnMappings = normalizeInputToArray(action.payload);
-
-      tableColumnMappings.forEach(({ tableId, columnIds }) => {
-        // Check if the table exists
-        if (!state.byId[tableId]) {
-          throw new Error(`Table with ID ${tableId} does not exist`);
-        }
-        // Update the table's column IDs
-        state.byId[tableId].columnIds = columnIds;
-      });
-    },
   }, // end reducers
 });
 
-export const { addTables, updateTables, deleteTables, setTablesColumnIds } =
-  slice.actions;
+export const { addTables, updateTables, deleteTables } = slice.actions;
 
 export default slice;

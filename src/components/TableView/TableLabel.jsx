@@ -62,7 +62,7 @@ const TableLabel = ({
         {name}{" "}
         {includeDimensions && (
           <small>
-            ({columnCount} x {rowCount})
+            ({columnCount.toLocaleString()} x {rowCount.toLocaleString()})
           </small>
         )}
       </Typography>

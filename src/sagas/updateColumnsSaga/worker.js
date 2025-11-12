@@ -6,6 +6,7 @@ import {
 import { getColumnStats } from "../../lib/duckdb";
 import { updateColumnsFailure, updateColumnsSuccess } from "./actions";
 import { DATABASE_ATTRIBUTES } from "../../slices/columnsSlice";
+import { selectTablesById } from "../../slices/tablesSlice";
 
 // Worker saga
 export default function* updateColumnsWorker(action) {
@@ -17,6 +18,9 @@ export default function* updateColumnsWorker(action) {
     const column = yield select((state) =>
       selectColumnsById(state, columnUpdate.id)
     );
+    const parent = yield select((state) =>
+      selectTablesById(state, column.parentId)
+    );
     try {
       let databaseUpdates = {};
       if (
@@ -24,7 +28,7 @@ export default function* updateColumnsWorker(action) {
           DATABASE_ATTRIBUTES.includes(key)
         )
       ) {
-        databaseUpdates = yield call(getColumnStats, column.parentId, [
+        databaseUpdates = yield call(getColumnStats, parent.databaseName, [
           column.databaseName,
         ]);
       }

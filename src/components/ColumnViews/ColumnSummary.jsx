@@ -20,6 +20,7 @@ const ColumnSummary = ({
   topValues,
   name,
   databaseName,
+  columnType,
   id,
   nullCount,
   uniqueCount,
@@ -169,7 +170,7 @@ const ColumnSummary = ({
               }}
             >
               {/* TODO */}
-              {/* <ColumnTypeIcon column={column} /> */}
+              <ColumnTypeIcon columnType={columnType} />
             </Box>
           </Box>
           <IconButton

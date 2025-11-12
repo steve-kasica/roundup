@@ -11,8 +11,9 @@ import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
+  selectAllOperationIds,
   selectMaxOperationDepth,
-  selectRootOperationId,
+  selectRootOperation,
 } from "../../slices/operationsSlice";
 
 import TableDropTarget from "./TableDropTarget";
@@ -31,23 +32,22 @@ const gridWidth = gridColumns - 2;
 // A watcher for deleting operations will handle this cleanup after operation update
 // request finishes.
 export default function CompositeTableSchema() {
-  const root = useSelector(selectRootOperationId);
-  const maxOperationDepth = useSelector(selectMaxOperationDepth);
+  const rootOperation = useSelector(selectRootOperation);
 
   return (
     <div className="CompositeTableSchema">
-      {maxOperationDepth >= 0 ? (
+      {rootOperation ? (
         <Grid container spacing={0}>
           <Grid size={gridWidth}>
-            {root.operationType === OPERATION_TYPE_STACK &&
-            root.children.length > 0 ? (
-              <EnhancedStackOperationBlock id={root.id} />
-            ) : root.operationType === OPERATION_TYPE_PACK &&
-              root.children.length > 0 ? (
-              <EnhancedPackOperationBlock id={root.id} />
-            ) : root.operationType === OPERATION_TYPE_NO_OP &&
-              root.children.length > 0 ? (
-              <EnhancedTableBlock id={root.children[0]} />
+            {rootOperation.operationType === OPERATION_TYPE_STACK &&
+            rootOperation.childIds.length > 0 ? (
+              <EnhancedStackOperationBlock id={rootOperation.id} />
+            ) : rootOperation.operationType === OPERATION_TYPE_PACK &&
+              rootOperation.childIds.length > 0 ? (
+              <EnhancedPackOperationBlock id={rootOperation.id} />
+            ) : rootOperation.operationType === OPERATION_TYPE_NO_OP &&
+              rootOperation.childIds.length > 0 ? (
+              <EnhancedTableBlock id={rootOperation.childIds[0]} />
             ) : null}
           </Grid>
           <Grid size={gridColumns - gridWidth}>

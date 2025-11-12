@@ -11,7 +11,7 @@ import { Tooltip } from "@mui/material";
 import { COLUMN_TYPE_VARCHAR } from "../../slices/columnsSlice";
 
 export default function ColumnTypeIcon({
-  column,
+  columnType,
   placement = "right",
   onClick = () => {},
   sx: customSx = {},
@@ -32,25 +32,17 @@ export default function ColumnTypeIcon({
       transform: "scale(0.95)",
     },
   };
-  const isKey = column && column.uniqueValues === column.nonNullValues;
 
-  if (!column || column.nullPercentage === 1) {
-    Icon = NullIcon;
-    tooltipText = "Column is null";
-  } else if (column.columnType === undefined) {
+  if (columnType === undefined) {
     Icon = UndefinedIcon;
     tooltipText = "Unknown column type";
-    // } else if (column.columnType === COLUMN_TYPE_VARCHAR && isKey) {
-    //   Icon = KeyIcon;
-    //   defaultSx["fontSize"] = "1rem";
-    //   tooltipText = "Key column (unique text)";
-  } else if (column.columnType === COLUMN_TYPE_VARCHAR) {
+  } else if (columnType === COLUMN_TYPE_VARCHAR) {
     Icon = CategoricalIcon;
     tooltipText = "Column Type: VARCHAR";
-  } else if (column.columnType === "NUMERIC") {
+  } else if (columnType === "NUMERIC") {
     Icon = NumericIcon;
     tooltipText = "Column Type: NUMERIC";
-  } else if (column.columnType === "DATE") {
+  } else if (columnType === "DATE") {
     Icon = DateIcon;
     tooltipText = "Column Type: DATE";
   }

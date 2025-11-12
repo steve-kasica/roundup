@@ -42,6 +42,7 @@ import SchemaToolbar from "../ui/SchemaToolbar";
 import FocusIconButton from "../ui/FocusIconButton";
 import ExcludeIconButton from "../ui/ExcludeIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
+import { TableLabel } from "./TableLabel";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -269,7 +270,13 @@ const TableSchema = ({
             />
           </>
         }
-      />
+      >
+        <TableLabel
+          name={name}
+          rowCount={rowCount}
+          columnCount={activeColumnIds.length}
+        />
+      </SchemaToolbar>
 
       {/* Column Type Change Menu */}
       <Menu

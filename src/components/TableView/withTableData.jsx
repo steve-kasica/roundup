@@ -18,7 +18,6 @@ import { setVisibleColumnIds as setVisibleColumnsAction } from "../../slices/uiS
 import {
   selectTableColumnIds,
   selectTablesById,
-  setTablesColumnIds,
 } from "../../slices/tablesSlice";
 
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
@@ -112,7 +111,7 @@ export default function withTableData(WrappedComponent) {
         const columnIds = activeColumnIds.filter(
           (colId) => !columnIdsToExclude.includes(colId)
         );
-        dispatch(setTablesColumnIds({ id, columnIds }));
+        dispatch(updateTablesRequest({ tableUpdates: [{ id, columnIds }] }));
       },
       [activeColumnIds, dispatch, id]
     );
