@@ -28,15 +28,23 @@ export const JOIN_PREDICATES = {
 
 let idCounter = 0; // each node gets a unique ID, regardless if it's a table vs operation node
 
-export default function Operation(operationType = null) {
+export default function Operation({
+  name = null,
+  databaseName = null,
+  parentId = null,
+  childIds = [],
+  columnIds = [],
+  operationType = null,
+} = {}) {
   const id = `o${++idCounter}`; // Each operation has a unique ID
 
   return {
-    id, // ID is immutable and unique
-    name: id, // Name is the same as ID by default, can be changed later
-    parentId: null, // ID of the parent table/operation
-    childIds: [], // IDs of child tables/operations
-    columnIds: [], // IDs of columns resulting from this operation
+    id,
+    name,
+    databaseName,
+    parentId,
+    childIds,
+    columnIds,
     operationType,
 
     // Properties specific to PACK operations
