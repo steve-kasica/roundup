@@ -31,7 +31,7 @@ export default function withOperationData(WrappedComponent) {
     id,
     alertIds,
     hasAlerts,
-    removeAlerts,
+    deleteAlerts,
     silenceAlerts,
     ...props
   }) {
@@ -154,7 +154,7 @@ export default function withOperationData(WrappedComponent) {
         // Directly associated alerts (from withAssociatedAlerts)
         alertIds={alertIds}
         hasAlerts={hasAlerts}
-        removeAlerts={removeAlerts}
+        deleteAlerts={deleteAlerts}
         silenceAlerts={silenceAlerts}
         // Interaction props (TODO, is this deprecated?)
         isFocused={isFocused}

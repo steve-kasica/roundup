@@ -57,7 +57,7 @@ const TableWindow = ({ id }) => {
         {viewMode === VIEW_TABLE ? (
           <EnhancedTableRows id={id} />
         ) : viewMode === VIEW_NO_OP ? (
-          <EnhancedTableRows id={focusedOperation.children[0]} />
+          <EnhancedTableRows id={focusedOperation.childIds[0]} />
         ) : viewMode === VIEW_STACK ? (
           <EnhancedStackRows id={id} />
         ) : viewMode === VIEW_PACK ? (

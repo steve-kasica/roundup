@@ -252,6 +252,7 @@ const TableSchema = ({
         rowCount={rowCount}
         name={name}
         objectId={id}
+        alertIds={alertIds}
         customMenuItems={
           <>
             <FocusIconButton

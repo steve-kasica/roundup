@@ -37,3 +37,11 @@ export const selectAllSourceIdsWithAlerts = createSelector(
     return Array.from(sourceIds);
   }
 );
+
+/**
+ * Selector to retrieve all alert IDs from the Redux state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @returns {Array<string>} An array of all alert IDs.
+ */
+export const selectAllAlertIds = (state) => state.alerts.allIds;

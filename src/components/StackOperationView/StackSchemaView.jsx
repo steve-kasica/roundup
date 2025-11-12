@@ -33,7 +33,7 @@ const StackSchemaView = ({
   // Props passed via withAssociatedAlerts
   alertIds,
   hasAlerts,
-  removeAlerts,
+  deleteAlerts,
   silenceAlerts,
   //
   selectColumns, // Sets global set of selected column IDs

@@ -31,7 +31,9 @@ export default function withColumnData(WrappedComponent) {
 
     // Column data
     let column = useSelector((state) => selectColumnsById(state, id));
-    const index = useSelector((state) => selectColumnIndexById(state, id));
+    const index = useSelector((state) =>
+      selectColumnIndexById(state, id, column.parentId)
+    );
     const parentId = column.tableId;
 
     // Column interaction state properties

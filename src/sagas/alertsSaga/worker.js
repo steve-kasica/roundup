@@ -1,23 +1,25 @@
 // Worker saga
 
-import { put } from "redux-saga/effects";
+import { put, select } from "redux-saga/effects";
 import {
-  addAlerts as addAlertsSliceRequest,
-  removeAlertsBySignature as removeAlertsBySignatureSliceRequest,
+  addAlerts as addAlertsToSlice,
+  deleteAlerts as deleteAlertsFromSlice,
 } from "../../slices/alertsSlice/alertsSlice";
+import { selectAllAlertIds } from "../../slices/alertsSlice";
 
 export default function* alertsSagaWorker(raisedAlerts) {
   const alertsToAdd = [];
-  const alertsToClear = [];
+  const alertsToDelete = [];
+  const alertIds = yield select(selectAllAlertIds);
 
   for (const alert of raisedAlerts) {
-    const isRaised = true; // TODO
+    const isRaised = alertIds.includes(alert.id);
     if (isRaised && !alert.isPassing) {
       // Alert already exists, skip
       continue;
     } else if (isRaised && alert.isPassing) {
       // Alert is passing, clear it
-      alertsToClear.push(alert.signature);
+      alertsToDelete.push(alert.id);
     } else if (!isRaised && !alert.isPassing) {
       // New alert is raised
       alertsToAdd.push(alert);
@@ -25,11 +27,11 @@ export default function* alertsSagaWorker(raisedAlerts) {
   }
 
   if (alertsToAdd.length > 0) {
-    yield put(addAlertsSliceRequest(alertsToAdd));
+    yield put(addAlertsToSlice(alertsToAdd));
   }
 
   // If any objects were validation and no alerts were raised, clear existing alerts
-  if (alertsToClear.length > 0) {
-    yield put(removeAlertsBySignatureSliceRequest(alertsToClear));
+  if (alertsToDelete.length > 0) {
+    yield put(deleteAlertsFromSlice(alertsToDelete));
   }
 }

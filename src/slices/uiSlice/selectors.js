@@ -150,7 +150,7 @@ export const isColumnIdVisible = createSelector(
 
 export const selectColumnIndexById = createSelector(
   [
-    (state, columnId, parentId) => state.columns.byParentId[parentId],
+    (state, columnId, tableId) => state.tables.byId[tableId].columnIds,
     (state, columnId) => columnId,
   ],
   (tableColumns, columnId) => tableColumns.indexOf(columnId)

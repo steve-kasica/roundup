@@ -33,7 +33,7 @@ import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedTableLabel } from "../TableView";
 import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
-import { selectAlertsById } from "../../slices/alertsSlice/alertsSelectors";
+import { selectAlertsById } from "../../slices/alertsSlice/selectors";
 
 const SchemaToolbar = ({
   // columnIds,
