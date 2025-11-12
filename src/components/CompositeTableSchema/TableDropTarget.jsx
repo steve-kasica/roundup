@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_STACK,
-  selectOperations,
+  selectOperationsById,
   selectRootOperationId,
 } from "../../slices/operationsSlice";
 import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
@@ -144,7 +144,7 @@ export default function TableDropTarget({ operationType, children }) {
   const dispatch = useDispatch();
   const rootOperation = useSelector((state) => {
     const rootId = selectRootOperationId(state);
-    return selectOperations(state, rootId);
+    return selectOperationsById(state, rootId);
   });
 
   const [{ isOver, canDrop }, dropRef] = useDrop({

@@ -17,7 +17,7 @@ import {
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { selectOperations } from "../../slices/operationsSlice";
+import { selectOperationsById } from "../../slices/operationsSlice";
 import { useCallback } from "react";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 

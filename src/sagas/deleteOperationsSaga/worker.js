@@ -1,8 +1,8 @@
 import { call, put, select } from "redux-saga/effects";
 import {
   OPERATION_TYPE_NO_OP,
-  selectOperation,
-  removeOperations as removeOperationsFromSlice,
+  selectOperationsById,
+  deleteOperations as deleteOperationsFromSlice,
 } from "../../slices/operationsSlice";
 import { dropView } from "../../lib/duckdb";
 import { deleteOperationsFailure, deleteOperationsSuccess } from "./actions";
@@ -22,7 +22,7 @@ export default function* deleteOperationsWorker(action) {
   }
 
   const operations = yield select((state) =>
-    operationIds.map((id) => selectOperation(state, id))
+    selectOperationsById(state, operationIds)
   );
 
   for (const operation of operations) {
@@ -30,15 +30,15 @@ export default function* deleteOperationsWorker(action) {
     if (operation.operationType !== OPERATION_TYPE_NO_OP) {
       try {
         yield call(dropView, operation.id);
-        yield put(removeOperationsFromSlice(operation.id));
+        yield put(deleteOperationsFromSlice(operation.id));
         successfulDeletions.push(operation.id);
       } catch (error) {
         console.error("Error deleting operation:", error);
         failedDeletions.push({ id: operation.id, error });
       }
     } else {
-      // For NO_OP operations, just remove from the slice
-      yield put(removeOperationsFromSlice(operation.id));
+      // For NO_OP operations, just delete from the slice
+      yield put(deleteOperationsFromSlice(operation.id));
       successfulDeletions.push(operation.id);
     }
   }

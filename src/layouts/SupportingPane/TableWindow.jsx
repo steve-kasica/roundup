@@ -6,7 +6,7 @@ import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  selectOperation,
+  selectOperationsById,
 } from "../../slices/operationsSlice";
 import { EnhancedPackRows } from "../../components/PackOperationView";
 import { isTableId } from "../../slices/tablesSlice";
@@ -21,7 +21,7 @@ const VIEW_UNKNOWN = "UNKNOWN";
 const TableWindow = ({ id }) => {
   const isFocusedTable = isTableId(id);
   const focusedOperation = useSelector((state) =>
-    isFocusedTable ? null : selectOperation(state, id)
+    isFocusedTable ? null : selectOperationsById(state, id)
   );
 
   const viewMode = (function (opType) {

@@ -1,4 +1,7 @@
 import { createSelector } from "reselect";
+import { normalizeInputToArray } from "../utilities";
+
+export const selectAllTableIds = (state) => state.tables.allIds;
 
 /**
  * Memoized selector to retrieve table metadata by ID or an array of IDs from the Redux state.
@@ -35,12 +38,21 @@ export const selectTablesById = createSelector(
  * const activeColumnIds = selectTableColumnIds(state, 't1');
  * // Returns: ['c1', 'c2', 'c3']
  */
-export const selectTableColumnIds = (state, tableId) => {
-  if (!state.tables.byId[tableId]) {
-    throw new Error(`No columns found for table ID ${tableId}`);
+export const selectTableColumnIds = createSelector(
+  [
+    (state) => state.tables.byId,
+    (state, tableIds) => normalizeInputToArray(tableIds),
+  ],
+  (tablesById, tableIds) => {
+    const output = tableIds.map((tableId) => {
+      if (!tablesById[tableId]) {
+        throw new Error(`No columns found for table ID ${tableId}`);
+      }
+      return tablesById[tableId].columnIds;
+    });
+    return tableIds.length === 1 ? output[0] : output;
   }
-  return state.tables.byId[tableId].columnIds;
-};
+);
 
 /**
  * Selector to retrieve all table metadata as an array.

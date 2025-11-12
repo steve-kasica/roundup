@@ -1,7 +1,10 @@
 import { deleteOperationsRequest, deleteOperationsSuccess } from "./actions";
 import { put, select, takeEvery, takeLatest } from "redux-saga/effects";
 import deleteOperationsWorker from "./worker";
-import { isOperationId, selectOperation } from "../../slices/operationsSlice";
+import {
+  isOperationId,
+  selectOperationsById,
+} from "../../slices/operationsSlice";
 import {
   updateOperationsRequest,
   updateOperationsSuccess,
@@ -14,7 +17,7 @@ export default function* deleteOperationsWatcher() {
   // yield takeEvery(deleteOperationsSuccess, function* (action) {
   //   const { operationIds } = action.payload;
   //   const operations = yield select((state) =>
-  //     operationIds.map((operationId) => selectOperation(state, operationId))
+  //     operationIds.map((operationId) => selectOperationsById(state, operationId))
   //   );
   //   // TODO
   //   // if (operations.length > 0) {
@@ -34,7 +37,9 @@ export default function* deleteOperationsWatcher() {
     const operationIdsToDelete = [];
     for (const [id, keys] of Object.entries(changedPropertiesByOperation)) {
       if (keys.includes("children")) {
-        const operation = yield select((state) => selectOperation(state, id));
+        const operation = yield select((state) =>
+          selectOperationsById(state, id)
+        );
         if (operation.children.length === 0) {
           operationIdsToDelete.push(id);
         }

@@ -17,7 +17,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ExportButton } from "./ExportButton";
 import { useSelector } from "react-redux";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { selectOperation } from "../../slices/operationsSlice";
+import { selectOperationsById } from "../../slices/operationsSlice";
 
 function ExportDialog({ name, id, onClose }) {
   const [format, setFormat] = useState("csv");
@@ -95,7 +95,9 @@ function ExportDialog({ name, id, onClose }) {
 const EnhancedExportDialog = (props) => {
   const { id } = props;
   const { name } = useSelector((state) =>
-    isTableId(id) ? selectTablesById(state, id) : selectOperation(state, id)
+    isTableId(id)
+      ? selectTablesById(state, id)
+      : selectOperationsById(state, id)
   );
 
   return <ExportDialog {...props} name={name} />;

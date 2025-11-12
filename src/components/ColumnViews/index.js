@@ -8,3 +8,4 @@ export * from "./ColumnTick";
 export * from "./ColumnTypeIcon";
 export * from "./ColumnValueCounts";
 export * from "./ColumnValues";
+export { default as StyledColumnCard } from "./StyledColumnCard";

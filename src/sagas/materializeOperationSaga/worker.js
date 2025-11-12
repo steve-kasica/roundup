@@ -6,7 +6,7 @@ import {
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  selectOperation,
+  selectOperationsById,
   selectOperationQueryData,
 } from "../../slices/operationsSlice";
 import {
@@ -19,7 +19,7 @@ export default function* materializeOperationWorker(action) {
   let { operationId } = action.payload;
 
   const operation = yield select((state) =>
-    selectOperation(state, operationId)
+    selectOperationsById(state, operationId)
   );
   const queryData = yield select((state) =>
     selectOperationQueryData(state, operation)

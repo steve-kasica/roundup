@@ -9,7 +9,7 @@ import ColumnWindow from "./ColumnWindow";
 import TableWindow from "./TableWindow";
 import SchemaWindow from "./SchemaWindow";
 import {
-  selectOperation,
+  selectOperationsById,
   selectRootOperationId,
 } from "../../slices/operationsSlice";
 import {
@@ -37,7 +37,7 @@ export default function SupportingPane() {
   const tables = useSelector(selectAllTablesData);
   const rootOperation = useSelector((state) => {
     const id = selectRootOperationId(state);
-    return id ? selectOperation(state, id) : null;
+    return id ? selectOperationsById(state, id) : null;
   });
   const focusedObject = useSelector(selectFocusedObject);
   const focusedColumnIds = useSelector(selectFocusedColumnIds);

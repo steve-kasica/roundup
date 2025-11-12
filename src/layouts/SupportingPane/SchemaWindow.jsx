@@ -2,27 +2,27 @@ import { Alert, Box, Typography } from "@mui/material";
 import {
   OPERATION_TYPE_STACK,
   OPERATION_TYPE_PACK,
-  selectOperation,
+  selectOperationsById,
   selectAllOperationIds,
   OPERATION_TYPE_NO_OP,
 } from "../../slices/operationsSlice";
 import { useSelector } from "react-redux";
-import { isTableId } from "../../slices/tablesSlice";
+import { isTableId, selectAllTableIds } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
 import { EnhancedStackSchemaView } from "../../components/StackOperationView/StackSchemaView";
 import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
 
 export default function SchemaWindow() {
-  const areTablesUploaded = useSelector(
-    (state) => Object.keys(state.tables.data).length > 0
-  );
+  const tablesUploaded = useSelector((state) => selectAllTableIds(state));
   const focusedObjectId = useSelector((state) => state.ui.focusedObject);
   const isFocusedTable = isTableId(focusedObjectId);
   const focusedOperation = useSelector((state) =>
-    isFocusedTable ? null : selectOperation(state, focusedObjectId)
+    isFocusedTable ? null : selectOperationsById(state, focusedObjectId)
   );
   const operations = useSelector(selectAllOperationIds);
+
+  const areTablesUploaded = tablesUploaded.length > 0;
 
   return (
     <>

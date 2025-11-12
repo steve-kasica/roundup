@@ -3,7 +3,7 @@ import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  selectOperation,
+  selectOperationsById,
   updateOperations as updateOperationsSlice,
 } from "../../slices/operationsSlice";
 import { updateOperationsFailure, updateOperationsSuccess } from "./actions";
@@ -23,7 +23,7 @@ export default function* updateOperationsWorker(action) {
   for (let operationUpdate of operationUpdates) {
     const { id } = operationUpdate;
     const keys = Object.keys(operationUpdate);
-    const operation = yield select((state) => selectOperation(state, id));
+    const operation = yield select((state) => selectOperationsById(state, id));
 
     // If we're changing the operationType or children, then we need to re-create the view
     if (

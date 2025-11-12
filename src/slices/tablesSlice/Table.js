@@ -6,47 +6,55 @@
  */
 
 /**
- * Counter used to generate unique IDs for columns.
+ * Counter used to generate unique IDs for tables.
  * @type {number}
  * @private
  */
 let idCounter = 0;
 
 /**
+ * Creates a new table metadata object.
  *
- * @param {*} id
- * @param {*} name
- * @param {*} rowCount
- * @param {*} dateCreated
- * @param {*} dateLastModified
- * @param {*} tags
- * @returns
+ * @param {Object} params - Table configuration object.
+ * @param {string|null} [params.source=null] - The source of the table data.
+ * @param {string|null} [params.name=null] - The display name of the table. This property is mutable.
+ * @param {string|null} [params.fileName=null] - The original name of the file uploaded.
+ * @param {string|null} [params.extension=null] - The file extension of the uploaded file.
+ * @param {number|null} [params.size=null] - The size of the file in bytes.
+ * @param {string|null} [params.mimeType=null] - The MIME type of the file.
+ * @param {Date|string|null} [params.dateLastModified=null] - The last modified date of the file.
+ * @param {string[]} [params.columnIds=[]] - Array of column IDs associated with this table.
+ * @param {string|null} [params.parentId=null] - ID of the parent operation if this table is a result of an operation.
+ * @returns {Object} The newly created table object with all the provided metadata properties.
  */
-export function Table(
+export function Table({
+  parentId = null,
   source = null,
+  databaseName = null,
   name = null,
-  fileName = null, // fileName is the original name of the file uploaded
+  fileName = null,
   extension = null,
   size = null,
   mimeType = null,
   dateLastModified = null,
   columnIds = [],
-  parentId = null
-) {
+  rowCount = null,
+} = {}) {
   const id = `t${++idCounter}`;
 
   return {
-    id, // This unique identifier for table objects in Redux store corresponds to the name of the table in DuckDB
-    parentId, // ID of the parent operation if this table is a result of an operation
-    columnIds,
+    id,
+    parentId,
     source,
-    name, // name is mutable
+    databaseName,
+    name,
     fileName,
     extension,
     size,
     mimeType,
-    rowCount: null, // This will be set later when the table is created in DuckDB
     dateLastModified,
+    columnIds,
+    rowCount,
   };
 }
 

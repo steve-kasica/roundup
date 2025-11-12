@@ -13,7 +13,7 @@ import { setSelectedMatches } from "../../slices/uiSlice";
 import {
   selectPackOperationColumnCount,
   selectPackOperationMatchStats,
-} from "../../slices/operationsSlice/operationsSelectors";
+} from "../../slices/operationsSlice";
 export default function withPackOperationData(WrappedComponent) {
   function EnhancedPackComponent({
     // Props passed from withOperationData

@@ -51,29 +51,29 @@ let idCounter = 0;
 /**
  * Creates a new column metadata object.
  *
- * @param {string|number} parentId - The unique identifier of the table this column belongs to.
- * @param {number} index - The index/position of the column in the table.
- * @param {string|null} [name=null] - The display name of the column. This property is mutable.
- * @param {string|null} [columnName=null] - The original column name from the data source.
- * @param {number|null} [approxUnique=null] - Approximate number of unique values in the column.
- * @param {number|null} [avg=null] - Average value for numerical columns.
- * @param {string|null} [columnType=null] - The type of the column. Must be one of the values in COLUMN_TYPES.
- * @param {number|null} [count=null] - Count of non-null values in the column.
- * @param {number|null} [max=null] - Maximum value for numerical columns.
- * @param {number|null} [min=null] - Minimum value for numerical columns.
- * @param {number|null} [nullPercentage=null] - Percentage of null values in the column.
- * @param {number|null} [p25=null] - 25th percentile value for numerical columns.
- * @param {number|null} [p50=null] - 50th percentile (median) value for numerical columns.
- * @param {number|null} [p75=null] - 75th percentile value for numerical columns.
- * @param {number|null} [std=null] - Standard deviation for numerical columns.
- * @param {*} [modeValue=null] - The most frequently occurring value in the column.
- * @param {number|null} [modeCount=null] - The frequency count of the mode value.
- * @param {Array|null} [topValues=null] - Array of the most common values in the column.
+ * @param {Object} params - Column configuration object.
+ * @param {string|number} params.parentId - The unique identifier of the table this column belongs to.
+ * @param {number} params.index - The index/position of the column in the table.
+ * @param {string|null} [params.name=null] - The display name of the column. This property is mutable.
+ * @param {string|null} [params.columnName=null] - The original column name from the data source.
+ * @param {number|null} [params.approxUnique=null] - Approximate number of unique values in the column.
+ * @param {number|null} [params.avg=null] - Average value for numerical columns.
+ * @param {string|null} [params.columnType=null] - The type of the column. Must be one of the values in COLUMN_TYPES.
+ * @param {number|null} [params.count=null] - Count of non-null values in the column.
+ * @param {number|null} [params.max=null] - Maximum value for numerical columns.
+ * @param {number|null} [params.min=null] - Minimum value for numerical columns.
+ * @param {number|null} [params.nullPercentage=null] - Percentage of null values in the column.
+ * @param {number|null} [params.p25=null] - 25th percentile value for numerical columns.
+ * @param {number|null} [params.p50=null] - 50th percentile (median) value for numerical columns.
+ * @param {number|null} [params.p75=null] - 75th percentile value for numerical columns.
+ * @param {number|null} [params.std=null] - Standard deviation for numerical columns.
+ * @param {*} [params.modeValue=null] - The most frequently occurring value in the column.
+ * @param {number|null} [params.modeCount=null] - The frequency count of the mode value.
+ * @param {Array|null} [params.topValues=null] - Array of the most common values in the column.
  * @returns {Object} The newly created column object with all the provided metadata properties.
  */
-function Column(
+function Column({
   parentId,
-  index,
   name = null,
   columnName = null,
   approxUnique = null,
@@ -89,14 +89,13 @@ function Column(
   std = null,
   modeValue = null,
   modeCount = null,
-  topValues = null
-) {
+  topValues = null,
+}) {
   const id = `c${++idCounter}`;
 
   return {
     id,
     parentId,
-    index,
     name,
     columnName,
     approxUnique,
@@ -115,5 +114,22 @@ function Column(
     topValues,
   };
 }
+
+export const DATABASE_ATTRIBUTES = [
+  "columnType",
+  "approxUnique",
+  "avg",
+  "count",
+  "max",
+  "min",
+  "nullPercentage",
+  "q25",
+  "q50",
+  "q75",
+  "std",
+  "modeValue",
+  "modeCount",
+  "topValues",
+];
 
 export default Column;

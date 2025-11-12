@@ -5,7 +5,7 @@ import {
 } from "../../slices/columnsSlice";
 import { getColumnStats } from "../../lib/duckdb";
 import { updateColumnsFailure, updateColumnsSuccess } from "./actions";
-import { DATABASE_ATTRIBUTES } from ".";
+import { DATABASE_ATTRIBUTES } from "../../slices/columnsSlice";
 
 // Worker saga
 export default function* updateColumnsWorker(action) {
@@ -18,39 +18,30 @@ export default function* updateColumnsWorker(action) {
       selectColumnsById(state, columnUpdate.id)
     );
     try {
-      let databaseAttributeValues = {};
+      let databaseUpdates = {};
       if (
         Object.keys(columnUpdate).some((key) =>
           DATABASE_ATTRIBUTES.includes(key)
         )
       ) {
-        databaseAttributeValues = yield call(
-          getColumnStats,
-          columnUpdate.tableId,
-          [column.columnName]
-        );
+        databaseUpdates = yield call(getColumnStats, column.parentId, [
+          column.columnName,
+        ]);
       }
 
       successfulUpdates.push({
         ...columnUpdate,
-        ...databaseAttributeValues[0],
-        error: null,
+        ...databaseUpdates[0],
       });
     } catch (error) {
-      console.error(
-        "Error (`updateColumnsSaga/worker.js`) fetching column stats from DB:",
-        error,
-        columnUpdate
-      );
       failedUpdates.push({
         ...columnUpdate,
-        error: error.message || "Unknown error",
       });
     }
   }
 
   // Update the column objects in the store (both successful and failed)
-  yield put(updateColumnsSlice([...successfulUpdates, ...failedUpdates]));
+  yield put(updateColumnsSlice(successfulUpdates));
 
   const formatUpdates = (updates) =>
     Object.fromEntries(

@@ -5,7 +5,7 @@ import { createTablesSuccess } from "../createTablesSaga";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import {
   OPERATION_TYPE_NO_OP,
-  selectOperation,
+  selectOperationsById,
 } from "../../slices/operationsSlice";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { CREATION_MODE_INITIALIZATION } from ".";
@@ -16,7 +16,7 @@ import { materializeOperationSuccess } from "../materializeOperationSaga/actions
 const handleOperations = function* (action) {
   const { operationIds } = action.payload;
   const operations = yield select((state) =>
-    operationIds.map((id) => selectOperation(state, id))
+    operationIds.map((id) => selectOperationsById(state, id))
   );
   for (const { id, operationType, columnCount } of operations) {
     if (operationType === OPERATION_TYPE_NO_OP) {
@@ -100,7 +100,7 @@ export default function* createColumnsWatcher() {
   yield takeEvery(materializeOperationSuccess.type, function* (action) {
     const { operationId } = action.payload;
     const operation = yield select((state) =>
-      selectOperation(state, operationId)
+      selectOperationsById(state, operationId)
     );
     if (operation.operationType === OPERATION_TYPE_NO_OP) {
       return; // No columns to create for NO-OP operations

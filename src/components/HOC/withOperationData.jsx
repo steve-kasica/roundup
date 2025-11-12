@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useSelector } from "react-redux";
 import {
-  selectOperation,
+  selectOperationsById,
   selectOperationChildrenByIds,
   selectOperationDepthById,
   updateOperations,
@@ -9,7 +9,6 @@ import {
 import { useDispatch } from "react-redux";
 import {
   selectColumnIdsByTableId,
-  selectSelectedChildColumnsByOperationId,
   selectSelectedColumnIdsByParentId,
 } from "../../slices/columnsSlice";
 import {
@@ -18,7 +17,7 @@ import {
   setVisibleColumnIds as setVisibleColumnsAction,
 } from "../../slices/uiSlice/uiSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import {
   createColumnsRequest,
@@ -38,16 +37,18 @@ export default function withOperationData(WrappedComponent) {
   }) {
     const dispatch = useDispatch();
 
-    const operation = useSelector((state) => selectOperation(state, id));
+    const operation = useSelector((state) => selectOperationsById(state, id));
     const depth = useSelector((state) => selectOperationDepthById(state, id));
-    const childIds = useSelector((state) => selectOperationChildrenByIds(state, id));
+    const childIds = useSelector((state) =>
+      selectOperationChildrenByIds(state, id)
+    );
 
     // Get columnIds associated with this table, both active and "removed"
     const columnIds = useSelector((state) =>
       selectColumnIdsByTableId(state, id)
     );
 
-    const activeColumnIds = useSelector((state) => )
+    const activeColumnIds = useSelector((state) => []); // TODO
 
     const removedColumnIds = useSelector(); // TODO
 
@@ -55,7 +56,6 @@ export default function withOperationData(WrappedComponent) {
     const selectedColumnIds = useSelector((state) =>
       selectSelectedColumnIdsByParentId(state, id)
     );
-
 
     const isFocused = false; // TODO
     const isHovered = false; // TODO

@@ -1,17 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
-import { selectColumnIdsByTableIds } from "../../slices/columnsSlice";
-import {
-  selectOperationChildren,
-  selectStackOperationRowRanges,
-} from "../../slices/operationsSlice";
+import { selectStackOperationRowRanges } from "../../slices/operationsSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import withOperationData from "../HOC/withOperationData";
 import {
   selectStackOperationRowCount,
   selectStackOperationColumnCount,
-} from "../../slices/operationsSlice/operationsSelectors";
+} from "../../slices/operationsSlice";
+import { selectTableColumnIds } from "../../slices/tablesSlice";
 
 /**
  * This HOC produces a matrix of column IDs for each table ID provided
@@ -50,7 +47,7 @@ export default function withStackOperationData(WrappedComponent) {
 
     // Returns a matrix of columnIDs, ordered by child table IDs
     const childColumnIds = useSelector((state) =>
-      selectColumnIdsByTableIds(state, childIds)
+      selectTableColumnIds(state, childIds)
     );
 
     const columnIdMatrix = useMemo(() => {
@@ -66,12 +63,6 @@ export default function withStackOperationData(WrappedComponent) {
 
     // TODO: we really need to know whether or not a object is
     // a pack or stack from its ID. That'd be a good refactor.
-
-    // TODO: is this really needed? HOCs should pass IDs of other
-    // objects
-    const childObjects = useSelector((state) =>
-      selectOperationChildren(state, id)
-    );
 
     // Memoized variables derived from selector results
     // ----------------------------------------------------------------------------
@@ -138,7 +129,7 @@ export default function withStackOperationData(WrappedComponent) {
         columnIds={columnIds}
         selectedColumnIds={selectedColumnIds}
         // Props specific to Stack operations
-        childObjects={childObjects}
+        childObjects={null} // TODO delete
         rowCount={rowCount}
         columnCount={columnCount}
         rowRanges={rowRanges}
