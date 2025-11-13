@@ -273,7 +273,7 @@ export const selectPackOperationColumnCount = createSelector(
  */
 export const selectStackOperationColumnCount = createSelector(
   [
-    (state, operationId) => [], // TODO
+    (state, operationId) => select,
     // selectColumnIdMatrixByOperationId(state, operationId),
   ],
   (columnIdMatrix) => {

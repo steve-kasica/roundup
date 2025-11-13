@@ -32,16 +32,12 @@ function TableBlock({
 
   return (
     <Box
-      className="table-block" // Added className for easier targeting during debugging
+      data-table="table-block" // Added className for easier targeting during debugging
       sx={{
-        height: "100%",
         display: "flex",
         border: "5px solid #ddd",
         flexDirection: "row",
         alignItems: "stretch",
-        flexBasis: `${
-          (activeColumnsCount / parentColumnCount || activeColumnsCount) * 100
-        }%`,
         position: "relative",
         // Visual indication of alerts
         ...(hasAlerts && {

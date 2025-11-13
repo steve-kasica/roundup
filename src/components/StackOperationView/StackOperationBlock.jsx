@@ -22,8 +22,10 @@ const StyledBox = styled(Box, {
   shouldForwardProp: (prop) =>
     ["isError", "isFocused"].includes(prop) === false,
 })(({ theme, isError, isFocused }) => ({
+  display: "flex",
   borderWidth: "4px",
   borderStyle: "solid",
+  boxSizing: "border-box",
   borderColor: theme.palette.divider,
   ...(isError && {
     // backgroundColor: theme.palette.error.main,
@@ -43,21 +45,26 @@ function StackOperationBlock({
   hasAlerts = false,
 
   // Optional props passed recursively via parent operation
-  parentColumnCount = 0,
+  parentColumnCount,
+  sx = {},
 }) {
-  console.log("Rendering StackOperationBlock for operation:", childIds);
   return (
     <StyledBox
+      data-operation-type="stack"
       isError={hasAlerts}
       isFocused={isFocused}
       sx={{
-        flexBasis: `${(columnCount / parentColumnCount) * 100}%`,
+        ...sx,
+        flexDirection: "column",
       }}
     >
       {/* Render child operations and tables */}
       {childIds.map((id, index) => {
         const isFirst = index === 0;
-        const childSx = !isFirst ? { borderTop: "none" } : {};
+        const childSx = {
+          height: `${(1 / childIds.length) * 100}%`,
+          borderTopWidth: isFirst ? 0 : 4,
+        };
         return (
           <React.Fragment key={id}>
             {isOperationId(id) ? (

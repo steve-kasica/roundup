@@ -60,7 +60,7 @@ const DropZone = styled(ForwardedBox, {
     },
     auto: {
       height: "100%",
-      minHeight: "30px",
+      minHeight: "20px",
     },
   };
 
@@ -172,7 +172,6 @@ export default function TableDropTarget({ operationType, children }) {
         // Case: first table added after schema initialized with only one table
         // Update the operation type and add the new table as a child
         // This allows the operation to evolve from a NO_OP to either PACK or STACK
-        console.log("Updating NO_OP operation to:", operationType);
         dispatch(
           updateOperationsRequest({
             operationUpdates: [

@@ -4,20 +4,16 @@
  * An interactive hierarchical visualization of the table tree
  */
 
-import "./CompositeTableSchema.scss";
-
 import { useSelector } from "react-redux";
 import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  selectAllOperationIds,
-  selectMaxOperationDepth,
   selectRootOperation,
 } from "../../slices/operationsSlice";
 
 import TableDropTarget from "./TableDropTarget";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 import { EnhancedStackOperationBlock } from "../StackOperationView/StackOperationBlock";
@@ -25,7 +21,7 @@ import { EnhancedPackOperationBlock } from "../PackOperationView/PackOperationBl
 import { EnhancedTableBlock } from "../TableView";
 
 const gridColumns = 12;
-const gridWidth = gridColumns - 2;
+const gridWidth = gridColumns - 1;
 
 // Each root operation type condition also needs to catch
 // the edge case where there are no children (e.g. all tables have been removed)
@@ -35,13 +31,16 @@ export default function CompositeTableSchema() {
   const rootOperation = useSelector(selectRootOperation);
 
   return (
-    <div className="CompositeTableSchema">
+    <Box className="CompositeTableSchema" sx={{ height: "100%" }}>
       {rootOperation ? (
-        <Grid container spacing={0}>
+        <Grid container spacing={0} sx={{ height: "100%" }}>
           <Grid size={gridWidth}>
             {rootOperation.operationType === OPERATION_TYPE_STACK &&
             rootOperation.childIds.length > 0 ? (
-              <EnhancedStackOperationBlock id={rootOperation.id} />
+              <EnhancedStackOperationBlock
+                id={rootOperation.id}
+                sx={{ height: "100%" }}
+              />
             ) : rootOperation.operationType === OPERATION_TYPE_PACK &&
               rootOperation.childIds.length > 0 ? (
               <EnhancedPackOperationBlock id={rootOperation.id} />
@@ -66,6 +65,6 @@ export default function CompositeTableSchema() {
           <Typography>Drag to add a source table</Typography>
         </TableDropTarget>
       )}
-    </div>
+    </Box>
   );
 }
