@@ -77,6 +77,9 @@ export default function TableLayout({
   selectedTableIds,
   setSelectedTableIds,
 }) {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableLayout");
+  }
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
   const [lastClickedIndex, setLastClickedIndex] = useState(null);

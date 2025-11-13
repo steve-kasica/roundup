@@ -15,10 +15,10 @@ import { isTableId } from "../tablesSlice";
  */
 export const selectOperationsById = createSelector(
   [(state) => state.operations.byId, (state, operationId) => operationId],
-  (data, operationId) => {
+  (byId, operationId) => {
     return Array.isArray(operationId)
-      ? operationId.map((id) => data[id])
-      : data[operationId];
+      ? operationId.map((id) => byId[id])
+      : byId[operationId];
   }
 );
 
@@ -136,7 +136,7 @@ export const selectRootOperation = (state) => {
 };
 
 /**
- * Selector to build query data for an operation.
+ * Selector to build query byId for an operation.
  * Constructs the data structure needed for database view creation.
  *
  * @param {Object} state - Redux state
@@ -203,7 +203,7 @@ export const selectStackOperationRowCount = createSelector(
   [
     (state, operationId, children) =>
       children || selectOperationsById(state, operationId)?.childIds,
-    (state) => state.tables.data,
+    (state) => state.tables.byId,
     (state) => state.operations.byId,
   ],
   (children, tablesData, operationsData) => {
@@ -309,7 +309,7 @@ export const selectStackOperationColumnCount = createSelector(
 export const selectStackOperationRowRanges = createSelector(
   [
     (state, operationId) => selectOperationsById(state, operationId)?.childIds,
-    (state) => state.tables.data,
+    (state) => state.tables.byId,
     (state) => state.operations.byId,
   ],
   (children, tablesData, operationsData) => {

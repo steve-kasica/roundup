@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-
 import { ColumnTick, EnhancedColumnTick } from "../ColumnViews";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
 import withTableData from "./withTableData.jsx";
@@ -13,11 +11,9 @@ function TableBlock({
   activeColumnIds,
   activeColumnsCount,
 
-  // props passed via OperationBlockView
+  // Props passed directly from parent
   parentOperationType,
   parentColumnCount,
-
-  // Props passed directly from parent
   sx = {},
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
@@ -32,8 +28,7 @@ function TableBlock({
     },
     (_, i) => (i < activeColumnsCount ? activeColumnIds[i] : null)
   );
-
-  console.log("TableBlock ticks:", ticks);
+  console.log({ ticks, parentColumnCount, activeColumnsCount });
 
   return (
     <Box

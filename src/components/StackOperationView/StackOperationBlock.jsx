@@ -10,14 +10,11 @@
  */
 
 import withStackOperationData from "./withStackOperationData.jsx";
-import {
-  isOperationId,
-  OPERATION_TYPE_PACK,
-  OPERATION_TYPE_STACK,
-} from "../../slices/operationsSlice";
-import { Box, Tooltip, Typography, styled } from "@mui/material";
-import { EnhancedPackOperationBlock } from "../PackOperationView/PackOperationBlock.jsx";
+import { isOperationId } from "../../slices/operationsSlice";
+import { Box, styled } from "@mui/material";
 import { EnhancedTableBlock } from "../TableView/TableBlock";
+import { EnhancedOperationBlock } from "../OperationView/OperationBlock.jsx";
+import React from "react";
 
 // TODO: when addressing this layout, consider using
 // styled components, but module SCSS will overwrite
@@ -39,24 +36,17 @@ const StyledBox = styled(Box, {
 
 function StackOperationBlock({
   // props via withStackOperationData
-  operation,
-  childObjects, // [{id, objectType}]
+  childIds,
+  operationType,
   columnCount,
   isFocused,
-  alerts = [],
   hasAlerts = false,
 
   // Optional props passed recursively via parent operation
   parentColumnCount = 0,
 }) {
-  // Parse error message if it's a JSON string
-  const getErrorMessage = () => {
-    if (!hasAlerts) return "";
-
-    return alerts.map((alert) => alert.message).join("\n");
-  };
-
-  const operationContent = (
+  console.log("Rendering StackOperationBlock for operation:", childIds);
+  return (
     <StyledBox
       isError={hasAlerts}
       isFocused={isFocused}
@@ -65,54 +55,34 @@ function StackOperationBlock({
       }}
     >
       {/* Render child operations and tables */}
-      {childObjects.map(({ id, operationType }, index) => {
+      {childIds.map((id, index) => {
         const isFirst = index === 0;
         const childSx = !isFirst ? { borderTop: "none" } : {};
-
-        if (isOperationId(id) && operationType === OPERATION_TYPE_STACK) {
-          return (
-            <EnhancedStackOperationBlock
-              key={id}
-              id={id}
-              parentColumnCount={columnCount}
-              sx={childSx}
-            />
-          );
-        } else if (isOperationId(id) && operationType === OPERATION_TYPE_PACK) {
-          return (
-            <EnhancedPackOperationBlock
-              key={id}
-              id={id}
-              parentColumnCount={columnCount}
-              sx={childSx}
-            />
-          );
-        } else {
-          return (
-            <EnhancedTableBlock
-              key={id}
-              id={id}
-              isDraggable={false}
-              parentOperationType={operation.operationType}
-              parentColumnCount={columnCount}
-              sx={childSx}
-            />
-          );
-        }
+        return (
+          <React.Fragment key={id}>
+            {isOperationId(id) ? (
+              <EnhancedOperationBlock
+                id={id}
+                parentOperationType={operationType}
+                parentColumnCount={columnCount}
+                sx={childSx}
+              />
+            ) : (
+              <EnhancedTableBlock
+                id={id}
+                parentOperationType={operationType}
+                parentColumnCount={columnCount}
+                sx={childSx}
+              />
+            )}
+          </React.Fragment>
+        );
       })}
     </StyledBox>
   );
-
-  return operation.error ? (
-    <Tooltip title={getErrorMessage()} arrow placement="top">
-      {operationContent}
-    </Tooltip>
-  ) : (
-    operationContent
-  );
 }
 
-StackOperationBlock.displayName = "StackOperationBlock";
+StackOperationBlock.displayName = "Stack Operation Block";
 
 const EnhancedStackOperationBlock = withStackOperationData(StackOperationBlock);
 

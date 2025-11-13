@@ -1,151 +1,21 @@
-/* eslint-disable react/prop-types */
 import { DragIndicator, Warning } from "@mui/icons-material";
 import HighlightText from "../ui/HighlightText";
-import { styled, Typography, Checkbox, Stack, Box, Badge } from "@mui/material";
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { Typography, Checkbox, Stack, Box, Badge } from "@mui/material";
+import { memo, useState } from "react";
 import { Menu, MenuItem } from "@mui/material";
 import { formatDate, formatNumber, formatBytes } from "../../lib/utilities";
 import withTableData from "./withTableData";
+import StyledTableRow from "./StyledTableRow";
+import BarChartCell from "./BarChartCell";
 
 export const TABLE_ROW_VIEW_CLASS = "TableRowSummary";
 
-// Styled component for bar chart background in table cells
-const BarChartCell = styled(Typography, {
-  shouldForwardProp: (prop) => !["percentage", "isDisabled"].includes(prop),
-})(({ percentage, isDisabled }) => ({
-  position: "relative",
-  backgroundImage: `linear-gradient(to right, ${
-    isDisabled ? "rgba(0, 0, 0, 0.05)" : "rgba(25, 118, 210, 0.15)"
-  } 0%, ${
-    isDisabled ? "rgba(0, 0, 0, 0.05)" : "rgba(25, 118, 210, 0.15)"
-  } ${percentage.toFixed(1)}%, transparent ${percentage.toFixed(1)}%)`,
-  backgroundRepeat: "no-repeat",
-  backgroundSize: "100% 100%",
-  borderRight: "2px solid transparent",
-  textWrap: "nowrap",
-  borderTop: "2px solid transparent",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: `linear-gradient(to right, ${
-      isDisabled ? "rgba(0, 0, 0, 0.08)" : "rgba(25, 118, 210, 0.2)"
-    } 0%, ${
-      isDisabled ? "rgba(0, 0, 0, 0.08)" : "rgba(25, 118, 210, 0.2)"
-    } ${percentage.toFixed(1)}%, transparent ${percentage.toFixed(1)}%)`,
-    zIndex: -1,
-    borderRadius: "2px",
-  },
-}));
-
-// Styled table row component that handles all drag and drop states
-const StyledTableRow = styled("tr", {
-  shouldForwardProp: (prop) =>
-    ![
-      "isDragging",
-      "isDisabled",
-      "isSelected",
-      "isHovered",
-      "hasAlerts",
-    ].includes(prop),
-})(({ isDragging, isDisabled, isSelected, isHovered, hasAlerts }) => {
-  let styles = {
-    transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
-    cursor: "pointer",
-    borderRadius: "6px",
-    position: "relative",
-    margin: "1px 0",
-    userSelect: "none",
-    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-    // make drag handle visible when the whole row is hovered
-    "&:hover .drag-icon": {
-      opacity: 1,
-      transition: "all 0.18s ease-in-out",
-    },
-  };
-
-  // Alert styles - orange/warning theme (highest priority after disabled)
-  if (hasAlerts && !isDisabled) {
-    styles = {
-      ...styles,
-      backgroundColor: "rgba(255, 152, 0, 0.12)",
-      boxShadow: "inset 3px 0 0 #ff9800, 0 1px 3px rgba(255, 152, 0, 0.2)",
-      borderLeft: "3px solid #ff9800",
-    };
-  }
-
-  // Base selected styles - blue theme for selection
-  if (isSelected && !hasAlerts) {
-    styles = {
-      ...styles,
-      backgroundColor: "rgba(25, 118, 210, 0.12)",
-      boxShadow: "inset 3px 0 0 #1976d2, 0 1px 3px rgba(25, 118, 210, 0.15)",
-    };
-  }
-
-  // Hover styles - subtle gray with shadow
-  if (isHovered && !isDragging && !isSelected && !hasAlerts) {
-    styles = {
-      ...styles,
-      backgroundColor: "rgba(0, 0, 0, 0.02)",
-      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-      transform: "translateY(-1px)",
-    };
-  }
-
-  // Selected + Hovered - enhanced selected state
-  if (isSelected && isHovered && !isDragging && !hasAlerts) {
-    styles = {
-      ...styles,
-      backgroundColor: "rgba(25, 118, 210, 0.16)",
-      boxShadow: "inset 3px 0 0 #1976d2, 0 2px 6px rgba(25, 118, 210, 0.2)",
-      transform: "translateY(-1px)",
-    };
-  }
-
-  // Alert + Hovered - enhanced alert state
-  if (hasAlerts && isHovered && !isDragging && !isDisabled) {
-    styles = {
-      ...styles,
-      backgroundColor: "rgba(255, 152, 0, 0.2)",
-      boxShadow: "inset 3px 0 0 #ff9800, 0 2px 6px rgba(255, 152, 0, 0.3)",
-      transform: "translateY(-1px)",
-    };
-  }
-
-  // Dragging styles - orange theme with elevation
-  if (isDragging) {
-    styles = {
-      ...styles,
-      cursor: "grabbing",
-      backgroundColor: "rgba(255, 152, 0, 0.15)",
-      boxShadow: "inset 4px 0 0 #f57c00, 0 12px 24px rgba(255, 152, 0, 0.35)",
-      zIndex: 1000,
-      opacity: 0.95,
-    };
-  }
-
-  // Disabled styles (highest priority) - maintains connection but muted
-  if (isDisabled) {
-    styles = {
-      ...styles,
-      opacity: 0.4,
-      cursor: "not-allowed",
-      backgroundColor: "rgba(0, 0, 0, 0.02)",
-      transform: "none",
-      boxShadow: "none",
-    };
-  }
-
-  return styles;
-});
-
-function TableRowSummary({
+const TableRowSummary = ({
   // props from withTableData
+  // Props from withAssociatedAlerts via withTableData
+  alertIds,
+  hasAlerts,
+
   id,
   name,
   mimeType,
@@ -156,17 +26,10 @@ function TableRowSummary({
   removedColumnCount,
   isInSchema,
 
-  // Props from withAssociatedAlerts via withTableData
-  alertIds,
-  hasAlerts,
+  setTableName,
 
-  // depth,
-  // parentOperation,
-  // functions to dispatch actions
-  peekTable,
   hoverTable,
   unhoverTable,
-  renameTable,
   dropTable,
   focusTable,
   isDisabled = false,
@@ -181,15 +44,12 @@ function TableRowSummary({
 
   // Props from TableDragContainer
   dragDropRef,
-}) {
+}) => {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering TableRowSummary for table:", id);
   }
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
-  // TODO: Should this be in the HOC?
-  const selectedTableIds = useSelector((state) => state.tables.selected || []);
 
   const handleMenuClose = (event) => {
     if (event) {
@@ -205,16 +65,8 @@ function TableRowSummary({
       onClick: (event) => {
         const newName = prompt("Enter new table name:", name);
         if (newName && newName.trim() !== "") {
-          renameTable(newName);
+          setTableName(newName);
         }
-        handleMenuClose(event);
-      },
-    },
-    {
-      label: "Peek at table",
-      isDisabled: false,
-      onClick: (event) => {
-        peekTable();
         handleMenuClose(event);
       },
     },
@@ -253,10 +105,6 @@ function TableRowSummary({
       hasAlerts={hasAlerts}
       data-tableid={id}
       data-selected={isSelected}
-      data-multiselected={
-        selectedTableIds.includes(id) && selectedTableIds.length > 1
-      }
-      data-selection-count={selectedTableIds.length}
       onMouseEnter={hoverTable}
       onMouseLeave={unhoverTable}
       // onContextMenu={handleMenuOpen}
@@ -402,7 +250,33 @@ function TableRowSummary({
       </td>
     </StyledTableRow>
   );
-}
+};
 
-const EnhancedTableRowSummary = withTableData(TableRowSummary);
+const EnhancedTableRowSummary = memo(
+  withTableData(TableRowSummary),
+  (prevProps, nextProps) => {
+    // Return true if props are equal (should NOT re-render)
+    // Only compare props that TableRowSummary actually uses
+    return true;
+    return (
+      prevProps.id === nextProps.id &&
+      prevProps.name === nextProps.name &&
+      prevProps.mimeType === nextProps.mimeType &&
+      prevProps.size === nextProps.size &&
+      prevProps.dateLastModified === nextProps.dateLastModified &&
+      prevProps.rowCount === nextProps.rowCount &&
+      prevProps.columnCount === nextProps.columnCount &&
+      prevProps.removedColumnCount === nextProps.removedColumnCount &&
+      prevProps.isInSchema === nextProps.isInSchema &&
+      prevProps.isDisabled === nextProps.isDisabled &&
+      prevProps.searchString === nextProps.searchString &&
+      prevProps.rowMax === nextProps.rowMax &&
+      prevProps.columnMax === nextProps.columnMax &&
+      prevProps.bytesMax === nextProps.bytesMax &&
+      prevProps.isSelected === nextProps.isSelected &&
+      prevProps.hasAlerts === nextProps.hasAlerts &&
+      prevProps.alertIds === nextProps.alertIds
+    );
+  }
+);
 export { EnhancedTableRowSummary, TableRowSummary };

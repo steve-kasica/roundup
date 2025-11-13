@@ -29,7 +29,7 @@ import { EnhancedColumnHeader } from "../ColumnViews";
 const StackRows = ({
   // Props passed via withOperationData
   id,
-  operation,
+  isViewMaterialized,
   materializeOperation,
   // Props passed directly from withStackoperationData
   columnIdMatrix,
@@ -110,7 +110,7 @@ const StackRows = ({
           <Alert severity="error" sx={{ mb: 1, height: "100%" }}>
             This stack operation has associated alerts. Please review them.
           </Alert>
-        ) : !operation.doesViewExist ? (
+        ) : !isViewMaterialized ? (
           <Alert
             severity="warning"
             action={
@@ -164,7 +164,7 @@ const StackRows = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {!operation.doesViewExist ? (
+            {!isViewMaterialized ? (
               <>
                 {Array.from({ length: 10 }).map((_, index) => (
                   <StyledAlternatingTableRow

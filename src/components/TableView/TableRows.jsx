@@ -88,11 +88,6 @@ const TableRows = ({
     direction: null, // 'asc', 'desc', or null
   });
 
-  /**
-   * Tracks which column header is currently being hovered
-   * @type {number|null} hoveredColumnIndex - Index of the hovered column (null for no hover)
-   */
-  const [hoveredColumnIndex, setHoveredColumnIndex] = useState(null);
   // Hook for managing paginated data with sorting
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
@@ -209,13 +204,7 @@ const TableRows = ({
                 {selectedColumnIds.length === 0
                   ? Array.from({ length: placeHolderColumnLength }).map(
                       (_, i) => (
-                        <TableCell
-                          key={i}
-                          align="center"
-                          sx={{ p: "1px" }}
-                          onMouseEnter={() => setHoveredColumnIndex(i)}
-                          onMouseLeave={() => setHoveredColumnIndex(null)}
-                        >
+                        <TableCell key={i} align="center" sx={{ p: "1px" }}>
                           <Typography
                             color="text.secondary"
                             sx={{
@@ -235,8 +224,6 @@ const TableRows = ({
                         key={`${i}-${colId}`}
                         align="center"
                         sx={{ p: "1px" }}
-                        onMouseEnter={() => setHoveredColumnIndex(i)}
-                        onMouseLeave={() => setHoveredColumnIndex(null)}
                       >
                         <EnhancedColumnHeader
                           id={colId}
@@ -273,7 +260,6 @@ const TableRows = ({
                           <StyledTableCell
                             key={i}
                             align="center"
-                            isHovered={hoveredColumnIndex === i}
                             isEven={rowIndex % 2 === 0}
                             maxWidth={columnWidths[colId] || "200px"}
                           >
@@ -306,7 +292,6 @@ const TableRows = ({
                     <StyledTableCell
                       key={colId}
                       align="center"
-                      isHovered={hoveredColumnIndex === i}
                       isEven={rowIndex % 2 === 0}
                       maxWidth={columnWidths[colId] || "200px"}
                     >
@@ -330,7 +315,6 @@ const TableRows = ({
                     {row.map((value, i) => (
                       <StyledTableCell
                         key={i}
-                        isHovered={hoveredColumnIndex === i}
                         isEven={rowIndex % 2 === 0}
                         maxWidth={columnWidths[selectedColumnIds[i]] || "200px"}
                       >

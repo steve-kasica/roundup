@@ -27,6 +27,9 @@ function TableSelector({
   bytesMax,
   unselectAllTables,
 }) {
+  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
+    console.debug("Rendering TableSelector");
+  }
   const dispatch = useDispatch();
   const [selectedTableIds, setSelectedTableIds] = useState([]);
   const [selectedTableType, setSelectedTableType] = useState("");

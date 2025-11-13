@@ -51,6 +51,8 @@ export default function withOperationData(WrappedComponent) {
     }, [columnIds, activeColumnIds]);
 
     // Column objects for all columns associated directly with this operation
+    // TODO: should this be a selector of should the selector draw straight
+    // from the ui source, then we memoize a calculation upon it?
     const selectedColumnIds = useSelector((state) =>
       selectSelectedColumnIdsByParentId(state, id)
     );
@@ -146,7 +148,6 @@ export default function withOperationData(WrappedComponent) {
         // Directly associated columns
         columnIds={columnIds} // All column IDs associated with this operation
         activeColumnIds={activeColumnIds} // columns not excluded
-        columnCount={activeColumnIds.length || operation.columnCount}
         selectedColumnIds={selectedColumnIds}
         removedColumnIds={removedColumnIds} // TODO: @deprecated?
         // Row stuff

@@ -25,7 +25,12 @@ import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
 const StackSchemaView = ({
-  operation,
+  // Props passed via withOperationData
+  childIds,
+  id,
+  name,
+  rowCount,
+  // Props passed via withStackOperationData
   activeColumnIds,
   columnIdMatrix, // column IDs of child tables in a matrix
   m, // width of the matrix (# of columns)
@@ -33,8 +38,6 @@ const StackSchemaView = ({
   // Props passed via withAssociatedAlerts
   alertIds,
   hasAlerts,
-  deleteAlerts,
-  silenceAlerts,
   //
   selectColumns, // Sets global set of selected column IDs
   clearSelectedColumns, // Clears global set of selected column IDs
@@ -266,9 +269,9 @@ const StackSchemaView = ({
   );
   const onInsertColumnIntoChildTable = useCallback(
     (i, j) => {
-      insertColumnIntoChildAtIndex(operation.childIds[i], j);
+      insertColumnIntoChildAtIndex(childIds[i], j);
     },
-    [insertColumnIntoChildAtIndex, operation.childIds]
+    [insertColumnIntoChildAtIndex, childIds]
   );
 
   const handleFocusColumns = useCallback(() => {
@@ -306,9 +309,9 @@ const StackSchemaView = ({
       <SchemaToolbar
         columnIds={columnIdMatrix.flat()}
         columnCount={activeColumnIds.length}
-        rowCount={operation.rowCount}
-        name={operation.name}
-        objectId={operation.id}
+        rowCount={rowCount}
+        name={name}
+        objectId={id}
         alertIds={alertIds}
         customMenuItems={
           <>
@@ -327,7 +330,7 @@ const StackSchemaView = ({
           </>
         }
       >
-        <EnhancedStackOperationLabel id={operation.id} />
+        <EnhancedStackOperationLabel id={id} />
       </SchemaToolbar>
       <Box
         sx={{
@@ -366,7 +369,7 @@ const StackSchemaView = ({
               flex: 1,
             }}
           >
-            {operation.childIds.map((childId, rowIndex) => (
+            {childIds.map((childId, rowIndex) => (
               <Box
                 key={childId}
                 sx={{

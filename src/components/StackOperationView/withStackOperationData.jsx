@@ -50,6 +50,15 @@ export default function withStackOperationData(WrappedComponent) {
       selectTableColumnIds(state, childIds)
     );
 
+    // The column count of a stack operation is always going to be the
+    // maximum column count of its child tables
+    const columnCount = useMemo(() => {
+      return Math.max(
+        ...childColumnIds.map((columnIds) => columnIds.length),
+        0
+      );
+    }, [childColumnIds]);
+
     const columnIdMatrix = useMemo(() => {
       const maxLength = Math.max(...childColumnIds.map((row) => row.length), 0);
       const backfilledMatrix = childColumnIds.map((row) => {
@@ -92,12 +101,6 @@ export default function withStackOperationData(WrappedComponent) {
         .filter(({ columnIds }) => columnIds.length > 0);
     }, [operation.childIds, columnIdMatrix, selectedColumnIds]);
 
-    const columnCount = useSelector((state) => {
-      return (
-        operation.columnCount || selectStackOperationColumnCount(state, id)
-      );
-    });
-
     const rowCount = useSelector((state) => {
       return operation.rowCount || selectStackOperationRowCount(state, id);
     });
@@ -123,13 +126,17 @@ export default function withStackOperationData(WrappedComponent) {
       <WrappedComponent
         // Pass along props directly from the parent component
         {...props}
+        // Props via withAssociatedAlerts
+        alertIds={alertIds}
+        hasAlerts={hasAlerts}
+        deleteAlerts={deleteAlerts}
+        silenceAlerts={silenceAlerts}
         // Props from withOperationData
         id={id}
-        operation={operation}
         columnIds={columnIds}
         selectedColumnIds={selectedColumnIds}
+        childIds={childIds}
         // Props specific to Stack operations
-        childObjects={null} // TODO delete
         rowCount={rowCount}
         columnCount={columnCount}
         rowRanges={rowRanges}
@@ -141,11 +148,6 @@ export default function withStackOperationData(WrappedComponent) {
         n={n}
         selectedTableIds={selectedTableIds}
         selection={selection}
-        // Props related to associated alerts
-        alertIds={alertIds}
-        hasAlerts={hasAlerts}
-        deleteAlerts={deleteAlerts}
-        silenceAlerts={silenceAlerts}
         // Callback props to dispatch actions
         swapColumns={(target, source) => {
           const tableColumnIds =

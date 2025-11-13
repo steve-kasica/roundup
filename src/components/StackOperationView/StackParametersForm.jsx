@@ -8,7 +8,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import {
-  JOIN_PREDICATES,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
@@ -17,7 +16,9 @@ import withStackOperationData from "./withStackOperationData";
 /* eslint-disable react/prop-types */
 
 const StackParametersForm = ({
-  operation,
+  id,
+  name,
+  operationType,
   isLoading,
   setOperationType,
   setName,
@@ -55,16 +56,16 @@ const StackParametersForm = ({
       <TextField
         fullWidth
         label="Operation Name"
-        value={operation.name}
+        value={name}
         onChange={(event) => setName(event.target.value)}
-        placeholder={operation?.name}
+        placeholder={name || id}
         error={hasAlerts}
       />
 
       <FormControl fullWidth error={hasAlerts}>
         <InputLabel>Operation Type</InputLabel>
         <Select
-          value={operation.operationType}
+          value={operationType}
           onChange={(event) => setOperationType(event.target.value)}
           label="Operation Type"
           error={hasAlerts}

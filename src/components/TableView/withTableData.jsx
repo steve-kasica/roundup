@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
   selectOperationDepthById,
@@ -169,13 +169,19 @@ export default function withTableData(WrappedComponent) {
     );
 
     // Current number of non-excluded columns
-    const columnCount = activeColumnIds.length;
+    const columnCount = useMemo(
+      () => activeColumnIds.length,
+      [activeColumnIds]
+    );
 
     // Number of columns when table was initialized
-    const initialColumnCount = columnIds.length;
+    const initialColumnCount = useMemo(() => columnIds.length, [columnIds]);
 
     // Number of columns that have been excluded
-    const removedColumnCount = initialColumnCount - columnCount;
+    const removedColumnCount = useMemo(
+      () => initialColumnCount - columnCount,
+      [initialColumnCount, columnCount]
+    );
 
     // Determine if the table is part of the current schema (has an operation)
     const isInSchema = useSelector(
@@ -231,5 +237,6 @@ export default function withTableData(WrappedComponent) {
   EnhancedComponent.displayName = `withTableData(${componentName})`;
 
   // Wrap EnhancedComponent with withAssociatedAlerts
+  // Note: Memoization should be applied at the individual component level
   return withAssociatedAlerts(EnhancedComponent);
 }
