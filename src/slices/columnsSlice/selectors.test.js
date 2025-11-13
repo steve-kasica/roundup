@@ -8,23 +8,49 @@ import {
 import { initialState as columnsInitialState } from "./columnsSlice";
 import Column from "./Column";
 import { Table } from "../tablesSlice";
+import { Operation } from "../operationsSlice";
 
 describe("Column selectors", () => {
-  let state, table1, table2, column1, column2, column3;
+  let state,
+    table1,
+    table2,
+    table3,
+    column1,
+    column2,
+    column3,
+    column4,
+    column5,
+    operation1;
   beforeAll(() => {
     table1 = Table();
     table2 = Table();
+    table3 = Table();
     column1 = Column({ parentId: table1.id, index: 0, databaseName: "Name" });
     column2 = Column({ parentId: table1.id, index: 1, databaseName: "Age" });
     column3 = Column({ parentId: table2.id, index: 0, databaseName: "Email" });
+    column4 = Column({ index: 0, databaseName: "Status" });
+    column5 = Column({ index: 1, databaseName: "Score" });
     table1.columnIds = [column1.id, column2.id];
     table2.columnIds = [column3.id];
+    operation1 = Operation({
+      columnIds: [column4.id, column5.id],
+    });
+    column4.parentId = operation1.id;
+    column5.parentId = operation1.id;
     state = {
+      operations: {
+        byId: {
+          [operation1.id]: operation1,
+        },
+        allIds: [operation1.id],
+      },
       tables: {
         byId: {
           [table1.id]: table1,
           [table2.id]: table2,
+          [table3.id]: table3,
         },
+        allIds: [table1.id, table2.id, table3.id],
       },
       columns: {
         ...columnsInitialState,
@@ -83,6 +109,20 @@ describe("Column selectors", () => {
       expect(selectSelectedColumnIdsByParentId(state, table2.id)).toEqual([
         column3.id,
       ]);
+    });
+    it("should return an empty array if no columns are selected for the table", () => {
+      expect(selectSelectedColumnIdsByParentId(state, table3.id)).toEqual([]);
+    });
+    it("should return selected column IDS for a given operation ID", () => {
+      expect(
+        selectSelectedColumnIdsByParentId(
+          {
+            ...state,
+            ui: { selectedColumnIds: [column4.id] },
+          },
+          operation1.id
+        )
+      ).toEqual([column4.id]);
     });
   });
 });

@@ -1,6 +1,11 @@
 import { createSelector } from "reselect";
 import { selectSelectedColumnIds } from "../uiSlice";
-import { selectTableColumnIds } from "../tablesSlice";
+import {
+  isTableId,
+  selectTableColumnIds,
+  selectTablesById,
+} from "../tablesSlice";
+import { selectOperationsById } from "../operationsSlice";
 
 /**
  * Select ALL column IDs for a specific table, including excluded columns.
@@ -73,7 +78,10 @@ export const selectColumnNamesById = createSelector(
  */
 export const selectSelectedColumnIdsByParentId = createSelector(
   [
-    (state, parentId) => selectTableColumnIds(state, parentId),
+    (state, parentId) =>
+      isTableId(parentId)
+        ? selectTablesById(state, parentId).columnIds
+        : selectOperationsById(state, parentId).columnIds,
     (state) => selectSelectedColumnIds(state),
   ],
   (activeColumnIds, selectedColumnIds) => {
