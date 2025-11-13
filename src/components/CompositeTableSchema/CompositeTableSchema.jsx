@@ -43,10 +43,16 @@ export default function CompositeTableSchema() {
               />
             ) : rootOperation.operationType === OPERATION_TYPE_PACK &&
               rootOperation.childIds.length > 0 ? (
-              <EnhancedPackOperationBlock id={rootOperation.id} />
+              <EnhancedPackOperationBlock
+                id={rootOperation.id}
+                sx={{ height: "100%" }}
+              />
             ) : rootOperation.operationType === OPERATION_TYPE_NO_OP &&
               rootOperation.childIds.length > 0 ? (
-              <EnhancedTableBlock id={rootOperation.childIds[0]} />
+              <EnhancedTableBlock
+                id={rootOperation.childIds[0]}
+                sx={{ height: "100%" }}
+              />
             ) : null}
           </Grid>
           <Grid size={gridColumns - gridWidth}>

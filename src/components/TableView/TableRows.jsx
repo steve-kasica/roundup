@@ -49,6 +49,7 @@ import {
   Alert,
   Button,
   Box,
+  Paper,
 } from "@mui/material";
 import { usePaginatedTableRows } from "../../hooks/index.js";
 import {
@@ -57,6 +58,7 @@ import {
   StickyTableCell,
 } from "../ui/Table";
 import { EnhancedColumnHeader } from "../ColumnViews";
+import { EnhancedTableLabel, TableLabel } from "./TableLabel.jsx";
 
 const placeHolderColumnLength = 11; // Number of placeholder columns when none are selected
 const placeHolderRowLength = 20; // Number of placeholder rows when none are selected

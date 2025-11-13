@@ -36,6 +36,7 @@ function TableBlock({
       sx={{
         display: "flex",
         border: "5px solid #ddd",
+        boxSizing: "border-box",
         flexDirection: "row",
         alignItems: "stretch",
         position: "relative",
