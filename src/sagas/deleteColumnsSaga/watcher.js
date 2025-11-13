@@ -6,7 +6,7 @@ import {
   updateOperationsFailure,
   updateOperationsSuccess,
 } from "../updateOperationsSaga";
-import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
+import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
 import { createOperationsFailure } from "../createOperationsSaga/actions";
 import { materializeOperationFailure } from "../materializeOperationSaga/actions";
 
@@ -40,7 +40,7 @@ export default function* deleteColumnsSaga() {
     if (operationIdsToUpdate.length > 0) {
       const columnsToDelete = yield select((state) =>
         operationIdsToUpdate.flatMap((id) =>
-          selectColumnIdsByTableId(state, id)
+          selectColumnIdsByParentId(state, id)
         )
       );
       if (columnsToDelete.length > 0) {
@@ -54,7 +54,7 @@ export default function* deleteColumnsSaga() {
   yield takeEvery(materializeOperationFailure.type, function* (action) {
     const { operationId } = action.payload;
     const columnsToDelete = yield select((state) =>
-      selectColumnIdsByTableId(state, operationId)
+      selectColumnIdsByParentId(state, operationId)
     );
     if (columnsToDelete.length > 0) {
       yield put(deleteColumnsRequest({ columnIds: columnsToDelete }));

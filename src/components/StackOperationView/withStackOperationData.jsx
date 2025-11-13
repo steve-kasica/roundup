@@ -82,7 +82,7 @@ export default function withStackOperationData(WrappedComponent) {
     );
 
     const selection = useMemo(() => {
-      return operation.children
+      return operation.childIds
         .map((tableId, rowIndex) => ({
           tableId,
           columnIds: columnIdMatrix[rowIndex].filter((columnId) =>
@@ -90,7 +90,7 @@ export default function withStackOperationData(WrappedComponent) {
           ),
         }))
         .filter(({ columnIds }) => columnIds.length > 0);
-    }, [operation.children, columnIdMatrix, selectedColumnIds]);
+    }, [operation.childIds, columnIdMatrix, selectedColumnIds]);
 
     const columnCount = useSelector((state) => {
       return (
@@ -116,8 +116,8 @@ export default function withStackOperationData(WrappedComponent) {
             : null
         )
         .filter((index) => index !== null)
-        .map((index) => operation.children[index]);
-    }, [columnIdMatrix, operation.children, selectedColumnIds]);
+        .map((index) => operation.childIds[index]);
+    }, [columnIdMatrix, operation.childIds, selectedColumnIds]);
 
     return (
       <WrappedComponent
@@ -149,7 +149,7 @@ export default function withStackOperationData(WrappedComponent) {
         // Callback props to dispatch actions
         swapColumns={(target, source) => {
           const tableColumnIds =
-            columnIdMatrix[operation.children.indexOf(target.tableId)];
+            columnIdMatrix[operation.childIds.indexOf(target.tableId)];
           const sourceIndex = tableColumnIds.indexOf(source.id);
           const targetIndex = tableColumnIds.indexOf(target.id);
 

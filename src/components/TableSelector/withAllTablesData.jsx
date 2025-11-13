@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import { useDispatch } from "react-redux";
-import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
+import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
 
 const withAllTablesData = (WrappedComponent) => {
   return function EnhancedComponent(props) {
@@ -14,7 +14,7 @@ const withAllTablesData = (WrappedComponent) => {
       Math.max(
         0,
         ...tables.map(
-          (table) => selectColumnIdsByTableId(state, table.id).length
+          (table) => selectColumnIdsByParentId(state, table.id).length
         )
       )
     );

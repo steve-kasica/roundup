@@ -10,10 +10,10 @@ import {
 import alertsSagaWorker from "./worker";
 
 export default function* updateAlertsSagaWatcher() {
-  yield takeEvery(updateOperationsSuccess.type, handleRaisedAlerts);
-  yield takeEvery(updateOperationsFailure.type, handleRaisedAlerts);
-  yield takeEvery(createOperationsSuccess.type, handleRaisedAlerts);
-  yield takeEvery(createOperationsFailure.type, handleRaisedAlerts);
+  // yield takeEvery(updateOperationsSuccess.type, handleRaisedAlerts);
+  // yield takeEvery(updateOperationsFailure.type, handleRaisedAlerts);
+  // yield takeEvery(createOperationsSuccess.type, handleRaisedAlerts);
+  // yield takeEvery(createOperationsFailure.type, handleRaisedAlerts);
 }
 
 function* handleRaisedAlerts(action) {

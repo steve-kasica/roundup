@@ -12,8 +12,8 @@ export async function createPackView(opData, columnList = null) {
 }
 
 export function formQuery(op, columnList = null) {
-  const table1 = op.children[0].id;
-  const table2 = op.children[1].id;
+  const table1 = op.childIds[0].id;
+  const table2 = op.childIds[1].id;
   const { joinType, joinKey1, joinKey2, joinPredicate } = op;
 
   // TODO: refactor to util file for DRY

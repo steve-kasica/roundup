@@ -32,39 +32,21 @@
 import { put } from "redux-saga/effects";
 import {
   addOperations as addOperationsToSlice,
-  OPERATION_TYPE_PACK,
-  OPERATION_TYPE_STACK,
+  updateOperations as updateOperationsSlice,
+  Operation,
 } from "../../slices/operationsSlice";
-import Operation, {
-  OPERATION_TYPE_NO_OP,
-} from "../../slices/operationsSlice/Operation";
-import { createOperationsSuccess, createOperationsFailure } from "./actions";
+import { createOperationsSuccess } from "./actions";
 import { setFocusedObjectId } from "../../slices/uiSlice";
-import {
-  testPackOperationForFatalErrors,
-  testStackOperationForFatalErrors,
-} from "../../slices/alertsSlice/Alerts/Errors/utilities";
 import { normalizeInputToArray } from "../../slices/utilities";
 import generateUUID from "../../lib/utilities/generateUUID";
+import {
+  isTableId,
+  updateTables as updateTablesSlice,
+} from "../../slices/tablesSlice";
 
 /**
  * Worker saga that creates or replaces database views based on operation type.
  *
- * This function is the core of the view creation process. It:
- * 1. Determines the operation type (PACK, STACK, or NO_OP)
- * 2. Calls the appropriate database view creation function
- * 3. Creates or replaces the existing view in the database
- * 4. Updates operation state with success/failure information
- *
- * Database View Creation Behavior:
- * - PACK operations: Creates a unified view combining all child table columns
- * - STACK operations: Creates a stacked view using first child table as template
- * - NO_OP operations: Skips view creation (no database changes needed)
- *
- * Error Handling:
- * - Failed view creation updates the operation with error details
- * - Successful creation clears any previous errors
- * - Database errors are logged and stored in operation state
  *
  * @generator
  * @param {Object} action - Redux action containing the operation ID
@@ -72,9 +54,9 @@ import generateUUID from "../../lib/utilities/generateUUID";
  * @yields {Effect} Various saga effects for database operations and state updates
  */
 export default function* createOperationsWorker(action) {
-  const successfulCreations = [];
-  const failedCreations = [];
-  const raisedAlerts = [];
+  const createdOperations = [];
+  const tableUpdates = [];
+  const operationUpdates = [];
   let { operationData } = action.payload;
 
   operationData = normalizeInputToArray(operationData);
@@ -87,53 +69,57 @@ export default function* createOperationsWorker(action) {
       databaseName: `${generateUUID("o_")}`,
     });
 
-    // Create database view based on operation type
-    if (operation.operationType === OPERATION_TYPE_PACK) {
-      // Creates a unified view with columns from all child tables
-      const { isAllPassing, fatalErrors, warnings } =
-        testPackOperationForFatalErrors(operation);
-      if (isAllPassing) {
-        successfulCreations.push(operation);
+    createdOperations.push(operation);
+
+    childIds.forEach((childId) => {
+      if (isTableId(childId)) {
+        tableUpdates.push({
+          id: childId,
+          parentId: operation.id,
+        });
       } else {
-        failedCreations.push(operation);
+        operationUpdates.push({
+          id: childId,
+          parentId: operation.id,
+        });
       }
-      raisedAlerts.push(...fatalErrors, ...warnings);
-    } else if (operation.operationType === OPERATION_TYPE_STACK) {
-      const { isAllPassing, fatalErrors, warnings } =
-        testStackOperationForFatalErrors(operation);
-      if (isAllPassing) {
-        successfulCreations.push(operation);
-      } else {
-        failedCreations.push(operation);
-      }
-      raisedAlerts.push(...fatalErrors, ...warnings);
-    } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
-      // NO_OP operations do not require a database view
-      successfulCreations.push(operation);
-    }
+    });
+
+    // // Create database view based on operation type
+    // if (operation.operationType === OPERATION_TYPE_PACK) {
+    //   // Creates a unified view with columns from all child tables
+    //   const { isAllPassing, fatalErrors, warnings } =
+    //     testPackOperationForFatalErrors(operation);
+    //   if (isAllPassing) {
+    //     successfulCreations.push(operation);
+    //   } else {
+    //     failedCreations.push(operation);
+    //   }
+    //   raisedAlerts.push(...fatalErrors, ...warnings);
+    // } else if (operation.operationType === OPERATION_TYPE_STACK) {
+    //   const { isAllPassing, fatalErrors, warnings } =
+    //     testStackOperationForFatalErrors(operation);
+    //   if (isAllPassing) {
+    //     successfulCreations.push(operation);
+    //   } else {
+    //     failedCreations.push(operation);
+    //   }
+    //   raisedAlerts.push(...fatalErrors, ...warnings);
+    // } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
+    //   // NO_OP operations do not require a database view
+    //   successfulCreations.push(operation);
+    // }
   }
 
-  // Exclude errors raised during creation from the operation objects
-  const combinedOperations = [...successfulCreations, ...failedCreations];
-
-  yield put(addOperationsToSlice(combinedOperations));
-  const focusedObjectId = combinedOperations[combinedOperations.length - 1].id;
+  yield put(addOperationsToSlice(createdOperations));
+  yield put(updateTablesSlice(tableUpdates));
+  yield put(updateOperationsSlice(operationUpdates));
+  const focusedObjectId = createdOperations[createdOperations.length - 1].id;
   yield put(setFocusedObjectId(focusedObjectId)); // focus the last operation created
 
-  if (successfulCreations.length > 0) {
-    yield put(
-      createOperationsSuccess({
-        successfulCreations,
-        raisedAlerts,
-      })
-    );
-  }
-  if (failedCreations.length > 0) {
-    yield put(
-      createOperationsFailure({
-        failedCreations,
-        raisedAlerts,
-      })
-    );
-  }
+  yield put(
+    createOperationsSuccess({
+      operationIds: createdOperations.map((op) => op.id),
+    })
+  );
 }

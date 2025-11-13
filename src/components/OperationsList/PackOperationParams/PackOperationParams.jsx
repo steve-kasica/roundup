@@ -123,21 +123,21 @@ const PackOperationParams = ({
         }}
       >
         <OperationKeyColumnSelect
-          id={operation.children[0]}
+          id={operation.childIds[0]}
           currentValue={operation.joinKey1}
           onChange={setLeftTableJoinKey}
         />
         <Divider orientation="vertical" flexItem />
         <OperationKeyColumnSelect
-          id={operation.children[1]}
+          id={operation.childIds[1]}
           currentValue={operation.joinKey2}
           onChange={setRightTableJoinKey}
         />
       </Box>
       <Box sx={{ mt: 2 }}>
         {/* <PackOutputDetails
-          leftTableId={operation.children[0]}
-          rightTableId={operation.children[1]}
+          leftTableId={operation.childIds[0]}
+          rightTableId={operation.childIds[1]}
           leftColumnId={operation.joinKey1}
           rightColumnId={operation.joinKey2}
           joinType={operation.joinPredicate}

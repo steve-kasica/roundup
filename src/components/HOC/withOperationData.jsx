@@ -7,7 +7,7 @@ import {
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import {
-  selectColumnIdsByTableId,
+  selectColumnIdsByParentId,
   selectSelectedColumnIdsByParentId,
 } from "../../slices/columnsSlice";
 import {
@@ -41,7 +41,7 @@ export default function withOperationData(WrappedComponent) {
 
     // Get columnIds associated with this table, both active and "removed"
     const columnIds = useSelector((state) =>
-      selectColumnIdsByTableId(state, id)
+      selectColumnIdsByParentId(state, id)
     );
 
     const activeColumnIds = operation.columnIds;
@@ -107,7 +107,7 @@ export default function withOperationData(WrappedComponent) {
 
     const swapTablePositions = useCallback(
       (aIndex, bIndex) => {
-        const updatedChildren = [...(operation.children || [])];
+        const updatedChildren = [...(operation.childIds || [])];
         // Swap the two table IDs
         [updatedChildren[aIndex], updatedChildren[bIndex]] = [
           updatedChildren[bIndex],
@@ -116,11 +116,11 @@ export default function withOperationData(WrappedComponent) {
         dispatch(
           updateOperations({
             id,
-            children: updatedChildren,
+            childIds: updatedChildren,
           })
         );
       },
-      [dispatch, id, operation.children]
+      [dispatch, id, operation.childIds]
     );
 
     // TODO

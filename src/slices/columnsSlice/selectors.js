@@ -10,7 +10,7 @@ import { selectTableColumnIds } from "../tablesSlice";
  * @param {string} parentId - The ID of the table/operation to get all columns for.
  * @returns {Array<string>} An array of all column IDs (both active and excluded) associated with the table. Returns an empty array if the table has no columns or doesn't exist.
  */
-export const selectColumnIdsByTableId = createSelector(
+export const selectColumnIdsByParentId = createSelector(
   [(state) => state.columns.byId, (_, parentId) => parentId],
   (byId, parentId) =>
     Object.values(byId)

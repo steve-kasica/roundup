@@ -4,7 +4,7 @@
  * -----------------------------------------------------------------
  * A visual representation of an operation in the **Output Schema**
  * It is a container for **Source Tables** and/or other **Operations**.
- * When an **Operation** is present in `node.children`, it recursively
+ * When an **Operation** is present in `node.childIds`, it recursively
  * calls itself. Only **SourceTables** can be leaves in the
  * **Table Tree**, by design.
  */

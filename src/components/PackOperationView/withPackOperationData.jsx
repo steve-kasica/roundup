@@ -2,7 +2,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import withOperationData from "../HOC/withOperationData";
 import { useCallback } from "react";
-import { selectColumnIdsByTableId } from "../../slices/columnsSlice";
+import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
 import {
   selectColumnsById,
   selectSelectedColumnIdsByParentId,
@@ -28,8 +28,8 @@ export default function withPackOperationData(WrappedComponent) {
   }) {
     const dispatch = useDispatch();
 
-    const leftTableId = operation?.children[0];
-    const rightTableId = operation?.children[1];
+    const leftTableId = operation?.childIds[0];
+    const rightTableId = operation?.childIds[1];
 
     const [leftKeyColumnName, rightKeyColumnName] = useSelector((state) => {
       const leftKeyColumn = selectColumnsById(state, operation?.joinKey1);
@@ -38,10 +38,10 @@ export default function withPackOperationData(WrappedComponent) {
     });
 
     const leftHandColumns = useSelector((state) =>
-      selectColumnIdsByTableId(state, operation?.children[0])
+      selectColumnIdsByParentId(state, operation?.childIds[0])
     );
     const rightHandColumns = useSelector((state) =>
-      selectColumnIdsByTableId(state, operation?.children[1])
+      selectColumnIdsByParentId(state, operation?.childIds[1])
     );
 
     const columnCount = useSelector((state) =>
@@ -54,13 +54,13 @@ export default function withPackOperationData(WrappedComponent) {
     leftHandColumns.forEach((colId, i) => {
       tableToOpColumnMap.set(colId, {
         columnId: operation.columnIds[i],
-        tableId: operation.children[0],
+        tableId: operation.childIds[0],
       });
     });
     rightHandColumns.forEach((colId, i) => {
       tableToOpColumnMap.set(colId, {
         columnId: operation.columnIds[i + (leftHandColumns?.length || 0)],
-        tableId: operation.children[1],
+        tableId: operation.childIds[1],
       });
     });
 
@@ -174,7 +174,7 @@ export default function withPackOperationData(WrappedComponent) {
         // General operation props
         id={id}
         operation={operation}
-        childIds={operation.children}
+        childIds={operation.childIds}
         name={operation.name}
         selectedOperationColumnIds={selectedOperationColumnIds} // Should this be in an operation above? (TODO)
         // Props specific to Pack operations

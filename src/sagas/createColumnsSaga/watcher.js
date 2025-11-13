@@ -74,13 +74,13 @@ export default function* createColumnsWatcher() {
     }
   });
 
-  // If an operation is successfully created, create columns for it
-  yield takeEvery(createOperationsSuccess.type, function* (action) {
-    const { successfulCreations } = action.payload;
-    yield call(handleOperations, {
-      payload: { operationIds: successfulCreations.map(({ id }) => id) },
-    });
-  });
+  // // If an operation is successfully created, create columns for it
+  // yield takeEvery(createOperationsSuccess.type, function* (action) {
+  //   const { successfulCreations } = action.payload;
+  //   yield call(handleOperations, {
+  //     payload: { operationIds: successfulCreations.map(({ id }) => id) },
+  //   });
+  // });
 
   // // If an operation is created but fails, we still want to create
   // // columns for it so the user can see the error in the UI
@@ -93,44 +93,44 @@ export default function* createColumnsWatcher() {
 
   // If an operation's child property is updated, we need
   // to create columns for it
-  yield takeEvery(updateOperationsSuccess.type, function* (action) {
-    const { changedPropertiesByOperation } = action.payload;
+  // yield takeEvery(updateOperationsSuccess.type, function* (action) {
+  //   const { changedPropertiesByOperation } = action.payload;
 
-    const operationIdsToUpdate = Object.entries(
-      changedPropertiesByOperation
-    ).reduce((acc, [id, changedProperties]) => {
-      if (changedProperties.includes("children")) {
-        acc.push(id);
-      }
-      return acc;
-    }, []);
+  //   const operationIdsToUpdate = Object.entries(
+  //     changedPropertiesByOperation
+  //   ).reduce((acc, [id, changedProperties]) => {
+  //     if (changedProperties.includes("children")) {
+  //       acc.push(id);
+  //     }
+  //     return acc;
+  //   }, []);
 
-    if (operationIdsToUpdate.length > 0) {
-      // Hand off to the shared handler for createOperationsSuccess
-      yield call(handleOperations, {
-        payload: { operationIds: operationIdsToUpdate },
-      });
-    }
-  });
+  //   if (operationIdsToUpdate.length > 0) {
+  //     // Hand off to the shared handler for createOperationsSuccess
+  //     yield call(handleOperations, {
+  //       payload: { operationIds: operationIdsToUpdate },
+  //     });
+  //   }
+  // });
 
-  yield takeEvery(materializeOperationSuccess.type, function* (action) {
-    const { operationId } = action.payload;
-    const operation = yield select((state) =>
-      selectOperationsById(state, operationId)
-    );
-    if (operation.operationType === OPERATION_TYPE_NO_OP) {
-      return; // No columns to create for NO-OP operations
-    }
-    yield put(
-      createColumnsRequest({
-        mode: CREATION_MODE_INITIALIZATION,
-        columnInfo: Array.from({ length: operation.columnCount }).map(
-          (_, index) => ({
-            parentId: operationId,
-            index,
-          })
-        ),
-      })
-    );
-  });
+  // yield takeEvery(materializeOperationSuccess.type, function* (action) {
+  //   const { operationId } = action.payload;
+  //   const operation = yield select((state) =>
+  //     selectOperationsById(state, operationId)
+  //   );
+  //   if (operation.operationType === OPERATION_TYPE_NO_OP) {
+  //     return; // No columns to create for NO-OP operations
+  //   }
+  //   yield put(
+  //     createColumnsRequest({
+  //       mode: CREATION_MODE_INITIALIZATION,
+  //       columnInfo: Array.from({ length: operation.columnCount }).map(
+  //         (_, index) => ({
+  //           parentId: operationId,
+  //           index,
+  //         })
+  //       ),
+  //     })
+  //   );
+  // });
 }

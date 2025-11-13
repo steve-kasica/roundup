@@ -266,9 +266,9 @@ const StackSchemaView = ({
   );
   const onInsertColumnIntoChildTable = useCallback(
     (i, j) => {
-      insertColumnIntoChildAtIndex(operation.children[i], j);
+      insertColumnIntoChildAtIndex(operation.childIds[i], j);
     },
-    [insertColumnIntoChildAtIndex, operation.children]
+    [insertColumnIntoChildAtIndex, operation.childIds]
   );
 
   const handleFocusColumns = useCallback(() => {
@@ -366,7 +366,7 @@ const StackSchemaView = ({
               flex: 1,
             }}
           >
-            {operation.children.map((childId, rowIndex) => (
+            {operation.childIds.map((childId, rowIndex) => (
               <Box
                 key={childId}
                 sx={{

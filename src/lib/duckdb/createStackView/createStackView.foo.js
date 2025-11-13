@@ -5,7 +5,7 @@ describe("formQuery", () => {
   it("should generate a view with a single child", () => {
     const op = {
       id: "o1",
-      children: [{ id: "t1", columnIds: ["c1", "c2"] }],
+      childIds: [{ id: "t1", columnIds: ["c1", "c2"] }],
     };
     const viewName = "my_view";
     const query = formQuery(op, viewName);
@@ -15,7 +15,7 @@ describe("formQuery", () => {
 
   it("should join multiple children with UNION ALL", () => {
     const op = {
-      children: [
+      childIds: [
         { id: "t1", columnIds: ["c1", "c2"] },
         { id: "t2", columnIds: ["c3", "c4"] },
       ],

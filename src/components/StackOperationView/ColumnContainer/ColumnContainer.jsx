@@ -2,7 +2,6 @@ import StyledPaper from "./StyledPaper";
 import { useRef, useState } from "react";
 import useDragAndDrop from "../../../hooks/useDragAndDrop";
 import { Box, List, ListItemButton, Popover } from "@mui/material";
-import PropTypes from "prop-types";
 
 function ColumnContainer({
   column,
@@ -209,29 +208,6 @@ function ColumnContainer({
     </>
   );
 }
-
-ColumnContainer.propTypes = {
-  column: PropTypes.object.isRequired,
-  name: PropTypes.string.isRequired,
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  index: PropTypes.number.isRequired,
-  tableId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  isDraggable: PropTypes.bool,
-  dragType: PropTypes.string,
-  handleOnDrop: PropTypes.func,
-  handleOnClick: PropTypes.func,
-  handleOnSwapClick: PropTypes.func,
-  handleOnRemoveClick: PropTypes.func,
-  handleOnNullClick: PropTypes.func,
-  handleOnRenameClick: PropTypes.func,
-  handleOnPopoverClose: PropTypes.func,
-  handleOnMouseEnter: PropTypes.func,
-  handleOnMouseLeave: PropTypes.func,
-  isSelected: PropTypes.bool,
-  isHovered: PropTypes.bool,
-  isNull: PropTypes.bool,
-  children: PropTypes.node,
-};
 
 ColumnContainer.defaultProps = {
   isDraggable: false,

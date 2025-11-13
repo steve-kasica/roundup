@@ -28,7 +28,7 @@ function OperationView({
   // renameOperation,
   focusOperation,
 }) {
-  const childrenIds = operation.children;
+  const childrenIds = operation.childIds;
   const label =
     operation.operationType.charAt(0).toUpperCase() +
     operation.operationType.slice(1);

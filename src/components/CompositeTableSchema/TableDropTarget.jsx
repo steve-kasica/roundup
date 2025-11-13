@@ -15,6 +15,7 @@ import {
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_STACK,
   selectOperationsById,
+  selectRootOperation,
   selectRootOperationId,
 } from "../../slices/operationsSlice";
 import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
@@ -142,10 +143,7 @@ const DropZone = styled(ForwardedBox, {
 
 export default function TableDropTarget({ operationType, children }) {
   const dispatch = useDispatch();
-  const rootOperation = useSelector((state) => {
-    const rootId = selectRootOperationId(state);
-    return selectOperationsById(state, rootId);
-  });
+  const rootOperation = useSelector(selectRootOperation);
 
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: [DRAG_TYPE_SOURCE_TABLE_ROW, DRAG_TYPE_SOURCE_TABLE_ITEM],
@@ -155,10 +153,8 @@ export default function TableDropTarget({ operationType, children }) {
         return; // Already handled by a nested drop target
       }
       const tableCount = draggedTableIds.length;
-      if (
-        operationType === OPERATION_TYPE_NO_OP &&
-        rootOperation === undefined
-      ) {
+
+      if (operationType === OPERATION_TYPE_NO_OP && rootOperation === null) {
         // Case: Initialize the first operation
         // If there is more than one table, default to a STACK operation
         dispatch(
@@ -176,13 +172,14 @@ export default function TableDropTarget({ operationType, children }) {
         // Case: first table added after schema initialized with only one table
         // Update the operation type and add the new table as a child
         // This allows the operation to evolve from a NO_OP to either PACK or STACK
+        console.log("Updating NO_OP operation to:", operationType);
         dispatch(
           updateOperationsRequest({
             operationUpdates: [
               {
                 id: rootOperation.id,
                 operationType,
-                children: [...rootOperation.children, ...draggedTableIds],
+                childIds: [...rootOperation.childIds, ...draggedTableIds],
               },
             ],
           })
@@ -194,7 +191,7 @@ export default function TableDropTarget({ operationType, children }) {
             operationUpdates: [
               {
                 id: rootOperation.id,
-                children: [...rootOperation.children, ...draggedTableIds],
+                childIds: [...rootOperation.childIds, ...draggedTableIds],
               },
             ],
           })
@@ -236,5 +233,5 @@ export default function TableDropTarget({ operationType, children }) {
 
 TableDropTarget.propTypes = {
   operationType: PropTypes.string.isRequired,
-  children: PropTypes.node,
+  childIds: PropTypes.node,
 };

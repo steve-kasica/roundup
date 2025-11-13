@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import {
-  selectColumnIdsByTableId,
+  selectColumnIdsByParentId,
   selectColumnNamesById,
   selectColumnsById,
   selectSelectedColumnIdsByParentId,
@@ -39,13 +39,17 @@ describe("Column selectors", () => {
       },
     };
   });
-  describe("selectColumnIdsByTableId", () => {
+  describe("selectColumnIdsByParentId", () => {
     it("should return column IDs for a given table ID", () => {
-      expect(selectColumnIdsByTableId(state, table1.id)).toEqual([
+      expect(selectColumnIdsByParentId(state, table1.id)).toEqual([
         column1.id,
         column2.id,
       ]);
-      expect(selectColumnIdsByTableId(state, table2.id)).toEqual([column3.id]);
+      expect(selectColumnIdsByParentId(state, table2.id)).toEqual([column3.id]);
+    });
+    it("should return an empty array for a table ID with no columns", () => {
+      const table3 = Table();
+      expect(selectColumnIdsByParentId(state, table3.id)).toEqual([]);
     });
   });
   describe("selectColumnsById", () => {

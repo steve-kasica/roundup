@@ -72,7 +72,7 @@
 //           "op-1": {
 //             id: "op-1",
 //             operationType: OPERATION_TYPE_STACK,
-//             children: ["table-1"],
+//             childIds: ["table-1"],
 //           },
 //         },
 //         ids: ["op-1"],
@@ -109,7 +109,7 @@
 //             "op-1": {
 //               id: "op-1",
 //               operationType: OPERATION_TYPE_NO_OP,
-//               children: [],
+//               childIds: [],
 //             },
 //           },
 //         },
@@ -181,7 +181,7 @@
 //             "op-1": {
 //               id: "op-1",
 //               operationType: OPERATION_TYPE_PACK,
-//               children: ["table-1", "table-2"],
+//               childIds: ["table-1", "table-2"],
 //             },
 //           },
 //         },
@@ -317,7 +317,7 @@
 //             "op-1": {
 //               id: "op-1",
 //               operationType: OPERATION_TYPE_STACK,
-//               children: ["table-1"],
+//               childIds: ["table-1"],
 //               error: "Previous error message",
 //             },
 //           },
@@ -363,7 +363,7 @@
 //             "op-1": {
 //               id: "op-1",
 //               operationType: OPERATION_TYPE_STACK,
-//               children: [],
+//               childIds: [],
 //             },
 //           },
 //         },
@@ -411,7 +411,7 @@
 //             "op-1": {
 //               id: "op-1",
 //               operationType: OPERATION_TYPE_STACK,
-//               children: ["table-1", "table-2"],
+//               childIds: ["table-1", "table-2"],
 //             },
 //           },
 //         },
@@ -428,7 +428,7 @@
 //       expect(result).toEqual({
 //         id: "op-1",
 //         operationType: OPERATION_TYPE_STACK,
-//         children: [
+//         childIds: [
 //           { id: "table-1", columnIds: ["col-1", "col-2"] },
 //           { id: "table-2", columnIds: ["col-3", "col-4"] },
 //         ],
@@ -442,7 +442,7 @@
 //             "op-1": {
 //               id: "op-1",
 //               operationType: OPERATION_TYPE_STACK,
-//               children: ["table-1"],
+//               childIds: ["table-1"],
 //             },
 //           },
 //         },
@@ -456,7 +456,7 @@
 //       expect(result).toEqual({
 //         id: "op-1",
 //         operationType: OPERATION_TYPE_STACK,
-//         children: [{ id: "table-1", columnIds: undefined }],
+//         childIds: [{ id: "table-1", columnIds: undefined }],
 //       });
 //     });
 //   });
@@ -479,7 +479,7 @@
 //                 "op-1": {
 //                   id: "op-1",
 //                   operationType: OPERATION_TYPE_STACK,
-//                   children: ["table-1"],
+//                   childIds: ["table-1"],
 //                 },
 //               },
 //               ids: ["op-1"],
@@ -533,7 +533,7 @@
 //                 "op-1": {
 //                   id: "op-1",
 //                   operationType: OPERATION_TYPE_PACK,
-//                   children: ["table-1", "table-2"],
+//                   childIds: ["table-1", "table-2"],
 //                 },
 //               },
 //               ids: ["op-1"],

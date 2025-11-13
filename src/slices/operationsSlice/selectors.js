@@ -157,7 +157,7 @@ export const selectOperationQueryData = (state, operationData) => {
   };
 
   // Parent properties that are used by both Stack and Pack operations
-  parent.children = parent.children.map((id) => {
+  parent.childIds = parent.childIds.map((id) => {
     let child = {
       id,
       // databaseNames: selectActiveColumnDBNamesByTableId(state, id),
@@ -202,7 +202,7 @@ export const selectOperationQueryData = (state, operationData) => {
 export const selectStackOperationRowCount = createSelector(
   [
     (state, operationId, children) =>
-      children || selectOperationsById(state, operationId)?.children,
+      children || selectOperationsById(state, operationId)?.childIds,
     (state) => state.tables.data,
     (state) => state.operations.byId,
   ],
@@ -308,7 +308,7 @@ export const selectStackOperationColumnCount = createSelector(
  */
 export const selectStackOperationRowRanges = createSelector(
   [
-    (state, operationId) => selectOperationsById(state, operationId)?.children,
+    (state, operationId) => selectOperationsById(state, operationId)?.childIds,
     (state) => state.tables.data,
     (state) => state.operations.byId,
   ],

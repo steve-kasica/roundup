@@ -1,6 +1,5 @@
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/material";
-import PropTypes from "prop-types";
 import { forwardRef } from "react";
 
 // Styled drop zone component with visual feedback for drag states
@@ -128,25 +127,5 @@ const DropZone = forwardRef(
 );
 
 DropZone.displayName = "DropZone";
-
-DropZone.propTypes = {
-  children: PropTypes.node,
-  isOver: PropTypes.bool,
-  canDrop: PropTypes.bool,
-  variant: PropTypes.oneOf([
-    "default",
-    "primary",
-    "secondary",
-    "success",
-    "warning",
-    "error",
-  ]),
-  size: PropTypes.oneOf(["small", "medium", "large", "auto"]),
-  className: PropTypes.string,
-  ref: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.any }),
-  ]),
-};
 
 export default DropZone;

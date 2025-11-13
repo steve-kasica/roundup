@@ -36,7 +36,7 @@ export default function* updateColumnsSaga() {
   //   for (const [id, updatedFields] of Object.entries(updates)) {
   //     const column = yield select((state) => selectColumnsById(state, id));
   //     const isExcluded = yield select((state) => {
-  //       return selectColumnIdsByTableId(state, column.tableId).includes(id);
+  //       return selectColumnIdsByParentId(state, column.tableId).includes(id);
   //     });
   //     if (isExcluded) {
   //       excludedTableIds.add(column.tableId);

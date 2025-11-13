@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, Tabs, Tab, Chip } from "@mui/material";
-import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import TableSelector from "../../components/TableSelector";
 import OperationsList from "../../components/OperationsList";
@@ -36,12 +35,6 @@ function CustomTabPanel(props) {
     </div>
   );
 }
-
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
 
 const LeftSideBar = () => {
   const [value, setValue] = React.useState(0);

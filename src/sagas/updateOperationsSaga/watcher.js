@@ -17,6 +17,7 @@ import {
   materializeOperationFailure,
 } from "../materializeOperationSaga/actions";
 import { selectTableColumnIds } from "../../slices/tablesSlice";
+import { createOperationsSuccess } from "../createOperationsSaga/actions";
 
 const handleChildTableColumnExclusion = function* (columnIds) {
   const tableIds = yield select((state) => {
@@ -87,14 +88,14 @@ const handleEmptyTable = function* (columnIds) {
         } else {
           updates.set(
             operation.id,
-            operation.children.filter((tid) => tid !== tableId)
+            operation.childIds.filter((tid) => tid !== tableId)
           );
         }
       });
 
       return Array.from(updates.entries()).map(([operationId, tableIds]) => ({
         id: operationId,
-        children: tableIds,
+        childIds: tableIds,
       }));
     });
 
@@ -112,35 +113,35 @@ export default function* updateOperationsWatcher() {
   // then re-create the DB view associated with that operation.
   // We don't need to actually modify the operation in Redux, just re-run the view creation,
   // which will update the related operation columns.
-  yield takeLatest(createColumnsSuccess.type, function* (action) {
-    const { mode, columnIds } = action.payload;
-    if (mode === CREATION_MODE_INSERTION) {
-      // Group inserted columns by their parent table ID
-      const columnsByTableId = group(
-        yield select((state) =>
-          columnIds.map((id) => selectColumnsById(state, id))
-        ),
-        (col) => col.tableId
-      );
+  // yield takeLatest(createColumnsSuccess.type, function* (action) {
+  //   const { mode, columnIds } = action.payload;
+  //   if (mode === CREATION_MODE_INSERTION) {
+  //     // Group inserted columns by their parent table ID
+  //     const columnsByTableId = group(
+  //       yield select((state) =>
+  //         columnIds.map((id) => selectColumnsById(state, id))
+  //       ),
+  //       (col) => col.tableId
+  //     );
 
-      // For each table, check if it's a child of an operation
-      for (const [tableId, columns] of columnsByTableId) {
-        const operation = yield select((state) =>
-          selectOperationIdByChildId(state, tableId)
-        );
-        if (operation) {
-          // Re-create the operation's view
-          yield put(
-            updateOperationsRequest({
-              operationUpdates: [
-                { children: operation.children, id: operation.id },
-              ], // No actual change, just trigger the worker, kind of a hack but works
-            })
-          );
-        }
-      }
-    }
-  });
+  //     // For each table, check if it's a child of an operation
+  //     for (const [tableId, columns] of columnsByTableId) {
+  //       const operation = yield select((state) =>
+  //         selectOperationIdByChildId(state, tableId)
+  //       );
+  //       if (operation) {
+  //         // Re-create the operation's view
+  //         yield put(
+  //           updateOperationsRequest({
+  //             operationUpdates: [
+  //               { childIds: operation.childIds, id: operation.id },
+  //             ], // No actual change, just trigger the worker, kind of a hack but works
+  //           })
+  //         );
+  //       }
+  //     }
+  //   }
+  // });
 
   // yield takeLatest(setTablesColumnIds.type, function* (action) {
   //   // Extract column IDs from the action payload
@@ -161,31 +162,45 @@ export default function* updateOperationsWatcher() {
   //   yield handleChildTableColumnExclusion(columnIds);
   // });
 
-  yield takeLatest(materializeOperationSuccess.type, function* (action) {
-    const { operationId, dimensions } = action.payload;
+  // yield takeLatest(materializeOperationSuccess.type, function* (action) {
+  //   const { operationId, dimensions } = action.payload;
+  //   yield put(
+  //     updateOperationsRequest({
+  //       operationUpdates: [
+  //         {
+  //           id: operationId,
+  //           rowCount: dimensions.rowCount,
+  //           columnCount: dimensions.columnCount,
+  //           doesViewExist: true,
+  //         },
+  //       ],
+  //     })
+  //   );
+  // });
+  // yield takeLatest(materializeOperationFailure.type, function* (action) {
+  //   const { operationId } = action.payload;
+  //   yield put(
+  //     updateOperationsRequest({
+  //       operationUpdates: [
+  //         {
+  //           id: operationId,
+  //           doesViewExist: true,
+  //         },
+  //       ],
+  //     })
+  //   );
+  // });
+
+  // When an operation is newly created, we need to set its columnCount
+  yield takeEvery(createOperationsSuccess.type, function* (action) {
+    const { operationIds } = action.payload;
+    const operationUpdates = operationIds.map((id) => ({
+      id,
+      columnCount: null, // will be set
+    }));
     yield put(
       updateOperationsRequest({
-        operationUpdates: [
-          {
-            id: operationId,
-            rowCount: dimensions.rowCount,
-            columnCount: dimensions.columnCount,
-            doesViewExist: true,
-          },
-        ],
-      })
-    );
-  });
-  yield takeLatest(materializeOperationFailure.type, function* (action) {
-    const { operationId } = action.payload;
-    yield put(
-      updateOperationsRequest({
-        operationUpdates: [
-          {
-            id: operationId,
-            doesViewExist: true,
-          },
-        ],
+        operationUpdates,
       })
     );
   });

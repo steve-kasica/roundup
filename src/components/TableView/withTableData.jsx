@@ -7,7 +7,7 @@ import {
   selectOperationIdByChildId,
 } from "../../slices/operationsSlice";
 import {
-  selectColumnIdsByTableId,
+  selectColumnIdsByParentId,
   selectSelectedColumnIdsByParentId,
 } from "../../slices/columnsSlice";
 import {
@@ -51,7 +51,7 @@ export default function withTableData(WrappedComponent) {
 
     // Get IDs of all columns associated with this specific table
     const columnIds = useSelector(
-      (state) => selectColumnIdsByTableId(state, id),
+      (state) => selectColumnIdsByParentId(state, id),
       shallowEqual
     );
 

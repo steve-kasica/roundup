@@ -1,7 +1,6 @@
 import { styled } from "@mui/material/styles";
 import { DragIndicator } from "@mui/icons-material";
 import { useState, forwardRef } from "react";
-import PropTypes from "prop-types";
 
 // Styled table row component that handles all drag and drop states
 const StyledTableRow = styled("tr", {
@@ -197,23 +196,5 @@ const StyledDraggableRow = forwardRef(
 );
 
 StyledDraggableRow.displayName = "StyledDraggableRow";
-
-StyledDraggableRow.propTypes = {
-  children: PropTypes.node.isRequired,
-  isDragging: PropTypes.bool,
-  isOver: PropTypes.bool,
-  canDropHere: PropTypes.bool,
-  isDisabled: PropTypes.bool,
-  isSelected: PropTypes.bool,
-  isHovered: PropTypes.bool,
-  showDragHandle: PropTypes.bool,
-  dragHandleRef: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.any }),
-  ]),
-  onDragHandleMouseEnter: PropTypes.func,
-  onDragHandleMouseLeave: PropTypes.func,
-  className: PropTypes.string,
-};
 
 export default StyledDraggableRow;

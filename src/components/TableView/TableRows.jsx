@@ -58,14 +58,14 @@ import {
 } from "../ui/Table";
 import { EnhancedColumnHeader } from "../ColumnViews";
 
-const placeHolderColumnLength = 10; // Number of placeholder columns when none are selected
+const placeHolderColumnLength = 11; // Number of placeholder columns when none are selected
+const placeHolderRowLength = 20; // Number of placeholder rows when none are selected
 
 const TableRows = ({
   // Props passed via withTableData HOC
   id,
   databaseName,
   selectedColumnIds, // IDs of selected columns in Redux
-  hoveredIndex,
   // Props passed directly from parent component
   onScrollContainerRef = null,
   onScroll = null,
@@ -88,6 +88,11 @@ const TableRows = ({
     direction: null, // 'asc', 'desc', or null
   });
 
+  /**
+   * Tracks which column header is currently being hovered
+   * @type {number|null} hoveredColumnIndex - Index of the hovered column (null for no hover)
+   */
+  const [hoveredColumnIndex, setHoveredColumnIndex] = useState(null);
   // Hook for managing paginated data with sorting
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
@@ -190,7 +195,13 @@ const TableRows = ({
             <TableHead>
               <TableRow>
                 {/* Sticky Row Number Header */}
-                <StickyTableCell sx={{ zIndex: 3, backgroundColor: "#f5f5f5" }}>
+                <StickyTableCell
+                  sx={{
+                    zIndex: 3,
+                    backgroundColor: "#f5f5f5",
+                    userSelect: "none",
+                  }}
+                >
                   #
                 </StickyTableCell>
 
@@ -198,13 +209,20 @@ const TableRows = ({
                 {selectedColumnIds.length === 0
                   ? Array.from({ length: placeHolderColumnLength }).map(
                       (_, i) => (
-                        <TableCell key={i} align="center" sx={{ p: "1px" }}>
+                        <TableCell
+                          key={i}
+                          align="center"
+                          sx={{ p: "1px" }}
+                          onMouseEnter={() => setHoveredColumnIndex(i)}
+                          onMouseLeave={() => setHoveredColumnIndex(null)}
+                        >
                           <Typography
                             color="text.secondary"
                             sx={{
                               fontStyle: "italic",
                               fontWeight: 600,
                               opacity: 0.6,
+                              userSelect: "none",
                             }}
                           >
                             Column {i + 1}
@@ -217,6 +235,8 @@ const TableRows = ({
                         key={`${i}-${colId}`}
                         align="center"
                         sx={{ p: "1px" }}
+                        onMouseEnter={() => setHoveredColumnIndex(i)}
+                        onMouseLeave={() => setHoveredColumnIndex(null)}
                       >
                         <EnhancedColumnHeader
                           id={colId}
@@ -232,27 +252,38 @@ const TableRows = ({
 
           {/* Table Body - Data rows with loading, error, and pagination states */}
           <TableBody>
-            {/* Error State - Full-width error message with retry option */}
+            {/* No columns selected*/}
             {selectedColumnIds.length === 0 ? (
               <>
-                {Array.from({ length: placeHolderColumnLength }).map(
+                {Array.from({ length: placeHolderRowLength }).map(
                   (_, rowIndex) => (
                     <StyledAlternatingTableRow
                       key={`no-columns-${rowIndex}`}
                       isEven={rowIndex % 2 === 0}
                     >
-                      <StickyTableCell>{rowIndex + 1}</StickyTableCell>
+                      <StickyTableCell
+                        sx={{
+                          userSelect: "none",
+                        }}
+                      >
+                        {rowIndex + 1}
+                      </StickyTableCell>
                       {Array.from({ length: placeHolderColumnLength }).map(
                         (colId, i) => (
                           <StyledTableCell
                             key={i}
                             align="center"
+                            isHovered={hoveredColumnIndex === i}
                             isEven={rowIndex % 2 === 0}
                             maxWidth={columnWidths[colId] || "200px"}
                           >
                             <Typography
                               color="text.secondary"
-                              sx={{ fontStyle: "italic", opacity: 0.6 }}
+                              sx={{
+                                fontStyle: "italic",
+                                opacity: 0.3,
+                                userSelect: "none",
+                              }}
                             >
                               No Data
                             </Typography>
@@ -275,6 +306,7 @@ const TableRows = ({
                     <StyledTableCell
                       key={colId}
                       align="center"
+                      isHovered={hoveredColumnIndex === i}
                       isEven={rowIndex % 2 === 0}
                       maxWidth={columnWidths[colId] || "200px"}
                     >
@@ -298,7 +330,7 @@ const TableRows = ({
                     {row.map((value, i) => (
                       <StyledTableCell
                         key={i}
-                        isHovered={hoveredIndex === i}
+                        isHovered={hoveredColumnIndex === i}
                         isEven={rowIndex % 2 === 0}
                         maxWidth={columnWidths[selectedColumnIds[i]] || "200px"}
                       >

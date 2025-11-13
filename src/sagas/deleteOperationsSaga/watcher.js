@@ -22,7 +22,7 @@ export default function* deleteOperationsWatcher() {
   //   // TODO
   //   // if (operations.length > 0) {
   //   //   const operationIdsToDelete = operations
-  //   //     .flatMap((op) => op.children)
+  //   //     .flatMap((op) => op.childIds)
   //   //     .filter(isOperationId);
   //   //   yield put(
   //   //     deleteOperationsRequest({ operationIds: operationIdsToDelete })
@@ -40,7 +40,7 @@ export default function* deleteOperationsWatcher() {
         const operation = yield select((state) =>
           selectOperationsById(state, id)
         );
-        if (operation.children.length === 0) {
+        if (operation.childIds.length === 0) {
           operationIdsToDelete.push(id);
         }
       }
