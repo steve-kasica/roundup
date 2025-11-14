@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import {
+  selectActiveColumnIdsByParentId,
   selectColumnIdsByParentId,
   selectColumnNamesById,
   selectColumnsById,
@@ -123,6 +124,24 @@ describe("Column selectors", () => {
           operation1.id
         )
       ).toEqual([column4.id]);
+    });
+  });
+  describe("selectActiveColumnIdsByParentId", () => {
+    it("should return active column IDs for a given table ID", () => {
+      expect(
+        selectActiveColumnIdsByParentId(state, [table1.id, table2.id])
+      ).toEqual([[column1.id, column2.id], [column3.id]]);
+    });
+    it("should return activeColumn IDs given multiple tableIDs", () => {
+      expect(
+        selectActiveColumnIdsByParentId(state, [table1.id, table2.id])
+      ).toEqual([[column1.id, column2.id], [column3.id]]);
+    });
+    it("should return active column IDSfor a given operation ID", () => {
+      expect(selectActiveColumnIdsByParentId(state, operation1.id)).toEqual([
+        column4.id,
+        column5.id,
+      ]);
     });
   });
 });

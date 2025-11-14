@@ -6,6 +6,7 @@ import {
   selectTablesById,
 } from "../tablesSlice";
 import { selectOperationsById } from "../operationsSlice";
+import { normalizeInputToArray } from "../utilities";
 
 /**
  * Select ALL column IDs for a specific table, including excluded columns.
@@ -87,5 +88,19 @@ export const selectSelectedColumnIdsByParentId = createSelector(
   (activeColumnIds, selectedColumnIds) => {
     const selectedSet = new Set(selectedColumnIds);
     return activeColumnIds.filter((colId) => selectedSet.has(colId));
+  }
+);
+
+export const selectActiveColumnIdsByParentId = createSelector(
+  [
+    (state) => state.tables.byId,
+    (state) => state.operations.byId,
+    (state, parentId) => normalizeInputToArray(parentId),
+  ],
+  (tablesById, operationsById, parentIds) => {
+    const columnIds = parentIds.map(
+      (id) => (isTableId(id) ? tablesById : operationsById)[id].columnIds
+    );
+    return columnIds.length === 1 ? columnIds[0] : columnIds;
   }
 );
