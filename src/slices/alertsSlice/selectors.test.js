@@ -35,9 +35,14 @@ describe("Alerts selectors", () => {
   });
 
   describe("selectAlertIdsBySourceId", () => {
-    it("returns alert IDs for a given source ID", () => {
+    it("returns alert IDs for single source ID", () => {
       const result1 = selectAlertIdsBySourceId(state, operation1.id);
       expect(result1).toEqual([alert1.id]);
+    });
+
+    it("returns multiple alert IDs for source ID", () => {
+      const result2 = selectAlertIdsBySourceId(state, operation2.id);
+      expect(result2).toEqual([alert2.id, alert3.id]);
     });
 
     it("returns an empty array if no alerts exist for the source ID", () => {

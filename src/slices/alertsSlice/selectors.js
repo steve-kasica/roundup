@@ -11,10 +11,10 @@ import { createSelector } from "@reduxjs/toolkit";
 export const selectAlertIdsBySourceId = createSelector(
   [(state) => state.alerts.byId, (state, sourceId) => sourceId],
   (byId, sourceId) => {
-    const alert = Object.values(byId).find(
+    const alert = Object.values(byId).filter(
       (alert) => alert.sourceId === sourceId
     );
-    return alert ? [alert.id] : [];
+    return alert.map((a) => a.id);
   }
 );
 
