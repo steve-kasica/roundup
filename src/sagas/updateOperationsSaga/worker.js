@@ -1,82 +1,61 @@
-import { put } from "redux-saga/effects";
-import { updateOperations as updateOperationsSlice } from "../../slices/operationsSlice";
+import { put, select } from "redux-saga/effects";
+import {
+  selectOperationsById,
+  updateOperations as updateOperationsSlice,
+} from "../../slices/operationsSlice";
 import { setFocusedObjectId } from "../../slices/uiSlice";
 import { updateOperationsSuccess } from "./actions";
+import { updateTables as updateTablesSlice } from "../../slices/tablesSlice";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
   const failedUpdates = [];
   const raisedAlerts = [];
+  const tableUpdates = [];
+  const furtherOperationUpdates = [];
   const { operationUpdates } = action.payload;
 
   for (let operationUpdate of operationUpdates) {
     successfulUpdates.push(operationUpdate);
-    //   const { id } = operationUpdate;
-    // const operation = yield select((state) => selectOperationsById(state, id));
-    // const keys = Object.keys(operationUpdate);
-    // // If we're changing the operationType or childIds, then we need to re-create the view
-    // if (
-    //   keys.includes("operationType") ||
-    //   keys.includes("childIds") ||
-    //   keys.includes("joinType") ||
-    //   keys.includes("joinKey1") ||
-    //   keys.includes("joinKey2") ||
-    //   keys.includes("joinPredicate")
-    // ) {
-    //   if (
-    //     operationUpdate.operationType === OPERATION_TYPE_STACK ||
-    //     (operationUpdate.operationType === undefined &&
-    //       operation.operationType === OPERATION_TYPE_STACK)
-    //   ) {
-    //     const children = operationUpdate.childIds || operation.childIds;
-    //     const childColumnCounts = yield select((state) => {
-    //       return children.map((childId) => {
-    //         return selectTableColumnIds(state, childId).length;
-    //       });
-    //     });
-    //     const { isAllPassing, fatalErrors, warnings } =
-    //       testStackOperationForFatalErrors(
-    //         {
-    //           ...operation,
-    //           ...operationUpdate,
-    //         },
-    //         childColumnCounts
-    //       );
-    //     if (isAllPassing) {
-    //       successfulUpdates.push(operationUpdate);
-    //     } else {
-    //       console.warn("Fatal alerts raised creating stack view");
-    //       failedUpdates.push(operationUpdate);
-    //     }
-    //     raisedAlerts.push(...fatalErrors, ...warnings);
-    //   } else if (
-    //     operationUpdate.operationType === OPERATION_TYPE_PACK ||
-    //     (operationUpdate.operationType === undefined &&
-    //       operation.operationType === OPERATION_TYPE_PACK)
-    //   ) {
-    //     const { isAllPassing, fatalErrors, warnings } =
-    //       testPackOperationForFatalErrors({
-    //         ...operation,
-    //         ...operationUpdate,
-    //       });
-    //     if (isAllPassing) {
-    //       successfulUpdates.push(operationUpdate);
-    //     } else {
-    //       console.warn("Error updateOperationsSaga/worker.js:", fatalErrors);
-    //       failedUpdates.push(operationUpdate);
-    //     }
-    //     raisedAlerts.push(...fatalErrors, ...warnings);
-    //   } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
-    //     // No-op operations don't have views to create
-    //     successfulUpdates.push(operationUpdate);
-    //   }
-    // } else {
-    //   // Just a regular update, no need to re-create the view
-    //   successfulUpdates.push(operationUpdate);
-    // }
+
+    // If the operation is updating the `childIds` property,
+    // we need to ensure that the corresponding children specify this
+    // operation as their `parentId`.
+    if (Object.hasOwnProperty.call(operationUpdate, "childIds")) {
+      for (let childId of operationUpdate.childIds) {
+        let childObject;
+        if (isTableId(childId)) {
+          childObject = yield select((state) =>
+            selectTablesById(state, childId)
+          );
+          if (childObject.parentId !== operationUpdate.id) {
+            tableUpdates.push({
+              id: childId,
+              parentId: operationUpdate.id,
+            });
+          }
+        } else {
+          childObject = yield select((state) =>
+            selectOperationsById(state, childId)
+          );
+          if (childObject.parentId !== operationUpdate.id) {
+            furtherOperationUpdates.push({
+              id: childId,
+              parentId: operationUpdate.id,
+            });
+          }
+        }
+      }
+    }
   }
 
-  yield put(updateOperationsSlice(successfulUpdates));
+  if (tableUpdates.length > 0) {
+    yield put(updateTablesSlice(tableUpdates));
+  }
+  yield put(
+    updateOperationsSlice([...successfulUpdates, ...furtherOperationUpdates])
+  );
   yield put(
     setFocusedObjectId(successfulUpdates[successfulUpdates.length - 1].id)
   );

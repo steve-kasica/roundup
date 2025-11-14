@@ -80,7 +80,12 @@ export default function* updateTablesWorker(action) {
   if (successfulUpdates.length > 0) {
     yield put(
       updateTablesSuccess({
-        tableIds: successfulUpdates.map(({ id }) => id),
+        changedPropertiesByTableId: Object.fromEntries(
+          successfulUpdates.map(({ id, ...changedProperties }) => [
+            id,
+            Object.keys(changedProperties),
+          ])
+        ),
       })
     );
   }

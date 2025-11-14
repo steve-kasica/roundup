@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { selectStackOperationRowRanges } from "../../slices/operationsSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import withOperationData from "../HOC/withOperationData";
@@ -9,6 +9,7 @@ import {
   selectStackOperationColumnCount,
 } from "../../slices/operationsSlice";
 import { selectTableColumnIds } from "../../slices/tablesSlice";
+import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 
 /**
  * This HOC produces a matrix of column IDs for each table ID provided
@@ -121,6 +122,39 @@ export default function withStackOperationData(WrappedComponent) {
         .map((index) => operation.childIds[index]);
     }, [columnIdMatrix, operation.childIds, selectedColumnIds]);
 
+    const swapColumns = useCallback(
+      (target, source) => {
+        const tableColumnIds = [
+          ...activeChildColumnIds[childIds.indexOf(target.parentId)],
+        ];
+        const sourceIndex = tableColumnIds.indexOf(source.id);
+        const targetIndex = tableColumnIds.indexOf(target.id);
+
+        const columnIds = tableColumnIds.map((colId, index) => {
+          if (index === targetIndex) return source.id;
+          if (index === sourceIndex) return target.id;
+          return colId;
+        });
+        console.log("Dispatching column swap:", {
+          target,
+          source,
+          columnIds,
+        });
+
+        dispatch(
+          updateTablesRequest({
+            tableUpdates: [
+              {
+                id: target.parentId,
+                columnIds,
+              },
+            ],
+          })
+        );
+      },
+      [dispatch, childIds, activeChildColumnIds]
+    );
+
     return (
       <WrappedComponent
         // Pass along props directly from the parent component
@@ -148,21 +182,7 @@ export default function withStackOperationData(WrappedComponent) {
         selectedTableIds={selectedTableIds}
         selection={selection}
         // Callback props to dispatch actions
-        swapColumns={(target, source) => {
-          const tableColumnIds =
-            columnIdMatrix[operation.childIds.indexOf(target.tableId)];
-          const sourceIndex = tableColumnIds.indexOf(source.id);
-          const targetIndex = tableColumnIds.indexOf(target.id);
-
-          dispatch(
-            updateColumnsRequest({
-              columnUpdates: [
-                { id: source.id, index: targetIndex },
-                { id: target.id, index: sourceIndex },
-              ],
-            })
-          );
-        }}
+        swapColumns={swapColumns}
       />
     );
   }

@@ -11,6 +11,8 @@ import {
   testPackOperationForFatalErrors,
 } from "../../slices/alertsSlice";
 import { selectActiveColumnIdsByParentId } from "../../slices/columnsSlice";
+import { updateTablesSuccess } from "../updateTablesSaga";
+import { selectTablesById } from "../../slices/tablesSlice";
 
 export default function* updateAlertsSagaWatcher() {
   yield takeEvery(checkOperationForAlertsRequest.type, function* (action) {
@@ -69,15 +71,30 @@ export default function* updateAlertsSagaWatcher() {
     );
   });
 
-  // yield takeEvery(updateOperationsFailure.type, handleRaisedAlerts);
-  // yield takeEvery(createOperationsSuccess.type, handleRaisedAlerts);
-  // yield takeEvery(createOperationsFailure.type, handleRaisedAlerts);
-}
-
-function* handleRaisedAlerts(action) {
-  const { raisedAlerts } = action.payload;
-  if (raisedAlerts.length > 0) {
-    // If any alerts were raised during creation, pass them along.
-    yield call(alertsSagaWorker, raisedAlerts);
-  }
+  // When tables are updated, we need to check if any operations that depend on those tables need to be re-checked for alerts.
+  // For example, if the columnIds of a table change, a stack operation using that table may now have mismatched columns.
+  yield takeEvery(updateTablesSuccess.type, function* (action) {
+    const propertiesToCheck = ["columnIds"];
+    const { changedPropertiesByTableId } = action.payload;
+    const operationIdsToCheck = new Set();
+    for (let [tableId, changedProperties] of Object.entries(
+      changedPropertiesByTableId
+    )) {
+      const { parentId } = yield select((state) =>
+        selectTablesById(state, tableId)
+      );
+      if (
+        parentId &&
+        !operationIdsToCheck.has(parentId) &&
+        changedProperties.some((prop) => propertiesToCheck.includes(prop))
+      ) {
+        operationIdsToCheck.add(parentId);
+      }
+    }
+    yield put(
+      checkOperationForAlertsRequest({
+        operationIds: Array.from(operationIdsToCheck),
+      })
+    );
+  });
 }
