@@ -1,9 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useSelector, useDispatch } from "react-redux";
 import withOperationData from "../HOC/withOperationData";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
 import {
+  selectActiveColumnIdsByParentId,
   selectColumnsById,
   selectSelectedColumnIdsByParentId,
 } from "../../slices/columnsSlice/selectors";
@@ -13,10 +14,7 @@ import {
   setSelectedMatches,
   selectSelectedMatches,
 } from "../../slices/uiSlice";
-import {
-  selectPackOperationColumnCount,
-  selectPackOperationMatchStats,
-} from "../../slices/operationsSlice";
+import { selectPackOperationMatchStats } from "../../slices/operationsSlice";
 export default function withPackOperationData(WrappedComponent) {
   function EnhancedPackComponent({
     // Props passed from withOperationData
@@ -37,18 +35,17 @@ export default function withPackOperationData(WrappedComponent) {
       return [leftKeyColumn?.databaseName, rightKeyColumn?.databaseName];
     });
 
-    const leftHandColumns = useSelector((state) =>
-      selectColumnIdsByParentId(state, operation?.childIds[0])
-    );
-    const rightHandColumns = useSelector((state) =>
-      selectColumnIdsByParentId(state, operation?.childIds[1])
+    const childColumnIds = useSelector((state) =>
+      selectActiveColumnIdsByParentId(state, operation.childIds)
     );
 
-    const columnCount = useSelector((state) =>
-      selectPackOperationColumnCount(state, id)
-    );
+    const leftHandColumns = childColumnIds[0];
+    const rightHandColumns = childColumnIds[1];
 
-    const rowCount = operation.rowCount;
+    const columnCount = useMemo(
+      () => childColumnIds.reduce((a, b) => a + b.length, 0),
+      [childColumnIds]
+    );
 
     const tableToOpColumnMap = new Map();
     leftHandColumns.forEach((colId, i) => {
@@ -182,7 +179,7 @@ export default function withPackOperationData(WrappedComponent) {
         joinPredicate={operation.joinPredicate}
         selectedMatchTypes={selectedMatchTypes}
         columnCount={columnCount}
-        rowCount={rowCount}
+        rowCount={operation.rowCount} // TODO: is this in withOperationData?
         matchStats={matchStats}
         // Left table props
         leftTableId={leftTableId}
