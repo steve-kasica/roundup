@@ -42,9 +42,10 @@ function PackOperationBlock({
   hasAlerts,
   // Props passed via parent
   parentColumnCount,
+  sx = {},
 }) {
   return (
-    <StyledBox className="pack-operation-block" hasError={hasAlerts}>
+    <StyledBox className="pack-operation-block" hasError={hasAlerts} sx={sx}>
       {childIds.map((childId, index, array) => {
         const childSx = {
           width:
