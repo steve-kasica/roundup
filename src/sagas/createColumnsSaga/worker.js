@@ -1,13 +1,14 @@
-import { call, put } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import {
   addColumns as addColumnsToSlice,
   Column,
 } from "../../slices/columnsSlice";
-import { createColumnsSuccess, createColumnsFailure } from "./actions";
-import { insertColumn } from "../../lib/duckdb";
+import { createColumnsSuccess } from "./actions";
 import { getTableColumnNames } from "../../lib/duckdb/getTableColumnNames";
-import { CREATION_MODE_INSERTION, CREATION_MODE_INITIALIZATION } from ".";
-import { updateTables } from "../../slices/tablesSlice";
+import { selectTablesById, updateTables } from "../../slices/tablesSlice";
+import { CREATION_MODE_INSERTION } from ".";
+import generateUUID from "../../lib/utilities/generateUUID";
+import { insertColumn } from "../../lib/duckdb";
 
 /**
  * The create columns saga assumes that an underlying database table exists
@@ -18,41 +19,56 @@ import { updateTables } from "../../slices/tablesSlice";
  */
 
 export default function* createColumnsWorker(action) {
-  const { columnLocations } = action.payload;
+  const { columnLocations, mode } = action.payload;
   const successfulCreations = [];
   const tableIdToColumnNames = new Map();
   const tableUpdates = {};
 
-  for (const { parentId, parentDatabaseName, index } of columnLocations) {
-    // Create new column object
-    if (!tableIdToColumnNames.has(parentId)) {
-      // Fetch column names for this TABLE or VIEW from the DB only once
-      const columnDBNames = yield call(getTableColumnNames, parentDatabaseName);
-      tableIdToColumnNames.set(parentId, columnDBNames);
+  if (mode === CREATION_MODE_INSERTION) {
+    for (const { parentId, index } of columnLocations) {
+      const parentTable = yield select((state) =>
+        selectTablesById(state, parentId)
+      );
+      const column = Column({
+        parentId,
+        name: "New column",
+        databaseName: generateUUID("col_"),
+      });
+      // For insertion mode, we need to handle things slightly differenly
+      yield call(
+        insertColumn,
+        parentTable.databaseName,
+        column.databaseName,
+        index
+      );
+      successfulCreations.push(column);
+
+      if (Object.hasOwnProperty.call(tableUpdates, parentId) === false) {
+        tableUpdates[parentId] = [...parentTable.columnIds];
+      }
+      tableUpdates[parentId].splice(index, 0, column.id);
     }
-    const newColumn = Column({
-      parentId,
-      databaseName: tableIdToColumnNames.get(parentId)[index],
-    });
-    tableUpdates[parentId] = tableUpdates[parentId] || [];
-    tableUpdates[parentId].push(newColumn.id);
-
-    // if (mode === CREATION_MODE_INSERTION) {
-    // try {
-    //   yield call(insertColumn, parentId, newColumn.databaseName, index);
-    //   successfulCreations.push(newColumn);
-    // } catch (error) {
-    //   console.error("Error inserting column:", error);
-    //   newColumn.error = JSON.stringify(error);
-    //   failedCreations.push(newColumn);
-    // }
-    // } else if (mode === CREATION_MODE_INITIALIZATION) {
-    // If mode is initialization, then database columns already exist
-    // We just need to match the column names in the DB to the column objects
-
-    successfulCreations.push(newColumn);
-    // }
+  } else {
+    // For initialization mode, we assume the database column already exists
+    for (const { parentId, parentDatabaseName, index } of columnLocations) {
+      if (!tableIdToColumnNames.has(parentId)) {
+        // Fetch column names for this TABLE or VIEW from the DB only once
+        const columnDBNames = yield call(
+          getTableColumnNames,
+          parentDatabaseName
+        );
+        tableIdToColumnNames.set(parentId, columnDBNames);
+      }
+      const column = Column({
+        parentId,
+        databaseName: tableIdToColumnNames.get(parentId)[index],
+      });
+      tableUpdates[parentId] = tableUpdates[parentId] || [];
+      tableUpdates[parentId].push(column.id);
+      successfulCreations.push(column);
+    }
   }
+
   // Add new columns to the database slice
   yield put(addColumnsToSlice(successfulCreations));
 

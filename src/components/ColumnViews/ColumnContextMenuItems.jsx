@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import {
   MenuItem,
   ListItemIcon,
@@ -109,13 +108,14 @@ const ColumnContextMenu = ({
     [handleColumnTypeDialogClose, closeMenu]
   );
 
-  const handleExcludeColumn = useCallback(
-    (event) => {
-      excludeColumn();
-      closeMenu(event);
-    },
-    [closeMenu, excludeColumn]
-  );
+  // TODO: address later
+  // const handleExcludeColumn = useCallback(
+  //   (event) => {
+  //     excludeColumn();
+  //     closeMenu(event);
+  //   },
+  //   [closeMenu, excludeColumn]
+  // );
 
   const handleSetColumnType = useCallback(() => {
     setSelectedColumnType(columnType || "");
@@ -170,12 +170,12 @@ const ColumnContextMenu = ({
         </ListItemIcon>
         <ListItemText>Rename column</ListItemText>
       </MenuItem>
-      <MenuItem onClick={handleExcludeColumn} sx={menuItemSx}>
+      {/* <MenuItem onClick={handleExcludeColumn} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <Delete fontSize="small" />
         </ListItemIcon>
         <ListItemText>Exclude column</ListItemText>
-      </MenuItem>
+      </MenuItem> */}
       <MenuItem onClick={handleSetColumnType} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <SwapHoriz fontSize="small" />

@@ -147,7 +147,7 @@ export default function withTableData(WrappedComponent) {
         dispatch(
           createColumnsRequest({
             mode: CREATION_MODE_INSERTION,
-            columnInfo: [
+            columnLocations: [
               {
                 parentId: id,
                 index: newColumnIndex,

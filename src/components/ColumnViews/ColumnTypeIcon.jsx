@@ -33,7 +33,7 @@ export default function ColumnTypeIcon({
     },
   };
 
-  if (columnType === undefined) {
+  if (columnType === null) {
     Icon = UndefinedIcon;
     tooltipText = "Unknown column type";
   } else if (columnType === COLUMN_TYPE_VARCHAR) {
