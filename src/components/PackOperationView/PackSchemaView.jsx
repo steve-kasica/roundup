@@ -55,14 +55,12 @@ const PackSchemaView = withPackOperationData(
     matchStats,
     // Left table props (via withPackOperationData)
     leftTableId,
-    leftColumns,
+    leftColumnIds,
     leftKey,
-    leftKeyColumnName,
     // Right table props (via withPackOperationData)
     rightTableId,
     rightKey,
-    rightKeyColumnName,
-    rightColumns,
+    rightColumnIds,
     // Props defined in `withAssociatedAlerts`
     alertIds,
     hasAlerts,
@@ -211,7 +209,7 @@ const PackSchemaView = withPackOperationData(
           const [lastColumnId, lastMatchLabel] = lastClickedCell.split(":");
 
           // Determine the bounds of the rectangle
-          const allColumns = [...leftColumns, ...rightColumns];
+          const allColumns = [...leftColumnIds, ...rightColumnIds];
 
           // Find column indices
           const lastColIndex = allColumns.indexOf(lastColumnId);
@@ -254,7 +252,7 @@ const PackSchemaView = withPackOperationData(
           setLastClickedCell(cellKey);
         }
       },
-      [lastClickedCell, leftColumns, rightColumns, matchTypes]
+      [lastClickedCell, leftColumnIds, rightColumnIds, matchTypes]
     );
 
     const handleMatchLabelClick = useCallback(
@@ -277,7 +275,7 @@ const PackSchemaView = withPackOperationData(
               const match = matchTypes[m];
 
               // Add all columns for this match
-              [...leftColumns, ...rightColumns].forEach((columnId) => {
+              [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
                 cellsToSelect.add(`${columnId}:${match}`);
               });
             }
@@ -294,7 +292,7 @@ const PackSchemaView = withPackOperationData(
           const cellsToSelect = new Set();
 
           // Add all columns for this match
-          [...leftColumns, ...rightColumns].forEach((columnId) => {
+          [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
             cellsToSelect.add(`${columnId}:${matchLabel}`);
           });
 
@@ -305,9 +303,9 @@ const PackSchemaView = withPackOperationData(
         setLastClickedMatch(matchLabel);
 
         // Set last clicked cell to first cell in this match
-        setLastClickedCell(`${leftColumns[0]}:${matchLabel}`);
+        setLastClickedCell(`${leftColumnIds[0]}:${matchLabel}`);
       },
-      [lastClickedMatch, leftColumns, matchTypes, rightColumns]
+      [lastClickedMatch, leftColumnIds, matchTypes, rightColumnIds]
     );
 
     const handleColumnClick = useCallback(
@@ -316,7 +314,7 @@ const PackSchemaView = withPackOperationData(
 
         if (event.shiftKey && lastClickedColumn) {
           // Shift click: Select range of columns
-          const allColumns = [...leftColumns, ...rightColumns];
+          const allColumns = [...leftColumnIds, ...rightColumnIds];
           const lastColIndex = allColumns.indexOf(lastClickedColumn);
           const currentColIndex = allColumns.indexOf(columnId);
 
@@ -352,7 +350,7 @@ const PackSchemaView = withPackOperationData(
         // Set last clicked cell to first cell in this column
         setLastClickedCell(`${columnId}:${matchTypes[0]}`);
       },
-      [lastClickedColumn, matchTypes, leftColumns, rightColumns]
+      [lastClickedColumn, matchTypes, leftColumnIds, rightColumnIds]
     );
 
     const handleSelectAll = useCallback(() => {
@@ -364,13 +362,13 @@ const PackSchemaView = withPackOperationData(
 
       // Select all cells across all columns and match types
       matchTypes.forEach((match) => {
-        [...leftColumns, ...rightColumns].forEach((columnId) => {
+        [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
           allCells.add(`${columnId}:${match}`);
         });
       });
 
       setClickedBlockCells(allCells);
-    }, [areAnySelected, matchTypes, leftColumns, rightColumns]);
+    }, [areAnySelected, matchTypes, leftColumnIds, rightColumnIds]);
 
     const handleToggleMatch = useCallback((matchKey) => {
       console.log("Toggling match:", matchKey);
@@ -414,7 +412,7 @@ const PackSchemaView = withPackOperationData(
     // Check if at least one complete column is selected
     const hasCompleteColumnSelected = useMemo(() => {
       // Check each column in both tables
-      const allColumns = [...leftColumns, ...rightColumns];
+      const allColumns = [...leftColumnIds, ...rightColumnIds];
 
       for (const columnId of allColumns) {
         const allCellsSelected = matchTypes.every((matchLabel) => {
@@ -427,7 +425,7 @@ const PackSchemaView = withPackOperationData(
       }
 
       return false;
-    }, [leftColumns, matchTypes, clickedBlockCells, rightColumns]);
+    }, [leftColumnIds, matchTypes, clickedBlockCells, rightColumnIds]);
 
     const yAxisLabelWidth = "70px";
     const yAxisLabelPadding = "4px";
@@ -513,8 +511,8 @@ const PackSchemaView = withPackOperationData(
                 flexShrink={0}
               />
               {[
-                { tableId: leftTableId, columnCount: leftColumns.length },
-                { tableId: rightTableId, columnCount: rightColumns.length },
+                { tableId: leftTableId, columnCount: leftColumnIds.length },
+                { tableId: rightTableId, columnCount: rightColumnIds.length },
               ].map(({ tableId, columnCount }) => (
                 <Box
                   key={tableId}
@@ -550,7 +548,7 @@ const PackSchemaView = withPackOperationData(
                 justifyContent={"center"}
                 flexShrink={0}
               />
-              {[...leftColumns, ...rightColumns].map((columnId) => {
+              {[...leftColumnIds, ...rightColumnIds].map((columnId) => {
                 return (
                   <Box
                     key={columnId}
@@ -641,10 +639,10 @@ const PackSchemaView = withPackOperationData(
                     {label}
                     <br />({value})
                   </Typography>
-                  {[...leftColumns, ...rightColumns].map((columnId, j) => {
+                  {[...leftColumnIds, ...rightColumnIds].map((columnId, j) => {
                     // Check if this is a key column
                     const tableId =
-                      j < leftColumns.length ? leftTableId : rightTableId;
+                      j < leftColumnIds.length ? leftTableId : rightTableId;
                     const isKeyColumn =
                       columnId === leftKey || columnId === rightKey;
                     const cellKey = `${columnId}:${key}`;
@@ -669,7 +667,7 @@ const PackSchemaView = withPackOperationData(
                     if (isClicked) {
                       // Find the match type index for this row
                       const currentMatchIndex = matchTypes.indexOf(key);
-                      const allColumns = [...leftColumns, ...rightColumns];
+                      const allColumns = [...leftColumnIds, ...rightColumnIds];
                       const currentColIndex = allColumns.indexOf(columnId);
 
                       // Check cell above (previous match type)
@@ -712,7 +710,7 @@ const PackSchemaView = withPackOperationData(
                     const borderWidth = "2px";
 
                     // Check if the cell to the right is also selected
-                    const allColumns = [...leftColumns, ...rightColumns];
+                    const allColumns = [...leftColumnIds, ...rightColumnIds];
                     const currentColIndex = allColumns.indexOf(columnId);
                     const hasRightNeighbor =
                       currentColIndex < allColumns.length - 1;
@@ -796,12 +794,12 @@ const PackSchemaView = withPackOperationData(
             {[
               {
                 tableId: leftTableId,
-                columns: leftColumns,
+                columns: leftColumnIds,
                 margin: "marginRight",
               },
               {
                 tableId: rightTableId,
-                columns: rightColumns,
+                columns: rightColumnIds,
                 margin: "marginLeft",
               },
             ].map(({ tableId, columns, margin }) => (

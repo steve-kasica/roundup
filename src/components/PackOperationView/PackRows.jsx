@@ -71,8 +71,6 @@ const PackRows = ({
     materializeOperation();
   }, [materializeOperation]);
 
-  console.log({ activeColumnIds });
-
   return <pre>{JSON.stringify(results, null, 2)}</pre>;
 
   return (

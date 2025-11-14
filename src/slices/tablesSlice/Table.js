@@ -7,6 +7,11 @@
 
 /**
  * Counter used to generate unique IDs for tables.
+ * Unique counters like these with a prefix not only provide a significant semantic benefit
+ * because I can figure out if an error correspond to a table, column, or operations. but these IDs are also
+ * unique between data object, e.g. columns, tables, and operations, are also
+ * useful for react b/c we can use them in a key and we have the guarantee that each item in an array will have a unique key
+ * even if its a mix of different data object types.
  * @type {number}
  * @private
  */

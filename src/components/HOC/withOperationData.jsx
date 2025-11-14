@@ -150,14 +150,19 @@ export default function withOperationData(WrappedComponent) {
       <WrappedComponent
         // Pass along props directly from the parent component
         {...props}
-        id={id} // Need to pass id explicitly
-        // Props derived in this HOC
+        id={id}
+        // Props via this HOC
         operation={operation}
         name={operation.name}
         operationType={operation.operationType}
         childIds={operation.childIds}
         doesViewExist={operation.doesViewExist}
         depth={depth}
+        // Pack-related operations
+        joinKey1={operation.joinKey1}
+        joinKey2={operation.joinKey2}
+        joinPredicate={operation.joinPredicate}
+        joinType={operation.joinType}
         // Directly associated columns
         columnIds={columnIds} // All column IDs associated with this operation
         activeColumnIds={activeColumnIds} // columns not excluded

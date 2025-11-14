@@ -10,13 +10,11 @@
  */
 
 import { EnhancedTableBlock } from "../TableView";
-import withOperationData from "../HOC/withOperationData";
-import {
-  isOperationId,
-  OPERATION_TYPE_PACK,
-} from "../../slices/operationsSlice";
+import { OPERATION_TYPE_PACK } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
-import { Box, Tooltip, styled } from "@mui/material";
+import { Box, styled } from "@mui/material";
+import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
+import withPackOperationData from "./withPackOperationData";
 
 // TODO: when addressing this layout, consider using
 // styled components, but module SCSS will overwrite
@@ -36,47 +34,53 @@ const StyledBox = styled(Box, {
 function PackOperationBlock({
   // props via withOperationData
   childIds,
+  // Props via withPackOperationData
+  leftColumnCount,
+  rightColumnCount,
   columnCount,
   // Props via withAssociatedAlerts HOC
   hasAlerts,
   // Props passed via parent
-  parentColumnCount = 0,
+  parentColumnCount,
 }) {
-  const childOperationIds = childIds.filter(isOperationId);
-  const childTableIds = childIds.filter(isTableId);
-
   return (
     <StyledBox className="pack-operation-block" hasError={hasAlerts}>
-      {childOperationIds.length > 0
-        ? childOperationIds.map(
-            (childOperationId) => null
-            // <EnhancedOperationView
-            //   key={childOperationId}
-            //   id={childOperationId}
-            //   parentColumnCount={columnCount}
-            // />
-          )
-        : null}
-      {childTableIds.length > 0
-        ? childTableIds.map((tableId, index) => (
+      {childIds.map((childId, index, array) => {
+        const childSx = {
+          width:
+            ((index === 0 ? leftColumnCount : rightColumnCount) / columnCount) *
+              100 +
+            "%",
+          ...(index === array.length - 1 && {
+            borderLeft: "none",
+          }),
+        };
+        if (isTableId(childId)) {
+          return (
             <EnhancedTableBlock
-              key={tableId}
-              id={tableId}
+              key={childId}
+              id={childId}
               isDraggable={false}
               parentOperationType={OPERATION_TYPE_PACK}
               parentColumnCount={columnCount}
-              sx={{
-                ...(index === childTableIds.length - 1 && {
-                  borderLeft: "none",
-                }),
-              }}
+              sx={childSx}
             />
-          ))
-        : null}
+          );
+        } else {
+          return (
+            <EnhancedOperationBlock
+              id={childId}
+              key={childId}
+              parentColumnCount={columnCount}
+              sx={childSx}
+            />
+          );
+        }
+      })}
     </StyledBox>
   );
 }
 
-const EnhancedPackOperationBlock = withOperationData(PackOperationBlock);
+const EnhancedPackOperationBlock = withPackOperationData(PackOperationBlock);
 
 export { PackOperationBlock, EnhancedPackOperationBlock };

@@ -2,7 +2,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import withOperationData from "../HOC/withOperationData";
 import { useCallback, useMemo } from "react";
-import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
 import {
   selectActiveColumnIdsByParentId,
   selectColumnsById,
@@ -15,32 +14,31 @@ import {
   selectSelectedMatches,
 } from "../../slices/uiSlice";
 import { selectPackOperationMatchStats } from "../../slices/operationsSlice";
+
 export default function withPackOperationData(WrappedComponent) {
   function EnhancedPackComponent({
     // Props passed from withOperationData
-    operation,
+    id,
+    joinKey1,
+    joinKey2,
+    childIds,
+    columnIds,
     selectedColumnIds,
     // Props passed directly from parent
-    id,
     ...props
   }) {
     const dispatch = useDispatch();
 
-    const leftTableId = operation?.childIds[0];
-    const rightTableId = operation?.childIds[1];
-
-    const [leftKeyColumnName, rightKeyColumnName] = useSelector((state) => {
-      const leftKeyColumn = selectColumnsById(state, operation?.joinKey1);
-      const rightKeyColumn = selectColumnsById(state, operation?.joinKey2);
-      return [leftKeyColumn?.databaseName, rightKeyColumn?.databaseName];
-    });
+    const [leftTableId, rightTableId] = useMemo(() => childIds, [childIds]);
 
     const childColumnIds = useSelector((state) =>
-      selectActiveColumnIdsByParentId(state, operation.childIds)
+      selectActiveColumnIdsByParentId(state, childIds)
     );
 
-    const leftHandColumns = childColumnIds[0];
-    const rightHandColumns = childColumnIds[1];
+    const [leftColumnIds, rightColumnIds] = useMemo(
+      () => childColumnIds,
+      [childColumnIds]
+    );
 
     const columnCount = useMemo(
       () => childColumnIds.reduce((a, b) => a + b.length, 0),
@@ -48,16 +46,16 @@ export default function withPackOperationData(WrappedComponent) {
     );
 
     const tableToOpColumnMap = new Map();
-    leftHandColumns.forEach((colId, i) => {
+    leftColumnIds.forEach((colId, i) => {
       tableToOpColumnMap.set(colId, {
-        columnId: operation.columnIds[i],
-        tableId: operation.childIds[0],
+        columnId: columnIds[i],
+        tableId: childIds[0],
       });
     });
-    rightHandColumns.forEach((colId, i) => {
+    rightColumnIds.forEach((colId, i) => {
       tableToOpColumnMap.set(colId, {
-        columnId: operation.columnIds[i + (leftHandColumns?.length || 0)],
-        tableId: operation.childIds[1],
+        columnId: columnIds[i + (leftColumnIds?.length || 0)],
+        tableId: childIds[1],
       });
     });
 
@@ -71,7 +69,7 @@ export default function withPackOperationData(WrappedComponent) {
       selectSelectedColumnIdsByParentId(state, rightTableId)
     );
 
-    const selectedOperationColumnIds = operation.columnIds.filter((columnid) =>
+    const selectedOperationColumnIds = columnIds.filter((columnid) =>
       selectedColumnIds.includes(columnid)
     );
 
@@ -79,22 +77,18 @@ export default function withPackOperationData(WrappedComponent) {
     const leftTable = useSelector((state) =>
       selectTablesById(state, leftTableId)
     );
+    const leftRowCount = leftTable?.rowCount || 0;
 
     const rightTable = useSelector((state) =>
       selectTablesById(state, rightTableId)
     );
+    const rightRowCount = rightTable?.rowCount || 0;
 
     const matchStats = useSelector((state) =>
       selectPackOperationMatchStats(state, id)
     );
 
-    // Props derived form selector results
-    // -------------------------------------------------------
-
     // Extract row counts from table objects
-    const leftRowCount = leftTable?.rowCount || 0;
-    const rightRowCount = rightTable?.rowCount || 0;
-
     const selectedMatchTypes = useSelector(selectSelectedMatches);
 
     // Define callback functions
@@ -164,41 +158,39 @@ export default function withPackOperationData(WrappedComponent) {
       },
       [dispatch, id]
     );
+    console.log("EnhancedPackComponent render", {
+      leftColumnIds,
+      rightColumnIds,
+      columnCount,
+    });
 
     return (
       <WrappedComponent
         {...props}
-        // General operation props
+        // Props via withOperationData
         id={id}
-        operation={operation}
-        childIds={operation.childIds}
-        name={operation.name}
+        childIds={childIds}
+        columnIds={columnIds}
+        selectedColumnIds={selectedColumnIds}
         selectedOperationColumnIds={selectedOperationColumnIds} // Should this be in an operation above? (TODO)
         // Props specific to Pack operations
-        joinType={operation.joinType}
-        joinPredicate={operation.joinPredicate}
         selectedMatchTypes={selectedMatchTypes}
         columnCount={columnCount}
-        rowCount={operation.rowCount} // TODO: is this in withOperationData?
         matchStats={matchStats}
         // Left table props
         leftTableId={leftTableId}
-        joinKey1={operation.joinKey1} // Deprecated, use leftKey
-        leftKey={operation.joinKey1}
-        leftKeyColumnName={leftKeyColumnName}
+        leftKey={joinKey1}
         leftRowCount={leftRowCount} // TODO: are these needed, seems like table property
-        leftHandColumns={leftHandColumns} // Deprecated, use leftColumns
-        leftColumns={leftHandColumns}
+        leftColumnIds={leftColumnIds}
+        leftColumnCount={leftColumnIds.length}
         leftSelectedColumns={leftSelectedColumnsIds}
         // Right table props
-        joinKey2={operation.joinKey2} // Deprecated, use rightKey
-        rightKey={operation.joinKey2}
-        rightKeyColumnName={rightKeyColumnName}
+        rightKey={joinKey2}
         rightTableId={rightTableId}
         rightRowCount={rightRowCount} // TODO: are these needed, seems like table property
         tableToOpColumnMap={tableToOpColumnMap}
-        rightHandColumns={rightHandColumns} // Deprecated, use rightColumns
-        rightColumns={rightHandColumns}
+        rightColumnIds={rightColumnIds}
+        rightColumnCount={rightColumnIds.length}
         rightSelectedColumns={rightSelectedColumnsIds}
         // Pack-specific join dispatchers
         setJoinType={setJoinType}
