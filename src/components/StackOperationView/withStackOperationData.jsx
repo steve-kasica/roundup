@@ -34,6 +34,7 @@ export default function withStackOperationData(WrappedComponent) {
     columnIds,
     selectedColumnIds,
     childIds,
+    activeChildColumnIds,
     // Props passed from withAssociatedAlerts
     alertIds,
     hasAlerts,
@@ -45,30 +46,28 @@ export default function withStackOperationData(WrappedComponent) {
   }) {
     const dispatch = useDispatch();
 
-    // Returns a matrix of columnIDs, ordered by child table IDs
-    const childColumnIds = useSelector((state) =>
-      selectTableColumnIds(state, childIds)
-    );
-
     // The column count of a stack operation is always going to be the
     // maximum column count of its child tables
     const columnCount = useMemo(() => {
       return Math.max(
-        ...childColumnIds.map((columnIds) => columnIds.length),
+        ...activeChildColumnIds.map((columnIds) => columnIds.length),
         0
       );
-    }, [childColumnIds]);
+    }, [activeChildColumnIds]);
 
     const columnIdMatrix = useMemo(() => {
-      const maxLength = Math.max(...childColumnIds.map((row) => row.length), 0);
-      const backfilledMatrix = childColumnIds.map((row) => {
+      const maxLength = Math.max(
+        ...activeChildColumnIds.map((row) => row.length),
+        0
+      );
+      const backfilledMatrix = activeChildColumnIds.map((row) => {
         if (row.length < maxLength) {
           return [...row, ...Array(maxLength - row.length).fill(null)];
         }
         return row;
       });
       return backfilledMatrix;
-    }, [childColumnIds]);
+    }, [activeChildColumnIds]);
 
     // TODO: we really need to know whether or not a object is
     // a pack or stack from its ID. That'd be a good refactor.

@@ -4,9 +4,11 @@ import {
   selectOperationsById,
   selectOperationDepthById,
   updateOperations,
+  isOperationId,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import {
+  selectActiveColumnIdsByParentId,
   selectColumnIdsByParentId,
   selectSelectedColumnIdsByParentId,
 } from "../../slices/columnsSlice";
@@ -26,6 +28,9 @@ import {
 import { materializeOperationRequest } from "../../sagas/materializeOperationSaga/actions";
 import withAssociatedAlerts from "./withAssociatedAlerts";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
+import { group } from "d3";
+import { isTableId } from "../../slices/tablesSlice";
+import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 
 export default function withOperationData(WrappedComponent) {
   function EnhancedComponent({
@@ -43,6 +48,10 @@ export default function withOperationData(WrappedComponent) {
     // Get columnIds associated with this table, both active and "removed"
     const columnIds = useSelector((state) =>
       selectColumnIdsByParentId(state, id)
+    );
+
+    const activeChildColumnIds = useSelector((state) =>
+      selectActiveColumnIdsByParentId(state, operation.childIds)
     );
 
     const activeColumnIds = operation.columnIds;
@@ -73,17 +82,7 @@ export default function withOperationData(WrappedComponent) {
     );
 
     const selectColumns = useCallback(
-      (columnIds) =>
-        dispatch(
-          updateColumnsRequest({
-            columnUpdates: [
-              ...columnIds.filter(Boolean).map((id) => ({
-                id,
-                isSelected: true,
-              })),
-            ],
-          })
-        ),
+      (columnIds) => dispatch(setSelectedColumnIds(columnIds)),
       [dispatch]
     );
 
@@ -127,7 +126,55 @@ export default function withOperationData(WrappedComponent) {
     );
 
     // TODO
-    const excludeColumns = useCallback((columnIds) => null, [dispatch]);
+    const excludeColumns = useCallback(
+      (columnIdsToExclude) => {
+        const columnIdsToExcludeByParentId = Array.from(
+          group(columnIdsToExclude, (columnId) => {
+            let parentId = null;
+            for (const childColumns of activeChildColumnIds) {
+              if (childColumns.includes(columnId)) {
+                parentId =
+                  operation.childIds[
+                    activeChildColumnIds.indexOf(childColumns)
+                  ];
+                break;
+              }
+            }
+            return parentId;
+          }),
+          ([parentId, columnIds]) => ({ parentId, columnIds })
+        );
+
+        const columnIdsToIncludeByParentId = columnIdsToExcludeByParentId.map(
+          ({ parentId, columnIds }) => {
+            const activeColumnIds =
+              activeChildColumnIds[operation.childIds.indexOf(parentId)];
+            return {
+              id: parentId,
+              columnIds: activeColumnIds.filter(
+                (colId) => !columnIds.includes(colId)
+              ),
+            };
+          }
+        );
+
+        const tableUpdates = columnIdsToIncludeByParentId.filter(({ id }) =>
+          isTableId(id)
+        );
+        const operationUpdates = columnIdsToIncludeByParentId.filter(({ id }) =>
+          isOperationId(id)
+        );
+
+        if (tableUpdates.length > 0) {
+          dispatch(updateTablesRequest({ tableUpdates }));
+        }
+        if (operationUpdates.length > 0) {
+          dispatch(updateOperationsRequest({ operationUpdates }));
+        }
+        dispatch(setSelectedColumnIds([]));
+      },
+      [activeChildColumnIds, dispatch, operation.childIds]
+    );
 
     const materializeOperation = useCallback(
       () => dispatch(materializeOperationRequest({ operationId: id })),
@@ -157,6 +204,7 @@ export default function withOperationData(WrappedComponent) {
         operationType={operation.operationType}
         childIds={operation.childIds}
         doesViewExist={operation.doesViewExist}
+        activeChildColumnIds={activeChildColumnIds}
         depth={depth}
         // Pack-related operations
         joinKey1={operation.joinKey1}

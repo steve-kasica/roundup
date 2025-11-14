@@ -2,11 +2,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import withOperationData from "../HOC/withOperationData";
 import { useCallback, useMemo } from "react";
-import {
-  selectActiveColumnIdsByParentId,
-  selectColumnsById,
-  selectSelectedColumnIdsByParentId,
-} from "../../slices/columnsSlice/selectors";
+import { selectSelectedColumnIdsByParentId } from "../../slices/columnsSlice/selectors";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import {
@@ -24,6 +20,7 @@ export default function withPackOperationData(WrappedComponent) {
     childIds,
     columnIds,
     selectedColumnIds,
+    activeChildColumnIds,
     // Props passed directly from parent
     ...props
   }) {
@@ -31,18 +28,14 @@ export default function withPackOperationData(WrappedComponent) {
 
     const [leftTableId, rightTableId] = useMemo(() => childIds, [childIds]);
 
-    const childColumnIds = useSelector((state) =>
-      selectActiveColumnIdsByParentId(state, childIds)
-    );
-
     const [leftColumnIds, rightColumnIds] = useMemo(
-      () => childColumnIds,
-      [childColumnIds]
+      () => activeChildColumnIds,
+      [activeChildColumnIds]
     );
 
     const columnCount = useMemo(
-      () => childColumnIds.reduce((a, b) => a + b.length, 0),
-      [childColumnIds]
+      () => activeChildColumnIds.reduce((a, b) => a + b.length, 0),
+      [activeChildColumnIds]
     );
 
     const tableToOpColumnMap = new Map();

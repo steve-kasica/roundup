@@ -152,13 +152,13 @@ const StackRows = ({
               <TableCell>#</TableCell>
               {displayColumns.map((columnId, index) => (
                 <TableCell key={index} align="left">
-                  <EnhancedColumnHeader
+                  {/* <EnhancedColumnHeader
                     id={columnId}
                     isActive={sortBy === columnId}
                     // onSort={handleColumnSort}
                     // onMenuClose={handleMenuClose}
                     sortDirection={sortDirection}
-                  />
+                  /> */}
                 </TableCell>
               ))}
             </TableRow>
