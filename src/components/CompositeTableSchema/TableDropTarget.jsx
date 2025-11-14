@@ -12,11 +12,12 @@ import { styled } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  JOIN_PREDICATES,
+  JOIN_TYPES,
   OPERATION_TYPE_NO_OP,
+  OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  selectOperationsById,
   selectRootOperation,
-  selectRootOperationId,
 } from "../../slices/operationsSlice";
 import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
@@ -179,6 +180,10 @@ export default function TableDropTarget({ operationType, children }) {
                 id: rootOperation.id,
                 operationType,
                 childIds: [...rootOperation.childIds, ...draggedTableIds],
+                ...(operationType === OPERATION_TYPE_PACK && {
+                  joinPredicate: JOIN_PREDICATES["EQUALS"],
+                  joinType: JOIN_TYPES["FULL_OUTER"],
+                }),
               },
             ],
           })

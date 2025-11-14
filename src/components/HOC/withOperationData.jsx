@@ -12,6 +12,7 @@ import {
 } from "../../slices/columnsSlice";
 import {
   setFocusedColumnIds,
+  setFocusedObjectId,
   setSelectedColumnIds,
   setVisibleColumnIds as setVisibleColumnsAction,
 } from "../../slices/uiSlice/uiSlice";
@@ -133,6 +134,18 @@ export default function withOperationData(WrappedComponent) {
       [dispatch, id]
     );
 
+    /**
+     * Sets the currently focused operation by dispatching the setFocusedObjectId action
+     * with the provided operation ID.
+     *
+     * @function
+     * @returns {void}
+     */
+    const focusOperation = useCallback(
+      () => dispatch(setFocusedObjectId(id)),
+      [dispatch, id]
+    );
+
     return (
       <WrappedComponent
         // Pass along props directly from the parent component
@@ -173,13 +186,7 @@ export default function withOperationData(WrappedComponent) {
             updateOperationsRequest({ operationUpdates: [{ id, name }] })
           )
         }
-        focusOperation={() =>
-          dispatch(
-            updateOperationsRequest({
-              operationUpdates: [{ id, isFocused: true }],
-            })
-          )
-        }
+        focusOperation={focusOperation}
         setOperationType={(operationType) =>
           dispatch(
             updateOperationsRequest({

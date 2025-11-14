@@ -26,10 +26,10 @@ export default function* deleteColumnsSaga() {
   // If an operation `children` property update has failed, just
   // delete any columns associated with that operation
   yield takeEvery(updateOperationsFailure.type, function* (action) {
-    const { changedPropertiesByOperation } = action.payload;
+    const { changedPropertiesByOperationId } = action.payload;
 
     const operationIdsToUpdate = Object.entries(
-      changedPropertiesByOperation
+      changedPropertiesByOperationId
     ).reduce((acc, [id, changedProperties]) => {
       if (changedProperties.includes("children")) {
         acc.push(id);

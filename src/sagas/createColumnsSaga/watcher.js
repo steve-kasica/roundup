@@ -94,10 +94,10 @@ export default function* createColumnsWatcher() {
   // If an operation's child property is updated, we need
   // to create columns for it
   // yield takeEvery(updateOperationsSuccess.type, function* (action) {
-  //   const { changedPropertiesByOperation } = action.payload;
+  //   const { changedPropertiesByOperationId} = action.payload;
 
   //   const operationIdsToUpdate = Object.entries(
-  //     changedPropertiesByOperation
+  //     changedPropertiesByOperationId
   //   ).reduce((acc, [id, changedProperties]) => {
   //     if (changedProperties.includes("children")) {
   //       acc.push(id);
