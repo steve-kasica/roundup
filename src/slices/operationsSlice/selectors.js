@@ -3,7 +3,8 @@ import {
   // selectActiveColumnDBNamesByTableId,
   selectColumnsById,
 } from "../columnsSlice";
-import { isTableId } from "../tablesSlice";
+import { isTableId, selectTableQueryData } from "../tablesSlice";
+import { OPERATION_TYPE_PACK, OPERATION_TYPE_STACK } from "./Operation";
 
 /**
  * Selects an operation by its ID from the Redux state.
@@ -146,36 +147,47 @@ export const selectRootOperation = (state) => {
  *   must contain at least the `id`
  * @returns {Object} Query data object with operation details and child table information
  */
-export const selectOperationQueryData = (state, operationData) => {
+export const selectOperationQueryData = (state, id) => {
   // Select the full operation from state, if it is present
   // It may not be present if this is a newly created Operation
-  const operation = selectOperationsById(state, operationData.id);
-
-  const parent = {
-    ...operation, // can be undefined
-    ...operationData,
-  };
-
-  // Parent properties that are used by both Stack and Pack operations
-  parent.childIds = parent.childIds.map((id) => {
-    let child = {
-      id,
-      // databaseNames: selectActiveColumnDBNamesByTableId(state, id),
-      databaseNames: [], // TODO: re-add this selector
-    };
-    return child;
+  const operation = selectOperationsById(state, id);
+  const childrenQueryData = operation.childIds.map((childId) => {
+    if (isTableId(childId)) {
+      return selectTableQueryData(state, childId);
+    } else {
+      // return {
+      //   tableName: selectOperationsById(state, childId).databaseName,
+      //   columnNames: selectOperationsById(state, childId).columnIds.map(
+      //     (colId) => selectColumnsById(state, colId).databaseName
+      //   ),
+      // };
+      return {
+        tableName: selectOperationsById(state, childId).databaseName,
+        columnNames: selectOperationsById(state, childId).columnIds.map(
+          (colId) => selectColumnsById(state, colId).databaseName
+        ),
+      };
+    }
   });
+  let operationTypeParams =
+    operation.operationType === OPERATION_TYPE_PACK
+      ? {
+          joinKey1: selectColumnsById(state, operation.joinKey1).databaseName,
+          joinKey2: selectColumnsById(state, operation.joinKey2).databaseName,
+          joinPredicate: operation.joinPredicate,
+        }
+      : {};
 
-  // parent properties that are only need for Pack operations
-  // Stack operation will not throw errors if these are undefined
-  parent.joinKey1 = parent.joinKey1
-    ? selectColumnsById(state, parent.joinKey1).databaseName
-    : null;
-  parent.joinKey2 = parent.joinKey2
-    ? selectColumnsById(state, parent.joinKey2).databaseName
-    : null;
+  const columnNames = operation.columnIds.map(
+    (colId) => selectColumnsById(state, colId).databaseName
+  );
 
-  return parent;
+  return {
+    viewName: operation.databaseName,
+    columnNames,
+    ...operationTypeParams,
+    children: childrenQueryData,
+  };
 };
 
 // TODO: assess below

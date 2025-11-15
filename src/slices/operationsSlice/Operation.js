@@ -36,6 +36,10 @@ export default function Operation({
   childIds = [],
   columnIds = [],
   rowCount = null,
+  joinKey1 = null,
+  joinKey2 = null,
+  joinPredicate = JOIN_PREDICATES.EQUALS,
+  joinType = JOIN_TYPES.FULL_OUTER,
 } = {}) {
   const id = `o${++idCounter}`; // Each operation has a unique ID
 
@@ -48,17 +52,17 @@ export default function Operation({
     columnIds,
     rowCount,
     operationType,
+    isViewMaterialized: false, // Initially false, can be updated later
 
     // Properties specific to PACK operations
-    joinType:
-      operationType === OPERATION_TYPE_PACK ? JOIN_TYPES.FULL_OUTER : undefined,
-    joinPredicate:
-      operationType === OPERATION_TYPE_PACK
-        ? JOIN_PREDICATES.EQUALS
-        : undefined,
-    joinKey1: operationType === OPERATION_TYPE_PACK ? null : undefined,
-    joinKey2: operationType === OPERATION_TYPE_PACK ? null : undefined,
-    isViewMaterialized: false, // Initially false, can be updated later
+    ...(operationType === OPERATION_TYPE_PACK
+      ? {
+          joinType,
+          joinPredicate,
+          joinKey1: joinKey1,
+          joinKey2: joinKey2,
+        }
+      : {}),
   };
 }
 
