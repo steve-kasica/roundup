@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import {
   selectOperationsById,
   selectOperationDepthById,
+  selectOperationChildRowCounts,
   updateOperations,
   isOperationId,
 } from "../../slices/operationsSlice";
@@ -20,7 +21,6 @@ import {
 } from "../../slices/uiSlice/uiSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
 import { useCallback, useMemo } from "react";
-import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
@@ -28,7 +28,7 @@ import {
 import withAssociatedAlerts from "./withAssociatedAlerts";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
 import { group } from "d3";
-import { isTableId } from "../../slices/tablesSlice";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 
 export default function withOperationData(WrappedComponent) {
@@ -49,8 +49,14 @@ export default function withOperationData(WrappedComponent) {
       selectColumnIdsByParentId(state, id)
     );
 
+    // Get columnIds of child tables that are active (not excluded)
     const activeChildColumnIds = useSelector((state) =>
       selectActiveColumnIdsByParentId(state, operation.childIds)
+    );
+
+    // Get active columnIds of child tables that are selected
+    const selectedChildColumnIds = useSelector((state) =>
+      selectSelectedColumnIdsByParentId(state, operation.childIds)
     );
 
     const activeColumnIds = operation.columnIds;
@@ -67,6 +73,10 @@ export default function withOperationData(WrappedComponent) {
     );
 
     const focusedObjectId = useSelector(selectFocusedObjectId);
+
+    const childRowCounts = useSelector((state) =>
+      selectOperationChildRowCounts(state, id)
+    );
 
     const isFocused = focusedObjectId === id;
     const isHovered = false; // TODO
@@ -205,12 +215,15 @@ export default function withOperationData(WrappedComponent) {
         // Props via this HOC
         operation={operation}
         name={operation.name}
+        databaseName={operation.databaseName}
         operationType={operation.operationType}
         childIds={operation.childIds}
         doesViewExist={operation.doesViewExist}
         isMaterialized={operation.isMaterialized}
         isInSync={operation.isInSync}
         activeChildColumnIds={activeChildColumnIds}
+        selectedChildColumnIds={selectedChildColumnIds}
+        childRowCounts={childRowCounts}
         depth={depth}
         // Pack-related operations
         joinKey1={operation.joinKey1}

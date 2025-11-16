@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import {
   selectActiveColumnIdsByParentId,
   selectColumnIdsByParentId,
+  selectColumnIndexById,
   selectColumnNamesById,
   selectColumnsById,
   selectSelectedColumnIdsByParentId,
@@ -59,6 +60,8 @@ describe("Column selectors", () => {
           [column1.id]: column1,
           [column2.id]: column2,
           [column3.id]: column3,
+          [column4.id]: column4,
+          [column5.id]: column5,
         },
       },
       ui: {
@@ -158,6 +161,14 @@ describe("Column selectors", () => {
         column4.id,
         column5.id,
       ]);
+    });
+  });
+  describe("selectColumnIndexById", () => {
+    it("should return the correct index for a column ID within a table", () => {
+      expect(selectColumnIndexById(state, column1.id)).toBe(0);
+    });
+    it("should return the correct index for a column ID within an operation", () => {
+      expect(selectColumnIndexById(state, column5.id)).toBe(1);
     });
   });
 });

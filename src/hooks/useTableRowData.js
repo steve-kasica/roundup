@@ -94,6 +94,7 @@ export function useTableRowData(
  * @param {number} pageSize - Number of rows per page (default: 50)
  * @param {string} sortBy - Column name to sort by (default: null)
  * @param {string} sortDirection - Sort direction: 'asc' or 'desc' (default: 'asc')
+ * @param {number} initialOffset - Starting row offset (default: 0, meaning start from row 1)
  *
  * @returns {Object} Hook state and methods for pagination
  */
@@ -102,7 +103,8 @@ export function usePaginatedTableRows(
   columnIds = null,
   pageSize = 50,
   sortByColumnId = null,
-  sortDirection = "asc"
+  sortDirection = "asc",
+  initialOffset = 0
 ) {
   const sortBy = useSelector(
     (state) => selectColumnsById(state, sortByColumnId)?.databaseName || null
@@ -133,7 +135,7 @@ export function usePaginatedTableRows(
       setError(null);
 
       try {
-        const offset = pageNum * pageSize;
+        const offset = initialOffset + pageNum * pageSize;
         const rows = await getTableRows(
           tableId,
           columnsList,
@@ -160,7 +162,15 @@ export function usePaginatedTableRows(
         setLoading(false);
       }
     },
-    [tableId, columnIds, columnsList, pageSize, sortBy, sortDirection]
+    [
+      tableId,
+      columnIds,
+      columnsList,
+      pageSize,
+      sortBy,
+      sortDirection,
+      initialOffset,
+    ]
   );
 
   const loadMore = useCallback(() => {

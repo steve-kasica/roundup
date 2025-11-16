@@ -4,6 +4,8 @@ import withStackOperationData from "./withStackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
 
+const pageSize = 50; // default page size for pagination
+
 /**
  * Virtualized table view for stack operations
  * Supports synchronized or sequential scrolling/loading of multiple tables
@@ -12,11 +14,14 @@ import RoundupTable from "../ui/Table/Table.jsx";
  */
 const StackRows = ({
   // Props passed via withOperationData
-  id,
+  databaseName,
   materializeOperation,
   isMaterialized,
   isInSync,
   selectedColumnIds,
+  childIds, // an array of child operation/table IDs
+  childRowCounts, // a map of childId to row count
+  selectedChildColumnIds,
   // Props passed directly from withStackoperationData
   columnIdMatrix,
   // Props passed from withAssociatedAlerts
@@ -25,9 +30,21 @@ const StackRows = ({
   const [sortBy, setSortBy] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
 
+  const initialOffset = useMemo(() => {
+    const firstSelectedChildIndex = selectedChildColumnIds
+      .map((columnIds) => columnIds.length === 0)
+      .findIndex((isEmpty) => isEmpty);
+    const firstSelectedChildId = childIds[firstSelectedChildIndex];
+    return childRowCounts.get(firstSelectedChildId) || 0;
+  }, [childIds, childRowCounts, selectedChildColumnIds]);
+
   const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
-    id,
-    null
+    databaseName,
+    null,
+    pageSize, // default pageSize
+    sortBy,
+    sortDirection,
+    initialOffset
   );
 
   // Handle scroll events for infinite loading

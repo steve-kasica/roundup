@@ -148,12 +148,4 @@ export const isColumnIdVisible = createSelector(
   (visibleColumnIds, columnId) => visibleColumnIds.includes(columnId)
 );
 
-export const selectColumnIndexById = createSelector(
-  [
-    (state, columnId, tableId) => state.tables.byId[tableId].columnIds,
-    (state, columnId) => columnId,
-  ],
-  (tableColumns, columnId) => tableColumns.indexOf(columnId)
-);
-
 export const selectSelectedMatches = (state) => state.ui.selectedMatches;

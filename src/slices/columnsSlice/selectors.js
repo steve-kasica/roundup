@@ -109,3 +109,18 @@ export const selectActiveColumnIdsByParentId = createSelector(
     return columnIds.length === 1 ? columnIds[0] : columnIds;
   }
 );
+
+export const selectColumnIndexById = createSelector(
+  [
+    (state, columnId) => state.columns.byId[columnId].parentId,
+    (state) => state.tables.byId,
+    (state) => state.operations.byId,
+    (state, columnId) => columnId,
+  ],
+  (parentId, tablesById, operationsById, columnId) => {
+    const parent = isTableId(parentId)
+      ? tablesById[parentId]
+      : operationsById[parentId];
+    return parent.columnIds.indexOf(columnId);
+  }
+);
