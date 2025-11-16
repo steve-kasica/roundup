@@ -10,7 +10,11 @@ import { setFocusedObjectId } from "../../slices/uiSlice";
 import { updateOperationsSuccess } from "./actions";
 import { updateTables as updateTablesSlice } from "../../slices/tablesSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { createPackView, createStackView } from "../../lib/duckdb";
+import {
+  createPackView,
+  createStackView,
+  getTableDimensions,
+} from "../../lib/duckdb";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
@@ -29,6 +33,7 @@ export default function* updateOperationsWorker(action) {
     // we need to ensure that the corresponding children specify this
     // operation as their `parentId`.
     if (Object.hasOwnProperty.call(operationUpdate, "childIds")) {
+      operationUpdate.isInSync = false; // Mark as out-of-sync due to child change
       for (let childId of operationUpdate.childIds) {
         let childObject;
         if (isTableId(childId)) {
@@ -57,19 +62,28 @@ export default function* updateOperationsWorker(action) {
       const queryData = yield select((state) =>
         selectOperationQueryData(state, operation.id)
       );
-      console.log("Materializing operation:", operation, queryData);
       try {
         if (operation.operationType === OPERATION_TYPE_STACK) {
           yield call(createStackView, queryData);
         } else if (operation.operationType === OPERATION_TYPE_PACK) {
           yield call(createPackView, queryData);
         }
+        const { columnCount, rowCount } = yield call(
+          getTableDimensions,
+          operation.databaseName
+        );
+        operationUpdate.columnCount = columnCount;
+        operationUpdate.rowCount = rowCount;
         operationUpdate.isMaterialized = true;
+        operationUpdate.isInSync = true;
       } catch (error) {
         console.error("Error materializing operation:", error, queryData);
         operationUpdate.isMaterialized = false;
       }
+    } else if (Object.hasOwnProperty.call(operationUpdate, "operationType")) {
+      operationUpdate.isInSync = false; // Mark as out-of-sync due to type change
     }
+    // TODO: need to update isInSync when table change their column order or are removed
     successfulUpdates.push(operationUpdate);
   }
 

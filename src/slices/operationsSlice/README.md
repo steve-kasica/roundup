@@ -1,0 +1,8 @@
+## Operation metadata objects
+
+The ultimate goal of Roundup is to support the user in operations upon tables. To this end, an Operation stores metadata about `Operations` upon tables. Conceptually, operations are functions that map one or more tables to one table. The `Operation` objects represent these functions in the global data state and contains properties about these functions, which are specified in the factory function exported by `Operation.js`. All operations correspond to database `VIEWS`.
+
+### Properties that apply to all operations
+
+- `isMaterialized`: This flag indicates whether or not a correspond view has been created in the database.
+- `isInSync`: In order to synchronize the state of Operation metadata with the associated database view, this flag indicates whether schema-related properties accurately represent the materialized database view, which is represented in `isMaterialized`. Because the user must physically materialize the view, changes to operation properties, such as `childIds`, post-materialization can cause the schema specified in operation metadata and the underlying database schema to not longer be synchronized. I opted to use boolean flags `isInSync` and `isMaterialized` to keep track of this state as opposed to using a timestamp approach, i.e. including a `lastUpdated` and `lastMaterialized` properties that contained datetimes because not all operation updates are schema related and time deltas between the two properties are meaningless in Roundup. Because we store table and operation aliases in the global data state with a separate mapping for the corresponding object in the database, updating an operation `name` would not impact syncroncity between the global data state and the database w.r.t common objects.

@@ -209,6 +209,7 @@ export default function withOperationData(WrappedComponent) {
         childIds={operation.childIds}
         doesViewExist={operation.doesViewExist}
         isMaterialized={operation.isMaterialized}
+        isInSync={operation.isInSync}
         activeChildColumnIds={activeChildColumnIds}
         depth={depth}
         // Pack-related operations

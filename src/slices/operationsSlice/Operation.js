@@ -1,8 +1,6 @@
 /**
- * Operations keep track of their children nodes, as opposed to keeping track of their parent nodes. Because
- * It provides a natural tree structure for rending operations and components in a doward traversal. It is
- * Easy to add or remove children nodes, following an iteratiev approach consistent with direct manipulation.
- * The one downside is upward travelsal is not as straightforward, but this is not a common use case.
+ * Operation.js
+ *
  */
 export const OPERATION_TYPE_STACK = "stack";
 export const OPERATION_TYPE_PACK = "pack";
@@ -53,6 +51,7 @@ export default function Operation({
     rowCount,
     operationType,
     isMaterialized: false, // Initially false, can be updated later
+    isInSync: false, // Initially false, can be updated later
 
     // Properties specific to PACK operations
     ...(operationType === OPERATION_TYPE_PACK

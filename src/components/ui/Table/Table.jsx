@@ -22,6 +22,8 @@ const Table = ({
   loading,
   error,
   handleScroll,
+  isMaterialized = true, // specific to operation tables
+  isInSync = true, // specific to operation tables
   columnWidths = {},
   onColumnSort,
   sortConfig,
@@ -31,7 +33,16 @@ const Table = ({
   const tableContainerRef = React.useRef(null);
   return (
     <>
-      {columnIds.length === 0 ? (
+      {!isMaterialized ? (
+        <Alert severity="warning" sx={{ borderBottom: "1px solid #ccc" }}>
+          This operation is not materialized. Please materialize to view data.
+        </Alert>
+      ) : !isInSync ? (
+        <Alert severity="warning" sx={{ borderBottom: "1px solid #ccc" }}>
+          This operation is out of sync. Please materialize to view updated
+          data.
+        </Alert>
+      ) : columnIds.length === 0 ? (
         <Alert severity="info" sx={{ borderBottom: "1px solid #ccc" }}>
           No columns selected. Please select columns to display data.
         </Alert>

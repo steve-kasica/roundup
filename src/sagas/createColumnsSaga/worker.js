@@ -5,7 +5,12 @@ import {
 } from "../../slices/columnsSlice";
 import { createColumnsSuccess } from "./actions";
 import { getTableColumnNames } from "../../lib/duckdb/getTableColumnNames";
-import { selectTablesById, updateTables } from "../../slices/tablesSlice";
+import {
+  isTableId,
+  selectTablesById,
+  updateTables as updateTablesSlice,
+} from "../../slices/tablesSlice";
+import { updateOperations as updateOperationsSlice } from "../../slices/operationsSlice";
 import { CREATION_MODE_INSERTION } from ".";
 import generateUUID from "../../lib/utilities/generateUUID";
 import { insertColumn } from "../../lib/duckdb";
@@ -23,6 +28,7 @@ export default function* createColumnsWorker(action) {
   const successfulCreations = [];
   const tableIdToColumnNames = new Map();
   const tableUpdates = {};
+  const operationUpdates = {};
 
   if (mode === CREATION_MODE_INSERTION) {
     for (const { parentId, index } of columnLocations) {
@@ -49,7 +55,6 @@ export default function* createColumnsWorker(action) {
       tableUpdates[parentId].splice(index, 0, column.id);
     }
   } else {
-    // For initialization mode, we assume the database column already exists
     for (const { parentId, parentDatabaseName, index } of columnLocations) {
       if (!tableIdToColumnNames.has(parentId)) {
         // Fetch column names for this TABLE or VIEW from the DB only once
@@ -63,9 +68,17 @@ export default function* createColumnsWorker(action) {
         parentId,
         databaseName: tableIdToColumnNames.get(parentId)[index],
       });
-      tableUpdates[parentId] = tableUpdates[parentId] || [];
-      tableUpdates[parentId].push(column.id);
+
       successfulCreations.push(column);
+
+      if (isTableId(parentId)) {
+        tableUpdates[parentId] = tableUpdates[parentId] || [];
+        tableUpdates[parentId].push(column.id);
+      } else {
+        // Is an operation
+        operationUpdates[parentId] = operationUpdates[parentId] || [];
+        operationUpdates[parentId].push(column.id);
+      }
     }
   }
 
@@ -73,14 +86,28 @@ export default function* createColumnsWorker(action) {
   yield put(addColumnsToSlice(successfulCreations));
 
   // Update tables with new column IDs
-  yield put(
-    updateTables(
-      Object.entries(tableUpdates).map(([tableId, columnIds]) => ({
-        id: tableId,
-        columnIds,
-      }))
-    )
-  );
+  if (Object.keys(tableUpdates).length > 0) {
+    yield put(
+      updateTablesSlice(
+        Object.entries(tableUpdates).map(([tableId, columnIds]) => ({
+          id: tableId,
+          columnIds,
+        }))
+      )
+    );
+  }
+
+  // Update operations with new column IDs
+  if (Object.keys(operationUpdates).length > 0) {
+    yield put(
+      updateOperationsSlice(
+        Object.entries(operationUpdates).map(([operationId, columnIds]) => ({
+          id: operationId,
+          columnIds,
+        }))
+      )
+    );
+  }
 
   if (successfulCreations.length > 0) {
     yield put(

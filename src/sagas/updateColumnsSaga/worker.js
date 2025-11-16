@@ -6,7 +6,8 @@ import {
 import { getColumnStats } from "../../lib/duckdb";
 import { updateColumnsFailure, updateColumnsSuccess } from "./actions";
 import { DATABASE_ATTRIBUTES } from "../../slices/columnsSlice";
-import { selectTablesById } from "../../slices/tablesSlice";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectOperationsById } from "../../slices/operationsSlice";
 
 // Worker saga
 export default function* updateColumnsWorker(action) {
@@ -18,8 +19,11 @@ export default function* updateColumnsWorker(action) {
     const column = yield select((state) =>
       selectColumnsById(state, columnUpdate.id)
     );
+    // TODO: honestly, this should be streamlined into a selector that handles both tables and operations
     const parent = yield select((state) =>
-      selectTablesById(state, column.parentId)
+      isTableId(column.parentId)
+        ? selectTablesById(state, column.parentId)
+        : selectOperationsById(state, column.parentId)
     );
     try {
       let databaseUpdates = {};
@@ -38,6 +42,7 @@ export default function* updateColumnsWorker(action) {
         ...databaseUpdates[0],
       });
     } catch (error) {
+      console.error("Failed to update column:", column.id, error);
       failedUpdates.push({
         ...columnUpdate,
       });
