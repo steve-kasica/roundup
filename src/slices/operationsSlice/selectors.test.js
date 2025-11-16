@@ -7,6 +7,7 @@ import {
   selectOperationDepthById,
   selectMaxOperationDepth,
   selectOperationQueryData,
+  selectOperationChildRowCounts,
 } from "./selectors";
 import Operation, {
   JOIN_PREDICATES,
@@ -25,6 +26,7 @@ describe("operationsSelectors", () => {
     tables = Array.from({ length: 3 }, (_, i) =>
       Table({
         databaseName: `table_${i}`,
+        rowCount: Math.floor(Math.random() * 10000),
       })
     ),
     operations = Array.from({ length: 2 }, (_, i) =>
@@ -48,6 +50,9 @@ describe("operationsSelectors", () => {
   operations[1].columnIds = [columns[8].id, columns[9].id];
   operations[0].childIds = [tables[0].id, tables[1].id];
   operations[0].columnIds = [columns[6].id, columns[7].id];
+
+  operations[0].rowCount = tables[0].rowCount + tables[1].rowCount;
+  operations[1].rowCount = operations[0].rowCount + tables[2].rowCount;
 
   operations[1].parentId = operations[0].id;
   tables[0].parentId = operations[1].id;
@@ -152,6 +157,16 @@ describe("operationsSelectors", () => {
           },
         ],
       });
+    });
+  });
+  describe("selectOperationChildRowCounts", () => {
+    it("should return the row counts of child tables/operations", () => {
+      expect(selectOperationChildRowCounts(state, operations[1].id)).toEqual(
+        new Map([
+          [operations[0].id, operations[0].rowCount],
+          [tables[2].id, tables[2].rowCount],
+        ])
+      );
     });
   });
 });

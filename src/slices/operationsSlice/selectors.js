@@ -394,3 +394,24 @@ export const selectPackOperationMatchStats = createSelector(
     return stats;
   }
 );
+
+export const selectOperationChildRowCounts = createSelector(
+  [
+    (state, operationId) => selectOperationsById(state, operationId)?.childIds,
+    (state) => state.tables.byId,
+    (state) => state.operations.byId,
+  ],
+  (children, tablesData, operationsData) => {
+    if (!children) return new Map();
+
+    const rowCounts = [];
+    for (const childId of children) {
+      const rowCount =
+        (isTableId(childId)
+          ? tablesData[childId]?.rowCount
+          : operationsData[childId]?.rowCount) || 0;
+      rowCounts.push([childId, rowCount]);
+    }
+    return new Map(rowCounts);
+  }
+);
