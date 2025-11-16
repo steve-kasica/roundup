@@ -79,15 +79,20 @@ export const selectColumnNamesById = createSelector(
  */
 export const selectSelectedColumnIdsByParentId = createSelector(
   [
-    (state, parentId) =>
-      isTableId(parentId)
-        ? selectTablesById(state, parentId).columnIds
-        : selectOperationsById(state, parentId).columnIds,
+    (state, parentIds) =>
+      (Array.isArray(parentIds) ? parentIds : [parentIds]).map((parentId) =>
+        isTableId(parentId)
+          ? selectTablesById(state, parentId).columnIds
+          : selectOperationsById(state, parentId).columnIds
+      ),
     (state) => selectSelectedColumnIds(state),
   ],
-  (activeColumnIds, selectedColumnIds) => {
+  (activeColumnIdsByParent, selectedColumnIds) => {
     const selectedSet = new Set(selectedColumnIds);
-    return activeColumnIds.filter((colId) => selectedSet.has(colId));
+    const output = activeColumnIdsByParent.map((colIds) =>
+      colIds.filter((colId) => selectedSet.has(colId))
+    );
+    return output.length === 1 ? output[0] : output;
   }
 );
 

@@ -103,7 +103,7 @@ describe("Column selectors", () => {
   });
 
   describe("selectSelectedColumnIdsByParentId", () => {
-    it("should return selected column IDs for a given table ID", () => {
+    it("returns selected column IDs for a single table ID", () => {
       expect(selectSelectedColumnIdsByParentId(state, table1.id)).toEqual([
         column1.id,
       ]);
@@ -111,10 +111,10 @@ describe("Column selectors", () => {
         column3.id,
       ]);
     });
-    it("should return an empty array if no columns are selected for the table", () => {
+    it("returns an empty array if no columns are selected a single table ID", () => {
       expect(selectSelectedColumnIdsByParentId(state, table3.id)).toEqual([]);
     });
-    it("should return selected column IDS for a given operation ID", () => {
+    it("returns selected column IDs for a single operation ID", () => {
       expect(
         selectSelectedColumnIdsByParentId(
           {
@@ -124,6 +124,22 @@ describe("Column selectors", () => {
           operation1.id
         )
       ).toEqual([column4.id]);
+    });
+    it("returns selected column IDs for multiple table IDs", () => {
+      expect(
+        selectSelectedColumnIdsByParentId(state, [table1.id, table2.id])
+      ).toEqual([[column1.id], [column3.id]]);
+    });
+    it("returns selected column IDs for multiple operation IDs", () => {
+      expect(
+        selectSelectedColumnIdsByParentId(
+          {
+            ...state,
+            ui: { selectedColumnIds: [column4.id, column1.id] },
+          },
+          [operation1.id, table1.id]
+        )
+      ).toEqual([[column4.id], [column1.id]]);
     });
   });
   describe("selectActiveColumnIdsByParentId", () => {
