@@ -267,42 +267,6 @@ export const selectPackOperationColumnCount = createSelector(
 );
 
 /**
- * Memoized selector to calculate the maximum column count for a stack operation.
- *
- * Determines the maximum number of columns across all child tables in the stack.
- * This represents the width of the stack operation's matrix, where some tables may
- * have fewer columns and will be padded with null values.
- *
- * This selector is memoized using createSelector, which means the calculation is
- * cached and only recomputed when dependencies change. Importantly, this memoization
- * is shared across all component instances that use this selector - if multiple
- * components call this selector with the same arguments, they will receive the same
- * cached result without triggering a recalculation.
- *
- * @param {Object} state - The Redux state object.
- * @param {string|number} operationId - The unique identifier of the stack operation.
- * @returns {number} The maximum column count among all child tables, or 0 if no children.
- */
-export const selectStackOperationColumnCount = createSelector(
-  [
-    (state, operationId) => select,
-    // selectColumnIdMatrixByOperationId(state, operationId),
-  ],
-  (columnIdMatrix) => {
-    if (!columnIdMatrix) return 0;
-
-    // Group columns by tableId and count columns per table
-    const counts = columnIdMatrix.reduce(
-      (max, tableIds) => (tableIds.length > max ? tableIds.length : max),
-      0
-    );
-
-    // Return the maximum column count across all tables
-    return counts;
-  }
-);
-
-/**
  * Memoized selector to calculate row ranges for each child in a stack operation.
  *
  * Returns a Map where each key is a child ID and each value is a tuple [start, end]
