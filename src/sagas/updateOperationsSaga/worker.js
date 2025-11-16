@@ -1,12 +1,16 @@
-import { put, select } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import {
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
   selectOperationsById,
   updateOperations as updateOperationsSlice,
+  selectOperationQueryData,
 } from "../../slices/operationsSlice";
 import { setFocusedObjectId } from "../../slices/uiSlice";
 import { updateOperationsSuccess } from "./actions";
 import { updateTables as updateTablesSlice } from "../../slices/tablesSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { createPackView, createStackView } from "../../lib/duckdb";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
@@ -17,7 +21,9 @@ export default function* updateOperationsWorker(action) {
   const { operationUpdates } = action.payload;
 
   for (let operationUpdate of operationUpdates) {
-    successfulUpdates.push(operationUpdate);
+    const operation = yield select((state) =>
+      selectOperationsById(state, operationUpdate.id)
+    );
 
     // If the operation is updating the `childIds` property,
     // we need to ensure that the corresponding children specify this
@@ -47,7 +53,24 @@ export default function* updateOperationsWorker(action) {
           }
         }
       }
+    } else if (Object.hasOwnProperty.call(operationUpdate, "isMaterialized")) {
+      const queryData = yield select((state) =>
+        selectOperationQueryData(state, operation.id)
+      );
+      console.log("Materializing operation:", operation, queryData);
+      try {
+        if (operation.operationType === OPERATION_TYPE_STACK) {
+          yield call(createStackView, queryData);
+        } else if (operation.operationType === OPERATION_TYPE_PACK) {
+          yield call(createPackView, queryData);
+        }
+        operationUpdate.isMaterialized = true;
+      } catch (error) {
+        console.error("Error materializing operation:", error, queryData);
+        operationUpdate.isMaterialized = false;
+      }
     }
+    successfulUpdates.push(operationUpdate);
   }
 
   if (tableUpdates.length > 0) {

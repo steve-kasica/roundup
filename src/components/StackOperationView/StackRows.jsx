@@ -29,7 +29,7 @@ import { EnhancedColumnHeader } from "../ColumnViews";
 const StackRows = ({
   // Props passed via withOperationData
   id,
-  isViewMaterialized,
+  isMaterialized,
   materializeOperation,
   // Props passed directly from withStackoperationData
   columnIdMatrix,
@@ -110,19 +110,8 @@ const StackRows = ({
           <Alert severity="error" sx={{ mb: 1, height: "100%" }}>
             This stack operation has associated alerts. Please review them.
           </Alert>
-        ) : !isViewMaterialized ? (
-          <Alert
-            severity="warning"
-            action={
-              <IconButton
-                disabled={hasAlerts}
-                title="Materialize operation from schema specification"
-                onClick={handleRefresh}
-              >
-                {<Refresh />}
-              </IconButton>
-            }
-          >
+        ) : !isMaterialized ? (
+          <Alert severity="warning">
             <Typography variant="body2">
               The materialized view for this operation does not exist. Please
               compute the operation to generate the data.
@@ -164,7 +153,7 @@ const StackRows = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {!isViewMaterialized ? (
+            {!isMaterialized ? (
               <>
                 {Array.from({ length: 10 }).map((_, index) => (
                   <StyledAlternatingTableRow

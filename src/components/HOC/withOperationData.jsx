@@ -25,7 +25,6 @@ import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
-import { materializeOperationRequest } from "../../sagas/materializeOperationSaga/actions";
 import withAssociatedAlerts from "./withAssociatedAlerts";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
 import { group } from "d3";
@@ -177,7 +176,12 @@ export default function withOperationData(WrappedComponent) {
     );
 
     const materializeOperation = useCallback(
-      () => dispatch(materializeOperationRequest({ operationId: id })),
+      () =>
+        dispatch(
+          updateOperationsRequest({
+            operationUpdates: [{ id, isMaterialized: null }],
+          })
+        ),
       [dispatch, id]
     );
 
@@ -204,6 +208,7 @@ export default function withOperationData(WrappedComponent) {
         operationType={operation.operationType}
         childIds={operation.childIds}
         doesViewExist={operation.doesViewExist}
+        isMaterialized={operation.isMaterialized}
         activeChildColumnIds={activeChildColumnIds}
         depth={depth}
         // Pack-related operations

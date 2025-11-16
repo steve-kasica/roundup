@@ -1,12 +1,6 @@
 /* eslint-disable react/prop-types */
 import {
-  ArrowDropDown,
-  ClearAll,
-  Delete as ExcludeIcon,
   FileDownload as ExportIcon,
-  SelectAll,
-  TableView,
-  Visibility,
   ErrorOutline as AlertIcon,
 } from "@mui/icons-material";
 import {
@@ -23,15 +17,8 @@ import {
   Badge,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setSelectedColumnIds,
-  setFocusedColumnIds,
-  selectSelectedColumnIds,
-} from "../../slices/uiSlice";
+import { selectSelectedColumnIds } from "../../slices/uiSlice";
 import { useCallback, useState } from "react";
-import { isTableId } from "../../slices/tablesSlice";
-import { EnhancedTableLabel } from "../TableView";
-import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
 import { selectAlertsById } from "../../slices/alertsSlice/selectors";
 

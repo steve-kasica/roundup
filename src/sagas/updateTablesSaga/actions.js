@@ -12,6 +12,7 @@ export const updateTablesRequest = createAction("sagas/updateTables/request");
 /**
  * Action creator for successful table updates.
  *
+ * @param {Object} payload.
  * This action is dispatched when table updates complete successfully.
  *
  */

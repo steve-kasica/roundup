@@ -11,16 +11,10 @@ import { EnhancedColumnSummary, StyledColumnCard } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedStackOperationLabel } from "./StackOperationLabel";
-import {
-  CenterFocusStrong as FocusIcon,
-  VisibilityOff as ExcludeIcon,
-  Deselect as DeselectAllIcon,
-  SelectAll as SelectAllIcon,
-  SwapHoriz as SwapIcon,
-} from "@mui/icons-material";
 import FocusIconButton from "../ui/FocusIconButton";
 import ExcludeIconButton from "../ui/ExcludeIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
+import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -46,6 +40,7 @@ const StackSchemaView = ({
   swapColumns,
   insertColumnIntoChildAtIndex,
   setVisibleColumns: setVisibleColumnsInSlice,
+  materializeOperation,
 }) => {
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
   const [selectedTableColumnIds, setSelectedTableColumnIds] = useState([]);
@@ -293,6 +288,11 @@ const StackSchemaView = ({
     }
   }, [columnIdMatrix, selectedTableColumnIds.length]);
 
+  const handleMaterializeView = useCallback(() => {
+    // Placeholder for materialize view action
+    materializeOperation();
+  }, [id]);
+
   return (
     <Box
       display={"flex"}
@@ -326,6 +326,10 @@ const StackSchemaView = ({
             <SelectToggleIconButton
               onClick={handleSelectionAllColumns}
               isSelected={selectedTableColumnIds.length > 0}
+            />
+            <MaterializeViewIconButton
+              onClick={handleMaterializeView}
+              disabled={hasAlerts}
             />
           </>
         }

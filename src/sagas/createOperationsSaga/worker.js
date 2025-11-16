@@ -84,31 +84,6 @@ export default function* createOperationsWorker(action) {
         });
       }
     });
-
-    // // Create database view based on operation type
-    // if (operation.operationType === OPERATION_TYPE_PACK) {
-    //   // Creates a unified view with columns from all child tables
-    //   const { isAllPassing, fatalErrors, warnings } =
-    //     testPackOperationForFatalErrors(operation);
-    //   if (isAllPassing) {
-    //     successfulCreations.push(operation);
-    //   } else {
-    //     failedCreations.push(operation);
-    //   }
-    //   raisedAlerts.push(...fatalErrors, ...warnings);
-    // } else if (operation.operationType === OPERATION_TYPE_STACK) {
-    //   const { isAllPassing, fatalErrors, warnings } =
-    //     testStackOperationForFatalErrors(operation);
-    //   if (isAllPassing) {
-    //     successfulCreations.push(operation);
-    //   } else {
-    //     failedCreations.push(operation);
-    //   }
-    //   raisedAlerts.push(...fatalErrors, ...warnings);
-    // } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
-    //   // NO_OP operations do not require a database view
-    //   successfulCreations.push(operation);
-    // }
   }
 
   yield put(addOperationsToSlice(createdOperations));

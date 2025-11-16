@@ -1,6 +1,11 @@
 import { createAction } from "@reduxjs/toolkit";
 
-// Action creators for view creation workflow
+/**
+ * Action creators for creating operations.
+ *
+ * @param {Object} payload.operationData - The data to create the operation(s) with
+ * @returns {Object} Redux action with type "sagas/createOperation/request"
+ */
 export const createOperationsRequest = createAction(
   "sagas/createOperation/request"
 );

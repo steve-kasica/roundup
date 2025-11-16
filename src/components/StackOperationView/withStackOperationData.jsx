@@ -2,13 +2,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useMemo } from "react";
 import { selectStackOperationRowRanges } from "../../slices/operationsSlice";
-import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import withOperationData from "../HOC/withOperationData";
-import {
-  selectStackOperationRowCount,
-  selectStackOperationColumnCount,
-} from "../../slices/operationsSlice";
-import { selectTableColumnIds } from "../../slices/tablesSlice";
+import { selectStackOperationRowCount } from "../../slices/operationsSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 
 /**
@@ -31,7 +26,7 @@ import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 export default function withStackOperationData(WrappedComponent) {
   function EnhancedComponent({
     // Props passed from withOperationData
-    operation,
+    // rowCount,
     columnIds,
     selectedColumnIds,
     childIds,
@@ -91,7 +86,7 @@ export default function withStackOperationData(WrappedComponent) {
     );
 
     const selection = useMemo(() => {
-      return operation.childIds
+      return childIds
         .map((tableId, rowIndex) => ({
           tableId,
           columnIds: columnIdMatrix[rowIndex].filter((columnId) =>
@@ -99,11 +94,12 @@ export default function withStackOperationData(WrappedComponent) {
           ),
         }))
         .filter(({ columnIds }) => columnIds.length > 0);
-    }, [operation.childIds, columnIdMatrix, selectedColumnIds]);
+    }, [childIds, columnIdMatrix, selectedColumnIds]);
 
-    const rowCount = useSelector((state) => {
-      return operation.rowCount || selectStackOperationRowCount(state, id);
-    });
+    // const rowCount = useSelector((state) => {
+    //   return rowCount || selectStackOperationRowCount(state, id);
+    // });
+    const rowCount = -1; // TODO
 
     const rowRanges = useSelector((state) =>
       selectStackOperationRowRanges(state, id)
@@ -120,7 +116,7 @@ export default function withStackOperationData(WrappedComponent) {
         )
         .filter((index) => index !== null)
         .map((index) => operation.childIds[index]);
-    }, [columnIdMatrix, operation.childIds, selectedColumnIds]);
+    }, [columnIdMatrix, selectedColumnIds]);
 
     const swapColumns = useCallback(
       (target, source) => {

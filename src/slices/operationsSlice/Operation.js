@@ -52,7 +52,7 @@ export default function Operation({
     columnIds,
     rowCount,
     operationType,
-    isViewMaterialized: false, // Initially false, can be updated later
+    isMaterialized: false, // Initially false, can be updated later
 
     // Properties specific to PACK operations
     ...(operationType === OPERATION_TYPE_PACK

@@ -1,5 +1,9 @@
 import { createSelector } from "reselect";
 import { normalizeInputToArray } from "../utilities";
+import {
+  selectActiveColumnIdsByParentId,
+  selectColumnsById,
+} from "../columnsSlice";
 
 export const selectAllTableIds = (state) => state.tables.allIds;
 
@@ -64,4 +68,18 @@ export const selectTableColumnIds = createSelector(
 export const selectAllTablesData = createSelector(
   [(state) => state.tables.byId],
   (byId) => Object.values(byId)
+);
+
+export const selectTableQueryData = createSelector(
+  [
+    (state, tableId) => selectTablesById(state, tableId),
+    (state, tableId) =>
+      selectColumnsById(state, selectTablesById(state, tableId).columnIds),
+  ],
+  (table, columns) => {
+    return {
+      tableName: table.databaseName,
+      columnNames: columns.map((col) => col.databaseName),
+    };
+  }
 );
