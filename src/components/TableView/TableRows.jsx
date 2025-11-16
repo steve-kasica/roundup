@@ -59,6 +59,9 @@ import {
 } from "../ui/Table";
 import { EnhancedColumnHeader } from "../ColumnViews";
 import { EnhancedTableLabel, TableLabel } from "./TableLabel.jsx";
+import StyledTable from "../ui/Table/StyledTable.jsx";
+import StyledTableContainer from "../ui/Table/StyledTableContainer.jsx";
+import RoundupTable from "../ui/Table/Table.jsx";
 
 const placeHolderColumnLength = 11; // Number of placeholder columns when none are selected
 const placeHolderRowLength = 20; // Number of placeholder rows when none are selected
@@ -122,16 +125,6 @@ const TableRows = ({
   }, []);
 
   /**
-   * Registers the table container reference with parent component
-   * Allows parent to coordinate scrolling across multiple table instances
-   */
-  useEffect(() => {
-    if (tableContainerRef.current && onScrollContainerRef) {
-      onScrollContainerRef(tableContainerRef.current);
-    }
-  }, [onScrollContainerRef]);
-
-  /**
    * Handles scroll events for infinite scrolling and parent coordination
    * Triggers pagination when near bottom and notifies parent of scroll position
    *
@@ -140,13 +133,7 @@ const TableRows = ({
   const handleScroll = useCallback(
     (event) => {
       const container = event.target;
-      const { scrollTop, scrollHeight, clientHeight, scrollLeft } = container;
-
-      // Notify parent of scroll position for coordination
-      // parent will know which child is the source
-      if (onScroll) {
-        onScroll(scrollLeft, scrollTop);
-      }
+      const { scrollTop, scrollHeight, clientHeight } = container;
 
       // Check if user has scrolled near the bottom (within 100px)
       const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
@@ -155,217 +142,24 @@ const TableRows = ({
         loadMore();
       }
     },
-    [hasMore, loading, error, loadMore, onScroll]
+    [hasMore, loading, error, loadMore]
   );
 
   return (
-    <>
-      {selectedColumnIds.length === 0 ? (
-        <Alert severity="info" sx={{ borderBottom: "1px solid #ccc" }}>
-          No columns selected. Please select columns to display data.
-        </Alert>
-      ) : error ? (
-        <Alert
-          severity="error"
-          sx={{
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-          }}
-          action={
-            <Button color="inherit" size="small" onClick={refresh}>
-              Retry
-            </Button>
-          }
-        >
-          Error loading table data: {error?.message || "Unknown error"}
-        </Alert>
-      ) : null}
-      <TableContainer
-        ref={tableContainerRef}
-        onScroll={handleScroll}
-        sx={{ height: "100%", overflow: "auto" }}
-      >
-        <Table size="small" stickyHeader sx={{ width: "auto" }}>
-          {/* Table Header - Sortable column headers with hover effects */}
-          {showHeader && (
-            <TableHead>
-              <TableRow>
-                {/* Sticky Row Number Header */}
-                <StickyTableCell
-                  sx={{
-                    zIndex: 3,
-                    backgroundColor: "#f5f5f5",
-                    userSelect: "none",
-                  }}
-                >
-                  #
-                </StickyTableCell>
-
-                {/* Column Headers with Sorting */}
-                {selectedColumnIds.length === 0
-                  ? Array.from({ length: placeHolderColumnLength }).map(
-                      (_, i) => (
-                        <TableCell key={i} align="center" sx={{ p: "1px" }}>
-                          <Typography
-                            color="text.secondary"
-                            sx={{
-                              fontStyle: "italic",
-                              fontWeight: 600,
-                              opacity: 0.6,
-                              userSelect: "none",
-                            }}
-                          >
-                            Column {i + 1}
-                          </Typography>
-                        </TableCell>
-                      )
-                    )
-                  : selectedColumnIds.map((colId, i) => (
-                      <TableCell
-                        key={`${i}-${colId}`}
-                        align="center"
-                        sx={{ p: "1px" }}
-                      >
-                        <EnhancedColumnHeader
-                          id={colId}
-                          isActive={sortConfig.columnId === colId}
-                          onSort={handleColumnSort}
-                          sortDirection={sortConfig.direction}
-                        />
-                      </TableCell>
-                    ))}
-              </TableRow>
-            </TableHead>
-          )}
-
-          {/* Table Body - Data rows with loading, error, and pagination states */}
-          <TableBody>
-            {/* No columns selected*/}
-            {selectedColumnIds.length === 0 ? (
-              <>
-                {Array.from({ length: placeHolderRowLength }).map(
-                  (_, rowIndex) => (
-                    <StyledAlternatingTableRow
-                      key={`no-columns-${rowIndex}`}
-                      isEven={rowIndex % 2 === 0}
-                    >
-                      <StickyTableCell
-                        sx={{
-                          userSelect: "none",
-                        }}
-                      >
-                        {rowIndex + 1}
-                      </StickyTableCell>
-                      {Array.from({ length: placeHolderColumnLength }).map(
-                        (colId, i) => (
-                          <StyledTableCell
-                            key={i}
-                            align="center"
-                            isEven={rowIndex % 2 === 0}
-                            maxWidth={columnWidths[colId] || "200px"}
-                          >
-                            <Typography
-                              color="text.secondary"
-                              sx={{
-                                fontStyle: "italic",
-                                opacity: 0.3,
-                                userSelect: "none",
-                              }}
-                            >
-                              No Data
-                            </Typography>
-                          </StyledTableCell>
-                        )
-                      )}
-                    </StyledAlternatingTableRow>
-                  )
-                )}
-              </>
-            ) : loading && data.length === 0 ? (
-              /* Initial Loading State - Skeleton rows with loading indicators */
-              Array.from({ length: 10 }).map((_, rowIndex) => (
-                <StyledAlternatingTableRow
-                  key={`loading-${rowIndex}`}
-                  isEven={rowIndex % 2 === 0}
-                >
-                  <StickyTableCell>{rowIndex + 1}</StickyTableCell>
-                  {selectedColumnIds.map((colId, i) => (
-                    <StyledTableCell
-                      key={colId}
-                      align="center"
-                      isEven={rowIndex % 2 === 0}
-                      maxWidth={columnWidths[colId] || "200px"}
-                    >
-                      <CircularProgress size={16} />
-                    </StyledTableCell>
-                  ))}
-                </StyledAlternatingTableRow>
-              ))
-            ) : (
-              /* Data Rows - Actual table content with alternating colors and hover effects */
-              <>
-                {data.map((row, rowIndex) => (
-                  <StyledAlternatingTableRow
-                    key={rowIndex}
-                    isEven={rowIndex % 2 === 0}
-                  >
-                    {/* Row Number Cell */}
-                    <StickyTableCell>{rowIndex + 1}</StickyTableCell>
-
-                    {/* Data Cells with proper formatting for different data types */}
-                    {row.map((value, i) => (
-                      <StyledTableCell
-                        key={i}
-                        isEven={rowIndex % 2 === 0}
-                        maxWidth={columnWidths[selectedColumnIds[i]] || "200px"}
-                      >
-                        {value === null ? (
-                          <Typography
-                            color="text.secondary"
-                            sx={{ fontStyle: "italic", opacity: 0.6 }}
-                          >
-                            NULL
-                          </Typography>
-                        ) : typeof value === "number" ? (
-                          value.toLocaleString()
-                        ) : (
-                          value
-                        )}
-                      </StyledTableCell>
-                    ))}
-                  </StyledAlternatingTableRow>
-                ))}
-
-                {/* Pagination Loading Indicator - Shows when loading more data */}
-                {loading && data.length > 0 && (
-                  <StyledAlternatingTableRow isEven={data.length % 2 === 0}>
-                    <TableCell
-                      colSpan={selectedColumnIds.length + 1}
-                      align="center"
-                    >
-                      <Box
-                        sx={{
-                          py: 2,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <CircularProgress size={20} />
-                        <Typography variant="body2" sx={{ ml: 1 }}>
-                          Loading more rows...
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </StyledAlternatingTableRow>
-                )}
-              </>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+    <RoundupTable
+      columnIds={selectedColumnIds}
+      data={data}
+      loading={loading}
+      error={error}
+      sortConfig={sortConfig}
+      onColumnSort={handleColumnSort}
+      tableContainerRef={tableContainerRef}
+      handleScroll={handleScroll}
+      showHeader={showHeader}
+      columnWidths={columnWidths}
+      placeHolderColumnLength={placeHolderColumnLength}
+      placeHolderRowLength={placeHolderRowLength}
+    />
   );
 };
 

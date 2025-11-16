@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { getTableRows } from "../lib/duckdb/getTableRows.js";
 import { useSelector } from "react-redux";
-import { selectColumnNamesById } from "../slices/columnsSlice/selectors.js";
+import {
+  selectColumnNamesById,
+  selectColumnsById,
+} from "../slices/columnsSlice/selectors.js";
 
 /**
  * Custom React Hook for querying DuckDB database rows
@@ -98,9 +101,12 @@ export function usePaginatedTableRows(
   tableId,
   columnIds = null,
   pageSize = 50,
-  sortBy = null,
+  sortByColumnId = null,
   sortDirection = "asc"
 ) {
+  const sortBy = useSelector(
+    (state) => selectColumnsById(state, sortByColumnId)?.databaseName || null
+  );
   const columnsList = useSelector((state) =>
     selectColumnNamesById(state, columnIds)
   );
