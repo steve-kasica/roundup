@@ -155,12 +155,6 @@ export const selectOperationQueryData = (state, id) => {
     if (isTableId(childId)) {
       return selectTableQueryData(state, childId);
     } else {
-      // return {
-      //   tableName: selectOperationsById(state, childId).databaseName,
-      //   columnNames: selectOperationsById(state, childId).columnIds.map(
-      //     (colId) => selectColumnsById(state, colId).databaseName
-      //   ),
-      // };
       return {
         tableName: selectOperationsById(state, childId).databaseName,
         columnNames: selectOperationsById(state, childId).columnIds.map(
@@ -172,8 +166,9 @@ export const selectOperationQueryData = (state, id) => {
   let operationTypeParams =
     operation.operationType === OPERATION_TYPE_PACK
       ? {
-          joinKey1: selectColumnsById(state, operation.joinKey1).databaseName,
-          joinKey2: selectColumnsById(state, operation.joinKey2).databaseName,
+          leftKey: selectColumnsById(state, operation.joinKey1).databaseName,
+          rightKey: selectColumnsById(state, operation.joinKey2).databaseName,
+          joinType: operation.joinType,
           joinPredicate: operation.joinPredicate,
         }
       : {};

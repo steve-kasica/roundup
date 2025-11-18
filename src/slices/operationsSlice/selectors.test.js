@@ -11,6 +11,7 @@ import {
 } from "./selectors";
 import Operation, {
   JOIN_PREDICATES,
+  JOIN_TYPES,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "./Operation";
@@ -38,6 +39,7 @@ describe("operationsSelectors", () => {
               joinKey1: columns[6].id,
               joinKey2: columns[8].id,
               joinPredicate: JOIN_PREDICATES.EQUALS,
+              joinType: JOIN_TYPES.FULL_OUTER,
             }
           : {
               operationType: OPERATION_TYPE_STACK,
@@ -139,9 +141,10 @@ describe("operationsSelectors", () => {
         columnNames: operations[1].columnIds.map(
           (id) => state.columns.byId[id].databaseName
         ),
-        joinKey1: columns[6].databaseName,
-        joinKey2: columns[8].databaseName,
+        leftKey: columns[6].databaseName,
+        rightKey: columns[8].databaseName,
         joinPredicate: JOIN_PREDICATES.EQUALS,
+        joinType: operations[1].joinType,
         children: [
           {
             tableName: operations[0].databaseName,
