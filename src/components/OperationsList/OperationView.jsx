@@ -15,31 +15,33 @@ import {
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
 import StackParametersForm from "../StackOperationView/StackParametersForm";
-import PackParametersForm from "../PackOperationView/PackParametersForm";
+import { EnhancedPackParametersForm } from "../PackOperationView/PackParametersForm";
 
 export const LAYOUT_ID = "operationListItem";
 
 function OperationView({
-  operation,
+  id,
+  name,
+  childIds,
+  operationType,
   columnCount,
   isFocused,
   index,
   // peekTable,
   // renameOperation,
   focusOperation,
+  error,
 }) {
-  const childrenIds = operation.childIds;
-  const label =
-    operation.operationType.charAt(0).toUpperCase() +
-    operation.operationType.slice(1);
+  const childrenIds = childIds;
+  const label = operationType.charAt(0).toUpperCase() + operationType.slice(1);
   const position = index + 1;
 
   const renderOperationParams = () => {
-    switch (operation.operationType) {
+    switch (operationType) {
       case OPERATION_TYPE_PACK:
-        return <PackParametersForm id={operation.id} />;
+        return <EnhancedPackParametersForm id={id} />;
       case OPERATION_TYPE_STACK:
-        return <StackParametersForm id={operation.id} />;
+        return <StackParametersForm id={id} />;
       default:
         return <Typography component="pre">Unknown operation type</Typography>;
     }
@@ -47,18 +49,18 @@ function OperationView({
 
   // Parse error message if it's a JSON string
   const getErrorMessage = () => {
-    if (!operation.error) return "";
+    if (!error) return "";
 
-    if (typeof operation.error === "string") {
+    if (typeof error === "string") {
       try {
-        const parsedError = JSON.parse(operation.error);
-        return parsedError.message || operation.error;
+        const parsedError = JSON.parse(error);
+        return parsedError.message || error;
       } catch {
-        return operation.error;
+        return error;
       }
     }
 
-    return operation.error.message || "An error occurred";
+    return error.message || "An error occurred";
   };
 
   const listItemContent = (
@@ -88,7 +90,7 @@ function OperationView({
           }}
         >
           <ListItemText
-            primary={`${position}. ${operation.name} (${columnCount})`}
+            primary={`${position}. ${name} (${columnCount})`}
             secondary={`${label}: ${childrenIds.join(", ")}`}
           />
         </AccordionSummary>
@@ -118,7 +120,7 @@ function OperationView({
     </>
   );
 
-  return operation.error ? (
+  return error ? (
     <Tooltip title={getErrorMessage()} arrow placement="right">
       {listItemContent}
     </Tooltip>

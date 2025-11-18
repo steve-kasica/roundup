@@ -18,16 +18,14 @@ import {
 } from "../../slices/operationsSlice";
 import { EnhancedColumnName } from "../ColumnViews";
 
-/* eslint-disable react/prop-types */
-
 const PackParametersForm = ({
   name,
   joinPredicate,
   leftKey,
   rightKey,
   operationType,
-  rightHandColumns,
-  leftHandColumns,
+  rightColumnIds,
+  leftColumnIds,
   isLoading,
   alerts = [],
   setJoinPredicate,
@@ -123,8 +121,8 @@ const PackParametersForm = ({
           label="Left Join Key"
           error={hasAlerts}
         >
-          {leftHandColumns &&
-            leftHandColumns.map((columnId) => (
+          {leftColumnIds &&
+            leftColumnIds.map((columnId) => (
               <MenuItem key={columnId} value={columnId}>
                 <EnhancedColumnName id={columnId} />
               </MenuItem>
@@ -146,8 +144,8 @@ const PackParametersForm = ({
           label="Right Join Key"
           error={hasAlerts}
         >
-          {rightHandColumns &&
-            rightHandColumns.map((columnId) => (
+          {rightColumnIds &&
+            rightColumnIds.map((columnId) => (
               <MenuItem key={columnId} value={columnId}>
                 <EnhancedColumnName id={columnId} />
               </MenuItem>
@@ -164,6 +162,7 @@ const PackParametersForm = ({
 PackParametersForm.displayName = "PackParametersForm";
 
 const EnhancedPackParametersForm = withPackOperationData(PackParametersForm);
+
 EnhancedPackParametersForm.displayName = "EnhancedPackParametersForm";
 
-export default EnhancedPackParametersForm;
+export { PackParametersForm, EnhancedPackParametersForm };

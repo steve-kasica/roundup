@@ -26,7 +26,6 @@ const StackRows = ({
   columnIdMatrix,
   // Props defined in withAssociatedAlerts
 }) => {
-  const tableContainerRef = useRef(null);
   const [sortByColumnId, setSortByColumnId] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
 
@@ -63,6 +62,8 @@ const StackRows = ({
   );
 
   // Handle scroll events for infinite loading
+  // TODO: does this need to be in RoundupTable
+  // to not be repeated?
   const handleScroll = useCallback(
     (event) => {
       const container = event.target;

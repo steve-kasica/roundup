@@ -207,6 +207,18 @@ export default function withOperationData(WrappedComponent) {
       [dispatch, id]
     );
 
+    const name = useMemo(() => {
+      const operationLabel = operation.operationType
+        ? operation.operationType.charAt(0).toUpperCase() +
+          operation.operationType.slice(1) +
+          " operation"
+        : "Operation";
+      if (operation.name && operation.name.trim().length > 0) {
+        return operation.name;
+      }
+      return operationLabel;
+    }, [operation.name, operation.operationType]);
+
     return (
       <WrappedComponent
         // Pass along props directly from the parent component
@@ -214,7 +226,7 @@ export default function withOperationData(WrappedComponent) {
         id={id}
         // Props via this HOC
         operation={operation}
-        name={operation.name}
+        name={name}
         databaseName={operation.databaseName}
         operationType={operation.operationType}
         childIds={operation.childIds}
