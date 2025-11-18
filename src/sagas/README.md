@@ -9,8 +9,37 @@ Sagas also address the added complexity of denormalizing the Redux state, coordi
 
 # Control flows
 
+## Uploading a source table
+
+When the user uploads a source table from their personal computer. The following happens in the Sagas layer
+
 ```mermaid
-graph TD;
-   `createTables`-->`createColumns`
-   `createColumns`-->`updateColumns`
+flowchart LR
+   Start -->|request| B[[Create<br>tables<br>saga]]
+      B -->|success| E[[Create<br>columns<br>saga]]
+         E -->|success| H[[Update<br>columns<br>saga]]
+               H -->|success| Z
+               H -->|failure| Z
+         E -->|failure| Z
+      B -->|failure| Z[[handleAlerts]]
+   Z --> End
 ```
+
+## Creating an operation
+
+```mermaid
+flowchart LR
+   A(Create<br>operations<br>request) --> B[[Create<br>operations<br>saga]]
+      B --> C(Create<br>operations<br>success)
+         C --> E[[Update<br>operations<br>saga]]
+            E --> F(Update<br>operations<br>success)
+               F --> Z[[handleAlerts]]
+            E --> G(Update<br>operations<br>failure)
+               G --> Z[[handleAlerts]]
+         C --> Z
+      B --> D(Create<br>operations<br>failure)
+         D --> Z[[handleAlerts]]
+
+```
+
+---

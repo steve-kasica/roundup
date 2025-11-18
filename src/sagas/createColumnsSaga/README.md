@@ -4,6 +4,24 @@ This saga create a column within Roundup. Its purpose is correctly link a newly 
 
 Since Roundup denormalizes global state to optimize column lookups, this saga also updates the inverse mapping between `columns` and `tables`/`operations` specified in the `.columnIds` property of both parent object.
 
+## Process
+
+```mermaid
+---
+title: Creation columns saga
+---
+flowchart LR
+    start --> A{which mode?}
+    A -->|Insertion| insertionStart
+    subgraph insertColumnsWorker[Insertion mode]
+    insertionStart
+    end
+    A -->|creation| creationStart
+    subgraph createColumnsWorker[Creation mode]
+    creationStart
+    end
+```
+
 ## Inserting columns
 
 Roundup supports inserting new columns into existing database tables/views and this functionality is handled as a special case of `createColumnsSaga`. Column creation requests payloads where `mode` equals `CREATION_MODE_INSERTION`.

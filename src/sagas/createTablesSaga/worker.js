@@ -9,7 +9,7 @@ import generateUUID from "../../lib/utilities/generateUUID";
 
 export default function* createTablesWorker(action) {
   const successfulCreations = [];
-  // const failedCreations = [];
+  const failedCreations = [];
   const { tablesInfo } = action.payload;
 
   for (const info of tablesInfo) {
@@ -35,7 +35,7 @@ export default function* createTablesWorker(action) {
       successfulCreations.push(table);
     } catch (error) {
       console.error("Error creating tables:", error);
-      // failedCreations.push(table);
+      failedCreations.push(tablesInfo);
     }
   }
 
@@ -49,9 +49,7 @@ export default function* createTablesWorker(action) {
     );
   }
 
-  // if (failedCreations.length > 0) {
-  //   yield put(
-  //     createTablesFailure({ tableIds: failedCreations.map((t) => t.id) })
-  //   );
-  // }
+  if (failedCreations.length > 0) {
+    yield put(createTablesFailure({ tablesInfo }));
+  }
 }

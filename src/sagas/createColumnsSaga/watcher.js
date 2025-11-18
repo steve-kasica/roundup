@@ -2,7 +2,6 @@ import { call, put, select, takeEvery } from "redux-saga/effects";
 import createColumnsWorker from "./worker";
 import { createColumnsRequest } from "./actions";
 import { createTablesSuccess } from "../createTablesSaga";
-import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import {
   OPERATION_TYPE_NO_OP,
   selectOperationsById,
