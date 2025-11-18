@@ -1,7 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useSelector, useDispatch } from "react-redux";
 
-import { selectColumnsById } from "../../slices/columnsSlice";
+import {
+  selectColumnsById,
+  selectColumnIndexById,
+} from "../../slices/columnsSlice";
 import {
   setFocusedColumnIds,
   removeFromHoveredColumnIds,
@@ -12,7 +15,6 @@ import {
   isColumnIdDropTarget,
   isColumnIdFocused,
   isColumnIdVisible,
-  selectColumnIndexById,
 } from "../../slices/uiSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
