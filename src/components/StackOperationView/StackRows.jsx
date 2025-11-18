@@ -13,21 +13,21 @@ const pageSize = 50; // default page size for pagination
  * @returns
  */
 const StackRows = ({
-  // Props passed via withOperationData
+  // Props defined via withOperationData
   databaseName,
   materializeOperation,
   isMaterialized,
   isInSync,
-  selectedColumnIds,
+  activeColumnIds,
   childIds, // an array of child operation/table IDs
   childRowCounts, // a map of childId to row count
   selectedChildColumnIds,
-  // Props passed directly from withStackoperationData
+  // Props defined in withStackOperationData
   columnIdMatrix,
-  // Props passed from withAssociatedAlerts
+  // Props defined in withAssociatedAlerts
 }) => {
   const tableContainerRef = useRef(null);
-  const [sortBy, setSortBy] = useState(null);
+  const [sortByColumnId, setSortByColumnId] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
 
   const initialOffset = useMemo(() => {
@@ -38,11 +38,26 @@ const StackRows = ({
     return childRowCounts.get(firstSelectedChildId) || 0;
   }, [childIds, childRowCounts, selectedChildColumnIds]);
 
+  const displayColumnIds = useMemo(() => {
+    const selectedChildColumnIdsSet = new Set(selectedChildColumnIds.flat());
+    const selectedIndices = new Set();
+    columnIdMatrix.forEach((columnIds) => {
+      columnIds.forEach((colId, colIndex) => {
+        if (selectedChildColumnIdsSet.has(colId)) {
+          selectedIndices.add(colIndex);
+        }
+      });
+    });
+    return activeColumnIds.filter((colId, index) => selectedIndices.has(index));
+  }, [activeColumnIds, columnIdMatrix, selectedChildColumnIds]);
+
+  console.log({ initialOffset, displayColumnIds });
+
   const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
     databaseName,
-    null,
-    pageSize, // default pageSize
-    sortBy,
+    displayColumnIds,
+    pageSize,
+    sortByColumnId,
     sortDirection,
     initialOffset
   );
@@ -66,18 +81,14 @@ const StackRows = ({
   const handleColumnSort = useCallback(
     (event, columnId) => {
       let newDirection = "asc";
-      if (sortBy === columnId) {
+      if (sortByColumnId === columnId) {
         newDirection = sortDirection === "asc" ? "desc" : "asc";
       }
-      setSortBy(columnId);
+      setSortByColumnId(columnId);
       setSortDirection(newDirection);
     },
-    [sortBy, sortDirection]
+    [sortByColumnId, sortDirection]
   );
-
-  const displayColumns = useMemo(() => {
-    return columnIdMatrix[0];
-  }, [columnIdMatrix]);
 
   const handleRefresh = useCallback(() => {
     materializeOperation();
@@ -85,7 +96,7 @@ const StackRows = ({
 
   return (
     <RoundupTable
-      columnIds={selectedColumnIds}
+      columnIds={displayColumnIds}
       isMaterialized={isMaterialized}
       isInSync={isInSync}
       data={data}
@@ -93,7 +104,7 @@ const StackRows = ({
       error={error}
       handleScroll={handleScroll}
       onColumnSort={handleColumnSort}
-      sortConfig={{ sortBy, sortDirection }}
+      sortConfig={{ sortByColumnId, sortDirection }}
       placeHolderColumnLength={11}
       placeHolderRowLength={20}
     />

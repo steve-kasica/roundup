@@ -1,9 +1,7 @@
-/* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useMemo } from "react";
 import { selectStackOperationRowRanges } from "../../slices/operationsSlice";
 import withOperationData from "../HOC/withOperationData";
-import { selectStackOperationRowCount } from "../../slices/operationsSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 
 /**

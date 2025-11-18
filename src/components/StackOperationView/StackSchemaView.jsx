@@ -291,7 +291,7 @@ const StackSchemaView = ({
   const handleMaterializeView = useCallback(() => {
     // Placeholder for materialize view action
     materializeOperation();
-  }, [id]);
+  }, [materializeOperation]);
 
   return (
     <Box

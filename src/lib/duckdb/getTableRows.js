@@ -19,6 +19,7 @@ export async function getTableRows(
     FROM ${tableId} 
     ${sortBy ? `ORDER BY ${sortBy} ${sortDirection}` : ""}
     LIMIT ${limit} 
+    OFFSET ${offset}
   `;
   const result = await conn.query(query);
   await conn.close();
