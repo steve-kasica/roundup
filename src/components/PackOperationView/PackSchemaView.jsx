@@ -21,6 +21,7 @@ import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { extent, interpolateGreys, scaleSequential } from "d3";
 import { EnhancedTableName } from "../TableView/TableName";
 import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
+import { isTableId } from "../../slices/tablesSlice";
 const matchLabels = new Map([
   ["matchingRowCount", "Matches"],
   ["leftUnmatchedRowCount", "Left Only"],
@@ -494,25 +495,39 @@ const PackSchemaView = withPackOperationData(
                 flexShrink={0}
               />
               {[
-                { tableId: leftTableId, columnCount: leftColumnIds.length },
-                { tableId: rightTableId, columnCount: rightColumnIds.length },
-              ].map(({ tableId, columnCount }) => (
+                { childId: leftTableId, columnCount: leftColumnIds.length },
+                { childId: rightTableId, columnCount: rightColumnIds.length },
+              ].map(({ childId, columnCount }) => (
                 <Box
-                  key={tableId}
+                  key={childId}
                   flex={columnCount}
                   minWidth={0}
                   textAlign={"center"}
                 >
-                  <EnhancedTableName
-                    id={tableId}
-                    sx={{
-                      fontSize: "0.75rem",
-                      userSelect: "none",
-                      fontWeight: "none",
-                    }}
-                    onMouseEnter={() => setHoveredColumn(`${tableId}:`)}
-                    onMouseLeave={() => setHoveredColumn(null)}
-                  />
+                  {isTableId(childId) ? (
+                    <EnhancedTableName
+                      id={childId}
+                      sx={{
+                        fontSize: "0.75rem",
+                        userSelect: "none",
+                        fontWeight: "none",
+                      }}
+                      onMouseEnter={() => setHoveredColumn(`${tableId}:`)}
+                      onMouseLeave={() => setHoveredColumn(null)}
+                    />
+                  ) : (
+                    <p>{childId}</p>
+                    // <EnhancedOperationName
+                    //   id={childId}
+                    //   sx={{
+                    //     fontSize: "0.75rem",
+                    //     userSelect: "none",
+                    //     fontWeight: "none",
+                    //   }}
+                    //   onMouseEnter={() => setHoveredColumn(`${childId}:`)}
+                    //   onMouseLeave={() => setHoveredColumn(null)}
+                    // />
+                  )}
                 </Box>
               ))}
             </Box>

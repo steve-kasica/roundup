@@ -2,112 +2,12 @@
 // Unlike other sagas, this saga is only in charge of
 // syncing database views with operations in the redux store.
 
-import { put, select, takeEvery, takeLatest, delay } from "redux-saga/effects";
+import { put, select, takeEvery } from "redux-saga/effects";
 import { updateOperationsRequest } from "./actions";
 import updateOperationsWorker from "./worker";
-import { selectColumnsById } from "../../slices/columnsSlice";
-import { group } from "d3";
-import { selectOperationIdByChildId } from "../../slices/operationsSlice";
-import {
-  createColumnsSuccess,
-  CREATION_MODE_INSERTION,
-} from "../createColumnsSaga";
-import {
-  materializeOperationSuccess,
-  materializeOperationFailure,
-} from "../materializeOperationSaga/actions";
-import {
-  selectTableColumnIds,
-  selectTablesById,
-} from "../../slices/tablesSlice";
+import { selectTablesById } from "../../slices/tablesSlice";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import { updateTablesSuccess } from "../updateTablesSaga";
-
-const handleChildTableColumnExclusion = function* (columnIds) {
-  const tableIds = yield select((state) => {
-    const ids = new Set();
-    columnIds.forEach((id) => {
-      const column = selectColumnsById(state, id);
-      if (column) {
-        ids.add(column.tableId);
-      }
-    });
-    return Array.from(ids);
-  });
-
-  const operationUpdates = yield select((state) => {
-    return tableIds
-      .map((tableId) => selectOperationIdByChildId(state, tableId))
-      .filter(Boolean);
-  });
-
-  if (operationUpdates.length > 0) {
-    yield put(
-      updateOperationsRequest({
-        operationUpdates: operationUpdates.map(({ id, children }) => ({
-          id,
-          children, // essentially a no-op, but it will trigger the view re-creation in the database
-        })),
-      })
-    );
-  } else {
-    yield null;
-  }
-};
-
-const handleEmptyTable = function* (columnIds) {
-  // Wait one tick to ensure all synchronous updates are done
-  yield delay(0);
-
-  // Use yield select() to get state AFTER the reducer has run
-  const emptyTables = yield select((state) => {
-    const emptyTables = [];
-
-    // Calculate which tables will be empty after exclusion
-    const recentlyExcludedTableIds = new Set(
-      columnIds.map((id) => selectColumnsById(state, id).tableId)
-    );
-    for (const tableId of recentlyExcludedTableIds) {
-      const activeColumnIds = selectTableColumnIds(state, tableId); // `columnIds` should be excluded already
-
-      if (activeColumnIds.length === 0) {
-        emptyTables.push(tableId);
-      }
-    }
-
-    return emptyTables; // Return the result
-  });
-
-  if (emptyTables.length > 0) {
-    const operationUpdates = yield select((state) => {
-      const updates = new Map();
-
-      emptyTables.forEach((tableId) => {
-        const operation = selectOperationIdByChildId(state, tableId);
-        if (updates.has(operation.id)) {
-          updates.set(
-            operation.id,
-            updates.get(operation.id).filter((tid) => tid !== tableId)
-          );
-        } else {
-          updates.set(
-            operation.id,
-            operation.childIds.filter((tid) => tid !== tableId)
-          );
-        }
-      });
-
-      return Array.from(updates.entries()).map(([operationId, tableIds]) => ({
-        id: operationId,
-        childIds: tableIds,
-      }));
-    });
-
-    if (operationUpdates.length > 0) {
-      yield put(updateOperationsRequest({ operationUpdates }));
-    }
-  }
-};
 
 // This it listen for actions by the operations and columns slice
 export default function* updateOperationsWatcher() {

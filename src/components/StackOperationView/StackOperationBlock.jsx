@@ -10,7 +10,10 @@
  */
 
 import withStackOperationData from "./withStackOperationData.jsx";
-import { isOperationId } from "../../slices/operationsSlice";
+import {
+  isOperationId,
+  OPERATION_TYPE_STACK,
+} from "../../slices/operationsSlice";
 import { Box, styled } from "@mui/material";
 import { EnhancedTableBlock } from "../TableView/TableBlock";
 import { EnhancedOperationBlock } from "../OperationView/OperationBlock.jsx";
@@ -39,7 +42,6 @@ const StyledBox = styled(Box, {
 function StackOperationBlock({
   // props via withStackOperationData
   childIds,
-  operationType,
   columnCount,
   isFocused,
   hasAlerts = false,
@@ -70,14 +72,14 @@ function StackOperationBlock({
             {isOperationId(id) ? (
               <EnhancedOperationBlock
                 id={id}
-                parentOperationType={operationType}
+                parentOperationType={OPERATION_TYPE_STACK}
                 parentColumnCount={columnCount}
                 sx={childSx}
               />
             ) : (
               <EnhancedTableBlock
                 id={id}
-                parentOperationType={operationType}
+                parentOperationType={OPERATION_TYPE_STACK}
                 parentColumnCount={columnCount}
                 sx={childSx}
               />
@@ -93,6 +95,6 @@ StackOperationBlock.displayName = "Stack Operation Block";
 
 const EnhancedStackOperationBlock = withStackOperationData(StackOperationBlock);
 
-EnhancedStackOperationBlock.displayName = "EnhancedStackOperationBlock";
+EnhancedStackOperationBlock.displayName = "Enhanced Stack Operation Block";
 
 export { StackOperationBlock, EnhancedStackOperationBlock };

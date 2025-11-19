@@ -72,6 +72,7 @@ function PackOperationBlock({
             <EnhancedOperationBlock
               id={childId}
               key={childId}
+              parentOperationType={OPERATION_TYPE_PACK}
               parentColumnCount={columnCount}
               sx={childSx}
             />

@@ -6,7 +6,7 @@ import withOperationData from "../HOC/withOperationData";
 import { EnhancedPackOperationBlock } from "../PackOperationView/PackOperationBlock";
 import { EnhancedStackOperationBlock } from "../StackOperationView/StackOperationBlock";
 
-const OperationBlock = ({ operationType, props }) => {
+const OperationBlock = ({ operationType, ...props }) => {
   if (operationType == OPERATION_TYPE_STACK) {
     return <EnhancedStackOperationBlock {...props} />;
   } else if (operationType === OPERATION_TYPE_PACK) {
@@ -17,5 +17,7 @@ const OperationBlock = ({ operationType, props }) => {
 OperationBlock.displayName = "Operation Block";
 
 const EnhancedOperationBlock = withOperationData(OperationBlock);
+
+EnhancedOperationBlock.displayName = "Enhanced Operation Block";
 
 export { EnhancedOperationBlock, OperationBlock };

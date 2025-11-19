@@ -22,19 +22,15 @@ const operationsSlice = createSlice({
      *
      * @description
      * Creates a new operation using the provided operation type and child ID.
-     * If a rootOperationId exists, the new operation will include it as a child.
      * The new operation is added to the state, its ID is pushed to the list of IDs,
-     * and it becomes the new rootOperationId operation. This is how we build the tree structure
-     * of operations from the bottom up.
+     * and it becomes the new rootOperationId operation. This is how Roundup builds the
+     * tree structure of operations from the bottom up.
      */
     addOperations(state, action) {
       const operations = normalizeInputToArray(action.payload);
       operations.forEach((operation) => {
         if (state.byId[operation.id]) {
           throw new Error(`Operation with ID ${operation.id} already exists`);
-        }
-        if (state.rootOperationId) {
-          operation.childIds.push(state.rootOperationId);
         }
         state.byId[operation.id] = operation;
         state.allIds.push(operation.id);

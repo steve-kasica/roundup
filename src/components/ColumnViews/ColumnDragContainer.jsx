@@ -18,7 +18,8 @@ import {
   selectDropTargetColumnIds,
   setHoveredColumnIds,
 } from "../../slices/uiSlice";
-import { selectTableColumnIds } from "../../slices/tablesSlice";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectOperationsById } from "../../slices/operationsSlice";
 
 /**
  * ColumnDragContainer - A container component that handles drag functionality for columns
@@ -31,12 +32,19 @@ const ColumnDragContainer = withColumnData(
     const dragType = `${column.parentId}_Column`; // Unique drag type per table
 
     // Get sibling column IDs (all columns in table except current one)
-    const tableColumnIds = useSelector((state) =>
-      selectTableColumnIds(state, column.parentId)
+    // TODO: this selector is catywampus - needs to handle operations as parents too
+    // TODO: is this selector just getting siblinings? There should be one selector
+    // for that kind of selection that just deals with selecting from state
+    const parentColumnIds = useSelector(
+      (state) =>
+        (isTableId(column.parentId)
+          ? selectTablesById(state, column.parentId)
+          : selectOperationsById(state, column.parentId)
+        ).columnIds
     );
     const siblingColumnIds = useMemo(() => {
-      return tableColumnIds.filter((id) => id !== column.id);
-    }, [tableColumnIds, column.id]);
+      return parentColumnIds.filter((id) => id !== column.id);
+    }, [parentColumnIds, column.id]);
 
     const dropTargetColumnIds = useSelector((state) =>
       selectDropTargetColumnIds(state)

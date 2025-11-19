@@ -129,5 +129,9 @@ function OperationView({
   );
 }
 
+OperationView.displayName = "Operation View";
+
 const EnhancedOperationView = withOperationData(OperationView);
+
+EnhancedOperationView.displayName = "Enhanced Operation View";
 export default EnhancedOperationView;
