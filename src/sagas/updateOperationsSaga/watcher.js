@@ -8,6 +8,12 @@ import updateOperationsWorker from "./worker";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import { updateTablesSuccess } from "../updateTablesSaga";
+import {
+  JOIN_PREDICATES,
+  JOIN_TYPES,
+  OPERATION_TYPE_PACK,
+  selectOperationsById,
+} from "../../slices/operationsSlice";
 
 // This it listen for actions by the operations and columns slice
 export default function* updateOperationsWatcher() {
@@ -16,10 +22,23 @@ export default function* updateOperationsWatcher() {
   // When an operation is newly created, we need to set its columnCount
   yield takeEvery(createOperationsSuccess.type, function* (action) {
     const { operationIds } = action.payload;
-    const operationUpdates = operationIds.map((id) => ({
-      id,
-      columnCount: null, // will be set
-    }));
+    const operationUpdates = [];
+
+    for (const operationId of operationIds) {
+      const { operationType } = yield select((state) =>
+        selectOperationsById(state, operationId)
+      );
+      operationUpdates.push({
+        id: operationId,
+        columnCount: null, // will be set
+        // Set default metadata properties if the newly created operation is a PACK
+        ...(operationType === OPERATION_TYPE_PACK && {
+          joinType: JOIN_TYPES.FULL_OUTER,
+          joinPredicate: JOIN_PREDICATES.EQUALS,
+        }),
+      });
+    }
+
     yield put(
       updateOperationsRequest({
         operationUpdates,

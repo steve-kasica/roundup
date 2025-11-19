@@ -43,6 +43,8 @@ export default function* updateAlertsSagaWatcher() {
     }
   });
 
+  // If certain schema-related operation metadata properties are modified,
+  // we need to re-check that operation for alerts.
   yield takeEvery(updateOperationsSuccess.type, function* (action) {
     const operationIdsToCheck = [];
     const relevantChangedProperties = [
