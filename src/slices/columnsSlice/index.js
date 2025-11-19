@@ -1,6 +1,13 @@
 export * from "./columnsSlice.js"; // exports all actions
 export * from "./Column.js";
-export * from "./selectors.js";
+export {
+  selectColumnIdsByParentId,
+  selectColumnsById,
+  selectColumnNamesById,
+  selectSelectedColumnIdsByParentId,
+  selectActiveColumnIdsByParentId,
+  selectColumnIndexById,
+} from "./selectors.js";
 import Column from "./Column.js";
 import reducer from "./columnsSlice.js";
 

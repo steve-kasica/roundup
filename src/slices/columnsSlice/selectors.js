@@ -9,12 +9,12 @@ import { selectOperationsById } from "../operationsSlice";
 import { normalizeInputToArray } from "../utilities";
 
 /**
- * Select ALL column IDs for a specific table, including excluded columns.
+ * Select ALL column IDs for a specific `parentId`, by iterating over the entire set of columns in Redux.
  *
- * @function
  * @param {Object} state - The Redux state.
  * @param {string} parentId - The ID of the table/operation to get all columns for.
  * @returns {Array<string>} An array of all column IDs (both active and excluded) associated with the table. Returns an empty array if the table has no columns or doesn't exist.
+ * @type {import('@reduxjs/toolkit').Selector<any, string, Array<string>>}
  */
 export const selectColumnIdsByParentId = createSelector(
   [(state) => state.columns.byId, (_, parentId) => parentId],

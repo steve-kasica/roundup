@@ -7,8 +7,8 @@ import {
   updateOperationsSuccess,
 } from "../updateOperationsSaga";
 import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
-import { createOperationsFailure } from "../createOperationsSaga/actions";
 import { materializeOperationFailure } from "../materializeOperationSaga/actions";
+import { selectOperationsById } from "../../slices/operationsSlice";
 
 export default function* deleteColumnsSaga() {
   yield takeEvery(deleteColumnsRequest.type, deleteColumnsWorker);
@@ -21,6 +21,36 @@ export default function* deleteColumnsSaga() {
     if (columnIdsToRemove.length > 0) {
       yield put(deleteColumnsRequest({ columnIds: columnIdsToRemove }));
     }
+  });
+
+  // If an operation `columnIds` property update has succeeded, we need
+  // to check if there are any columns that have been orphaned due to
+  // being removed from that operation, and delete those columns.
+  //
+  // TODO: how does this not also remove columns that were intentionally
+  // excluded/hidden from the operation?
+  yield takeLatest(updateOperationsSuccess.type, function* (action) {
+    const { changedPropertiesByOperationId } = action.payload;
+
+    for (let [operationId, changedProperties] of Object.entries(
+      changedPropertiesByOperationId
+    )) {
+      if (changedProperties.includes("columnIds")) {
+        const currentColumnIds = yield select(
+          (state) => selectOperationsById(state, operationId).columnIds
+        );
+        const allColumnIds = yield select((state) =>
+          selectColumnIdsByParentId(state, operationId)
+        );
+        const orphanedColumnIds = allColumnIds.filter(
+          (id) => !currentColumnIds.includes(id)
+        );
+        if (orphanedColumnIds.length > 0) {
+          yield put(deleteColumnsRequest({ columnIds: orphanedColumnIds }));
+        }
+      }
+    }
+    yield null;
   });
 
   // If an operation `children` property update has failed, just
