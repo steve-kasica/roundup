@@ -6,6 +6,7 @@ import {
   selectOperationChildRowCounts,
   updateOperations,
   isOperationId,
+  selectRootOperationId,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import {
@@ -43,6 +44,11 @@ export default function withOperationData(WrappedComponent) {
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperationsById(state, id));
     const depth = useSelector((state) => selectOperationDepthById(state, id));
+    const rootOperationId = useSelector(selectRootOperationId);
+    const isRootOperation = useMemo(
+      () => id === rootOperationId,
+      [id, rootOperationId]
+    );
 
     // Get columnIds associated with this table, both active and "removed"
     const columnIds = useSelector((state) =>
@@ -237,6 +243,7 @@ export default function withOperationData(WrappedComponent) {
         selectedChildColumnIds={selectedChildColumnIds}
         childRowCounts={childRowCounts}
         depth={depth}
+        isRootOperation={isRootOperation}
         // Pack-related operations
         joinKey1={operation.joinKey1}
         joinKey2={operation.joinKey2}

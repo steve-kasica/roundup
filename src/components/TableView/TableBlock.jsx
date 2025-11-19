@@ -1,16 +1,18 @@
 import { ColumnTick, EnhancedColumnTick } from "../ColumnViews";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
 import withTableData from "./withTableData.jsx";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 function TableBlock({
   // Props from withAssociatedAlerts via withTableData
   hasAlerts,
   // props via withTableData
   id,
+  name,
   activeColumnIds,
   activeColumnsCount,
-
+  rowCount = 0,
+  columnCount = 0,
   // Props passed directly from parent
   parentOperationType,
   parentColumnCount,
@@ -28,7 +30,6 @@ function TableBlock({
     },
     (_, i) => (i < activeColumnsCount ? activeColumnIds[i] : null)
   );
-  console.log({ ticks, parentColumnCount, activeColumnsCount });
 
   return (
     <Box
@@ -50,7 +51,7 @@ function TableBlock({
         ...sx,
       }}
     >
-      {/* <Typography
+      <Typography
         variant="caption"
         className="table-id"
         sx={{
@@ -60,7 +61,8 @@ function TableBlock({
           zIndex: 10,
           padding: "2px 6px",
           borderRadius: "4px",
-          fontSize: "0.7rem",
+          fontSize: "0.6rem",
+          lineHeight: 1,
           pointerEvents: "none",
           backdropFilter: "blur(2px)",
           ...(hasAlerts && {
@@ -71,8 +73,12 @@ function TableBlock({
         }}
       >
         {name || id}
-        {hasAlerts && ` ⚠ ${alertIds.length}`}
-      </Typography> */}
+        {hasAlerts && `⚠`}
+        <br />
+        <small style={{ color: "#757575" }}>
+          {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
+        </small>
+      </Typography>
       {ticks.map((columnId, index) =>
         columnId === null ? (
           <ColumnTick

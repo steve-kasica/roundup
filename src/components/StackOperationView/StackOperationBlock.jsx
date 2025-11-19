@@ -15,7 +15,7 @@ import {
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
 import { Box, styled } from "@mui/material";
-import { EnhancedTableBlock } from "../TableView/TableBlock";
+import { EnhancedTableBlock, TableBlock } from "../TableView/TableBlock";
 import { EnhancedOperationBlock } from "../OperationView/OperationBlock.jsx";
 import React from "react";
 
@@ -40,16 +40,23 @@ const StyledBox = styled(Box, {
 }));
 
 function StackOperationBlock({
+  // Props defined in `withOperationData` HOC
+  id,
+  isFocused,
+  isRootOperation,
+  activeColumnIds,
   // props via withStackOperationData
   childIds,
   columnCount,
-  isFocused,
+  // Props defined in `withAssociatedAlerts` HOC
   hasAlerts = false,
 
   // Optional props passed recursively via parent operation
+  // eslint-disable-next-line no-unused-vars
   parentColumnCount,
   sx = {},
 }) {
+  const isParentRender = isFocused || isRootOperation;
   return (
     <StyledBox
       data-operation-type="stack"
@@ -60,33 +67,44 @@ function StackOperationBlock({
         flexDirection: "column",
       }}
     >
-      {/* Render child operations and tables */}
-      {childIds.map((id, index) => {
-        const isFirst = index === 0;
-        const childSx = {
-          height: `${(1 / childIds.length) * 100}%`,
-          borderTopWidth: isFirst ? 0 : 4,
-        };
-        return (
-          <React.Fragment key={id}>
-            {isOperationId(id) ? (
-              <EnhancedOperationBlock
-                id={id}
-                parentOperationType={OPERATION_TYPE_STACK}
-                parentColumnCount={columnCount}
-                sx={childSx}
-              />
-            ) : (
-              <EnhancedTableBlock
-                id={id}
-                parentOperationType={OPERATION_TYPE_STACK}
-                parentColumnCount={columnCount}
-                sx={childSx}
-              />
-            )}
-          </React.Fragment>
-        );
-      })}
+      {isParentRender ? (
+        childIds.map((id, index) => {
+          const isFirst = index === 0;
+          const childSx = {
+            height: `${(1 / childIds.length) * 100}%`,
+            borderTopWidth: isFirst ? 0 : 4,
+          };
+          return (
+            <React.Fragment key={id}>
+              {isOperationId(id) ? (
+                <EnhancedOperationBlock
+                  id={id}
+                  parentOperationType={OPERATION_TYPE_STACK}
+                  parentColumnCount={columnCount}
+                  sx={childSx}
+                />
+              ) : (
+                <EnhancedTableBlock
+                  id={id}
+                  parentOperationType={OPERATION_TYPE_STACK}
+                  parentColumnCount={columnCount}
+                  sx={childSx}
+                />
+              )}
+            </React.Fragment>
+          );
+        })
+      ) : (
+        <TableBlock
+          hasAlerts={hasAlerts}
+          id={id}
+          activeColumnIds={activeColumnIds}
+          activeColumnsCount={activeColumnIds.length} // TODO: is this already in HOC?
+          parentOperationType={OPERATION_TYPE_STACK}
+          parentColumnCount={columnCount}
+          sx={{ width: "100%", height: "100%", border: "none" }}
+        />
+      )}
     </StyledBox>
   );
 }

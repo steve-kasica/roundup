@@ -9,7 +9,7 @@
  * **Table Tree**, by design.
  */
 
-import { EnhancedTableBlock } from "../TableView";
+import { EnhancedTableBlock, TableBlock } from "../TableView";
 import { OPERATION_TYPE_PACK } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
 import { Box, styled } from "@mui/material";
@@ -34,6 +34,11 @@ const StyledBox = styled(Box, {
 function PackOperationBlock({
   // props via withOperationData
   childIds,
+  id,
+  activeColumnIds,
+  isFocused,
+  isRootOperation,
+  rowCount,
   // Props via withPackOperationData
   leftColumnCount,
   rightColumnCount,
@@ -44,41 +49,58 @@ function PackOperationBlock({
   parentColumnCount,
   sx = {},
 }) {
+  const isParentRender = isFocused || isRootOperation;
+
   return (
     <StyledBox className="pack-operation-block" hasError={hasAlerts} sx={sx}>
-      {childIds.map((childId, index, array) => {
-        const childSx = {
-          width:
-            ((index === 0 ? leftColumnCount : rightColumnCount) / columnCount) *
-              100 +
-            "%",
-          ...(index === array.length - 1 && {
-            borderLeft: "none",
-          }),
-        };
-        if (isTableId(childId)) {
-          return (
-            <EnhancedTableBlock
-              key={childId}
-              id={childId}
-              isDraggable={false}
-              parentOperationType={OPERATION_TYPE_PACK}
-              parentColumnCount={columnCount}
-              sx={childSx}
-            />
-          );
-        } else {
-          return (
-            <EnhancedOperationBlock
-              id={childId}
-              key={childId}
-              parentOperationType={OPERATION_TYPE_PACK}
-              parentColumnCount={columnCount}
-              sx={childSx}
-            />
-          );
-        }
-      })}
+      {isParentRender ? (
+        childIds.map((childId, index, array) => {
+          const childSx = {
+            width:
+              ((index === 0 ? leftColumnCount : rightColumnCount) /
+                columnCount) *
+                100 +
+              "%",
+            ...(index === array.length - 1 && {
+              borderLeft: "none",
+            }),
+          };
+          if (isTableId(childId)) {
+            return (
+              <EnhancedTableBlock
+                key={childId}
+                id={childId}
+                isDraggable={false}
+                parentOperationType={OPERATION_TYPE_PACK}
+                parentColumnCount={columnCount}
+                sx={childSx}
+              />
+            );
+          } else {
+            return (
+              <EnhancedOperationBlock
+                id={childId}
+                key={childId}
+                parentOperationType={OPERATION_TYPE_PACK}
+                parentColumnCount={columnCount}
+                sx={childSx}
+              />
+            );
+          }
+        })
+      ) : (
+        <TableBlock
+          hasAlerts={hasAlerts}
+          id={id}
+          activeColumnIds={activeColumnIds}
+          activeColumnsCount={activeColumnIds.length} // TODO: is this already in HOC?
+          columnCount={columnCount}
+          rowCount={rowCount}
+          parentOperationType={OPERATION_TYPE_PACK}
+          parentColumnCount={columnCount}
+          sx={{ width: "100%", height: "100%", border: "none" }}
+        />
+      )}
     </StyledBox>
   );
 }

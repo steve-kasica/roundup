@@ -8,9 +8,11 @@ import { Box } from "@mui/material";
 export default function OperationsList() {
   const operationIds = useSelector(selectAllOperationIds);
 
+  const reveredOperationIds = [...operationIds].reverse();
+
   return (
     <Box>
-      {operationIds.map((operationId, i) => (
+      {reveredOperationIds.map((operationId, i) => (
         <OperationView key={operationId} id={operationId} index={i} />
       ))}
     </Box>
