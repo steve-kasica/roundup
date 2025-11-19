@@ -148,4 +148,10 @@ export const isColumnIdVisible = createSelector(
   (visibleColumnIds, columnId) => visibleColumnIds.includes(columnId)
 );
 
+/**
+ * Selector to retrieve the selected matches from the UI slice of the state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @returns {Array} The array of selected matches.
+ */
 export const selectSelectedMatches = (state) => state.ui.selectedMatches;

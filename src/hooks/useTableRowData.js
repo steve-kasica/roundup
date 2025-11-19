@@ -95,6 +95,7 @@ export function useTableRowData(
  * @param {string} sortBy - Column name to sort by (default: null)
  * @param {string} sortDirection - Sort direction: 'asc' or 'desc' (default: 'asc')
  * @param {number} initialOffset - Starting row offset (default: 0, meaning start from row 1)
+ * @param {number|null} rowLimit - Maximum total rows to load (null for unlimited)
  *
  * @returns {Object} Hook state and methods for pagination
  */
@@ -104,7 +105,8 @@ export function usePaginatedTableRows(
   pageSize = 50,
   sortByColumnId = null,
   sortDirection = "asc",
-  initialOffset = 0
+  initialOffset = 0,
+  rowLimit = null
 ) {
   const sortBy = useSelector(
     (state) => selectColumnsById(state, sortByColumnId)?.databaseName || null
@@ -136,10 +138,26 @@ export function usePaginatedTableRows(
 
       try {
         const offset = initialOffset + pageNum * pageSize;
+
+        // Calculate the limit for this fetch
+        let effectiveLimit = pageSize;
+        if (rowLimit !== null) {
+          const currentDataLength = reset || pageNum === 0 ? 0 : data.length;
+          const remainingRows = rowLimit - currentDataLength;
+
+          if (remainingRows <= 0) {
+            setHasMore(false);
+            setLoading(false);
+            return;
+          }
+
+          effectiveLimit = Math.min(pageSize, remainingRows);
+        }
+
         const rows = await getTableRows(
           tableId,
           columnsList,
-          pageSize,
+          effectiveLimit,
           offset,
           sortBy,
           sortDirection
@@ -153,7 +171,16 @@ export function usePaginatedTableRows(
         });
 
         // Check if we have more data
-        setHasMore(rows.length === pageSize);
+        if (rowLimit !== null) {
+          const newDataLength =
+            (reset || pageNum === 0 ? 0 : data.length) + rows.length;
+          setHasMore(
+            rows.length === effectiveLimit && newDataLength < rowLimit
+          );
+        } else {
+          setHasMore(rows.length === pageSize);
+        }
+
         setCurrentPage(pageNum);
       } catch (err) {
         setError(err);
@@ -170,6 +197,8 @@ export function usePaginatedTableRows(
       sortBy,
       sortDirection,
       initialOffset,
+      rowLimit,
+      data.length,
     ]
   );
 

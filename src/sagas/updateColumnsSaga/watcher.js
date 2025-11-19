@@ -3,7 +3,8 @@ import { updateColumnsRequest } from "./actions";
 import updateColumnsWorker from "./worker";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
 import {
-  DATABASE_ATTRIBUTES,
+  SUMMARY_ATTRIBUTES,
+  TOP_VALUES_ATTR,
   selectColumnsById,
 } from "../../slices/columnsSlice";
 import { normalizeInputToArray } from "../../slices/utilities";
@@ -19,7 +20,8 @@ export default function* updateColumnsSaga() {
 
     const columnUpdates = normalizeInputToArray(columnIds).map((id) => ({
       id,
-      ...Object.fromEntries(DATABASE_ATTRIBUTES.map((attr) => [attr, null])),
+      ...Object.fromEntries(SUMMARY_ATTRIBUTES.map((attr) => [attr, null])),
+      [TOP_VALUES_ATTR]: null,
     }));
 
     // Call the worker to update columns with fetched attributes

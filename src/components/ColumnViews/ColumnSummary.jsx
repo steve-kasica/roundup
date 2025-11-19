@@ -219,7 +219,7 @@ const ColumnSummary = ({
           >
             {/* TODO: should I use Chips instead of comma b/c values may include commas */}
             {topValues ? topValues.map(({ value }) => value).join(", ") : ""}
-            {topValues && (topValues.length || 0) > 10 ? ", ..." : ""}
+            {(topValues && topValues.length) || 0 > 10 ? ", ..." : ""}
           </Typography>
         </Box>
 

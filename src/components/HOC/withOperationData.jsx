@@ -233,7 +233,7 @@ export default function withOperationData(WrappedComponent) {
         doesViewExist={operation.doesViewExist}
         isMaterialized={operation.isMaterialized}
         isInSync={operation.isInSync}
-        activeChildColumnIds={activeChildColumnIds}
+        activeChildColumnIds={activeChildColumnIds} // ColumnIDs of operation's child tables (not excluded)
         selectedChildColumnIds={selectedChildColumnIds}
         childRowCounts={childRowCounts}
         depth={depth}

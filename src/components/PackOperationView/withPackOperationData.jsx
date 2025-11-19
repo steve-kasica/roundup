@@ -1,15 +1,28 @@
-/* eslint-disable react/prop-types */
 import { useSelector, useDispatch } from "react-redux";
 import withOperationData from "../HOC/withOperationData";
 import { useCallback, useMemo } from "react";
-import { selectSelectedColumnIdsByParentId } from "../../slices/columnsSlice/selectors";
+import {
+  selectColumnsById,
+  selectSelectedColumnIdsByParentId,
+} from "../../slices/columnsSlice/selectors";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import {
   setSelectedMatches,
   selectSelectedMatches,
 } from "../../slices/uiSlice";
-import { selectPackOperationMatchStats } from "../../slices/operationsSlice";
+
+const matchEquality = (a, b) => a === b;
+const matchContains = (a, b) => a.includes(b);
+const matchStartsWith = (a, b) => a.startsWith(b);
+const matchEndsWith = (a, b) => a.endsWith(b);
+
+const matchFunctionMap = new Map([
+  ["EQUALS", matchEquality],
+  ["CONTAINS", matchContains],
+  ["STARTS_WITH", matchStartsWith],
+  ["ENDS_WITH", matchEndsWith],
+]);
 
 export default function withPackOperationData(WrappedComponent) {
   function EnhancedPackComponent({
@@ -17,6 +30,7 @@ export default function withPackOperationData(WrappedComponent) {
     id,
     joinKey1,
     joinKey2,
+    joinPredicate,
     childIds,
     columnIds,
     selectedColumnIds,
@@ -77,9 +91,51 @@ export default function withPackOperationData(WrappedComponent) {
     );
     const rightRowCount = rightTable?.rowCount || 0;
 
-    const matchStats = useSelector((state) =>
-      selectPackOperationMatchStats(state, id)
+    const leftValueCounts = useSelector(
+      (state) => selectColumnsById(state, joinKey1)?.topValues
     );
+
+    const rightValueCounts = useSelector(
+      (state) => selectColumnsById(state, joinKey2)?.topValues
+    );
+
+    const matchStats = useMemo(() => {
+      const stats = {
+        matchingRowCount: 0,
+        leftUnmatchedRowCount: 0,
+        rightUnmatchedRowCount: 0,
+      };
+      const matchFunction = matchFunctionMap.get(joinPredicate);
+      if (!joinPredicate || !leftValueCounts || !rightValueCounts) {
+        return stats;
+      }
+
+      leftValueCounts.forEach(({ value: leftValue, count: leftCount }) => {
+        const matches = rightValueCounts.filter(({ value: rightValue }) =>
+          matchFunction(leftValue, rightValue)
+        );
+        if (matches.length > 0) {
+          const totalRightMatches = matches.reduce(
+            (sum, match) => sum + match.count,
+            0
+          );
+          stats.matchingRowCount += leftCount * totalRightMatches;
+        } else {
+          stats.leftUnmatchedRowCount += leftCount;
+        }
+      });
+
+      rightValueCounts.forEach(({ value: rightValue, count: rightCount }) => {
+        const matches = leftValueCounts.filter(({ value: leftValue }) =>
+          matchFunction(leftValue, rightValue)
+        );
+        if (matches.length === 0) {
+          stats.rightUnmatchedRowCount += rightCount;
+        }
+      });
+
+      return stats;
+    }, [leftValueCounts, rightValueCounts, joinPredicate]);
 
     // Extract row counts from table objects
     const selectedMatchTypes = useSelector(selectSelectedMatches);
@@ -130,6 +186,13 @@ export default function withPackOperationData(WrappedComponent) {
       [dispatch, id]
     );
 
+    /**
+     * Updates the right table join key for the current operation by dispatching an update action.
+     *
+     * @function
+     * @param {any} columnId - The new column ID to set as the right table join key.
+     * @returns {void}
+     */
     const setRightTableJoinKey = useCallback(
       (columnId) => {
         dispatch(
@@ -146,6 +209,13 @@ export default function withPackOperationData(WrappedComponent) {
       [dispatch, id]
     );
 
+    /**
+     * Updates the join predicate for the current operation by dispatching an update action.
+     *
+     * @function
+     * @param {any} joinPredicate - The new join predicate to set for the operation.
+     * @returns {void}
+     */
     const setJoinPredicateCallback = useCallback(
       (joinPredicate) => {
         dispatch(
@@ -156,22 +226,19 @@ export default function withPackOperationData(WrappedComponent) {
       },
       [dispatch, id]
     );
-    console.log("EnhancedPackComponent render", {
-      leftColumnIds,
-      rightColumnIds,
-      columnCount,
-    });
 
     return (
       <WrappedComponent
         {...props}
-        // Props via withOperationData
+        // Props defined in `withOperationData`
         id={id}
         childIds={childIds}
         columnIds={columnIds}
         selectedColumnIds={selectedColumnIds}
+        activeChildColumnIds={activeChildColumnIds}
         selectedOperationColumnIds={selectedOperationColumnIds} // Should this be in an operation above? (TODO)
-        // Props specific to Pack operations
+        joinPredicate={joinPredicate}
+        // Props defined in this HOC `withPackOperationData`
         selectedMatchTypes={selectedMatchTypes}
         columnCount={columnCount}
         matchStats={matchStats}

@@ -19,6 +19,7 @@ import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 import { Refresh } from "@mui/icons-material";
 import RoundupTable from "../ui/Table/Table.jsx";
+import { MATCH_TYPES } from "../OperationsList/PackOperationParams/PackOutputDetails/MatchDetail/withMatchDetailData.jsx";
 /**
  * Virtualized table view for stack operations
  * Supports synchronized or sequential scrolling/loading of multiple tables
@@ -27,15 +28,17 @@ import RoundupTable from "../ui/Table/Table.jsx";
  */
 const PackRows = ({
   // Props passed via withOperationData
-  id,
-  doesViewExist,
-  activeColumnIds,
+  databaseName,
+  activeColumnIds, // columnIDs of this operation (not excluded)
+  activeChildColumnIds, // column IDs of operation's child tables (not excluded)
   isMaterialized,
   isInSync,
   materializeOperation,
+  selectedChildColumnIds,
   // Props passed from withAssociatedAlerts HOC
   hasAlerts,
   // Props passed directyl from withPackOperationData HOC
+  matchStats,
   joinPredicate,
   leftTableId,
   leftKey,
@@ -47,26 +50,49 @@ const PackRows = ({
 }) => {
   const [sortByColumnId, setSortByColumnId] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
-  // Memoize column arrays to prevent infinite re-renders
-  const leftColumnIds = useMemo(
-    () => [...leftSelectedColumns],
-    [leftSelectedColumns]
-  );
 
-  const rightColumnIds = useMemo(
-    () => [...rightSelectedColumns],
-    [rightSelectedColumns]
-  );
+  const displayColumnIds = useMemo(() => {
+    const selectedChildColumnIdsSet = new Set(selectedChildColumnIds.flat());
+    const activeIndices = new Set();
+    activeChildColumnIds.flat().forEach((colId, index) => {
+      if (selectedChildColumnIdsSet.has(colId)) {
+        activeIndices.add(index);
+      }
+    });
+    return activeColumnIds.filter((_, index) => activeIndices.has(index));
+  }, [activeColumnIds, activeChildColumnIds, selectedChildColumnIds]);
+
+  // TODO: also need to do limit
+  const initialOffset = useMemo(() => {
+    if (selectedMatchTypes.includes("matchingRowCount")) {
+      return 0;
+    } else if (selectedMatchTypes.includes("leftUnmatchedRowCount")) {
+      return matchStats.matchingRowCount;
+    } else if (selectedMatchTypes.includes("rightUnmatchedRowCount")) {
+      return matchStats.leftUnmatchedRowCount;
+    }
+    return null;
+  }, [matchStats, selectedMatchTypes]);
+
+  const rowLimit = useMemo(() => {
+    const filteredMatchStats = selectedMatchTypes.reduce((acc, type) => {
+      return acc + matchStats[type];
+    }, 0);
+    return filteredMatchStats;
+  }, [matchStats, selectedMatchTypes]);
 
   // const [sortBy, setSortBy] = useState(null);
   // const [sortDirection, setSortDirection] = useState("asc");
-  const results = usePaginatedTableRows(id, null);
+  const results = usePaginatedTableRows(
+    databaseName,
+    displayColumnIds,
+    50,
+    sortByColumnId,
+    sortDirection,
+    initialOffset,
+    rowLimit
+  );
   const { data, loading, error, hasMore, loadMore } = results;
-  const tableContainerRef = useRef(null);
-
-  const handleRefresh = useCallback(() => {
-    materializeOperation();
-  }, [materializeOperation]);
 
   // TODO: does this need to be in RoundupTable
   // to not be repeated?
@@ -97,8 +123,6 @@ const PackRows = ({
     [sortByColumnId, sortDirection]
   );
 
-  const displayColumnIds = [];
-
   return (
     <RoundupTable
       columnIds={displayColumnIds}
@@ -112,6 +136,7 @@ const PackRows = ({
       sortConfig={{ sortByColumnId, sortDirection }}
       placeHolderColumnLength={11}
       placeHolderRowLength={20}
+      initialOffset={initialOffset} // TODO: update row counts
     />
   );
 };

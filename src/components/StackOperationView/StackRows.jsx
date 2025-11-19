@@ -50,8 +50,6 @@ const StackRows = ({
     return activeColumnIds.filter((colId, index) => selectedIndices.has(index));
   }, [activeColumnIds, columnIdMatrix, selectedChildColumnIds]);
 
-  console.log({ initialOffset, displayColumnIds });
-
   const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
     databaseName,
     displayColumnIds,

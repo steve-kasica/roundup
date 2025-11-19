@@ -8,39 +8,6 @@ export async function getColumnStats(tableId, columnList) {
   // This allows for summarizing specific columns or the entire table
   const query = `SUMMARIZE SELECT ${columnsClause} FROM ${tableId};`;
   const response = await conn.query(query);
-
-  // Get top 10 most frequent values and their counts for each column
-  const columns =
-    columnList ||
-    (await conn.query(`SELECT * FROM ${tableId} LIMIT 0`)).schema.fields.map(
-      (f) => f.name
-    );
-  const topValuesQueries = columns.map(
-    (col) =>
-      `SELECT '${col}' as column_name, ${col} as value, COUNT(*) as count 
-     FROM ${tableId} 
-     WHERE ${col} IS NOT NULL 
-     GROUP BY ${col} 
-     ORDER BY COUNT(*) DESC 
-     LIMIT 10`
-  );
-  const topValuesQuery = topValuesQueries.join(" UNION ALL ");
-  const topValuesResponse = await conn.query(topValuesQuery);
-  const topValuesResults = topValuesResponse.toArray().reduce((acc, row) => {
-    const rowData = row.toJSON();
-    const databaseName = rowData.column_name;
-
-    if (!acc[databaseName]) {
-      acc[databaseName] = [];
-    }
-
-    acc[databaseName].push({
-      value: rowData.value,
-      count: Number(rowData.count),
-    });
-
-    return acc;
-  }, {});
   await conn.close();
   const result = response.toArray().map((proxyStruct) => {
     const jsonData = proxyStruct.toJSON();
@@ -89,11 +56,6 @@ export async function getColumnStats(tableId, columnList) {
       }
     }
 
-    // Get the top 10 most frequent values for this column
-    const databaseName = serialized.column_name;
-    const topValues = topValuesResults[databaseName] || [];
-    const modeData = topValues[0] || { value: null, count: null };
-
     return {
       approxUnique: serialized.approx_unique,
       avg: serialized.avg,
@@ -106,9 +68,6 @@ export async function getColumnStats(tableId, columnList) {
       p50: serialized.p50,
       p75: serialized.p75,
       std: serialized.std,
-      modeValue: modeData.value,
-      modeCount: modeData.count,
-      topValues: topValues,
     };
   });
 

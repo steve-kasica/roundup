@@ -56,6 +56,23 @@ export function formQuery(data, columnList = null) {
       ON ${predicates[joinPredicate]}
       WHERE ${leftTable}.${leftKey} IS NULL OR ${rightTable}.${rightKey} IS NULL
     `;
+  } else if (joinType === JOIN_TYPES.FULL) {
+    // Full outer join with custom ordering:
+    // 1. Matched rows (both sides have values)
+    // 2. Left-only rows (right side is NULL)
+    // 3. Right-only rows (left side is NULL)
+    definition = `
+      SELECT *
+      FROM ${leftTable} 
+      FULL OUTER JOIN ${rightTable}
+      ON ${predicates[joinPredicate]}
+      ORDER BY 
+        CASE 
+          WHEN ${leftTable}.${leftKey} IS NOT NULL AND ${rightTable}.${rightKey} IS NOT NULL THEN 1
+          WHEN ${leftTable}.${leftKey} IS NOT NULL AND ${rightTable}.${rightKey} IS NULL THEN 2
+          WHEN ${leftTable}.${leftKey} IS NULL AND ${rightTable}.${rightKey} IS NOT NULL THEN 3
+        END
+    `;
   } else {
     // DuckDB offers native support for other supported join types
     definition = `

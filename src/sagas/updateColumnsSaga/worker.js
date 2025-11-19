@@ -1,11 +1,12 @@
 import { call, put, select } from "redux-saga/effects";
 import {
   selectColumnsById,
+  TOP_VALUES_ATTR,
   updateColumns as updateColumnsSlice,
 } from "../../slices/columnsSlice";
-import { getColumnStats } from "../../lib/duckdb";
+import { getColumnStats, getValueCounts } from "../../lib/duckdb";
 import { updateColumnsFailure, updateColumnsSuccess } from "./actions";
-import { DATABASE_ATTRIBUTES } from "../../slices/columnsSlice";
+import { SUMMARY_ATTRIBUTES } from "../../slices/columnsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
 
@@ -25,21 +26,31 @@ export default function* updateColumnsWorker(action) {
         ? selectTablesById(state, column.parentId)
         : selectOperationsById(state, column.parentId)
     );
+    const updateKeys = Object.keys(columnUpdate);
+    let databaseUpdates = {};
     try {
-      let databaseUpdates = {};
-      if (
-        Object.keys(columnUpdate).some((key) =>
-          DATABASE_ATTRIBUTES.includes(key)
-        )
-      ) {
-        databaseUpdates = yield call(getColumnStats, parent.databaseName, [
-          column.databaseName,
-        ]);
+      if (updateKeys.some((key) => SUMMARY_ATTRIBUTES.includes(key))) {
+        databaseUpdates = {
+          ...databaseUpdates,
+          ...(yield call(getColumnStats, parent.databaseName, [
+            column.databaseName,
+          ]))[0],
+        };
+      }
+      if (updateKeys.includes(TOP_VALUES_ATTR)) {
+        databaseUpdates = {
+          ...databaseUpdates,
+          [TOP_VALUES_ATTR]: yield call(
+            getValueCounts,
+            parent.databaseName,
+            column.databaseName
+          ),
+        };
       }
 
       successfulUpdates.push({
         ...columnUpdate,
-        ...databaseUpdates[0],
+        ...databaseUpdates,
       });
     } catch (error) {
       console.error("Failed to update column:", column.id, error);

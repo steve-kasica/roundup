@@ -48,6 +48,8 @@ export const COLUMN_TYPES = [
  */
 let idCounter = 0;
 
+export const TOP_VALUES_ATTR = "topValues";
+
 /**
  * Creates a new column metadata object.
  *
@@ -92,6 +94,8 @@ function Column({
   topValues = null,
 }) {
   const id = `c${++idCounter}`;
+  const output = {};
+  output[TOP_VALUES_ATTR] = null;
 
   return {
     id,
@@ -112,11 +116,11 @@ function Column({
     std,
     modeValue,
     modeCount,
-    topValues,
+    ...output,
   };
 }
 
-export const DATABASE_ATTRIBUTES = [
+export const SUMMARY_ATTRIBUTES = [
   "columnType",
   "approxUnique",
   "avg",
@@ -130,7 +134,6 @@ export const DATABASE_ATTRIBUTES = [
   "std",
   "modeValue",
   "modeCount",
-  "topValues",
 ];
 
 export default Column;
