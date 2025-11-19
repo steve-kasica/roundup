@@ -284,7 +284,7 @@ const PackSchemaView = withPackOperationData(
     );
 
     const handleColumnClick = useCallback(
-      (event, tableId, columnId) => {
+      (event, columnId) => {
         event.stopPropagation();
 
         if (event.shiftKey && lastClickedColumn) {
