@@ -5,8 +5,8 @@ import { styled } from "@mui/system";
  * Provides visual feedback for row interactions
  */
 const StyledAlternatingTableRow = styled(TableRow, {
-  shouldForwardProp: (prop) => prop !== "isEven",
-})(({ isEven }) => ({
+  shouldForwardProp: (prop) => prop !== "isEven" && prop !== "isDisabled",
+})(({ isEven, isDisabled }) => ({
   backgroundColor: isEven ? "#fff" : "#f5f5f5",
   "&:hover": {
     backgroundColor: isEven ? "#e3f2fd" : "#bbdefb",
@@ -15,6 +15,15 @@ const StyledAlternatingTableRow = styled(TableRow, {
     backgroundColor: "inherit", // Inherit row hover color
   },
   transition: "background-color 0.1s ease",
+  ...(isDisabled && {
+    opacity: 0.5,
+    pointerEvents: "none",
+    backgroundColor: "#e0e0e0",
+    color: "#9e9e9e",
+    "&:hover": {
+      backgroundColor: "#e0e0e0",
+    },
+  }),
 }));
 
 export default StyledAlternatingTableRow;

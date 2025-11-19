@@ -30,6 +30,10 @@ const gridWidth = gridColumns - 1;
 export default function CompositeTableSchema() {
   const rootOperation = useSelector(selectRootOperation);
 
+  const isAddingOperationsDisabled =
+    (!rootOperation.isMaterialized || !rootOperation.isInSync) &&
+    rootOperation.operationType !== OPERATION_TYPE_NO_OP;
+
   return (
     <Box className="CompositeTableSchema" sx={{ height: "100%" }}>
       {rootOperation ? (
@@ -57,7 +61,7 @@ export default function CompositeTableSchema() {
           </Grid>
           <Grid size={gridColumns - gridWidth}>
             <TableDropTarget
-              disabled={!rootOperation.isMaterialized}
+              disabled={isAddingOperationsDisabled}
               operationType={OPERATION_TYPE_PACK}
             >
               <AddIcon />
@@ -65,7 +69,7 @@ export default function CompositeTableSchema() {
           </Grid>
           <Grid size={gridWidth}>
             <TableDropTarget
-              disabled={!rootOperation.isMaterialized}
+              disabled={isAddingOperationsDisabled}
               operationType={OPERATION_TYPE_STACK}
             >
               <AddIcon />

@@ -12,8 +12,10 @@ export const updateTablesRequest = createAction("sagas/updateTables/request");
 /**
  * Action creator for successful table updates.
  *
- * @param {Object} payload.
- * This action is dispatched when table updates complete successfully.
+ * @param {Object} payload.changedPropertiesByTableId - The updated properties for each table by ID
+ * @returns {Object} Redux action with type "sagas/updateTables/success"
+ * @type {import('@reduxjs/toolkit')}
+ *
  *
  */
 export const updateTablesSuccess = createAction("sagas/updateTables/success");

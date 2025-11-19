@@ -173,6 +173,7 @@ const Table = ({
                   <StyledAlternatingTableRow
                     key={rowIndex}
                     isEven={rowIndex % 2 === 0}
+                    isDisabled={!isInSync}
                   >
                     {/* Row Number Cell */}
                     <StickyTableCell>{rowIndex + 1}</StickyTableCell>

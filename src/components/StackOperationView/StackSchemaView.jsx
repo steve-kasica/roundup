@@ -24,6 +24,8 @@ const StackSchemaView = ({
   id,
   name,
   rowCount,
+  isInSync,
+  isMaterialized,
   // Props passed via withStackOperationData
   activeColumnIds,
   columnIdMatrix, // column IDs of child tables in a matrix
@@ -328,7 +330,7 @@ const StackSchemaView = ({
             />
             <MaterializeViewIconButton
               onClick={handleMaterializeView}
-              disabled={hasAlerts}
+              disabled={hasAlerts || (isMaterialized && isInSync)}
             />
           </>
         }

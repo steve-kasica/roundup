@@ -16,8 +16,12 @@ import {
   materializeOperationSuccess,
   materializeOperationFailure,
 } from "../materializeOperationSaga/actions";
-import { selectTableColumnIds } from "../../slices/tablesSlice";
+import {
+  selectTableColumnIds,
+  selectTablesById,
+} from "../../slices/tablesSlice";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
+import { updateTablesSuccess } from "../updateTablesSaga";
 
 const handleChildTableColumnExclusion = function* (columnIds) {
   const tableIds = yield select((state) => {
@@ -109,6 +113,52 @@ const handleEmptyTable = function* (columnIds) {
 export default function* updateOperationsWatcher() {
   yield takeEvery(updateOperationsRequest.type, updateOperationsWorker);
 
+  // When an operation is newly created, we need to set its columnCount
+  yield takeEvery(createOperationsSuccess.type, function* (action) {
+    const { operationIds } = action.payload;
+    const operationUpdates = operationIds.map((id) => ({
+      id,
+      columnCount: null, // will be set
+    }));
+    yield put(
+      updateOperationsRequest({
+        operationUpdates,
+      })
+    );
+  });
+
+  // When a table is updated, if it's columnIds property has changed
+  // and the table is the child of a operation, we need to flag that
+  // the operation is out-of-sync.
+  yield takeEvery(updateTablesSuccess.type, function* (action) {
+    const { changedPropertiesByTableId } = action.payload;
+    const operationUpdates = [];
+
+    for (const [tableId, changedProperties] of Object.entries(
+      changedPropertiesByTableId
+    )) {
+      if (changedProperties.includes("columnIds")) {
+        const { parentId } = yield select((state) =>
+          selectTablesById(state, tableId)
+        );
+        if (parentId) {
+          operationUpdates.push({
+            id: parentId,
+            isInSync: false,
+          });
+        }
+      }
+    }
+
+    if (operationUpdates.length > 0) {
+      yield put(
+        updateOperationsRequest({
+          operationUpdates,
+        })
+      );
+    }
+  });
+
   // If inserting a column into a table that is a child of an operation,
   // then re-create the DB view associated with that operation.
   // We don't need to actually modify the operation in Redux, just re-run the view creation,
@@ -190,18 +240,4 @@ export default function* updateOperationsWatcher() {
   //     })
   //   );
   // });
-
-  // When an operation is newly created, we need to set its columnCount
-  yield takeEvery(createOperationsSuccess.type, function* (action) {
-    const { operationIds } = action.payload;
-    const operationUpdates = operationIds.map((id) => ({
-      id,
-      columnCount: null, // will be set
-    }));
-    yield put(
-      updateOperationsRequest({
-        operationUpdates,
-      })
-    );
-  });
 }
