@@ -96,6 +96,8 @@ const TableRowSummary = ({
     },
   ];
 
+  console.log({ columnCount, columnMax });
+
   return (
     <StyledTableRow
       isDragging={false} // TODO

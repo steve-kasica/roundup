@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Tabs, Tab, Chip } from "@mui/material";
 import { useSelector } from "react-redux";
-import TableSelector from "../../components/TableSelector";
+import TablesList from "../../components/TablesList";
 import OperationsList from "../../components/OperationsList";
 import { selectAllOperationIds } from "../../slices/operationsSlice";
 import { selectAllTablesData } from "../../slices/tablesSlice";
@@ -107,7 +107,7 @@ const LeftSideBar = () => {
       <Box sx={{ flex: 1, minHeight: 0 }}>
         <Box sx={{ overflow: "auto", height: "100%" }}>
           <CustomTabPanel value={value} index={0}>
-            <TableSelector />
+            <TablesList />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={1}>
             <OperationsList />
