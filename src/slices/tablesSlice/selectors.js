@@ -1,9 +1,6 @@
 import { createSelector } from "reselect";
 import { normalizeInputToArray } from "../utilities";
-import {
-  selectActiveColumnIdsByParentId,
-  selectColumnsById,
-} from "../columnsSlice";
+import { selectColumnsById } from "../columnsSlice";
 
 export const selectAllTableIds = (state) => state.tables.allIds;
 
