@@ -39,6 +39,7 @@ const PackSchemaView = withPackOperationData(
     joinPredicate,
     setJoinType,
     setMatchSelection,
+    clearMatchSelection,
     matchStats,
     // Left table props (via withPackOperationData)
     leftTableId,
@@ -90,55 +91,42 @@ const PackSchemaView = withPackOperationData(
 
     // Call usePackStats hook and log results
     const data = matchStats;
-    const loading = false;
 
     const areAnySelected = useMemo(() => {
       return clickedBlockCells.size > 0;
     }, [clickedBlockCells.size]);
 
-    // Update toggle state when data changes
-    // useEffect(() => {
-    //   setToggledMatches((prev) => {
-    //     const newState = { ...prev };
-    //     if (!data) return newState;
-    //     Object.entries(data).forEach(([key, count]) => {
-    //       newState[key] = (count || 0) > 0;
-    //     });
-    //     return newState;
-    //   });
-    // }, [data]);
-
     // Update column selection when block cells change
-    // useEffect(() => {
-    //   const selectedColumnIds = new Set();
+    useEffect(() => {
+      const selectedColumnIds = new Set();
+      const selectedMatchCategories = new Set();
 
-    //   // Extract unique column IDs from clicked block cells
-    //   clickedBlockCells.forEach((cellKey) => {
-    //     const [tableId, columnId] = cellKey.split(":");
-    //     selectedColumnIds.add(columnId);
-    //   });
+      // Extract unique column IDs from clicked block cells
+      clickedBlockCells.forEach((cellKey) => {
+        const [columnId, matchType] = cellKey.split(":");
+        selectedColumnIds.add(columnId);
+        selectedMatchCategories.add(matchType);
+      });
 
-    //   // Call selectColumns with array of column IDs
-    //   if (selectedColumnIds.size > 0) {
-    //     selectColumns(Array.from(selectedColumnIds));
-    //   } else {
-    //     clearSelectedColumns();
-    //   }
-    // }, [clearSelectedColumns, clickedBlockCells, selectColumns]);
+      // Call selectColumns with array of column IDs
+      if (selectedColumnIds.size > 0) {
+        selectColumns(Array.from(selectedColumnIds));
+      } else {
+        clearSelectedColumns();
+      }
 
-    // Update match selection when block cells change
-    // useEffect(() => {
-    //   const selectedMatchCategories = new Set();
-
-    //   // Extract unique match categories from clicked block cells
-    //   clickedBlockCells.forEach((cellKey) => {
-    //     const [, , matchLabel] = cellKey.split(":");
-    //     selectedMatchCategories.add(matchLabel);
-    //   });
-
-    //   // Call setMatchSelection with array of match categories
-    //   setMatchSelection(Array.from(selectedMatchCategories));
-    // }, [clickedBlockCells, setMatchSelection]);
+      if (selectedMatchCategories.size > 0) {
+        setMatchSelection(Array.from(selectedMatchCategories));
+      } else {
+        clearMatchSelection();
+      }
+    }, [
+      clearSelectedColumns,
+      clickedBlockCells,
+      selectColumns,
+      clearMatchSelection,
+      setMatchSelection,
+    ]);
 
     // // Calculate join type based on toggled matchingRowCount
     // useEffect(() => {

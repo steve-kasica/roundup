@@ -109,6 +109,11 @@ export default function withPackOperationData(WrappedComponent) {
       [dispatch]
     );
 
+    const clearMatchSelection = useCallback(
+      () => dispatch(setSelectedMatches([])),
+      [dispatch]
+    );
+
     const setLeftTableJoinKey = useCallback(
       (columnId) => {
         dispatch(
@@ -191,6 +196,7 @@ export default function withPackOperationData(WrappedComponent) {
         setRightTableJoinKey={setRightTableJoinKey}
         setJoinPredicate={setJoinPredicateCallback}
         setMatchSelection={setMatchSelection}
+        clearMatchSelection={clearMatchSelection}
       />
     );
   }
