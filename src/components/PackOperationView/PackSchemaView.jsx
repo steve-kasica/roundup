@@ -11,8 +11,6 @@ import {
 } from "@mui/material";
 import withPackOperationData from "./withPackOperationData";
 import { useCallback, useEffect, useState, useMemo } from "react";
-import { EnhancedTableLabel } from "../TableView";
-import { JOIN_TYPES } from "../../slices/operationsSlice";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 import { EnhancedColumnName } from "../ColumnViews";
@@ -20,21 +18,9 @@ import { SwapHoriz as SwapIcon } from "@mui/icons-material";
 import ExcludeIconButton from "../ui/ExcludeIconButton";
 import FocusIconButton from "../ui/FocusIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
-import { isTableId } from "../../slices/tablesSlice";
-import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
-import {
-  extent,
-  interpolateGreys,
-  scaleOrdinal,
-  scaleSequential,
-  schemeGreys,
-} from "d3";
+import { extent, interpolateGreys, scaleSequential } from "d3";
 import { EnhancedTableName } from "../TableView/TableName";
-/*
-        matchingRowCount={matchingRowCount}
-        leftUnmatchedRowCount={leftUnmatchedRowCount}
-        rightUnmatchedRowCount={rightUnmatchedRowCount}
-*/
+import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
 const matchLabels = new Map([
   ["matchingRowCount", "Matches"],
   ["leftUnmatchedRowCount", "Left Only"],
@@ -43,11 +29,12 @@ const matchLabels = new Map([
 
 const PackSchemaView = withPackOperationData(
   ({
-    // General operation props
+    // Props defined in `withOperationData`
     id,
     selectColumns,
     clearSelectedColumns,
     swapTablePositions,
+    materializeOperation,
     // Pack-specific props
     joinPredicate,
     setJoinType,
@@ -404,6 +391,10 @@ const PackSchemaView = withPackOperationData(
       swapTablePositions(0, 1);
     }, [swapTablePositions]);
 
+    const handleMaterializeView = useCallback(() => {
+      materializeOperation();
+    }, [materializeOperation]);
+
     const totalRows = Object.values(data || {}).reduce(
       (sum, count) => sum + (count || 0),
       0
@@ -476,6 +467,10 @@ const PackSchemaView = withPackOperationData(
               <SelectToggleIconButton
                 onClick={handleSelectAll}
                 isSelected={areAnySelected}
+              />
+              <MaterializeViewIconButton
+                onClick={handleMaterializeView}
+                disabled={hasAlerts}
               />
             </>
           }

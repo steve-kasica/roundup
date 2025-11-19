@@ -22,8 +22,8 @@ const withAllTablesData = (WrappedComponent) => {
       [tables]
     );
     const createTables = useCallback(
-      (tableInfos) => {
-        dispatch(createTablesRequest(tableInfos));
+      (tablesInfo) => {
+        dispatch(createTablesRequest({ tablesInfo }));
       },
       [dispatch]
     );

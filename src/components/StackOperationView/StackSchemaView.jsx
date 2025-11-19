@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useCallback, useEffect, useRef, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import {
   getValuesInRange,
   getIndexOfValue,
@@ -289,7 +289,6 @@ const StackSchemaView = ({
   }, [columnIdMatrix, selectedTableColumnIds.length]);
 
   const handleMaterializeView = useCallback(() => {
-    // Placeholder for materialize view action
     materializeOperation();
   }, [materializeOperation]);
 
