@@ -56,12 +56,18 @@ export default function CompositeTableSchema() {
             ) : null}
           </Grid>
           <Grid size={gridColumns - gridWidth}>
-            <TableDropTarget operationType={OPERATION_TYPE_PACK}>
+            <TableDropTarget
+              disabled={!rootOperation.isMaterialized}
+              operationType={OPERATION_TYPE_PACK}
+            >
               <AddIcon />
             </TableDropTarget>
           </Grid>
           <Grid size={gridWidth}>
-            <TableDropTarget operationType={OPERATION_TYPE_STACK}>
+            <TableDropTarget
+              disabled={!rootOperation.isMaterialized}
+              operationType={OPERATION_TYPE_STACK}
+            >
               <AddIcon />
             </TableDropTarget>
           </Grid>

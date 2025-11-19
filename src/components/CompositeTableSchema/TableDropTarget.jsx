@@ -142,7 +142,7 @@ const DropZone = styled(ForwardedBox, {
   return styles;
 });
 
-export default function TableDropTarget({ operationType, children }) {
+export default function TableDropTarget({ disabled, operationType, children }) {
   const dispatch = useDispatch();
   const rootOperation = useSelector(selectRootOperation);
 
@@ -215,7 +215,7 @@ export default function TableDropTarget({ operationType, children }) {
         );
       }
     },
-    canDrop: () => true,
+    canDrop: () => !disabled,
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
