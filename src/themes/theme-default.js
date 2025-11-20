@@ -57,21 +57,23 @@ export default createTheme(baseTheme, {
     column: {
       default: {
         outlineColor: "#e0e0e0",
-        backgroundColor: baseTheme.palette.background.paper,
+        // backgroundColor: baseTheme.palette.background.paper,
         transition: "all 0.2s ease-in-out",
       },
       hovered: {
-        backgroundColor: lighten(baseTheme.palette.action.hoverColor, 0.85), // Lightens by 85%
-        borderColor: baseTheme.palette.action.hoverColor,
+        // backgroundColor: lighten(baseTheme.palette.action.hoverColor, 0.85), // Lightens by 85%
+        // borderColor: baseTheme.palette.action.hoverColor,
         transform: "scale(1.01)",
+        zIndex: 10,
+        boxShadow: `0 8px 16px rgba(0, 0, 0, 0.25), 0 4px 8px rgba(0, 0, 0, 0.15)`,
       },
       selected: {
-        backgroundColor: lighten(baseTheme.palette.action.selectedColor, 0.85),
+        // backgroundColor: lighten(baseTheme.palette.action.selectedColor, 0.85),
         outlineColor: baseTheme.palette.action.selectedColor,
         transform: "scale(1.01)",
       },
       dragging: {
-        backgroundColor: lighten(baseTheme.palette.action.draggingColor, 0.85),
+        // backgroundColor: lighten(baseTheme.palette.action.draggingColor, 0.85),
         border: baseTheme.palette.action.draggingColor,
         transform: "scale(0.95) rotate(2deg)",
         opacity: 0.8,
@@ -82,27 +84,29 @@ export default createTheme(baseTheme, {
         )}`,
       },
       dropTarget: {
-        backgroundColor: lighten(
-          baseTheme.palette.action.dropTargetColor,
-          0.85
-        ),
-        outlineColor: baseTheme.palette.action.dropTargetColor,
-        outlineStyle: "dashed",
+        // backgroundColor: lighten(
+        //   baseTheme.palette.action.dropTargetColor,
+        //   0.85
+        // ),
+        // borderStyle: "dashed",
+        // outlineWidth: "1px",
+        // outlineColor: baseTheme.palette.action.dropTargetColor,
+        // outlineStyle: "dashed",
         boxShadow: "0 2px 4px rgba(76, 175, 80, 0.3)",
       },
       overDropTarget: {
-        backgroundColor: lighten(
-          baseTheme.palette.action.dropTargetColor,
-          0.85
-        ),
-        outlineColor: baseTheme.palette.action.dropTargetColor,
-        outlineStyle: "dashed",
+        // backgroundColor: lighten(
+        //   baseTheme.palette.action.dropTargetColor,
+        //   0.85
+        // ),
+        // outlineColor: baseTheme.palette.action.dropTargetColor,
+        // outlineStyle: "dashed",
         boxShadow: "0 2px 4px rgba(76, 175, 80, 0.3)",
         transform: "scale(1.05)",
       },
       loading: {
-        background: lighten(baseTheme.palette.action.loadingColor, 0.85),
-        outlineColor: baseTheme.palette.action.loadingColor,
+        // background: lighten(baseTheme.palette.action.loadingColor, 0.85),
+        // outlineColor: baseTheme.palette.action.loadingColor,
         animation: "pulse 1.5s ease-in-out infinite",
         "@keyframes pulse": {
           "0%": { opacity: 0.6 },
@@ -111,20 +115,20 @@ export default createTheme(baseTheme, {
         },
       },
       error: {
-        background: lighten(baseTheme.palette.action.errorColor, 0.85),
+        // background: lighten(baseTheme.palette.action.errorColor, 0.85),
         outlineColor: baseTheme.palette.action.errorColor,
       },
       null: {
-        background: "#fafafa", // Very light grey
+        // background: "#fafafa", // Very light grey
         border: "#bdbdbd", // Grey
       },
       focused: {
-        background: lighten(baseTheme.palette.action.focusedColor, 0.85),
+        // background: lighten(baseTheme.palette.action.focusedColor, 0.85),
         outlineColor: baseTheme.palette.action.focusedColor,
         shadow: "rgba(251, 192, 45, 0.2)",
       },
       hidden: {
-        opacity: 0.3,
+        // opacity: 0.3,
       },
     },
   },

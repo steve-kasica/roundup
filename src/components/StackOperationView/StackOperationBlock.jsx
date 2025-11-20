@@ -18,26 +18,10 @@ import { Box, styled } from "@mui/material";
 import { EnhancedTableBlock, TableBlock } from "../TableView/TableBlock";
 import { EnhancedOperationBlock } from "../OperationView/OperationBlock.jsx";
 import React from "react";
+import StyledBlock from "../ui/StyledBlock.js";
 
 // TODO: when addressing this layout, consider using
 // styled components, but module SCSS will overwrite
-const StyledBox = styled(Box, {
-  shouldForwardProp: (prop) =>
-    ["isError", "isFocused"].includes(prop) === false,
-})(({ theme, isError, isFocused }) => ({
-  display: "flex",
-  borderWidth: "4px",
-  borderStyle: "solid",
-  boxSizing: "border-box",
-  borderColor: theme.palette.divider,
-  ...(isError && {
-    // backgroundColor: theme.palette.error.main,
-    borderColor: theme.palette.error.dark,
-  }),
-  ...(isFocused && {
-    boxShadow: `0 0 0 2px ${theme.palette.primary.main}`,
-  }),
-}));
 
 function StackOperationBlock({
   // Props defined in `withOperationData` HOC
@@ -51,16 +35,20 @@ function StackOperationBlock({
   // Props defined in `withAssociatedAlerts` HOC
   hasAlerts = false,
 
+  // Props defined in `OperationBlock` parent component
+  backgroundColor,
+
   // Optional props passed recursively via parent operation
   // eslint-disable-next-line no-unused-vars
   parentColumnCount,
   sx = {},
 }) {
   const isParentRender = isFocused || isRootOperation;
+  console.log("StackOperationBlock", { backgroundColor });
   return (
-    <StyledBox
+    <StyledBlock
       data-operation-type="stack"
-      isError={hasAlerts}
+      hasError={hasAlerts}
       isFocused={isFocused}
       sx={{
         ...sx,
@@ -68,11 +56,12 @@ function StackOperationBlock({
       }}
     >
       {isParentRender ? (
-        childIds.map((id, index) => {
-          const isFirst = index === 0;
+        childIds.map((id, index, array) => {
           const childSx = {
             height: `${(1 / childIds.length) * 100}%`,
-            borderTopWidth: isFirst ? 0 : 4,
+            ...(index < array.length - 1 && {
+              marginBottom: "2px",
+            }),
           };
           return (
             <React.Fragment key={id}>
@@ -81,6 +70,7 @@ function StackOperationBlock({
                   id={id}
                   parentOperationType={OPERATION_TYPE_STACK}
                   parentColumnCount={columnCount}
+                  backgroundColor={backgroundColor}
                   sx={childSx}
                 />
               ) : (
@@ -88,6 +78,7 @@ function StackOperationBlock({
                   id={id}
                   parentOperationType={OPERATION_TYPE_STACK}
                   parentColumnCount={columnCount}
+                  backgroundColor={backgroundColor}
                   sx={childSx}
                 />
               )}
@@ -105,7 +96,7 @@ function StackOperationBlock({
           sx={{ width: "100%", height: "100%", border: "none" }}
         />
       )}
-    </StyledBox>
+    </StyledBlock>
   );
 }
 

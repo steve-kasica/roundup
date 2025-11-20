@@ -16,9 +16,7 @@ import TableDropTarget from "./TableDropTarget";
 import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
-import { EnhancedStackOperationBlock } from "../StackOperationView/StackOperationBlock";
-import { EnhancedPackOperationBlock } from "../PackOperationView/PackOperationBlock";
-import { EnhancedTableBlock } from "../TableView";
+import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
 
 const gridColumns = 12;
 const gridWidth = gridColumns - 1;
@@ -39,22 +37,9 @@ export default function CompositeTableSchema() {
       {rootOperation ? (
         <Grid container spacing={0} sx={{ height: "100%" }}>
           <Grid size={gridWidth}>
-            {rootOperation.operationType === OPERATION_TYPE_STACK &&
-            rootOperation.childIds.length > 0 ? (
-              <EnhancedStackOperationBlock
+            {rootOperation.childIds.length > 0 ? (
+              <EnhancedOperationBlock
                 id={rootOperation.id}
-                sx={{ height: "100%" }}
-              />
-            ) : rootOperation.operationType === OPERATION_TYPE_PACK &&
-              rootOperation.childIds.length > 0 ? (
-              <EnhancedPackOperationBlock
-                id={rootOperation.id}
-                sx={{ height: "100%" }}
-              />
-            ) : rootOperation.operationType === OPERATION_TYPE_NO_OP &&
-              rootOperation.childIds.length > 0 ? (
-              <EnhancedTableBlock
-                id={rootOperation.childIds[0]}
                 sx={{ height: "100%" }}
               />
             ) : null}

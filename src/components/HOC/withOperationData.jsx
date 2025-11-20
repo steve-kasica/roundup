@@ -7,6 +7,7 @@ import {
   updateOperations,
   isOperationId,
   selectRootOperationId,
+  selectMaxOperationDepth,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import {
@@ -49,6 +50,7 @@ export default function withOperationData(WrappedComponent) {
       () => id === rootOperationId,
       [id, rootOperationId]
     );
+    const maxDepth = useSelector(selectMaxOperationDepth);
 
     // Get columnIds associated with this table, both active and "removed"
     const columnIds = useSelector((state) =>
@@ -243,6 +245,7 @@ export default function withOperationData(WrappedComponent) {
         selectedChildColumnIds={selectedChildColumnIds}
         childRowCounts={childRowCounts}
         depth={depth}
+        maxDepth={maxDepth}
         isRootOperation={isRootOperation}
         // Pack-related operations
         joinKey1={operation.joinKey1}

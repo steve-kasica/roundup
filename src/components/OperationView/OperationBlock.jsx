@@ -1,3 +1,4 @@
+import { scaleOrdinal, schemeTableau10 } from "d3";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
@@ -5,12 +6,35 @@ import {
 import withOperationData from "../HOC/withOperationData";
 import { EnhancedPackOperationBlock } from "../PackOperationView/PackOperationBlock";
 import { EnhancedStackOperationBlock } from "../StackOperationView/StackOperationBlock";
+import { EnhancedTableBlock } from "../TableView";
 
-const OperationBlock = ({ operationType, ...props }) => {
+const OperationBlock = ({
+  operationType,
+  childIds,
+  depth,
+  maxDepth,
+  ...props
+}) => {
+  const colorRange = schemeTableau10;
+  const colorScale = scaleOrdinal(colorRange);
+  const backgroundColor = colorScale(depth);
+  console.log({ depth, maxDepth, backgroundColor });
   if (operationType == OPERATION_TYPE_STACK) {
-    return <EnhancedStackOperationBlock {...props} />;
+    return (
+      <EnhancedStackOperationBlock
+        {...props}
+        backgroundColor={backgroundColor}
+      />
+    );
   } else if (operationType === OPERATION_TYPE_PACK) {
-    return <EnhancedPackOperationBlock {...props} />;
+    return (
+      <EnhancedPackOperationBlock
+        {...props}
+        backgroundColor={backgroundColor}
+      />
+    );
+  } else {
+    return <EnhancedTableBlock id={childIds[0]} sx={{ height: "100%" }} />;
   }
 };
 

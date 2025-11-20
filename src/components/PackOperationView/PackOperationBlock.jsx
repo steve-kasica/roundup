@@ -15,21 +15,7 @@ import { isTableId } from "../../slices/tablesSlice";
 import { Box, styled } from "@mui/material";
 import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
 import withPackOperationData from "./withPackOperationData";
-
-// TODO: when addressing this layout, consider using
-// styled components, but module SCSS will overwrite
-const StyledBox = styled(Box, {
-  shouldForwardProp: (prop) => prop !== "hasError",
-})(({ theme, hasError }) => ({
-  display: "flex",
-  flexDirection: "row",
-  borderWidth: "4px",
-  borderStyle: "solid",
-  borderColor: theme.palette.divider,
-  ...(hasError && {
-    borderColor: theme.palette.error.dark,
-  }),
-}));
+import StyledBlock from "../ui/StyledBlock";
 
 function PackOperationBlock({
   // props via withOperationData
@@ -52,7 +38,7 @@ function PackOperationBlock({
   const isParentRender = isFocused || isRootOperation;
 
   return (
-    <StyledBox className="pack-operation-block" hasError={hasAlerts} sx={sx}>
+    <StyledBlock className="pack-operation-block" hasError={hasAlerts} sx={sx}>
       {isParentRender ? (
         childIds.map((childId, index, array) => {
           const childSx = {
@@ -62,7 +48,7 @@ function PackOperationBlock({
                 100 +
               "%",
             ...(index === array.length - 1 && {
-              borderLeft: "none",
+              borderLeft: "2px solid " + "#000",
             }),
           };
           if (isTableId(childId)) {
@@ -101,7 +87,7 @@ function PackOperationBlock({
           sx={{ width: "100%", height: "100%", border: "none" }}
         />
       )}
-    </StyledBox>
+    </StyledBlock>
   );
 }
 

@@ -16,6 +16,7 @@ function TableBlock({
   // Props passed directly from parent
   parentOperationType,
   parentColumnCount,
+  backgroundColor,
   sx = {},
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
@@ -36,15 +37,12 @@ function TableBlock({
       data-table="table-block" // Added className for easier targeting during debugging
       sx={{
         display: "flex",
-        border: "5px solid #ddd",
         boxSizing: "border-box",
         flexDirection: "row",
         alignItems: "stretch",
         position: "relative",
         // Visual indication of alerts
         ...(hasAlerts && {
-          border: "2px solid",
-          borderColor: "warning.main",
           backgroundColor: "warning.light",
           opacity: 0.9,
         }),
@@ -55,19 +53,17 @@ function TableBlock({
         variant="caption"
         className="table-id"
         sx={{
+          userSelect: "none",
           position: "absolute",
           top: 4,
           left: 4,
-          zIndex: 10,
-          padding: "2px 6px",
-          borderRadius: "4px",
+          zIndex: 100,
+          padding: "1px 1px",
           fontSize: "0.6rem",
           lineHeight: 1,
           pointerEvents: "none",
-          backdropFilter: "blur(2px)",
+          background: "transparent",
           ...(hasAlerts && {
-            color: "warning.dark",
-            backgroundColor: "warning.light",
             fontWeight: "bold",
           }),
         }}
@@ -75,24 +71,35 @@ function TableBlock({
         {name || id}
         {hasAlerts && `⚠`}
         <br />
-        <small style={{ color: "#757575" }}>
+        <small style={{ color: "#555" }}>
           {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
         </small>
       </Typography>
-      {ticks.map((columnId, index) =>
-        columnId === null ? (
+      {ticks.map((columnId, index) => {
+        const childSx = {
+          backgroundColor, // apply background color defined in operation
+          ...(index === 0 && {
+            paddingLeft: "0", // no border on the first tick, as it's the left edge
+          }),
+        };
+        return columnId === null ? (
           <ColumnTick
             key={`empty-${index}`} // Ensure unique key even when columnId is null
             id={null}
             sx={{
-              outlineColor: "#f44336",
-              backgroundColor: "rgb(253, 226, 224)",
+              ...childSx,
+              background:
+                "repeating-linear-gradient(45deg, #666, #666 10px, #888 10px, #888 20px)",
             }}
           />
         ) : (
-          <EnhancedColumnTick key={`${columnId}-${index}`} id={columnId} />
-        )
-      )}
+          <EnhancedColumnTick
+            key={`${columnId}-${index}`}
+            id={columnId}
+            sx={childSx}
+          />
+        );
+      })}
     </Box>
   );
 }

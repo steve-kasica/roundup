@@ -95,6 +95,7 @@ const StackRows = ({
 
   return (
     <RoundupTable
+      able
       columnIds={displayColumnIds}
       isMaterialized={isMaterialized}
       isInSync={isInSync}

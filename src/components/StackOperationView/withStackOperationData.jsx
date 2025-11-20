@@ -94,15 +94,14 @@ export default function withStackOperationData(WrappedComponent) {
         .filter(({ columnIds }) => columnIds.length > 0);
     }, [childIds, columnIdMatrix, selectedColumnIds]);
 
-    // const rowCount = useSelector((state) => {
-    //   return rowCount || selectStackOperationRowCount(state, id);
-    // });
-    const rowCount = -1; // TODO
-
     const rowRanges = useSelector((state) =>
       selectStackOperationRowRanges(state, id)
     );
+    const rowCount = useMemo(() => {
+      return [...rowRanges].reduce((acc, [, [, end]]) => Math.max(acc, end), 0);
+    }, [rowRanges]);
 
+    // TODO: is no one using this?
     const selectedTableIds = useMemo(() => {
       return columnIdMatrix
         .map((row, rowIndex) =>

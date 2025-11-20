@@ -30,7 +30,6 @@ const StackSchemaView = ({
   activeColumnIds,
   columnIdMatrix, // column IDs of child tables in a matrix
   m, // width of the matrix (# of columns)
-  // selectedColumnIndices,
   // Props passed via withAssociatedAlerts
   alertIds,
   hasAlerts,
