@@ -32,6 +32,7 @@ import { selectFocusedObjectId } from "../../slices/uiSlice";
 import { group } from "d3";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
+import { scaleOrdinal, schemeTableau10 } from "d3";
 
 export default function withOperationData(WrappedComponent) {
   function EnhancedComponent({
@@ -227,6 +228,16 @@ export default function withOperationData(WrappedComponent) {
       return operationLabel;
     }, [operation.name, operation.operationType]);
 
+    const backgroundColor = useMemo(() => {
+      const colorRange = schemeTableau10;
+      const colorScale = scaleOrdinal(
+        Array.from({ length: maxDepth + 1 }, (_, i) => i),
+        colorRange
+      );
+      const backgroundColor = colorScale(depth);
+      return backgroundColor;
+    }, [depth, maxDepth]);
+
     return (
       <WrappedComponent
         // Pass along props directly from the parent component
@@ -247,6 +258,7 @@ export default function withOperationData(WrappedComponent) {
         depth={depth}
         maxDepth={maxDepth}
         isRootOperation={isRootOperation}
+        backgroundColor={backgroundColor}
         // Pack-related operations
         joinKey1={operation.joinKey1}
         joinKey2={operation.joinKey2}

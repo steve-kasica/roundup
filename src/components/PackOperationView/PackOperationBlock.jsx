@@ -12,7 +12,7 @@
 import { EnhancedTableBlock, TableBlock } from "../TableView";
 import { OPERATION_TYPE_PACK } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
-import { Box, styled } from "@mui/material";
+import { Box, styled, Typography } from "@mui/material";
 import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
 import withPackOperationData from "./withPackOperationData";
 import StyledBlock from "../ui/StyledBlock";
@@ -21,6 +21,7 @@ function PackOperationBlock({
   // props via withOperationData
   childIds,
   id,
+  name,
   activeColumnIds,
   isFocused,
   isRootOperation,
@@ -33,60 +34,70 @@ function PackOperationBlock({
   hasAlerts,
   // Props passed via parent
   parentColumnCount,
+  backgroundColor,
   sx = {},
 }) {
   const isParentRender = isFocused || isRootOperation;
+  const rowCountDisplay = rowCount?.toLocaleString() || "???";
+  const columnCountDisplay = columnCount?.toLocaleString() || "???";
 
   return (
-    <StyledBlock className="pack-operation-block" hasError={hasAlerts} sx={sx}>
-      {isParentRender ? (
-        childIds.map((childId, index, array) => {
-          const childSx = {
-            width:
-              ((index === 0 ? leftColumnCount : rightColumnCount) /
-                columnCount) *
-                100 +
-              "%",
-            ...(index === array.length - 1 && {
-              borderLeft: "2px solid " + "#000",
-            }),
-          };
-          if (isTableId(childId)) {
-            return (
-              <EnhancedTableBlock
-                key={childId}
-                id={childId}
-                isDraggable={false}
-                parentOperationType={OPERATION_TYPE_PACK}
-                parentColumnCount={columnCount}
-                sx={childSx}
-              />
-            );
-          } else {
-            return (
-              <EnhancedOperationBlock
-                id={childId}
-                key={childId}
-                parentOperationType={OPERATION_TYPE_PACK}
-                parentColumnCount={columnCount}
-                sx={childSx}
-              />
-            );
-          }
-        })
-      ) : (
-        <TableBlock
-          hasAlerts={hasAlerts}
-          id={id}
-          activeColumnIds={activeColumnIds}
-          activeColumnsCount={activeColumnIds.length} // TODO: is this already in HOC?
-          columnCount={columnCount}
-          rowCount={rowCount}
-          parentOperationType={OPERATION_TYPE_PACK}
-          parentColumnCount={columnCount}
-          sx={{ width: "100%", height: "100%", border: "none" }}
-        />
-      )}
+    <StyledBlock
+      className="pack-operation-block"
+      isFocused={isFocused}
+      hasError={hasAlerts}
+      sx={{
+        paddingTop: "20px",
+        paddingLeft: "2px",
+        paddingRight: "2px",
+        paddingBottom: "2px",
+        boxSizing: "border-box",
+        alignItems: "stretch",
+        position: "relative",
+        backgroundColor: backgroundColor,
+        ...sx,
+      }}
+    >
+      <Typography variant="treemap label">
+        {hasAlerts && `⚠`} {name || id}{" "}
+        <small style={{ color: "#555" }}>
+          {columnCountDisplay} x {rowCountDisplay}
+        </small>
+      </Typography>
+      {childIds.map((childId, index, array) => {
+        const childSx = {
+          width:
+            ((index === 0 ? leftColumnCount : rightColumnCount) / columnCount) *
+              100 +
+            "%",
+          ...(index === array.length - 1 && {
+            paddingLeft: "1px",
+          }),
+        };
+        if (isTableId(childId)) {
+          return (
+            <EnhancedTableBlock
+              key={childId}
+              id={childId}
+              isDraggable={false}
+              parentOperationType={OPERATION_TYPE_PACK}
+              parentColumnCount={columnCount}
+              backgroundColor={backgroundColor}
+              sx={childSx}
+            />
+          );
+        } else {
+          return (
+            <EnhancedOperationBlock
+              id={childId}
+              key={childId}
+              parentOperationType={OPERATION_TYPE_PACK}
+              parentColumnCount={columnCount}
+              sx={childSx}
+            />
+          );
+        }
+      })}
     </StyledBlock>
   );
 }

@@ -49,25 +49,7 @@ function TableBlock({
         ...sx,
       }}
     >
-      <Typography
-        variant="caption"
-        className="table-id"
-        sx={{
-          userSelect: "none",
-          position: "absolute",
-          top: 4,
-          left: 4,
-          zIndex: 100,
-          padding: "1px 1px",
-          fontSize: "0.6rem",
-          lineHeight: 1,
-          pointerEvents: "none",
-          background: "transparent",
-          ...(hasAlerts && {
-            fontWeight: "bold",
-          }),
-        }}
-      >
+      <Typography variant="treemap label">
         {name || id}
         {hasAlerts && `⚠`}
         <br />

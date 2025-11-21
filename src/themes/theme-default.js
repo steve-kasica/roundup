@@ -37,6 +37,18 @@ const baseTheme = createTheme({
     "icon text": {
       fontSize: 10,
     },
+    "treemap label": {
+      userSelect: "none",
+      position: "absolute",
+      top: 4,
+      left: 4,
+      zIndex: 100,
+      padding: "1px 1px",
+      fontSize: "0.6rem",
+      lineHeight: 1,
+      pointerEvents: "none",
+      background: "transparent",
+    },
   },
   components: {
     MuiTypography: {

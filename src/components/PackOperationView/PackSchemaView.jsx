@@ -14,7 +14,11 @@ import { useCallback, useEffect, useState, useMemo } from "react";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 import { EnhancedColumnName } from "../ColumnViews";
-import { SwapHoriz as SwapIcon } from "@mui/icons-material";
+import {
+  SwapHoriz as SwapIcon,
+  KeyboardArrowLeft as InsertLeftIcon,
+  KeyboardArrowRight as InsertRightIcon,
+} from "@mui/icons-material";
 import ExcludeIconButton from "../ui/ExcludeIconButton";
 import FocusIconButton from "../ui/FocusIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
@@ -445,6 +449,22 @@ const PackSchemaView = withPackOperationData(
               >
                 <SwapIcon fontSize="small" />
               </IconButton>
+              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+              <IconButton
+                size="small"
+                disabled={!hasCompleteColumnSelected}
+                title="Insert column to the left"
+              >
+                <InsertLeftIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                disabled={!hasCompleteColumnSelected}
+                title="Insert column to the right"
+              >
+                <InsertRightIcon fontSize="small" />
+              </IconButton>
+              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
               <FocusIconButton
                 disabled={!hasCompleteColumnSelected}
                 onClick={handleFocusColumns}

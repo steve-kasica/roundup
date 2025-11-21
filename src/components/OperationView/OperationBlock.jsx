@@ -1,4 +1,3 @@
-import { scaleOrdinal, schemeTableau10 } from "d3";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
@@ -13,12 +12,9 @@ const OperationBlock = ({
   childIds,
   depth,
   maxDepth,
+  backgroundColor,
   ...props
 }) => {
-  const colorRange = schemeTableau10;
-  const colorScale = scaleOrdinal(colorRange);
-  const backgroundColor = colorScale(depth);
-  console.log({ depth, maxDepth, backgroundColor });
   if (operationType == OPERATION_TYPE_STACK) {
     return (
       <EnhancedStackOperationBlock

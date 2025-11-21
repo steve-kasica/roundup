@@ -36,7 +36,6 @@ const StyledColumnTick = styled(Box, {
     minHeight: "25px",
     display: "flex",
     flexDirection: "column",
-    borderLeft: "1px solid #fff",
     paddingLeft: "5px",
     boxSizing: "border-box",
     overflow: "hidden",
