@@ -3,57 +3,72 @@ import createColumnsWorker from "./worker";
 import { createColumnsRequest } from "./actions";
 import { createTablesSuccess } from "../createTablesSaga";
 import {
-  OPERATION_TYPE_NO_OP,
+  isOperationId,
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
   selectOperationsById,
 } from "../../slices/operationsSlice";
-import { selectTablesById } from "../../slices/tablesSlice";
-import { CREATION_MODE_INITIALIZATION } from ".";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { CREATION_MODE_INITIALIZATION, CREATION_MODE_INSERTION } from ".";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
-import { materializeOperationSuccess } from "../materializeOperationSaga/actions";
-import { useSelector } from "react-redux";
-
-// Create a shared function for handling both success and failure operations
-const handleOperations = function* (action) {
-  const { operationIds } = action.payload;
-  const operations = yield select((state) =>
-    operationIds.map((id) => selectOperationsById(state, id))
-  );
-  for (const { id, operationType, columnCount } of operations) {
-    if (operationType === OPERATION_TYPE_NO_OP) {
-      continue;
-    }
-    yield put(
-      createColumnsRequest({
-        mode: CREATION_MODE_INITIALIZATION,
-        columnInfo: Array.from({ length: columnCount }).map((_, index) => ({
-          parentId: id,
-          index,
-        })),
-      })
-    );
-  }
-};
-
-const handleTables = function* (action) {
-  const { tableIds } = action.payload;
-  const tables = yield select((state) => selectTablesById(state, tableIds));
-  for (const { id, initialColumnCount } of tables) {
-    yield put(
-      createColumnsRequest({
-        mode: CREATION_MODE_INITIALIZATION,
-        columnInfo: Array.from({ length: initialColumnCount }).map(
-          (_, index) => ({
-            parentId: id, // tables and operations can be parents of columns
-            index,
-          })
-        ),
-      })
-    );
-  }
-};
 
 export default function* createColumnsWatcher() {
-  yield takeEvery(createColumnsRequest.type, createColumnsWorker);
+  yield takeEvery(createColumnsRequest.type, function* (action) {
+    const { columnLocations, mode } = action.payload;
+    // If we are inserting columns into an operation, we need to
+    // instead insert columns into each child tables/operations of that operation.
+    if (
+      mode === CREATION_MODE_INSERTION &&
+      columnLocations.some(({ parentId }) => isOperationId(parentId))
+    ) {
+      const nextPayload = [];
+      const operationUpdates = columnLocations.filter(({ parentId }) =>
+        isOperationId(parentId)
+      );
+      for (const { parentId, index } of operationUpdates) {
+        const operation = yield select((state) =>
+          selectOperationsById(state, parentId)
+        );
+        if (operation.operationType === OPERATION_TYPE_STACK) {
+          // For stack operations, insert a new column into each child table/operation
+          // at the specified location
+          nextPayload.push(
+            ...operation.childIds.map((childId) => ({
+              parentId: childId,
+              index,
+            }))
+          );
+        } else if (operation.operationType === OPERATION_TYPE_PACK) {
+          // For pack operations, determine which child table/operation to insert the new column into
+          // Modify insertion index related to child table/operation column count
+          const leftColumns = yield select((state) =>
+            isTableId(operation.childIds[0])
+              ? selectTablesById(state, operation.childIds[0]).columnIds
+              : selectOperationsById(state, operation.childIds[0]).columnIds
+          );
+          if (index < leftColumns.length) {
+            nextPayload.push({
+              parentId: operation.childIds[0],
+              index,
+            });
+          } else {
+            nextPayload.push({
+              parentId: operation.childIds[1],
+              index: index - leftColumns.length,
+            });
+          }
+        }
+      } // end for loop through operationUpdates
+      yield put(
+        createColumnsRequest({
+          mode: CREATION_MODE_INSERTION,
+          columnLocations: nextPayload,
+        })
+      );
+    } else {
+      yield call(createColumnsWorker, action);
+    }
+  });
 
   // When tables are created, create columns for them
   yield takeEvery(createTablesSuccess.type, function* (action) {
