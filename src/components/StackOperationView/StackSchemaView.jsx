@@ -15,6 +15,8 @@ import FocusIconButton from "../ui/FocusIconButton";
 import ExcludeIconButton from "../ui/ExcludeIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
+import { isTableId } from "../../slices/tablesSlice";
+import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -387,12 +389,21 @@ const StackSchemaView = ({
                   cursor: "pointer",
                 }}
               >
-                <EnhancedTableLabel
-                  id={childId}
-                  onClick={(event) => onRowLabelClick(event, rowIndex)}
-                  includeIcon={false}
-                  includeDimensions={false}
-                />
+                {isTableId(childId) ? (
+                  <EnhancedTableLabel
+                    id={childId}
+                    onClick={(event) => onRowLabelClick(event, rowIndex)}
+                    includeIcon={false}
+                    includeDimensions={false}
+                  />
+                ) : (
+                  <EnhancedOperationLabel
+                    id={childId}
+                    onClick={(event) => onRowLabelClick(event, rowIndex)}
+                    includeIcon={false}
+                    includeDimensions={false}
+                  />
+                )}
               </Box>
             ))}
           </Box>
