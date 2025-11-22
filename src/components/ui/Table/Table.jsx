@@ -15,6 +15,7 @@ import StickyTableCell from "./StickyTableCell";
 import StyledAlternatingTableRow from "./StyledAlternatingTableRow";
 import StyledTableCell from "./StyledTableCell";
 import { Box } from "lucide-react";
+import MaterializeViewIconButton from "../MaterializeViewIconButton";
 
 const Table = ({
   columnIds,
@@ -22,25 +23,41 @@ const Table = ({
   loading,
   error,
   handleScroll,
-  isMaterialized = true, // specific to operation tables
-  isInSync = true, // specific to operation tables
   columnWidths = {},
   onColumnSort,
   sortConfig,
   placeHolderColumnLength = 10,
   placeHolderRowLength = 20,
+  hasAlerts,
+
+  // Props specific to operation tables, and are not passed
+  // when the operation is a table
+  isMaterialized = true,
+  isInSync = true,
+  onMaterializeView = () => null,
 }) => {
   const tableContainerRef = React.useRef(null);
   return (
     <>
-      {!isMaterialized ? (
-        <Alert severity="warning" sx={{ borderBottom: "1px solid #ccc" }}>
+      {hasAlerts ? (
+        <Alert severity="error" sx={{ borderBottom: "1px solid #ccc" }}>
+          This operation has schema-related issue that prevent materialization.
+        </Alert>
+      ) : !isMaterialized ? (
+        <Alert
+          severity="warning"
+          sx={{ borderBottom: "1px solid #ccc" }}
+          action={<MaterializeViewIconButton onClick={onMaterializeView} />}
+        >
           This operation is not materialized. Please materialize to view data.
         </Alert>
       ) : !isInSync ? (
-        <Alert severity="warning" sx={{ borderBottom: "1px solid #ccc" }}>
-          This operation is out of sync. Please materialize to view updated
-          data.
+        <Alert
+          severity="warning"
+          sx={{ borderBottom: "1px solid #ccc" }}
+          action={<MaterializeViewIconButton onClick={onMaterializeView} />}
+        >
+          This operation is out of sync. Re-materialize to view updated data.
         </Alert>
       ) : columnIds.length === 0 ? (
         <Alert severity="info" sx={{ borderBottom: "1px solid #ccc" }}>

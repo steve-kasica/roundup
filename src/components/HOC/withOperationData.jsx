@@ -30,9 +30,8 @@ import {
 import withAssociatedAlerts from "./withAssociatedAlerts";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
 import { group, interpolateMagma, scaleSequential } from "d3";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { isTableId } from "../../slices/tablesSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
-import { scaleOrdinal, schemeTableau10 } from "d3";
 
 export default function withOperationData(WrappedComponent) {
   function EnhancedComponent({
@@ -236,6 +235,10 @@ export default function withOperationData(WrappedComponent) {
       [maxDepth]
     );
 
+    const selectAllChildColumns = useCallback(() => {
+      selectColumns(activeChildColumnIds.flat());
+    }, [selectColumns, activeChildColumnIds]);
+
     return (
       <WrappedComponent
         // Pass along props directly from the parent component
@@ -311,6 +314,7 @@ export default function withOperationData(WrappedComponent) {
         insertColumnIntoChildAtIndex={insertColumnIntoChildAtIndex}
         setVisibleColumns={setVisibleColumns}
         focusColumns={focusColumns}
+        selectAllChildColumns={selectAllChildColumns}
       />
     );
   }

@@ -24,7 +24,7 @@ import {
 import ExcludeIconButton from "../ui/ExcludeIconButton";
 import FocusIconButton from "../ui/FocusIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
-import { extent, interpolateGreys, scaleSequential } from "d3";
+import { extent, interpolateGreys, scaleSequential, text } from "d3";
 import { EnhancedTableName } from "../TableView/TableName";
 import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
 import { isTableId } from "../../slices/tablesSlice";
@@ -72,9 +72,6 @@ const PackSchemaView = withPackOperationData(
 
     // Add hover state for columns
     const [hoveredColumn, setHoveredColumn] = useState(null);
-
-    // Add state for column selection across tables
-    const [anchorColumn, setAnchorColumn] = useState(null);
 
     // Add toggle state for showing/hiding match types
     const [toggledMatches, setToggledMatches] = useState(() =>
@@ -298,7 +295,6 @@ const PackSchemaView = withPackOperationData(
     const handleColumnContextMenu = useCallback((event, columnId) => {
       event.preventDefault();
       event.stopPropagation();
-      console.log("Opening context menu for column:", columnId);
       setContextMenu({
         mouseX: event.clientX + 2,
         mouseY: event.clientY - 6,
@@ -443,10 +439,6 @@ const PackSchemaView = withPackOperationData(
       swapTablePositions(0, 1);
     }, [swapTablePositions]);
 
-    const handleMaterializeView = useCallback(() => {
-      materializeOperation();
-    }, [materializeOperation]);
-
     const totalRows = Object.values(data || {}).reduce(
       (sum, count) => sum + (count || 0),
       0
@@ -536,10 +528,6 @@ const PackSchemaView = withPackOperationData(
                 onClick={handleSelectAll}
                 isSelected={areAnySelected}
               />
-              <MaterializeViewIconButton
-                onClick={handleMaterializeView}
-                disabled={hasAlerts}
-              />
             </>
           }
         >
@@ -616,6 +604,9 @@ const PackSchemaView = withPackOperationData(
               alignItems={"center"}
               justifyContent={"flex-start"}
               marginTop={"20px"}
+              sx={{
+                containerType: "inline-size",
+              }}
             >
               <Box
                 width={yAxisLabelWidth}
@@ -654,14 +645,36 @@ const PackSchemaView = withPackOperationData(
                       id={columnId}
                       sx={{
                         fontSize: "0.6rem",
-                        transform: "rotate(-45deg)",
-                        transformOrigin: "left bottom",
-                        marginLeft: "15px",
                         userSelect: "none",
                         width: "50px",
                         minWidth: "50px",
                         maxWidth: "50px",
-                        textAlign: "left",
+                        textAlign: "center",
+                        marginBottom: "2px",
+                        // Progressive rotation based on container width
+                        transform: "rotate(0deg)",
+                        transformOrigin: "left bottom",
+                        marginLeft: "0px",
+                        "@container (max-width: 1000px)": {
+                          transform: "rotate(-10deg)",
+                          marginLeft: "10%",
+                          marginBottom: "1px",
+                        },
+                        "@container (max-width: 800px)": {
+                          transform: "rotate(-20deg)",
+                          marginLeft: "20%",
+                          marginBottom: "1px",
+                        },
+                        "@container (max-width: 600px)": {
+                          transform: "rotate(-30deg)",
+                          marginLeft: "35%",
+                          marginBottom: "1px",
+                        },
+                        "@container (max-width: 400px)": {
+                          transform: "rotate(-45deg)",
+                          marginLeft: "50%",
+                          marginBottom: "1px",
+                        },
                       }}
                       onClick={handleColumnClick}
                     />
@@ -718,26 +731,15 @@ const PackSchemaView = withPackOperationData(
                     onClick={(event) => handleMatchLabelClick(event, key)}
                   >
                     {label}
-                    <br />({value})
+                    <br />({value.toLocaleString()})
                   </Typography>
                   {[...leftColumnIds, ...rightColumnIds].map((columnId, j) => {
                     // Check if this is a key column
+                    const isLastLeftColumn = j === leftColumnIds.length - 1;
                     const tableId =
                       j < leftColumnIds.length ? leftTableId : rightTableId;
-                    const isKeyColumn =
-                      columnId === leftKey || columnId === rightKey;
                     const cellKey = `${columnId}:${key}`;
                     const isClicked = clickedBlockCells.has(cellKey);
-                    const isColumnHovered =
-                      hoveredColumn === `${tableId}:${columnId}`;
-                    const isRowHovered = hoveredMatch === key;
-
-                    // Determine if cell is empty based on table and match type
-                    const isEmpty =
-                      (tableId === leftTableId &&
-                        key === "rightUnmatchedRowCount") ||
-                      (tableId === rightTableId &&
-                        key === "leftUnmatchedRowCount");
 
                     // Calculate which borders to show for contiguous selection
                     let showTopBorder = false;
@@ -798,10 +800,6 @@ const PackSchemaView = withPackOperationData(
                     const colRight = hasRightNeighbor
                       ? allColumns[currentColIndex + 1]
                       : null;
-                    const rightCellKey = colRight ? `${colRight}:${key}` : null;
-                    const rightCellSelected = rightCellKey
-                      ? clickedBlockCells.has(rightCellKey)
-                      : false;
 
                     return (
                       <Box
@@ -855,6 +853,9 @@ const PackSchemaView = withPackOperationData(
                             backgroundColor: "grey.300",
                             cursor: "not-allowed",
                           }),
+                          ...(isLastLeftColumn && {
+                            marginRight: "4px",
+                          }),
                           "&:hover": {
                             opacity: isMatchDisabled ? 1 : 0.8,
                           },
@@ -889,7 +890,7 @@ const PackSchemaView = withPackOperationData(
             Insert Column Right
           </MenuItem>
           <MenuItem onClick={handleCloseContextMenu}>Rename Column</MenuItem>
-          <MenuItem onClick={handleCloseContextMenu}>Delete Column</MenuItem>
+          <MenuItem onClick={handleCloseContextMenu}>Exclude Column</MenuItem>
         </Menu>
       </Box>
     );

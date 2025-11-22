@@ -19,9 +19,11 @@ const StackRows = ({
   isMaterialized,
   isInSync,
   activeColumnIds,
+  hasAlerts,
   childIds, // an array of child operation/table IDs
   childRowCounts, // a map of childId to row count
   selectedChildColumnIds,
+  selectAllChildColumns,
   // Props defined in withStackOperationData
   columnIdMatrix,
   // Props defined in withAssociatedAlerts
@@ -89,8 +91,9 @@ const StackRows = ({
     [sortByColumnId, sortDirection]
   );
 
-  const handleRefresh = useCallback(() => {
+  const handleMaterializeView = useCallback(() => {
     materializeOperation();
+    selectAllChildColumns();
   }, [materializeOperation]);
 
   return (
@@ -103,17 +106,20 @@ const StackRows = ({
       error={error}
       handleScroll={handleScroll}
       onColumnSort={handleColumnSort}
+      onMaterializeView={handleMaterializeView}
       sortConfig={{ sortByColumnId, sortDirection }}
       placeHolderColumnLength={11}
       placeHolderRowLength={20}
+      // initialOffset={initialOffset} // TODO
+      hasAlerts={hasAlerts}
     />
   );
 };
 
-StackRows.displayName = "StackRows";
+StackRows.displayName = "Stack Rows";
 
 const EnhancedStackRows = withStackOperationData(StackRows);
 
-EnhancedStackRows.displayName = "EnhancedStackRows";
+EnhancedStackRows.displayName = "Enhanced Stack Rows";
 
 export { EnhancedStackRows, StackRows };

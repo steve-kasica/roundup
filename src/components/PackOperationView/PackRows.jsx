@@ -123,6 +123,10 @@ const PackRows = ({
     [sortByColumnId, sortDirection]
   );
 
+  const handleMaterializeView = useCallback(() => {
+    materializeOperation();
+  }, [materializeOperation]);
+
   return (
     <RoundupTable
       columnIds={displayColumnIds}
@@ -133,10 +137,12 @@ const PackRows = ({
       error={error}
       handleScroll={handleScroll}
       onColumnSort={handleColumnSort}
+      onMaterializeView={handleMaterializeView}
       sortConfig={{ sortByColumnId, sortDirection }}
       placeHolderColumnLength={11}
       placeHolderRowLength={20}
       initialOffset={initialOffset} // TODO: update row counts
+      hasAlerts={hasAlerts}
     />
   );
 };

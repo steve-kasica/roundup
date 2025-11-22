@@ -42,4 +42,6 @@ flowchart LR
 
 ```
 
+## Inserting a column into an operation
+
 ---

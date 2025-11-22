@@ -14,7 +14,6 @@ import { EnhancedStackOperationLabel } from "./StackOperationLabel";
 import FocusIconButton from "../ui/FocusIconButton";
 import ExcludeIconButton from "../ui/ExcludeIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
-import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 
@@ -26,8 +25,6 @@ const StackSchemaView = ({
   id,
   name,
   rowCount,
-  isInSync,
-  isMaterialized,
   // Props passed via withStackOperationData
   activeColumnIds,
   columnIdMatrix, // column IDs of child tables in a matrix
@@ -328,10 +325,6 @@ const StackSchemaView = ({
             <SelectToggleIconButton
               onClick={handleSelectionAllColumns}
               isSelected={selectedTableColumnIds.length > 0}
-            />
-            <MaterializeViewIconButton
-              onClick={handleMaterializeView}
-              disabled={hasAlerts || (isMaterialized && isInSync)}
             />
           </>
         }
