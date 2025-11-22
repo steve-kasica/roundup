@@ -92,11 +92,11 @@ export default function* createColumnsWatcher() {
   // If an operation has been recently materialized as a view,
   // then we need to create columns that represent columns of that view.
   yield takeEvery(updateOperationsSuccess.type, function* (action) {
-    const { changedPropertiesByOperationId } = action.payload;
+    const { changedPropertiesById } = action.payload;
     const columnLocations = [];
 
     for (const [id, changedProperties] of Object.entries(
-      changedPropertiesByOperationId
+      changedPropertiesById
     )) {
       if (changedProperties.includes("isMaterialized")) {
         const operation = yield select((state) =>

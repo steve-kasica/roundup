@@ -55,9 +55,9 @@ export default function* updateAlertsSagaWatcher() {
       "joinKey2",
       "joinPredicate",
     ];
-    const { changedPropertiesByOperationId } = action.payload;
+    const { changedPropertiesById } = action.payload;
 
-    Object.entries(changedPropertiesByOperationId).forEach(
+    Object.entries(changedPropertiesById).forEach(
       ([operationId, changedProperties]) => {
         const hasRelevantChange = relevantChangedProperties.some((prop) =>
           changedProperties.includes(prop)
@@ -77,10 +77,10 @@ export default function* updateAlertsSagaWatcher() {
   // For example, if the columnIds of a table change, a stack operation using that table may now have mismatched columns.
   yield takeEvery(updateTablesSuccess.type, function* (action) {
     const propertiesToCheck = ["columnIds"];
-    const { changedPropertiesByTableId } = action.payload;
+    const { changedPropertiesById } = action.payload;
     const operationIdsToCheck = new Set();
     for (let [tableId, changedProperties] of Object.entries(
-      changedPropertiesByTableId
+      changedPropertiesById
     )) {
       const { parentId } = yield select((state) =>
         selectTablesById(state, tableId)

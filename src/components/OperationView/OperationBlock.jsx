@@ -12,25 +12,22 @@ const OperationBlock = ({
   childIds,
   depth,
   maxDepth,
-  backgroundColor,
+  colorScale,
   ...props
 }) => {
   if (operationType == OPERATION_TYPE_STACK) {
-    return (
-      <EnhancedStackOperationBlock
-        {...props}
-        backgroundColor={backgroundColor}
-      />
-    );
+    return <EnhancedStackOperationBlock {...props} />;
   } else if (operationType === OPERATION_TYPE_PACK) {
+    return <EnhancedPackOperationBlock {...props} />;
+  } else {
+    const backgroundColor = colorScale(depth);
+    console.log({ color: backgroundColor });
     return (
-      <EnhancedPackOperationBlock
-        {...props}
-        backgroundColor={backgroundColor}
+      <EnhancedTableBlock
+        id={childIds[0]}
+        sx={{ height: "100%", backgroundColor }}
       />
     );
-  } else {
-    return <EnhancedTableBlock id={childIds[0]} sx={{ height: "100%" }} />;
   }
 };
 

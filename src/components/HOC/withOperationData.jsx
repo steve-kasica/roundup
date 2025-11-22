@@ -29,7 +29,7 @@ import {
 } from "../../sagas/createColumnsSaga";
 import withAssociatedAlerts from "./withAssociatedAlerts";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
-import { group } from "d3";
+import { group, interpolateMagma, scaleSequential } from "d3";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 import { scaleOrdinal, schemeTableau10 } from "d3";
@@ -109,11 +109,11 @@ export default function withOperationData(WrappedComponent) {
     }, [dispatch]);
 
     const insertColumnIntoChildAtIndex = useCallback(
-      (childTableId, targetIndex) => {
+      (childId, targetIndex) => {
         dispatch(
           createColumnsRequest({
             mode: CREATION_MODE_INSERTION,
-            columnInfo: [{ parentId: childTableId, index: targetIndex }],
+            columnLocations: [{ parentId: childId, index: targetIndex }],
           })
         );
       },
@@ -228,15 +228,13 @@ export default function withOperationData(WrappedComponent) {
       return operationLabel;
     }, [operation.name, operation.operationType]);
 
-    const backgroundColor = useMemo(() => {
-      const colorRange = schemeTableau10;
-      const colorScale = scaleOrdinal(
-        Array.from({ length: maxDepth + 1 }, (_, i) => i),
-        colorRange
-      );
-      const backgroundColor = colorScale(depth);
-      return backgroundColor;
-    }, [depth, maxDepth]);
+    const colorScale = useCallback(
+      (depth) => {
+        const scale = scaleSequential([maxDepth + 1, 0], interpolateMagma);
+        return scale(depth);
+      },
+      [maxDepth]
+    );
 
     return (
       <WrappedComponent
@@ -258,7 +256,7 @@ export default function withOperationData(WrappedComponent) {
         depth={depth}
         maxDepth={maxDepth}
         isRootOperation={isRootOperation}
-        backgroundColor={backgroundColor}
+        colorScale={colorScale}
         // Pack-related operations
         joinKey1={operation.joinKey1}
         joinKey2={operation.joinKey2}

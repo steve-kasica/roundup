@@ -33,9 +33,9 @@ export default function* deleteOperationsWatcher() {
   // If an operation successfully updates such that it has no children, then delete it
   // Note: the `changedPropertiesByOperation` payload object is in the form { operationId: [ keyUpdated, keyUpdated ]}
   yield takeLatest(updateOperationsSuccess.type, function* (action) {
-    const { changedPropertiesByOperationId } = action.payload;
+    const { changedPropertiesById } = action.payload;
     const operationIdsToDelete = [];
-    for (const [id, keys] of Object.entries(changedPropertiesByOperationId)) {
+    for (const [id, keys] of Object.entries(changedPropertiesById)) {
       if (keys.includes("children")) {
         const operation = yield select((state) =>
           selectOperationsById(state, id)

@@ -8,6 +8,8 @@ import {
   Chip,
   Divider,
   Badge,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import withPackOperationData from "./withPackOperationData";
 import { useCallback, useEffect, useState, useMemo } from "react";
@@ -46,6 +48,7 @@ const PackSchemaView = withPackOperationData(
     setMatchSelection,
     clearMatchSelection,
     matchStats,
+    insertColumnIntoChildAtIndex,
     // Left table props (via withPackOperationData)
     leftTableId,
     leftColumnIds,
@@ -93,6 +96,10 @@ const PackSchemaView = withPackOperationData(
 
     // Track the last clicked column for range selection
     const [lastClickedColumn, setLastClickedColumn] = useState(null);
+
+    // Track context menu state
+    const [contextMenu, setContextMenu] = useState(null);
+    const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
 
     // Call usePackStats hook and log results
     const data = matchStats;
@@ -288,10 +295,62 @@ const PackSchemaView = withPackOperationData(
       [lastClickedMatch, leftColumnIds, matchTypes, rightColumnIds]
     );
 
+    const handleColumnContextMenu = useCallback((event, columnId) => {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log("Opening context menu for column:", columnId);
+      setContextMenu({
+        mouseX: event.clientX + 2,
+        mouseY: event.clientY - 6,
+      });
+      setContextMenuColumnId(columnId);
+    }, []);
+
+    const handleCloseContextMenu = useCallback(() => {
+      setContextMenu(null);
+      setContextMenuColumnId(null);
+    }, []);
+
+    const handleInsertColumn = useCallback(
+      (mode) => {
+        const columnId = contextMenuColumnId;
+
+        // Determine which child table/operation this column belongs to
+        const allColumns = [...leftColumnIds, ...rightColumnIds];
+        const columnIndex = allColumns.indexOf(columnId);
+
+        let childId;
+        let indexInChild;
+
+        if (columnIndex < leftColumnIds.length) {
+          // Column is in the left child
+          childId = leftTableId;
+          indexInChild = columnIndex;
+        } else {
+          // Column is in the right child
+          childId = rightTableId;
+          indexInChild = columnIndex - leftColumnIds.length;
+        }
+
+        const insertionIndex =
+          mode === "left" ? indexInChild : indexInChild + 1;
+
+        insertColumnIntoChildAtIndex(childId, insertionIndex);
+        handleCloseContextMenu();
+      },
+      [
+        contextMenuColumnId,
+        leftColumnIds,
+        rightColumnIds,
+        leftTableId,
+        rightTableId,
+        insertColumnIntoChildAtIndex,
+        handleCloseContextMenu,
+      ]
+    );
+
     const handleColumnClick = useCallback(
       (event, columnId) => {
-        event.stopPropagation();
-
         if (event.shiftKey && lastClickedColumn) {
           // Shift click: Select range of columns
           const allColumns = [...leftColumnIds, ...rightColumnIds];
@@ -532,7 +591,7 @@ const PackSchemaView = withPackOperationData(
                         userSelect: "none",
                         fontWeight: "none",
                       }}
-                      onMouseEnter={() => setHoveredColumn(`${tableId}:`)}
+                      onMouseEnter={() => setHoveredColumn(`${childId}:`)}
                       onMouseLeave={() => setHoveredColumn(null)}
                     />
                   ) : (
@@ -584,8 +643,12 @@ const PackSchemaView = withPackOperationData(
                         height: "4px",
                         backgroundColor: "text.secondary",
                         transform: "translateX(-50%)",
+                        cursor: "context-menu",
                       },
                     }}
+                    onContextMenu={(event) =>
+                      handleColumnContextMenu(event, columnId)
+                    }
                   >
                     <EnhancedColumnName
                       id={columnId}
@@ -809,6 +872,25 @@ const PackSchemaView = withPackOperationData(
             })}
           </Box>
         </Box>
+        <Menu
+          open={contextMenu !== null}
+          onClose={handleCloseContextMenu}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            contextMenu !== null
+              ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+              : undefined
+          }
+        >
+          <MenuItem onClick={() => handleInsertColumn("left")}>
+            Insert Column Left
+          </MenuItem>
+          <MenuItem onClick={() => handleInsertColumn("right")}>
+            Insert Column Right
+          </MenuItem>
+          <MenuItem onClick={handleCloseContextMenu}>Rename Column</MenuItem>
+          <MenuItem onClick={handleCloseContextMenu}>Delete Column</MenuItem>
+        </Menu>
       </Box>
     );
   }

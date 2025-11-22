@@ -10,10 +10,15 @@ import {
   selectTablesById,
   updateTables as updateTablesSlice,
 } from "../../slices/tablesSlice";
-import { updateOperations as updateOperationsSlice } from "../../slices/operationsSlice";
+import {
+  updateOperations,
+  updateOperations as updateOperationsSlice,
+} from "../../slices/operationsSlice";
 import { CREATION_MODE_INSERTION } from ".";
 import generateUUID from "../../lib/utilities/generateUUID";
 import { insertColumn } from "../../lib/duckdb";
+import { updateTablesRequest } from "../updateTablesSaga";
+import { updateOperationsRequest } from "../updateOperationsSaga";
 
 /**
  * The create columns saga assumes that an underlying database table exists
@@ -88,24 +93,28 @@ export default function* createColumnsWorker(action) {
   // Update tables with new column IDs
   if (Object.keys(tableUpdates).length > 0) {
     yield put(
-      updateTablesSlice(
-        Object.entries(tableUpdates).map(([tableId, columnIds]) => ({
-          id: tableId,
-          columnIds,
-        }))
-      )
+      updateTablesRequest({
+        tableUpdates: Object.entries(tableUpdates).map(
+          ([tableId, columnIds]) => ({
+            id: tableId,
+            columnIds,
+          })
+        ),
+      })
     );
   }
 
   // Update operations with new column IDs
   if (Object.keys(operationUpdates).length > 0) {
     yield put(
-      updateOperationsSlice(
-        Object.entries(operationUpdates).map(([operationId, columnIds]) => ({
-          id: operationId,
-          columnIds,
-        }))
-      )
+      updateOperationsRequest({
+        operationUpdates: Object.entries(operationUpdates).map(
+          ([operationId, columnIds]) => ({
+            id: operationId,
+            columnIds,
+          })
+        ),
+      })
     );
   }
 

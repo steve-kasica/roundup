@@ -31,6 +31,7 @@ function StackOperationBlock({
   activeColumnIds,
   name,
   rowCount,
+  depth,
   // props via withStackOperationData
   childIds,
   columnCount,
@@ -38,7 +39,7 @@ function StackOperationBlock({
   hasAlerts = false,
 
   // Props defined in `OperationBlock` parent component
-  backgroundColor,
+  colorScale,
 
   // Optional props passed recursively via parent operation
   // eslint-disable-next-line no-unused-vars
@@ -46,6 +47,7 @@ function StackOperationBlock({
   sx = {},
 }) {
   const isParentRender = isFocused || isRootOperation;
+  console.log({ color: colorScale(depth) });
   return (
     <StyledBlock
       data-operation-type="stack"
@@ -61,7 +63,7 @@ function StackOperationBlock({
         paddingLeft: "2px",
         paddingRight: "2px",
         paddingBottom: "2px",
-        backgroundColor: backgroundColor,
+        backgroundColor: colorScale(depth),
       }}
     >
       <Typography variant="treemap label">
@@ -85,7 +87,6 @@ function StackOperationBlock({
                 id={id}
                 parentOperationType={OPERATION_TYPE_STACK}
                 parentColumnCount={columnCount}
-                backgroundColor={backgroundColor}
                 sx={childSx}
               />
             ) : (
@@ -93,7 +94,7 @@ function StackOperationBlock({
                 id={id}
                 parentOperationType={OPERATION_TYPE_STACK}
                 parentColumnCount={columnCount}
-                backgroundColor={backgroundColor}
+                backgroundColor={colorScale(depth + 1)}
                 sx={childSx}
               />
             )}

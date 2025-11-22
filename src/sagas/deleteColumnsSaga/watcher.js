@@ -30,10 +30,10 @@ export default function* deleteColumnsSaga() {
   // TODO: how does this not also remove columns that were intentionally
   // excluded/hidden from the operation?
   yield takeLatest(updateOperationsSuccess.type, function* (action) {
-    const { changedPropertiesByOperationId } = action.payload;
+    const { changedPropertiesById } = action.payload;
 
     for (let [operationId, changedProperties] of Object.entries(
-      changedPropertiesByOperationId
+      changedPropertiesById
     )) {
       if (changedProperties.includes("columnIds")) {
         const currentColumnIds = yield select(
@@ -56,16 +56,17 @@ export default function* deleteColumnsSaga() {
   // If an operation `children` property update has failed, just
   // delete any columns associated with that operation
   yield takeEvery(updateOperationsFailure.type, function* (action) {
-    const { changedPropertiesByOperationId } = action.payload;
+    const { changedPropertiesById } = action.payload;
 
-    const operationIdsToUpdate = Object.entries(
-      changedPropertiesByOperationId
-    ).reduce((acc, [id, changedProperties]) => {
-      if (changedProperties.includes("children")) {
-        acc.push(id);
-      }
-      return acc;
-    }, []);
+    const operationIdsToUpdate = Object.entries(changedPropertiesById).reduce(
+      (acc, [id, changedProperties]) => {
+        if (changedProperties.includes("children")) {
+          acc.push(id);
+        }
+        return acc;
+      },
+      []
+    );
 
     if (operationIdsToUpdate.length > 0) {
       const columnsToDelete = yield select((state) =>

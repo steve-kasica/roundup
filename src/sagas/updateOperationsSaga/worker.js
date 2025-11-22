@@ -99,7 +99,7 @@ export default function* updateOperationsWorker(action) {
 
   const formatSagaEndPayload = (updates) => ({
     // operationIds: updates.map(({ id }) => id),
-    changedPropertiesByOperationId: Object.fromEntries(
+    changedPropertiesById: Object.fromEntries(
       updates.map(({ id }) => [
         id,
         Object.keys(

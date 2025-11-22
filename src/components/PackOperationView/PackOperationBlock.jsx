@@ -22,6 +22,7 @@ function PackOperationBlock({
   childIds,
   id,
   name,
+  depth,
   activeColumnIds,
   isFocused,
   isRootOperation,
@@ -34,7 +35,7 @@ function PackOperationBlock({
   hasAlerts,
   // Props passed via parent
   parentColumnCount,
-  backgroundColor,
+  colorScale,
   sx = {},
 }) {
   const isParentRender = isFocused || isRootOperation;
@@ -54,7 +55,7 @@ function PackOperationBlock({
         boxSizing: "border-box",
         alignItems: "stretch",
         position: "relative",
-        backgroundColor: backgroundColor,
+        backgroundColor: colorScale(depth),
         ...sx,
       }}
     >
@@ -82,7 +83,7 @@ function PackOperationBlock({
               isDraggable={false}
               parentOperationType={OPERATION_TYPE_PACK}
               parentColumnCount={columnCount}
-              backgroundColor={backgroundColor}
+              backgroundColor={colorScale(depth + 1)}
               sx={childSx}
             />
           );
