@@ -49,24 +49,26 @@ export default function* updateOperationsWatcher() {
   // When a table is updated, if it's columnIds property has changed
   // and the table is the child of a operation, we need to flag that
   // the operation is out-of-sync.
-  yield takeEvery(updateTablesSuccess.type, handleOutOfSyncUpdates);
-  yield takeEvery(updateOperationsSuccess.type, handleOutOfSyncUpdates);
+  yield takeEvery(updateTablesSuccess.type, handleRematerializations);
+  yield takeEvery(updateOperationsSuccess.type, handleRematerializations);
 }
 
-// Both tables and operation update success actions will pass
+// Note: both tables and operation update success actions will pass
 // the same object key in their payloads, `changedPropertiesById`
-function* handleOutOfSyncUpdates(action) {
+function* handleRematerializations(action) {
+  const rematerializationProperteies = ["columnIds", "childIds"];
   const { changedPropertiesById } = action.payload;
   const operationUpdates = [];
 
-  for (const [tableId, changedProperties] of Object.entries(
-    changedPropertiesById
-  )) {
-    if (changedProperties.includes("columnIds")) {
+  for (const [id, changedProperties] of Object.entries(changedPropertiesById)) {
+    const hasSchemaChange = changedProperties.some((prop) =>
+      rematerializationProperteies.includes(prop)
+    );
+    if (hasSchemaChange) {
       const { parentId } = yield select((state) =>
-        isTableId(tableId)
-          ? selectTablesById(state, tableId)
-          : selectOperationsById(state, tableId)
+        isTableId(id)
+          ? selectTablesById(state, id)
+          : selectOperationsById(state, id)
       );
 
       if (parentId) {

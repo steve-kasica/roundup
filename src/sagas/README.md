@@ -42,6 +42,49 @@ flowchart LR
 
 ```
 
-## Inserting a column into an operation
+## Inserting a column into a child table (of an operation)
+
+```mermaid
+%%{init: {'theme': 'base'}}%%
+graph TB
+   subgraph o1["O<sub>1</sub>"]
+      direction TB
+      C5["C<sub>5</sub>"]
+      C10["C<sub>10</sub>"]
+      C6["C<sub>6</sub>"]
+      C7["C<sub>7</sub>"]
+      C8["C<sub>8</sub>"]
+   end
+   subgraph t1["T<sub>1</sub>"]
+      direction TB
+      C1["C<sub>1</sub>"]
+      C9["C<sub>9</sub>"]
+      C2["C<sub>2</sub>"]
+   end
+   subgraph t2["T<sub>2</sub>"]
+      direction TB
+      C3["C<sub>3</sub>"]
+      C4["C<sub>4</sub>"]
+   end
+   o1 --- t1
+   o1 --- t2
+```
+
+Inserting columns into an child operation
+
+```mermaid
+   graph TB
+   O1 --->|1. Insert| O2
+      O2 -->|4. Update| O1
+   O1 --- T3
+   O2 --->|2. Insert| T1
+      T1 -->|3. Update| O2
+   O2 --- T2
+
+   linkStyle 0 stroke: red
+   linkStyle 1 stroke: red
+   linkStyle 3 stroke: red
+   linkStyle 4 stroke: red
+```
 
 ---
