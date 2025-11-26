@@ -93,9 +93,6 @@ export default function* updateOperationsWorker(action) {
   yield put(
     updateOperationsSlice([...successfulUpdates, ...furtherOperationUpdates])
   );
-  yield put(
-    setFocusedObjectId(successfulUpdates[successfulUpdates.length - 1].id)
-  );
 
   const formatSagaEndPayload = (updates) => ({
     // operationIds: updates.map(({ id }) => id),

@@ -70,16 +70,20 @@ graph TB
    o1 --- t2
 ```
 
-Inserting columns into an child operation
+### How schema change proprogate through the AST
+
+#### Inserting columns into an child operation
+
+For example, inserting a new column into O<sub>2</sub>.
 
 ```mermaid
    graph TB
-   O1 --->|1. Insert| O2
+   O1(("O<sub>1<sub>")) --->|1. Insert| O2(("O<sub>2<sub>"))
       O2 -->|4. Update| O1
-   O1 --- T3
-   O2 --->|2. Insert| T1
+   O1 --- T3["T<sub>3<sub>"]
+   O2 --->|2. Insert| T1["T<sub>1<sub>"]
       T1 -->|3. Update| O2
-   O2 --- T2
+   O2 --- T2["T<sub>2<sub>"]
 
    linkStyle 0 stroke: red
    linkStyle 1 stroke: red
