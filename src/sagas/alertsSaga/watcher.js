@@ -3,6 +3,8 @@ import { updateOperationsSuccess } from "../updateOperationsSaga";
 import alertsSagaWorker from "./worker";
 import { checkOperationForAlertsRequest } from "./actions";
 import {
+  OPERATION_TYPE_NO_OP,
+  OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectOperationsById,
 } from "../../slices/operationsSlice";
@@ -33,8 +35,14 @@ export default function* updateAlertsSagaWatcher() {
           operation,
           childColumnIds.map((columnIds) => columnIds.length)
         );
-      } else {
+      } else if (operation.operationType === OPERATION_TYPE_PACK) {
         testResults = testPackOperationForFatalErrors(operation);
+      } else if (operation.operationType === OPERATION_TYPE_NO_OP) {
+        continue;
+      } else {
+        throw new Error(
+          `Unsupported operation type "${operation.operationType}" for alert checking.`
+        );
       }
       raisedAlerts.push(...testResults.fatalErrors, ...testResults.warnings);
     }
