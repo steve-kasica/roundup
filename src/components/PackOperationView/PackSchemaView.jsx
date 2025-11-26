@@ -444,14 +444,21 @@ const PackSchemaView = withPackOperationData(
       hideColumns(Array.from(columnsToHide));
     }, [clickedBlockCells, hideColumns]);
 
-    const handleDeleteColumns = useCallback(() => {
-      const columnsToDelete = new Set();
-      clickedBlockCells.forEach((cellKey) => {
-        const [columnId] = cellKey.split(":");
-        columnsToDelete.add(columnId);
-      });
-      deleteColumns(Array.from(columnsToDelete));
-    }, [clickedBlockCells, deleteColumns]);
+    const handleDeleteColumns = useCallback(
+      (columnId) => {
+        const columnsToDelete = new Set();
+        if (columnId) {
+          columnsToDelete.add(columnId);
+        } else {
+          clickedBlockCells.forEach((cellKey) => {
+            const [columnId] = cellKey.split(":");
+            columnsToDelete.add(columnId);
+          });
+        }
+        deleteColumns(Array.from(columnsToDelete));
+      },
+      [clickedBlockCells, deleteColumns]
+    );
 
     const handleFocusColumns = useCallback(() => {}, []);
 
@@ -540,10 +547,11 @@ const PackSchemaView = withPackOperationData(
                 disabled={!hasCompleteColumnSelected}
                 onClick={handleFocusColumns}
               />
-              <HideIconButton
+              {/* HIDE */}
+              {/* <HideIconButton
                 disabled={!hasCompleteColumnSelected}
                 onClick={handleHideColumns}
-              />
+              /> */}
               <DeleteIconButton
                 disabled={!hasCompleteColumnSelected}
                 onConfirm={handleDeleteColumns}
@@ -912,6 +920,14 @@ const PackSchemaView = withPackOperationData(
           </MenuItem>
           <MenuItem onClick={() => handleInsertColumn("right")}>
             Insert Column Right
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleDeleteColumns(contextMenuColumnId);
+              handleCloseContextMenu();
+            }}
+          >
+            Delete Column
           </MenuItem>
           <MenuItem onClick={handleCloseContextMenu}>Rename Column</MenuItem>
           <MenuItem

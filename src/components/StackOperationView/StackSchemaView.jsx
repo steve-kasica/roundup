@@ -321,10 +321,11 @@ const StackSchemaView = ({
               onClick={handleFocusColumns}
               disabled={selectedTableColumnIds.length === 0}
             />
-            <HideIconButton
+            {/* TODO hide */}
+            {/* <HideIconButton
               onClick={handleHideColumns}
               disabled={selectedTableColumnIds.length === 0}
-            />
+            /> */}
             <DeleteIconButton
               onConfirm={handleDeleteColumns}
               disabled={selectedTableColumnIds.length === 0}

@@ -43,6 +43,7 @@ import FocusIconButton from "../ui/FocusIconButton";
 import HideIconButton from "../ui/HideIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { TableLabel } from "./TableLabel";
+import DeleteIconButton from "../ui/icons/DeleteIconButton";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -65,6 +66,7 @@ const TableSchema = ({
   swapColumns,
   selectColumns,
   hideColumns,
+  deleteColumns,
   focusColumns,
   insertColumn,
   setVisibleColumns: setVisibleColumnsInSlice,
@@ -222,6 +224,10 @@ const TableSchema = ({
     hideColumns(selectedColumnIds);
   }, [hideColumns, selectedColumnIds]);
 
+  const handleDeleteColumns = useCallback(() => {
+    deleteColumns(selectedColumnIds);
+  }, [deleteColumns, selectedColumnIds]);
+
   const handleSelectAllColumns = useCallback(() => {
     if (selectedColumnIds.length > 0) {
       // All selected - deselect all
@@ -260,10 +266,15 @@ const TableSchema = ({
               disabled={selectedColumnIds.length === 0}
               onClick={handleFocusColumns}
             />
-            <HideIconButton
+            {/* TODO: implement Hide */}
+            <DeleteIconButton
+              disabled={selectedColumnIds.length === 0}
+              onConfirm={handleDeleteColumns}
+            />
+            {/* <HideIconButton
               disabled={selectedColumnIds.length === 0}
               onClick={handleHideColumns}
-            />
+            /> */}
             <SelectToggleIconButton
               isSelected={selectedColumnIds.length > 0}
               onClick={handleSelectAllColumns}

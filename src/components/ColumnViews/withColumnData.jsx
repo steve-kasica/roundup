@@ -18,8 +18,6 @@ import {
 } from "../../slices/uiSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { selectOperationsById } from "../../slices/operationsSlice";
 import { useCallback } from "react";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 
@@ -87,6 +85,11 @@ export default function withColumnData(WrappedComponent) {
       dispatch(setFocusedColumnIds([id]));
     }, [dispatch, id]);
 
+    const deleteColumn = useCallback(
+      () => dispatch(deleteColumnsRequest({ columnIds: [id] })),
+      [dispatch, id]
+    );
+
     return (
       <WrappedComponent
         {...props}
@@ -133,6 +136,7 @@ export default function withColumnData(WrappedComponent) {
         unfocusColumn={unfocusColumn}
         focusColumn={focusColumn}
         setColumnType={setColumnType}
+        deleteColumn={deleteColumn}
       />
     );
   }

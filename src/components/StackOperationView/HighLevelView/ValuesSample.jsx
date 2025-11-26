@@ -53,7 +53,7 @@ export default function ValuesSample({ values }) {
         "&:hover": {
           overflowX: "auto",
           textOverflow: "clip",
-          // Hide scrollbar in all browsers
+          // Do not display scrollbar in all browsers
           scrollbarWidth: "none", // Firefox
           "&::-webkit-scrollbar": {
             display: "none", // Chrome, Safari, Edge

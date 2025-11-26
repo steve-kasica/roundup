@@ -22,7 +22,8 @@ export default function* deleteColumnsSaga() {
   // columns as well.
   yield takeEvery(deleteColumnsRequest.type, function* (action) {
     const tablesToAlter = [];
-    const { columnIds } = action.payload;
+    let { columnIds } = action.payload;
+    columnIds = Array.isArray(columnIds) ? columnIds : [columnIds];
     const columns = yield select((state) =>
       selectColumnsById(state, columnIds)
     );

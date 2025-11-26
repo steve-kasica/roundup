@@ -121,7 +121,7 @@ const ColumnContextMenu = ({
 
   const handleDeleteColumn = useCallback(
     (event) => {
-      deleteColumn(); // Assuming delete is similar to hide in this context
+      deleteColumn();
       closeMenu(event);
     },
     [closeMenu, deleteColumn]
@@ -180,12 +180,13 @@ const ColumnContextMenu = ({
         </ListItemIcon>
         <ListItemText>Rename column</ListItemText>
       </MenuItem>
-      <MenuItem onClick={handleHideColumn} sx={menuItemSx}>
+      {/* Address hiding columns (TODO) */}
+      {/* <MenuItem onClick={handleHideColumn} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <VisibilityOff fontSize="small" />
         </ListItemIcon>
         <ListItemText>Hide column</ListItemText>
-      </MenuItem>
+      </MenuItem> */}
       <MenuItem onClick={handleDeleteColumn} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <DeleteForever fontSize="small" />

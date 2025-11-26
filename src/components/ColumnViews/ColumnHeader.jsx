@@ -81,7 +81,7 @@ const ColumnHeader = ({
             cursor: "pointer",
             flex: 1,
             "& .MuiTableSortLabel-icon": {
-              opacity: isActive ? 1 : 0, // Hide icon completely when not sorting
+              opacity: isActive ? 1 : 0, // icon completely when not sorting
             },
             "&:hover .MuiTableSortLabel-icon": {
               opacity: isActive ? 1 : 0.6, // Show faded icon on hover

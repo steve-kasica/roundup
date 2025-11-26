@@ -29,6 +29,7 @@ import {
 } from "../../sagas/createColumnsSaga";
 import { setFocusedObjectId } from "../../slices/uiSlice";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
+import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 
 export default function withTableData(WrappedComponent) {
   const componentName =
@@ -114,6 +115,12 @@ export default function withTableData(WrappedComponent) {
         dispatch(updateTablesRequest({ tableUpdates: [{ id, columnIds }] }));
       },
       [activeColumnIds, dispatch, id]
+    );
+
+    const deleteColumns = useCallback(
+      (columnIdsToDelete) =>
+        dispatch(deleteColumnsRequest({ columnIds: columnIdsToDelete })),
+      [dispatch]
     );
 
     const setVisibleColumns = useCallback(
@@ -222,6 +229,7 @@ export default function withTableData(WrappedComponent) {
         selectColumns={selectColumns}
         swapColumns={swapColumns}
         hideColumns={hideColumns}
+        deleteColumns={deleteColumns}
         focusColumns={focusColumns}
         setTableName={setTableName}
         setVisibleColumns={setVisibleColumns}
