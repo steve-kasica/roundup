@@ -24,6 +24,8 @@ export const JOIN_PREDICATES = {
   ENDS_WITH: "ENDS_WITH",
 };
 
+export const HIDDEN_COLUMNS_ATTR = "hiddenColumnIds";
+
 let idCounter = 0; // each node gets a unique ID, regardless if it's a table vs operation node
 
 export default function Operation({
@@ -33,6 +35,7 @@ export default function Operation({
   parentId = null,
   childIds = [],
   columnIds = [],
+  hiddenColumnIds = [],
   rowCount = null,
   joinKey1 = null,
   joinKey2 = null,
@@ -40,6 +43,8 @@ export default function Operation({
   joinType = JOIN_TYPES.FULL_OUTER,
 } = {}) {
   const id = `o${++idCounter}`; // Each operation has a unique ID
+  const output = {};
+  output[HIDDEN_COLUMNS_ATTR] = hiddenColumnIds;
 
   return {
     id,
@@ -62,6 +67,7 @@ export default function Operation({
           joinKey2: joinKey2,
         }
       : {}),
+    ...output,
   };
 }
 

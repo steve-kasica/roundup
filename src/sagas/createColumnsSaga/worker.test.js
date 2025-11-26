@@ -7,6 +7,7 @@ import { updateTables } from "../../slices/tablesSlice";
 import { createColumnsSuccess } from "./actions";
 import { getTableColumnNames } from "../../lib/duckdb/getTableColumnNames";
 import { CREATION_MODE_INITIALIZATION } from ".";
+import { updateTablesRequest } from "../updateTablesSaga";
 
 describe("createColumnsWorker saga", () => {
   describe("successful column creation", () => {
@@ -39,10 +40,15 @@ describe("createColumnsWorker saga", () => {
 
       // Verify updateTables was called with correct structure
       const updateTablesAction = effects.put.find(
-        (effect) => effect.payload.action.type === updateTables.type
+        (effect) => effect.payload.action.type === updateTablesRequest.type
       );
-      expect(updateTablesAction.payload.action.payload).toHaveLength(1);
-      expect(updateTablesAction.payload.action.payload[0].id).toBe("t1");
+      console.log(updateTablesAction);
+      expect(
+        updateTablesAction.payload.action.payload.tableUpdates
+      ).toHaveLength(1);
+      expect(updateTablesAction.payload.action.payload.tableUpdates[0].id).toBe(
+        "t1"
+      );
 
       // Verify success action was called
       const successAction = effects.put.find(
@@ -90,10 +96,10 @@ describe("createColumnsWorker saga", () => {
 
       // Verify the table update contains 3 column IDs
       const updateTablesAction = effects.put.find(
-        (effect) => effect.payload.action.type === updateTables.type
+        (effect) => effect.payload.action.type === updateTablesRequest.type
       );
       expect(
-        updateTablesAction.payload.action.payload[0].columnIds
+        updateTablesAction.payload.action.payload.tableUpdates[0].columnIds
       ).toHaveLength(3);
     });
 
@@ -148,9 +154,10 @@ describe("createColumnsWorker saga", () => {
       });
       // Verify 3 table updates (one for each table)
       const updateTablesAction = effects.put.find(
-        (effect) => effect.payload.action.type === updateTables.type
+        (effect) => effect.payload.action.type === updateTablesRequest.type
       );
-      const tableUpdates = updateTablesAction.payload.action.payload;
+      const tableUpdates =
+        updateTablesAction.payload.action.payload.tableUpdates;
 
       expect(tableUpdates).toHaveLength(3);
 

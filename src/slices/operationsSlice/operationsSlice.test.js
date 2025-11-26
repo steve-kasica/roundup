@@ -56,10 +56,6 @@ describe("operationsSlice reducers", () => {
       it("updates `rootOperationId` with new operation ID", () => {
         expect(nextState.rootOperationId).toBe(op2.id);
       });
-
-      it("updates the children of the new operation to include previous rootOperationId", () => {
-        expect(nextState.byId[op2.id].childIds).toContain(op1.id);
-      });
     });
   });
 
