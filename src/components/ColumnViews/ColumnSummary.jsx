@@ -1,19 +1,10 @@
 /* eslint-disable react/prop-types */
 import withColumnData from "./withColumnData";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Menu,
-  Tooltip,
-  Badge,
-} from "@mui/material";
-import { MoreVert, Info, Warning } from "@mui/icons-material";
-import { useState } from "react";
+import { Box, Typography, Tooltip, Badge } from "@mui/material";
+import { Info, Warning } from "@mui/icons-material";
 import SingleBar from "../visualization/SingleBar";
 import { scaleLinear } from "d3";
 import ColumnTypeIcon from "./ColumnTypeIcon";
-import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
 import StyledColumnCard from "./StyledColumnCard";
 
 const ColumnSummary = ({
@@ -43,20 +34,9 @@ const ColumnSummary = ({
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
   alertIds,
   hasAlerts,
+  // Props passed directly from parent
+  onContextMenu,
 }) => {
-  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-
-  const handleMenuClick = (event) => {
-    event.stopPropagation();
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = (event, callback) => {
-    event.stopPropagation();
-    setMenuAnchorEl(null);
-    if (callback && typeof callback === "function") callback();
-  };
-
   return (
     <StyledColumnCard
       data-column-id={id}
@@ -73,7 +53,9 @@ const ColumnSummary = ({
       onMouseLeave={unhoverColumn}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
       sx={{
+        cursor: "context-menu",
         ...(hasAlerts && {
           borderColor: "warning.main",
           borderWidth: 2,
@@ -93,27 +75,6 @@ const ColumnSummary = ({
           width: "100%",
         }}
       >
-        <Menu
-          anchorEl={menuAnchorEl}
-          open={Boolean(menuAnchorEl)}
-          onClose={(event) => handleMenuClose(event)}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-        >
-          <EnhancedColumnContextMenuItems
-            id={id}
-            closeMenu={handleMenuClose}
-            onInsertColumnLeftClick={handleInsertColumnLeft}
-            onInsertColumnRightClick={handleInsertColumnRight}
-          />
-        </Menu>
-
         {/* Header - Always visible */}
         <Box
           sx={{
@@ -173,21 +134,6 @@ const ColumnSummary = ({
               <ColumnTypeIcon columnType={columnType} />
             </Box>
           </Box>
-          <IconButton
-            size="small"
-            onClick={handleMenuClick}
-            sx={{
-              p: 0.5,
-              "@container (min-width: 100px)": {
-                display: "inline-flex",
-              },
-              "@container (max-width: 99px)": {
-                display: "none",
-              },
-            }}
-          >
-            <MoreVert fontSize="small" />
-          </IconButton>
         </Box>
 
         {/* Sample Values - Hidden when height < 200px */}

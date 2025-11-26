@@ -8,7 +8,6 @@ import {
   isOperationId,
   selectRootOperationId,
   selectMaxOperationDepth,
-  HIDDEN_COLUMNS_ATTR,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import {
@@ -165,11 +164,9 @@ export default function withOperationData(WrappedComponent) {
 
         const columnIdsToIncludeByParentId = columnIdsToHideByParentId.map(
           ({ parentId, columnIds }) => {
-            const activeColumnIds =
-              activeChildColumnIds[operation.childIds.indexOf(parentId)];
             return {
               id: parentId,
-              [HIDDEN_COLUMNS_ATTR]: columnIds,
+              hiddenColumnIds: columnIds,
             };
           }
         );

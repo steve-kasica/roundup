@@ -11,6 +11,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Divider,
 } from "@mui/material";
 import {
   Edit,
@@ -33,15 +34,16 @@ const ColumnContextMenu = ({
   databaseName,
   setColumnType,
   focusColumn,
-  onInsertColumnLeftClick,
-  onInsertColumnRightClick,
-  hideColumn,
+
   deleteColumn,
   renameColumn,
   // Props passed directly from parent component
-  closeMenu,
   includeInsert = true,
   isError = false,
+  onHideColumn,
+  onInsertColumnLeftClick,
+  onInsertColumnRightClick,
+  handleCloseMenu,
 }) => {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [newColumnName, setNewColumnName] = useState("");
@@ -59,9 +61,9 @@ const ColumnContextMenu = ({
     (event) => {
       setRenameDialogOpen(false);
       setNewColumnName("");
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [closeMenu]
+    [handleCloseMenu]
   );
 
   const handleRenameConfirm = useCallback(
@@ -70,26 +72,26 @@ const ColumnContextMenu = ({
         renameColumn(newColumnName.trim());
       }
       handleRenameDialogClose();
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [newColumnName, renameColumn, handleRenameDialogClose, closeMenu]
+    [newColumnName, renameColumn, handleRenameDialogClose, handleCloseMenu]
   );
 
   const handleRenameCancel = useCallback(
     (event) => {
       handleRenameDialogClose();
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [handleRenameDialogClose, closeMenu]
+    [handleRenameDialogClose, handleCloseMenu]
   );
 
   const handleColumnTypeDialogClose = useCallback(
     (event) => {
       setColumnTypeDialogOpen(false);
       setSelectedColumnType("");
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [closeMenu]
+    [handleCloseMenu]
   );
 
   const handleColumnTypeConfirm = useCallback(
@@ -98,33 +100,38 @@ const ColumnContextMenu = ({
         setColumnType(selectedColumnType);
       }
       handleColumnTypeDialogClose();
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [selectedColumnType, setColumnType, handleColumnTypeDialogClose, closeMenu]
+    [
+      selectedColumnType,
+      setColumnType,
+      handleColumnTypeDialogClose,
+      handleCloseMenu,
+    ]
   );
 
   const handleColumnTypeCancel = useCallback(
     (event) => {
       handleColumnTypeDialogClose();
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [handleColumnTypeDialogClose, closeMenu]
+    [handleColumnTypeDialogClose, handleCloseMenu]
   );
 
   const handleHideColumn = useCallback(
     (event) => {
-      hideColumn();
-      closeMenu(event);
+      onHideColumn();
+      handleCloseMenu(event);
     },
-    [closeMenu, hideColumn]
+    [handleCloseMenu, onHideColumn]
   );
 
   const handleDeleteColumn = useCallback(
     (event) => {
       deleteColumn();
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [closeMenu, deleteColumn]
+    [handleCloseMenu, deleteColumn]
   );
 
   const handleSetColumnType = useCallback(() => {
@@ -135,25 +142,25 @@ const ColumnContextMenu = ({
   const handleFocusColumn = useCallback(
     (event) => {
       focusColumn();
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [closeMenu, focusColumn]
+    [handleCloseMenu, focusColumn]
   );
 
   const handleInsertColumnLeft = useCallback(
     (event) => {
       onInsertColumnLeftClick();
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [closeMenu, onInsertColumnLeftClick]
+    [handleCloseMenu, onInsertColumnLeftClick]
   );
 
   const handleInsertColumnRight = useCallback(
     (event) => {
       onInsertColumnRightClick();
-      closeMenu(event);
+      handleCloseMenu(event);
     },
-    [closeMenu, onInsertColumnRightClick]
+    [handleCloseMenu, onInsertColumnRightClick]
   );
 
   const menuItemSx = isError
@@ -180,46 +187,50 @@ const ColumnContextMenu = ({
         </ListItemIcon>
         <ListItemText>Rename column</ListItemText>
       </MenuItem>
-      {/* Address hiding columns (TODO) */}
-      {/* <MenuItem onClick={handleHideColumn} sx={menuItemSx}>
-        <ListItemIcon sx={iconSx}>
-          <VisibilityOff fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Hide column</ListItemText>
-      </MenuItem> */}
-      <MenuItem onClick={handleDeleteColumn} sx={menuItemSx}>
-        <ListItemIcon sx={iconSx}>
-          <DeleteForever fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Delete column</ListItemText>
-      </MenuItem>
       <MenuItem onClick={handleSetColumnType} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <SwapHoriz fontSize="small" />
         </ListItemIcon>
         <ListItemText>Change column type</ListItemText>
       </MenuItem>
+      <Divider orientation="horizontal" />
+      <MenuItem onClick={handleHideColumn} sx={menuItemSx}>
+        <ListItemIcon sx={iconSx}>
+          <VisibilityOff fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Hide column</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={handleDeleteColumn} sx={menuItemSx}>
+        <ListItemIcon sx={iconSx}>
+          <DeleteForever fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Delete column</ListItemText>
+      </MenuItem>
+      <Divider orientation="horizontal" />
       <MenuItem onClick={handleFocusColumn} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <CenterFocusStrong fontSize="small" />
         </ListItemIcon>
         <ListItemText>Focus column</ListItemText>
       </MenuItem>
-      {includeInsert && (
-        <>
-          <MenuItem onClick={handleInsertColumnLeft} sx={menuItemSx}>
-            <ListItemIcon sx={iconSx}>
-              <KeyboardArrowLeft fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Insert column to the left</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={handleInsertColumnRight} sx={menuItemSx}>
-            <ListItemIcon sx={iconSx}>
-              <KeyboardArrowRight fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Insert column to the right</ListItemText>
-          </MenuItem>
-        </>
+      {onInsertColumnLeftClick && onInsertColumnRightClick && (
+        <Divider orientation="horizontal" />
+      )}
+      {onInsertColumnLeftClick && (
+        <MenuItem onClick={handleInsertColumnLeft} sx={menuItemSx}>
+          <ListItemIcon sx={iconSx}>
+            <KeyboardArrowLeft fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Insert column to the left</ListItemText>
+        </MenuItem>
+      )}
+      {onInsertColumnRightClick && (
+        <MenuItem onClick={handleInsertColumnRight} sx={menuItemSx}>
+          <ListItemIcon sx={iconSx}>
+            <KeyboardArrowRight fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Insert column to the right</ListItemText>
+        </MenuItem>
       )}
 
       {/* Rename Column Dialog */}

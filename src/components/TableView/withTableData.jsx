@@ -108,13 +108,30 @@ export default function withTableData(WrappedComponent) {
     );
 
     const hideColumns = useCallback(
-      (columnIdsToHide) => {
-        const columnIds = activeColumnIds.filter(
-          (colId) => !columnIdsToHide.includes(colId)
+      (hiddenColumnIds) => {
+        dispatch(
+          updateTablesRequest({ tableUpdates: [{ id, hiddenColumnIds }] })
         );
-        dispatch(updateTablesRequest({ tableUpdates: [{ id, columnIds }] }));
       },
-      [activeColumnIds, dispatch, id]
+      [dispatch, id]
+    );
+
+    const unhideColumns = useCallback(
+      (columnIdsToUnhide) => {
+        dispatch(
+          updateTablesRequest({
+            tableUpdates: [
+              {
+                id,
+                hiddenColumnIds: table.hiddenColumnIds.filter(
+                  (hid) => !columnIdsToUnhide.includes(hid)
+                ),
+              },
+            ],
+          })
+        );
+      },
+      [dispatch, id, table.hiddenColumnIds]
     );
 
     const deleteColumns = useCallback(
@@ -181,6 +198,19 @@ export default function withTableData(WrappedComponent) {
       [activeColumnIds]
     );
 
+    const displayColumnIds = useMemo(
+      () =>
+        activeColumnIds.reduce((acc, columnId, index) => {
+          if (!table.hiddenColumnIds.includes(columnId)) {
+            acc.push({ columnId, index });
+          } else if (acc[index - 1] !== null) {
+            acc.push(null);
+          }
+          return acc;
+        }, []),
+      [activeColumnIds, table.hiddenColumnIds]
+    );
+
     // Number of columns when table was initialized
     const initialColumnCount = useMemo(() => columnIds.length, [columnIds]);
 
@@ -222,6 +252,8 @@ export default function withTableData(WrappedComponent) {
         columnIds={columnIds}
         activeColumnsCount={activeColumnIds.length}
         selectedColumnIds={selectedColumnIds}
+        hiddenColumnIds={table.hiddenColumnIds}
+        displayColumnIds={displayColumnIds}
         initialColumnCount={initialColumnCount}
         columnCount={columnCount}
         removedColumnCount={removedColumnCount}
@@ -229,6 +261,7 @@ export default function withTableData(WrappedComponent) {
         selectColumns={selectColumns}
         swapColumns={swapColumns}
         hideColumns={hideColumns}
+        unhideColumns={unhideColumns}
         deleteColumns={deleteColumns}
         focusColumns={focusColumns}
         setTableName={setTableName}

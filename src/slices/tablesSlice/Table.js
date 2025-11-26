@@ -5,8 +5,6 @@
  *
  */
 
-export const HIDDEN_COLUMNS_ATTR = "hiddenColumnIds";
-
 /**
  * Counter used to generate unique IDs for tables.
  * Unique counters like these with a prefix not only provide a significant semantic benefit
@@ -49,8 +47,6 @@ export function Table({
   hiddenColumnIds = [],
 } = {}) {
   const id = `t${++idCounter}`;
-  const output = {};
-  output[HIDDEN_COLUMNS_ATTR] = hiddenColumnIds; // Initialize hidden columns as empty array
   return {
     id,
     parentId,
@@ -64,7 +60,7 @@ export function Table({
     dateLastModified,
     columnIds,
     rowCount,
-    ...output,
+    hiddenColumnIds,
   };
 }
 

@@ -26,17 +26,32 @@
  * ```
  */
 
-import { Box, Typography, Menu, MenuItem } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Menu,
+  MenuItem,
+  IconButton,
+  Divider,
+  Stack,
+  Tooltip,
+} from "@mui/material";
 import withTableData from "./withTableData";
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setFocusedColumnIds } from "../../slices/uiSlice"; // TODO: this should be in HOC
+import {
+  setFocusedColumnIds,
+  setSelectedColumnIds,
+} from "../../slices/uiSlice"; // TODO: this should be in HOC
 import {
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_CATEGORICAL,
   COLUMN_TYPE_VARCHAR,
 } from "../../slices/columnsSlice/Column";
-import { EnhancedColumnSummary } from "../ColumnViews";
+import {
+  EnhancedColumnContextMenuItems,
+  EnhancedColumnSummary,
+} from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import FocusIconButton from "../ui/FocusIconButton";
@@ -44,6 +59,7 @@ import HideIconButton from "../ui/HideIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { TableLabel } from "./TableLabel";
 import DeleteIconButton from "../ui/icons/DeleteIconButton";
+import { ArrowRight, ArrowLeft } from "@mui/icons-material";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -66,6 +82,9 @@ const TableSchema = ({
   swapColumns,
   selectColumns,
   hideColumns,
+  unhideColumns,
+  displayColumnIds,
+  hiddenColumnIds,
   deleteColumns,
   focusColumns,
   insertColumn,
@@ -80,6 +99,8 @@ const TableSchema = ({
   }
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
+  const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
+  const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
   const columnContainerRef = useRef(null);
   const [visibleColumns, setVisibleColumns] = useState([]);
 
@@ -238,6 +259,17 @@ const TableSchema = ({
     }
   }, [activeColumnIds, selectedColumnIds, selectColumns]);
 
+  const handleContextMenu = useCallback((event, columnId) => {
+    event.preventDefault();
+    setContextMenuAnchor({ left: event.clientX, top: event.clientY });
+    setContextMenuColumnId(columnId);
+  }, []);
+
+  const handleContextMenuClose = useCallback(() => {
+    setContextMenuAnchor(null);
+    setContextMenuColumnId(null);
+  }, []);
+
   return (
     <Box
       display="flex"
@@ -266,15 +298,14 @@ const TableSchema = ({
               disabled={selectedColumnIds.length === 0}
               onClick={handleFocusColumns}
             />
-            {/* TODO: implement Hide */}
             <DeleteIconButton
               disabled={selectedColumnIds.length === 0}
               onConfirm={handleDeleteColumns}
             />
-            {/* <HideIconButton
+            <HideIconButton
               disabled={selectedColumnIds.length === 0}
               onClick={handleHideColumns}
-            /> */}
+            />
             <SelectToggleIconButton
               isSelected={selectedColumnIds.length > 0}
               onClick={handleSelectAllColumns}
@@ -319,6 +350,30 @@ const TableSchema = ({
         </MenuItem>
       </Menu>
 
+      {/* Context Menu for Column */}
+      <Menu
+        open={Boolean(contextMenuAnchor)}
+        onClose={handleContextMenuClose}
+        anchorReference="anchorPosition"
+        anchorPosition={contextMenuAnchor}
+      >
+        {contextMenuColumnId && (
+          <EnhancedColumnContextMenuItems
+            id={contextMenuColumnId}
+            handleCloseMenu={handleContextMenuClose}
+            onInsertColumnLeftClick={() =>
+              insertColumn(activeColumnIds.indexOf(contextMenuColumnId))
+            }
+            onInsertColumnRightClick={() =>
+              insertColumn(activeColumnIds.indexOf(contextMenuColumnId) + 1)
+            }
+            onHideColumn={() =>
+              hideColumns([...hiddenColumnIds, contextMenuColumnId])
+            }
+          />
+        )}
+      </Menu>
+
       {/* Column Cards Container - Horizontally scrollable grid of column summaries */}
       <Box
         ref={columnContainerRef}
@@ -334,50 +389,126 @@ const TableSchema = ({
         }}
       >
         {/* Individual Column Cards - Each column rendered as a numbered card with summary */}
-        {activeColumnIds.map((columnId, i) => (
-          <Box
-            key={columnId}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              flex: "0 0 auto",
-              minWidth: 200,
-              width: 200,
-              userSelect: "none",
-            }}
-          >
-            {/* Column Number Header */}
-            <Typography
-              variant="h6"
-              textAlign="center"
-              width="100%"
-              gutterBottom
-            >
-              {i + 1}
-            </Typography>
-
-            <ColumnDragContainer
-              id={columnId}
-              columnIndex={i}
-              canDrag={selectedColumnIds.includes(columnId)}
-              onDrop={(draggedItem, targetItem) => {
-                swapColumns(targetItem.id, draggedItem.id);
-              }}
-            >
-              {/* Interactive Column Summary Card that includes [data-column-id] */}
-              <EnhancedColumnSummary
-                id={columnId}
-                onClick={(event) => handleColumnClick(event, columnId)}
-                onDoubleClick={(event) =>
-                  handleColumnDoubleClick(event, columnId)
-                }
-                isDraggable={selectedColumnIds.includes(columnId)}
-                handleInsertColumnLeft={() => insertColumn(i)}
-                handleInsertColumnRight={() => insertColumn(i + 1)}
-              />
-            </ColumnDragContainer>
-          </Box>
-        ))}
+        {activeColumnIds
+          .reduce((acc, columnId, i) => {
+            const isVisible = !hiddenColumnIds.includes(columnId);
+            if (isVisible) {
+              acc.push({ columnIds: [columnId], indices: [i], isVisible });
+            } else {
+              if (acc[acc.length - 1] && !acc[acc.length - 1].isVisible) {
+                acc[acc.length - 1].columnIds.push(columnId);
+                acc[acc.length - 1].indices.push(i);
+              } else {
+                acc.push({ columnIds: [columnId], indices: [i], isVisible });
+              }
+            }
+            return acc;
+          }, [])
+          .map(({ columnIds, indices, isVisible }, i) => {
+            return (
+              <Box
+                key={columnIds.join("-")}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: "0 0 auto",
+                  minWidth: isVisible ? 200 : 20,
+                  width: isVisible ? 200 : 20,
+                  userSelect: "none",
+                }}
+              >
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    !isVisible ? unhideColumns(columnIds) : null;
+                  }}
+                  sx={{ borderRadius: 0 }}
+                >
+                  <Tooltip
+                    title={
+                      isVisible
+                        ? `Column #${indices[0] + 1}`
+                        : `Hidden columns at ${
+                            indices[0] + 1
+                          }. Click to unhide.`
+                    }
+                    arrow
+                  >
+                    <Box
+                      width="100%"
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      {isVisible ? (
+                        <Typography
+                          variant="h6"
+                          textAlign="center"
+                          width="100%"
+                          fontSize={"0.75rem"}
+                          height="20px"
+                          gutterBottom
+                        >
+                          {indices[0] + 1}
+                        </Typography>
+                      ) : (
+                        <>
+                          <Stack
+                            direction="row"
+                            spacing={0}
+                            alignItems="center"
+                          >
+                            <ArrowRight size="small" width="0.8em" />
+                            |
+                            <ArrowLeft size="small" width="0.8em" />
+                          </Stack>
+                        </>
+                      )}
+                    </Box>
+                  </Tooltip>
+                </IconButton>
+                {isVisible ? (
+                  <>
+                    <ColumnDragContainer
+                      id={columnIds[0]}
+                      columnIndex={i}
+                      canDrag={
+                        selectedColumnIds.includes(columnIds[0]) && isVisible
+                      }
+                      onDrop={(draggedItem, targetItem) => {
+                        swapColumns(targetItem.id, draggedItem.id);
+                      }}
+                    >
+                      {/* Interactive Column Summary Card that includes [data-column-id] */}
+                      <EnhancedColumnSummary
+                        id={columnIds[0]}
+                        onClick={(event) =>
+                          handleColumnClick(event, columnIds[0])
+                        }
+                        onDoubleClick={(event) =>
+                          handleColumnDoubleClick(event, columnIds[0])
+                        }
+                        onContextMenu={(event) =>
+                          handleContextMenu(event, columnIds[0])
+                        }
+                        isDraggable={selectedColumnIds.includes(columnIds[0])}
+                        handleInsertColumnLeft={() => insertColumn(i)}
+                        handleInsertColumnRight={() => insertColumn(i + 1)}
+                      />
+                    </ColumnDragContainer>
+                  </>
+                ) : (
+                  <Divider
+                    orientation="vertical"
+                    sx={{
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                    }}
+                  />
+                )}
+              </Box>
+            );
+          })}
       </Box>
     </Box>
   );
