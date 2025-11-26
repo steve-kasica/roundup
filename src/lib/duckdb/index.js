@@ -1,6 +1,5 @@
 export * from "./getTableRows";
 export * from "./getValuesCountMatrix";
-export * from "./dropTable";
 export * from "./createStackView";
 export * from "./createPackView";
 export * from "./getTableDimensions";
@@ -16,4 +15,6 @@ export * from "./getMatchValues";
 export * from "./getColumnValues";
 export * from "./insertColumn";
 export * from "./getColumnNames";
+export * from "./dropTable";
 export * from "./dropView";
+export * from "./dropColumns";

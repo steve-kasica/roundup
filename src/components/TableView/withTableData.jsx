@@ -106,10 +106,10 @@ export default function withTableData(WrappedComponent) {
       [dispatch, activeColumnIds, id]
     );
 
-    const excludeColumns = useCallback(
-      (columnIdsToExclude) => {
+    const hideColumns = useCallback(
+      (columnIdsToHide) => {
         const columnIds = activeColumnIds.filter(
-          (colId) => !columnIdsToExclude.includes(colId)
+          (colId) => !columnIdsToHide.includes(colId)
         );
         dispatch(updateTablesRequest({ tableUpdates: [{ id, columnIds }] }));
       },
@@ -168,7 +168,7 @@ export default function withTableData(WrappedComponent) {
       [dispatch]
     );
 
-    // Current number of non-excluded columns
+    // Current number of non-hided columns
     const columnCount = useMemo(
       () => activeColumnIds.length,
       [activeColumnIds]
@@ -177,7 +177,7 @@ export default function withTableData(WrappedComponent) {
     // Number of columns when table was initialized
     const initialColumnCount = useMemo(() => columnIds.length, [columnIds]);
 
-    // Number of columns that have been excluded
+    // Number of columns that have been hided
     const removedColumnCount = useMemo(
       () => initialColumnCount - columnCount,
       [initialColumnCount, columnCount]
@@ -221,7 +221,7 @@ export default function withTableData(WrappedComponent) {
         // Interaction handlers
         selectColumns={selectColumns}
         swapColumns={swapColumns}
-        excludeColumns={excludeColumns}
+        hideColumns={hideColumns}
         focusColumns={focusColumns}
         setTableName={setTableName}
         setVisibleColumns={setVisibleColumns}

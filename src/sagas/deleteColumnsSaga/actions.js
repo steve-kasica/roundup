@@ -7,6 +7,8 @@ import { createAction } from "@reduxjs/toolkit";
  * The payload should contain information about which columns to delete.
  *
  * @function
+ * @param {Object} payload - The payload for the action.
+ * @param {Array|string} payload.columnIds - An array of column IDs or a single column ID to be deleted.
  * @returns {Object} Redux action with type "sagas/deleteColumn" and payload.
  */
 export const deleteColumnsRequest = createAction("sagas/deleteColumns/request");

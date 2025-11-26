@@ -40,7 +40,7 @@ import { EnhancedColumnSummary } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import FocusIconButton from "../ui/FocusIconButton";
-import ExcludeIconButton from "../ui/ExcludeIconButton";
+import HideIconButton from "../ui/HideIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { TableLabel } from "./TableLabel";
 
@@ -64,7 +64,7 @@ const TableSchema = ({
   columnCount,
   swapColumns,
   selectColumns,
-  excludeColumns,
+  hideColumns,
   focusColumns,
   insertColumn,
   setVisibleColumns: setVisibleColumnsInSlice,
@@ -218,9 +218,9 @@ const TableSchema = ({
     focusColumns(selectedColumnIds);
   }, [focusColumns, selectedColumnIds]);
 
-  const handleExcludeColumns = useCallback(() => {
-    excludeColumns(selectedColumnIds);
-  }, [excludeColumns, selectedColumnIds]);
+  const handleHideColumns = useCallback(() => {
+    hideColumns(selectedColumnIds);
+  }, [hideColumns, selectedColumnIds]);
 
   const handleSelectAllColumns = useCallback(() => {
     if (selectedColumnIds.length > 0) {
@@ -260,9 +260,9 @@ const TableSchema = ({
               disabled={selectedColumnIds.length === 0}
               onClick={handleFocusColumns}
             />
-            <ExcludeIconButton
+            <HideIconButton
               disabled={selectedColumnIds.length === 0}
-              onClick={handleExcludeColumns}
+              onClick={handleHideColumns}
             />
             <SelectToggleIconButton
               isSelected={selectedColumnIds.length > 0}

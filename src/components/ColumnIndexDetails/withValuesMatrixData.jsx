@@ -30,7 +30,7 @@ export default function withValuesCountMatrixData(WrappedComponent) {
           setUniqueValues(matrix.map((row) => row[0]));
           setValueDegrees(matrix.map((row) => row[row.length - 2])); // Store the degrees of each value
           setSignature(matrix.map((row) => row[row.length - 1])); // Store the signature of each value
-          setData(matrix.map((row) => row.slice(1, -2))); // Exclude the first and last columns (value and degree)
+          setData(matrix.map((row) => row.slice(1, -2))); // Do not include the first and last columns (value and degree)
         } catch (err) {
           setError(err);
         } finally {

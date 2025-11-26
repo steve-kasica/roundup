@@ -13,7 +13,7 @@ import { normalizeInputToArray } from "../utilities";
  *
  * @param {Object} state - The Redux state.
  * @param {string} parentId - The ID of the table/operation to get all columns for.
- * @returns {Array<string>} An array of all column IDs (both active and excluded) associated with the table. Returns an empty array if the table has no columns or doesn't exist.
+ * @returns {Array<string>} An array of all column IDs (both active and hided) associated with the table. Returns an empty array if the table has no columns or doesn't exist.
  * @type {import('@reduxjs/toolkit').Selector<any, string, Array<string>>}
  */
 export const selectColumnIdsByParentId = createSelector(
@@ -74,7 +74,7 @@ export const selectColumnNamesById = createSelector(
  * @function
  * @param {Object} state - The Redux state.
  * @param {string} parentId - The ID of the table to get selected active columns for.
- * @returns {Array<string>} An array of column IDs that are both active (not excluded) AND selected, in the same order as they appear in the table. Returns an empty array if no columns match both criteria or if the table doesn't exist.
+ * @returns {Array<string>} An array of column IDs that are both active (not hided) AND selected, in the same order as they appear in the table. Returns an empty array if no columns match both criteria or if the table doesn't exist.
  *
  */
 export const selectSelectedColumnIdsByParentId = createSelector(

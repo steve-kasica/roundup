@@ -29,8 +29,8 @@ import { MATCH_TYPES } from "../OperationsList/PackOperationParams/PackOutputDet
 const PackRows = ({
   // Props passed via withOperationData
   databaseName,
-  activeColumnIds, // columnIDs of this operation (not excluded)
-  activeChildColumnIds, // column IDs of operation's child tables (not excluded)
+  activeColumnIds, // columnIDs of this operation (not hidden)
+  activeChildColumnIds, // column IDs of operation's child tables (not hidden)
   isMaterialized,
   isInSync,
   materializeOperation,

@@ -29,7 +29,7 @@ const SchemaToolbar = ({
   hasAlerts,
   children,
   customMenuItems = null,
-  handleExcludeSelected = () => {},
+  handleHideSelected = () => {},
 }) => {
   const dispatch = useDispatch();
   const selectedColumnIds = useSelector(selectSelectedColumnIds);

@@ -12,10 +12,11 @@ import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedStackOperationLabel } from "./StackOperationLabel";
 import FocusIconButton from "../ui/FocusIconButton";
-import ExcludeIconButton from "../ui/ExcludeIconButton";
+import HideIconButton from "../ui/HideIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
+import DeleteIconButton from "../ui/icons/DeleteIconButton";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -25,6 +26,7 @@ const StackSchemaView = ({
   id,
   name,
   rowCount,
+  deleteColumns,
   // Props passed via withStackOperationData
   activeColumnIds,
   columnIdMatrix, // column IDs of child tables in a matrix
@@ -36,7 +38,7 @@ const StackSchemaView = ({
   selectColumns, // Sets global set of selected column IDs
   clearSelectedColumns, // Clears global set of selected column IDs
   focusColumns, // Sets global set of focused column IDs
-  excludeColumns,
+  hideColumns,
   swapColumns,
   insertColumnIntoChildAtIndex,
   setVisibleColumns: setVisibleColumnsInSlice,
@@ -273,9 +275,14 @@ const StackSchemaView = ({
     focusColumns(selectedTableColumnIds);
   }, [focusColumns, selectedTableColumnIds]);
 
-  const handleExcludeColumns = useCallback(
-    () => excludeColumns(selectedTableColumnIds),
-    [excludeColumns, selectedTableColumnIds]
+  const handleHideColumns = useCallback(
+    () => hideColumns(selectedTableColumnIds),
+    [hideColumns, selectedTableColumnIds]
+  );
+
+  const handleDeleteColumns = useCallback(
+    () => deleteColumns(selectedTableColumnIds),
+    [deleteColumns, selectedTableColumnIds]
   );
 
   const handleSelectionAllColumns = useCallback(() => {
@@ -287,10 +294,6 @@ const StackSchemaView = ({
       setSelectedTableColumnIds(columnIdMatrix.flat());
     }
   }, [columnIdMatrix, selectedTableColumnIds.length]);
-
-  const handleMaterializeView = useCallback(() => {
-    materializeOperation();
-  }, [materializeOperation]);
 
   return (
     <Box
@@ -318,8 +321,12 @@ const StackSchemaView = ({
               onClick={handleFocusColumns}
               disabled={selectedTableColumnIds.length === 0}
             />
-            <ExcludeIconButton
-              onClick={handleExcludeColumns}
+            <HideIconButton
+              onClick={handleHideColumns}
+              disabled={selectedTableColumnIds.length === 0}
+            />
+            <DeleteIconButton
+              onConfirm={handleDeleteColumns}
               disabled={selectedTableColumnIds.length === 0}
             />
             <SelectToggleIconButton

@@ -8,6 +8,7 @@ import {
   isOperationId,
   selectRootOperationId,
   selectMaxOperationDepth,
+  HIDDEN_COLUMNS_ATTR,
 } from "../../slices/operationsSlice";
 import { useDispatch } from "react-redux";
 import {
@@ -32,6 +33,7 @@ import { selectFocusedObjectId } from "../../slices/uiSlice";
 import { group, interpolateMagma, scaleSequential } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
+import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 
 export default function withOperationData(WrappedComponent) {
   function EnhancedComponent({
@@ -57,7 +59,7 @@ export default function withOperationData(WrappedComponent) {
       selectColumnIdsByParentId(state, id)
     );
 
-    // Get columnIds of child tables that are active (not excluded)
+    // Get columnIds of child tables that are active (not hidden)
     const activeChildColumnIds = useSelector((state) =>
       selectActiveColumnIdsByParentId(state, operation.childIds)
     );
@@ -142,11 +144,10 @@ export default function withOperationData(WrappedComponent) {
       [dispatch, id, operation.childIds]
     );
 
-    // TODO
-    const excludeColumns = useCallback(
-      (columnIdsToExclude) => {
-        const columnIdsToExcludeByParentId = Array.from(
-          group(columnIdsToExclude, (columnId) => {
+    const hideColumns = useCallback(
+      (columnIdsToHide) => {
+        const columnIdsToHideByParentId = Array.from(
+          group(columnIdsToHide, (columnId) => {
             let parentId = null;
             for (const childColumns of activeChildColumnIds) {
               if (childColumns.includes(columnId)) {
@@ -162,15 +163,13 @@ export default function withOperationData(WrappedComponent) {
           ([parentId, columnIds]) => ({ parentId, columnIds })
         );
 
-        const columnIdsToIncludeByParentId = columnIdsToExcludeByParentId.map(
+        const columnIdsToIncludeByParentId = columnIdsToHideByParentId.map(
           ({ parentId, columnIds }) => {
             const activeColumnIds =
               activeChildColumnIds[operation.childIds.indexOf(parentId)];
             return {
               id: parentId,
-              columnIds: activeColumnIds.filter(
-                (colId) => !columnIds.includes(colId)
-              ),
+              [HIDDEN_COLUMNS_ATTR]: columnIds,
             };
           }
         );
@@ -191,6 +190,13 @@ export default function withOperationData(WrappedComponent) {
         dispatch(setSelectedColumnIds([]));
       },
       [activeChildColumnIds, dispatch, operation.childIds]
+    );
+
+    const deleteColumns = useCallback(
+      (columnIdsToDelete) => {
+        dispatch(deleteColumnsRequest({ columnIds: columnIdsToDelete }));
+      },
+      [dispatch]
     );
 
     const materializeOperation = useCallback(
@@ -253,7 +259,7 @@ export default function withOperationData(WrappedComponent) {
         doesViewExist={operation.doesViewExist}
         isMaterialized={operation.isMaterialized}
         isInSync={operation.isInSync}
-        activeChildColumnIds={activeChildColumnIds} // ColumnIDs of operation's child tables (not excluded)
+        activeChildColumnIds={activeChildColumnIds} // ColumnIDs of operation's child tables (not hidden)
         selectedChildColumnIds={selectedChildColumnIds}
         childRowCounts={childRowCounts}
         depth={depth}
@@ -267,7 +273,7 @@ export default function withOperationData(WrappedComponent) {
         joinType={operation.joinType}
         // Directly associated columns
         columnIds={columnIds} // All column IDs associated with this operation
-        activeColumnIds={activeColumnIds} // columns not excluded
+        activeColumnIds={activeColumnIds} // columns not hidden
         selectedColumnIds={selectedColumnIds}
         removedColumnIds={removedColumnIds} // TODO: @deprecated?
         // Row stuff
@@ -309,7 +315,8 @@ export default function withOperationData(WrappedComponent) {
         materializeOperation={materializeOperation}
         // Callback function related to columns
         selectColumns={selectColumns}
-        excludeColumns={excludeColumns}
+        hideColumns={hideColumns}
+        deleteColumns={deleteColumns}
         clearSelectedColumns={clearSelectedColumns}
         insertColumnIntoChildAtIndex={insertColumnIntoChildAtIndex}
         setVisibleColumns={setVisibleColumns}

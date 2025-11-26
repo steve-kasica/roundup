@@ -21,13 +21,15 @@ import {
   KeyboardArrowLeft as InsertLeftIcon,
   KeyboardArrowRight as InsertRightIcon,
 } from "@mui/icons-material";
-import ExcludeIconButton from "../ui/ExcludeIconButton";
+import HideIconButton from "../ui/HideIconButton";
 import FocusIconButton from "../ui/FocusIconButton";
+import DeleteIconButton from "../ui/icons/DeleteIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { extent, interpolateGreys, scaleSequential, text } from "d3";
 import { EnhancedTableName } from "../TableView/TableName";
 import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
 import { isTableId } from "../../slices/tablesSlice";
+import { deleteColumns } from "../../slices/columnsSlice";
 const matchLabels = new Map([
   ["matchingRowCount", "Matches"],
   ["leftUnmatchedRowCount", "Left Only"],
@@ -41,6 +43,8 @@ const PackSchemaView = withPackOperationData(
     selectColumns,
     clearSelectedColumns,
     swapTablePositions,
+    hideColumns,
+    deleteColumns,
     materializeOperation,
     // Pack-specific props
     joinPredicate,
@@ -431,7 +435,23 @@ const PackSchemaView = withPackOperationData(
       });
     }, []);
 
-    const handleExcludeColumns = useCallback(() => {}, []);
+    const handleHideColumns = useCallback(() => {
+      const columnsToHide = new Set();
+      clickedBlockCells.forEach((cellKey) => {
+        const [columnId] = cellKey.split(":");
+        columnsToHide.add(columnId);
+      });
+      hideColumns(Array.from(columnsToHide));
+    }, [clickedBlockCells, hideColumns]);
+
+    const handleDeleteColumns = useCallback(() => {
+      const columnsToDelete = new Set();
+      clickedBlockCells.forEach((cellKey) => {
+        const [columnId] = cellKey.split(":");
+        columnsToDelete.add(columnId);
+      });
+      deleteColumns(Array.from(columnsToDelete));
+    }, [clickedBlockCells, deleteColumns]);
 
     const handleFocusColumns = useCallback(() => {}, []);
 
@@ -520,9 +540,13 @@ const PackSchemaView = withPackOperationData(
                 disabled={!hasCompleteColumnSelected}
                 onClick={handleFocusColumns}
               />
-              <ExcludeIconButton
+              <HideIconButton
                 disabled={!hasCompleteColumnSelected}
-                onClick={handleExcludeColumns}
+                onClick={handleHideColumns}
+              />
+              <DeleteIconButton
+                disabled={!hasCompleteColumnSelected}
+                onConfirm={handleDeleteColumns}
               />
               <SelectToggleIconButton
                 onClick={handleSelectAll}
@@ -890,7 +914,14 @@ const PackSchemaView = withPackOperationData(
             Insert Column Right
           </MenuItem>
           <MenuItem onClick={handleCloseContextMenu}>Rename Column</MenuItem>
-          <MenuItem onClick={handleCloseContextMenu}>Exclude Column</MenuItem>
+          <MenuItem
+            onClick={() => {
+              hideColumns(contextMenuColumnId);
+              handleCloseContextMenu();
+            }}
+          >
+            Hide Column
+          </MenuItem>
         </Menu>
       </Box>
     );

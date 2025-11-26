@@ -14,11 +14,13 @@ import {
 } from "@mui/material";
 import {
   Edit,
-  Delete,
   SwapHoriz,
   CenterFocusStrong,
   KeyboardArrowLeft,
   KeyboardArrowRight,
+  VisibilityOff,
+  Delete,
+  DeleteForever,
 } from "@mui/icons-material";
 import { useCallback, useState } from "react";
 import withColumnData from "./withColumnData";
@@ -29,11 +31,12 @@ const ColumnContextMenu = ({
   columnType,
   name,
   databaseName,
-  excludeColumn,
   setColumnType,
   focusColumn,
   onInsertColumnLeftClick,
   onInsertColumnRightClick,
+  hideColumn,
+  deleteColumn,
   renameColumn,
   // Props passed directly from parent component
   closeMenu,
@@ -108,14 +111,21 @@ const ColumnContextMenu = ({
     [handleColumnTypeDialogClose, closeMenu]
   );
 
-  // TODO: address later
-  // const handleExcludeColumn = useCallback(
-  //   (event) => {
-  //     excludeColumn();
-  //     closeMenu(event);
-  //   },
-  //   [closeMenu, excludeColumn]
-  // );
+  const handleHideColumn = useCallback(
+    (event) => {
+      hideColumn();
+      closeMenu(event);
+    },
+    [closeMenu, hideColumn]
+  );
+
+  const handleDeleteColumn = useCallback(
+    (event) => {
+      deleteColumn(); // Assuming delete is similar to hide in this context
+      closeMenu(event);
+    },
+    [closeMenu, deleteColumn]
+  );
 
   const handleSetColumnType = useCallback(() => {
     setSelectedColumnType(columnType || "");
@@ -170,12 +180,18 @@ const ColumnContextMenu = ({
         </ListItemIcon>
         <ListItemText>Rename column</ListItemText>
       </MenuItem>
-      {/* <MenuItem onClick={handleExcludeColumn} sx={menuItemSx}>
+      <MenuItem onClick={handleHideColumn} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
-          <Delete fontSize="small" />
+          <VisibilityOff fontSize="small" />
         </ListItemIcon>
-        <ListItemText>Exclude column</ListItemText>
-      </MenuItem> */}
+        <ListItemText>Hide column</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={handleDeleteColumn} sx={menuItemSx}>
+        <ListItemIcon sx={iconSx}>
+          <DeleteForever fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Delete column</ListItemText>
+      </MenuItem>
       <MenuItem onClick={handleSetColumnType} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <SwapHoriz fontSize="small" />

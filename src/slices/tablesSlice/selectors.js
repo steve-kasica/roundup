@@ -22,17 +22,17 @@ export const selectTablesById = createSelector(
 );
 
 /**
- * Select active column IDs (not excluded) for a specific table.
+ * Select active column IDs (not hided) for a specific table.
  *
  * This selector returns only the columns that are currently included in the table's
- * idsByTable array. When columns are excluded via `setTablesColumnIds`, they are
+ * idsByTable array. When columns are hided via `setTablesColumnIds`, they are
  * removed from this array but remain in the columns.byId object. This selector is
  * used to determine which columns should be displayed and operated on.
  *
  * @function
  * @param {Object} state - The Redux state.
  * @param {string} tableId - The ID of the table to get active columns for.
- * @returns {Array<string>} An array of column IDs that are active (not excluded) for the table.
+ * @returns {Array<string>} An array of column IDs that are active (not hided) for the table.
  *                          Returns an empty array if the table has no columns or doesn't exist.
  *
  * @example
