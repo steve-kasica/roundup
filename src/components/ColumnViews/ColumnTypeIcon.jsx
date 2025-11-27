@@ -39,7 +39,6 @@ import {
   DoNotDisturb as NullIcon,
 } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
-import { COLUMN_TYPE_VARCHAR } from "../../slices/columnsSlice";
 
 export default function ColumnTypeIcon({
   columnType,
