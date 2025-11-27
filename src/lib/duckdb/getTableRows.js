@@ -1,5 +1,22 @@
 import { getDuckDB } from "./duckdbClient";
 
+function parseValue(value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  if (typeof value === "bigint") {
+    return Number(value);
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value === "object" && !Array.isArray(value)) {
+    // Handle nested objects (like STRUCT types)
+    return JSON.stringify(value);
+  }
+  return value;
+}
+
 export async function getTableRows(
   tableId,
   columnsList,
@@ -23,5 +40,6 @@ export async function getTableRows(
   `;
   const result = await conn.query(query);
   await conn.close();
-  return result.toArray().map((row) => Object.values(row));
+
+  return result.toArray().map((row) => Object.values(row).map(parseValue));
 }
