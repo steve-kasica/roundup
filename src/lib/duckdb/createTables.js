@@ -7,7 +7,7 @@ export async function createTables(tableName, fileName) {
 
   // Create the table
   await conn.query(
-    `CREATE TABLE "${tableName}" AS SELECT * FROM read_csv_auto('${fileName}', AUTO_DETECT=TRUE, all_varchar=true);`
+    `CREATE TABLE "${tableName}" AS SELECT * FROM read_csv_auto('${fileName}', AUTO_DETECT=TRUE);`
   );
 
   await conn.close();

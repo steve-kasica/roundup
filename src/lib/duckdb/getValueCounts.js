@@ -36,7 +36,7 @@ export async function getValueCounts(
     const result = await conn.query(query);
 
     return result.toArray().map((row) => ({
-      value: row.value,
+      value: String(row.value),
       count: typeof row.count === "bigint" ? Number(row.count) : row.count,
     }));
   } catch (error) {
