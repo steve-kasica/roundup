@@ -12,7 +12,10 @@ import {
   testStackOperationForFatalErrors,
   testPackOperationForFatalErrors,
 } from "../../slices/alertsSlice";
-import { selectActiveColumnIdsByParentId } from "../../slices/columnsSlice";
+import {
+  selectActiveColumnIdsByParentId,
+  selectColumnsById,
+} from "../../slices/columnsSlice";
 import { updateTablesSuccess } from "../updateTablesSaga";
 import { selectTablesById } from "../../slices/tablesSlice";
 
@@ -28,13 +31,17 @@ export default function* updateAlertsSagaWatcher() {
         selectOperationsById(state, operationId)
       );
       if (operation.operationType === OPERATION_TYPE_STACK) {
-        const childColumnIds = yield select((state) =>
-          selectActiveColumnIdsByParentId(state, operation.childIds)
-        );
-        testResults = testStackOperationForFatalErrors(
-          operation,
-          childColumnIds.map((columnIds) => columnIds.length)
-        );
+        const childColumns = yield select((state) => {
+          const childColumnIdsMatrix = selectActiveColumnIdsByParentId(
+            state,
+            operation.childIds
+          );
+          const childColumns = childColumnIdsMatrix.map((columnIds) =>
+            selectColumnsById(state, columnIds)
+          );
+          return childColumns;
+        });
+        testResults = testStackOperationForFatalErrors(operation, childColumns);
       } else if (operation.operationType === OPERATION_TYPE_PACK) {
         testResults = testPackOperationForFatalErrors(operation);
       } else if (operation.operationType === OPERATION_TYPE_NO_OP) {

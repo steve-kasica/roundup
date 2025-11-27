@@ -3,6 +3,7 @@ import { validateMissingJoinType } from "./MissingJoinType";
 import { validateMissingLeftJoinKey } from "./MissingLeftJoinKey";
 import { validateMissingRightJoinKey } from "./MissingRightJoinKey";
 import { validateIncongruentTables } from "./IncongruentTables";
+import { validateHeterogeneousColumnTypes } from "./heterogeneousColumnTypes";
 
 const testPackOperationForFatalErrors = (operation) => {
   const fatalErrors = [
@@ -19,8 +20,15 @@ const testPackOperationForFatalErrors = (operation) => {
   };
 };
 
-const testStackOperationForFatalErrors = (operation, childColumnCounts) => {
-  const fatalErrors = [validateIncongruentTables(operation, childColumnCounts)];
+const testStackOperationForFatalErrors = (operation, childColumns) => {
+  const childColumnCounts = childColumns.map((columns) => columns.length);
+  const childColumnTypes = childColumns.map((columns) =>
+    columns.map((column) => column.columnType)
+  );
+  const fatalErrors = [
+    validateIncongruentTables(operation, childColumnCounts),
+    validateHeterogeneousColumnTypes(operation, childColumnTypes),
+  ];
   const warnings = [];
   return {
     fatalErrors,
