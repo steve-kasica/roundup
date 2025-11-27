@@ -4,7 +4,11 @@ import {
   TOP_VALUES_ATTR,
   updateColumns as updateColumnsSlice,
 } from "../../slices/columnsSlice";
-import { getColumnStats, getValueCounts } from "../../lib/duckdb";
+import {
+  getColumnStats,
+  getValueCounts,
+  setColumnType,
+} from "../../lib/duckdb";
 import { updateColumnsFailure, updateColumnsSuccess } from "./actions";
 import { SUMMARY_ATTRIBUTES } from "../../slices/columnsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
@@ -29,6 +33,15 @@ export default function* updateColumnsWorker(action) {
     const updateKeys = Object.keys(columnUpdate);
     let databaseUpdates = {};
     try {
+      if (updateKeys.includes("columnType")) {
+        // We need to update the column type in the database prior to fetching stats
+        yield call(
+          setColumnType,
+          parent.databaseName,
+          column.databaseName,
+          columnUpdate.columnType
+        );
+      }
       if (updateKeys.some((key) => SUMMARY_ATTRIBUTES.includes(key))) {
         databaseUpdates = {
           ...databaseUpdates,
@@ -53,7 +66,11 @@ export default function* updateColumnsWorker(action) {
         ...databaseUpdates,
       });
     } catch (error) {
-      console.error("Failed to update column:", column.id, error);
+      alert(
+        `Failed to update column (${
+          column.name || column.databaseName || column.id
+        }): ${error.message}`
+      );
       failedUpdates.push({
         ...columnUpdate,
       });

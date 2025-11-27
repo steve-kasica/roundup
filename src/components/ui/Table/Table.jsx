@@ -8,13 +8,13 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Box,
 } from "@mui/material";
 import StyledTableContainer from "./StyledTableContainer";
 import StyledTable from "./StyledTable";
 import StickyTableCell from "./StickyTableCell";
 import StyledAlternatingTableRow from "./StyledAlternatingTableRow";
 import StyledTableCell from "./StyledTableCell";
-import { Box } from "lucide-react";
 import MaterializeViewIconButton from "../MaterializeViewIconButton";
 
 const Table = ({
@@ -183,6 +183,25 @@ const Table = ({
                   ))}
                 </StyledAlternatingTableRow>
               ))
+            ) : error ? (
+              /* Error State - Show error message in table body */
+              <StyledAlternatingTableRow isEven={true}>
+                <TableCell colSpan={columnIds.length + 1} align="center">
+                  <Box
+                    sx={{
+                      py: 4,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Typography variant="body1" color="error" sx={{ mb: 1 }}>
+                      Failed to load table data
+                    </Typography>
+                  </Box>
+                </TableCell>
+              </StyledAlternatingTableRow>
             ) : (
               /* Data Rows - Actual table content with alternating colors and hover effects */
               <>

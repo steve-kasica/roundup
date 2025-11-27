@@ -20,6 +20,7 @@ export const COLUMN_TYPE_CATEGORICAL = "CATEGORICAL";
 export const COLUMN_TYPE_NUMERICAL = "NUMERICAL";
 export const COLUMN_TYPE_DATE = "DATE";
 export const COLUMN_TYPE_VARCHAR = "VARCHAR";
+export const COLUMN_TYPE_BOOLEAN = "BOOLEAN";
 /**
  * An array containing the supported column types.
  *

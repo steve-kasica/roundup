@@ -18,3 +18,5 @@ export * from "./getColumnNames";
 export * from "./dropTable";
 export * from "./dropView";
 export * from "./dropColumns";
+export * from "./columnTypes";
+export * from "./setColumnType";

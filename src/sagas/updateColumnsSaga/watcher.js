@@ -20,7 +20,11 @@ export default function* updateColumnsSaga() {
 
     const columnUpdates = normalizeInputToArray(columnIds).map((id) => ({
       id,
-      ...Object.fromEntries(SUMMARY_ATTRIBUTES.map((attr) => [attr, null])),
+      ...Object.fromEntries(
+        SUMMARY_ATTRIBUTES.filter((attr) => attr !== "columnType").map(
+          (attr) => [attr, null]
+        )
+      ),
       [TOP_VALUES_ATTR]: null,
     }));
 

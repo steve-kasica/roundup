@@ -25,7 +25,13 @@ import {
 } from "@mui/icons-material";
 import { useCallback, useState } from "react";
 import withColumnData from "./withColumnData";
-import { COLUMN_TYPE_VARCHAR } from "../../slices/columnsSlice";
+import {
+  COLUMN_TYPE_CATEGORICAL,
+  COLUMN_TYPE_DATE,
+  COLUMN_TYPE_NUMERICAL,
+  COLUMN_TYPE_VARCHAR,
+} from "../../slices/columnsSlice";
+import { RoundupToDuckDBTypes } from "../../lib/duckdb";
 
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
@@ -185,33 +191,33 @@ const ColumnContextMenu = ({
         <ListItemIcon sx={iconSx}>
           <Edit fontSize="small" />
         </ListItemIcon>
-        <ListItemText>Rename column</ListItemText>
+        <ListItemText>Rename Column</ListItemText>
       </MenuItem>
       <MenuItem onClick={handleSetColumnType} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <SwapHoriz fontSize="small" />
         </ListItemIcon>
-        <ListItemText>Change column type</ListItemText>
+        <ListItemText>Change Column Type</ListItemText>
       </MenuItem>
       <Divider orientation="horizontal" />
       <MenuItem onClick={handleHideColumn} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <VisibilityOff fontSize="small" />
         </ListItemIcon>
-        <ListItemText>Hide column</ListItemText>
+        <ListItemText>Hide Column</ListItemText>
       </MenuItem>
       <MenuItem onClick={handleDeleteColumn} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <DeleteForever fontSize="small" />
         </ListItemIcon>
-        <ListItemText>Delete column</ListItemText>
+        <ListItemText>Delete Column</ListItemText>
       </MenuItem>
       <Divider orientation="horizontal" />
       <MenuItem onClick={handleFocusColumn} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <CenterFocusStrong fontSize="small" />
         </ListItemIcon>
-        <ListItemText>Focus column</ListItemText>
+        <ListItemText>Focus Column</ListItemText>
       </MenuItem>
       {onInsertColumnLeftClick && onInsertColumnRightClick && (
         <Divider orientation="horizontal" />
@@ -221,7 +227,7 @@ const ColumnContextMenu = ({
           <ListItemIcon sx={iconSx}>
             <KeyboardArrowLeft fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Insert column to the left</ListItemText>
+          <ListItemText>Insert Column To The Left</ListItemText>
         </MenuItem>
       )}
       {onInsertColumnRightClick && (
@@ -229,7 +235,7 @@ const ColumnContextMenu = ({
           <ListItemIcon sx={iconSx}>
             <KeyboardArrowRight fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Insert column to the right</ListItemText>
+          <ListItemText>Insert Column To The Right</ListItemText>
         </MenuItem>
       )}
 
@@ -285,20 +291,21 @@ const ColumnContextMenu = ({
             onChange={(e) => setSelectedColumnType(e.target.value)}
           >
             <FormControlLabel
-              value={COLUMN_TYPE_VARCHAR}
+              value={RoundupToDuckDBTypes(COLUMN_TYPE_CATEGORICAL)}
               control={<Radio />}
-              label="VARCHAR"
-            />
-            {/* <FormControlLabel
-              value={COLUMN_TYPE_NUMERICAL}
-              control={<Radio />}
-              label="Numerical"
+              label={
+                COLUMN_TYPE_CATEGORICAL.charAt(0).toUpperCase() +
+                COLUMN_TYPE_CATEGORICAL.slice(1).toLocaleLowerCase()
+              }
             />
             <FormControlLabel
-              value={COLUMN_TYPE_DATE}
+              value={RoundupToDuckDBTypes(COLUMN_TYPE_NUMERICAL)}
               control={<Radio />}
-              label="Date"
-            /> */}
+              label={
+                COLUMN_TYPE_NUMERICAL.charAt(0).toUpperCase() +
+                COLUMN_TYPE_NUMERICAL.slice(1).toLocaleLowerCase()
+              }
+            />
           </RadioGroup>
         </DialogContent>
         <DialogActions>

@@ -14,6 +14,7 @@ import {
   OPERATION_TYPE_PACK,
   selectOperationsById,
 } from "../../slices/operationsSlice";
+import { selectFocusedObjectId } from "../../slices/uiSlice";
 
 // This it listen for actions by the operations and columns slice
 export default function* updateOperationsWatcher() {
@@ -59,6 +60,7 @@ function* handleRematerializations(action) {
   const rematerializationProperteies = ["columnIds", "childIds"];
   const { changedPropertiesById } = action.payload;
   const operationUpdates = [];
+  const focusedOperationId = yield select(selectFocusedObjectId);
 
   for (const [id, changedProperties] of Object.entries(changedPropertiesById)) {
     const hasSchemaChange = changedProperties.some((prop) =>
@@ -74,14 +76,16 @@ function* handleRematerializations(action) {
       if (parentId) {
         operationUpdates.push({
           id: parentId,
-          // TODO whether or not it's in sync or
-          // should re-materialize depends on whether or
-          // not the operation is in focus, if in focus,
-          // then we should just flag out of sync, otherwise
-          // the user will have to up manually materialize
-          // all child operations
-          isMaterialized: null,
-          // isInSync: false,
+          ...(parentId === focusedOperationId
+            ? {
+                // If the operation is focused, we can set it to out-of-sync
+                isInSync: false,
+              }
+            : {
+                // If the operation is not focused, we set isMaterialized to null
+                // so that when the user focuses on it, it will re-materialize
+                isMaterialized: null,
+              }),
         });
       }
     }
