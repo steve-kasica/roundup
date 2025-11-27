@@ -65,11 +65,12 @@ const DragDropFileUpload = ({ handleFileUpload, acceptedTypes = "*" }) => {
     const maxSize = 100 * 1024 * 1024; // 100MB
     const allowedTypes = [
       "text/csv",
-      "application/json",
-      "text/plain",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "text/tab-separated-values",
+      // TODO: Enable these types when their parsing is supported
+      // "application/json",
+      // "text/plain",
+      // "application/vnd.ms-excel",
+      // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      // "text/tab-separated-values",
     ];
 
     if (file.size > maxSize) {
@@ -77,7 +78,7 @@ const DragDropFileUpload = ({ handleFileUpload, acceptedTypes = "*" }) => {
     }
 
     if (acceptedTypes !== "*" && !allowedTypes.includes(file.type)) {
-      return `File ${file.name} has unsupported type. Supported types: CSV, JSON, TXT, Excel, TSV.`;
+      return `File ${file.name} has unsupported type. Supported types: CSV.`;
     }
 
     return null;
@@ -172,7 +173,9 @@ const DragDropFileUpload = ({ handleFileUpload, acceptedTypes = "*" }) => {
         onChange={handleFileSelect}
         style={{ display: "none" }}
         id="file-upload-input"
-        accept=".csv,.json,.txt,.xls,.xlsx,.tsv"
+        // TODO: support more types when their parsing is implemented
+        accept=".csv"
+        // accept=".csv,.json,.txt,.xls,.xlsx,.tsv"
       />
 
       <FileUploadZone
@@ -203,7 +206,7 @@ const DragDropFileUpload = ({ handleFileUpload, acceptedTypes = "*" }) => {
             : "Drag & drop files here, or click to select"}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Supports CSV, JSON, TXT, Excel, and TSV files (max 100MB each)
+          Supports CSV files (max 100MB each)
         </Typography>
       </FileUploadZone>
 
