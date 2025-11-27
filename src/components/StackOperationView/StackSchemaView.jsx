@@ -17,6 +17,7 @@ import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
 import DeleteIconButton from "../ui/icons/DeleteIconButton";
+import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -38,12 +39,12 @@ const StackSchemaView = ({
   selectColumns, // Sets global set of selected column IDs
   clearSelectedColumns, // Clears global set of selected column IDs
   focusColumns, // Sets global set of focused column IDs
-  hideColumns,
   swapColumns,
   insertColumnIntoChildAtIndex,
   setVisibleColumns: setVisibleColumnsInSlice,
   materializeOperation,
 }) => {
+  const [hiddenIndices, setHiddenIndices] = useState([]); // This array stores column indices that are hidden
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
   const [selectedTableColumnIds, setSelectedTableColumnIds] = useState([]);
   const columnContainerRef = useRef(null);
@@ -275,15 +276,37 @@ const StackSchemaView = ({
     focusColumns(selectedTableColumnIds);
   }, [focusColumns, selectedTableColumnIds]);
 
-  const handleHideColumns = useCallback(
-    () => hideColumns(selectedTableColumnIds),
-    [hideColumns, selectedTableColumnIds]
-  );
+  const handleHideColumns = useCallback(() => {
+    // Find all column indices where all cells are selected
+    const indicesToHide = [];
+    const columnIdsToDeselect = [];
+    for (let colIndex = 0; colIndex < m; colIndex++) {
+      const columnIds = columnIdMatrix
+        .map((row) => row[colIndex])
+        .filter((id) => id !== null);
 
-  const handleDeleteColumns = useCallback(
-    () => deleteColumns(selectedTableColumnIds),
-    [deleteColumns, selectedTableColumnIds]
-  );
+      const allSelected = columnIds.every((id) =>
+        selectedTableColumnIds.includes(id)
+      );
+
+      if (allSelected && columnIds.length > 0) {
+        indicesToHide.push(colIndex);
+        columnIdsToDeselect.push(...columnIds);
+      }
+    }
+
+    setHiddenIndices((prev) =>
+      Array.from(new Set([...prev, ...indicesToHide]))
+    );
+    setSelectedTableColumnIds((prev) =>
+      prev.filter((columnId) => !columnIdsToDeselect.includes(columnId))
+    ); // Remove from selection after hiding
+  }, [columnIdMatrix, m, selectedTableColumnIds]);
+
+  const handleDeleteColumns = useCallback(() => {
+    deleteColumns(selectedTableColumnIds);
+    setSelectedTableColumnIds([]); // Clear selection after deletion
+  }, [deleteColumns, selectedTableColumnIds]);
 
   const handleSelectionAllColumns = useCallback(() => {
     if (selectedTableColumnIds.length > 0) {
@@ -294,6 +317,24 @@ const StackSchemaView = ({
       setSelectedTableColumnIds(columnIdMatrix.flat());
     }
   }, [columnIdMatrix, selectedTableColumnIds.length]);
+
+  const isCompleteColumnSelected = useCallback(() => {
+    // Check if there's at least one column index where all cells are selected
+    for (let colIndex = 0; colIndex < m; colIndex++) {
+      const columnIds = columnIdMatrix
+        .map((row) => row[colIndex])
+        .filter((id) => id !== null);
+
+      const allSelected = columnIds.every((id) =>
+        selectedTableColumnIds.includes(id)
+      );
+
+      if (allSelected && columnIds.length > 0) {
+        return true;
+      }
+    }
+    return false;
+  }, [columnIdMatrix, m, selectedTableColumnIds]);
 
   return (
     <Box
@@ -321,11 +362,10 @@ const StackSchemaView = ({
               onClick={handleFocusColumns}
               disabled={selectedTableColumnIds.length === 0}
             />
-            {/* TODO hide */}
-            {/* <HideIconButton
+            <HideIconButton
               onClick={handleHideColumns}
-              disabled={selectedTableColumnIds.length === 0}
-            /> */}
+              disabled={!isCompleteColumnSelected()}
+            />
             <DeleteIconButton
               onConfirm={handleDeleteColumns}
               disabled={selectedTableColumnIds.length === 0}
@@ -425,140 +465,182 @@ const StackSchemaView = ({
             overflowY: "auto",
           }}
         >
-          {Array.from({ length: m }).map((_, colIndex) => (
-            <Box
-              key={colIndex}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "4px",
-                padding: "2px", // This has to mach outline thickness in ColumnSummary
-                flex: 1,
-                height: "100%", // Take full height
-                minWidth: "125px",
-                overflow: "hidden", // Prevent overflow
-              }}
-            >
-              {/* Column Header */}
-              <Box
-                sx={{
-                  fontWeight: "bold",
-                  display: "flex",
-                  height: `${topRowHeight}px`,
-                  flexShrink: 0,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                }}
-                onClick={(e) => onColumnLabelClick(e, colIndex)}
-              >
-                {colIndex + 1}
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-evenly",
-                  padding: "2px", // Has to match border thickness in ColumnSummary
-                  gap: 1,
-                  flex: 1,
-                  overflow: "hidden",
-                  transition: "all 0.2s ease-in-out", // Follows ColumnSummary.jsx
-                }}
-              >
-                {columnIdMatrix.map((row) => {
-                  const columnId = row[colIndex];
-                  if (columnId === null) {
-                    return (
-                      <StyledColumnCard
-                        key={`empty-${colIndex}`}
-                        isError={true}
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          textAlign: "center",
-                          // minHeight: "120px",
+          {Array.from({ length: m }, (_, i) => i)
+            .reduce((acc, i) => {
+              const isHidden = hiddenIndices.includes(i);
+              const prev = acc[acc.length - 1];
+              if (!isHidden) {
+                acc.push({ colIndex: i, isHidden });
+              } else {
+                if (prev?.isHidden) {
+                  prev.hiddenIndices.push(i);
+                } else {
+                  acc.push({ hiddenIndices: [i], isHidden });
+                }
+              }
+              return acc;
+            }, [])
+            .map(({ colIndex, hiddenIndices, isHidden }, i) => {
+              return (
+                <Box
+                  key={`column-${isHidden ? `hidden-${i}` : i}`}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px",
+                    padding: "2px",
+                    flex: isHidden ? "0 0 auto" : 1,
+                    height: "100%",
+                    minWidth: isHidden ? "30px" : "125px",
+                    maxWidth: isHidden ? "30px" : undefined,
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Column Header */}
+                  <Box
+                    sx={{
+                      fontWeight: "bold",
+                      display: "flex",
+                      height: `${topRowHeight}px`,
+                      flexShrink: 0,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={(e) => onColumnLabelClick(e, colIndex)}
+                  >
+                    {!isHidden ? (
+                      colIndex + 1
+                    ) : (
+                      <HiddenColumnsButton
+                        onClick={() => {
+                          setHiddenIndices((prev) =>
+                            prev.filter((idx) => !hiddenIndices.includes(idx))
+                          );
+                          setSelectedTableColumnIds([]); // Clear selection on unhide
+                          console.log({ selectedTableColumnIds });
                         }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <Typography
-                            variant="caption"
-                            color="error"
-                            sx={{
-                              fontWeight: "medium",
-                              textTransform: "uppercase",
-                              letterSpacing: "0.5px",
-                              fontSize: "0.7rem",
-                            }}
-                          >
-                            Schema Mismatch
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{
-                              fontSize: "0.75rem",
-                              lineHeight: 1.3,
-                              maxWidth: "90%",
-                            }}
-                          >
-                            Column structure
-                            <br />
-                            inconsistency detected
-                          </Typography>
-                        </Box>
-                      </StyledColumnCard>
-                    );
-                  } else {
-                    return (
-                      <ColumnDragContainer
-                        key={columnId}
-                        id={columnId}
-                        columnIndex={colIndex}
-                        canDrag={selectedTableColumnIds.includes(columnId)}
-                        onDrop={(draggedItem, targetItem) =>
-                          swapColumns(targetItem, draggedItem)
+                      />
+                    )}
+                  </Box>
+                  {!isHidden && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-evenly",
+                        padding: "2px", // Has to match border thickness in ColumnSummary
+                        gap: 1,
+                        flex: 1,
+                        overflow: "hidden",
+                        transition: "all 0.2s ease-in-out", // Follows ColumnSummary.jsx
+                      }}
+                    >
+                      {columnIdMatrix.map((row) => {
+                        const columnId = row[colIndex];
+                        if (columnId === null) {
+                          return (
+                            <StyledColumnCard
+                              key={`empty-${colIndex}`}
+                              isError={true}
+                              sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                textAlign: "center",
+                                // minHeight: "120px",
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
+                              >
+                                <Typography
+                                  variant="caption"
+                                  color="error"
+                                  sx={{
+                                    fontWeight: "medium",
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.5px",
+                                    fontSize: "0.7rem",
+                                  }}
+                                >
+                                  Schema Mismatch
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                  sx={{
+                                    fontSize: "0.75rem",
+                                    lineHeight: 1.3,
+                                    maxWidth: "90%",
+                                  }}
+                                >
+                                  Column structure
+                                  <br />
+                                  inconsistency detected
+                                </Typography>
+                              </Box>
+                            </StyledColumnCard>
+                          );
+                        } else {
+                          return (
+                            <ColumnDragContainer
+                              key={columnId}
+                              id={columnId}
+                              columnIndex={colIndex}
+                              canDrag={selectedTableColumnIds.includes(
+                                columnId
+                              )}
+                              onDrop={(draggedItem, targetItem) =>
+                                swapColumns(targetItem, draggedItem)
+                              }
+                            >
+                              {/* Interactive Column Summary Card that includes [data-column-id] */}
+                              <EnhancedColumnSummary
+                                id={columnId}
+                                onClick={(event) =>
+                                  onCellClick(event, columnId)
+                                }
+                                onDoubleClick={(event) =>
+                                  onCellDoubleClick(event, columnId)
+                                }
+                                isDraggable={selectedTableColumnIds.includes(
+                                  columnId
+                                )}
+                                handleInsertColumnLeft={() =>
+                                  onInsertColumnIntoChildTable(
+                                    getIndexOfValue(
+                                      columnIdMatrix,
+                                      columnId
+                                    )[0],
+                                    colIndex
+                                  )
+                                }
+                                handleInsertColumnRight={() =>
+                                  onInsertColumnIntoChildTable(
+                                    getIndexOfValue(
+                                      columnIdMatrix,
+                                      columnId
+                                    )[0],
+                                    colIndex + 1
+                                  )
+                                }
+                              />
+                            </ColumnDragContainer>
+                          );
                         }
-                      >
-                        {/* Interactive Column Summary Card that includes [data-column-id] */}
-                        <EnhancedColumnSummary
-                          id={columnId}
-                          onClick={(event) => onCellClick(event, columnId)}
-                          onDoubleClick={(event) =>
-                            onCellDoubleClick(event, columnId)
-                          }
-                          isDraggable={selectedTableColumnIds.includes(
-                            columnId
-                          )}
-                          handleInsertColumnLeft={() =>
-                            onInsertColumnIntoChildTable(
-                              getIndexOfValue(columnIdMatrix, columnId)[0],
-                              colIndex
-                            )
-                          }
-                          handleInsertColumnRight={() =>
-                            onInsertColumnIntoChildTable(
-                              getIndexOfValue(columnIdMatrix, columnId)[0],
-                              colIndex + 1
-                            )
-                          }
-                        />
-                      </ColumnDragContainer>
-                    );
-                  }
-                })}
-              </Box>
-            </Box>
-          ))}
+                      })}
+                    </Box>
+                  )}
+                </Box>
+              );
+            })}
         </Box>
       </Box>
     </Box>

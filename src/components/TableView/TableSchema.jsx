@@ -60,6 +60,7 @@ import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { TableLabel } from "./TableLabel";
 import DeleteIconButton from "../ui/icons/DeleteIconButton";
 import { ArrowRight, ArrowLeft } from "@mui/icons-material";
+import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -452,17 +453,7 @@ const TableSchema = ({
                           {indices[0] + 1}
                         </Typography>
                       ) : (
-                        <>
-                          <Stack
-                            direction="row"
-                            spacing={0}
-                            alignItems="center"
-                          >
-                            <ArrowRight size="small" width="0.8em" />
-                            |
-                            <ArrowLeft size="small" width="0.8em" />
-                          </Stack>
-                        </>
+                        <HiddenColumnsButton />
                       )}
                     </Box>
                   </Tooltip>

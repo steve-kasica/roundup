@@ -1,7 +1,7 @@
 import { IconButton } from "@mui/material";
 import { VisibilityOff } from "@mui/icons-material";
 const HideIconButton = (props) => (
-  <IconButton size="small" {...props} title="Hide columns" color="error">
+  <IconButton size="small" {...props} title="Hide columns">
     <VisibilityOff fontSize="small" />
   </IconButton>
 );
