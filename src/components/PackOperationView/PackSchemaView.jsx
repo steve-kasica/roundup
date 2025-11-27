@@ -30,6 +30,7 @@ import { EnhancedTableName } from "../TableView/TableName";
 import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
 import { isTableId } from "../../slices/tablesSlice";
 import { deleteColumns } from "../../slices/columnsSlice";
+import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 const matchLabels = new Map([
   ["matchingRowCount", "Matches"],
   ["leftUnmatchedRowCount", "Left Only"],
@@ -43,9 +44,7 @@ const PackSchemaView = withPackOperationData(
     selectColumns,
     clearSelectedColumns,
     swapTablePositions,
-    hideColumns,
     deleteColumns,
-    materializeOperation,
     // Pack-specific props
     joinPredicate,
     setJoinType,
@@ -76,6 +75,8 @@ const PackSchemaView = withPackOperationData(
 
     // Add hover state for columns
     const [hoveredColumn, setHoveredColumn] = useState(null);
+
+    const [hiddenColumns, setHiddenColumns] = useState(new Set());
 
     // Add toggle state for showing/hiding match types
     const [toggledMatches, setToggledMatches] = useState(() =>
@@ -141,6 +142,7 @@ const PackSchemaView = withPackOperationData(
       setMatchSelection,
     ]);
 
+    // TODO: does this need to be done? how is join type getting set?
     // // Calculate join type based on toggled matchingRowCount
     // useEffect(() => {
     //   const signature = (function (
@@ -435,14 +437,21 @@ const PackSchemaView = withPackOperationData(
       });
     }, []);
 
-    const handleHideColumns = useCallback(() => {
-      const columnsToHide = new Set();
-      clickedBlockCells.forEach((cellKey) => {
-        const [columnId] = cellKey.split(":");
-        columnsToHide.add(columnId);
-      });
-      hideColumns(Array.from(columnsToHide));
-    }, [clickedBlockCells, hideColumns]);
+    const handleHideColumns = useCallback(
+      (columnId) => {
+        if (columnId) {
+          setHiddenColumns((prev) => new Set(prev).add(columnId));
+        } else {
+          const columnsToHide = new Set();
+          clickedBlockCells.forEach((cellKey) => {
+            const [columnId] = cellKey.split(":");
+            columnsToHide.add(columnId);
+          });
+          setHiddenColumns((prev) => new Set([...prev, ...columnsToHide]));
+        }
+      },
+      [clickedBlockCells]
+    );
 
     const handleDeleteColumns = useCallback(
       (columnId) => {
@@ -491,6 +500,29 @@ const PackSchemaView = withPackOperationData(
 
     const yAxisLabelWidth = "70px";
     const yAxisLabelPadding = "4px";
+
+    // This memoized variable groups columns into contiguous visible/hidden segments
+    const columnIdVisibilityGroups = useMemo(
+      () =>
+        [...leftColumnIds, ...rightColumnIds].reduce((acc, columnId, i) => {
+          const isHidden = hiddenColumns.has(columnId);
+          const prev = acc[acc.length - 1];
+          if (!isHidden) {
+            acc.push({ columnIds: [columnId], isHidden });
+          } else {
+            if (prev?.isHidden) {
+              prev.columnIds.push(columnId);
+            } else {
+              acc.push({
+                isHidden: true,
+                columnIds: [columnId],
+              });
+            }
+          }
+          return acc;
+        }, []),
+      [hiddenColumns, leftColumnIds, rightColumnIds]
+    );
 
     return (
       <Box display={"flex"} flexDirection="column" height="100%">
@@ -547,11 +579,10 @@ const PackSchemaView = withPackOperationData(
                 disabled={!hasCompleteColumnSelected}
                 onClick={handleFocusColumns}
               />
-              {/* HIDE */}
-              {/* <HideIconButton
+              <HideIconButton
                 disabled={!hasCompleteColumnSelected}
-                onClick={handleHideColumns}
-              /> */}
+                onClick={() => handleHideColumns()}
+              />
               <DeleteIconButton
                 disabled={!hasCompleteColumnSelected}
                 onConfirm={handleDeleteColumns}
@@ -616,6 +647,7 @@ const PackSchemaView = withPackOperationData(
                     />
                   ) : (
                     <p>{childId}</p>
+                    // TODO
                     // <EnhancedOperationName
                     //   id={childId}
                     //   sx={{
@@ -648,68 +680,86 @@ const PackSchemaView = withPackOperationData(
                 justifyContent={"center"}
                 flexShrink={0}
               />
-              {[...leftColumnIds, ...rightColumnIds].map((columnId) => {
+              {columnIdVisibilityGroups.map(({ columnIds, isHidden }) => {
                 return (
                   <Box
-                    key={columnId}
-                    flex={1}
+                    key={columnIds.join("-")}
+                    flex={isHidden ? "0 0 auto" : 1}
                     minWidth={0}
                     textAlign={"center"}
                     sx={{
                       position: "relative",
-                      "&::after": {
-                        content: '""',
-                        position: "absolute",
-                        bottom: 0,
-                        left: "50%",
-                        width: "1px",
-                        height: "4px",
-                        backgroundColor: "text.secondary",
-                        transform: "translateX(-50%)",
-                        cursor: "context-menu",
-                      },
+                      ...(!isHidden && {
+                        "&::after": {
+                          content: '""',
+                          position: "absolute",
+                          bottom: 0,
+                          left: "50%",
+                          width: "1px",
+                          height: "4px",
+                          backgroundColor: "text.secondary",
+                          transform: "translateX(-50%)",
+                          cursor: "context-menu",
+                        },
+                      }),
                     }}
                     onContextMenu={(event) =>
-                      handleColumnContextMenu(event, columnId)
+                      !isHidden
+                        ? handleColumnContextMenu(event, columnIds[0])
+                        : null
                     }
                   >
-                    <EnhancedColumnName
-                      id={columnId}
-                      sx={{
-                        fontSize: "0.6rem",
-                        userSelect: "none",
-                        width: "50px",
-                        minWidth: "50px",
-                        maxWidth: "50px",
-                        textAlign: "center",
-                        marginBottom: "2px",
-                        // Progressive rotation based on container width
-                        transform: "rotate(0deg)",
-                        transformOrigin: "left bottom",
-                        marginLeft: "0px",
-                        "@container (max-width: 1000px)": {
-                          transform: "rotate(-10deg)",
-                          marginLeft: "10%",
-                          marginBottom: "1px",
-                        },
-                        "@container (max-width: 800px)": {
-                          transform: "rotate(-20deg)",
-                          marginLeft: "20%",
-                          marginBottom: "1px",
-                        },
-                        "@container (max-width: 600px)": {
-                          transform: "rotate(-30deg)",
-                          marginLeft: "35%",
-                          marginBottom: "1px",
-                        },
-                        "@container (max-width: 400px)": {
-                          transform: "rotate(-45deg)",
-                          marginLeft: "50%",
-                          marginBottom: "1px",
-                        },
-                      }}
-                      onClick={handleColumnClick}
-                    />
+                    {isHidden ? (
+                      <HiddenColumnsButton
+                        count={columnIds.length}
+                        onClick={() => {
+                          setHiddenColumns((prev) => {
+                            const nextSet = new Set(prev);
+                            columnIds.forEach((colId) => nextSet.delete(colId));
+                            return nextSet;
+                          });
+                        }}
+                        sx={{ width: "10px", height: "20px" }}
+                      />
+                    ) : (
+                      <EnhancedColumnName
+                        id={columnIds[0]}
+                        sx={{
+                          fontSize: "0.6rem",
+                          userSelect: "none",
+                          width: "50px",
+                          minWidth: "50px",
+                          maxWidth: "50px",
+                          textAlign: "center",
+                          marginBottom: "2px",
+                          // Progressive rotation based on container width
+                          transform: "rotate(0deg)",
+                          transformOrigin: "left bottom",
+                          marginLeft: "0px",
+                          "@container (max-width: 1000px)": {
+                            transform: "rotate(-10deg)",
+                            marginLeft: "10%",
+                            marginBottom: "1px",
+                          },
+                          "@container (max-width: 800px)": {
+                            transform: "rotate(-20deg)",
+                            marginLeft: "20%",
+                            marginBottom: "1px",
+                          },
+                          "@container (max-width: 600px)": {
+                            transform: "rotate(-30deg)",
+                            marginLeft: "35%",
+                            marginBottom: "1px",
+                          },
+                          "@container (max-width: 400px)": {
+                            transform: "rotate(-45deg)",
+                            marginLeft: "50%",
+                            marginBottom: "1px",
+                          },
+                        }}
+                        onClick={handleColumnClick}
+                      />
+                    )}
                   </Box>
                 );
               })}
@@ -765,141 +815,168 @@ const PackSchemaView = withPackOperationData(
                     {label}
                     <br />({value.toLocaleString()})
                   </Typography>
-                  {[...leftColumnIds, ...rightColumnIds].map((columnId, j) => {
-                    // Check if this is a key column
-                    const isLastLeftColumn = j === leftColumnIds.length - 1;
-                    const tableId =
-                      j < leftColumnIds.length ? leftTableId : rightTableId;
-                    const cellKey = `${columnId}:${key}`;
-                    const isClicked = clickedBlockCells.has(cellKey);
+                  {columnIdVisibilityGroups.map(
+                    ({ columnIds, isHidden }, j) => {
+                      if (isHidden) {
+                        return (
+                          <Box
+                            key={columnIds.join("-")}
+                            flex={"0 0 auto"}
+                            minWidth={"10px"}
+                            display={"flex"}
+                            justifyContent={"center"}
+                            height="100%"
+                          >
+                            <Divider orientation="vertical" flexItem />
+                          </Box>
+                        );
+                      }
+                      // If not hidden, there will only be one columnId
+                      const columnId = columnIds[0];
+                      const isLastLeftColumn = j === leftColumnIds.length - 1;
+                      const tableId =
+                        j < leftColumnIds.length ? leftTableId : rightTableId;
+                      const cellKey = `${columnId}:${key}`;
+                      const isClicked = clickedBlockCells.has(cellKey);
 
-                    // Calculate which borders to show for contiguous selection
-                    let showTopBorder = false;
-                    let showBottomBorder = false;
-                    let showLeftBorder = false;
-                    let showRightBorder = false;
+                      // Calculate which borders to show for contiguous selection
+                      let showTopBorder = false;
+                      let showBottomBorder = false;
+                      let showLeftBorder = false;
+                      let showRightBorder = false;
 
-                    if (isClicked) {
-                      // Find the match type index for this row
-                      const currentMatchIndex = matchTypes.indexOf(key);
+                      if (isClicked) {
+                        // Find the match type index for this row
+                        const currentMatchIndex = matchTypes.indexOf(key);
+                        const allColumns = [
+                          ...leftColumnIds,
+                          ...rightColumnIds,
+                        ];
+                        const currentColIndex = allColumns.indexOf(columnId);
+
+                        // Check cell above (previous match type)
+                        if (currentMatchIndex > 0) {
+                          const matchAbove = matchTypes[currentMatchIndex - 1];
+                          const cellKeyAbove = `${columnId}:${matchAbove}`;
+                          showTopBorder = !clickedBlockCells.has(cellKeyAbove);
+                        } else {
+                          showTopBorder = true; // First row
+                        }
+
+                        // Check cell below (next match type)
+                        if (currentMatchIndex < matchTypes.length - 1) {
+                          const matchBelow = matchTypes[currentMatchIndex + 1];
+                          const cellKeyBelow = `${columnId}:${matchBelow}`;
+                          showBottomBorder =
+                            !clickedBlockCells.has(cellKeyBelow);
+                        } else {
+                          showBottomBorder = true; // Last row
+                        }
+
+                        // Check cell to the left
+                        if (currentColIndex > 0) {
+                          const colLeft = allColumns[currentColIndex - 1];
+                          const cellKeyLeft = `${colLeft}:${key}`;
+                          showLeftBorder = !clickedBlockCells.has(cellKeyLeft);
+                        } else {
+                          showLeftBorder = true; // First column
+                        }
+
+                        // Check cell to the right
+                        if (currentColIndex < allColumns.length - 1) {
+                          const colRight = allColumns[currentColIndex + 1];
+                          const cellKeyRight = `${colRight}:${key}`;
+                          showRightBorder =
+                            !clickedBlockCells.has(cellKeyRight);
+                        } else {
+                          showRightBorder = true; // Last column
+                        }
+                      }
+
+                      const borderWidth = "2px";
+
+                      // Check if the cell to the right is also selected
                       const allColumns = [...leftColumnIds, ...rightColumnIds];
                       const currentColIndex = allColumns.indexOf(columnId);
+                      const hasRightNeighbor =
+                        currentColIndex < allColumns.length - 1;
+                      const colRight = hasRightNeighbor
+                        ? allColumns[currentColIndex + 1]
+                        : null;
 
-                      // Check cell above (previous match type)
-                      if (currentMatchIndex > 0) {
-                        const matchAbove = matchTypes[currentMatchIndex - 1];
-                        const cellKeyAbove = `${columnId}:${matchAbove}`;
-                        showTopBorder = !clickedBlockCells.has(cellKeyAbove);
-                      } else {
-                        showTopBorder = true; // First row
-                      }
+                      return (
+                        <Box
+                          key={columnId}
+                          sx={{
+                            flex: 1,
+                            minWidth: 0,
+                            height: "100%",
+                            backgroundColor: colorScale(value),
+                            position: "relative",
+                            boxShadow: (theme) => {
+                              const shadows = [];
 
-                      // Check cell below (next match type)
-                      if (currentMatchIndex < matchTypes.length - 1) {
-                        const matchBelow = matchTypes[currentMatchIndex + 1];
-                        const cellKeyBelow = `${columnId}:${matchBelow}`;
-                        showBottomBorder = !clickedBlockCells.has(cellKeyBelow);
-                      } else {
-                        showBottomBorder = true; // Last row
-                      }
+                              // Always show a subtle separator on the right
+                              shadows.push(
+                                "inset -1px 0 0 0 rgba(0, 0, 0, 0.05)"
+                              );
 
-                      // Check cell to the left
-                      if (currentColIndex > 0) {
-                        const colLeft = allColumns[currentColIndex - 1];
-                        const cellKeyLeft = `${colLeft}:${key}`;
-                        showLeftBorder = !clickedBlockCells.has(cellKeyLeft);
-                      } else {
-                        showLeftBorder = true; // First column
-                      }
-
-                      // Check cell to the right
-                      if (currentColIndex < allColumns.length - 1) {
-                        const colRight = allColumns[currentColIndex + 1];
-                        const cellKeyRight = `${colRight}:${key}`;
-                        showRightBorder = !clickedBlockCells.has(cellKeyRight);
-                      } else {
-                        showRightBorder = true; // Last column
-                      }
-                    }
-
-                    const borderWidth = "2px";
-
-                    // Check if the cell to the right is also selected
-                    const allColumns = [...leftColumnIds, ...rightColumnIds];
-                    const currentColIndex = allColumns.indexOf(columnId);
-                    const hasRightNeighbor =
-                      currentColIndex < allColumns.length - 1;
-                    const colRight = hasRightNeighbor
-                      ? allColumns[currentColIndex + 1]
-                      : null;
-
-                    return (
-                      <Box
-                        key={columnId}
-                        sx={{
-                          flex: 1,
-                          minWidth: 0,
-                          height: "100%",
-                          backgroundColor: colorScale(value),
-                          position: "relative",
-                          boxShadow: (theme) => {
-                            const shadows = [];
-
-                            // Always show a subtle separator on the right
-                            shadows.push(
-                              "inset -1px 0 0 0 rgba(0, 0, 0, 0.05)"
-                            );
-
-                            // Add selection borders (these will overlay on top of separator)
-                            if (isClicked) {
-                              if (showTopBorder) {
-                                shadows.push(
-                                  `inset 0 ${borderWidth} 0 0 ${theme.palette.primary.main}`
-                                );
+                              // Add selection borders (these will overlay on top of separator)
+                              if (isClicked) {
+                                if (showTopBorder) {
+                                  shadows.push(
+                                    `inset 0 ${borderWidth} 0 0 ${theme.palette.primary.main}`
+                                  );
+                                }
+                                if (showBottomBorder) {
+                                  shadows.push(
+                                    `inset 0 -${borderWidth} 0 0 ${theme.palette.primary.main}`
+                                  );
+                                }
+                                if (showLeftBorder) {
+                                  shadows.push(
+                                    `inset ${borderWidth} 0 0 0 ${theme.palette.primary.main}`
+                                  );
+                                }
+                                // Only show right selection border if it's truly an edge
+                                // (not just because the next cell isn't selected)
+                                if (showRightBorder) {
+                                  shadows.push(
+                                    `inset -${borderWidth} 0 0 0 ${theme.palette.primary.main}`
+                                  );
+                                }
                               }
-                              if (showBottomBorder) {
-                                shadows.push(
-                                  `inset 0 -${borderWidth} 0 0 ${theme.palette.primary.main}`
-                                );
-                              }
-                              if (showLeftBorder) {
-                                shadows.push(
-                                  `inset ${borderWidth} 0 0 0 ${theme.palette.primary.main}`
-                                );
-                              }
-                              // Only show right selection border if it's truly an edge
-                              // (not just because the next cell isn't selected)
-                              if (showRightBorder) {
-                                shadows.push(
-                                  `inset -${borderWidth} 0 0 0 ${theme.palette.primary.main}`
-                                );
-                              }
+
+                              return shadows.join(", ");
+                            },
+                            ...(isClicked && {
+                              opacity: 0.8,
+                            }),
+                            ...(isMatchDisabled && {
+                              backgroundColor: "grey.300",
+                              cursor: "not-allowed",
+                            }),
+                            ...(isLastLeftColumn && {
+                              marginRight: "4px",
+                            }),
+                            "&:hover": {
+                              opacity: isMatchDisabled ? 1 : 0.8,
+                            },
+                          }}
+                          onClick={(event) => {
+                            if (!isMatchDisabled) {
+                              handleBlockCellClick(
+                                event,
+                                tableId,
+                                columnId,
+                                key
+                              );
                             }
-
-                            return shadows.join(", ");
-                          },
-                          ...(isClicked && {
-                            opacity: 0.8,
-                          }),
-                          ...(isMatchDisabled && {
-                            backgroundColor: "grey.300",
-                            cursor: "not-allowed",
-                          }),
-                          ...(isLastLeftColumn && {
-                            marginRight: "4px",
-                          }),
-                          "&:hover": {
-                            opacity: isMatchDisabled ? 1 : 0.8,
-                          },
-                        }}
-                        onClick={(event) => {
-                          if (!isMatchDisabled) {
-                            handleBlockCellClick(event, tableId, columnId, key);
-                          }
-                        }}
-                      ></Box>
-                    );
-                  })}
+                          }}
+                        ></Box>
+                      );
+                    }
+                  )}
                 </Box>
               );
             })}
@@ -932,7 +1009,7 @@ const PackSchemaView = withPackOperationData(
           <MenuItem onClick={handleCloseContextMenu}>Rename Column</MenuItem>
           <MenuItem
             onClick={() => {
-              hideColumns(contextMenuColumnId);
+              handleHideColumns(contextMenuColumnId);
               handleCloseContextMenu();
             }}
           >
