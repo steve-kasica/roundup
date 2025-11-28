@@ -26,6 +26,7 @@ export default function* deleteColumnsWorker(tablesToAlter) {
       // Call the database function to drop columns
       yield dropColumns(parentDatabaseName, columnDatabaseNames);
     } catch (error) {
+      alert(`Error deleting columns: ${error.message}`);
       console.error(
         `Failed to drop columns [${columnDatabaseNames.join(
           ", "

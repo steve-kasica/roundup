@@ -14,6 +14,7 @@ import {
 import { group } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import deleteColumnsWorker from "./worker";
+import { deleteTablesSuccess } from "../deleteTablesSaga";
 
 export default function* deleteColumnsSaga() {
   // Main watcher for delete columns requests
@@ -99,17 +100,14 @@ export default function* deleteColumnsSaga() {
   });
 
   // If tables are deleted, we need to delete their columns as well
-  // yield takeLatest(deleteTablesSuccess, function* (action) {
-  //   const { tableIds } = action.payload;
-  //   // Extract all column IDs from the deleted tables
-  //   const columnIdsToRemove = tableIds.flatMap((table) => table.columnIds);
-  //   if (columnIdsToRemove.length > 0) {
-  //     yield put(deleteColumnsRequest({ columnIds: columnIdsToRemove }));
-  //   }
-  // });
-
-  // If an operation `columnIds` property update has succeeded, we need
-  // to check if there are any columns that have been orphaned due to
-  // being removed from that operation, and delete those columns.
-  //
+  yield takeLatest(deleteTablesSuccess, function* (action) {
+    const { tableIds } = action.payload;
+    // Extract all column IDs from the deleted tables
+    const orphanedColumnIds = yield select((state) =>
+      selectColumnIdsByParentId(state, tableIds)
+    );
+    if (orphanedColumnIds.length > 0) {
+      yield put(deleteColumnsRequest({ columnIds: orphanedColumnIds.flat() }));
+    }
+  });
 }

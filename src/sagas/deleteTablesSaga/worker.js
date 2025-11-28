@@ -1,7 +1,21 @@
+/**
+ * deleteTablesSaga/worker.js
+ *
+ * Worker saga to handle deleting tables and its columns from the database and state.
+ *  One quirky aspect of Roundup's architectural integration with DuckDB is that
+ *  because DuckDB won't let you delete all the columns from a table via the ALTER
+ *  TABLE statement, we can't use the deleteColumnsSaga to delete the columns that
+ *  belong to tables slated for deletion.
+ */
+
 import { call, put, select } from "redux-saga/effects";
-import { deleteTables, selectTablesById } from "../../slices/tablesSlice";
+import {
+  deleteTables as deleteTablesInSlice,
+  selectTablesById,
+} from "../../slices/tablesSlice";
 import { dropTable } from "../../lib/duckdb";
 import { deleteTablesFailure, deleteTablesSuccess } from "./actions";
+import { deleteColumns as deleteColumnsInSlice } from "../../slices/columnsSlice";
 
 export default function* deleteTablesWorker(action) {
   const successfulDeletions = [];
@@ -15,43 +29,47 @@ export default function* deleteTablesWorker(action) {
 
   for (const table of tables) {
     try {
-      // Remove table from DuckDB
-      yield call(dropTable, table.id);
+      // Remove table (and columns) from DuckDB
+      yield call(dropTable, table.databaseName);
+      // Remove columns from state (by-pass column deletion saga)
+      yield put(deleteColumnsInSlice(table.columnIds));
 
       // Remove table from state
-      yield put(deleteTables(table.id));
+      yield put(deleteTablesInSlice(table.id));
 
       successfulDeletions.push(table);
     } catch (error) {
-      console.error("Error dropping table from DuckDB:", error);
+      alert(`Error deleting table ${table?.name}: ${error.message}`);
+      console.error("Failed to drop table", { table, error });
       failedDeletions.push(table);
     }
-    if (failedDeletions.length > 0) {
-      yield put(
-        deleteTablesFailure({
-          tableIds: failedDeletions.map((t) => t.id),
-          error: "One or more tables failed to delete.",
-        })
-      );
-    }
-
-    if (successfulDeletions.length > 0) {
-      yield put(
-        deleteTablesSuccess({
-          tableIds: successfulDeletions.map((t) => t.id),
-        })
-      );
-    }
-    // TODO: address via updateOperation
-    // if (table.operationId) {
-    //   yield put(
-    //     removeChildFromOperation({
-    //       operationId: table.operationId,
-    //       childId: table.id,
-    //     })
-    //   );
-    // }
   }
+
+  if (failedDeletions.length > 0) {
+    yield put(
+      deleteTablesFailure({
+        tableIds: failedDeletions.map((t) => t.id),
+        error: "One or more tables failed to delete.",
+      })
+    );
+  }
+
+  if (successfulDeletions.length > 0) {
+    yield put(
+      deleteTablesSuccess({
+        tableIds: successfulDeletions.map((t) => t.id),
+      })
+    );
+  }
+  // TODO: address via updateOperation
+  // if (table.operationId) {
+  //   yield put(
+  //     removeChildFromOperation({
+  //       operationId: table.operationId,
+  //       childId: table.id,
+  //     })
+  //   );
+  // }
 
   // Remove from tables state
   // Also removes tables from loading state
