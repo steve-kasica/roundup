@@ -70,16 +70,22 @@ describe("Column selectors", () => {
     };
   });
   describe("selectColumnIdsByParentId", () => {
-    it("should return column IDs for a given table ID", () => {
+    it("should return column IDs for a single parent ID", () => {
       expect(selectColumnIdsByParentId(state, table1.id)).toEqual([
         column1.id,
         column2.id,
       ]);
       expect(selectColumnIdsByParentId(state, table2.id)).toEqual([column3.id]);
     });
-    it("should return an empty array for a table ID with no columns", () => {
+    it("should return an empty array for a parent ID with no columns", () => {
       const table3 = Table();
       expect(selectColumnIdsByParentId(state, table3.id)).toEqual([]);
+    });
+    it("should return a matrix of ColumnIDs for multiple parent IDs", () => {
+      expect(selectColumnIdsByParentId(state, [table1.id, table2.id])).toEqual([
+        [column1.id, column2.id],
+        [column3.id],
+      ]);
     });
   });
   describe("selectColumnsById", () => {

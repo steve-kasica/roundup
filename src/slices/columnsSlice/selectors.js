@@ -12,16 +12,23 @@ import { normalizeInputToArray } from "../utilities";
  * Select ALL column IDs for a specific `parentId`, by iterating over the entire set of columns in Redux.
  *
  * @param {Object} state - The Redux state.
- * @param {string} parentId - The ID of the table/operation to get all columns for.
- * @returns {Array<string>} An array of all column IDs (both active and hided) associated with the table. Returns an empty array if the table has no columns or doesn't exist.
- * @type {import('@reduxjs/toolkit').Selector<any, string, Array<string>>}
+ * @param {string|string[]} parentId - The ID(s) of the table/operation to get all columns for.
+ * @returns {Array<string>|Array<Array<string>>} An array of all column IDs (both active and hided) associated with the table. If parentId is an array, returns an array of arrays. Returns an empty array if the table has no columns or doesn't exist.
+ * @type {import('@reduxjs/toolkit').Selector<any, string|string[], Array<string>|Array<Array<string>>>}
  */
 export const selectColumnIdsByParentId = createSelector(
   [(state) => state.columns.byId, (_, parentId) => parentId],
-  (byId, parentId) =>
-    Object.values(byId)
-      .filter((col) => col.parentId === parentId)
-      .map((col) => col.id)
+  (byId, parentId) => {
+    const getColumnIds = (id) =>
+      Object.values(byId)
+        .filter((col) => col.parentId === id)
+        .map((col) => col.id);
+
+    if (Array.isArray(parentId)) {
+      return parentId.map(getColumnIds);
+    }
+    return getColumnIds(parentId);
+  }
 );
 
 /**
