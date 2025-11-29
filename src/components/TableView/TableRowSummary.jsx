@@ -32,7 +32,7 @@ const TableRowSummary = ({
   unhoverTable,
   dropTable,
   focusTable,
-  isDisabled = false,
+  isDisabled = false, // TODO: remove this, I don't think it's being set anywhere above
 
   // props passed from TableLayout.jsx
   onTrClick,
@@ -41,6 +41,7 @@ const TableRowSummary = ({
   columnMax,
   bytesMax,
   isSelected,
+  hasNameMatch, // does the table name match the search string?
 
   // Props from TableDragContainer
   dragDropRef,
@@ -96,15 +97,14 @@ const TableRowSummary = ({
     },
   ];
 
-  console.log({ columnCount, columnMax });
-
   return (
     <StyledTableRow
       isDragging={false} // TODO
-      isDisabled={isDisabled}
+      isDisabled={isDisabled || (searchString.length > 0 && !hasNameMatch)}
       isSelected={isSelected}
       isHovered={false} // TODO: Implement hover state if needed
       hasAlerts={hasAlerts}
+      hasNameMatch={hasNameMatch}
       data-tableid={id}
       data-selected={isSelected}
       onMouseEnter={hoverTable}
@@ -166,7 +166,13 @@ const TableRowSummary = ({
         data-column="name"
       >
         <Stack direction="row" alignItems="center" spacing={0.5}>
-          <HighlightText pattern={searchString} text={name} />
+          <HighlightText
+            pattern={searchString}
+            text={name}
+            matchSx={{
+              backgroundColor: "yellow",
+            }}
+          />
           {hasAlerts && (
             <Badge
               badgeContent={alertIds.length}
@@ -254,31 +260,5 @@ const TableRowSummary = ({
   );
 };
 
-const EnhancedTableRowSummary = memo(
-  withTableData(TableRowSummary),
-  (prevProps, nextProps) => {
-    // Return true if props are equal (should NOT re-render)
-    // Only compare props that TableRowSummary actually uses
-    return true;
-    return (
-      prevProps.id === nextProps.id &&
-      prevProps.name === nextProps.name &&
-      prevProps.mimeType === nextProps.mimeType &&
-      prevProps.size === nextProps.size &&
-      prevProps.dateLastModified === nextProps.dateLastModified &&
-      prevProps.rowCount === nextProps.rowCount &&
-      prevProps.columnCount === nextProps.columnCount &&
-      prevProps.removedColumnCount === nextProps.removedColumnCount &&
-      prevProps.isInSchema === nextProps.isInSchema &&
-      prevProps.isDisabled === nextProps.isDisabled &&
-      prevProps.searchString === nextProps.searchString &&
-      prevProps.rowMax === nextProps.rowMax &&
-      prevProps.columnMax === nextProps.columnMax &&
-      prevProps.bytesMax === nextProps.bytesMax &&
-      prevProps.isSelected === nextProps.isSelected &&
-      prevProps.hasAlerts === nextProps.hasAlerts &&
-      prevProps.alertIds === nextProps.alertIds
-    );
-  }
-);
+const EnhancedTableRowSummary = withTableData(TableRowSummary);
 export { EnhancedTableRowSummary, TableRowSummary };

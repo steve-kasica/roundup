@@ -7,7 +7,6 @@ const StackOperationIcon = React.forwardRef(function StackOperationIcon(
     color = "currentColor",
     title = "Stack operation",
     className = "",
-    ...props
   },
   ref
 ) {
@@ -22,7 +21,6 @@ const StackOperationIcon = React.forwardRef(function StackOperationIcon(
       role="img"
       aria-label={title}
       className={className}
-      {...props}
     >
       <title>{title}</title>
 

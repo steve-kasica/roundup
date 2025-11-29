@@ -3,12 +3,16 @@ import { selectAllTablesData } from "../../slices/tablesSlice";
 import { useCallback, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { createTablesRequest } from "../../sagas/createTablesSaga";
+import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
+import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
+import { selectRootOperationId } from "../../slices/operationsSlice";
 
 const withAllTablesData = (WrappedComponent) => {
   return function EnhancedComponent(props) {
     const dispatch = useDispatch();
     const tables = useSelector(selectAllTablesData);
-    const [selectedTableIds, setSelectedTableIds] = useState([]);
+    const rootOperationId = useSelector(selectRootOperationId);
+    const [selectedTableIds, setSelectedTableIds] = useState([]); // TODO: delete this?
     const rowMax = useMemo(
       () => Math.max(0, ...tables.map((table) => table.rowCount)),
       [tables]
@@ -28,6 +32,25 @@ const withAllTablesData = (WrappedComponent) => {
       [dispatch]
     );
 
+    const deleteTables = useCallback(
+      (tableIds) => dispatch(deleteTablesRequest({ tableIds })),
+      [dispatch]
+    );
+
+    const addNewOperation = useCallback(
+      (operationType, tableIds) => {
+        const childIds = (rootOperationId ? [rootOperationId] : []).concat(
+          tableIds
+        );
+        dispatch(
+          createOperationsRequest({
+            operationData: { operationType, childIds },
+          })
+        );
+      },
+      [dispatch, rootOperationId]
+    );
+
     return (
       <WrappedComponent
         {...props}
@@ -38,6 +61,8 @@ const withAllTablesData = (WrappedComponent) => {
         columnMax={columnMax}
         bytesMax={bytesMax}
         createTables={createTables}
+        deleteTables={deleteTables}
+        addNewOperation={addNewOperation}
       />
     );
   };

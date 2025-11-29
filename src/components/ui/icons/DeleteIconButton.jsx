@@ -6,11 +6,17 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Tooltip,
 } from "@mui/material";
 import { DeleteForever } from "@mui/icons-material";
 import { useState } from "react";
 
-const DeleteIconButton = ({ onConfirm, ...props }) => {
+const DeleteIconButton = ({
+  onConfirm,
+  title = "Delete",
+  disabled,
+  ...props
+}) => {
   const [open, setOpen] = useState(false);
 
   const handleClick = (e) => {
@@ -31,15 +37,20 @@ const DeleteIconButton = ({ onConfirm, ...props }) => {
 
   return (
     <>
-      <IconButton
-        size="small"
-        {...props}
-        title="Delete columns"
-        color="error"
-        onClick={handleClick}
-      >
-        <DeleteForever fontSize="small" />
-      </IconButton>
+      <Tooltip title={title} disableHoverListener={disabled}>
+        <span>
+          <IconButton
+            size="small"
+            {...props}
+            title="Delete columns"
+            color="error"
+            onClick={handleClick}
+            disabled={disabled}
+          >
+            <DeleteForever fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
 
       <Dialog
         open={open}

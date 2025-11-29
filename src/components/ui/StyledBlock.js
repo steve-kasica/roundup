@@ -1,7 +1,7 @@
 import { Box, styled } from "@mui/material";
 
 const StyledBlock = styled(Box, {
-  shouldForwardProp: (prop) => prop !== "hasError",
+  shouldForwardProp: (prop) => !["isFocused", "hasError"].includes(prop),
 })(({ theme, hasError }) => ({
   display: "flex",
   flexDirection: "row",

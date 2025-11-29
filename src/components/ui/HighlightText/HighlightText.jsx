@@ -1,6 +1,7 @@
+import { Typography } from "@mui/material";
 import PropTypes from "prop-types";
 
-export default function HighlightText({ pattern, text }) {
+export default function HighlightText({ pattern, text, matchSx }) {
   text = String(text);
   const haystack = text.toLowerCase();
   const needle = pattern.toLowerCase();
@@ -18,9 +19,13 @@ export default function HighlightText({ pattern, text }) {
 
     return (
       <>
-        {beginning}
-        <span className="highlight">{middle}</span>
-        {end}
+        <Typography component={"span"}>
+          {beginning}
+          <Typography component={"span"} sx={matchSx}>
+            {middle}
+          </Typography>
+          {end}
+        </Typography>
       </>
     );
   }

@@ -5,18 +5,12 @@
  * A component for displaying and interacting with the set of source tables.
  */
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import DragDropFileUpload from "./DragDropFileUpload";
 import withAllTablesData from "./withAllTablesData";
-import { createTablesRequest } from "../../sagas/createTablesSaga";
 import { registerFiles } from "../../lib/duckdb";
-
 import "./SourceTables.scss";
-import { useDispatch } from "react-redux";
-// import Toolbar from "./Toolbar";
-
-import { deleteTablesRequest } from "../../sagas/deleteTablesSaga/actions";
 import {
   Box,
   TableHead,
@@ -46,6 +40,13 @@ import {
   EnhancedTableRowSummary,
 } from "../TableView";
 import { DRAG_TYPE_SOURCE_TABLE_ROW } from "../CustomDragLayer";
+import { EnhancedTablesToolbar } from "./TablesToolbar";
+import {
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
+} from "../../slices/operationsSlice";
+import withFocusedObjectData from "../HOC/withFocusedObjectData";
+import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 
 const headers = [
   {
@@ -93,34 +94,31 @@ function TablesList({
   rowMax,
   columnMax,
   bytesMax,
-  unselectAllTables,
-  createTables,
+  createTables, // callback for creating tables from uploaded files
+  deleteTables, // callback for deleting tables from Roundup
+  addNewOperation, // callback for adding a new operation
+  insertTablesInFocusedOperation, // callback for inserting tables into an existing operation
+
+  // Props defined in withAssociatedAlerts (for focused objectId)
+  hasAlerts: focusedObjectHasAlerts,
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering TablesList");
   }
-  // eslint-disable-next-line no-unused-vars
-  const [selectedTableType, setSelectedTableType] = useState("");
   const [searchString, setSearchString] = useState("");
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
   const [lastClickedIndex, setLastClickedIndex] = useState(null);
 
-  const filteredTables = tables
-    .filter((table) => table.name.toLowerCase().includes(searchString))
-    .filter(
-      (table) =>
-        selectedTableType.length === 0 ||
-        table.mimeType.includes(selectedTableType)
-    );
+  const clearSelectedTableIds = useCallback(() => {
+    setSelectedTableIds([]);
+  }, [setSelectedTableIds]);
 
-  const tableIds = tables
-    .toSorted((a, b) =>
-      isAscending
-        ? ascending(a[sortAttribute], b[sortAttribute])
-        : descending(a[sortAttribute], b[sortAttribute])
-    )
-    .map((table) => table.id);
+  const sortedTables = tables.toSorted((a, b) =>
+    isAscending
+      ? ascending(a[sortAttribute], b[sortAttribute])
+      : descending(a[sortAttribute], b[sortAttribute])
+  );
 
   async function handleFileUpload(files) {
     if (!files.length) return;
@@ -145,7 +143,40 @@ function TablesList({
       });
   }
 
-  if (filteredTables.length === 0) {
+  const handleSelectAllClick = useCallback(() => {
+    if (selectedTableIds.length > 0) {
+      clearSelectedTableIds();
+    } else {
+      setSelectedTableIds(tables.map(({ id }) => id));
+    }
+  }, [
+    selectedTableIds.length,
+    setSelectedTableIds,
+    tables,
+    clearSelectedTableIds,
+  ]);
+
+  const handleDeleteClick = useCallback(() => {
+    deleteTables(selectedTableIds);
+    clearSelectedTableIds();
+  }, [deleteTables, selectedTableIds, clearSelectedTableIds]);
+
+  const handleAddPackOperationClick = useCallback(() => {
+    addNewOperation(OPERATION_TYPE_PACK, selectedTableIds);
+    clearSelectedTableIds();
+  }, [addNewOperation, selectedTableIds, clearSelectedTableIds]);
+
+  const handleAddStackOperationClick = useCallback(() => {
+    addNewOperation(OPERATION_TYPE_STACK, selectedTableIds);
+    clearSelectedTableIds();
+  }, [addNewOperation, selectedTableIds, clearSelectedTableIds]);
+
+  const handleInsertTablesInOperationClick = useCallback(() => {
+    insertTablesInFocusedOperation(selectedTableIds);
+    clearSelectedTableIds();
+  }, [insertTablesInFocusedOperation, selectedTableIds, clearSelectedTableIds]);
+
+  if (tables.length === 0) {
     return (
       <DragDropFileUpload
         handleFileUpload={handleFileUpload}
@@ -153,28 +184,22 @@ function TablesList({
       />
     );
   }
+
   return (
     <Box className="SourceTables">
-      {/* <Toolbar
+      <EnhancedTablesToolbar
         searchString={searchString}
+        setSearchString={setSearchString}
+        onFileUpload={handleFileUpload}
         selectedTableIds={selectedTableIds}
-        layout={layout}
-        onSearchChange={(event) =>
-          setSearchString(event.target.value.trim().toLowerCase())
-        }
-        onFileUpload={(event) => {
-          const files = event.target.files;
-          if (files && files.length > 0 && handleFileUpload) {
-            handleFileUpload(Array.from(files));
-          }
-        }}
-        onDeleteAll={() => dispatch(deleteTablesRequest(selectedTableIds))}
-        onClearSelection={() => unselectAllTables()}
-        // TODO: does this need to be global?
-        onSelectAll={() => null}
-        onLayoutChange={(event, newValue) => setLayout(newValue)}
-      /> */}
-
+        setSelectedTableIds={setSelectedTableIds}
+        focusedObjectHasAlerts={focusedObjectHasAlerts}
+        handleSelectAllClick={handleSelectAllClick}
+        handleDeleteClick={handleDeleteClick}
+        handleAddPackOperationClick={handleAddPackOperationClick}
+        handleAddStackOperationClick={handleAddStackOperationClick}
+        handleInsertTablesInOperationClick={handleInsertTablesInOperationClick}
+      />
       <Box
         sx={{
           overflowX: "auto",
@@ -226,7 +251,7 @@ function TablesList({
             </TableRow>
           </TableHead>
           <TableBody>
-            {tableIds.map((id) => (
+            {sortedTables.map(({ id, name }) => (
               <EnhancedTableDragContainer
                 key={id}
                 id={id}
@@ -240,11 +265,14 @@ function TablesList({
                 <EnhancedTableRowSummary
                   id={id}
                   searchString={searchString}
+                  hasNameMatch={name.toLowerCase().includes(searchString)}
                   rowMax={rowMax}
                   columnMax={columnMax}
                   bytesMax={bytesMax}
                   onTrClick={(event) => {
-                    const currentIndex = tableIds.indexOf(id);
+                    const currentIndex = sortedTables
+                      .map(({ id }) => id)
+                      .indexOf(id);
                     const isCurrentlySelected = selectedTableIds.includes(id);
 
                     // Ctrl/Cmd + click: Toggle individual selection
@@ -262,7 +290,9 @@ function TablesList({
                     else if (event.shiftKey && lastClickedIndex !== null) {
                       const start = Math.min(lastClickedIndex, currentIndex);
                       const end = Math.max(lastClickedIndex, currentIndex);
-                      const rangeIds = tableIds.slice(start, end + 1);
+                      const rangeIds = sortedTables
+                        .map(({ id }) => id)
+                        .slice(start, end + 1);
 
                       // Combine existing selection with range
                       const newSelection = [
@@ -293,7 +323,18 @@ function TablesList({
   );
 }
 
-const EnhancedTablesList = withAllTablesData(TablesList);
+// Wrapper component to map focusedObjectId to id for withAssociatedAlerts
+const TablesListWithFocusedAlerts = (props) => {
+  const { focusedObjectId, ...rest } = props;
+  return <TablesList {...rest} id={focusedObjectId} />;
+};
+
+const EnhancedTablesList = withAllTablesData(
+  withAssociatedAlerts(withFocusedObjectData(TablesListWithFocusedAlerts))
+);
+
+EnhancedTablesList.displayName = "Enhanced Tables List";
+
 export default EnhancedTablesList;
 
 // eslint-disable-next-line no-unused-vars
