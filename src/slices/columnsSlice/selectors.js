@@ -107,13 +107,18 @@ export const selectActiveColumnIdsByParentId = createSelector(
   [
     (state) => state.tables.byId,
     (state) => state.operations.byId,
-    (state, parentId) => normalizeInputToArray(parentId),
+    (state, parentIds) => parentIds,
   ],
   (tablesById, operationsById, parentIds) => {
-    const columnIds = parentIds.map(
-      (id) => (isTableId(id) ? tablesById : operationsById)[id].columnIds
-    );
-    return columnIds.length === 1 ? columnIds[0] : columnIds;
+    if (Array.isArray(parentIds)) {
+      const columnIds = parentIds.map(
+        (id) => (isTableId(id) ? tablesById : operationsById)[id].columnIds
+      );
+      return columnIds;
+    } else {
+      return (isTableId(parentIds) ? tablesById : operationsById)[parentIds]
+        .columnIds;
+    }
   }
 );
 
