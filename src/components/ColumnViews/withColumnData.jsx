@@ -18,7 +18,7 @@ import {
 } from "../../slices/uiSlice";
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 
 export default function withColumnData(WrappedComponent) {
@@ -90,12 +90,16 @@ export default function withColumnData(WrappedComponent) {
       [dispatch, id]
     );
 
+    const [modeValue, modeCount] = useMemo(() => {
+      return [column?.topValues?.[0]?.value, column?.topValues?.[0]?.count];
+    }, [column?.topValues]);
+
     return (
       <WrappedComponent
         {...props}
         // Props from withAssociatedAlerts
         id={id}
-        parentId={parentId}
+        parentId={parentId || column.parentId}
         // Column data props
         name={column.name}
         databaseName={column.databaseName}
@@ -103,16 +107,16 @@ export default function withColumnData(WrappedComponent) {
         avg={column.avg}
         columnType={column.columnType}
         count={column.count}
-        max={column.max}
-        min={column.min}
-        nullPercentage={column.nullPercentage}
-        p25={column.p25}
-        p50={column.p50}
-        p75={column.p75}
-        std={column.std}
-        modeValue={column.modeValue}
-        modeCount={column.modeCount}
-        topValues={column.topValues}
+        max={column?.max}
+        min={column?.min}
+        nullPercentage={column?.nullPercentage}
+        p25={column?.p25}
+        p50={column?.p50}
+        p75={column?.p75}
+        std={column?.std}
+        modeValue={modeValue}
+        modeCount={modeCount}
+        topValues={column?.topValues}
         column={column}
         nullCount={nullCount} // Total number of null values
         completeness={completeness} // Percentage of non-null values

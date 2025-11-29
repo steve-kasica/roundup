@@ -1,11 +1,10 @@
-/* eslint-disable react/prop-types */
 /**
- *
+ * ColumnDetails.jsx
+ * ------------------------------------------------------------------------------
  *
  * This component provides many of the same statistics available in commerical data wrangling
  * software, including:
  *   - Pandas: Column name, Non-null count, Dtype (columnType) via `.describe`
- *
  *
  * This stats aid the user in the precusory EDA that occurs during the Wrangling stage of
  * data work.
@@ -18,6 +17,7 @@ import { EnhancedColumnValues } from "./ColumnValues";
 import ColumnValueCounts from "./ColumnValueCounts";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useState } from "react";
+import { duckDBToRoundupTypes } from "../../lib/duckdb";
 
 const ColumnDetails = ({
   // Props passed via `withColumnData` HOC
@@ -79,7 +79,7 @@ const ColumnDetails = ({
       <Divider sx={{ my: 1 }} />
       <DescriptionList
         data={{
-          type: columnType,
+          type: `${duckDBToRoundupTypes(columnType)} (${columnType})`,
           null: nullCount.toLocaleString(),
           completeness: `${completeness * 100}%`,
           unique: uniqueCount.toLocaleString(),
@@ -104,11 +104,7 @@ const ColumnDetails = ({
       </Box>
       <Box sx={{ mt: "10px", flexGrow: 1, overflow: "auto" }}>
         {view === "value counts" && (
-          <ColumnValueCounts
-            databaseName={databaseName}
-            tableId={parentId}
-            uniqueCount={uniqueCount}
-          />
+          <ColumnValueCounts id={id} uniqueCount={uniqueCount} />
         )}
         {view === "raw values" && <EnhancedColumnValues id={id} />}
       </Box>

@@ -22,7 +22,7 @@ import {
   KeyboardArrowRight as InsertRightIcon,
 } from "@mui/icons-material";
 import HideIconButton from "../ui/HideIconButton";
-import FocusIconButton from "../ui/FocusIconButton";
+import FocusIconButton from "../ui/icons/FocusIconButton";
 import DeleteIconButton from "../ui/icons/DeleteIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { extent, interpolateGreys, scaleSequential, text } from "d3";
@@ -31,6 +31,7 @@ import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
 import { isTableId } from "../../slices/tablesSlice";
 import { deleteColumns } from "../../slices/columnsSlice";
 import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
+import withGlobalInterfaceData from "../HOC/withGlobalInterfaceData";
 const matchLabels = new Map([
   ["matchingRowCount", "Matches"],
   ["leftUnmatchedRowCount", "Left Only"],
@@ -38,987 +39,1017 @@ const matchLabels = new Map([
 ]);
 
 const PackSchemaView = withPackOperationData(
-  ({
-    // Props defined in `withOperationData`
-    id,
-    selectColumns,
-    clearSelectedColumns,
-    swapTablePositions,
-    deleteColumns,
-    // Pack-specific props
-    joinPredicate,
-    setJoinType,
-    setMatchSelection,
-    clearMatchSelection,
-    matchStats,
-    insertColumnIntoChildAtIndex,
-    // Left table props (via withPackOperationData)
-    leftTableId,
-    leftColumnIds,
-    leftKey,
-    // Right table props (via withPackOperationData)
-    rightTableId,
-    rightKey,
-    rightColumnIds,
-    // Props defined in `withAssociatedAlerts`
-    alertIds,
-    hasAlerts,
-  }) => {
-    const colorScale = scaleSequential(interpolateGreys).domain(
-      extent(Object.values(matchStats))
-    );
-
-    const matchTypes = Object.keys(matchStats);
-
-    // Add hover state for coordinating between tables
-    const [hoveredMatch, setHoveredMatch] = useState(null);
-
-    // Add hover state for columns
-    const [hoveredColumn, setHoveredColumn] = useState(null);
-
-    const [hiddenColumns, setHiddenColumns] = useState(new Set());
-
-    // Add toggle state for showing/hiding match types
-    const [toggledMatches, setToggledMatches] = useState(() =>
-      Object.entries(matchStats).reduce((acc, [key, count]) => {
-        acc[key] = count > 0;
-        return acc;
-      }, {})
-    );
-
-    // Track which block cells have been clicked
-    // Key format: `${columnId}:${matchLabel}`
-    const [clickedBlockCells, setClickedBlockCells] = useState(new Set());
-
-    // Track the last clicked cell for range selection
-    const [lastClickedCell, setLastClickedCell] = useState(null);
-
-    // Track the last clicked match label for range selection
-    const [lastClickedMatch, setLastClickedMatch] = useState(null);
-
-    // Track the last clicked column for range selection
-    const [lastClickedColumn, setLastClickedColumn] = useState(null);
-
-    // Track context menu state
-    const [contextMenu, setContextMenu] = useState(null);
-    const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
-
-    // Call usePackStats hook and log results
-    const data = matchStats;
-
-    const areAnySelected = useMemo(() => {
-      return clickedBlockCells.size > 0;
-    }, [clickedBlockCells.size]);
-
-    // Update column selection when block cells change
-    useEffect(() => {
-      const selectedColumnIds = new Set();
-      const selectedMatchCategories = new Set();
-
-      // Extract unique column IDs from clicked block cells
-      clickedBlockCells.forEach((cellKey) => {
-        const [columnId, matchType] = cellKey.split(":");
-        selectedColumnIds.add(columnId);
-        selectedMatchCategories.add(matchType);
-      });
-
-      // Call selectColumns with array of column IDs
-      if (selectedColumnIds.size > 0) {
-        selectColumns(Array.from(selectedColumnIds));
-      } else {
-        clearSelectedColumns();
-      }
-
-      if (selectedMatchCategories.size > 0) {
-        setMatchSelection(Array.from(selectedMatchCategories));
-      } else {
-        clearMatchSelection();
-      }
-    }, [
-      clearSelectedColumns,
-      clickedBlockCells,
+  withGlobalInterfaceData(
+    ({
+      // Props defined in `withGlobalInterfaceData`
+      focusColumns,
+      // Props defined in `withOperationData`
+      id,
       selectColumns,
-      clearMatchSelection,
+      clearSelectedColumns,
+      swapTablePositions,
+      deleteColumns,
+      // Pack-specific props
+      joinPredicate,
+      setJoinType,
       setMatchSelection,
-    ]);
+      clearMatchSelection,
+      matchStats,
+      insertColumnIntoChildAtIndex,
+      // Left table props (via withPackOperationData)
+      leftTableId,
+      leftColumnIds,
+      leftKey,
+      // Right table props (via withPackOperationData)
+      rightTableId,
+      rightKey,
+      rightColumnIds,
+      // Props defined in `withAssociatedAlerts`
+      alertIds,
+      hasAlerts,
+    }) => {
+      const colorScale = scaleSequential(interpolateGreys).domain(
+        extent(Object.values(matchStats))
+      );
 
-    // TODO: does this need to be done? how is join type getting set?
-    // // Calculate join type based on toggled matchingRowCount
-    // useEffect(() => {
-    //   const signature = (function (
-    //     matchingRowCount,
-    //     leftUnmatchedRowCount,
-    //     rightUnmatchedRowCount
-    //   ) {
-    //     let sig = "";
-    //     sig += leftUnmatchedRowCount ? "1" : "0";
-    //     sig += matchingRowCount ? "1" : "0";
-    //     sig += rightUnmatchedRowCount ? "1" : "0";
-    //     return sig;
-    //   })(
-    //     toggledMatches.matchingRowCount,
-    //     toggledMatches.leftUnmatchedRowCount,
-    //     toggledMatches.rightUnmatchedRowCount
-    //   );
+      const matchTypes = Object.keys(matchStats);
 
-    //   const joinType = (function (sig) {
-    //     switch (sig) {
-    //       case "111":
-    //         return JOIN_TYPES.FULL_OUTER;
-    //       case "110":
-    //         return JOIN_TYPES.LEFT_OUTER;
-    //       case "101":
-    //         return JOIN_TYPES.FULL_ANTI;
-    //       case "100":
-    //         return JOIN_TYPES.LEFT_ANTI;
-    //       case "011":
-    //         return JOIN_TYPES.RIGHT_OUTER;
-    //       case "010":
-    //         return JOIN_TYPES.INNER;
-    //       case "001":
-    //         return JOIN_TYPES.RIGHT_ANTI;
-    //       case "000":
-    //       default:
-    //         return JOIN_TYPES.EMPTY;
-    //     }
-    //   })(signature);
+      // Add hover state for coordinating between tables
+      const [hoveredMatch, setHoveredMatch] = useState(null);
 
-    //   setJoinType(joinType);
-    // }, [setJoinType, toggledMatches]);
+      // Add hover state for columns
+      const [hoveredColumn, setHoveredColumn] = useState(null);
 
-    const handleBlockCellClick = useCallback(
-      (event, tableId, columnId, matchLabel) => {
-        event.stopPropagation();
+      const [hiddenColumns, setHiddenColumns] = useState(new Set());
 
-        const cellKey = `${columnId}:${matchLabel}`;
+      // Add toggle state for showing/hiding match types
+      const [toggledMatches, setToggledMatches] = useState(() =>
+        Object.entries(matchStats).reduce((acc, [key, count]) => {
+          acc[key] = count > 0;
+          return acc;
+        }, {})
+      );
 
-        if (event.shiftKey && lastClickedCell) {
-          // Shift click: Rectangular selection like a spreadsheet
+      // Track which block cells have been clicked
+      // Key format: `${columnId}:${matchLabel}`
+      const [clickedBlockCells, setClickedBlockCells] = useState(new Set());
 
-          // Parse the last clicked cell
-          const [lastColumnId, lastMatchLabel] = lastClickedCell.split(":");
+      // Track the last clicked cell for range selection
+      const [lastClickedCell, setLastClickedCell] = useState(null);
 
-          // Determine the bounds of the rectangle
-          const allColumns = [...leftColumnIds, ...rightColumnIds];
+      // Track the last clicked match label for range selection
+      const [lastClickedMatch, setLastClickedMatch] = useState(null);
 
-          // Find column indices
-          const lastColIndex = allColumns.indexOf(lastColumnId);
-          const currentColIndex = allColumns.indexOf(columnId);
-          const colStart = Math.min(lastColIndex, currentColIndex);
-          const colEnd = Math.max(lastColIndex, currentColIndex);
+      // Track the last clicked column for range selection
+      const [lastClickedColumn, setLastClickedColumn] = useState(null);
 
-          // Find match type indices
-          const lastMatchIndex = matchTypes.indexOf(lastMatchLabel);
-          const currentMatchIndex = matchTypes.indexOf(matchLabel);
+      // Track context menu state
+      const [contextMenu, setContextMenu] = useState(null);
+      const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
 
-          // Calculate match type range
-          const matchStart = Math.min(lastMatchIndex, currentMatchIndex);
-          const matchEnd = Math.max(lastMatchIndex, currentMatchIndex);
+      // Call usePackStats hook and log results
+      const data = matchStats;
 
-          // Build selection range
-          const cellsInRange = new Set();
+      const areAnySelected = useMemo(() => {
+        return clickedBlockCells.size > 0;
+      }, [clickedBlockCells.size]);
 
-          for (let m = matchStart; m <= matchEnd; m++) {
-            const match = matchTypes[m];
-            for (let c = colStart; c <= colEnd; c++) {
-              cellsInRange.add(`${allColumns[c]}:${match}`);
-            }
-          }
+      // Update column selection when block cells change
+      useEffect(() => {
+        const selectedColumnIds = new Set();
+        const selectedMatchCategories = new Set();
 
-          setClickedBlockCells((prev) => {
-            const newSet = new Set(prev);
-            cellsInRange.forEach((key) => newSet.add(key));
-            return newSet;
-          });
+        // Extract unique column IDs from clicked block cells
+        clickedBlockCells.forEach((cellKey) => {
+          const [columnId, matchType] = cellKey.split(":");
+          selectedColumnIds.add(columnId);
+          selectedMatchCategories.add(matchType);
+        });
+
+        // Call selectColumns with array of column IDs
+        if (selectedColumnIds.size > 0) {
+          selectColumns(Array.from(selectedColumnIds));
         } else {
-          // Regular click: Toggle single cell, clear others
-          setClickedBlockCells((prev) => {
-            const newSet = new Set();
-            if (!prev.has(cellKey)) {
-              newSet.add(cellKey);
-            }
-            return newSet;
-          });
-          setLastClickedCell(cellKey);
+          clearSelectedColumns();
         }
-      },
-      [lastClickedCell, leftColumnIds, rightColumnIds, matchTypes]
-    );
 
-    const handleMatchLabelClick = useCallback(
-      (event, matchLabel) => {
-        event.stopPropagation();
+        if (selectedMatchCategories.size > 0) {
+          setMatchSelection(Array.from(selectedMatchCategories));
+        } else {
+          clearMatchSelection();
+        }
+      }, [
+        clearSelectedColumns,
+        clickedBlockCells,
+        selectColumns,
+        clearMatchSelection,
+        setMatchSelection,
+      ]);
 
-        if (event.shiftKey && lastClickedMatch) {
-          // Shift click: Select range of match categories
-          const lastMatchIndex = matchTypes.indexOf(lastClickedMatch);
-          const currentMatchIndex = matchTypes.indexOf(matchLabel);
+      // TODO: does this need to be done? how is join type getting set?
+      // // Calculate join type based on toggled matchingRowCount
+      // useEffect(() => {
+      //   const signature = (function (
+      //     matchingRowCount,
+      //     leftUnmatchedRowCount,
+      //     rightUnmatchedRowCount
+      //   ) {
+      //     let sig = "";
+      //     sig += leftUnmatchedRowCount ? "1" : "0";
+      //     sig += matchingRowCount ? "1" : "0";
+      //     sig += rightUnmatchedRowCount ? "1" : "0";
+      //     return sig;
+      //   })(
+      //     toggledMatches.matchingRowCount,
+      //     toggledMatches.leftUnmatchedRowCount,
+      //     toggledMatches.rightUnmatchedRowCount
+      //   );
 
-          if (lastMatchIndex !== -1 && currentMatchIndex !== -1) {
+      //   const joinType = (function (sig) {
+      //     switch (sig) {
+      //       case "111":
+      //         return JOIN_TYPES.FULL_OUTER;
+      //       case "110":
+      //         return JOIN_TYPES.LEFT_OUTER;
+      //       case "101":
+      //         return JOIN_TYPES.FULL_ANTI;
+      //       case "100":
+      //         return JOIN_TYPES.LEFT_ANTI;
+      //       case "011":
+      //         return JOIN_TYPES.RIGHT_OUTER;
+      //       case "010":
+      //         return JOIN_TYPES.INNER;
+      //       case "001":
+      //         return JOIN_TYPES.RIGHT_ANTI;
+      //       case "000":
+      //       default:
+      //         return JOIN_TYPES.EMPTY;
+      //     }
+      //   })(signature);
+
+      //   setJoinType(joinType);
+      // }, [setJoinType, toggledMatches]);
+
+      const handleBlockCellClick = useCallback(
+        (event, tableId, columnId, matchLabel) => {
+          event.stopPropagation();
+
+          const cellKey = `${columnId}:${matchLabel}`;
+
+          if (event.shiftKey && lastClickedCell) {
+            // Shift click: Rectangular selection like a spreadsheet
+
+            // Parse the last clicked cell
+            const [lastColumnId, lastMatchLabel] = lastClickedCell.split(":");
+
+            // Determine the bounds of the rectangle
+            const allColumns = [...leftColumnIds, ...rightColumnIds];
+
+            // Find column indices
+            const lastColIndex = allColumns.indexOf(lastColumnId);
+            const currentColIndex = allColumns.indexOf(columnId);
+            const colStart = Math.min(lastColIndex, currentColIndex);
+            const colEnd = Math.max(lastColIndex, currentColIndex);
+
+            // Find match type indices
+            const lastMatchIndex = matchTypes.indexOf(lastMatchLabel);
+            const currentMatchIndex = matchTypes.indexOf(matchLabel);
+
+            // Calculate match type range
             const matchStart = Math.min(lastMatchIndex, currentMatchIndex);
             const matchEnd = Math.max(lastMatchIndex, currentMatchIndex);
 
-            const cellsToSelect = new Set();
+            // Build selection range
+            const cellsInRange = new Set();
 
-            // Select all cells for all match types in the range
             for (let m = matchStart; m <= matchEnd; m++) {
               const match = matchTypes[m];
-
-              // Add all columns for this match
-              [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
-                cellsToSelect.add(`${columnId}:${match}`);
-              });
+              for (let c = colStart; c <= colEnd; c++) {
+                cellsInRange.add(`${allColumns[c]}:${match}`);
+              }
             }
 
-            // Add to existing selection
             setClickedBlockCells((prev) => {
               const newSet = new Set(prev);
-              cellsToSelect.forEach((cell) => newSet.add(cell));
+              cellsInRange.forEach((key) => newSet.add(key));
               return newSet;
             });
-          }
-        } else {
-          // Regular click: Replace selection with this match category
-          const cellsToSelect = new Set();
-
-          // Add all columns for this match
-          [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
-            cellsToSelect.add(`${columnId}:${matchLabel}`);
-          });
-
-          setClickedBlockCells(cellsToSelect);
-        }
-
-        // Set last clicked match for future range operations
-        setLastClickedMatch(matchLabel);
-
-        // Set last clicked cell to first cell in this match
-        setLastClickedCell(`${leftColumnIds[0]}:${matchLabel}`);
-      },
-      [lastClickedMatch, leftColumnIds, matchTypes, rightColumnIds]
-    );
-
-    const handleColumnContextMenu = useCallback((event, columnId) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setContextMenu({
-        mouseX: event.clientX + 2,
-        mouseY: event.clientY - 6,
-      });
-      setContextMenuColumnId(columnId);
-    }, []);
-
-    const handleCloseContextMenu = useCallback(() => {
-      setContextMenu(null);
-      setContextMenuColumnId(null);
-    }, []);
-
-    const handleInsertColumn = useCallback(
-      (mode) => {
-        const columnId = contextMenuColumnId;
-
-        // Determine which child table/operation this column belongs to
-        const allColumns = [...leftColumnIds, ...rightColumnIds];
-        const columnIndex = allColumns.indexOf(columnId);
-
-        let childId;
-        let indexInChild;
-
-        if (columnIndex < leftColumnIds.length) {
-          // Column is in the left child
-          childId = leftTableId;
-          indexInChild = columnIndex;
-        } else {
-          // Column is in the right child
-          childId = rightTableId;
-          indexInChild = columnIndex - leftColumnIds.length;
-        }
-
-        const insertionIndex =
-          mode === "left" ? indexInChild : indexInChild + 1;
-
-        insertColumnIntoChildAtIndex(childId, insertionIndex);
-        handleCloseContextMenu();
-      },
-      [
-        contextMenuColumnId,
-        leftColumnIds,
-        rightColumnIds,
-        leftTableId,
-        rightTableId,
-        insertColumnIntoChildAtIndex,
-        handleCloseContextMenu,
-      ]
-    );
-
-    const handleColumnClick = useCallback(
-      (event, columnId) => {
-        if (event.shiftKey && lastClickedColumn) {
-          // Shift click: Select range of columns
-          const allColumns = [...leftColumnIds, ...rightColumnIds];
-          const lastColIndex = allColumns.indexOf(lastClickedColumn);
-          const currentColIndex = allColumns.indexOf(columnId);
-
-          const colStart = Math.min(lastColIndex, currentColIndex);
-          const colEnd = Math.max(lastColIndex, currentColIndex);
-
-          const columnsToSelect = allColumns.slice(colStart, colEnd + 1);
-
-          // Add all cells for selected columns across all match types
-          setClickedBlockCells((prev) => {
-            const newSet = new Set(prev);
-            columnsToSelect.forEach((colId) => {
-              matchTypes.forEach((match) => {
-                newSet.add(`${colId}:${match}`);
-              });
-            });
-            return newSet;
-          });
-        } else {
-          // Regular click: Select all cells in this column across all match types
-          const cellsToSelect = new Set();
-
-          matchTypes.forEach((match) => {
-            cellsToSelect.add(`${columnId}:${match}`);
-          });
-
-          setClickedBlockCells(cellsToSelect);
-        }
-
-        // Set last clicked column for future range operations
-        setLastClickedColumn(columnId);
-
-        // Set last clicked cell to first cell in this column
-        setLastClickedCell(`${columnId}:${matchTypes[0]}`);
-      },
-      [lastClickedColumn, matchTypes, leftColumnIds, rightColumnIds]
-    );
-
-    const handleSelectAll = useCallback(() => {
-      if (areAnySelected) {
-        setClickedBlockCells(new Set());
-        return;
-      }
-      const allCells = new Set();
-
-      // Select all cells across all columns and match types
-      matchTypes.forEach((match) => {
-        [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
-          allCells.add(`${columnId}:${match}`);
-        });
-      });
-
-      setClickedBlockCells(allCells);
-    }, [areAnySelected, matchTypes, leftColumnIds, rightColumnIds]);
-
-    const handleToggleMatch = useCallback((matchKey) => {
-      console.log("Toggling match:", matchKey);
-      setToggledMatches((prev) => {
-        const newState = {
-          ...prev,
-          [matchKey]: !prev[matchKey],
-        };
-
-        // If toggling off, deselect all cells for this match type
-        if (!newState[matchKey]) {
-          setClickedBlockCells((prevCells) => {
-            const newCells = new Set(prevCells);
-            Array.from(newCells).forEach((cellKey) => {
-              const [, matchLabel] = cellKey.split(":");
-              if (matchLabel === matchKey) {
-                newCells.delete(cellKey);
-              }
-            });
-            return newCells;
-          });
-        }
-
-        return newState;
-      });
-    }, []);
-
-    const handleHideColumns = useCallback(
-      (columnId) => {
-        if (columnId) {
-          setHiddenColumns((prev) => new Set(prev).add(columnId));
-        } else {
-          const columnsToHide = new Set();
-          clickedBlockCells.forEach((cellKey) => {
-            const [columnId] = cellKey.split(":");
-            columnsToHide.add(columnId);
-          });
-          setHiddenColumns((prev) => new Set([...prev, ...columnsToHide]));
-        }
-      },
-      [clickedBlockCells]
-    );
-
-    const handleDeleteColumns = useCallback(
-      (columnId) => {
-        const columnsToDelete = new Set();
-        if (columnId) {
-          columnsToDelete.add(columnId);
-        } else {
-          clickedBlockCells.forEach((cellKey) => {
-            const [columnId] = cellKey.split(":");
-            columnsToDelete.add(columnId);
-          });
-        }
-        deleteColumns(Array.from(columnsToDelete));
-      },
-      [clickedBlockCells, deleteColumns]
-    );
-
-    const handleFocusColumns = useCallback(() => {}, []);
-
-    const handleSwapTables = useCallback(() => {
-      swapTablePositions(0, 1);
-    }, [swapTablePositions]);
-
-    const totalRows = Object.values(data || {}).reduce(
-      (sum, count) => sum + (count || 0),
-      0
-    );
-
-    // Check if at least one complete column is selected
-    const hasCompleteColumnSelected = useMemo(() => {
-      // Check each column in both tables
-      const allColumns = [...leftColumnIds, ...rightColumnIds];
-
-      for (const columnId of allColumns) {
-        const allCellsSelected = matchTypes.every((matchLabel) => {
-          const cellKey = `${columnId}:${matchLabel}`;
-          return clickedBlockCells.has(cellKey);
-        });
-        if (allCellsSelected && matchTypes.length > 0) {
-          return true;
-        }
-      }
-
-      return false;
-    }, [leftColumnIds, matchTypes, clickedBlockCells, rightColumnIds]);
-
-    const yAxisLabelWidth = "70px";
-    const yAxisLabelPadding = "4px";
-
-    // This memoized variable groups columns into contiguous visible/hidden segments
-    const columnIdVisibilityGroups = useMemo(
-      () =>
-        [...leftColumnIds, ...rightColumnIds].reduce((acc, columnId, i) => {
-          const isHidden = hiddenColumns.has(columnId);
-          const prev = acc[acc.length - 1];
-          if (!isHidden) {
-            acc.push({ columnIds: [columnId], isHidden });
           } else {
-            if (prev?.isHidden) {
-              prev.columnIds.push(columnId);
-            } else {
-              acc.push({
-                isHidden: true,
-                columnIds: [columnId],
+            // Regular click: Toggle single cell, clear others
+            setClickedBlockCells((prev) => {
+              const newSet = new Set();
+              if (!prev.has(cellKey)) {
+                newSet.add(cellKey);
+              }
+              return newSet;
+            });
+            setLastClickedCell(cellKey);
+          }
+        },
+        [lastClickedCell, leftColumnIds, rightColumnIds, matchTypes]
+      );
+
+      const handleMatchLabelClick = useCallback(
+        (event, matchLabel) => {
+          event.stopPropagation();
+
+          if (event.shiftKey && lastClickedMatch) {
+            // Shift click: Select range of match categories
+            const lastMatchIndex = matchTypes.indexOf(lastClickedMatch);
+            const currentMatchIndex = matchTypes.indexOf(matchLabel);
+
+            if (lastMatchIndex !== -1 && currentMatchIndex !== -1) {
+              const matchStart = Math.min(lastMatchIndex, currentMatchIndex);
+              const matchEnd = Math.max(lastMatchIndex, currentMatchIndex);
+
+              const cellsToSelect = new Set();
+
+              // Select all cells for all match types in the range
+              for (let m = matchStart; m <= matchEnd; m++) {
+                const match = matchTypes[m];
+
+                // Add all columns for this match
+                [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
+                  cellsToSelect.add(`${columnId}:${match}`);
+                });
+              }
+
+              // Add to existing selection
+              setClickedBlockCells((prev) => {
+                const newSet = new Set(prev);
+                cellsToSelect.forEach((cell) => newSet.add(cell));
+                return newSet;
               });
             }
-          }
-          return acc;
-        }, []),
-      [hiddenColumns, leftColumnIds, rightColumnIds]
-    );
+          } else {
+            // Regular click: Replace selection with this match category
+            const cellsToSelect = new Set();
 
-    return (
-      <Box display={"flex"} flexDirection="column" height="100%">
-        <SchemaToolbar
-          objectId={id}
-          columnIds={[]}
-          alertIds={alertIds}
-          customMenuItems={
-            <>
-              {/* Match category filter chips */}
-              <Box display="flex" gap={0.5} alignItems="center">
-                {Object.entries(matchStats).map(([key, count]) => (
-                  <Chip
-                    key={key}
-                    label={matchLabels.get(key)}
-                    disabled={count === 0}
-                    size="small"
-                    onClick={() => handleToggleMatch(key)}
-                    color={toggledMatches[key] ? "primary" : "default"}
-                    variant={toggledMatches[key] ? "filled" : "outlined"}
-                    sx={{
-                      fontSize: "0.75rem",
-                      cursor: "pointer",
-                    }}
-                  />
-                ))}
-              </Box>
-              <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-              {/* Swap tables */}
-              <IconButton
-                size="small"
-                onClick={handleSwapTables}
-                title="Swap table positions"
-              >
-                <SwapIcon fontSize="small" />
-              </IconButton>
-              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-              <IconButton
-                size="small"
-                disabled={!hasCompleteColumnSelected}
-                title="Insert column to the left"
-              >
-                <InsertLeftIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                disabled={!hasCompleteColumnSelected}
-                title="Insert column to the right"
-              >
-                <InsertRightIcon fontSize="small" />
-              </IconButton>
-              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-              <FocusIconButton
-                disabled={!hasCompleteColumnSelected}
-                onClick={handleFocusColumns}
-              />
-              <HideIconButton
-                disabled={!hasCompleteColumnSelected}
-                onClick={() => handleHideColumns()}
-              />
-              <DeleteIconButton
-                disabled={!hasCompleteColumnSelected}
-                onConfirm={handleDeleteColumns}
-              />
-              <SelectToggleIconButton
-                onClick={handleSelectAll}
-                isSelected={areAnySelected}
-              />
-            </>
+            // Add all columns for this match
+            [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
+              cellsToSelect.add(`${columnId}:${matchLabel}`);
+            });
+
+            setClickedBlockCells(cellsToSelect);
           }
-        >
-          <EnhancedPackOperationLabel id={id} />
-        </SchemaToolbar>
-        <Box
-          display={"flex"}
-          flexDirection={"column"}
-          alignItems={"stretch"}
-          justifyContent={"flex-start"}
-          flex={1}
-          gap={0.5}
-          padding={1}
-          sx={{
-            backgroundColor: hasAlerts ? "error.lighter" : "transparent",
-            overflow: "hidden",
-          }}
-        >
-          <Box display="flex" flexDirection="column" minHeight="100%" gap="2px">
-            <Box
-              display={"flex"}
-              flexDirection={"row"}
-              alignItems={"center"}
-              justifyContent={"flex-start"}
-            >
-              <Box
-                width={yAxisLabelWidth}
-                minWidth={yAxisLabelWidth}
-                padding={yAxisLabelPadding}
-                alignItems={"center"}
-                justifyContent={"center"}
-                flexShrink={0}
-              />
-              {[
-                { childId: leftTableId, columnCount: leftColumnIds.length },
-                { childId: rightTableId, columnCount: rightColumnIds.length },
-              ].map(({ childId, columnCount }) => (
-                <Box
-                  key={childId}
-                  flex={columnCount}
-                  minWidth={0}
-                  textAlign={"center"}
-                >
-                  {isTableId(childId) ? (
-                    <EnhancedTableName
-                      id={childId}
+
+          // Set last clicked match for future range operations
+          setLastClickedMatch(matchLabel);
+
+          // Set last clicked cell to first cell in this match
+          setLastClickedCell(`${leftColumnIds[0]}:${matchLabel}`);
+        },
+        [lastClickedMatch, leftColumnIds, matchTypes, rightColumnIds]
+      );
+
+      const handleColumnContextMenu = useCallback((event, columnId) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setContextMenu({
+          mouseX: event.clientX + 2,
+          mouseY: event.clientY - 6,
+        });
+        setContextMenuColumnId(columnId);
+      }, []);
+
+      const handleCloseContextMenu = useCallback(() => {
+        setContextMenu(null);
+        setContextMenuColumnId(null);
+      }, []);
+
+      const handleInsertColumn = useCallback(
+        (mode) => {
+          const columnId = contextMenuColumnId;
+
+          // Determine which child table/operation this column belongs to
+          const allColumns = [...leftColumnIds, ...rightColumnIds];
+          const columnIndex = allColumns.indexOf(columnId);
+
+          let childId;
+          let indexInChild;
+
+          if (columnIndex < leftColumnIds.length) {
+            // Column is in the left child
+            childId = leftTableId;
+            indexInChild = columnIndex;
+          } else {
+            // Column is in the right child
+            childId = rightTableId;
+            indexInChild = columnIndex - leftColumnIds.length;
+          }
+
+          const insertionIndex =
+            mode === "left" ? indexInChild : indexInChild + 1;
+
+          insertColumnIntoChildAtIndex(childId, insertionIndex);
+          handleCloseContextMenu();
+        },
+        [
+          contextMenuColumnId,
+          leftColumnIds,
+          rightColumnIds,
+          leftTableId,
+          rightTableId,
+          insertColumnIntoChildAtIndex,
+          handleCloseContextMenu,
+        ]
+      );
+
+      const handleColumnClick = useCallback(
+        (event, columnId) => {
+          if (event.shiftKey && lastClickedColumn) {
+            // Shift click: Select range of columns
+            const allColumns = [...leftColumnIds, ...rightColumnIds];
+            const lastColIndex = allColumns.indexOf(lastClickedColumn);
+            const currentColIndex = allColumns.indexOf(columnId);
+
+            const colStart = Math.min(lastColIndex, currentColIndex);
+            const colEnd = Math.max(lastColIndex, currentColIndex);
+
+            const columnsToSelect = allColumns.slice(colStart, colEnd + 1);
+
+            // Add all cells for selected columns across all match types
+            setClickedBlockCells((prev) => {
+              const newSet = new Set(prev);
+              columnsToSelect.forEach((colId) => {
+                matchTypes.forEach((match) => {
+                  newSet.add(`${colId}:${match}`);
+                });
+              });
+              return newSet;
+            });
+          } else {
+            // Regular click: Select all cells in this column across all match types
+            const cellsToSelect = new Set();
+
+            matchTypes.forEach((match) => {
+              cellsToSelect.add(`${columnId}:${match}`);
+            });
+
+            setClickedBlockCells(cellsToSelect);
+          }
+
+          // Set last clicked column for future range operations
+          setLastClickedColumn(columnId);
+
+          // Set last clicked cell to first cell in this column
+          setLastClickedCell(`${columnId}:${matchTypes[0]}`);
+        },
+        [lastClickedColumn, matchTypes, leftColumnIds, rightColumnIds]
+      );
+
+      const handleSelectAll = useCallback(() => {
+        if (areAnySelected) {
+          setClickedBlockCells(new Set());
+          return;
+        }
+        const allCells = new Set();
+
+        // Select all cells across all columns and match types
+        matchTypes.forEach((match) => {
+          [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
+            allCells.add(`${columnId}:${match}`);
+          });
+        });
+
+        setClickedBlockCells(allCells);
+      }, [areAnySelected, matchTypes, leftColumnIds, rightColumnIds]);
+
+      const handleToggleMatch = useCallback((matchKey) => {
+        console.log("Toggling match:", matchKey);
+        setToggledMatches((prev) => {
+          const newState = {
+            ...prev,
+            [matchKey]: !prev[matchKey],
+          };
+
+          // If toggling off, deselect all cells for this match type
+          if (!newState[matchKey]) {
+            setClickedBlockCells((prevCells) => {
+              const newCells = new Set(prevCells);
+              Array.from(newCells).forEach((cellKey) => {
+                const [, matchLabel] = cellKey.split(":");
+                if (matchLabel === matchKey) {
+                  newCells.delete(cellKey);
+                }
+              });
+              return newCells;
+            });
+          }
+
+          return newState;
+        });
+      }, []);
+
+      const handleHideColumns = useCallback(
+        (columnId) => {
+          if (columnId) {
+            setHiddenColumns((prev) => new Set(prev).add(columnId));
+          } else {
+            const columnsToHide = new Set();
+            clickedBlockCells.forEach((cellKey) => {
+              const [columnId] = cellKey.split(":");
+              columnsToHide.add(columnId);
+            });
+            setHiddenColumns((prev) => new Set([...prev, ...columnsToHide]));
+          }
+        },
+        [clickedBlockCells]
+      );
+
+      const handleDeleteColumns = useCallback(
+        (columnId) => {
+          const columnsToDelete = new Set();
+          if (columnId) {
+            columnsToDelete.add(columnId);
+          } else {
+            clickedBlockCells.forEach((cellKey) => {
+              const [columnId] = cellKey.split(":");
+              columnsToDelete.add(columnId);
+            });
+          }
+          deleteColumns(Array.from(columnsToDelete));
+        },
+        [clickedBlockCells, deleteColumns]
+      );
+
+      const handleFocusColumns = useCallback(() => {
+        focusColumns(
+          Array.from(
+            Array.from(clickedBlockCells).reduce((acc, cellKey) => {
+              const [columnId] = cellKey.split(":");
+              acc.add(columnId);
+              return acc;
+            }, new Set())
+          )
+        );
+      }, [clickedBlockCells, focusColumns]);
+
+      const handleSwapTables = useCallback(() => {
+        swapTablePositions(0, 1);
+      }, [swapTablePositions]);
+
+      const totalRows = Object.values(data || {}).reduce(
+        (sum, count) => sum + (count || 0),
+        0
+      );
+
+      // Check if at least one complete column is selected
+      const hasCompleteColumnSelected = useMemo(() => {
+        // Check each column in both tables
+        const allColumns = [...leftColumnIds, ...rightColumnIds];
+
+        for (const columnId of allColumns) {
+          const allCellsSelected = matchTypes.every((matchLabel) => {
+            const cellKey = `${columnId}:${matchLabel}`;
+            return clickedBlockCells.has(cellKey);
+          });
+          if (allCellsSelected && matchTypes.length > 0) {
+            return true;
+          }
+        }
+
+        return false;
+      }, [leftColumnIds, matchTypes, clickedBlockCells, rightColumnIds]);
+
+      const yAxisLabelWidth = "70px";
+      const yAxisLabelPadding = "4px";
+
+      // This memoized variable groups columns into contiguous visible/hidden segments
+      const columnIdVisibilityGroups = useMemo(
+        () =>
+          [...leftColumnIds, ...rightColumnIds].reduce((acc, columnId, i) => {
+            const isHidden = hiddenColumns.has(columnId);
+            const prev = acc[acc.length - 1];
+            if (!isHidden) {
+              acc.push({ columnIds: [columnId], isHidden });
+            } else {
+              if (prev?.isHidden) {
+                prev.columnIds.push(columnId);
+              } else {
+                acc.push({
+                  isHidden: true,
+                  columnIds: [columnId],
+                });
+              }
+            }
+            return acc;
+          }, []),
+        [hiddenColumns, leftColumnIds, rightColumnIds]
+      );
+
+      return (
+        <Box display={"flex"} flexDirection="column" height="100%">
+          <SchemaToolbar
+            objectId={id}
+            columnIds={[]}
+            alertIds={alertIds}
+            customMenuItems={
+              <>
+                {/* Match category filter chips */}
+                <Box display="flex" gap={0.5} alignItems="center">
+                  {Object.entries(matchStats).map(([key, count]) => (
+                    <Chip
+                      key={key}
+                      label={matchLabels.get(key)}
+                      disabled={count === 0}
+                      size="small"
+                      onClick={() => handleToggleMatch(key)}
+                      color={toggledMatches[key] ? "primary" : "default"}
+                      variant={toggledMatches[key] ? "filled" : "outlined"}
                       sx={{
                         fontSize: "0.75rem",
-                        userSelect: "none",
-                        fontWeight: "none",
+                        cursor: "pointer",
                       }}
-                      onMouseEnter={() => setHoveredColumn(`${childId}:`)}
-                      onMouseLeave={() => setHoveredColumn(null)}
                     />
-                  ) : (
-                    <p>{childId}</p>
-                    // TODO
-                    // <EnhancedOperationName
-                    //   id={childId}
-                    //   sx={{
-                    //     fontSize: "0.75rem",
-                    //     userSelect: "none",
-                    //     fontWeight: "none",
-                    //   }}
-                    //   onMouseEnter={() => setHoveredColumn(`${childId}:`)}
-                    //   onMouseLeave={() => setHoveredColumn(null)}
-                    // />
-                  )}
+                  ))}
                 </Box>
-              ))}
-            </Box>
+                <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                {/* Swap tables */}
+                <IconButton
+                  size="small"
+                  onClick={handleSwapTables}
+                  title="Swap table positions"
+                >
+                  <SwapIcon fontSize="small" />
+                </IconButton>
+                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                <IconButton
+                  size="small"
+                  disabled={!hasCompleteColumnSelected}
+                  title="Insert column to the left"
+                >
+                  <InsertLeftIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  disabled={!hasCompleteColumnSelected}
+                  title="Insert column to the right"
+                >
+                  <InsertRightIcon fontSize="small" />
+                </IconButton>
+                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                <FocusIconButton
+                  disabled={!hasCompleteColumnSelected}
+                  onClick={handleFocusColumns}
+                />
+                <HideIconButton
+                  disabled={!hasCompleteColumnSelected}
+                  onClick={() => handleHideColumns()}
+                />
+                <DeleteIconButton
+                  disabled={!hasCompleteColumnSelected}
+                  onConfirm={handleDeleteColumns}
+                />
+                <SelectToggleIconButton
+                  onClick={handleSelectAll}
+                  isSelected={areAnySelected}
+                />
+              </>
+            }
+          >
+            <EnhancedPackOperationLabel id={id} />
+          </SchemaToolbar>
+          <Box
+            display={"flex"}
+            flexDirection={"column"}
+            alignItems={"stretch"}
+            justifyContent={"flex-start"}
+            flex={1}
+            gap={0.5}
+            padding={1}
+            sx={{
+              backgroundColor: hasAlerts ? "error.lighter" : "transparent",
+              overflow: "hidden",
+            }}
+          >
             <Box
-              display={"flex"}
-              flexDirection={"row"}
-              alignItems={"center"}
-              justifyContent={"flex-start"}
-              marginTop={"20px"}
-              sx={{
-                containerType: "inline-size",
-              }}
+              display="flex"
+              flexDirection="column"
+              minHeight="100%"
+              gap="2px"
             >
               <Box
-                width={yAxisLabelWidth}
-                minWidth={yAxisLabelWidth}
-                padding={yAxisLabelPadding}
+                display={"flex"}
+                flexDirection={"row"}
                 alignItems={"center"}
-                justifyContent={"center"}
-                flexShrink={0}
-              />
-              {columnIdVisibilityGroups.map(({ columnIds, isHidden }) => {
-                return (
+                justifyContent={"flex-start"}
+              >
+                <Box
+                  width={yAxisLabelWidth}
+                  minWidth={yAxisLabelWidth}
+                  padding={yAxisLabelPadding}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  flexShrink={0}
+                />
+                {[
+                  { childId: leftTableId, columnCount: leftColumnIds.length },
+                  { childId: rightTableId, columnCount: rightColumnIds.length },
+                ].map(({ childId, columnCount }) => (
                   <Box
-                    key={columnIds.join("-")}
-                    flex={isHidden ? "0 0 auto" : 1}
+                    key={childId}
+                    flex={columnCount}
                     minWidth={0}
                     textAlign={"center"}
-                    sx={{
-                      position: "relative",
-                      ...(!isHidden && {
-                        "&::after": {
-                          content: '""',
-                          position: "absolute",
-                          bottom: 0,
-                          left: "50%",
-                          width: "1px",
-                          height: "4px",
-                          backgroundColor: "text.secondary",
-                          transform: "translateX(-50%)",
-                          cursor: "context-menu",
-                        },
-                      }),
-                    }}
-                    onContextMenu={(event) =>
-                      !isHidden
-                        ? handleColumnContextMenu(event, columnIds[0])
-                        : null
-                    }
                   >
-                    {isHidden ? (
-                      <HiddenColumnsButton
-                        count={columnIds.length}
-                        onClick={() => {
-                          setHiddenColumns((prev) => {
-                            const nextSet = new Set(prev);
-                            columnIds.forEach((colId) => nextSet.delete(colId));
-                            return nextSet;
-                          });
+                    {isTableId(childId) ? (
+                      <EnhancedTableName
+                        id={childId}
+                        sx={{
+                          fontSize: "0.75rem",
+                          userSelect: "none",
+                          fontWeight: "none",
                         }}
-                        sx={{ width: "10px", height: "20px" }}
+                        onMouseEnter={() => setHoveredColumn(`${childId}:`)}
+                        onMouseLeave={() => setHoveredColumn(null)}
                       />
                     ) : (
-                      <EnhancedColumnName
-                        id={columnIds[0]}
-                        sx={{
-                          fontSize: "0.6rem",
-                          userSelect: "none",
-                          width: "50px",
-                          minWidth: "50px",
-                          maxWidth: "50px",
-                          textAlign: "center",
-                          marginBottom: "2px",
-                          // Progressive rotation based on container width
-                          transform: "rotate(0deg)",
-                          transformOrigin: "left bottom",
-                          marginLeft: "0px",
-                          "@container (max-width: 1000px)": {
-                            transform: "rotate(-10deg)",
-                            marginLeft: "10%",
-                            marginBottom: "1px",
-                          },
-                          "@container (max-width: 800px)": {
-                            transform: "rotate(-20deg)",
-                            marginLeft: "20%",
-                            marginBottom: "1px",
-                          },
-                          "@container (max-width: 600px)": {
-                            transform: "rotate(-30deg)",
-                            marginLeft: "35%",
-                            marginBottom: "1px",
-                          },
-                          "@container (max-width: 400px)": {
-                            transform: "rotate(-45deg)",
-                            marginLeft: "50%",
-                            marginBottom: "1px",
-                          },
-                        }}
-                        onClick={handleColumnClick}
-                      />
+                      <p>{childId}</p>
+                      // TODO
+                      // <EnhancedOperationName
+                      //   id={childId}
+                      //   sx={{
+                      //     fontSize: "0.75rem",
+                      //     userSelect: "none",
+                      //     fontWeight: "none",
+                      //   }}
+                      //   onMouseEnter={() => setHoveredColumn(`${childId}:`)}
+                      //   onMouseLeave={() => setHoveredColumn(null)}
+                      // />
                     )}
                   </Box>
-                );
-              })}
-            </Box>
-            {Object.entries(matchStats).map(([key, value], i, array) => {
-              // Check if any cells in this match category are selected
-              const hasSelectedCells = Array.from(clickedBlockCells).some(
-                (cellKey) => {
-                  const [, matchLabel] = cellKey.split(":");
-                  return matchLabel === key;
-                }
-              );
-              const label = matchLabels.get(key) || key;
-              const isMatchDisabled = !toggledMatches[key];
-
-              return (
+                ))}
+              </Box>
+              <Box
+                display={"flex"}
+                flexDirection={"row"}
+                alignItems={"center"}
+                justifyContent={"flex-start"}
+                marginTop={"20px"}
+                sx={{
+                  containerType: "inline-size",
+                }}
+              >
                 <Box
-                  key={key}
-                  flex={1}
-                  minHeight={"60px"}
-                  display={"flex"}
-                  flexDirection="row"
-                  alignItems="center"
-                  justifyContent="flex-start"
-                  textAlign={"right"}
-                >
-                  <Typography
-                    variant="caption"
-                    component="div"
-                    sx={{
-                      width: yAxisLabelWidth,
-                      minWidth: yAxisLabelWidth,
-                      maxWidth: yAxisLabelWidth,
-                      flexShrink: 0,
-                      padding: yAxisLabelPadding,
-                      textAlign: "right",
-                      userSelect: "none",
-                      cursor: "pointer",
-                      opacity: hoveredMatch === key ? 1 : 0.8,
-                      fontWeight:
-                        hasSelectedCells || hoveredMatch === key
-                          ? "bold"
-                          : "normal",
-                      color: hasSelectedCells ? "primary.dark" : "text.primary",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                    onMouseEnter={() => setHoveredMatch(key)}
-                    onMouseLeave={() => setHoveredMatch(null)}
-                    onClick={(event) => handleMatchLabelClick(event, key)}
-                  >
-                    {label}
-                    <br />({value.toLocaleString()})
-                  </Typography>
-                  {columnIdVisibilityGroups.map(
-                    ({ columnIds, isHidden }, j) => {
-                      if (isHidden) {
-                        return (
-                          <Box
-                            key={columnIds.join("-")}
-                            flex={"0 0 auto"}
-                            minWidth={"10px"}
-                            display={"flex"}
-                            justifyContent={"center"}
-                            height="100%"
-                          >
-                            <Divider orientation="vertical" flexItem />
-                          </Box>
-                        );
+                  width={yAxisLabelWidth}
+                  minWidth={yAxisLabelWidth}
+                  padding={yAxisLabelPadding}
+                  alignItems={"center"}
+                  justifyContent={"center"}
+                  flexShrink={0}
+                />
+                {columnIdVisibilityGroups.map(({ columnIds, isHidden }) => {
+                  return (
+                    <Box
+                      key={columnIds.join("-")}
+                      flex={isHidden ? "0 0 auto" : 1}
+                      minWidth={0}
+                      textAlign={"center"}
+                      sx={{
+                        position: "relative",
+                        ...(!isHidden && {
+                          "&::after": {
+                            content: '""',
+                            position: "absolute",
+                            bottom: 0,
+                            left: "50%",
+                            width: "1px",
+                            height: "4px",
+                            backgroundColor: "text.secondary",
+                            transform: "translateX(-50%)",
+                            cursor: "context-menu",
+                          },
+                        }),
+                      }}
+                      onContextMenu={(event) =>
+                        !isHidden
+                          ? handleColumnContextMenu(event, columnIds[0])
+                          : null
                       }
-                      // If not hidden, there will only be one columnId
-                      const columnId = columnIds[0];
-                      const isLastLeftColumn = j === leftColumnIds.length - 1;
-                      const tableId =
-                        j < leftColumnIds.length ? leftTableId : rightTableId;
-                      const cellKey = `${columnId}:${key}`;
-                      const isClicked = clickedBlockCells.has(cellKey);
+                    >
+                      {isHidden ? (
+                        <HiddenColumnsButton
+                          count={columnIds.length}
+                          onClick={() => {
+                            setHiddenColumns((prev) => {
+                              const nextSet = new Set(prev);
+                              columnIds.forEach((colId) =>
+                                nextSet.delete(colId)
+                              );
+                              return nextSet;
+                            });
+                          }}
+                          sx={{ width: "10px", height: "20px" }}
+                        />
+                      ) : (
+                        <EnhancedColumnName
+                          id={columnIds[0]}
+                          sx={{
+                            fontSize: "0.6rem",
+                            userSelect: "none",
+                            width: "50px",
+                            minWidth: "50px",
+                            maxWidth: "50px",
+                            textAlign: "center",
+                            marginBottom: "2px",
+                            // Progressive rotation based on container width
+                            transform: "rotate(0deg)",
+                            transformOrigin: "left bottom",
+                            marginLeft: "0px",
+                            "@container (max-width: 1000px)": {
+                              transform: "rotate(-10deg)",
+                              marginLeft: "10%",
+                              marginBottom: "1px",
+                            },
+                            "@container (max-width: 800px)": {
+                              transform: "rotate(-20deg)",
+                              marginLeft: "20%",
+                              marginBottom: "1px",
+                            },
+                            "@container (max-width: 600px)": {
+                              transform: "rotate(-30deg)",
+                              marginLeft: "35%",
+                              marginBottom: "1px",
+                            },
+                            "@container (max-width: 400px)": {
+                              transform: "rotate(-45deg)",
+                              marginLeft: "50%",
+                              marginBottom: "1px",
+                            },
+                          }}
+                          onClick={handleColumnClick}
+                        />
+                      )}
+                    </Box>
+                  );
+                })}
+              </Box>
+              {Object.entries(matchStats).map(([key, value], i, array) => {
+                // Check if any cells in this match category are selected
+                const hasSelectedCells = Array.from(clickedBlockCells).some(
+                  (cellKey) => {
+                    const [, matchLabel] = cellKey.split(":");
+                    return matchLabel === key;
+                  }
+                );
+                const label = matchLabels.get(key) || key;
+                const isMatchDisabled = !toggledMatches[key];
 
-                      // Calculate which borders to show for contiguous selection
-                      let showTopBorder = false;
-                      let showBottomBorder = false;
-                      let showLeftBorder = false;
-                      let showRightBorder = false;
+                return (
+                  <Box
+                    key={key}
+                    flex={1}
+                    minHeight={"60px"}
+                    display={"flex"}
+                    flexDirection="row"
+                    alignItems="center"
+                    justifyContent="flex-start"
+                    textAlign={"right"}
+                  >
+                    <Typography
+                      variant="caption"
+                      component="div"
+                      sx={{
+                        width: yAxisLabelWidth,
+                        minWidth: yAxisLabelWidth,
+                        maxWidth: yAxisLabelWidth,
+                        flexShrink: 0,
+                        padding: yAxisLabelPadding,
+                        textAlign: "right",
+                        userSelect: "none",
+                        cursor: "pointer",
+                        opacity: hoveredMatch === key ? 1 : 0.8,
+                        fontWeight:
+                          hasSelectedCells || hoveredMatch === key
+                            ? "bold"
+                            : "normal",
+                        color: hasSelectedCells
+                          ? "primary.dark"
+                          : "text.primary",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                      onMouseEnter={() => setHoveredMatch(key)}
+                      onMouseLeave={() => setHoveredMatch(null)}
+                      onClick={(event) => handleMatchLabelClick(event, key)}
+                    >
+                      {label}
+                      <br />({value.toLocaleString()})
+                    </Typography>
+                    {columnIdVisibilityGroups.map(
+                      ({ columnIds, isHidden }, j) => {
+                        if (isHidden) {
+                          return (
+                            <Box
+                              key={columnIds.join("-")}
+                              flex={"0 0 auto"}
+                              minWidth={"10px"}
+                              display={"flex"}
+                              justifyContent={"center"}
+                              height="100%"
+                            >
+                              <Divider orientation="vertical" flexItem />
+                            </Box>
+                          );
+                        }
+                        // If not hidden, there will only be one columnId
+                        const columnId = columnIds[0];
+                        const isLastLeftColumn = j === leftColumnIds.length - 1;
+                        const tableId =
+                          j < leftColumnIds.length ? leftTableId : rightTableId;
+                        const cellKey = `${columnId}:${key}`;
+                        const isClicked = clickedBlockCells.has(cellKey);
 
-                      if (isClicked) {
-                        // Find the match type index for this row
-                        const currentMatchIndex = matchTypes.indexOf(key);
+                        // Calculate which borders to show for contiguous selection
+                        let showTopBorder = false;
+                        let showBottomBorder = false;
+                        let showLeftBorder = false;
+                        let showRightBorder = false;
+
+                        if (isClicked) {
+                          // Find the match type index for this row
+                          const currentMatchIndex = matchTypes.indexOf(key);
+                          const allColumns = [
+                            ...leftColumnIds,
+                            ...rightColumnIds,
+                          ];
+                          const currentColIndex = allColumns.indexOf(columnId);
+
+                          // Check cell above (previous match type)
+                          if (currentMatchIndex > 0) {
+                            const matchAbove =
+                              matchTypes[currentMatchIndex - 1];
+                            const cellKeyAbove = `${columnId}:${matchAbove}`;
+                            showTopBorder =
+                              !clickedBlockCells.has(cellKeyAbove);
+                          } else {
+                            showTopBorder = true; // First row
+                          }
+
+                          // Check cell below (next match type)
+                          if (currentMatchIndex < matchTypes.length - 1) {
+                            const matchBelow =
+                              matchTypes[currentMatchIndex + 1];
+                            const cellKeyBelow = `${columnId}:${matchBelow}`;
+                            showBottomBorder =
+                              !clickedBlockCells.has(cellKeyBelow);
+                          } else {
+                            showBottomBorder = true; // Last row
+                          }
+
+                          // Check cell to the left
+                          if (currentColIndex > 0) {
+                            const colLeft = allColumns[currentColIndex - 1];
+                            const cellKeyLeft = `${colLeft}:${key}`;
+                            showLeftBorder =
+                              !clickedBlockCells.has(cellKeyLeft);
+                          } else {
+                            showLeftBorder = true; // First column
+                          }
+
+                          // Check cell to the right
+                          if (currentColIndex < allColumns.length - 1) {
+                            const colRight = allColumns[currentColIndex + 1];
+                            const cellKeyRight = `${colRight}:${key}`;
+                            showRightBorder =
+                              !clickedBlockCells.has(cellKeyRight);
+                          } else {
+                            showRightBorder = true; // Last column
+                          }
+                        }
+
+                        const borderWidth = "2px";
+
+                        // Check if the cell to the right is also selected
                         const allColumns = [
                           ...leftColumnIds,
                           ...rightColumnIds,
                         ];
                         const currentColIndex = allColumns.indexOf(columnId);
+                        const hasRightNeighbor =
+                          currentColIndex < allColumns.length - 1;
+                        const colRight = hasRightNeighbor
+                          ? allColumns[currentColIndex + 1]
+                          : null;
 
-                        // Check cell above (previous match type)
-                        if (currentMatchIndex > 0) {
-                          const matchAbove = matchTypes[currentMatchIndex - 1];
-                          const cellKeyAbove = `${columnId}:${matchAbove}`;
-                          showTopBorder = !clickedBlockCells.has(cellKeyAbove);
-                        } else {
-                          showTopBorder = true; // First row
-                        }
+                        return (
+                          <Box
+                            key={columnId}
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              height: "100%",
+                              backgroundColor: colorScale(value),
+                              position: "relative",
+                              boxShadow: (theme) => {
+                                const shadows = [];
 
-                        // Check cell below (next match type)
-                        if (currentMatchIndex < matchTypes.length - 1) {
-                          const matchBelow = matchTypes[currentMatchIndex + 1];
-                          const cellKeyBelow = `${columnId}:${matchBelow}`;
-                          showBottomBorder =
-                            !clickedBlockCells.has(cellKeyBelow);
-                        } else {
-                          showBottomBorder = true; // Last row
-                        }
+                                // Always show a subtle separator on the right
+                                shadows.push(
+                                  "inset -1px 0 0 0 rgba(0, 0, 0, 0.05)"
+                                );
 
-                        // Check cell to the left
-                        if (currentColIndex > 0) {
-                          const colLeft = allColumns[currentColIndex - 1];
-                          const cellKeyLeft = `${colLeft}:${key}`;
-                          showLeftBorder = !clickedBlockCells.has(cellKeyLeft);
-                        } else {
-                          showLeftBorder = true; // First column
-                        }
-
-                        // Check cell to the right
-                        if (currentColIndex < allColumns.length - 1) {
-                          const colRight = allColumns[currentColIndex + 1];
-                          const cellKeyRight = `${colRight}:${key}`;
-                          showRightBorder =
-                            !clickedBlockCells.has(cellKeyRight);
-                        } else {
-                          showRightBorder = true; // Last column
-                        }
-                      }
-
-                      const borderWidth = "2px";
-
-                      // Check if the cell to the right is also selected
-                      const allColumns = [...leftColumnIds, ...rightColumnIds];
-                      const currentColIndex = allColumns.indexOf(columnId);
-                      const hasRightNeighbor =
-                        currentColIndex < allColumns.length - 1;
-                      const colRight = hasRightNeighbor
-                        ? allColumns[currentColIndex + 1]
-                        : null;
-
-                      return (
-                        <Box
-                          key={columnId}
-                          sx={{
-                            flex: 1,
-                            minWidth: 0,
-                            height: "100%",
-                            backgroundColor: colorScale(value),
-                            position: "relative",
-                            boxShadow: (theme) => {
-                              const shadows = [];
-
-                              // Always show a subtle separator on the right
-                              shadows.push(
-                                "inset -1px 0 0 0 rgba(0, 0, 0, 0.05)"
-                              );
-
-                              // Add selection borders (these will overlay on top of separator)
-                              if (isClicked) {
-                                if (showTopBorder) {
-                                  shadows.push(
-                                    `inset 0 ${borderWidth} 0 0 ${theme.palette.primary.main}`
-                                  );
+                                // Add selection borders (these will overlay on top of separator)
+                                if (isClicked) {
+                                  if (showTopBorder) {
+                                    shadows.push(
+                                      `inset 0 ${borderWidth} 0 0 ${theme.palette.primary.main}`
+                                    );
+                                  }
+                                  if (showBottomBorder) {
+                                    shadows.push(
+                                      `inset 0 -${borderWidth} 0 0 ${theme.palette.primary.main}`
+                                    );
+                                  }
+                                  if (showLeftBorder) {
+                                    shadows.push(
+                                      `inset ${borderWidth} 0 0 0 ${theme.palette.primary.main}`
+                                    );
+                                  }
+                                  // Only show right selection border if it's truly an edge
+                                  // (not just because the next cell isn't selected)
+                                  if (showRightBorder) {
+                                    shadows.push(
+                                      `inset -${borderWidth} 0 0 0 ${theme.palette.primary.main}`
+                                    );
+                                  }
                                 }
-                                if (showBottomBorder) {
-                                  shadows.push(
-                                    `inset 0 -${borderWidth} 0 0 ${theme.palette.primary.main}`
-                                  );
-                                }
-                                if (showLeftBorder) {
-                                  shadows.push(
-                                    `inset ${borderWidth} 0 0 0 ${theme.palette.primary.main}`
-                                  );
-                                }
-                                // Only show right selection border if it's truly an edge
-                                // (not just because the next cell isn't selected)
-                                if (showRightBorder) {
-                                  shadows.push(
-                                    `inset -${borderWidth} 0 0 0 ${theme.palette.primary.main}`
-                                  );
-                                }
+
+                                return shadows.join(", ");
+                              },
+                              ...(isClicked && {
+                                opacity: 0.8,
+                              }),
+                              ...(isMatchDisabled && {
+                                backgroundColor: "grey.300",
+                                cursor: "not-allowed",
+                              }),
+                              ...(isLastLeftColumn && {
+                                marginRight: "4px",
+                              }),
+                              "&:hover": {
+                                opacity: isMatchDisabled ? 1 : 0.8,
+                              },
+                            }}
+                            onClick={(event) => {
+                              if (!isMatchDisabled) {
+                                handleBlockCellClick(
+                                  event,
+                                  tableId,
+                                  columnId,
+                                  key
+                                );
                               }
-
-                              return shadows.join(", ");
-                            },
-                            ...(isClicked && {
-                              opacity: 0.8,
-                            }),
-                            ...(isMatchDisabled && {
-                              backgroundColor: "grey.300",
-                              cursor: "not-allowed",
-                            }),
-                            ...(isLastLeftColumn && {
-                              marginRight: "4px",
-                            }),
-                            "&:hover": {
-                              opacity: isMatchDisabled ? 1 : 0.8,
-                            },
-                          }}
-                          onClick={(event) => {
-                            if (!isMatchDisabled) {
-                              handleBlockCellClick(
-                                event,
-                                tableId,
-                                columnId,
-                                key
-                              );
-                            }
-                          }}
-                        ></Box>
-                      );
-                    }
-                  )}
-                </Box>
-              );
-            })}
+                            }}
+                          ></Box>
+                        );
+                      }
+                    )}
+                  </Box>
+                );
+              })}
+            </Box>
           </Box>
+          <Menu
+            open={contextMenu !== null}
+            onClose={handleCloseContextMenu}
+            anchorReference="anchorPosition"
+            anchorPosition={
+              contextMenu !== null
+                ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                : undefined
+            }
+          >
+            <MenuItem onClick={() => handleInsertColumn("left")}>
+              Insert Column Left
+            </MenuItem>
+            <MenuItem onClick={() => handleInsertColumn("right")}>
+              Insert Column Right
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleDeleteColumns(contextMenuColumnId);
+                handleCloseContextMenu();
+              }}
+            >
+              Delete Column
+            </MenuItem>
+            <MenuItem onClick={handleCloseContextMenu}>Rename Column</MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleHideColumns(contextMenuColumnId);
+                handleCloseContextMenu();
+              }}
+            >
+              Hide Column
+            </MenuItem>
+          </Menu>
         </Box>
-        <Menu
-          open={contextMenu !== null}
-          onClose={handleCloseContextMenu}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            contextMenu !== null
-              ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-              : undefined
-          }
-        >
-          <MenuItem onClick={() => handleInsertColumn("left")}>
-            Insert Column Left
-          </MenuItem>
-          <MenuItem onClick={() => handleInsertColumn("right")}>
-            Insert Column Right
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              handleDeleteColumns(contextMenuColumnId);
-              handleCloseContextMenu();
-            }}
-          >
-            Delete Column
-          </MenuItem>
-          <MenuItem onClick={handleCloseContextMenu}>Rename Column</MenuItem>
-          <MenuItem
-            onClick={() => {
-              handleHideColumns(contextMenuColumnId);
-              handleCloseContextMenu();
-            }}
-          >
-            Hide Column
-          </MenuItem>
-        </Menu>
-      </Box>
-    );
-  }
+      );
+    }
+  )
 );
 
 export default PackSchemaView;

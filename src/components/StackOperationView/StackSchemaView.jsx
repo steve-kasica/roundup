@@ -11,7 +11,7 @@ import { EnhancedColumnSummary, StyledColumnCard } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedStackOperationLabel } from "./StackOperationLabel";
-import FocusIconButton from "../ui/FocusIconButton";
+import FocusIconButton from "../ui/icons/FocusIconButton";
 import HideIconButton from "../ui/HideIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { isTableId } from "../../slices/tablesSlice";

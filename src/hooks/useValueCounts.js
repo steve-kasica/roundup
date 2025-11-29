@@ -3,6 +3,10 @@ import {
   getValueCounts,
   getPaginatedValueCounts,
 } from "../lib/duckdb/getValueCounts";
+import { useSelector } from "react-redux";
+import { isTableId, selectTablesById } from "../slices/tablesSlice";
+import { selectColumnsById } from "../slices/columnsSlice";
+import { selectOperationsById } from "../slices/operationsSlice";
 
 /**
  * Custom React Hook for querying value counts for a column
@@ -93,17 +97,25 @@ export function useValueCounts(
  * @returns {Function} refresh - Function to refresh data from start
  * @returns {Function} reset - Function to reset state to initial values
  */
-export function usePaginatedValueCounts(tableId, databaseName, pageSize = 100) {
-  const [data, setData] = useState({});
+export function usePaginatedValueCounts(id, pageSize = 100) {
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [total, setTotal] = useState(0);
 
+  const column = useSelector((state) => selectColumnsById(state, id));
+
+  const table = useSelector((state) =>
+    isTableId(column.parentId)
+      ? selectTablesById(state, column?.parentId)
+      : selectOperationsById(state, column?.parentId)
+  );
+
   const fetchPage = useCallback(
     async (pageNum = 0, reset = false) => {
-      if (!tableId || !databaseName) {
+      if (!table || !column) {
         return;
       }
 
@@ -113,8 +125,9 @@ export function usePaginatedValueCounts(tableId, databaseName, pageSize = 100) {
       try {
         const offset = pageNum * pageSize;
         const result = await getPaginatedValueCounts(
-          tableId,
-          databaseName,
+          table.databaseName,
+          column.databaseName,
+          column.columnType,
           pageSize,
           offset
         );
@@ -136,7 +149,7 @@ export function usePaginatedValueCounts(tableId, databaseName, pageSize = 100) {
         setLoading(false);
       }
     },
-    [tableId, databaseName, pageSize]
+    [table, column, pageSize]
   );
 
   const loadMore = useCallback(() => {

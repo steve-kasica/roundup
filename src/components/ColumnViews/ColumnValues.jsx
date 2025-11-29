@@ -3,10 +3,13 @@ import { Box, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { getColumnValues } from "../../lib/duckdb";
 import withColumnData from "./withColumnData";
+import { useSelector } from "react-redux";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectOperationsById } from "../../slices/operationsSlice";
 
 const ColumnValues = ({
   id,
-  databaseName,
+  databaseName: columnDatabaseName,
   parentId,
   limit = 20,
   scrollTop = 0,
@@ -18,6 +21,11 @@ const ColumnValues = ({
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef(null);
+  const table = useSelector((state) =>
+    isTableId(parentId)
+      ? selectTablesById(state, parentId)
+      : selectOperationsById(state, parentId)
+  );
 
   // Reset state when id or parentId changes
   useEffect(() => {
@@ -32,7 +40,7 @@ const ColumnValues = ({
     let isMounted = true;
     setLoading(true);
     setError(null);
-    getColumnValues(parentId, databaseName, limit, offset)
+    getColumnValues(table.databaseName, columnDatabaseName, limit, offset)
       .then((result) => {
         if (isMounted) {
           setValues((prev) =>
@@ -50,7 +58,7 @@ const ColumnValues = ({
     return () => {
       isMounted = false;
     };
-  }, [id, parentId, offset, limit]);
+  }, [id, parentId, offset, limit, table.databaseName, columnDatabaseName]);
 
   // Remove handleLoadMore and inline logic in scroll handler to avoid dependency warning
 

@@ -33,16 +33,12 @@ import {
   MenuItem,
   IconButton,
   Divider,
-  Stack,
   Tooltip,
 } from "@mui/material";
 import withTableData from "./withTableData";
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import {
-  setFocusedColumnIds,
-  setSelectedColumnIds,
-} from "../../slices/uiSlice"; // TODO: this should be in HOC
+import { setFocusedColumnIds } from "../../slices/uiSlice"; // TODO: this should be in HOC
 import {
   COLUMN_TYPE_NUMERICAL,
   COLUMN_TYPE_CATEGORICAL,
@@ -54,12 +50,11 @@ import {
 } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
-import FocusIconButton from "../ui/FocusIconButton";
+import FocusIconButton from "../ui/icons/FocusIconButton";
 import HideIconButton from "../ui/HideIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { TableLabel } from "./TableLabel";
 import DeleteIconButton from "../ui/icons/DeleteIconButton";
-import { ArrowRight, ArrowLeft } from "@mui/icons-material";
 import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 
 /**

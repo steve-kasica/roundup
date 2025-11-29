@@ -108,7 +108,6 @@ export async function getPaginatedValueCounts(
     `;
     const dataResult = await conn.query(dataQuery);
 
-    console.log("Data Result:", dataResult.toArray(), { columnType });
     const data = dataResult.toArray().map((row) => ({
       value:
         columnType === "DATE"
