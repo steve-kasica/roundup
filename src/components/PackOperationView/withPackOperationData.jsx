@@ -40,10 +40,18 @@ export default function withPackOperationData(WrappedComponent) {
   }) {
     const dispatch = useDispatch();
 
-    const [leftTableId, rightTableId] = useMemo(() => childIds, [childIds]);
+    // Handle case where there is only one child table
+    const [leftTableId, rightTableId] = useMemo(
+      () => (childIds.length === 2 ? childIds : [childIds[0], null]),
+      [childIds]
+    );
 
+    // Handle case where there is only one child table
     const [leftColumnIds, rightColumnIds] = useMemo(
-      () => activeChildColumnIds,
+      () =>
+        activeChildColumnIds.length === 2
+          ? activeChildColumnIds
+          : [activeChildColumnIds[0], []],
       [activeChildColumnIds]
     );
 
@@ -73,7 +81,7 @@ export default function withPackOperationData(WrappedComponent) {
 
     // Get a list of selectedColumnIds in the right table
     const rightSelectedColumnsIds = useSelector((state) =>
-      selectSelectedColumnIdsByParentId(state, rightTableId)
+      rightTableId ? selectSelectedColumnIdsByParentId(state, rightTableId) : []
     );
 
     const selectedOperationColumnIds = columnIds.filter((columnid) =>
