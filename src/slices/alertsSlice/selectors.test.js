@@ -8,18 +8,23 @@ import MissingLeftJoinKeyAlert from "./Alerts/Errors/MissingLeftJoinKey";
 import MissingRightJoinKeyAlert from "./Alerts/Errors/MissingRightJoinKey";
 import { initialState } from "./alertsSlice";
 import {
+  selectAlertErrorCount,
   selectAlertIdsBySourceId,
   selectAlertsById,
+  selectAlertWarningCount,
   selectAllSourceIdsWithAlerts,
 } from "./selectors";
+import HeterogeneousColumnTypesAlert from "./Alerts/Warnings/HeterogeneousColumnTypes";
 
 describe("Alerts selectors", () => {
-  let state, alert1, alert2, alert3, operation1, operation2;
+  let state, alert1, alert2, alert3, alert4, operation1, operation2, operation3;
 
   beforeAll(() => {
     operation1 = Operation({ operationType: OPERATION_TYPE_STACK });
     operation2 = Operation({ operationType: OPERATION_TYPE_PACK });
+    operation3 = Operation({ operationType: OPERATION_TYPE_PACK });
     alert1 = IncongruentTablesAlert(operation1.id);
+    alert4 = HeterogeneousColumnTypesAlert(operation1.id);
     alert2 = MissingLeftJoinKeyAlert(operation2.id);
     alert3 = MissingRightJoinKeyAlert(operation2.id);
     state = {
@@ -28,8 +33,9 @@ describe("Alerts selectors", () => {
           [alert1.id]: alert1,
           [alert2.id]: alert2,
           [alert3.id]: alert3,
+          [alert4.id]: alert4,
         },
-        allIds: [alert1.id, alert2.id, alert3.id],
+        allIds: [alert1.id, alert2.id, alert3.id, alert4.id],
       },
     };
   });
@@ -37,7 +43,7 @@ describe("Alerts selectors", () => {
   describe("selectAlertIdsBySourceId", () => {
     it("returns alert IDs for single source ID", () => {
       const result1 = selectAlertIdsBySourceId(state, operation1.id);
-      expect(result1).toEqual([alert1.id]);
+      expect(result1).toEqual([alert1.id, alert4.id]);
     });
 
     it("returns multiple alert IDs for source ID", () => {
@@ -65,6 +71,26 @@ describe("Alerts selectors", () => {
     it("returns all source IDs that have alerts", () => {
       const result = selectAllSourceIdsWithAlerts(state);
       expect(result).toEqual([operation1.id, operation2.id]);
+    });
+  });
+  describe("selectAlertWarningCount", () => {
+    it("returns the count of warning-level alerts for a given source ID", () => {
+      const result = selectAlertWarningCount(state, operation1.id);
+      expect(result).toEqual(1);
+    });
+    it("returns the count of warning-level alerts for a given source ID with no warnings", () => {
+      const result = selectAlertWarningCount(state, operation2.id);
+      expect(result).toEqual(0);
+    });
+  });
+  describe("selectAlertErrorCount", () => {
+    it("returns the count of error-level alerts for a given source ID", () => {
+      const result = selectAlertErrorCount(state, operation1.id);
+      expect(result).toEqual(1);
+    });
+    it("returns the count of error-level alerts for a given source ID with no errors", () => {
+      const result = selectAlertErrorCount(state, operation3.id);
+      expect(result).toEqual(0);
     });
   });
 });

@@ -1,4 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { SEVERITY_ERROR, SEVERITY_WARNING } from ".";
 
 /**
  * Selector to retrieve alert IDs associated with a specific source ID.
@@ -45,3 +46,25 @@ export const selectAllSourceIdsWithAlerts = createSelector(
  * @returns {Array<string>} An array of all alert IDs.
  */
 export const selectAllAlertIds = (state) => state.alerts.allIds;
+
+export const selectAlertWarningCount = createSelector(
+  [(state) => state.alerts.byId, (state, sourceId) => sourceId],
+  (byId, sourceId) => {
+    const warnings = Object.values(byId).filter(
+      (alert) =>
+        alert.sourceId === sourceId && alert.severity === SEVERITY_WARNING
+    );
+    return warnings.length;
+  }
+);
+
+export const selectAlertErrorCount = createSelector(
+  [(state) => state.alerts.byId, (state, sourceId) => sourceId],
+  (byId, sourceId) => {
+    const errors = Object.values(byId).filter(
+      (alert) =>
+        alert.sourceId === sourceId && alert.severity === SEVERITY_ERROR
+    );
+    return errors.length;
+  }
+);
