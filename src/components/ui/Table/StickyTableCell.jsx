@@ -6,12 +6,15 @@ import { TableCell, styled } from "@mui/material";
 const StickyTableCell = styled(TableCell)(() => ({
   position: "sticky",
   left: 0,
+  width: "10px",
   maxWidth: "10px",
+  minWidth: "10px",
   backgroundColor: "inherit",
   textAlign: "right",
   color: "#888",
   zIndex: 1,
   borderRight: "1px solid rgba(224, 224, 224, 1)",
+  padding: "6px 8px",
 }));
 
 export default StickyTableCell;
