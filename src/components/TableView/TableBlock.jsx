@@ -5,7 +5,7 @@ import { Box, Typography } from "@mui/material";
 
 function TableBlock({
   // Props from withAssociatedAlerts via withTableData
-  hasAlerts,
+  totalCount,
   // props via withTableData
   id,
   name,
@@ -42,7 +42,7 @@ function TableBlock({
         alignItems: "stretch",
         position: "relative",
         // Visual indication of alerts
-        ...(hasAlerts && {
+        ...(totalCount && {
           backgroundColor: "warning.light",
           opacity: 0.9,
         }),
@@ -51,7 +51,7 @@ function TableBlock({
     >
       <Typography variant="treemap label">
         {name || id}
-        {hasAlerts && `⚠`}
+        {totalCount && `⚠`}
         <br />
         <small style={{ color: "#555" }}>
           {columnCount.toLocaleString()} x {rowCount.toLocaleString()}

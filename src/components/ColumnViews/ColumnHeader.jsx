@@ -20,7 +20,7 @@ const ColumnHeader = ({
   isFocused,
   isDraggable,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
-  hasAlerts,
+  totalCount,
   // Props passed directly from parent
   isActive,
   onSort,
@@ -58,14 +58,14 @@ const ColumnHeader = ({
         isLoading={isLoading}
         isFocused={isFocused}
         isDraggable={isDraggable}
-        isError={hasAlerts}
+        isError={totalCount}
         sx={{
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
           borderRadius: 0,
-          ...(hasAlerts && {
+          ...(totalCount && {
             backgroundColor: "warning.light",
             borderBottom: "2px solid",
             borderBottomColor: "warning.main",

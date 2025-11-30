@@ -34,7 +34,8 @@ const StackSchemaView = ({
   m, // width of the matrix (# of columns)
   // Props passed via withAssociatedAlerts
   alertIds,
-  hasAlerts,
+  totalCount,
+  errorCount,
   //
   selectColumns, // Sets global set of selected column IDs
   clearSelectedColumns, // Clears global set of selected column IDs
@@ -42,7 +43,6 @@ const StackSchemaView = ({
   swapColumns,
   insertColumnIntoChildAtIndex,
   setVisibleColumns: setVisibleColumnsInSlice,
-  materializeOperation,
 }) => {
   const [hiddenIndices, setHiddenIndices] = useState([]); // This array stores column indices that are hidden
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
@@ -342,11 +342,11 @@ const StackSchemaView = ({
       flexDirection="column"
       height="100%"
       sx={{
-        border: hasAlerts ? "2px solid" : "none",
-        borderColor: hasAlerts ? "error.main" : "transparent",
-        borderRadius: hasAlerts ? 1 : 0,
-        backgroundColor: hasAlerts ? "error.lighter" : "transparent",
-        padding: hasAlerts ? 1 : 0,
+        border: totalCount ? "2px solid" : "none",
+        borderColor: totalCount ? "error.main" : "transparent",
+        borderRadius: totalCount ? 1 : 0,
+        backgroundColor: totalCount ? "error.lighter" : "transparent",
+        padding: totalCount ? 1 : 0,
       }}
     >
       <SchemaToolbar
@@ -356,6 +356,8 @@ const StackSchemaView = ({
         name={name}
         objectId={id}
         alertIds={alertIds}
+        errorCount={errorCount}
+        totalCount={totalCount}
         customMenuItems={
           <>
             <FocusIconButton

@@ -16,7 +16,7 @@ const OperationLabel = ({
   rowCount = 0,
   loading = false,
   // Props defined in `withAssociatedAlerts`
-  hasAlerts,
+  totalCount,
   includeIcon = true,
   includeDimensions = true,
 }) => {
@@ -26,23 +26,23 @@ const OperationLabel = ({
   return (
     <Stack direction={"row"} spacing={1} alignItems="center">
       {includeIcon && operationType === OPERATION_TYPE_STACK && (
-        <StackOperationIcon hasAlerts={hasAlerts} />
+        <StackOperationIcon totalCount={totalCount} />
       )}
       {includeIcon && operationType === OPERATION_TYPE_PACK && (
-        <PackOperationIcon hasAlerts={hasAlerts} />
+        <PackOperationIcon totalCount={totalCount} />
       )}
       <Typography
         variant="h6"
         component="div"
         sx={{
           userSelect: "none",
-          color: hasAlerts ? "error.main" : "inherit",
-          fontWeight: hasAlerts ? 600 : "inherit",
+          color: totalCount ? "error.main" : "inherit",
+          fontWeight: totalCount ? 600 : "inherit",
         }}
       >
         {name || id}{" "}
         {includeDimensions && (
-          <small style={{ color: hasAlerts ? "inherit" : undefined }}>
+          <small style={{ color: totalCount ? "inherit" : undefined }}>
             ({columnCount.toLocaleString()} x {rowCount.toLocaleString()})
           </small>
         )}

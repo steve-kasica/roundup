@@ -38,7 +38,7 @@ export default function withTableData(WrappedComponent) {
   function EnhancedComponent({
     // Props passed from withAssociatedAlerts
     alertIds,
-    hasAlerts,
+    totalCount,
     deleteAlerts,
     silenceAlerts,
     // Props passed directly from parent
@@ -231,7 +231,7 @@ export default function withTableData(WrappedComponent) {
         id={id}
         // Props from withAssociatedAlerts
         alertIds={alertIds}
-        hasAlerts={hasAlerts}
+        totalCount={totalCount}
         deleteAlerts={deleteAlerts}
         silenceAlerts={silenceAlerts}
         // Table properties

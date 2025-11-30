@@ -31,7 +31,7 @@ export default function withStackOperationData(WrappedComponent) {
     activeChildColumnIds,
     // Props passed from withAssociatedAlerts
     alertIds,
-    hasAlerts,
+    totalCount,
     deleteAlerts,
     silenceAlerts,
     // Props passed directly from parent
@@ -154,7 +154,7 @@ export default function withStackOperationData(WrappedComponent) {
         {...props}
         // Props via withAssociatedAlerts
         alertIds={alertIds}
-        hasAlerts={hasAlerts}
+        totalCount={totalCount}
         deleteAlerts={deleteAlerts}
         silenceAlerts={silenceAlerts}
         // Props from withOperationData

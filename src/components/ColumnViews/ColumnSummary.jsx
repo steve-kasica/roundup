@@ -33,7 +33,7 @@ const ColumnSummary = ({
   handleInsertColumnRight,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
   alertIds,
-  hasAlerts,
+  totalCount,
   // Props passed directly from parent
   onContextMenu,
 }) => {
@@ -48,7 +48,7 @@ const ColumnSummary = ({
       isSelected={isSelected}
       isDraggable={isDraggable}
       isFocused={isFocused}
-      isError={isError || hasAlerts}
+      isError={isError || totalCount}
       onMouseEnter={hoverColumn}
       onMouseLeave={unhoverColumn}
       onClick={onClick}
@@ -56,7 +56,7 @@ const ColumnSummary = ({
       onContextMenu={onContextMenu}
       sx={{
         cursor: "context-menu",
-        ...(hasAlerts && {
+        ...(totalCount && {
           borderColor: "warning.main",
           borderWidth: 2,
           backgroundColor: "warning.light",
@@ -104,14 +104,15 @@ const ColumnSummary = ({
                 textOverflow: "ellipsis",
                 minWidth: 0,
                 flex: 1,
-                ...(hasAlerts && {
+                ...(totalCount && {
                   color: "#e65100", // warning.dark
                 }),
               }}
             >
               {name || databaseName || id}
             </h3>
-            {hasAlerts && (
+            {/* TODO: handle alerts associated with columns
+            {totalCount && (
               <Badge
                 badgeContent={alertIds.length}
                 color="warning"
@@ -119,7 +120,7 @@ const ColumnSummary = ({
               >
                 <Warning color="warning" fontSize="small" />
               </Badge>
-            )}
+            )} */}
             <Box
               sx={{
                 "@container (min-width: 150px)": {
@@ -130,7 +131,6 @@ const ColumnSummary = ({
                 },
               }}
             >
-              {/* TODO */}
               <ColumnTypeIcon columnType={columnType} />
             </Box>
           </Box>

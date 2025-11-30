@@ -21,7 +21,6 @@ const OperationBlock = ({
     return <EnhancedPackOperationBlock {...props} />;
   } else {
     const backgroundColor = colorScale(depth);
-    console.log({ color: backgroundColor });
     return (
       <EnhancedTableBlock
         id={childIds[0]}

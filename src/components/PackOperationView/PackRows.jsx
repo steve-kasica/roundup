@@ -1,25 +1,7 @@
-import { useRef, useCallback, useMemo, useState } from "react";
-import {
-  TableBody,
-  TableCell,
-  TableContainer,
-  Typography,
-  Table,
-  TableHead,
-  TableRow,
-  Skeleton,
-  Alert,
-  IconButton,
-} from "@mui/material";
-import { EnhancedColumnHeader } from "../ColumnViews";
+import { useCallback, useMemo, useState } from "react";
 import withPackOperationData from "./withPackOperationData";
-import { StickyTableCell, StyledAlternatingTableRow } from "../ui/Table";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
-import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
-import { EnhancedPackOperationLabel } from "./PackOperationLabel";
-import { Refresh } from "@mui/icons-material";
 import RoundupTable from "../ui/Table/Table.jsx";
-import { MATCH_TYPES } from "../OperationsList/PackOperationParams/PackOutputDetails/MatchDetail/withMatchDetailData.jsx";
 /**
  * Virtualized table view for stack operations
  * Supports synchronized or sequential scrolling/loading of multiple tables
@@ -36,16 +18,9 @@ const PackRows = ({
   materializeOperation,
   selectedChildColumnIds,
   // Props passed from withAssociatedAlerts HOC
-  hasAlerts,
+  errorCount,
   // Props passed directyl from withPackOperationData HOC
   matchStats,
-  joinPredicate,
-  leftTableId,
-  leftKey,
-  leftSelectedColumns,
-  rightTableId,
-  rightKey,
-  rightSelectedColumns,
   selectedMatchTypes,
 }) => {
   const [sortByColumnId, setSortByColumnId] = useState(null);
@@ -142,7 +117,7 @@ const PackRows = ({
       placeHolderColumnLength={11}
       placeHolderRowLength={20}
       initialOffset={initialOffset} // TODO: update row counts
-      hasAlerts={hasAlerts}
+      errorCount={errorCount}
     />
   );
 };

@@ -88,7 +88,7 @@ const TableSchema = ({
 
   // Props from withAssociatedAlerts via withTableData
   alertIds, // eslint-disable-line no-unused-vars
-  hasAlerts,
+  totalCount,
 }) => {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering TableSchema for table:", id);
@@ -272,7 +272,7 @@ const TableSchema = ({
       flexDirection="column"
       height="100%"
       sx={{
-        ...(hasAlerts && {
+        ...(totalCount && {
           border: "3px solid",
           borderColor: "warning.main",
           backgroundColor: "warning.light",

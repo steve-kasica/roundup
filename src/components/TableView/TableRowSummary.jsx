@@ -14,7 +14,7 @@ const TableRowSummary = ({
   // props from withTableData
   // Props from withAssociatedAlerts via withTableData
   alertIds,
-  hasAlerts,
+  totalCount,
 
   id,
   name,
@@ -103,7 +103,7 @@ const TableRowSummary = ({
       isDisabled={isDisabled || (searchString.length > 0 && !hasNameMatch)}
       isSelected={isSelected}
       isHovered={false} // TODO: Implement hover state if needed
-      hasAlerts={hasAlerts}
+      totalCount={totalCount}
       hasNameMatch={hasNameMatch}
       data-tableid={id}
       data-selected={isSelected}
@@ -161,7 +161,7 @@ const TableRowSummary = ({
         component="td"
         sx={{ fontSize: "13px" }}
         color={
-          isDisabled ? "textDisabled" : hasAlerts ? "warning.dark" : "normal"
+          isDisabled ? "textDisabled" : totalCount ? "warning.dark" : "normal"
         }
         data-column="name"
       >
@@ -173,7 +173,7 @@ const TableRowSummary = ({
               backgroundColor: "yellow",
             }}
           />
-          {hasAlerts && (
+          {totalCount && (
             <Badge
               badgeContent={alertIds.length}
               color="warning"

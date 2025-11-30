@@ -11,7 +11,7 @@ const TableLabel = ({
   rowCount,
   // Props passed from withAssociatedAlerts via withTableData
   alertIds,
-  hasAlerts,
+  totalCount,
   // Props passed directly from parent component
   onClick,
   includeDimensions = true,
@@ -29,7 +29,7 @@ const TableLabel = ({
       onClick={onClick}
       sx={{
         ...(onClick && { cursor: "pointer" }),
-        ...(hasAlerts && {
+        ...(totalCount && {
           padding: "4px 8px",
           borderRadius: 1,
           backgroundColor: "warning.light",
@@ -41,11 +41,11 @@ const TableLabel = ({
     >
       {includeIcon && (
         <Badge
-          badgeContent={hasAlerts ? alertIds.length : 0}
+          badgeContent={totalCount ? alertIds.length : 0}
           color="warning"
           overlap="circular"
         >
-          {hasAlerts ? <Warning color="warning" /> : <TableChart />}
+          {totalCount ? <Warning color="warning" /> : <TableChart />}
         </Badge>
       )}
       <Typography
@@ -53,7 +53,7 @@ const TableLabel = ({
         component="div"
         sx={{
           userSelect: "none",
-          ...(hasAlerts && {
+          ...(totalCount && {
             color: "warning.dark",
             fontWeight: "bold",
           }),

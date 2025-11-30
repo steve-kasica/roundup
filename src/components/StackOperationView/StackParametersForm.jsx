@@ -24,7 +24,7 @@ const StackParametersForm = ({
   setName,
   alerts = [],
 }) => {
-  const hasAlerts = alerts.length > 0;
+  const totalCount = alerts.length > 0;
 
   if (isLoading) {
     return (
@@ -46,11 +46,11 @@ const StackParametersForm = ({
         display: "flex",
         flexDirection: "column",
         gap: 3,
-        border: hasAlerts ? "2px solid" : "none",
-        borderColor: hasAlerts ? "error.main" : "transparent",
-        borderRadius: hasAlerts ? 1 : 0,
-        backgroundColor: hasAlerts ? "error.lighter" : "transparent",
-        padding: hasAlerts ? 2 : 0,
+        border: totalCount ? "2px solid" : "none",
+        borderColor: totalCount ? "error.main" : "transparent",
+        borderRadius: totalCount ? 1 : 0,
+        backgroundColor: totalCount ? "error.lighter" : "transparent",
+        padding: totalCount ? 2 : 0,
       }}
     >
       <TextField
@@ -59,16 +59,16 @@ const StackParametersForm = ({
         value={name}
         onChange={(event) => setName(event.target.value)}
         placeholder={name || id}
-        error={hasAlerts}
+        error={totalCount}
       />
 
-      <FormControl fullWidth error={hasAlerts}>
+      <FormControl fullWidth error={totalCount}>
         <InputLabel>Operation Type</InputLabel>
         <Select
           value={operationType}
           onChange={(event) => setOperationType(event.target.value)}
           label="Operation Type"
-          error={hasAlerts}
+          error={totalCount}
         >
           <MenuItem value={OPERATION_TYPE_PACK}>Pack</MenuItem>
           <MenuItem value={OPERATION_TYPE_STACK}>Stack</MenuItem>

@@ -100,7 +100,7 @@ function TablesList({
   insertTablesInFocusedOperation, // callback for inserting tables into an existing operation
 
   // Props defined in withAssociatedAlerts (for focused objectId)
-  hasAlerts: focusedObjectHasAlerts,
+  totalCount: focusedObjectHasAlerts,
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering TablesList");

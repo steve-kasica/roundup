@@ -2,12 +2,9 @@
 import {
   Box,
   Typography,
-  CircularProgress,
-  Toolbar,
   IconButton,
   Chip,
   Divider,
-  Badge,
   Menu,
   MenuItem,
 } from "@mui/material";
@@ -27,9 +24,7 @@ import DeleteIconButton from "../ui/icons/DeleteIconButton";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { extent, interpolateGreys, scaleSequential, text } from "d3";
 import { EnhancedTableName } from "../TableView/TableName";
-import MaterializeViewIconButton from "../ui/MaterializeViewIconButton";
 import { isTableId } from "../../slices/tablesSlice";
-import { deleteColumns } from "../../slices/columnsSlice";
 import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 import withGlobalInterfaceData from "../HOC/withGlobalInterfaceData";
 const matchLabels = new Map([
@@ -66,7 +61,8 @@ const PackSchemaView = withPackOperationData(
       rightColumnIds,
       // Props defined in `withAssociatedAlerts`
       alertIds,
-      hasAlerts,
+      totalCount,
+      errorCount,
     }) => {
       const colorScale = scaleSequential(interpolateGreys).domain(
         extent(Object.values(matchStats))
@@ -544,6 +540,8 @@ const PackSchemaView = withPackOperationData(
             objectId={id}
             columnIds={[]}
             alertIds={alertIds}
+            errorCount={errorCount}
+            totalCount={totalCount}
             customMenuItems={
               <>
                 {/* Match category filter chips */}
@@ -619,7 +617,7 @@ const PackSchemaView = withPackOperationData(
             gap={0.5}
             padding={1}
             sx={{
-              backgroundColor: hasAlerts ? "error.lighter" : "transparent",
+              backgroundColor: totalCount ? "error.lighter" : "transparent",
               overflow: "hidden",
             }}
           >

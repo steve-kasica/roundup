@@ -18,6 +18,7 @@ export const Alert = (
 
   sourceId,
   isPassing,
+  isSilenced: false,
   message,
   id: [sourceId, code].join("_"),
 });

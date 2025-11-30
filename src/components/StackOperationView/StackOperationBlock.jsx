@@ -36,7 +36,7 @@ function StackOperationBlock({
   childIds,
   columnCount,
   // Props defined in `withAssociatedAlerts` HOC
-  hasAlerts = false,
+  totalCount = false,
 
   // Props defined in `OperationBlock` parent component
   colorScale,
@@ -51,7 +51,7 @@ function StackOperationBlock({
   return (
     <StyledBlock
       data-operation-type="stack"
-      hasError={hasAlerts}
+      hasError={totalCount}
       isFocused={isFocused}
       sx={{
         ...sx,
@@ -67,7 +67,7 @@ function StackOperationBlock({
       }}
     >
       <Typography variant="treemap label">
-        {hasAlerts && `⚠`} {name || id}{" "}
+        {totalCount && `⚠`} {name || id}{" "}
         <small style={{ color: "#555" }}>
           {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
         </small>

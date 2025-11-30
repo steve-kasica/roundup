@@ -34,7 +34,7 @@ const PackParametersForm = ({
   setOperationType,
   setName,
 }) => {
-  const hasAlerts = alerts.length > 0;
+  const totalCount = alerts.length > 0;
   const [formData, setFormData] = useState({
     leftJoinKey: "",
     rightJoinKey: "",
@@ -64,11 +64,11 @@ const PackParametersForm = ({
         display: "flex",
         flexDirection: "column",
         gap: 3,
-        border: hasAlerts ? "2px solid" : "none",
-        borderColor: hasAlerts ? "error.main" : "transparent",
-        borderRadius: hasAlerts ? 1 : 0,
-        backgroundColor: hasAlerts ? "error.lighter" : "transparent",
-        padding: hasAlerts ? 2 : 0,
+        border: totalCount ? "2px solid" : "none",
+        borderColor: totalCount ? "error.main" : "transparent",
+        borderRadius: totalCount ? 1 : 0,
+        backgroundColor: totalCount ? "error.lighter" : "transparent",
+        padding: totalCount ? 2 : 0,
       }}
     >
       <TextField
@@ -78,29 +78,29 @@ const PackParametersForm = ({
         onChange={(event) => setName(event.target.value)}
         helperText={errors.name}
         placeholder={name}
-        error={hasAlerts}
+        error={totalCount}
       />
 
-      <FormControl fullWidth error={!!errors.rightJoinKey || hasAlerts}>
+      <FormControl fullWidth error={!!errors.rightJoinKey || totalCount}>
         <InputLabel>Operation Type</InputLabel>
         <Select
           value={operationType}
           onChange={(event) => setOperationType(event.target.value)}
           label="Operation Type"
-          error={hasAlerts}
+          error={totalCount}
         >
           <MenuItem value={OPERATION_TYPE_PACK}>Pack</MenuItem>
           <MenuItem value={OPERATION_TYPE_STACK}>Stack</MenuItem>
         </Select>
       </FormControl>
 
-      <FormControl fullWidth error={!!errors.rightJoinKey || hasAlerts}>
+      <FormControl fullWidth error={!!errors.rightJoinKey || totalCount}>
         <InputLabel>Join Predicate</InputLabel>
         <Select
           value={joinPredicate}
           onChange={(event) => setJoinPredicate(event.target.value)}
           label="Join Predicate"
-          error={hasAlerts}
+          error={totalCount}
         >
           {Object.keys(JOIN_PREDICATES).map((predicate) => (
             <MenuItem key={predicate} value={predicate}>
@@ -112,14 +112,14 @@ const PackParametersForm = ({
 
       <FormControl
         fullWidth
-        error={!!errors.leftJoinKey || !leftKey || hasAlerts}
+        error={!!errors.leftJoinKey || !leftKey || totalCount}
       >
         <InputLabel>Left Join Key</InputLabel>
         <Select
           value={leftKey || ""}
           onChange={(event) => setLeftTableJoinKey(event.target.value)}
           label="Left Join Key"
-          error={hasAlerts}
+          error={totalCount}
         >
           {leftColumnIds &&
             leftColumnIds.map((columnId) => (
@@ -135,14 +135,14 @@ const PackParametersForm = ({
 
       <FormControl
         fullWidth
-        error={!!errors.rightJoinKey || !rightKey || hasAlerts}
+        error={!!errors.rightJoinKey || !rightKey || totalCount}
       >
         <InputLabel>Right Join Key</InputLabel>
         <Select
           value={rightKey || ""}
           onChange={(event) => setRightTableJoinKey(event.target.value)}
           label="Right Join Key"
-          error={hasAlerts}
+          error={totalCount}
         >
           {rightColumnIds &&
             rightColumnIds.map((columnId) => (

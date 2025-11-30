@@ -6,9 +6,9 @@ import { styled } from "@mui/material/styles";
  * Styled Lucide icon with access to MUI theme
  */
 const StyledColumns2 = styled(Columns2, {
-  shouldForwardProp: (prop) => prop !== 'hasAlerts',
-})(({ theme, hasAlerts }) => ({
-  color: hasAlerts ? theme.palette.warning.main : 'inherit',
+  shouldForwardProp: (prop) => prop !== "totalCount",
+})(({ theme, totalCount }) => ({
+  color: totalCount ? theme.palette.warning.main : "inherit",
 }));
 
 /**

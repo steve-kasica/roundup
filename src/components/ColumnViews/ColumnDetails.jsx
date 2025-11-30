@@ -10,7 +10,7 @@
  * data work.
  */
 import withColumnData from "./withColumnData";
-import { Box, Divider, Typography, Chip } from "@mui/material";
+import { Box, Divider, Typography, Chip, Stack } from "@mui/material";
 import { Warning } from "@mui/icons-material";
 import DescriptionList from "../ui/DescriptionList";
 import { EnhancedColumnValues } from "./ColumnValues";
@@ -18,6 +18,10 @@ import ColumnValueCounts from "./ColumnValueCounts";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useState } from "react";
 import { duckDBToRoundupTypes } from "../../lib/duckdb";
+import ColumnIcon from "./ColumnIcon";
+
+const VALUE_COUNTS_VIEW = "value_counts";
+const RAW_VALUES_VIEW = "raw_values";
 
 const ColumnDetails = ({
   // Props passed via `withColumnData` HOC
@@ -34,9 +38,9 @@ const ColumnDetails = ({
   completeness,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
   alertIds,
-  hasAlerts,
+  totalCount,
 }) => {
-  const [view, setView] = useState("value counts");
+  const [view, setView] = useState(VALUE_COUNTS_VIEW);
 
   const handleViewChange = (event, newView) => {
     if (newView !== null) {
@@ -50,7 +54,7 @@ const ColumnDetails = ({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        ...(hasAlerts && {
+        ...(totalCount && {
           border: "2px solid",
           borderColor: "warning.main",
           backgroundColor: "warning.light",
@@ -59,13 +63,17 @@ const ColumnDetails = ({
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Typography
-          variant="h5"
-          sx={{ ...(hasAlerts && { color: "warning.dark" }) }}
-        >
-          {name || databaseName || id}
-        </Typography>
-        {hasAlerts && (
+        <Stack direction="row" spacing={1} alignItems="center">
+          <ColumnIcon />
+          <Typography
+            variant="h5"
+            sx={{ ...(totalCount && { color: "warning.dark" }) }}
+          >
+            {name || databaseName || id}
+          </Typography>
+        </Stack>
+
+        {totalCount && (
           <Chip
             icon={<Warning />}
             label={`${alertIds.length} alert${
@@ -98,15 +106,16 @@ const ColumnDetails = ({
           onChange={handleViewChange}
           size="small"
         >
-          <ToggleButton value="value counts">Counts</ToggleButton>
-          <ToggleButton value="raw values">Values</ToggleButton>
+          <ToggleButton value={VALUE_COUNTS_VIEW}>Counts</ToggleButton>
+          <ToggleButton value={RAW_VALUES_VIEW}>Values</ToggleButton>
         </ToggleButtonGroup>
       </Box>
       <Box sx={{ mt: "10px", flexGrow: 1, overflow: "auto" }}>
-        {view === "value counts" && (
+        {view === VALUE_COUNTS_VIEW ? (
           <ColumnValueCounts id={id} uniqueCount={uniqueCount} />
-        )}
-        {view === "raw values" && <EnhancedColumnValues id={id} />}
+        ) : view === RAW_VALUES_VIEW ? (
+          <EnhancedColumnValues id={id} />
+        ) : null}
       </Box>
     </Box>
   );

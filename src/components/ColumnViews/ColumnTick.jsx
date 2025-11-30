@@ -96,7 +96,7 @@ const ColumnTick = ({
   hoverColumn,
   unhoverColumn,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
-  hasAlerts,
+  totalCount,
   sx = {},
 }) => (
   <StyledColumnTick
@@ -109,7 +109,7 @@ const ColumnTick = ({
     isFocused={isFocused}
     isDraggable={isDraggable}
     isNull={isNull}
-    isError={hasAlerts}
+    isError={totalCount}
     isVisible={isVisible}
     onMouseEnter={hoverColumn}
     onMouseLeave={unhoverColumn}

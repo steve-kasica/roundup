@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
@@ -19,7 +19,6 @@ const StackRows = ({
   isMaterialized,
   isInSync,
   activeColumnIds,
-  hasAlerts,
   childIds, // an array of child operation/table IDs
   childRowCounts, // a map of childId to row count
   selectedChildColumnIds,
@@ -27,6 +26,7 @@ const StackRows = ({
   // Props defined in withStackOperationData
   columnIdMatrix,
   // Props defined in withAssociatedAlerts
+  errorCount,
 }) => {
   const [sortByColumnId, setSortByColumnId] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -111,7 +111,7 @@ const StackRows = ({
       placeHolderColumnLength={11}
       placeHolderRowLength={20}
       // initialOffset={initialOffset} // TODO
-      hasAlerts={hasAlerts}
+      errorCount={errorCount}
     />
   );
 };

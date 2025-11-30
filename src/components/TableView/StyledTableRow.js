@@ -8,9 +8,9 @@ const StyledTableRow = styled("tr", {
       "isDisabled",
       "isSelected",
       "isHovered",
-      "hasAlerts",
+      "totalCount",
     ].includes(prop),
-})(({ isDragging, isDisabled, isSelected, isHovered, hasAlerts }) => {
+})(({ isDragging, isDisabled, isSelected, isHovered, totalCount }) => {
   let styles = {
     transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
     cursor: "pointer",
@@ -27,7 +27,7 @@ const StyledTableRow = styled("tr", {
   };
 
   // Alert styles - orange/warning theme (highest priority after disabled)
-  if (hasAlerts && !isDisabled) {
+  if (totalCount && !isDisabled) {
     styles = {
       ...styles,
       backgroundColor: "rgba(255, 152, 0, 0.12)",
@@ -37,7 +37,7 @@ const StyledTableRow = styled("tr", {
   }
 
   // Base selected styles - blue theme for selection
-  if (isSelected && !hasAlerts) {
+  if (isSelected && !totalCount) {
     styles = {
       ...styles,
       backgroundColor: "rgba(25, 118, 210, 0.12)",
@@ -46,7 +46,7 @@ const StyledTableRow = styled("tr", {
   }
 
   // Hover styles - subtle gray with shadow
-  if (isHovered && !isDragging && !isSelected && !hasAlerts) {
+  if (isHovered && !isDragging && !isSelected && !totalCount) {
     styles = {
       ...styles,
       backgroundColor: "rgba(0, 0, 0, 0.02)",
@@ -56,7 +56,7 @@ const StyledTableRow = styled("tr", {
   }
 
   // Selected + Hovered - enhanced selected state
-  if (isSelected && isHovered && !isDragging && !hasAlerts) {
+  if (isSelected && isHovered && !isDragging && !totalCount) {
     styles = {
       ...styles,
       backgroundColor: "rgba(25, 118, 210, 0.16)",
@@ -66,7 +66,7 @@ const StyledTableRow = styled("tr", {
   }
 
   // Alert + Hovered - enhanced alert state
-  if (hasAlerts && isHovered && !isDragging && !isDisabled) {
+  if (totalCount && isHovered && !isDragging && !isDisabled) {
     styles = {
       ...styles,
       backgroundColor: "rgba(255, 152, 0, 0.2)",

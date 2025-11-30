@@ -6,6 +6,7 @@
 
 import { useSelector } from "react-redux";
 import {
+  isOperationId,
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
@@ -17,6 +18,8 @@ import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import AddIcon from "@mui/icons-material/Add";
 import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
+import { selectAlertErrorCount } from "../../slices/alertsSlice";
+import { selectFocusedObjectId } from "../../slices/uiSlice";
 
 const gridColumns = 12;
 const gridWidth = gridColumns - 1;
@@ -27,10 +30,17 @@ const gridWidth = gridColumns - 1;
 // request finishes.
 export default function CompositeTableSchema() {
   const rootOperation = useSelector(selectRootOperation);
+  const errorCount = useSelector((state) => {
+    const focusedObjectId = selectFocusedObjectId(state);
+    return isOperationId(focusedObjectId)
+      ? selectAlertErrorCount(state, focusedObjectId)
+      : null;
+  });
 
   const isAddingOperationsDisabled =
-    (!rootOperation.isMaterialized || !rootOperation.isInSync) &&
-    rootOperation.operationType !== OPERATION_TYPE_NO_OP;
+    ((!rootOperation.isMaterialized || !rootOperation.isInSync) &&
+      rootOperation.operationType !== OPERATION_TYPE_NO_OP) ||
+    (errorCount && errorCount > 0);
 
   return (
     <Box className="CompositeTableSchema" sx={{ height: "100%" }}>

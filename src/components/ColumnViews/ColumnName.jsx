@@ -12,7 +12,7 @@ const ColumnName = ({
   isSelected,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
   alertIds,
-  hasAlerts,
+  totalCount,
   // Props passed from parent component
   selectedSx = {},
 }) => {
@@ -53,7 +53,7 @@ const ColumnName = ({
                 fontWeight: "bold",
               }
             : {}),
-          ...(hasAlerts && {
+          ...(totalCount && {
             color: "warning.dark",
             fontWeight: "bold",
           }),
@@ -61,7 +61,7 @@ const ColumnName = ({
       >
         {name || databaseName || id}
       </Typography>
-      {hasAlerts && (
+      {totalCount && (
         <Tooltip
           title={`${alertIds.length} alert${alertIds.length !== 1 ? "s" : ""}`}
         >

@@ -28,7 +28,7 @@ const Table = ({
   sortConfig,
   placeHolderColumnLength = 10,
   placeHolderRowLength = 20,
-  hasAlerts,
+  totalCount,
 
   // Props specific to operation tables, and are not passed
   // when the operation is a table
@@ -39,7 +39,7 @@ const Table = ({
   const tableContainerRef = React.useRef(null);
   return (
     <>
-      {hasAlerts ? (
+      {totalCount ? (
         <Alert severity="error" sx={{ borderBottom: "1px solid #ccc" }}>
           This operation has schema-related issue that prevent materialization.
         </Alert>

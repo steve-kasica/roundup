@@ -38,7 +38,7 @@ export default function withOperationData(WrappedComponent) {
   function EnhancedComponent({
     id,
     alertIds,
-    hasAlerts,
+    totalCount,
     deleteAlerts,
     silenceAlerts,
     ...props
@@ -277,7 +277,7 @@ export default function withOperationData(WrappedComponent) {
         rowCount={operation.rowCount}
         // Directly associated alerts (from withAssociatedAlerts)
         alertIds={alertIds}
-        hasAlerts={hasAlerts}
+        totalCount={totalCount}
         deleteAlerts={deleteAlerts}
         silenceAlerts={silenceAlerts}
         // Interaction props (TODO, is this deprecated?)

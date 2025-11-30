@@ -32,7 +32,7 @@ function PackOperationBlock({
   rightColumnCount,
   columnCount,
   // Props via withAssociatedAlerts HOC
-  hasAlerts,
+  totalCount,
   // Props passed via parent
   parentColumnCount,
   colorScale,
@@ -46,7 +46,7 @@ function PackOperationBlock({
     <StyledBlock
       className="pack-operation-block"
       isFocused={isFocused}
-      hasError={hasAlerts}
+      hasError={totalCount}
       sx={{
         paddingTop: "20px",
         paddingLeft: "2px",
@@ -60,7 +60,7 @@ function PackOperationBlock({
       }}
     >
       <Typography variant="treemap label">
-        {hasAlerts && `⚠`} {name || id}{" "}
+        {totalCount && `⚠`} {name || id}{" "}
         <small style={{ color: "#555" }}>
           {columnCountDisplay} x {rowCountDisplay}
         </small>

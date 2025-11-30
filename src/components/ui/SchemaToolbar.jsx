@@ -11,31 +11,25 @@ import {
   Dialog,
   Popover,
   List,
-  ListItem,
-  ListItemText,
   Typography,
   Badge,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { selectSelectedColumnIds } from "../../slices/uiSlice";
+import { useSelector } from "react-redux";
 import { useCallback, useState } from "react";
 import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
 import { selectAlertsById } from "../../slices/alertsSlice/selectors";
+import { EnhancedAlertDescription } from "../Alerts/AlertDescription";
 
 const SchemaToolbar = ({
   // columnIds,
   objectId,
   alertIds,
-  hasAlerts,
+  totalCount,
   children,
+  errorCount,
   customMenuItems = null,
-  handleHideSelected = () => {},
 }) => {
-  const dispatch = useDispatch();
-  const selectedColumnIds = useSelector(selectSelectedColumnIds);
   const alerts = useSelector((state) => selectAlertsById(state, alertIds));
-  // const areAllColumnsSelected =
-  //   columnIds.length > 0 && selectedColumnIds.length === columnIds.length;
 
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [alertAnchorEl, setAlertAnchorEl] = useState(null);
@@ -89,11 +83,18 @@ const SchemaToolbar = ({
         <IconButton
           size="small"
           onClick={handleOpenAlerts}
-          disabled={alerts.length === 0}
-          title={`View alerts (${alerts.length})`}
-          color={alerts.length > 0 ? "warning" : "default"}
+          disabled={totalCount === 0}
+          title={`View alerts (${totalCount})`}
+          color={
+            errorCount > 0 ? "error" : totalCount > 0 ? "warning" : "default"
+          }
         >
-          <Badge badgeContent={alerts.length} color="warning">
+          <Badge
+            badgeContent={totalCount}
+            color={
+              errorCount > 0 ? "error" : totalCount > 0 ? "warning" : "default"
+            }
+          >
             <AlertIcon fontSize="small" />
           </Badge>
         </IconButton>
@@ -101,7 +102,7 @@ const SchemaToolbar = ({
         {/* Export */}
         <IconButton
           size="small"
-          disabled={hasAlerts}
+          disabled={errorCount > 0}
           onClick={handleExport}
           title="Export"
         >
@@ -143,35 +144,19 @@ const SchemaToolbar = ({
               p: 2,
               borderBottom: 1,
               borderColor: "divider",
-              bgcolor: "warning.light",
+              backgroundColor: "#f5f5f5",
             }}
           >
             <Typography variant="subtitle2" fontWeight="bold">
-              Alerts ({alerts.length})
+              Alerts ({totalCount})
             </Typography>
           </Box>
           <List sx={{ maxHeight: 320, overflow: "auto", p: 0 }}>
-            {alerts.map((alert, index) => (
-              <ListItem
-                key={alert?.id || index}
-                divider={index < alerts.length - 1}
-                sx={{ py: 1.5, px: 2 }}
-              >
-                <ListItemText
-                  primary={
-                    <Typography variant="body2" fontWeight="medium">
-                      {alert?.title || alert?.message || "Alert"}
-                    </Typography>
-                  }
-                  secondary={
-                    alert?.description || alert?.details ? (
-                      <Typography variant="caption" color="text.secondary">
-                        {alert?.description || alert?.details}
-                      </Typography>
-                    ) : null
-                  }
-                />
-              </ListItem>
+            {alerts.map(({ id }, i, arr) => (
+              <>
+                <EnhancedAlertDescription key={id} id={id} />
+                {i < arr.length - 1 && <Divider component="li" />}
+              </>
             ))}
           </List>
         </Box>

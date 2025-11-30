@@ -1,6 +1,6 @@
 import { transpose } from "d3";
 import { Alert } from "../Alert.js";
-import { SEVERITY_ERROR } from "../index.js";
+import { SEVERITY_WARNING } from "../index.js";
 
 const code = "HETEROGENEOUS_COLUMN_TYPES";
 
@@ -9,7 +9,7 @@ const HeterogeneousColumnTypesAlert = (sourceId, isPassing, message) =>
     code,
     "Heterogeneous Column Types",
     "All vertical groups of columns must have the same data type to create a stack view.",
-    SEVERITY_ERROR,
+    SEVERITY_WARNING,
 
     sourceId,
     isPassing,

@@ -3,7 +3,7 @@ import { validateMissingJoinType } from "./MissingJoinType";
 import { validateMissingLeftJoinKey } from "./MissingLeftJoinKey";
 import { validateMissingRightJoinKey } from "./MissingRightJoinKey";
 import { validateIncongruentTables } from "./IncongruentTables";
-import { validateHeterogeneousColumnTypes } from "./heterogeneousColumnTypes";
+import { validateHeterogeneousColumnTypes } from "../Warnings/HeterogeneousColumnTypes";
 
 const testPackOperationForFatalErrors = (operation) => {
   const fatalErrors = [
