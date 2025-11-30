@@ -36,31 +36,8 @@
 
 /* eslint-disable react/prop-types */
 import withTableData from "./withTableData.jsx";
-import { useRef, useCallback, useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-  CircularProgress,
-  Alert,
-  Button,
-  Box,
-  Paper,
-} from "@mui/material";
+import { useRef, useCallback, useState } from "react";
 import { usePaginatedTableRows } from "../../hooks/index.js";
-import {
-  StyledAlternatingTableRow,
-  StyledTableCell,
-  StickyTableCell,
-} from "../ui/Table";
-import { EnhancedColumnHeader } from "../ColumnViews";
-import { EnhancedTableLabel, TableLabel } from "./TableLabel.jsx";
-import StyledTable from "../ui/Table/StyledTable.jsx";
-import StyledTableContainer from "../ui/Table/StyledTableContainer.jsx";
 import RoundupTable from "../ui/Table/Table.jsx";
 
 const placeHolderColumnLength = 11; // Number of placeholder columns when none are selected
@@ -72,8 +49,6 @@ const TableRows = ({
   databaseName,
   selectedColumnIds, // IDs of selected columns in Redux
   // Props passed directly from parent component
-  onScrollContainerRef = null,
-  onScroll = null,
   showHeader = true,
   columnWidths = {}, // Optional prop for custom column widths
 }) => {
