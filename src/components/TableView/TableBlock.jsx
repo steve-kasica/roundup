@@ -60,8 +60,9 @@ function TableBlock({
       {ticks.map((columnId, index) => {
         const childSx = {
           backgroundColor, // apply background color defined in operation
+          borderLeft: "1px dotted rgba(0, 0, 0, 0.1)",
           ...(index === 0 && {
-            paddingLeft: "0", // no border on the first tick, as it's the left edge
+            borderLeft: "none", // no border on the first tick, as it's the left edge
           }),
         };
         return columnId === null ? (
