@@ -60,7 +60,7 @@ function PackOperationBlock({
       }}
     >
       <Typography variant="treemap label">
-        {totalCount && `⚠`} {name || id}{" "}
+        {totalCount > 0 ? `⚠` : ""} {name || id}{" "}
         <small style={{ color: "#555" }}>
           {columnCountDisplay} x {rowCountDisplay}
         </small>
