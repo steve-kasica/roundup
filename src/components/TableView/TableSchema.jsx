@@ -172,9 +172,8 @@ const TableSchema = ({
   }, [selectedColumnIds, handleColumnTypeMenuClose]);
 
   /**
-   * Handles column selection with support for multiple selection modes:
+   * Handles column selection with support for contiguous selection only:
    * - Regular click: Replace current selection with clicked column
-   * - Ctrl/Cmd+click: Toggle clicked column in selection
    * - Shift+click: Select range from last selected column to clicked column
    *
    * @param {Event} event - Click event containing modifier key information
@@ -182,7 +181,6 @@ const TableSchema = ({
    */
   const handleColumnClick = useCallback(
     (event, columnId) => {
-      const isCtrlOrCmd = event.ctrlKey || event.metaKey;
       const isShift = event.shiftKey;
       const currentColumnIndex = activeColumnIds.indexOf(columnId);
 
@@ -204,13 +202,6 @@ const TableSchema = ({
         } else {
           // Fallback to single selection if last selected column not found
           selectColumns([columnId]);
-        }
-      } else if (isCtrlOrCmd) {
-        // Ctrl/Cmd+click: Toggle selection
-        if (selectedColumnIds.includes(columnId)) {
-          selectColumns(selectedColumnIds.filter((id) => id !== columnId));
-        } else {
-          selectColumns([...selectedColumnIds, columnId]);
         }
       } else {
         // Regular click: Replace selection
