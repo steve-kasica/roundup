@@ -15,6 +15,7 @@ import { Warning } from "@mui/icons-material";
 import DescriptionList from "../ui/DescriptionList";
 import { EnhancedColumnValues } from "./ColumnValues";
 import ColumnValueCounts from "./ColumnValueCounts";
+import ColumnValueLengths from "./ColumnValueLengths";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useState } from "react";
 import { duckDBToRoundupTypes } from "../../lib/duckdb";
@@ -22,13 +23,13 @@ import ColumnIcon from "./ColumnIcon";
 
 const VALUE_COUNTS_VIEW = "value_counts";
 const RAW_VALUES_VIEW = "raw_values";
+const STRING_LENGTH_VIEW = "string_length";
 
 const ColumnDetails = ({
   // Props passed via `withColumnData` HOC
   name,
   columnType,
   id,
-  parentId,
   modeValue,
   modeCount,
   databaseName,
@@ -105,9 +106,11 @@ const ColumnDetails = ({
           exclusive
           onChange={handleViewChange}
           size="small"
+          sx={{ flexWrap: "wrap" }}
         >
           <ToggleButton value={VALUE_COUNTS_VIEW}>Counts</ToggleButton>
           <ToggleButton value={RAW_VALUES_VIEW}>Values</ToggleButton>
+          <ToggleButton value={STRING_LENGTH_VIEW}>Length</ToggleButton>
         </ToggleButtonGroup>
       </Box>
       <Box sx={{ mt: "10px", flexGrow: 1, overflow: "auto" }}>
@@ -115,6 +118,8 @@ const ColumnDetails = ({
           <ColumnValueCounts id={id} uniqueCount={uniqueCount} />
         ) : view === RAW_VALUES_VIEW ? (
           <EnhancedColumnValues id={id} />
+        ) : view === STRING_LENGTH_VIEW ? (
+          <ColumnValueLengths id={id} />
         ) : null}
       </Box>
     </Box>

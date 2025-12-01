@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
 const BarChart = ({
   data = {},
+  tooltipData = {},
   title = "",
   color = "#3b82f6",
   xAxisLabel = "",
@@ -19,6 +20,8 @@ const BarChart = ({
   isLoading = false,
 }) => {
   const scrollContainerRef = useRef(null);
+  const [hoveredBar, setHoveredBar] = useState(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
   const handleScroll = useCallback(
     (event) => {
@@ -157,6 +160,7 @@ const BarChart = ({
             );
             const yPosition = index * (barHeight + barSpacing);
             const showValueOutside = barWidth < 75;
+            const tooltipText = tooltipData[label];
 
             return (
               <div
@@ -186,13 +190,40 @@ const BarChart = ({
                       width: `${barWidth}%`,
                       height: "100%",
                       backgroundColor: color,
-                      transition: "width 0.3s ease-in-out",
+                      transition:
+                        "width 0.3s ease-in-out, filter 0.2s ease-in-out, transform 0.2s ease-in-out",
                       position: "relative",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: showValueOutside
                         ? "flex-start"
                         : "space-between",
+                      cursor: tooltipText ? "pointer" : "default",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.filter = "brightness(1.15)";
+                      e.currentTarget.style.transform = "scaleY(1.1)";
+                      if (tooltipText) {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setHoveredBar(label);
+                        setTooltipPosition({
+                          x: e.clientX,
+                          y: rect.top,
+                        });
+                      }
+                    }}
+                    onMouseMove={(e) => {
+                      if (tooltipText) {
+                        setTooltipPosition({
+                          x: e.clientX,
+                          y: e.clientY,
+                        });
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.filter = "brightness(1)";
+                      e.currentTarget.style.transform = "scaleY(1)";
+                      setHoveredBar(null);
                     }}
                   >
                     {/* Label inset on left */}
@@ -206,6 +237,7 @@ const BarChart = ({
                         whiteSpace: "nowrap",
                         maxWidth: showValueOutside ? "90%" : "60%",
                         paddingLeft: "5px",
+                        userSelect: "none",
                       }}
                       title={`${label}: ${formatValue(value)}`}
                     >
@@ -274,12 +306,36 @@ const BarChart = ({
           </div>
         )}
       </div>
+
+      {/* Tooltip */}
+      {hoveredBar && tooltipData[hoveredBar] && (
+        <div
+          style={{
+            position: "fixed",
+            left: `${tooltipPosition.x + 10}px`,
+            top: `${tooltipPosition.y - 10}px`,
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
+            color: "#ffffff",
+            padding: "8px 12px",
+            borderRadius: "6px",
+            fontSize: "12px",
+            pointerEvents: "none",
+            zIndex: 1000,
+            maxWidth: "300px",
+            wordWrap: "break-word",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          {tooltipData[hoveredBar]}
+        </div>
+      )}
     </div>
   );
 };
 
 BarChart.propTypes = {
   data: PropTypes.objectOf(PropTypes.number),
+  tooltipData: PropTypes.objectOf(PropTypes.string),
   title: PropTypes.string,
   color: PropTypes.string,
   xAxisLabel: PropTypes.string,

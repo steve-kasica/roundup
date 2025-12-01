@@ -10,6 +10,7 @@ export * from "./registerFiles";
 export * from "./renameColumns";
 export * from "./calcPackStats";
 export * from "./getValueCounts";
+export * from "./getValueLength";
 export * from "./getColumnNames";
 export * from "./getMatchValues";
 export * from "./getColumnValues";
