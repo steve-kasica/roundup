@@ -61,13 +61,14 @@ const ColumnName = ({
       >
         {name || databaseName || id}
       </Typography>
-      {totalCount && (
+      {/* Address column alerts (TODO) */}
+      {/* {totalCount && (
         <Tooltip
           title={`${alertIds.length} alert${alertIds.length !== 1 ? "s" : ""}`}
         >
           <Warning color="warning" fontSize="small" sx={{ ml: 0.25 }} />
         </Tooltip>
-      )}
+      )} */}
     </Box>
   );
 };
