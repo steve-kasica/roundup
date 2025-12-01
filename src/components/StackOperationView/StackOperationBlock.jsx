@@ -36,7 +36,7 @@ function StackOperationBlock({
   childIds,
   columnCount,
   // Props defined in `withAssociatedAlerts` HOC
-  totalCount = false,
+  totalCount,
 
   // Props defined in `OperationBlock` parent component
   colorScale,
@@ -67,7 +67,7 @@ function StackOperationBlock({
       }}
     >
       <Typography variant="treemap label">
-        {totalCount && `⚠`} {name || id}{" "}
+        {totalCount > 0 ? `⚠` : ""} {name || id}{" "}
         <small style={{ color: "#555" }}>
           {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
         </small>
