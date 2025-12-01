@@ -76,7 +76,7 @@ export const TOP_VALUES_ATTR = "topValues";
  * @returns {Object} The newly created column object with all the provided metadata properties.
  */
 function Column({
-  parentId,
+  parentId = null,
   name = null,
   databaseName = null,
   approxUnique = null,
@@ -93,10 +93,10 @@ function Column({
   modeValue = null,
   modeCount = null,
   topValues = null,
-}) {
+} = {}) {
   const id = `c${++idCounter}`;
   const output = {};
-  output[TOP_VALUES_ATTR] = null;
+  output[TOP_VALUES_ATTR] = topValues;
 
   return {
     id,

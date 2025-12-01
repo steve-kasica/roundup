@@ -18,13 +18,23 @@ import { Table, selectTablesById } from "../../slices/tablesSlice";
 import { Column } from "../../slices/columnsSlice";
 
 describe("updateOperationsSaga watcher", () => {
+  let state,
+    stackOp = Operation({ operationType: OPERATION_TYPE_STACK }),
+    packOp = Operation({ operationType: OPERATION_TYPE_PACK });
+  beforeEach(() => {
+    state = {
+      operations: {
+        byId: {
+          [stackOp.id]: stackOp,
+          [packOp.id]: packOp,
+        },
+        allIds: [stackOp.id, packOp.id],
+      },
+      ui: { focusedOperationId: null },
+    };
+  });
   describe("basic watcher functionality", () => {
     it("should call worker saga when updateOperationsRequest is dispatched", async () => {
-      const stackOp = Operation({
-        id: "op1",
-        operationType: OPERATION_TYPE_STACK,
-      });
-
       const action = updateOperationsRequest({
         operationUpdates: [{ id: stackOp.id, columnCount: 5 }],
       });
@@ -34,9 +44,7 @@ describe("updateOperationsSaga watcher", () => {
           [matchers.select.selector(selectOperationsById), stackOp],
           [matchers.call.fn(updateOperationsWorker), undefined],
         ])
-        .withState({
-          operations: { byId: { [stackOp.id]: stackOp } },
-        })
+        .withState(state)
         .dispatch(action)
         .silentRun(100);
 
@@ -46,23 +54,16 @@ describe("updateOperationsSaga watcher", () => {
 
   describe("newly created operations", () => {
     it("should dispatch updateOperationsRequest with columnCount null for newly created STACK operation", async () => {
-      const stackOperation = Operation({
-        id: "op1",
-        operationType: OPERATION_TYPE_STACK,
-      });
-
       const action = createOperationsSuccess({
-        operationIds: [stackOperation.id],
+        operationIds: [stackOp.id],
       });
 
       const { effects } = await expectSaga(updateOperationsWatcher)
         .provide([
-          [matchers.select.selector(selectOperationsById), stackOperation],
+          [matchers.select.selector(selectOperationsById), stackOp],
           [matchers.call.fn(updateOperationsWorker), undefined],
         ])
-        .withState({
-          operations: { byId: { [stackOperation.id]: stackOperation } },
-        })
+        .withState(state)
         .dispatch(action)
         .silentRun(100);
 
@@ -76,29 +77,22 @@ describe("updateOperationsSaga watcher", () => {
       const updatePayload = updateRequests[0].payload.action.payload;
       expect(updatePayload.operationUpdates).toHaveLength(1);
       expect(updatePayload.operationUpdates[0]).toEqual({
-        id: stackOperation.id,
+        id: stackOp.id,
         columnCount: null,
       });
     });
 
     it("should dispatch updateOperationsRequest with default join metadata for newly created PACK operation", async () => {
-      const packOperation = Operation({
-        id: "op1",
-        operationType: OPERATION_TYPE_PACK,
-      });
-
       const action = createOperationsSuccess({
-        operationIds: [packOperation.id],
+        operationIds: [packOp.id],
       });
 
       const { effects } = await expectSaga(updateOperationsWatcher)
         .provide([
-          [matchers.select.selector(selectOperationsById), packOperation],
+          [matchers.select.selector(selectOperationsById), packOp],
           [matchers.call.fn(updateOperationsWorker), undefined],
         ])
-        .withState({
-          operations: { byId: { [packOperation.id]: packOperation } },
-        })
+        .withState(state)
         .dispatch(action)
         .silentRun(100);
 
@@ -112,7 +106,7 @@ describe("updateOperationsSaga watcher", () => {
       const updatePayload = updateRequests[0].payload.action.payload;
       expect(updatePayload.operationUpdates).toHaveLength(1);
       expect(updatePayload.operationUpdates[0]).toEqual({
-        id: packOperation.id,
+        id: packOp.id,
         columnCount: null,
         joinType: JOIN_TYPES.FULL_OUTER,
         joinPredicate: JOIN_PREDICATES.EQUALS,
@@ -120,17 +114,18 @@ describe("updateOperationsSaga watcher", () => {
     });
 
     it("should handle multiple newly created operations", async () => {
-      const stackOp = Operation({
-        id: "op1",
+      const stackOp2 = Operation({
         operationType: OPERATION_TYPE_STACK,
       });
-      const packOp = Operation({
-        id: "op2",
+      const packOp2 = Operation({
         operationType: OPERATION_TYPE_PACK,
       });
+      state.operations.byId[stackOp2.id] = stackOp2;
+      state.operations.byId[packOp2.id] = packOp2;
+      state.operations.allIds.push(stackOp2.id, packOp2.id);
 
       const action = createOperationsSuccess({
-        operationIds: [stackOp.id, packOp.id],
+        operationIds: [stackOp2.id, packOp2.id],
       });
 
       const { effects } = await expectSaga(updateOperationsWatcher)
@@ -145,14 +140,7 @@ describe("updateOperationsSaga watcher", () => {
           ],
           [matchers.call.fn(updateOperationsWorker), undefined],
         ])
-        .withState({
-          operations: {
-            byId: {
-              [stackOp.id]: stackOp,
-              [packOp.id]: packOp,
-            },
-          },
-        })
+        .withState(state)
         .dispatch(action)
         .silentRun(100);
 
@@ -186,6 +174,7 @@ describe("updateOperationsSaga watcher", () => {
       columns[2].parentId = table.id;
       columns[3].parentId = table.id;
       state = {
+        ui: { focusedOperationId: null },
         columns: {
           byId: columns.reduce((acc, col) => ({ ...acc, [col.id]: col }), {}),
         },
@@ -264,6 +253,7 @@ describe("updateOperationsSaga watcher", () => {
           [matchers.call.fn(updateOperationsWorker), undefined],
         ])
         .withState({
+          ui: { focusedOperationId: null },
           operations: state.operations,
           columns: state.columns,
           tables: { byId: { ...state.tables.byId, [table.id]: table } },
@@ -319,6 +309,7 @@ describe("updateOperationsSaga watcher", () => {
       tables[2].parentId = operations[1].id;
 
       state = {
+        ui: { focusedOperationId: null },
         columns: {
           byId: columns.reduce((acc, col) => ({ ...acc, [col.id]: col }), {}),
         },

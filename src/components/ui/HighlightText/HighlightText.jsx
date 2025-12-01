@@ -21,7 +21,7 @@ export default function HighlightText({ pattern, text, matchSx }) {
       <>
         <Typography component={"span"}>
           {beginning}
-          <Typography component={"span"} sx={matchSx}>
+          <Typography component={"span"} className="highlight" sx={matchSx}>
             {middle}
           </Typography>
           {end}

@@ -100,6 +100,7 @@ export default function* deleteColumnsSaga() {
   });
 
   // If tables are deleted, we need to delete their columns as well
+  // TODO: I don't think I do this anymore do I?
   yield takeLatest(deleteTablesSuccess, function* (action) {
     const { tableIds } = action.payload;
     // Extract all column IDs from the deleted tables
