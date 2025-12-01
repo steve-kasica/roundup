@@ -397,10 +397,15 @@ const TableSchema = ({
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  flex: "0 0 auto",
-                  minWidth: isVisible ? 200 : 20,
-                  width: isVisible ? 200 : 20,
                   userSelect: "none",
+                  ...(isVisible
+                    ? {
+                        flex: "1",
+                      }
+                    : {
+                        flex: "0 0 auto",
+                        width: "20px",
+                      }),
                 }}
               >
                 <IconButton
