@@ -51,7 +51,7 @@ function TableBlock({
     >
       <Typography variant="treemap label">
         {name || id}
-        {totalCount && `⚠`}
+        {totalCount.length > 0 ? `⚠` : ""}
         <br />
         <small style={{ color: "#555" }}>
           {columnCount.toLocaleString()} x {rowCount.toLocaleString()}

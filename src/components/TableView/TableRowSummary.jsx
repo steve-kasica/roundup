@@ -173,7 +173,8 @@ const TableRowSummary = ({
               backgroundColor: "yellow",
             }}
           />
-          {totalCount && (
+          {/* TODO signal errors on table */}
+          {/* {totalCount && (
             <Badge
               badgeContent={alertIds.length}
               color="warning"
@@ -181,7 +182,7 @@ const TableRowSummary = ({
             >
               <Warning color="warning" fontSize="small" />
             </Badge>
-          )}
+          )} */}
         </Stack>
       </Typography>
       <Typography
