@@ -79,7 +79,6 @@ const TableSchema = ({
   selectColumns,
   hideColumns,
   unhideColumns,
-  displayColumnIds,
   hiddenColumnIds,
   deleteColumns,
   focusColumns,

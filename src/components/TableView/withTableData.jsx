@@ -95,11 +95,17 @@ export default function withTableData(WrappedComponent) {
             `Invalid column IDs for swapping: source (${source}) or target (${target}) not found in active columns of table ${id}.`
           );
         }
+        const nextColumnIds = [...activeColumnIds];
+        nextColumnIds[sourceIndex] = target;
+        nextColumnIds[targetIndex] = source;
+
         dispatch(
-          updateColumnsRequest({
-            columnUpdates: [
-              { id: source, index: targetIndex },
-              { id: target, index: sourceIndex },
+          updateTablesRequest({
+            tableUpdates: [
+              {
+                id,
+                columnIds: nextColumnIds,
+              },
             ],
           })
         );

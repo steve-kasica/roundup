@@ -26,17 +26,18 @@ export default function CustomDragLayer() {
     if (itemType === DRAG_TYPE_SOURCE_TABLE_ROW) {
       return <TableDragPreview tableIds={item.tableIds} />;
     } else {
-      return (
-        <Box
-          sx={{
-            border: "1px dashed gray",
-            padding: "8px",
-            width: "100px",
-            height: "100px",
-            backgroundColor: "orange",
-          }}
-        ></Box>
-      );
+      return null;
+      // return (
+      //   <Box
+      //     sx={{
+      //       border: "1px dashed gray",
+      //       padding: "8px",
+      //       width: "100px",
+      //       height: "100px",
+      //       backgroundColor: "orange",
+      //     }}
+      //   ></Box>
+      // );
     }
   };
 

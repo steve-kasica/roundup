@@ -55,7 +55,7 @@ const ColumnSummary = ({
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
       sx={{
-        cursor: "context-menu",
+        cursor: isSelected ? "grab" : "context-menu",
         ...(totalCount && {
           borderColor: "warning.main",
           borderWidth: 2,
