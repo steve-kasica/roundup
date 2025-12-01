@@ -23,7 +23,9 @@ const validateIncongruentTables = (operation, columnCounts) => {
   return IncongruentTablesAlert(
     operation.id,
     allColumnCountsEqual,
-    `Stack operation "${operation.name}" has incongruent child tables with differing column counts.`
+    `Stack operation ${
+      operation.name || ""
+    } has incongruent child tables with differing column counts.`
   );
 };
 

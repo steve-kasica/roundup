@@ -32,9 +32,9 @@ const validateHeterogeneousColumnTypes = (operation, columnTypeMatrix) => {
   return HeterogeneousColumnTypesAlert(
     operation.id,
     allColumnCountsEqual,
-    `Stack operation "${
-      operation.name
-    }" has different column types at indices: ${heterogeneousIndices.join(
+    `Stack operation ${
+      operation.name || ""
+    } has different column types at indices: ${heterogeneousIndices.join(
       ", "
     )}.`
   );
