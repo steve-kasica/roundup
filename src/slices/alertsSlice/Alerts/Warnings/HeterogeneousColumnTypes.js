@@ -8,7 +8,7 @@ const HeterogeneousColumnTypesAlert = (sourceId, isPassing, message) =>
   Alert(
     code,
     "Heterogeneous Column Types",
-    "All vertical groups of columns must have the same data type to create a stack view.",
+    "All vertical groups of columns should have the same data type.",
     SEVERITY_WARNING,
 
     sourceId,
