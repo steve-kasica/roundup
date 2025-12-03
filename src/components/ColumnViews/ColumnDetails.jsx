@@ -93,7 +93,7 @@ const ColumnDetails = ({
           completeness: `${completeness * 100}%`,
           unique: uniqueCount.toLocaleString(),
           duplicate: duplicateCount.toLocaleString(),
-          mode: `${modeValue || 0} (${modeCount.toLocaleString() || 0})`,
+          mode: `${modeValue || 0} (${modeCount?.toLocaleString() || 0})`,
         }}
       />
       <Divider sx={{ my: 1 }} />

@@ -127,7 +127,6 @@ export function usePaginatedValueCounts(id, pageSize = 100) {
         const result = await getPaginatedValueCounts(
           table.databaseName,
           column.databaseName,
-          column.columnType,
           pageSize,
           offset
         );

@@ -1,8 +1,24 @@
 import { getDuckDB } from "./duckdbClient";
 
+/**
+ * Calculate statistics for a pack operation (join) between two tables.
+ *
+ * Performs a full outer join between two tables and returns counts of:
+ * - Matched rows (present in both tables based on join condition)
+ * - Left unmatched rows (present only in left table)
+ * - Right unmatched rows (present only in right table)
+ *
+ * @param {string} leftTableName - Name of the left table
+ * @param {string} rightTableName - Name of the right table
+ * @param {string} leftColumnName - Column name in the left table to join on
+ * @param {string} rightColumnName - Column name in the right table to join on
+ * @param {string} joinType - Type of join predicate: 'EQUALS', 'CONTAINS', 'STARTS_WITH', or 'ENDS_WITH'
+ * @returns {Promise<{matches: number, left_unmatched: number, right_unmatched: number}>}
+ *          Object containing match statistics
+ */
 export async function calcPackStats(
-  leftTableId,
-  rightTableId,
+  leftTableName,
+  rightTableName,
   leftColumnName,
   rightColumnName,
   joinType
@@ -11,19 +27,19 @@ export async function calcPackStats(
   const conn = await db.connect();
   // TODO: refactor to util file for DRY
   const predicates = {
-    EQUALS: `${leftTableId}.${leftColumnName} = ${rightTableId}.${rightColumnName}`,
-    CONTAINS: `contains(${leftTableId}.${leftColumnName}, ${rightTableId}.${rightColumnName})`,
-    STARTS_WITH: `starts_with(${leftTableId}.${leftColumnName}, ${rightTableId}.${rightColumnName})`,
-    ENDS_WITH: `ends_with(${leftTableId}.${leftColumnName}, ${rightTableId}.${rightColumnName})`,
+    EQUALS: `${leftTableName}.${leftColumnName} = ${rightTableName}.${rightColumnName}`,
+    CONTAINS: `contains(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
+    STARTS_WITH: `starts_with(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
+    ENDS_WITH: `ends_with(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
   };
   const query = `
     -- Count output rows by join relationship type
     WITH join_analysis AS (
         SELECT 
-            ${leftTableId}.${leftColumnName} AS left_value,
-            ${rightTableId}.${rightColumnName} AS right_value
-        FROM ${leftTableId}
-        FULL OUTER JOIN ${rightTableId}
+            ${leftTableName}.${leftColumnName} AS left_value,
+            ${rightTableName}.${rightColumnName} AS right_value
+        FROM ${leftTableName}
+        FULL OUTER JOIN ${rightTableName}
         ON ${predicates[joinType]}
     )
     SELECT 

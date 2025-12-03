@@ -14,6 +14,8 @@ import { SUMMARY_ATTRIBUTES } from "../../slices/columnsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
 
+const uniqueValueLimit = 10;
+
 // Worker saga
 export default function* updateColumnsWorker(action) {
   const successfulUpdates = [];
@@ -56,7 +58,8 @@ export default function* updateColumnsWorker(action) {
           [TOP_VALUES_ATTR]: yield call(
             getValueCounts,
             parent.databaseName,
-            column.databaseName
+            column.databaseName,
+            uniqueValueLimit
           ),
         };
       }

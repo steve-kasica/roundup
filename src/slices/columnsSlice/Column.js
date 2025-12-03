@@ -70,8 +70,6 @@ export const TOP_VALUES_ATTR = "topValues";
  * @param {number|null} [params.p50=null] - 50th percentile (median) value for numerical columns.
  * @param {number|null} [params.p75=null] - 75th percentile value for numerical columns.
  * @param {number|null} [params.std=null] - Standard deviation for numerical columns.
- * @param {*} [params.modeValue=null] - The most frequently occurring value in the column.
- * @param {number|null} [params.modeCount=null] - The frequency count of the mode value.
  * @param {Array|null} [params.topValues=null] - Array of the most common values in the column.
  * @returns {Object} The newly created column object with all the provided metadata properties.
  */
@@ -90,8 +88,6 @@ function Column({
   p50 = null,
   p75 = null,
   std = null,
-  modeValue = null,
-  modeCount = null,
   topValues = null,
 } = {}) {
   const id = `c${++idCounter}`;
@@ -115,8 +111,6 @@ function Column({
     p50,
     p75,
     std,
-    modeValue,
-    modeCount,
     ...output,
   };
 }
@@ -133,8 +127,6 @@ export const SUMMARY_ATTRIBUTES = [
   "p50",
   "p75",
   "std",
-  "modeValue",
-  "modeCount",
 ];
 
 export default Column;

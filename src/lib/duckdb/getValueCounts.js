@@ -7,13 +7,15 @@ import { getDuckDB } from "./duckdbClient";
  * @param {string} databaseName - The column identifier
  * @param {number} limit - Maximum number of results to return (optional)
  * @param {number} offset - Number of results to skip (optional, for pagination)
+ * @param {number} minCount - Minimum count threshold; values with counts below this are excluded (default: 10)
  * @returns {Promise<Object>} Object with values as keys and counts as values
  */
 export async function getValueCounts(
   tableName,
   columnName,
   limit = null,
-  offset = 0
+  offset = 0,
+  minCount = null
 ) {
   const db = await getDuckDB();
   const conn = await db.connect();
@@ -21,40 +23,32 @@ export async function getValueCounts(
   const limitClause = limit !== null ? `LIMIT ${limit}` : "";
   const offsetClause = offset > 0 ? `OFFSET ${offset}` : "";
 
-  const columnTypeQuery = `
-    SELECT TYPEOF("${columnName}") as column_type
-    FROM "${tableName}"
-    LIMIT 1
-  `;
-  const columnTypeResult = await conn.query(columnTypeQuery);
-  const columnType =
-    columnTypeResult.toArray().length > 0
-      ? columnTypeResult.toArray()[0].column_type
-      : null;
+  const havingClause = minCount ? `HAVING COUNT(*) >= ${minCount}` : "";
 
   const query = `
       SELECT 
-        "${columnName}" as value,
+        "${columnName}"::VARCHAR as value,
         COUNT(*) as count
       FROM "${tableName}" 
       WHERE "${columnName}" IS NOT NULL
       GROUP BY "${columnName}"
+      ${havingClause}
       ORDER BY count DESC
       ${limitClause}
       ${offsetClause}
     `;
   try {
     const result = await conn.query(query);
-
-    console.log("Value Counts Result:", result.toArray(), { columnType });
-    return result.toArray().map((row) => ({
-      value:
-        columnType === "DATE"
-          ? new Date(row.value).toLocaleDateString()
-          : String(row.value),
+    const data = result.toArray().map((row) => ({
+      value: String(row.value),
       count: typeof row.count === "bigint" ? Number(row.count) : row.count,
     }));
+    console.log("Value counts data:", { data, results: result.toArray() });
+    return data;
   } catch (error) {
+    alert(
+      `Failed to get value counts for column ${columnName}: ${error.message}`
+    );
     throw new Error(
       `Failed to get value counts for column ${columnName}: ${error.message}`
     );
@@ -72,36 +66,44 @@ export async function getValueCounts(
  * @param {string} columnName - The column identifier
  * @param {number} limit - Number of results per page
  * @param {number} offset - Number of results to skip
+ * @param {number} minCount - Minimum count threshold; values with counts below this are excluded (default: 10)
  * @returns {Promise<Object>} Object with data, hasMore, and total count
  */
 export async function getPaginatedValueCounts(
   tableName,
   columnName,
-  columnType,
   limit = 100,
-  offset = 0
+  offset = 0,
+  minCount = null
 ) {
   const db = await getDuckDB();
   const conn = await db.connect();
 
   try {
-    // Get total count of unique values
+    // Get total count of unique values that meet the minCount threshold
     const totalQuery = `
-      SELECT COUNT(DISTINCT "${columnName}") as total
-      FROM "${tableName}" 
-      WHERE "${columnName}" IS NOT NULL
+      SELECT COUNT(*) as total
+      FROM (
+        SELECT "${columnName}"::VARCHAR
+        FROM "${tableName}" 
+        WHERE "${columnName}" IS NOT NULL
+        GROUP BY "${columnName}"
+        HAVING COUNT(*) >= ${minCount}
+      )
     `;
     const totalResult = await conn.query(totalQuery);
     const total = Number(totalResult.toArray()[0].total);
+    const havingClause = minCount ? `HAVING COUNT(*) >= ${minCount}` : "";
 
     // Get paginated data
     const dataQuery = `
       SELECT 
-        "${columnName}" as value,
+        "${columnName}"::VARCHAR as value,
         COUNT(*) as count
       FROM "${tableName}" 
       WHERE "${columnName}" IS NOT NULL
       GROUP BY "${columnName}"
+      ${havingClause}
       ORDER BY count DESC
       LIMIT ${limit}
       OFFSET ${offset}
@@ -109,10 +111,7 @@ export async function getPaginatedValueCounts(
     const dataResult = await conn.query(dataQuery);
 
     const data = dataResult.toArray().map((row) => ({
-      value:
-        columnType === "DATE"
-          ? new Date(row.value).toLocaleDateString()
-          : String(row.value),
+      value: String(row.value),
       count: typeof row.count === "bigint" ? Number(row.count) : row.count,
     }));
 
@@ -140,13 +139,15 @@ export async function getPaginatedValueCounts(
  * @param {Array<string>} columnNames - Array of column identifiers
  * @param {number} limit - Maximum number of results per column
  * @param {number} offset - Number of results to skip per column
+ * @param {number} minCount - Minimum count threshold; values with counts below this are excluded (default: 10)
  * @returns {Promise<Object>} Object with databaseName as keys and value counts as values
  */
 export async function getMultipleValueCounts(
   tableName,
   databaseNames,
   limit = 100,
-  offset = 0
+  offset = 0,
+  minCount = 10
 ) {
   const results = {};
 
@@ -156,7 +157,8 @@ export async function getMultipleValueCounts(
         tableName,
         databaseName,
         limit,
-        offset
+        offset,
+        minCount
       );
     } catch (error) {
       console.warn(
@@ -177,13 +179,15 @@ export async function getMultipleValueCounts(
  * @param {Array<string>} databaseNames - Array of column identifiers
  * @param {number} limit - Maximum number of results per column
  * @param {number} offset - Number of results to skip per column
+ * @param {number} minCount - Minimum count threshold; values with counts below this are excluded (default: 10)
  * @returns {Promise<Object>} Object with databaseName as keys and paginated results as values
  */
 export async function getMultiplePaginatedValueCounts(
   tableName,
   databaseNames,
   limit = 100,
-  offset = 0
+  offset = 0,
+  minCount = 10
 ) {
   const results = {};
 
@@ -193,7 +197,8 @@ export async function getMultiplePaginatedValueCounts(
         tableName,
         databaseName,
         limit,
-        offset
+        offset,
+        minCount
       );
     } catch (error) {
       console.warn(
