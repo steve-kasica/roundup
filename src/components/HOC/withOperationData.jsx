@@ -133,14 +133,19 @@ export default function withOperationData(WrappedComponent) {
           updatedChildren[bIndex],
           updatedChildren[aIndex],
         ];
+
         dispatch(
           updateOperations({
             id,
             childIds: updatedChildren,
+            // If join keys are set, we may need to swap them as well
+            ...(operation.joinKey1 && operation.joinKey2
+              ? { joinKey1: operation.joinKey2, joinKey2: operation.joinKey1 }
+              : {}),
           })
         );
       },
-      [dispatch, id, operation.childIds]
+      [dispatch, id, operation.childIds, operation.joinKey1, operation.joinKey2]
     );
 
     const hideColumns = useCallback(
