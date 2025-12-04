@@ -14,7 +14,7 @@ const pageSize = 50; // default page size for pagination
  */
 const StackRows = ({
   // Props defined via withOperationData
-  databaseName,
+  id,
   materializeOperation,
   isMaterialized,
   isInSync,
@@ -53,7 +53,7 @@ const StackRows = ({
   }, [activeColumnIds, columnIdMatrix, selectedChildColumnIds]);
 
   const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
-    databaseName,
+    id,
     displayColumnIds,
     pageSize,
     sortByColumnId,

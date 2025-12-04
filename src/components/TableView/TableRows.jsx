@@ -46,7 +46,6 @@ const placeHolderRowLength = 20; // Number of placeholder rows when none are sel
 const TableRows = ({
   // Props passed via withTableData HOC
   id,
-  databaseName,
   selectedColumnIds, // IDs of selected columns in Redux
   // Props passed directly from parent component
   showHeader = true,
@@ -71,7 +70,7 @@ const TableRows = ({
   // Hook for managing paginated data with sorting
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
-      databaseName,
+      id,
       selectedColumnIds,
       50, // pageSize
       sortConfig.columnId, // sortBy

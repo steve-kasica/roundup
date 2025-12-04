@@ -5,6 +5,9 @@ import {
   selectColumnNamesById,
   selectColumnsById,
 } from "../slices/columnsSlice/selectors.js";
+import { selectTablesById } from "../slices/tablesSlice/selectors.js";
+import { selectOperationsById } from "../slices/operationsSlice/selectors.js";
+import { isTableId } from "../slices/tablesSlice/Table.js";
 
 /**
  * Custom React Hook for querying DuckDB database rows
@@ -111,9 +114,14 @@ export function usePaginatedTableRows(
   const sortBy = useSelector(
     (state) => selectColumnsById(state, sortByColumnId)?.databaseName || null
   );
-  const columnsList = useSelector((state) =>
-    selectColumnNamesById(state, columnIds)
+  const table = useSelector((state) =>
+    isTableId(tableId)
+      ? selectTablesById(state, tableId)
+      : selectOperationsById(state, tableId)
   );
+  const columnsList = useSelector((state) =>
+    selectColumnsById(state, columnIds)
+  ).map(({ databaseName }) => databaseName);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -155,7 +163,7 @@ export function usePaginatedTableRows(
         }
 
         const rows = await getTableRows(
-          tableId,
+          table.databaseName,
           columnsList,
           effectiveLimit,
           offset,

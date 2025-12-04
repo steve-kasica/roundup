@@ -17,8 +17,21 @@ function parseValue(value) {
   return value;
 }
 
+/**
+ * Retrieves rows from a specified DuckDB table with optional column selection, sorting, and pagination.
+ *
+ * @async
+ * @function getTableRows
+ * @param {string} tableName - The name of the table to query.
+ * @param {string[]} columnsList - Array of column names to select. If null or empty, selects all columns.
+ * @param {number} [limit=50] - Maximum number of rows to retrieve.
+ * @param {number} [offset=0] - Number of rows to skip before starting to return rows.
+ * @param {string|null} [sortBy=null] - Column name to sort by. If null, no sorting is applied.
+ * @param {string} [sortDirection="asc"] - Sort direction, either "asc" or "desc".
+ * @returns {Promise<Array<Array<unknown>>>} A promise that resolves to an array of rows, each row as an array of parsed values.
+ */
 export async function getTableRows(
-  tableId,
+  tableName,
   columnsList,
   limit = 50,
   offset = 0,
@@ -33,7 +46,7 @@ export async function getTableRows(
       : "*";
   const query = `
     SELECT ${columnsClause} 
-    FROM ${tableId} 
+    FROM ${tableName} 
     ${sortBy ? `ORDER BY ${sortBy} ${sortDirection}` : ""}
     LIMIT ${limit} 
     OFFSET ${offset}
