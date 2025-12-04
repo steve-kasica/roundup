@@ -27,13 +27,6 @@ export async function calcPackStats(
   const rightValue = `CAST(${rightTableName}.${rightColumnName} AS VARCHAR)`;
   const db = await getDuckDB();
   const conn = await db.connect();
-  // TODO: refactor to util file for DRY
-  // const predicates = {
-  //   EQUALS: `${leftTableName}.${leftColumnName} = ${rightTableName}.${rightColumnName}`,
-  //   CONTAINS: `contains(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
-  //   STARTS_WITH: `starts_with(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
-  //   ENDS_WITH: `ends_with(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
-  // };
   const predicates = {
     EQUALS: `${leftValue} = ${rightValue}`,
     CONTAINS: `contains(${leftValue}, ${rightValue})`,

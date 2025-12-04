@@ -12,7 +12,7 @@ export async function createStackView(queryData, columnList = null) {
 
 export function formQuery(queryData, columnList = null) {
   const columnSpec = columnList ? `(${columnList.join(", ")})` : "";
-  return `CREATE OR REPLACE VIEW ${
+  return `CREATE OR REPLACE TABLE ${
     queryData.viewName
   }${columnSpec} AS SELECT * FROM (
     ${queryData.children

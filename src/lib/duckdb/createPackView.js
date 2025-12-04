@@ -85,7 +85,7 @@ export function formQuery(data, columnList = null) {
 
   const columnSpec = columnList ? `(${columnList.join(", ")})` : "";
   const query = `
-    CREATE OR REPLACE VIEW ${data.viewName}${columnSpec} AS
+    CREATE OR REPLACE TABLE ${data.viewName}${columnSpec} AS
     ${definition}`;
   return query;
 }
