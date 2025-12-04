@@ -23,28 +23,36 @@ export async function calcPackStats(
   rightColumnName,
   joinType
 ) {
+  const leftValue = `CAST(${leftTableName}.${leftColumnName} AS VARCHAR)`;
+  const rightValue = `CAST(${rightTableName}.${rightColumnName} AS VARCHAR)`;
   const db = await getDuckDB();
   const conn = await db.connect();
   // TODO: refactor to util file for DRY
+  // const predicates = {
+  //   EQUALS: `${leftTableName}.${leftColumnName} = ${rightTableName}.${rightColumnName}`,
+  //   CONTAINS: `contains(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
+  //   STARTS_WITH: `starts_with(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
+  //   ENDS_WITH: `ends_with(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
+  // };
   const predicates = {
-    EQUALS: `${leftTableName}.${leftColumnName} = ${rightTableName}.${rightColumnName}`,
-    CONTAINS: `contains(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
-    STARTS_WITH: `starts_with(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
-    ENDS_WITH: `ends_with(${leftTableName}.${leftColumnName}, ${rightTableName}.${rightColumnName})`,
+    EQUALS: `${leftValue} = ${rightValue}`,
+    CONTAINS: `contains(${leftValue}, ${rightValue})`,
+    STARTS_WITH: `starts_with(${leftValue}, ${rightValue})`,
+    ENDS_WITH: `ends_with(${leftValue}, ${rightValue})`,
   };
   const query = `
     -- Count output rows by join relationship type
     WITH join_analysis AS (
         SELECT 
-            ${leftTableName}.${leftColumnName} AS left_value,
-            ${rightTableName}.${rightColumnName} AS right_value
+            ${leftValue} AS left_value,
+            ${rightValue} AS right_value
         FROM ${leftTableName}
         FULL OUTER JOIN ${rightTableName}
         ON ${predicates[joinType]}
     )
     SELECT 
-        COUNT(CASE WHEN left_value IS NOT NULL AND right_value IS NOT NULL THEN 1 END) as matches,
         COUNT(CASE WHEN left_value IS NOT NULL AND right_value IS NULL THEN 1 END) as left_unmatched,
+        COUNT(CASE WHEN left_value IS NOT NULL AND right_value IS NOT NULL THEN 1 END) as matches,        
         COUNT(CASE WHEN left_value IS NULL AND right_value IS NOT NULL THEN 1 END) as right_unmatched
     FROM join_analysis
 `;
