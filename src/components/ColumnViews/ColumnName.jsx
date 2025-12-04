@@ -15,6 +15,7 @@ const ColumnName = ({
   totalCount,
   // Props passed from parent component
   selectedSx = {},
+  containerSx = {},
 }) => {
   const handleClick = (event) => {
     if (onClick) {
@@ -25,11 +26,13 @@ const ColumnName = ({
   return (
     <Box
       sx={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 0.5,
-        minWidth: 0,
-        maxWidth: "100%",
+        // display: "inline-flex",
+        // alignItems: "center",
+        // gap: 0.5,
+        // containerType: "size",
+        // minWidth: 0,
+        // maxWidth: "100%",
+        ...containerSx,
       }}
     >
       <Typography

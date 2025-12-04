@@ -10,7 +10,7 @@ import RoundupTable from "../ui/Table/Table.jsx";
  */
 const PackRows = ({
   // Props passed via withOperationData
-  databaseName,
+  id,
   activeColumnIds, // columnIDs of this operation (not hidden)
   activeChildColumnIds, // column IDs of operation's child tables (not hidden)
   isMaterialized,
@@ -59,7 +59,7 @@ const PackRows = ({
   // const [sortBy, setSortBy] = useState(null);
   // const [sortDirection, setSortDirection] = useState("asc");
   const results = usePaginatedTableRows(
-    databaseName,
+    id,
     displayColumnIds,
     50,
     sortByColumnId,

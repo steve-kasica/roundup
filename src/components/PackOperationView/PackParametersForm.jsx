@@ -124,7 +124,7 @@ const PackParametersForm = ({
           {leftColumnIds &&
             leftColumnIds.map((columnId) => (
               <MenuItem key={columnId} value={columnId}>
-                <EnhancedColumnName id={columnId} />
+                <EnhancedColumnName id={columnId} sx={{ color: "black" }} />
               </MenuItem>
             ))}
         </Select>

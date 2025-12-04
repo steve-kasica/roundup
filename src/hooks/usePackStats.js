@@ -1,5 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { calcPackStats } from "../lib/duckdb/calcPackStats.js";
+import { useSelector } from "react-redux";
+import { selectColumnsById } from "../slices/columnsSlice/selectors.js";
+import { selectTablesById } from "../slices/tablesSlice/selectors.js";
+import { selectOperationsById } from "../slices/operationsSlice/selectors.js";
+import { isTableId } from "../slices/tablesSlice/Table.js";
 
 /**
  * Custom React Hook for calculating pack statistics using DuckDB
@@ -25,24 +30,33 @@ import { calcPackStats } from "../lib/duckdb/calcPackStats.js";
  * @returns {Function} reset - Function to reset state to initial values
  */
 export function usePackStats(
-  leftTableId,
-  rightTableId,
-  leftColumnName,
-  rightColumnName,
+  leftColumnId,
+  rightColumnId,
   joinType,
   autoFetch = true
 ) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [leftColumn, rightColumn] = useSelector((state) =>
+    selectColumnsById(state, [leftColumnId, rightColumnId])
+  );
+  const [leftTable, rightTable] = useSelector((state) => [
+    isTableId(leftColumn?.parentId)
+      ? selectTablesById(state, leftColumn?.parentId)
+      : selectOperationsById(state, leftColumn?.parentId),
+    isTableId(rightColumn?.parentId)
+      ? selectTablesById(state, rightColumn?.parentId)
+      : selectOperationsById(state, rightColumn?.parentId),
+  ]);
 
   const fetchData = useCallback(async () => {
     // Skip calculation if any required parameter is missing
     if (
-      !leftTableId ||
-      !rightTableId ||
-      !leftColumnName ||
-      !rightColumnName ||
+      !leftTable?.databaseName ||
+      !rightTable?.databaseName ||
+      !leftColumn?.databaseName ||
+      !rightColumn?.databaseName ||
       !joinType
     ) {
       setData(null);
@@ -54,10 +68,10 @@ export function usePackStats(
 
     try {
       const stats = await calcPackStats(
-        leftTableId,
-        rightTableId,
-        leftColumnName,
-        rightColumnName,
+        leftTable?.databaseName,
+        rightTable?.databaseName,
+        leftColumn?.databaseName,
+        rightColumn?.databaseName,
         joinType
       );
       setData(stats);
@@ -67,7 +81,13 @@ export function usePackStats(
     } finally {
       setLoading(false);
     }
-  }, [leftTableId, rightTableId, leftColumnName, rightColumnName, joinType]);
+  }, [
+    leftTable?.databaseName,
+    rightTable?.databaseName,
+    leftColumn?.databaseName,
+    rightColumn?.databaseName,
+    joinType,
+  ]);
 
   const reset = useCallback(() => {
     setData(null);
@@ -82,8 +102,28 @@ export function usePackStats(
     }
   }, [fetchData, autoFetch]);
 
+  const matchKeys = useMemo(
+    () => ["left_unmatched", "matches", "right_unmatched"],
+    []
+  );
+  const matchLabels = useMemo(
+    () =>
+      new Map([
+        [matchKeys[0], "Left Only"],
+        [matchKeys[1], "Matches"],
+        [matchKeys[2], "Right Only"],
+      ]),
+    [matchKeys]
+  );
+
   return {
-    data,
+    data: data
+      ? data
+      : Object.fromEntries(
+          Array.from(matchLabels.keys()).map((type) => [type, 0])
+        ),
+    matchLabels,
+    matchKeys,
     loading,
     error,
     refetch: fetchData,
