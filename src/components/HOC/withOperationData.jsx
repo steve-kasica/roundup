@@ -4,7 +4,6 @@ import {
   selectOperationsById,
   selectOperationDepthById,
   selectOperationChildRowCounts,
-  updateOperations,
   isOperationId,
   selectRootOperationId,
   selectMaxOperationDepth,
@@ -28,7 +27,10 @@ import {
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
 import withAssociatedAlerts from "./withAssociatedAlerts";
-import { selectFocusedObjectId } from "../../slices/uiSlice";
+import {
+  selectFocusedObjectId,
+  selectLoadingOperations,
+} from "../../slices/uiSlice";
 import { group, interpolateMagma, scaleSequential } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
@@ -52,6 +54,12 @@ export default function withOperationData(WrappedComponent) {
       [id, rootOperationId]
     );
     const maxDepth = useSelector(selectMaxOperationDepth);
+
+    const loadingOperations = useSelector(selectLoadingOperations);
+    const isLoading = useMemo(
+      () => loadingOperations.includes(id),
+      [loadingOperations, id]
+    );
 
     // Get columnIds associated with this table, both active and "removed"
     const columnIds = useSelector((state) =>
@@ -135,13 +143,20 @@ export default function withOperationData(WrappedComponent) {
         ];
 
         dispatch(
-          updateOperations({
-            id,
-            childIds: updatedChildren,
-            // If join keys are set, we may need to swap them as well
-            ...(operation.joinKey1 && operation.joinKey2
-              ? { joinKey1: operation.joinKey2, joinKey2: operation.joinKey1 }
-              : {}),
+          updateOperationsRequest({
+            operationUpdates: [
+              {
+                id,
+                childIds: updatedChildren,
+                // If join keys are set, we may need to swap them as well
+                ...(operation.joinKey1 && operation.joinKey2
+                  ? {
+                      joinKey1: operation.joinKey2,
+                      joinKey2: operation.joinKey1,
+                    }
+                  : {}),
+              },
+            ],
           })
         );
       },
@@ -268,6 +283,7 @@ export default function withOperationData(WrappedComponent) {
         maxDepth={maxDepth}
         isRootOperation={isRootOperation}
         colorScale={colorScale}
+        isLoading={isLoading}
         // Pack-related operations
         joinKey1={operation.joinKey1}
         joinKey2={operation.joinKey2}
@@ -294,7 +310,11 @@ export default function withOperationData(WrappedComponent) {
         // Operation specific callbacks
         swapTablePositions={swapTablePositions}
         renameOperation={(newName) =>
-          dispatch(updateOperations({ id, name: newName }))
+          dispatch(
+            updateOperationsRequest({
+              operationUpdates: [{ id, name: newName }],
+            })
+          )
         }
         setName={(name) =>
           dispatch(
