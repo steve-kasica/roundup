@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { getTableRows } from "../lib/duckdb/getTableRows.js";
 import { useSelector } from "react-redux";
 import {
@@ -119,9 +119,15 @@ export function usePaginatedTableRows(
       ? selectTablesById(state, tableId)
       : selectOperationsById(state, tableId)
   );
-  const columnsList = useSelector((state) =>
-    selectColumnsById(state, columnIds)
-  ).map(({ databaseName }) => databaseName);
+  const columns = useSelector((state) => selectColumnsById(state, columnIds));
+  const columnsList = useMemo(
+    () => columns.map(({ databaseName }) => databaseName),
+    [columns]
+  );
+
+  // Extract stable values from table to avoid object reference changes
+  const tableDatabaseName = table?.databaseName;
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -147,23 +153,29 @@ export function usePaginatedTableRows(
       try {
         const offset = initialOffset + pageNum * pageSize;
 
-        // Calculate the limit for this fetch
+        // Calculate effective limit using functional update to avoid data.length dependency
         let effectiveLimit = pageSize;
+
         if (rowLimit !== null) {
-          const currentDataLength = reset || pageNum === 0 ? 0 : data.length;
-          const remainingRows = rowLimit - currentDataLength;
+          // We'll check this inside the functional update
+          setData((prevData) => {
+            const currentDataLength =
+              reset || pageNum === 0 ? 0 : prevData.length;
+            const remainingRows = rowLimit - currentDataLength;
 
-          if (remainingRows <= 0) {
-            setHasMore(false);
-            setLoading(false);
-            return;
-          }
+            if (remainingRows <= 0) {
+              setHasMore(false);
+              setLoading(false);
+            } else {
+              effectiveLimit = Math.min(pageSize, remainingRows);
+            }
 
-          effectiveLimit = Math.min(pageSize, remainingRows);
+            return prevData; // Don't modify data yet
+          });
         }
 
         const rows = await getTableRows(
-          table.databaseName,
+          tableDatabaseName,
           columnsList,
           effectiveLimit,
           offset,
@@ -172,22 +184,20 @@ export function usePaginatedTableRows(
         );
 
         setData((prevData) => {
-          if (reset || pageNum === 0) {
-            return rows;
-          }
-          return [...prevData, ...rows];
-        });
+          const newData =
+            reset || pageNum === 0 ? rows : [...prevData, ...rows];
 
-        // Check if we have more data
-        if (rowLimit !== null) {
-          const newDataLength =
-            (reset || pageNum === 0 ? 0 : data.length) + rows.length;
-          setHasMore(
-            rows.length === effectiveLimit && newDataLength < rowLimit
-          );
-        } else {
-          setHasMore(rows.length === pageSize);
-        }
+          // Calculate hasMore based on actual new data
+          if (rowLimit !== null) {
+            setHasMore(
+              rows.length === effectiveLimit && newData.length < rowLimit
+            );
+          } else {
+            setHasMore(rows.length === pageSize);
+          }
+
+          return newData;
+        });
 
         setCurrentPage(pageNum);
       } catch (err) {
@@ -200,13 +210,14 @@ export function usePaginatedTableRows(
     [
       tableId,
       columnIds,
-      columnsList,
+      initialOffset,
       pageSize,
+      rowLimit,
+      tableDatabaseName,
+      columnsList,
       sortBy,
       sortDirection,
-      initialOffset,
-      rowLimit,
-      data.length,
+      // Removed data.length - use functional updates instead
     ]
   );
 
@@ -228,11 +239,6 @@ export function usePaginatedTableRows(
     setCurrentPage(0);
     setHasMore(true);
   }, []);
-
-  // Auto-fetch first page on mount or dependency changes
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
 
   return {
     data,

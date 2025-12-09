@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import withStackOperationData from "./withStackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
@@ -52,32 +52,15 @@ const StackRows = ({
     return activeColumnIds.filter((colId, index) => selectedIndices.has(index));
   }, [activeColumnIds, columnIdMatrix, selectedChildColumnIds]);
 
-  const { data, loading, error, hasMore, loadMore } = usePaginatedTableRows(
-    id,
-    displayColumnIds,
-    pageSize,
-    sortByColumnId,
-    sortDirection,
-    initialOffset
-  );
-
-  // Handle scroll events for infinite loading
-  // TODO: does this need to be in RoundupTable
-  // to not be repeated?
-  const handleScroll = useCallback(
-    (event) => {
-      const container = event.target;
-      const { scrollTop, scrollHeight, clientHeight } = container;
-
-      // Check if user has scrolled near the bottom (within 100px)
-      const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
-
-      if (nearBottom && hasMore && !loading) {
-        loadMore();
-      }
-    },
-    [hasMore, loading, loadMore]
-  );
+  const { data, loading, error, hasMore, loadMore, refresh } =
+    usePaginatedTableRows(
+      id,
+      displayColumnIds,
+      pageSize,
+      sortByColumnId,
+      sortDirection,
+      initialOffset
+    );
 
   const handleColumnSort = useCallback(
     (event, columnId) => {
@@ -94,7 +77,19 @@ const StackRows = ({
   const handleMaterializeView = useCallback(() => {
     materializeOperation();
     selectAllChildColumns();
-  }, [materializeOperation]);
+  }, [materializeOperation, selectAllChildColumns]);
+
+  const onScrollThreshold = useCallback(() => {
+    if (hasMore && !loading && !error) {
+      loadMore();
+    }
+  }, [hasMore, loading, error, loadMore]);
+
+  // Load initial data only when table/columns/sort changes, not when refresh function changes
+  useEffect(() => {
+    refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, displayColumnIds, sortByColumnId, sortDirection]);
 
   return (
     <RoundupTable
@@ -104,7 +99,7 @@ const StackRows = ({
       data={data}
       loading={loading}
       error={error}
-      handleScroll={handleScroll}
+      onScrollThreshold={onScrollThreshold}
       onColumnSort={handleColumnSort}
       onMaterializeView={handleMaterializeView}
       sortConfig={{ sortByColumnId, sortDirection }}

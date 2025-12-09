@@ -15,28 +15,12 @@
  * - Alternating row colors for better readability
  * - Sticky header that remains visible during scrolling
  *
- * @component
- * @example
- * ```jsx
- * // Basic usage (typically wrapped with withTableData HOC)
- * <TableRows
- *   table={tableObject}
- *   selectedColumnIds={['col1', 'col2', 'col3']}
- *   hoverColumn={handleHover}
- *   unhoverColumn={handleUnhover}
- * />
- *
- * // Enhanced version with HOC (recommended usage)
- * <EnhancedTableRows
- *   id="table-1"
- *   selectedColumnIds={['col1', 'col2']}
- * />
  * ```
  */
 
 /* eslint-disable react/prop-types */
 import withTableData from "./withTableData.jsx";
-import { useRef, useCallback, useState } from "react";
+import { useRef, useCallback, useState, useEffect } from "react";
 import { usePaginatedTableRows } from "../../hooks/index.js";
 import RoundupTable from "../ui/Table/Table.jsx";
 
@@ -67,7 +51,6 @@ const TableRows = ({
     direction: null, // 'asc', 'desc', or null
   });
 
-  // Hook for managing paginated data with sorting
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
       id,
@@ -98,26 +81,17 @@ const TableRows = ({
     });
   }, []);
 
-  /**
-   * Handles scroll events for infinite scrolling and parent coordination
-   * Triggers pagination when near bottom and notifies parent of scroll position
-   *
-   * @param {Event} event - Scroll event from the table container
-   */
-  const handleScroll = useCallback(
-    (event) => {
-      const container = event.target;
-      const { scrollTop, scrollHeight, clientHeight } = container;
+  const onScrollThreshold = useCallback(() => {
+    if (hasMore && !loading && !error) {
+      loadMore();
+    }
+  }, [hasMore, loading, error, loadMore]);
 
-      // Check if user has scrolled near the bottom (within 100px)
-      const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
-
-      if (isNearBottom && hasMore && !loading && !error) {
-        loadMore();
-      }
-    },
-    [hasMore, loading, error, loadMore]
-  );
+  // Load initial data only when table/columns/sort changes, not when refresh function changes
+  useEffect(() => {
+    refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, selectedColumnIds, sortConfig.columnId, sortConfig.direction]);
 
   return (
     <RoundupTable
@@ -128,7 +102,7 @@ const TableRows = ({
       sortConfig={sortConfig}
       onColumnSort={handleColumnSort}
       tableContainerRef={tableContainerRef}
-      handleScroll={handleScroll}
+      onScrollThreshold={onScrollThreshold}
       showHeader={showHeader}
       columnWidths={columnWidths}
       placeHolderColumnLength={placeHolderColumnLength}
