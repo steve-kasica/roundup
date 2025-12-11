@@ -64,51 +64,46 @@ const SchemaToolbar = ({
         gap: 1,
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        {children}
-      </Box>
-
       {/* Action Buttons Section - Bulk operations for selected columns */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        {/* Custom Menu Items */}
-        {customMenuItems}
+      <Box>{children}</Box>
+      {/* Custom Menu Items */}
+      {customMenuItems}
 
-        <Divider
-          orientation="vertical"
-          flexItem
-          sx={{ mx: 1, height: 28, alignSelf: "center" }}
-        />
+      <Divider
+        orientation="vertical"
+        flexItem
+        sx={{ mx: 1, height: 28, alignSelf: "center" }}
+      />
 
-        {/* Alerts */}
-        <IconButton
-          size="small"
-          onClick={handleOpenAlerts}
-          disabled={totalCount === 0}
-          title={`View alerts (${totalCount})`}
+      {/* Alerts */}
+      <IconButton
+        size="small"
+        onClick={handleOpenAlerts}
+        disabled={totalCount === 0}
+        title={`View alerts (${totalCount})`}
+        color={
+          errorCount > 0 ? "error" : totalCount > 0 ? "warning" : "default"
+        }
+      >
+        <Badge
+          badgeContent={totalCount}
           color={
             errorCount > 0 ? "error" : totalCount > 0 ? "warning" : "default"
           }
         >
-          <Badge
-            badgeContent={totalCount}
-            color={
-              errorCount > 0 ? "error" : totalCount > 0 ? "warning" : "default"
-            }
-          >
-            <AlertIcon fontSize="small" />
-          </Badge>
-        </IconButton>
+          <AlertIcon fontSize="small" />
+        </Badge>
+      </IconButton>
 
-        {/* Export */}
-        <IconButton
-          size="small"
-          disabled={errorCount > 0}
-          onClick={handleExport}
-          title="Export"
-        >
-          <ExportIcon fontSize="small" />
-        </IconButton>
-      </Box>
+      {/* Export */}
+      <IconButton
+        size="small"
+        disabled={errorCount > 0}
+        onClick={handleExport}
+        title="Export"
+      >
+        <ExportIcon fontSize="small" />
+      </IconButton>
 
       {/* Export Dialog */}
       <Dialog

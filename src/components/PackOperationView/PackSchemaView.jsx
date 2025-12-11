@@ -13,6 +13,8 @@ import {
   Tooltip,
   ToggleButtonGroup,
   ToggleButton,
+  Stack,
+  Typography,
 } from "@mui/material";
 import withPackOperationData from "./withPackOperationData";
 import { useCallback, useEffect, useState, useMemo } from "react";
@@ -30,14 +32,13 @@ import FocusIconButton from "../ui/icons/FocusIconButton";
 import DeleteIconButton from "../ui/icons/DeleteIconButton";
 import VennDiagram from "../ui/icons/VennDiagram";
 import SelectToggleIconButton from "../ui/SelectToggleIconButton";
-import { extent, interpolateGreys, scaleSequential, text } from "d3";
 import { EnhancedTableName } from "../TableView/TableName";
 import { isTableId } from "../../slices/tablesSlice";
 import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 import withGlobalInterfaceData from "../HOC/withGlobalInterfaceData";
-import { usePackStats } from "../../hooks";
 import StyledBlockCell from "./StyledBlockCell";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
+import PackOperationIcon from "./PackOperationIcon";
 
 const yAxisLabelWidth = "50px";
 const yAxisLabelPadding = "0px";
@@ -50,17 +51,21 @@ const PackSchemaView = withPackOperationData(
       focusColumns,
       // Props defined in `withOperationData`
       id,
+      name,
       selectColumns,
       clearSelectedColumns,
       swapTablePositions,
       deleteColumns,
+      isLoading,
       // Pack-specific props
       joinPredicate,
+      joinType,
       setJoinType,
       setMatchSelection,
       clearMatchSelection,
-      // matchStats, // TODO: use this?
       insertColumnIntoChildAtIndex,
+      rowCount,
+      columnCount,
       // Left table props (via withPackOperationData)
       setLeftTableJoinKey,
       leftTableId,
@@ -71,6 +76,9 @@ const PackSchemaView = withPackOperationData(
       rightTableId,
       rightKey,
       rightColumnIds,
+      matchStats,
+      matchKeys,
+      matchLabels,
       // Props defined in `withAssociatedAlerts`
       alertIds,
       totalCount,
@@ -106,18 +114,17 @@ const PackSchemaView = withPackOperationData(
       const [contextMenu, setContextMenu] = useState(null);
       const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
 
-      // Call usePackStats hook and log results
-      const { data, matchLabels, matchKeys, error, loading, refetch, reset } =
-        usePackStats(leftKey, rightKey, joinPredicate);
-
-      console.log("PackSchemaView pack stats data:", { data, error, loading });
+      const allColumns = useMemo(
+        () => [...leftColumnIds, ...rightColumnIds],
+        [leftColumnIds, rightColumnIds]
+      );
 
       const colorScale = useMemo(() => {
         return () => "#ddd";
-        // const values = Object.values(data || {});
+        // const values = Object.values(matchStats || {});
         // const [min, max] = extent(values);
         // return scaleSequential(interpolateGreys).domain([min, max]);
-      }, [data]);
+      }, []);
 
       const areAnySelected = useMemo(() => {
         return clickedBlockCells.size > 0;
@@ -125,17 +132,18 @@ const PackSchemaView = withPackOperationData(
 
       // Auto-disable toggledMatches for any match type that has zero count
       useEffect(() => {
-        if (!data || loading) return;
+        if (!Object.values(matchStats).filter(Boolean).length > 0 || isLoading)
+          return;
 
         setToggledMatches((prev) => {
           const updated = [...prev];
           let hasChanges = false;
 
-          Object.keys(data).forEach((key) => {
-            if (data[key] === 0 && prev.includes(key)) {
+          Object.keys(matchStats).forEach((key) => {
+            if (matchStats[key] === 0 && prev.includes(key)) {
               updated.splice(updated.indexOf(key), 1);
               hasChanges = true;
-            } else if (data[key] > 0 && !prev.includes(key)) {
+            } else if (matchStats[key] > 0 && !prev.includes(key)) {
               updated.push(key);
               hasChanges = true;
             }
@@ -143,7 +151,7 @@ const PackSchemaView = withPackOperationData(
 
           return hasChanges ? updated : prev;
         });
-      }, [data, loading]);
+      }, [matchStats, isLoading]);
 
       // Update column selection when block cells change
       useEffect(() => {
@@ -220,9 +228,6 @@ const PackSchemaView = withPackOperationData(
             // Parse the last clicked cell
             const [lastColumnId, lastMatchLabel] = lastClickedCell.split(":");
 
-            // Determine the bounds of the rectangle
-            const allColumns = [...leftColumnIds, ...rightColumnIds];
-
             // Find column indices
             const lastColIndex = allColumns.indexOf(lastColumnId);
             const currentColIndex = allColumns.indexOf(columnId);
@@ -287,7 +292,7 @@ const PackSchemaView = withPackOperationData(
                 const match = matchKeys[m];
 
                 // Add all columns for this match
-                [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
+                allColumns.forEach((columnId) => {
                   cellsToSelect.add(`${columnId}:${match}`);
                 });
               }
@@ -304,7 +309,7 @@ const PackSchemaView = withPackOperationData(
             const cellsToSelect = new Set();
 
             // Add all columns for this match
-            [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
+            allColumns.forEach((columnId) => {
               cellsToSelect.add(`${columnId}:${matchLabel}`);
             });
 
@@ -340,7 +345,6 @@ const PackSchemaView = withPackOperationData(
           const columnId = contextMenuColumnId;
 
           // Determine which child table/operation this column belongs to
-          const allColumns = [...leftColumnIds, ...rightColumnIds];
           const columnIndex = allColumns.indexOf(columnId);
 
           let childId;
@@ -364,12 +368,12 @@ const PackSchemaView = withPackOperationData(
         },
         [
           contextMenuColumnId,
-          leftColumnIds,
-          rightColumnIds,
-          leftTableId,
-          rightTableId,
+          allColumns,
+          leftColumnIds.length,
           insertColumnIntoChildAtIndex,
           handleCloseContextMenu,
+          leftTableId,
+          rightTableId,
         ]
       );
 
@@ -377,7 +381,6 @@ const PackSchemaView = withPackOperationData(
         (event, columnId) => {
           if (event.shiftKey && lastClickedColumn) {
             // Shift click: Select range of columns
-            const allColumns = [...leftColumnIds, ...rightColumnIds];
             const lastColIndex = allColumns.indexOf(lastClickedColumn);
             const currentColIndex = allColumns.indexOf(columnId);
 
@@ -413,7 +416,7 @@ const PackSchemaView = withPackOperationData(
           // Set last clicked cell to first cell in this column
           setLastClickedCell(`${columnId}:${matchKeys[0]}`);
         },
-        [lastClickedColumn, matchKeys, leftColumnIds, rightColumnIds]
+        [lastClickedColumn, matchKeys, allColumns]
       );
 
       const handleSelectAll = useCallback(() => {
@@ -425,22 +428,16 @@ const PackSchemaView = withPackOperationData(
 
         // Select all cells across all columns and match types
         matchKeys.forEach((match) => {
-          [...leftColumnIds, ...rightColumnIds].forEach((columnId) => {
+          allColumns.forEach((columnId) => {
             allCells.add(`${columnId}:${match}`);
           });
         });
 
         setClickedBlockCells(allCells);
-      }, [areAnySelected, matchKeys, leftColumnIds, rightColumnIds]);
+      }, [areAnySelected, matchKeys, allColumns]);
 
       const handleToggleMatch = useCallback(
         (event, newValue) => {
-          console.log("handleToggleMatch called", {
-            event,
-            newValue,
-            current: toggledMatches,
-          });
-
           if (newValue === null || newValue.length === 0) {
             // Don't allow deselecting all buttons
             return;
@@ -526,7 +523,6 @@ const PackSchemaView = withPackOperationData(
       // Check if at least one complete column is selected
       const hasCompleteColumnSelected = useMemo(() => {
         // Check each column in both tables
-        const allColumns = [...leftColumnIds, ...rightColumnIds];
 
         for (const columnId of allColumns) {
           const allCellsSelected = matchKeys.every((matchLabel) => {
@@ -539,12 +535,12 @@ const PackSchemaView = withPackOperationData(
         }
 
         return false;
-      }, [leftColumnIds, matchKeys, clickedBlockCells, rightColumnIds]);
+      }, [allColumns, matchKeys, clickedBlockCells]);
 
       // This memoized variable groups columns into contiguous visible/hidden segments
       const columnIdVisibilityGroups = useMemo(
         () =>
-          [...leftColumnIds, ...rightColumnIds].reduce((acc, columnId, i) => {
+          allColumns.reduce((acc, columnId, i) => {
             const isHidden = hiddenColumns.has(columnId);
             const prev = acc[acc.length - 1];
             if (!isHidden) {
@@ -561,7 +557,7 @@ const PackSchemaView = withPackOperationData(
             }
             return acc;
           }, []),
-        [hiddenColumns, leftColumnIds, rightColumnIds]
+        [allColumns, hiddenColumns]
       );
 
       return (
@@ -575,39 +571,45 @@ const PackSchemaView = withPackOperationData(
             customMenuItems={
               <>
                 {/* Match category filter buttons */}
-                <ToggleButtonGroup
-                  value={toggledMatches}
-                  exclusive={false}
-                  aria-label="Toggle match categories"
-                  size="small"
-                  sx={{
-                    "& .MuiToggleButton-root": {
-                      fontSize: "0.75rem",
-                      textTransform: "none",
-                      px: 1.5,
-                    },
-                    "& .MuiToggleButton-root:first-of-type": {
-                      borderTopLeftRadius: "16px",
-                      borderBottomLeftRadius: "16px",
-                    },
-                    "& .MuiToggleButton-root:last-of-type": {
-                      borderTopRightRadius: "16px",
-                      borderBottomRightRadius: "16px",
-                    },
-                  }}
-                  onChange={handleToggleMatch}
-                >
-                  {Array.from(matchLabels.keys()).map((key) => (
-                    <ToggleButton
-                      key={key}
-                      value={key}
-                      aria-label={matchLabels.get(key)}
-                      disabled={data[key] === 0 || error}
-                    >
-                      {matchLabels.get(key).replace("Only", "").trim()}
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
+                <Box sx={{ overflow: "hidden", flexShrink: 0 }}>
+                  <ToggleButtonGroup
+                    value={toggledMatches}
+                    exclusive={false}
+                    aria-label="Toggle match categories"
+                    size="small"
+                    sx={{
+                      flexWrap: "nowrap",
+                      "& .MuiToggleButton-root": {
+                        fontSize: "0.75rem",
+                        textTransform: "none",
+                        px: 1.5,
+                        whiteSpace: "nowrap",
+                      },
+                      "& .MuiToggleButton-root:first-of-type": {
+                        borderTopLeftRadius: "16px",
+                        borderBottomLeftRadius: "16px",
+                      },
+                      "& .MuiToggleButton-root:last-of-type": {
+                        borderTopRightRadius: "16px",
+                        borderBottomRightRadius: "16px",
+                      },
+                    }}
+                    onChange={handleToggleMatch}
+                  >
+                    <Tooltip title={`${joinType} join`}>
+                      {Array.from(matchLabels.keys()).map((key) => (
+                        <ToggleButton
+                          key={key}
+                          value={key}
+                          aria-label={matchLabels.get(key)}
+                          disabled={matchStats[key] === 0 || errorCount > 0}
+                        >
+                          {matchLabels.get(key).replace("Only", "").trim()}
+                        </ToggleButton>
+                      ))}
+                    </Tooltip>
+                  </ToggleButtonGroup>
+                </Box>
                 <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
                 {/* Swap tables */}
                 <IconButton
@@ -617,22 +619,6 @@ const PackSchemaView = withPackOperationData(
                 >
                   <SwapIcon fontSize="small" />
                 </IconButton>
-                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-                <IconButton
-                  size="small"
-                  disabled={!hasCompleteColumnSelected}
-                  title="Insert column to the left"
-                >
-                  <InsertLeftIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  disabled={!hasCompleteColumnSelected}
-                  title="Insert column to the right"
-                >
-                  <InsertRightIcon fontSize="small" />
-                </IconButton>
-                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
                 <FocusIconButton
                   disabled={!hasCompleteColumnSelected}
                   onClick={handleFocusColumns}
@@ -652,7 +638,34 @@ const PackSchemaView = withPackOperationData(
               </>
             }
           >
-            <EnhancedPackOperationLabel id={id} />
+            <Stack direction="row" spacing={1} alignItems="center">
+              <PackOperationIcon />
+              <Box sx={{}}>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    userSelect: "none",
+                    color: totalCount ? "error.main" : "inherit",
+                    fontWeight: totalCount ? 600 : "inherit",
+                  }}
+                >
+                  {name || id}{" "}
+                </Typography>
+              </Box>
+              <Tooltip
+                title={`${columnCount.toLocaleString()} columns x ${rowCount.toLocaleString()} rows`}
+              >
+                <Chip
+                  size="small"
+                  label={`${columnCount.toLocaleString()} x ${rowCount.toLocaleString()}`}
+                />
+              </Tooltip>
+            </Stack>
+            {/* <EnhancedPackOperationLabel id={id} /> */}
           </SchemaToolbar>
           <Box
             display={"flex"}
@@ -832,7 +845,7 @@ const PackSchemaView = withPackOperationData(
                   );
                 })}
               </Box>
-              {Object.entries(data || {}).map(([key, value], i, array) => {
+              {Object.entries(matchStats).map(([key, value]) => {
                 // Check if any cells in this match category are selected
                 const hasSelectedCells = Array.from(clickedBlockCells).some(
                   (cellKey) => {
@@ -924,14 +937,13 @@ const PackSchemaView = withPackOperationData(
                         justifyContent="center"
                         width={"100%"}
                       >
-                        {loading ? (
+                        {isLoading ? (
                           <CircularProgress size={15} />
-                        ) : error || errorCount > 0 ? (
+                        ) : errorCount > 0 ? (
                           <Error color="error" />
                         ) : (
                           <Badge
                             color={"info"}
-                            invisible={isMatchDisabled}
                             badgeContent={value.toLocaleString()}
                           />
                         )}
@@ -952,7 +964,7 @@ const PackSchemaView = withPackOperationData(
                               <Divider orientation="vertical" flexItem />
                             </Box>
                           );
-                        } else if (loading) {
+                        } else if (isLoading) {
                           return (
                             <Skeleton
                               variant="rectangular"
