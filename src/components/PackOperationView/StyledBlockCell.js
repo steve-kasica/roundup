@@ -3,78 +3,79 @@ import { Box, styled } from "@mui/material";
 const StyledBlockCell = styled(Box, {
   shouldForwardProp: (prop) =>
     ![
-      "isClicked",
       "disabled",
+      "isEmpty",
       "isLastLeftColumn",
-      "showTopBorder",
-      "showBottomBorder",
-      "showLeftBorder",
-      "showRightBorder",
+      "highlightTopBorder",
+      "highlightBottomBorder",
+      "highlightLeftBorder",
+      "highlightRightBorder",
       "borderWidth",
       "backgroundColor",
     ].includes(prop),
 })(
   ({
     theme,
-    isClicked,
     disabled,
+    isEmpty,
     isLastLeftColumn,
-    showTopBorder,
-    showBottomBorder,
-    showLeftBorder,
-    showRightBorder,
-    borderWidth,
+    highlightTopBorder,
+    highlightBottomBorder,
+    highlightLeftBorder,
+    highlightRightBorder,
+    borderWidth = 1, // in pixels
     backgroundColor,
   }) => {
-    const shadows = [];
-
-    // Always show a subtle separator on the right
-    shadows.push("inset -1px 0 0 0 rgba(0, 0, 0, 0.05)");
-
-    // Add selection borders (these will overlay on top of separator)
-    if (isClicked) {
-      if (showTopBorder) {
-        shadows.push(
-          `inset 0 ${borderWidth} 0 0 ${theme.palette.primary.main}`
-        );
-      }
-      if (showBottomBorder) {
-        shadows.push(
-          `inset 0 -${borderWidth} 0 0 ${theme.palette.primary.main}`
-        );
-      }
-      if (showLeftBorder) {
-        shadows.push(
-          `inset ${borderWidth} 0 0 0 ${theme.palette.primary.main}`
-        );
-      }
-      if (showRightBorder) {
-        shadows.push(
-          `inset -${borderWidth} 0 0 0 ${theme.palette.primary.main}`
-        );
-      }
-    }
+    const borderColor = theme.palette.primary.main;
+    const defaultBorderColor = "rgba(0, 0, 255, 0.05)";
+    const isSelected =
+      highlightTopBorder ||
+      highlightBottomBorder ||
+      highlightLeftBorder ||
+      highlightRightBorder;
 
     return {
       flex: 1,
       minWidth: 0,
       height: "100%",
       backgroundColor,
+      opacity: 0.75,
       position: "relative",
-      boxShadow: shadows.join(", "),
-      ...(isClicked && {
-        opacity: 0.8,
+      boxShadow: `
+      inset 0 ${borderWidth}px 0 0 ${
+        highlightTopBorder ? borderColor : defaultBorderColor
+      },
+      inset 0 -${borderWidth}px 0 0 ${
+        highlightBottomBorder ? borderColor : defaultBorderColor
+      },
+      inset ${borderWidth}px 0 0 0 ${
+        highlightLeftBorder ? borderColor : defaultBorderColor
+      },
+      inset -${isLastLeftColumn ? borderWidth * 3 : borderWidth}px 0 0 0 ${
+        highlightRightBorder ? borderColor : defaultBorderColor
+      }
+      `,
+      transition: "box-shadow 0.2s ease, opacity 0.2s ease",
+      ...(isEmpty && {
+        backgroundImage: `repeating-linear-gradient(
+        45deg,
+        ${theme.palette.grey[100]},
+        ${theme.palette.grey[100]} 10px,
+        ${backgroundColor} 10px,
+        ${backgroundColor} 20px
+      )`,
+        backgroundColor: "transparent",
       }),
       ...(disabled && {
-        backgroundColor: theme.palette.grey[300],
+        backgroundColor: theme.palette.grey[200],
         cursor: "not-allowed",
-      }),
-      ...(isLastLeftColumn && {
-        marginRight: "4px",
       }),
       "&:hover": {
         opacity: disabled ? 1 : 0.8,
       },
+      ...(isSelected && {
+        opacity: 1,
+      }),
     };
   }
 );

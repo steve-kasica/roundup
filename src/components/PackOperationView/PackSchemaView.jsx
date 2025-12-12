@@ -236,6 +236,7 @@ const PackSchemaView = withPackOperationData(
 
             for (let m = matchStart; m <= matchEnd; m++) {
               const match = matchKeys[m];
+              if (!toggledMatches.includes(match)) continue;
               for (let c = colStart; c <= colEnd; c++) {
                 cellsInRange.add(`${allColumns[c]}:${match}`);
               }
@@ -258,7 +259,13 @@ const PackSchemaView = withPackOperationData(
             setLastClickedCell(cellKey);
           }
         },
-        [lastClickedCell, leftColumnIds, rightColumnIds, matchKeys]
+        [
+          lastClickedCell,
+          leftColumnIds,
+          rightColumnIds,
+          matchKeys,
+          toggledMatches,
+        ]
       );
 
       const handleMatchLabelClick = useCallback(
@@ -279,6 +286,7 @@ const PackSchemaView = withPackOperationData(
               // Select all cells for all match types in the range
               for (let m = matchStart; m <= matchEnd; m++) {
                 const match = matchKeys[m];
+                if (!toggledMatches.includes(match)) continue;
 
                 // Add all columns for this match
                 allColumns.forEach((columnId) => {
@@ -298,9 +306,11 @@ const PackSchemaView = withPackOperationData(
             const cellsToSelect = new Set();
 
             // Add all columns for this match
-            allColumns.forEach((columnId) => {
-              cellsToSelect.add(`${columnId}:${matchLabel}`);
-            });
+            if (toggledMatches.includes(matchLabel)) {
+              allColumns.forEach((columnId) => {
+                cellsToSelect.add(`${columnId}:${matchLabel}`);
+              });
+            }
 
             setClickedBlockCells(cellsToSelect);
           }
@@ -311,7 +321,7 @@ const PackSchemaView = withPackOperationData(
           // Set last clicked cell to first cell in this match
           setLastClickedCell(`${leftColumnIds[0]}:${matchLabel}`);
         },
-        [lastClickedMatch, leftColumnIds, matchKeys, rightColumnIds]
+        [allColumns, lastClickedMatch, leftColumnIds, matchKeys, toggledMatches]
       );
 
       const handleColumnContextMenu = useCallback((event, columnId) => {
@@ -378,11 +388,12 @@ const PackSchemaView = withPackOperationData(
 
             const columnsToSelect = allColumns.slice(colStart, colEnd + 1);
 
-            // Add all cells for selected columns across all match types
+            // Add all cells for selected columns across enabled match types
             setClickedBlockCells((prev) => {
               const newSet = new Set(prev);
               columnsToSelect.forEach((colId) => {
                 matchKeys.forEach((match) => {
+                  if (!toggledMatches.includes(match)) return;
                   newSet.add(`${colId}:${match}`);
                 });
               });
@@ -393,6 +404,7 @@ const PackSchemaView = withPackOperationData(
             const cellsToSelect = new Set();
 
             matchKeys.forEach((match) => {
+              if (!toggledMatches.includes(match)) return;
               cellsToSelect.add(`${columnId}:${match}`);
             });
 
@@ -405,7 +417,7 @@ const PackSchemaView = withPackOperationData(
           // Set last clicked cell to first cell in this column
           setLastClickedCell(`${columnId}:${matchKeys[0]}`);
         },
-        [lastClickedColumn, matchKeys, allColumns]
+        [lastClickedColumn, matchKeys, allColumns, toggledMatches]
       );
 
       const handleSelectAll = useCallback(() => {
@@ -842,7 +854,8 @@ const PackSchemaView = withPackOperationData(
                   );
                 })}
               </Box>
-              {Object.entries(matchStats).map(([key, value]) => {
+              {matchKeys.map((key) => {
+                const value = matchStats[key];
                 // Check if any cells in this match category are selected
                 const hasSelectedCells = Array.from(clickedBlockCells).some(
                   (cellKey) => {
@@ -977,10 +990,10 @@ const PackSchemaView = withPackOperationData(
                         const isClicked = clickedBlockCells.has(cellKey);
 
                         // Calculate which borders to show for contiguous selection
-                        let showTopBorder = false;
-                        let showBottomBorder = false;
-                        let showLeftBorder = false;
-                        let showRightBorder = false;
+                        let highlightTopBorder = false;
+                        let highlightBottomBorder = false;
+                        let highlightLeftBorder = false;
+                        let highlightRightBorder = false;
 
                         if (isClicked) {
                           // Find the match type index for this row
@@ -991,40 +1004,40 @@ const PackSchemaView = withPackOperationData(
                           if (currentMatchIndex > 0) {
                             const matchAbove = matchKeys[currentMatchIndex - 1];
                             const cellKeyAbove = `${columnId}:${matchAbove}`;
-                            showTopBorder =
+                            highlightTopBorder =
                               !clickedBlockCells.has(cellKeyAbove);
                           } else {
-                            showTopBorder = true; // First row
+                            highlightTopBorder = true; // First row
                           }
 
                           // Check cell below (next match type)
                           if (currentMatchIndex < matchKeys.length - 1) {
                             const matchBelow = matchKeys[currentMatchIndex + 1];
                             const cellKeyBelow = `${columnId}:${matchBelow}`;
-                            showBottomBorder =
+                            highlightBottomBorder =
                               !clickedBlockCells.has(cellKeyBelow);
                           } else {
-                            showBottomBorder = true; // Last row
+                            highlightBottomBorder = true; // Last row
                           }
 
                           // Check cell to the left
                           if (currentColIndex > 0) {
                             const colLeft = allColumns[currentColIndex - 1];
                             const cellKeyLeft = `${colLeft}:${key}`;
-                            showLeftBorder =
+                            highlightLeftBorder =
                               !clickedBlockCells.has(cellKeyLeft);
                           } else {
-                            showLeftBorder = true; // First column
+                            highlightLeftBorder = true; // First column
                           }
 
                           // Check cell to the right
                           if (currentColIndex < allColumns.length - 1) {
                             const colRight = allColumns[currentColIndex + 1];
                             const cellKeyRight = `${colRight}:${key}`;
-                            showRightBorder =
+                            highlightRightBorder =
                               !clickedBlockCells.has(cellKeyRight);
                           } else {
-                            showRightBorder = true; // Last column
+                            highlightRightBorder = true; // Last column
                           }
                         }
 
@@ -1049,10 +1062,10 @@ const PackSchemaView = withPackOperationData(
                                 j >= leftColumnIds.length)
                             }
                             isLastLeftColumn={isLastLeftColumn}
-                            highlightTopBorder={showTopBorder}
-                            highlightBottomBorder={showBottomBorder}
-                            highlightLeftBorder={showLeftBorder}
-                            highlightRightBorder={showRightBorder}
+                            highlightTopBorder={highlightTopBorder}
+                            highlightBottomBorder={highlightBottomBorder}
+                            highlightLeftBorder={highlightLeftBorder}
+                            highlightRightBorder={highlightRightBorder}
                             backgroundColor={colorScale(depth + 1)}
                             onClick={(event) => {
                               if (!isMatchDisabled) {
