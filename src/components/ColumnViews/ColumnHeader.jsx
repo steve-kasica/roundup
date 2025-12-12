@@ -7,10 +7,12 @@ import withColumnData from "./withColumnData";
 import { EnhancedColumnName } from "./ColumnName";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
 import StyledColumnCard from "./StyledColumnCard";
+import ColumnTypeIcon from "./ColumnTypeIcon";
 
 const ColumnHeader = ({
   // Props pass via withColumnData HOC
   id,
+  columnType,
   isHovered,
   isDragging,
   isDropTarget,
@@ -89,6 +91,7 @@ const ColumnHeader = ({
           }}
         >
           <EnhancedColumnName id={id} sx={{ cursor: "inherit" }} />
+          <ColumnTypeIcon columnType={columnType} sx={{ ml: 1 }} />
         </TableSortLabel>
         <IconButton
           size="small"
