@@ -1049,6 +1049,12 @@ const PackSchemaView = withPackOperationData(
                             key={columnId}
                             isClicked={isClicked}
                             disabled={isMatchDisabled}
+                            isEmpty={
+                              (key === "left_unmatched" &&
+                                j < leftColumnIds.length) ||
+                              (key === "right_unmatched" &&
+                                j >= leftColumnIds.length)
+                            }
                             isLastLeftColumn={isLastLeftColumn}
                             showTopBorder={showTopBorder}
                             showBottomBorder={showBottomBorder}
