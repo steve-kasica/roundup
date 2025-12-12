@@ -1,5 +1,5 @@
 import IconButton from "@mui/material/IconButton";
-import StackOperationIcon from "../../StackOperationView/StackOperationIcon";
+import StackOperationIcon from "./StackOperationIcon";
 import Tooltip from "@mui/material/Tooltip";
 
 const AddStackOperationButton = ({

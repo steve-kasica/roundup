@@ -1,5 +1,5 @@
 import IconButton from "@mui/material/IconButton";
-import PackOperationIcon from "../../PackOperationView/PackOperationIcon";
+import PackOperationIcon from "./PackOperationIcon";
 import Tooltip from "@mui/material/Tooltip";
 
 const AddPackOperationButton = ({

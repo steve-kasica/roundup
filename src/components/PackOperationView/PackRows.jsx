@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import withPackOperationData from "./withPackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
+import VennDiagram from "../ui/icons/VennDiagram";
 /**
  * Virtualized table view for stack operations
  * Supports synchronized or sequential scrolling/loading of multiple tables
@@ -15,6 +16,7 @@ const PackRows = ({
   activeColumnIds, // columnIDs of this operation (not hidden)
   activeChildColumnIds, // column IDs of operation's child tables (not hidden)
   isMaterialized,
+  isLoading,
   isInSync,
   materializeOperation,
   selectedChildColumnIds,
@@ -59,7 +61,7 @@ const PackRows = ({
       .filter(Boolean)
       .map((idx) => columnIds[idx]);
 
-    return [leftKeyColId, rightKeyColId, ...selectedParentColumnIds];
+    return selectedParentColumnIds;
   }, [
     columnIds,
     isMaterialized,
@@ -121,11 +123,29 @@ const PackRows = ({
 
   const setRowMargin = useCallback((rowData, index) => {
     if (rowData[0] !== null && rowData[1] !== null) {
-      return "matched row";
+      return (
+        <VennDiagram
+          leftFill={"transparent"}
+          overlapFill={"#000"}
+          rightFill={"transparent"}
+        />
+      );
     } else if (rowData[0] !== null && rowData[1] === null) {
-      return "Left only";
+      return (
+        <VennDiagram
+          leftFill={"#000"}
+          overlapFill={"transparent"}
+          rightFill={"transparent"}
+        />
+      );
     } else if (rowData[0] === null && rowData[1] !== null) {
-      return "Right only";
+      return (
+        <VennDiagram
+          leftFill={"transparent"}
+          overlapFill={"transparent"}
+          rightFill={"#000"}
+        />
+      );
     }
   }, []);
 
@@ -147,7 +167,7 @@ const PackRows = ({
       isMaterialized={isMaterialized}
       isInSync={isInSync}
       data={data}
-      loading={loading}
+      loading={loading || isLoading}
       error={error}
       hasMore={hasMore}
       onScrollThreshold={onScrollThreshold}

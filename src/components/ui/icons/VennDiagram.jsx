@@ -13,6 +13,7 @@ function VennDiagram(props) {
     stroke = "#000",
     strokeWidth = "1",
     size = "24",
+    disabled = false,
     ...otherProps
   } = props;
 
@@ -33,7 +34,12 @@ function VennDiagram(props) {
     <SvgIcon
       {...otherProps}
       viewBox={`0 0 ${S} ${S}`}
-      sx={{ width: S, height: S, ...(otherProps?.sx || {}) }}
+      sx={{
+        width: S,
+        height: S,
+        opacity: disabled ? 0.5 : 1,
+        ...(otherProps?.sx || {}),
+      }}
     >
       <text
         x={S / 2}
@@ -42,6 +48,7 @@ function VennDiagram(props) {
         fill={labelFill}
         textAnchor="middle"
         alignmentBaseline="middle"
+        opacity={disabled ? 0.5 : 1}
       >
         {label}
       </text>
@@ -51,9 +58,10 @@ function VennDiagram(props) {
         cy={cy}
         r={r}
         fill={leftFill}
-        fillOpacity={leftOpacity}
+        fillOpacity={disabled ? leftOpacity * 0.5 : leftOpacity}
         stroke={stroke}
         strokeWidth={strokeWidth}
+        opacity={disabled ? 0.5 : 1}
       />
       {/* Right circle */}
       <circle
@@ -61,9 +69,10 @@ function VennDiagram(props) {
         cy={cy}
         r={r}
         fill={rightFill}
-        fillOpacity={rightOpacity}
+        fillOpacity={disabled ? rightOpacity * 0.5 : rightOpacity}
         stroke={stroke}
         strokeWidth={strokeWidth}
+        opacity={disabled ? 0.5 : 1}
       />
       {/* Overlap area */}
       <path
@@ -71,9 +80,10 @@ function VennDiagram(props) {
           S * (12 / 24)
         } ${yBottom} A ${r} ${r} 0 0 0 ${S * (12 / 24)} ${yTop} Z`}
         fill={overlapFill}
-        fillOpacity={overlapOpacity}
+        fillOpacity={disabled ? overlapOpacity * 0.5 : overlapOpacity}
         stroke={stroke}
         strokeWidth={strokeWidth}
+        opacity={disabled ? 0.5 : 1}
       />
     </SvgIcon>
   );
