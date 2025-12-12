@@ -687,12 +687,14 @@ const PackSchemaView = withPackOperationData(
               gap="2px"
             >
               <Box
-                display={"flex"}
-                flexDirection={"row"}
-                alignItems={"center"}
-                justifyContent={"flex-start"}
+                className="table-labels"
+                display="flex"
+                flexDirection="row"
+                alignItems="center"
+                justifyContent="flex-start"
               >
                 <Box
+                  className="blank-cell"
                   width={yAxisLabelWidth}
                   minWidth={yAxisLabelWidth}
                   padding={yAxisLabelPadding}
@@ -708,45 +710,44 @@ const PackSchemaView = withPackOperationData(
                     key={childId}
                     flex={columnCount}
                     minWidth={0}
-                    textAlign={"center"}
+                    textAlign="center"
                   >
-                    {isTableId(childId) ? (
-                      <EnhancedTableName
-                        id={childId}
-                        sx={{
-                          fontSize: "0.75rem",
-                          userSelect: "none",
-                          fontWeight: "none",
-                        }}
-                        onMouseEnter={() => setHoveredColumn(`${childId}:`)}
-                        onMouseLeave={() => setHoveredColumn(null)}
-                      />
-                    ) : (
-                      <p>{childId}</p>
-                      // TODO
-                      // <EnhancedOperationName
-                      //   id={childId}
-                      //   sx={{
-                      //     fontSize: "0.75rem",
-                      //     userSelect: "none",
-                      //     fontWeight: "none",
-                      //   }}
-                      //   onMouseEnter={() => setHoveredColumn(`${childId}:`)}
-                      //   onMouseLeave={() => setHoveredColumn(null)}
-                      // />
-                    )}
+                    <Box>
+                      {isTableId(childId) ? (
+                        <EnhancedTableName
+                          id={childId}
+                          sx={{
+                            fontSize: "0.75rem",
+                            userSelect: "none",
+                            fontWeight: "none",
+                          }}
+                          onMouseEnter={() => setHoveredColumn(`${childId}:`)}
+                          onMouseLeave={() => setHoveredColumn(null)}
+                        />
+                      ) : (
+                        <p>{childId}</p>
+                        // TODO
+                        // <EnhancedOperationName
+                        //   id={childId}
+                        //   sx={{
+                        //     fontSize: "0.75rem",
+                        //     userSelect: "none",
+                        //     fontWeight: "none",
+                        //   }}
+                        //   onMouseEnter={() => setHoveredColumn(`${childId}:`)}
+                        //   onMouseLeave={() => setHoveredColumn(null)}
+                        // />
+                      )}
+                    </Box>
                   </Box>
                 ))}
               </Box>
               <Box
+                className="column-labels"
                 display={"flex"}
                 flexDirection={"row"}
                 alignItems={"center"}
                 justifyContent={"flex-start"}
-                marginTop={"20px"}
-                sx={{
-                  containerType: "inline-size",
-                }}
               >
                 <Box
                   width={yAxisLabelWidth}
@@ -812,7 +813,6 @@ const PackSchemaView = withPackOperationData(
                             transform: "rotate(0deg)",
                             transformOrigin: "left bottom",
                             textAlign: "center",
-                            marginBottom: "1px",
                             ...(columnIds[0] === leftKey ||
                             columnIds[0] === rightKey
                               ? {
@@ -822,29 +822,36 @@ const PackSchemaView = withPackOperationData(
                                   textUnderlineOffset: "2px",
                                 }
                               : {}),
+                            marginBottom: "1px",
+                            marginTop: 0,
                             "@container (width < 50px)": {
                               textAlign: "left",
                               transform: `rotate(-10deg) translateX(${20}px)`,
+                              marginTop: "2.5px",
                             },
                             "@container (width < 45px)": {
                               transform:
                                 "rotate(-20deg) translateX(20px) translateY(5px)",
                               textAlign: "left",
+                              marginTop: "5px",
                             },
                             "@container (width < 40px)": {
                               transform:
                                 "rotate(-30deg) translateX(20px) translateY(8px)",
                               textAlign: "left",
+                              marginTop: "7.5px",
                             },
                             "@container (width < 35px)": {
                               transform:
                                 "rotate(-40deg) translateX(12px) translateY(9px)",
                               textAlign: "left",
+                              marginTop: "10px",
                             },
                             "@container (width < 30px)": {
                               transform:
                                 "rotate(-50deg) translateX(12px) translateY(10px)",
                               textAlign: "left",
+                              marginTop: "12.5px",
                             },
                           }}
                           onClick={handleColumnClick}
