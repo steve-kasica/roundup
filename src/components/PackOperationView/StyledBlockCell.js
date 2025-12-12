@@ -1,4 +1,4 @@
-import { Box, styled } from "@mui/material";
+import { Box, lighten, styled } from "@mui/material";
 
 const StyledBlockCell = styled(Box, {
   shouldForwardProp: (prop) =>
@@ -24,10 +24,11 @@ const StyledBlockCell = styled(Box, {
     highlightLeftBorder,
     highlightRightBorder,
     borderWidth = 1, // in pixels
+    tableBorderWidth = 2, // in pixels
+    defaultBorderColor = "rgba(0, 0, 255, 0.05)",
     backgroundColor,
   }) => {
-    const borderColor = theme.palette.primary.main;
-    const defaultBorderColor = "rgba(0, 0, 255, 0.05)";
+    const selectedBorderColor = theme.palette.primary.main;
     const isSelected =
       highlightTopBorder ||
       highlightBottomBorder ||
@@ -41,30 +42,24 @@ const StyledBlockCell = styled(Box, {
       backgroundColor,
       opacity: 0.75,
       position: "relative",
+      paddingRight: isLastLeftColumn ? tableBorderWidth : 0,
       boxShadow: `
       inset 0 ${borderWidth}px 0 0 ${
-        highlightTopBorder ? borderColor : defaultBorderColor
+        highlightTopBorder ? selectedBorderColor : defaultBorderColor
       },
       inset 0 -${borderWidth}px 0 0 ${
-        highlightBottomBorder ? borderColor : defaultBorderColor
+        highlightBottomBorder ? selectedBorderColor : defaultBorderColor
       },
       inset ${borderWidth}px 0 0 0 ${
-        highlightLeftBorder ? borderColor : defaultBorderColor
+        highlightLeftBorder ? selectedBorderColor : defaultBorderColor
       },
-      inset -${isLastLeftColumn ? borderWidth * 3 : borderWidth}px 0 0 0 ${
-        highlightRightBorder ? borderColor : defaultBorderColor
+      inset -${isLastLeftColumn ? tableBorderWidth : borderWidth}px 0 0 0 ${
+        highlightRightBorder ? selectedBorderColor : defaultBorderColor
       }
       `,
       transition: "box-shadow 0.2s ease, opacity 0.2s ease",
       ...(isEmpty && {
-        backgroundImage: `repeating-linear-gradient(
-        45deg,
-        ${theme.palette.grey[100]},
-        ${theme.palette.grey[100]} 10px,
-        ${backgroundColor} 10px,
-        ${backgroundColor} 20px
-      )`,
-        backgroundColor: "transparent",
+        backgroundColor: lighten(backgroundColor, 0.75),
       }),
       ...(disabled && {
         backgroundColor: theme.palette.grey[200],

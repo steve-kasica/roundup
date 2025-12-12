@@ -37,6 +37,8 @@ import PackOperationIcon from "./PackOperationIcon";
 const yAxisLabelWidth = "50px";
 const yAxisLabelPadding = "0px";
 const vennFill = "#555";
+const childTablesSeparatorWidth = 5; // in pixels
+const cellBorderColor = "rgba(0, 0, 255, 0.05)";
 
 const PackSchemaView = withPackOperationData(
   withGlobalInterfaceData(
@@ -708,7 +710,11 @@ const PackSchemaView = withPackOperationData(
                     minWidth={0}
                     textAlign="center"
                   >
-                    <Box>
+                    <Box
+                      textOverflow={"ellipsis"}
+                      overflow={"hidden"}
+                      whiteSpace={"nowrap"}
+                    >
                       {isTableId(childId) ? (
                         <EnhancedTableName
                           id={childId}
@@ -716,6 +722,7 @@ const PackSchemaView = withPackOperationData(
                             fontSize: "0.75rem",
                             userSelect: "none",
                             fontWeight: "none",
+                            // borderRight: `${childTablesSeparatorWidth}px solid ${cellBorderColor}`,
                           }}
                           onMouseEnter={() => setHoveredColumn(`${childId}:`)}
                           onMouseLeave={() => setHoveredColumn(null)}
@@ -794,7 +801,10 @@ const PackSchemaView = withPackOperationData(
                               return nextSet;
                             });
                           }}
-                          sx={{ width: "10px", height: "20px" }}
+                          sx={{
+                            width: "10px",
+                            height: "20px",
+                          }}
                         />
                       ) : (
                         <EnhancedColumnName
@@ -1067,6 +1077,9 @@ const PackSchemaView = withPackOperationData(
                             highlightLeftBorder={highlightLeftBorder}
                             highlightRightBorder={highlightRightBorder}
                             backgroundColor={colorScale(depth + 1)}
+                            tableBorderWidth={childTablesSeparatorWidth}
+                            defaultBorderColor={cellBorderColor}
+                            isClicked={isClicked}
                             onClick={(event) => {
                               if (!isMatchDisabled) {
                                 handleBlockCellClick(

@@ -10,6 +10,10 @@ const TableName = ({ name, sx = {} }) => {
       sx={{
         userSelect: "none",
         fontWeight: "bold",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        maxWidth: "100%",
         ...sx,
       }}
     >
