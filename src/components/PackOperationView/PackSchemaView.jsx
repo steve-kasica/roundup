@@ -813,6 +813,15 @@ const PackSchemaView = withPackOperationData(
                             transformOrigin: "left bottom",
                             textAlign: "center",
                             marginBottom: "1px",
+                            ...(columnIds[0] === leftKey ||
+                            columnIds[0] === rightKey
+                              ? {
+                                  fontWeight: "bold",
+                                  textDecoration: "underline",
+                                  textDecorationThickness: "2px",
+                                  textUnderlineOffset: "2px",
+                                }
+                              : {}),
                             "@container (width < 50px)": {
                               textAlign: "left",
                               transform: `rotate(-10deg) translateX(${20}px)`,
@@ -988,10 +997,6 @@ const PackSchemaView = withPackOperationData(
                         if (isClicked) {
                           // Find the match type index for this row
                           const currentMatchIndex = matchKeys.indexOf(key);
-                          const allColumns = [
-                            ...leftColumnIds,
-                            ...rightColumnIds,
-                          ];
                           const currentColIndex = allColumns.indexOf(columnId);
 
                           // Check cell above (previous match type)
@@ -1038,10 +1043,6 @@ const PackSchemaView = withPackOperationData(
                         // const borderWidth = "2px";
 
                         // Check if the cell to the right is also selected
-                        // const allColumns = [
-                        //   ...leftColumnIds,
-                        //   ...rightColumnIds,
-                        // ];
                         // const currentColIndex = allColumns.indexOf(columnId);
                         // const hasRightNeighbor =
                         //   currentColIndex < allColumns.length - 1;
