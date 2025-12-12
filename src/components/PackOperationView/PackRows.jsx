@@ -125,24 +125,24 @@ const PackRows = ({
     if (rowData[0] !== null && rowData[1] !== null) {
       return (
         <VennDiagram
-          leftFill={"transparent"}
+          leftFill={"#fff"}
           overlapFill={"#000"}
-          rightFill={"transparent"}
+          rightFill={"#fff"}
         />
       );
     } else if (rowData[0] !== null && rowData[1] === null) {
       return (
         <VennDiagram
           leftFill={"#000"}
-          overlapFill={"transparent"}
-          rightFill={"transparent"}
+          overlapFill={"#fff"}
+          rightFill={"#fff"}
         />
       );
     } else if (rowData[0] === null && rowData[1] !== null) {
       return (
         <VennDiagram
-          leftFill={"transparent"}
-          overlapFill={"transparent"}
+          leftFill={"#fff"}
+          overlapFill={"#fff"}
           rightFill={"#000"}
         />
       );
