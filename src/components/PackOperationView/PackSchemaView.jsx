@@ -6,7 +6,6 @@ import {
   Divider,
   Menu,
   MenuItem,
-  styled,
   Skeleton,
   CircularProgress,
   Badge,
@@ -52,6 +51,8 @@ const PackSchemaView = withPackOperationData(
       swapTablePositions,
       deleteColumns,
       isLoading,
+      colorScale,
+      depth,
       // Pack-specific props
       joinPredicate,
       joinType,
@@ -113,13 +114,6 @@ const PackSchemaView = withPackOperationData(
         () => [...leftColumnIds, ...rightColumnIds],
         [leftColumnIds, rightColumnIds]
       );
-
-      const colorScale = useMemo(() => {
-        return () => "#ddd";
-        // const values = Object.values(matchStats || {});
-        // const [min, max] = extent(values);
-        // return scaleSequential(interpolateGreys).domain([min, max]);
-      }, []);
 
       const areAnySelected = useMemo(() => {
         return clickedBlockCells.size > 0;
@@ -1047,7 +1041,6 @@ const PackSchemaView = withPackOperationData(
                         return (
                           <StyledBlockCell
                             key={columnId}
-                            isClicked={isClicked}
                             disabled={isMatchDisabled}
                             isEmpty={
                               (key === "left_unmatched" &&
@@ -1056,12 +1049,11 @@ const PackSchemaView = withPackOperationData(
                                 j >= leftColumnIds.length)
                             }
                             isLastLeftColumn={isLastLeftColumn}
-                            showTopBorder={showTopBorder}
-                            showBottomBorder={showBottomBorder}
-                            showLeftBorder={showLeftBorder}
-                            showRightBorder={showRightBorder}
-                            borderWidth={"2px"}
-                            backgroundColor={colorScale(value)}
+                            highlightTopBorder={showTopBorder}
+                            highlightBottomBorder={showBottomBorder}
+                            highlightLeftBorder={showLeftBorder}
+                            highlightRightBorder={showRightBorder}
+                            backgroundColor={colorScale(depth + 1)}
                             onClick={(event) => {
                               if (!isMatchDisabled) {
                                 handleBlockCellClick(
