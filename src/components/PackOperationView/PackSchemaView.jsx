@@ -32,7 +32,7 @@ import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 import withGlobalInterfaceData from "../HOC/withGlobalInterfaceData";
 import StyledBlockCell from "./StyledBlockCell";
 import { JOIN_TYPES } from "../../slices/operationsSlice";
-import PackOperationIcon from "./PackOperationIcon";
+import PackOperationIcon from "../ui/icons/PackOperationIcon";
 
 const yAxisLabelWidth = "50px";
 const yAxisLabelPadding = "0px";
@@ -642,7 +642,10 @@ const PackSchemaView = withPackOperationData(
             }
           >
             <Stack direction="row" spacing={1} alignItems="center">
-              <PackOperationIcon />
+              <PackOperationIcon
+                size={24}
+                color={totalCount > 0 ? "error" : "inherit"}
+              />
               <Box sx={{}}>
                 <Typography
                   variant="h6"
