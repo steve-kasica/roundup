@@ -21,12 +21,7 @@ import { useCallback, useEffect, useState, useMemo } from "react";
 import SchemaToolbar from "../ui/SchemaToolbar";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 import { EnhancedColumnName } from "../ColumnViews";
-import {
-  SwapHoriz as SwapIcon,
-  KeyboardArrowLeft as InsertLeftIcon,
-  KeyboardArrowRight as InsertRightIcon,
-  Error,
-} from "@mui/icons-material";
+import { SwapHoriz as SwapIcon, Error } from "@mui/icons-material";
 import HideIconButton from "../ui/HideIconButton";
 import FocusIconButton from "../ui/icons/FocusIconButton";
 import DeleteIconButton from "../ui/icons/DeleteIconButton";
@@ -680,12 +675,7 @@ const PackSchemaView = withPackOperationData(
               overflow: "hidden",
             }}
           >
-            <Box
-              display="flex"
-              flexDirection="column"
-              minHeight="100%"
-              gap="2px"
-            >
+            <Box display="flex" flexDirection="column" minHeight="100%">
               <Box
                 className="table-labels"
                 display="flex"
@@ -773,7 +763,7 @@ const PackSchemaView = withPackOperationData(
                             bottom: 0,
                             left: "50%",
                             width: "1px",
-                            height: "4px",
+                            height: "5px",
                             backgroundColor: "text.secondary",
                             transform: "translateX(-50%)",
                             cursor: "context-menu",
@@ -817,16 +807,13 @@ const PackSchemaView = withPackOperationData(
                             columnIds[0] === rightKey
                               ? {
                                   fontWeight: "bold",
-                                  textDecoration: "underline",
-                                  textDecorationThickness: "2px",
-                                  textUnderlineOffset: "2px",
                                 }
                               : {}),
-                            marginBottom: "1px",
+                            marginBottom: "2.5px",
                             marginTop: 0,
                             "@container (width < 50px)": {
                               textAlign: "left",
-                              transform: `rotate(-10deg) translateX(${20}px)`,
+                              transform: `rotate(-10deg) translateX(20px)`,
                               marginTop: "2.5px",
                             },
                             "@container (width < 45px)": {
