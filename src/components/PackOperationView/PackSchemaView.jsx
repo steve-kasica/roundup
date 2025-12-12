@@ -915,17 +915,9 @@ const PackSchemaView = withPackOperationData(
                       <VennDiagram
                         label={label}
                         size={yAxisLabelWidth.replace("px", "")}
+                        disabled={isMatchDisabled}
                         leftFill={
                           key === "left_unmatched" ? vennFill : "transparent"
-                        }
-                        leftOpacity={
-                          key === "left_unmatched" && isMatchDisabled ? 0.3 : 1
-                        }
-                        rightOpacity={
-                          key === "right_unmatched" && isMatchDisabled ? 0.3 : 1
-                        }
-                        overlapOpacity={
-                          key === "matches" && isMatchDisabled ? 0.3 : 1
                         }
                         rightFill={
                           key === "right_unmatched" ? vennFill : "transparent"
@@ -943,8 +935,9 @@ const PackSchemaView = withPackOperationData(
                           <Error color="error" />
                         ) : (
                           <Badge
-                            color={"info"}
+                            color={isMatchDisabled ? "default" : "info"}
                             badgeContent={value.toLocaleString()}
+                            max={Number.MAX_SAFE_INTEGER}
                           />
                         )}
                       </Box>
