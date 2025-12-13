@@ -63,6 +63,14 @@ export default function withStackOperationData(WrappedComponent) {
       return backfilledMatrix;
     }, [activeChildColumnIds]);
 
+    const [m, n] = useMemo(
+      () => [
+        Math.max(...columnIdMatrix.map((c) => c.length), 0),
+        columnIdMatrix.length,
+      ],
+      [columnIdMatrix]
+    );
+
     // TODO: we really need to know whether or not a object is
     // a pack or stack from its ID. That'd be a good refactor.
 
@@ -74,14 +82,6 @@ export default function withStackOperationData(WrappedComponent) {
         .map((colId) => columnIds.indexOf(colId))
         .filter((index) => index !== -1);
     }, [columnIds, selectedColumnIds]);
-
-    const [m, n] = useMemo(
-      () => [
-        Math.max(...columnIdMatrix.map((c) => c.length), 0),
-        columnIdMatrix.length,
-      ],
-      [columnIdMatrix]
-    );
 
     const selection = useMemo(() => {
       return childIds
@@ -97,6 +97,7 @@ export default function withStackOperationData(WrappedComponent) {
     const rowRanges = useSelector((state) =>
       selectStackOperationRowRanges(state, id)
     );
+
     const rowCount = useMemo(() => {
       return [...rowRanges].reduce((acc, [, [, end]]) => Math.max(acc, end), 0);
     }, [rowRanges]);

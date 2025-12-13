@@ -13,9 +13,7 @@ export async function createPackView(queryData, columnList = null) {
 
 export function formQuery(data, columnList = null) {
   const leftTable = data.children[0].tableName;
-  const leftColumns = data.children[0].columnNames;
   const rightTable = data.children[1].tableName;
-  const rightColumns = data.children[1].columnNames;
   const { joinType, leftKey, rightKey, joinPredicate } = data;
 
   // TODO: refactor to util file for DRY

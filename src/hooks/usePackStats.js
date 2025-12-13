@@ -5,6 +5,7 @@ import { selectColumnsById } from "../slices/columnsSlice/selectors.js";
 import { selectTablesById } from "../slices/tablesSlice/selectors.js";
 import { selectOperationsById } from "../slices/operationsSlice/selectors.js";
 import { isTableId } from "../slices/tablesSlice/Table.js";
+import { MATCH_STATS_DEFAULT } from "../slices/operationsSlice/Operation.js";
 
 /**
  * Custom React Hook for calculating pack statistics using DuckDB
@@ -102,10 +103,7 @@ export function usePackStats(
     }
   }, [fetchData, autoFetch]);
 
-  const matchKeys = useMemo(
-    () => ["left_unmatched", "matches", "right_unmatched"],
-    []
-  );
+  const matchKeys = useMemo(() => [...MATCH_STATS_DEFAULT.keys()], []);
   const matchLabels = useMemo(
     () =>
       new Map([

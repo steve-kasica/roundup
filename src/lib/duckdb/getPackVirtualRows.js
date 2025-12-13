@@ -1,3 +1,8 @@
+import {
+  MATCH_TYPE_LEFT_UNMATCHED,
+  MATCH_TYPE_MATCHES,
+  MATCH_TYPE_RIGHT_UNMATCHED,
+} from "../../slices/operationsSlice";
 import { getDuckDB } from "./duckdbClient";
 
 /**
@@ -14,25 +19,12 @@ import { getDuckDB } from "./duckdbClient";
  * @param {string} leftKeyColumn - Name of the key column in the left table used for joining
  * @param {string} rightKeyColumn - Name of the key column in the right table used for joining
  * @param {string} joinPredicate - Type of join predicate: "EQUALS", "CONTAINS", "STARTS_WITH", or "ENDS_WITH"
- * @param {Array<string>} matchTypes - Array of match types to filter by: "matches", "left_unmatched", and/or "right_unmatched"
+ * @param {Array<string>} matchTypes - Array of match types to filter by: MATCH_TYPE_MATCHES, MATCH_TYPE_LEFT_UNMATCHED, MATCH_TYPE_RIGHT_UNMATCHED
  * @param {number} [limit=50] - Maximum number of rows to return
  * @param {number} [offset=0] - Number of rows to skip before returning results
  *
  * @returns {Promise<Array<Array>>} Array of rows matching the specified match types
  *
- * @example
- * const result = await getPackVirtualRows(
- *   "customers",
- *   "orders",
- *   ["customer_id", "name", "email"],
- *   ["order_id", "customer_id", "total"],
- *   "customer_id",
- *   "customer_id",
- *   "EQUALS",
- *   ["matches", "left_unmatched"], // Get matched rows and left-only rows
- *   100,
- *   0
- * );
  */
 export async function getPackVirtualRows(
   leftTableId,
@@ -66,7 +58,11 @@ export async function getPackVirtualRows(
   }
 
   // Validate match types
-  const validMatchTypes = ["matches", "left_unmatched", "right_unmatched"];
+  const validMatchTypes = [
+    MATCH_TYPE_MATCHES,
+    MATCH_TYPE_LEFT_UNMATCHED,
+    MATCH_TYPE_RIGHT_UNMATCHED,
+  ];
   const invalidTypes = matchTypes.filter(
     (type) => !validMatchTypes.includes(type)
   );

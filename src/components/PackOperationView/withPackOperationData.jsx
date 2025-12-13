@@ -11,18 +11,13 @@ import {
   setSelectedMatches,
   selectSelectedMatches,
 } from "../../slices/uiSlice";
-
-const matchEquality = (a, b) => a === b;
-const matchContains = (a, b) => a.includes(b);
-const matchStartsWith = (a, b) => a.startsWith(b);
-const matchEndsWith = (a, b) => a.endsWith(b);
-
-const matchFunctionMap = new Map([
-  ["EQUALS", matchEquality],
-  ["CONTAINS", matchContains],
-  ["STARTS_WITH", matchStartsWith],
-  ["ENDS_WITH", matchEndsWith],
-]);
+import {
+  MATCH_STATS_DEFAULT,
+  MATCH_TYPE_LEFT_UNMATCHED,
+  MATCH_TYPE_MATCHES,
+  MATCH_TYPE_RIGHT_UNMATCHED,
+  selectOperationsById,
+} from "../../slices/operationsSlice";
 
 export default function withPackOperationData(WrappedComponent) {
   function EnhancedPackComponent({
@@ -39,6 +34,39 @@ export default function withPackOperationData(WrappedComponent) {
     ...props
   }) {
     const dispatch = useDispatch();
+
+    const operation = useSelector((state) => selectOperationsById(state, id));
+
+    const matchStats = useMemo(() => operation.matchStats || {}, [operation]);
+    const matchKeys = useMemo(() => [...MATCH_STATS_DEFAULT.keys()], []);
+    const matchLabels = useMemo(
+      () =>
+        [...MATCH_STATS_DEFAULT.keys()].reduce((acc, key) => {
+          switch (key) {
+            case MATCH_TYPE_LEFT_UNMATCHED:
+              acc.set(key, "Left Only");
+              break;
+            case MATCH_TYPE_RIGHT_UNMATCHED:
+              acc.set(key, "Right Only");
+              break;
+            case MATCH_TYPE_MATCHES:
+              acc.set(key, "Matches");
+              break;
+            default:
+              throw new Error(`Unknown match type: ${key}`);
+          }
+          return acc;
+        }, new Map()),
+      []
+    );
+
+    const rowCount = useMemo(() => {
+      let total = 0;
+      Object.values(matchStats).reduce((acc, val) => {
+        total += val;
+      }, 0);
+      return total;
+    }, [matchStats]);
 
     // Handle case where there is only one child table
     const [leftTableId, rightTableId] = useMemo(
@@ -98,52 +126,6 @@ export default function withPackOperationData(WrappedComponent) {
       selectTablesById(state, rightTableId)
     );
     const rightRowCount = rightTable?.rowCount || 0;
-
-    const leftValueCounts = useSelector(
-      (state) => selectColumnsById(state, joinKey1)?.topValues
-    );
-
-    const rightValueCounts = useSelector(
-      (state) => selectColumnsById(state, joinKey2)?.topValues
-    );
-
-    const matchStats = useMemo(() => {
-      const stats = {
-        matchingRowCount: 0,
-        leftUnmatchedRowCount: 0,
-        rightUnmatchedRowCount: 0,
-      };
-      const matchFunction = matchFunctionMap.get(joinPredicate);
-      if (!joinPredicate || !leftValueCounts || !rightValueCounts) {
-        return stats;
-      }
-
-      leftValueCounts.forEach(({ value: leftValue, count: leftCount }) => {
-        const matches = rightValueCounts.filter(({ value: rightValue }) =>
-          matchFunction(leftValue, rightValue)
-        );
-        if (matches.length > 0) {
-          const totalRightMatches = matches.reduce(
-            (sum, match) => sum + match.count,
-            0
-          );
-          stats.matchingRowCount += leftCount * totalRightMatches;
-        } else {
-          stats.leftUnmatchedRowCount += leftCount;
-        }
-      });
-
-      rightValueCounts.forEach(({ value: rightValue, count: rightCount }) => {
-        const matches = leftValueCounts.filter(({ value: leftValue }) =>
-          matchFunction(leftValue, rightValue)
-        );
-        if (matches.length === 0) {
-          stats.rightUnmatchedRowCount += rightCount;
-        }
-      });
-
-      return stats;
-    }, [leftValueCounts, rightValueCounts, joinPredicate]);
 
     // Extract row counts from table objects
     const selectedMatchTypes = useSelector(selectSelectedMatches);
@@ -249,7 +231,10 @@ export default function withPackOperationData(WrappedComponent) {
         // Props defined in this HOC `withPackOperationData`
         selectedMatchTypes={selectedMatchTypes}
         columnCount={columnCount}
+        rowCount={rowCount}
         matchStats={matchStats}
+        matchKeys={matchKeys}
+        matchLabels={matchLabels}
         // Left table props
         leftTableId={leftTableId}
         leftKey={joinKey1}

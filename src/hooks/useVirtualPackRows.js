@@ -17,7 +17,7 @@ import { selectColumnsById } from "../slices/columnsSlice";
  * @param {string} leftKeyColumnId - ID of the key column in the left table used for joining
  * @param {string} rightKeyColumnId - ID of the key column in the right table used for joining
  * @param {string} joinPredicate - Type of join predicate: "EQUALS", "CONTAINS", "STARTS_WITH", or "ENDS_WITH"
- * @param {Array<string>} matchSelection - The type of match to filter by: "matches", "left_unmatched", "right_unmatched"
+ * @param {Array<string>} matchSelection - The type of match to filter by: MATCH_TYPE_MATCHES, MATCH_TYPE_LEFT_UNMATCHED, MATCH_TYPE_RIGHT_UNMATCHED
  * @param {number} [pageSize=50] - Number of rows per page
  *
  * @returns {Object} Hook state and methods

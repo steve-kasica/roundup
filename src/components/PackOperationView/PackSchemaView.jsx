@@ -31,7 +31,13 @@ import { isTableId } from "../../slices/tablesSlice";
 import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 import withGlobalInterfaceData from "../HOC/withGlobalInterfaceData";
 import StyledBlockCell from "./StyledBlockCell";
-import { JOIN_TYPES } from "../../slices/operationsSlice";
+import {
+  JOIN_TYPES,
+  MATCH_STATS_DEFAULT,
+  MATCH_TYPE_LEFT_UNMATCHED,
+  MATCH_TYPE_MATCHES,
+  MATCH_TYPE_RIGHT_UNMATCHED,
+} from "../../slices/operationsSlice";
 import PackOperationIcon from "../ui/icons/PackOperationIcon";
 
 const yAxisLabelWidth = "50px";
@@ -89,10 +95,8 @@ const PackSchemaView = withPackOperationData(
       const [hoveredColumn, setHoveredColumn] = useState(null);
 
       const [hiddenColumns, setHiddenColumns] = useState(new Set());
-      const [toggledMatches, setToggledMatches] = useState(() => [
-        "matches",
-        "left_unmatched",
-        "right_unmatched",
+      const [toggledMatches, setToggledMatches] = useState([
+        ...MATCH_STATS_DEFAULT.keys(),
       ]);
 
       // Track which block cells have been clicked
@@ -261,13 +265,7 @@ const PackSchemaView = withPackOperationData(
             setLastClickedCell(cellKey);
           }
         },
-        [
-          lastClickedCell,
-          leftColumnIds,
-          rightColumnIds,
-          matchKeys,
-          toggledMatches,
-        ]
+        [lastClickedCell, allColumns, matchKeys, toggledMatches]
       );
 
       const handleMatchLabelClick = useCallback(
@@ -439,29 +437,26 @@ const PackSchemaView = withPackOperationData(
         setClickedBlockCells(allCells);
       }, [areAnySelected, matchKeys, allColumns]);
 
-      const handleToggleMatch = useCallback(
-        (event, newValue) => {
-          if (newValue === null || newValue.length === 0) {
-            // Don't allow deselecting all buttons
-            return;
-          }
+      const handleToggleMatch = useCallback((event, newValue) => {
+        if (newValue === null || newValue.length === 0) {
+          // Don't allow deselecting all buttons
+          return;
+        }
 
-          setToggledMatches(newValue);
+        setToggledMatches(newValue);
 
-          // Deselect cells for any match types that were toggled off
-          setClickedBlockCells((prevCells) => {
-            const newCells = new Set(prevCells);
-            Array.from(newCells).forEach((cellKey) => {
-              const [, matchLabel] = cellKey.split(":");
-              if (!newValue.includes(matchLabel)) {
-                newCells.delete(cellKey);
-              }
-            });
-            return newCells;
+        // Deselect cells for any match types that were toggled off
+        setClickedBlockCells((prevCells) => {
+          const newCells = new Set(prevCells);
+          Array.from(newCells).forEach((cellKey) => {
+            const [, matchLabel] = cellKey.split(":");
+            if (!newValue.includes(matchLabel)) {
+              newCells.delete(cellKey);
+            }
           });
-        },
-        [toggledMatches]
-      );
+          return newCells;
+        });
+      }, []);
 
       const handleHideColumns = useCallback(
         (columnId) => {
@@ -601,16 +596,18 @@ const PackSchemaView = withPackOperationData(
                     onChange={handleToggleMatch}
                   >
                     <Tooltip title={`${joinType} join`}>
-                      {Array.from(matchLabels.keys()).map((key) => (
-                        <ToggleButton
-                          key={key}
-                          value={key}
-                          aria-label={matchLabels.get(key)}
-                          disabled={matchStats[key] === 0 || errorCount > 0}
-                        >
-                          {matchLabels.get(key).replace("Only", "").trim()}
-                        </ToggleButton>
-                      ))}
+                      {Array.from(matchLabels.keys())
+                        .sort((a, b) => a.localeCompare(b)) // Sort alphabetically to put matches in center
+                        .map((key) => (
+                          <ToggleButton
+                            key={key}
+                            value={key}
+                            aria-label={matchLabels.get(key)}
+                            disabled={matchStats[key] === 0 || errorCount > 0}
+                          >
+                            {matchLabels.get(key).replace("Only", "").trim()}
+                          </ToggleButton>
+                        ))}
                     </Tooltip>
                   </ToggleButtonGroup>
                 </Box>
@@ -942,12 +939,18 @@ const PackSchemaView = withPackOperationData(
                         size={yAxisLabelWidth.replace("px", "")}
                         disabled={isMatchDisabled}
                         leftFill={
-                          key === "left_unmatched" ? vennFill : "transparent"
+                          key === MATCH_TYPE_LEFT_UNMATCHED
+                            ? vennFill
+                            : "transparent"
                         }
                         rightFill={
-                          key === "right_unmatched" ? vennFill : "transparent"
+                          key === MATCH_TYPE_RIGHT_UNMATCHED
+                            ? vennFill
+                            : "transparent"
                         }
-                        overlapFill={key === "matches" ? vennFill : "white"}
+                        overlapFill={
+                          key === MATCH_TYPE_MATCHES ? vennFill : "white"
+                        }
                       />
                       <Box
                         display="flex"
@@ -1071,10 +1074,10 @@ const PackSchemaView = withPackOperationData(
                             key={columnId}
                             disabled={isMatchDisabled}
                             isEmpty={
-                              (key === "left_unmatched" &&
-                                j < leftColumnIds.length) ||
-                              (key === "right_unmatched" &&
-                                j >= leftColumnIds.length)
+                              (key === MATCH_TYPE_LEFT_UNMATCHED &&
+                                j >= leftColumnIds.length) ||
+                              (key === MATCH_TYPE_RIGHT_UNMATCHED &&
+                                j < leftColumnIds.length)
                             }
                             isLastLeftColumn={isLastLeftColumn}
                             highlightTopBorder={highlightTopBorder}

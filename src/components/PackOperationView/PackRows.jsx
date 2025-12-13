@@ -3,6 +3,14 @@ import withPackOperationData from "./withPackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
 import VennDiagram from "../ui/icons/VennDiagram";
+import {
+  MATCH_TYPE_LEFT_UNMATCHED,
+  MATCH_TYPE_MATCHES,
+  MATCH_TYPE_RIGHT_UNMATCHED,
+} from "../../slices/operationsSlice/Operation.js";
+import { Stack, Typography } from "@mui/material";
+
+const pageSize = 50;
 /**
  * Virtualized table view for stack operations
  * Supports synchronized or sequential scrolling/loading of multiple tables
@@ -13,8 +21,6 @@ const PackRows = ({
   // Props passed via withOperationData
   id,
   columnIds, // ColumnIDs of this operation
-  activeColumnIds, // columnIDs of this operation (not hidden)
-  activeChildColumnIds, // column IDs of operation's child tables (not hidden)
   isMaterialized,
   isLoading,
   isInSync,
@@ -73,37 +79,42 @@ const PackRows = ({
   ]);
 
   const initialOffset = useMemo(() => {
-    if (selectedMatchTypes.includes("matches")) {
+    if (selectedMatchTypes.includes(MATCH_TYPE_MATCHES)) {
       return 0;
-    } else if (selectedMatchTypes.includes("left_unmatched")) {
+    } else if (selectedMatchTypes.includes(MATCH_TYPE_LEFT_UNMATCHED)) {
       return matchStats.matches;
-    } else if (selectedMatchTypes.includes("right_unmatched")) {
+    } else if (selectedMatchTypes.includes(MATCH_TYPE_RIGHT_UNMATCHED)) {
       return matchStats.matches + matchStats.left_unmatched;
     }
     return null;
   }, [matchStats, selectedMatchTypes]);
 
-  // TODO: need to fix this, counts are adding up
   const rowLimit = useMemo(() => {
     const filteredMatchStats = selectedMatchTypes.reduce((acc, type) => {
       return acc + matchStats[type];
     }, 0);
     return filteredMatchStats;
   }, [matchStats, selectedMatchTypes]);
-  console.log("Row limit:", { initialOffset, rowLimit });
 
-  // const [sortBy, setSortBy] = useState(null);
-  // const [sortDirection, setSortDirection] = useState("asc");
   const results = usePaginatedTableRows(
     id,
     displayColumnIds,
-    50,
+    pageSize,
     sortByColumnId,
     sortDirection,
     initialOffset,
     rowLimit
   );
-  const { data, loading, error, hasMore, loadMore, refresh } = results;
+  const {
+    data,
+    minIndex,
+    maxIndex,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    refresh,
+  } = results;
 
   const handleColumnSort = useCallback(
     (event, columnId) => {
@@ -117,37 +128,65 @@ const PackRows = ({
     [sortByColumnId, sortDirection]
   );
 
+  console.log("PackRows data", {
+    data,
+    minIndex,
+    maxIndex,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    refresh,
+  });
+
   const handleMaterializeView = useCallback(() => {
     materializeOperation();
   }, [materializeOperation]);
 
-  const setRowMargin = useCallback((rowData, index) => {
-    if (rowData[0] !== null && rowData[1] !== null) {
+  const setRowMargin = useCallback(
+    (rowData, index) => {
+      const globalIndex = index + initialOffset; // Zero-indexed
+      let vennProps = {};
+      if (globalIndex < matchStats.matches) {
+        // Row is in matches range
+        vennProps = {
+          leftFill: "#fff",
+          overlapFill: "#000",
+          rightFill: "#fff",
+        };
+      } else if (
+        globalIndex >= matchStats.matches &&
+        globalIndex < matchStats.matches + matchStats.left_unmatched
+      ) {
+        // Row is in left_unmatched range
+        vennProps = {
+          leftFill: "#000",
+          overlapFill: "#fff",
+          rightFill: "#fff",
+        };
+      } else if (
+        globalIndex >=
+        matchStats.matches + matchStats.left_unmatched
+      ) {
+        // Row is in right_unmatched range
+        vennProps = {
+          leftFill: "#fff",
+          overlapFill: "#fff",
+          rightFill: "#000",
+        };
+      } else {
+        throw new Error("Index out of bounds");
+      }
+
       return (
-        <VennDiagram
-          leftFill={"#fff"}
-          overlapFill={"#000"}
-          rightFill={"#fff"}
-        />
+        <Stack direction="row" alignItems="right">
+          <VennDiagram {...vennProps} />
+          <Typography>{globalIndex + 1}.</Typography>
+        </Stack>
       );
-    } else if (rowData[0] !== null && rowData[1] === null) {
-      return (
-        <VennDiagram
-          leftFill={"#000"}
-          overlapFill={"#fff"}
-          rightFill={"#fff"}
-        />
-      );
-    } else if (rowData[0] === null && rowData[1] !== null) {
-      return (
-        <VennDiagram
-          leftFill={"#fff"}
-          overlapFill={"#fff"}
-          rightFill={"#000"}
-        />
-      );
-    }
-  }, []);
+    },
+    [initialOffset, matchStats.left_unmatched, matchStats.matches]
+  );
 
   const onScrollThreshold = useCallback(() => {
     if (hasMore && !loading && !error) {
@@ -176,7 +215,7 @@ const PackRows = ({
       sortConfig={{ sortByColumnId, sortDirection }}
       placeHolderColumnLength={11}
       placeHolderRowLength={20}
-      initialOffset={initialOffset} // TODO: update row counts
+      initialOffset={initialOffset}
       errorCount={errorCount}
       rowMargin={setRowMargin}
     />

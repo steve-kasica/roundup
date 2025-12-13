@@ -6,8 +6,8 @@ import { styled } from "@mui/system";
  */
 const StyledTableCell = styled(TableCell, {
   shouldForwardProp: (prop) =>
-    !["isHovered", "isEven", "maxWidth"].includes(prop),
-})(({ isHovered, isEven, maxWidth = "200px" }) => ({
+    !["isHovered", "isEven", "isSticky"].includes(prop),
+})(({ isHovered, isEven, isSticky }) => ({
   backgroundColor:
     isHovered && isEven
       ? "#e3f2fd"
@@ -15,10 +15,18 @@ const StyledTableCell = styled(TableCell, {
       ? "#bbdefb"
       : "transparent",
   transition: "background-color 0.1s ease",
-  maxWidth: maxWidth, // Dynamic maximum column width
+  // maxWidth: maxWidth, // Dynamic maximum column width
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
+  zIndex: 1,
+  ...(isSticky && {
+    position: "sticky",
+    left: 0,
+    // left: `${index * parseInt(maxWidth.replace("px", ""), 10)}px`,
+    zIndex: 100,
+    // borderRight: "1px solid rgba(224, 224, 224, 1)",
+  }),
 }));
 
 export default StyledTableCell;

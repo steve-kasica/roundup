@@ -1,6 +1,7 @@
 /**
  * Operation.js
  *
+ *
  */
 export const OPERATION_TYPE_STACK = "stack";
 export const OPERATION_TYPE_PACK = "pack";
@@ -24,8 +25,30 @@ export const JOIN_PREDICATES = {
   ENDS_WITH: "ENDS_WITH",
 };
 
+export const MATCH_TYPE_LEFT_UNMATCHED = "left_unmatched";
+export const MATCH_TYPE_MATCHES = "matches";
+export const MATCH_TYPE_RIGHT_UNMATCHED = "right_unmatched";
+
+/**
+ * I'm using Map here to ensure the order of the match keys is preserved,
+ * this is used for indexing into the opeation table by row index and partitioning
+ * rows by match type. This order must be consistent with how the table is ordered
+ * in `createPackView.js`.
+ */
+export const MATCH_STATS_DEFAULT = new Map([
+  [MATCH_TYPE_MATCHES, 0],
+  [MATCH_TYPE_LEFT_UNMATCHED, 0],
+  [MATCH_TYPE_RIGHT_UNMATCHED, 0],
+]);
+
 let idCounter = 0; // each node gets a unique ID, regardless if it's a table vs operation node
 
+/**
+ *
+ * @param {*} param0
+ * @returns {object} Operation object
+ *  * `matchStats` only apply to PACK operations are are derived from other pack operation parameters. They are not set by the user
+ */
 export default function Operation({
   operationType = null,
   name = null,
@@ -60,8 +83,9 @@ export default function Operation({
       ? {
           joinType,
           joinPredicate,
-          joinKey1: joinKey1,
-          joinKey2: joinKey2,
+          joinKey1,
+          joinKey2,
+          matchStats: { ...MATCH_STATS_DEFAULT }, // to be calculated: match counts and cardinality breakdown
         }
       : {}),
   };

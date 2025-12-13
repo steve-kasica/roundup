@@ -437,7 +437,7 @@ const StackSchemaView = ({
                     id={childId}
                     onClick={(event) => onRowLabelClick(event, rowIndex)}
                     includeIcon={false}
-                    includeDimensions={false}
+                    includeDimensions={true}
                   />
                 ) : (
                   <EnhancedOperationLabel
@@ -649,10 +649,9 @@ const StackSchemaView = ({
   );
 };
 
-StackSchemaView.displayName = "StackSchemaView";
+StackSchemaView.displayName = "Stack Schema View";
 
 const EnhancedStackSchemaView = withStackOperationData(StackSchemaView);
 
-EnhancedStackSchemaView.displayName = "EnhancedStackSchemaView";
-
+EnhancedStackSchemaView.displayName = "Enhanced Stack Schema View";
 export { EnhancedStackSchemaView, StackSchemaView };

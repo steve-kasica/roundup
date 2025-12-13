@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   JOIN_PREDICATES,
   JOIN_TYPES,
+  MATCH_STATS_DEFAULT,
   OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
@@ -68,6 +69,9 @@ export default function TableDropTarget({ disabled, operationType, children }) {
                 ...(operationType === OPERATION_TYPE_PACK && {
                   joinPredicate: JOIN_PREDICATES["EQUALS"],
                   joinType: JOIN_TYPES["FULL_OUTER"],
+                  joinKey1: null,
+                  joinKey2: null,
+                  matchStats: { ...MATCH_STATS_DEFAULT },
                 }),
               },
             ],

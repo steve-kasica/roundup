@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { getTableRows } from "../lib/duckdb/getTableRows.js";
 import { useSelector } from "react-redux";
-import {
-  selectColumnNamesById,
-  selectColumnsById,
-} from "../slices/columnsSlice/selectors.js";
+import { selectColumnsById } from "../slices/columnsSlice/selectors.js";
 import { selectTablesById } from "../slices/tablesSlice/selectors.js";
 import { selectOperationsById } from "../slices/operationsSlice/selectors.js";
 import { isTableId } from "../slices/tablesSlice/Table.js";
@@ -153,25 +150,10 @@ export function usePaginatedTableRows(
       try {
         const offset = initialOffset + pageNum * pageSize;
 
-        // Calculate effective limit using functional update to avoid data.length dependency
+        // Calculate effective limit upfront
         let effectiveLimit = pageSize;
-
         if (rowLimit !== null) {
-          // We'll check this inside the functional update
-          setData((prevData) => {
-            const currentDataLength =
-              reset || pageNum === 0 ? 0 : prevData.length;
-            const remainingRows = rowLimit - currentDataLength;
-
-            if (remainingRows <= 0) {
-              setHasMore(false);
-              setLoading(false);
-            } else {
-              effectiveLimit = Math.min(pageSize, remainingRows);
-            }
-
-            return prevData; // Don't modify data yet
-          });
+          effectiveLimit = Math.min(pageSize, rowLimit);
         }
 
         const rows = await getTableRows(
@@ -190,7 +172,7 @@ export function usePaginatedTableRows(
           // Calculate hasMore based on actual new data
           if (rowLimit !== null) {
             setHasMore(
-              rows.length === effectiveLimit && newData.length < rowLimit
+              newData.length < rowLimit && rows.length === effectiveLimit
             );
           } else {
             setHasMore(rows.length === pageSize);
@@ -217,7 +199,6 @@ export function usePaginatedTableRows(
       columnsList,
       sortBy,
       sortDirection,
-      // Removed data.length - use functional updates instead
     ]
   );
 
