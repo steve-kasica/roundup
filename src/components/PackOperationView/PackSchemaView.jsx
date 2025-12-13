@@ -587,14 +587,15 @@ const PackSchemaView = withPackOperationData(
                         textTransform: "none",
                         px: 1.5,
                         whiteSpace: "nowrap",
+                        borderRadius: 0,
                       },
                       "& .MuiToggleButton-root:first-of-type": {
-                        borderTopLeftRadius: "16px",
-                        borderBottomLeftRadius: "16px",
+                        borderTopLeftRadius: "10px",
+                        borderBottomLeftRadius: "10px",
                       },
                       "& .MuiToggleButton-root:last-of-type": {
-                        borderTopRightRadius: "16px",
-                        borderBottomRightRadius: "16px",
+                        borderTopRightRadius: "10px",
+                        borderBottomRightRadius: "10px",
                       },
                     }}
                     onChange={handleToggleMatch}
@@ -667,6 +668,7 @@ const PackSchemaView = withPackOperationData(
               >
                 <Chip
                   size="small"
+                  color={totalCount > 0 ? "error" : "inherit"}
                   label={`${columnCount.toLocaleString()} x ${rowCount.toLocaleString()}`}
                 />
               </Tooltip>
