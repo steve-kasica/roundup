@@ -99,7 +99,10 @@ export default function withStackOperationData(WrappedComponent) {
     );
 
     const rowCount = useMemo(() => {
-      return [...rowRanges].reduce((acc, [, [, end]]) => Math.max(acc, end), 0);
+      return [...Object.entries(rowRanges)].reduce(
+        (acc, [, { end }]) => Math.max(acc, end),
+        0
+      );
     }, [rowRanges]);
 
     // TODO: is no one using this?

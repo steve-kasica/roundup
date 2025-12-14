@@ -4,6 +4,7 @@ import withStackOperationData from "./withStackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
 import { Stack, Typography } from "@mui/material";
+import StackOperationChildIcon from "./StackOperationChildIcon.jsx";
 
 const pageSize = 50; // default page size for pagination
 
@@ -116,17 +117,34 @@ const StackRows = ({
   const setRowMargin = useCallback(
     (rowData, index) => {
       const globalIndex = index + initialOffset; // Zero-indexed
-      const tableId = [...rowRanges.entries()].find(
+      const tableIndex = [...rowRanges.entries()].findIndex(
         ([, { start, end }]) => globalIndex >= start && globalIndex <= end
-      )[0];
+      );
       return (
-        <Stack direction="row" alignItems="right">
-          <Typography>{tableId}: </Typography>
-          <Typography>{globalIndex + 1}.</Typography>
+        <Stack
+          direction="row"
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "5px",
+          }}
+        >
+          <StackOperationChildIcon
+            count={childIds.length}
+            highlightIndex={tableIndex}
+          />
+          <Typography
+            sx={{
+              fontSize: "0.9rem",
+              color: "text.secondary",
+            }}
+          >
+            {globalIndex + 1}.
+          </Typography>
         </Stack>
       );
     },
-    [initialOffset, rowRanges]
+    [childIds.length, initialOffset, rowRanges]
   );
 
   // Load initial data only when table/columns/sort changes, not when refresh function changes
