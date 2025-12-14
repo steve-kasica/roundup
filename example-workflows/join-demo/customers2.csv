@@ -1,0 +1,11 @@
+customer_id,name,city,age,email,interests
+19,John Smith,New York,28,john.smith@email.com,sports|technology
+20,Sarah Johnson,Los Angeles,34,sarah.j@email.com,cooking|travel
+21,Mike Davis,Chicago,45,mike.davis@email.com,reading|music
+22,Emily Brown,Houston,29,emily.brown@email.com,fitness|photography
+23,David Wilson,Phoenix,52,d.wilson@email.com,gardening|movies
+24,Lisa Garcia,Philadelphia,31,lisa.garcia@email.com,art|fashion
+25,Tom Anderson,San Antonio,38,tom.anderson@email.com,sports|gaming
+26,Jessica Taylor,San Diego,26,j.taylor@email.com,travel|music
+27,Chris Martinez,Dallas,42,c.martinez@email.com,technology|cooking
+28,Amanda White,San Jose,35,amanda.white@email.com,fitness|reading
