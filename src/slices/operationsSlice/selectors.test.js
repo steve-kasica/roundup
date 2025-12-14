@@ -1,5 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { initialState } from "./operationsSlice";
+import { describe, it, expect } from "vitest";
 import {
   selectOperationsById,
   selectAllOperationIds,

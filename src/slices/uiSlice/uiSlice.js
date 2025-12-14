@@ -14,6 +14,7 @@ export const initialState = {
   draggingColumnIds: [], // array of column ids
   dropTargetColumnIds: [], // array of column ids
   focusedObjectId: null, // either a table id or sucessfully created operation id
+  loadingOperations: [], // array of operation ids currently loading
   selectedMatches: [], // array of match types
 };
 
@@ -21,6 +22,34 @@ export const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    /**
+     *
+     * Adds operation IDs to the list of currently loading operations in the UI state.
+     *
+     * @param {*} state - The current UI slice state.
+     * @param {*} action - The Redux action object.
+     * @param {string|string[]} action.payload - The operation ID or array of operation IDs that should be loading.
+     */
+    addToLoadingOperations(state, action) {
+      const operationIds = normalizeInputToArray(action.payload);
+      state.loadingOperations = operationIds;
+    },
+
+    /**
+     *
+     * Removes operation IDs from the list of currently loading operations in the UI state.
+     *
+     * @param {*} state - The current UI slice state.
+     * @param {*} action - The Redux action object.
+     * @param {string|string[]} action.payload - The operation ID or array of operation IDs that should be loading.
+     */
+    removeFromLoadingOperations(state, action) {
+      const operationIdsToRemove = normalizeInputToArray(action.payload);
+      state.loadingOperations = state.loadingOperations.filter(
+        (id) => !operationIdsToRemove.includes(id)
+      );
+    },
+
     /**
      * Sets the selected column IDs in the state.
      *
@@ -155,6 +184,8 @@ export const uiSlice = createSlice({
 
 // Action
 export const {
+  addToLoadingOperations,
+  removeFromLoadingOperations,
   setSelectedColumnIds,
   setHoveredColumnIds,
   addToHoveredColumnIds,

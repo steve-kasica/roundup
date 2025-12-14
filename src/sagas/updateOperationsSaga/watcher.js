@@ -52,6 +52,55 @@ export default function* updateOperationsWatcher() {
   // the operation is out-of-sync.
   yield takeEvery(updateTablesSuccess.type, handleRematerializations);
   yield takeEvery(updateOperationsSuccess.type, handleRematerializations);
+
+  // When a Pack operation's join parameters change, we need to
+  // recalculate its pack statistics.
+  yield takeEvery(updateOperationsSuccess.type, function* (action) {
+    const { changedPropertiesById } = action.payload;
+    const operationUpdates = [];
+
+    for (const [id, changedProperties] of Object.entries(
+      changedPropertiesById
+    )) {
+      const hasJoinParamChange = changedProperties.some((prop) =>
+        ["joinPredicate", "joinKey1", "joinKey2", "childIds"].includes(prop)
+      );
+      if (!hasJoinParamChange) {
+        continue;
+      }
+
+      const hasValidParams = yield select((state) => {
+        const operation = selectOperationsById(state, id);
+        return (
+          operation.operationType === OPERATION_TYPE_PACK &&
+          operation.joinKey1 &&
+          operation.joinKey2 &&
+          operation.joinPredicate &&
+          operation.childIds.length === 2
+        );
+      });
+
+      if (hasValidParams) {
+        const operation = yield select((state) =>
+          selectOperationsById(state, id)
+        );
+        if (operation.operationType === OPERATION_TYPE_PACK) {
+          operationUpdates.push({
+            id,
+            matchStats: {}, // matchStats will be recalculated in the worker
+          });
+        }
+      }
+    }
+
+    if (operationUpdates.length > 0) {
+      yield put(
+        updateOperationsRequest({
+          operationUpdates,
+        })
+      );
+    }
+  });
 }
 
 // Note: both tables and operation update success actions will pass

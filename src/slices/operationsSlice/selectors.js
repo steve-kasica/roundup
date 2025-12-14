@@ -284,20 +284,24 @@ export const selectStackOperationRowRanges = createSelector(
     (state) => state.operations.byId,
   ],
   (children, tablesData, operationsData) => {
-    if (!children) return new Map();
+    const rowRanges = new Map();
+    if (!children) return rowRanges;
 
-    const rowRanges = [];
     for (let i = 0; i < children.length; i++) {
       const childId = children[i];
-      const rowCount =
-        (isTableId(childId)
-          ? tablesData[childId]?.rowCount
-          : operationsData[childId]?.rowCount) || 0;
-      const start = i === 0 ? 0 : rowRanges[i - 1][1][1];
-      const end = start + rowCount;
-      rowRanges.push([childId, [start, end]]);
+      const rowCount = isTableId(childId)
+        ? tablesData[childId].rowCount
+        : operationsData[childId].rowCount;
+      if (i === 0) {
+        rowRanges.set(childId, { start: 0, end: rowCount - 1 });
+      } else {
+        // TODO
+        const start = rowRanges.get(children[i - 1]).end + 1;
+        const end = start + rowCount - 1;
+        rowRanges.set(childId, { start, end });
+      }
     }
-    return new Map(rowRanges);
+    return rowRanges;
   }
 );
 

@@ -155,3 +155,11 @@ export const isColumnIdVisible = createSelector(
  * @returns {Array} The array of selected matches.
  */
 export const selectSelectedMatches = (state) => state.ui.selectedMatches;
+
+/**
+ * Selector to retrieve the loading operations from the UI slice of the state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @returns {Array} The array of loading operation IDs.
+ */
+export const selectLoadingOperations = (state) => state.ui.loadingOperations;

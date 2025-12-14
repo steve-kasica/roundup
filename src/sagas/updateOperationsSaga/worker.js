@@ -6,19 +6,26 @@ import {
   updateOperations as updateOperationsSlice,
   selectOperationQueryData,
 } from "../../slices/operationsSlice";
-import { setFocusedObjectId } from "../../slices/uiSlice";
 import { updateOperationsSuccess } from "./actions";
 import { updateTables as updateTablesSlice } from "../../slices/tablesSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import {
+  calcPackStats as calcMatchStats, // TODO: rename file
   createPackView,
   createStackView,
   getTableDimensions,
 } from "../../lib/duckdb";
+import { selectColumnsById } from "../../slices/columnsSlice";
+import {
+  addToLoadingOperations,
+  removeFromLoadingOperations,
+} from "../../slices/uiSlice";
 
 export default function* updateOperationsWorker(action) {
   const successfulUpdates = [];
+  // eslint-disable-next-line no-unused-vars
   const failedUpdates = [];
+  // eslint-disable-next-line no-unused-vars
   const raisedAlerts = [];
   const tableUpdates = [];
   const furtherOperationUpdates = [];
@@ -82,7 +89,65 @@ export default function* updateOperationsWorker(action) {
       }
     } else if (Object.hasOwnProperty.call(operationUpdate, "operationType")) {
       operationUpdate.isInSync = false; // Mark as out-of-sync due to type change
+    } else if (Object.hasOwnProperty.call(operationUpdate, "matchStats")) {
+      // This parameter can be a long-running process, so mark this operation
+      // as loading
+      yield put(addToLoadingOperations(operation.id));
+
+      const {
+        leftTableName,
+        rightTableName,
+        leftColumnName,
+        rightColumnName,
+        joinType,
+      } = yield select((state) => {
+        const leftTable = isTableId(operation.childIds[0])
+          ? selectTablesById(state, operation.childIds[0])
+          : selectOperationsById(state, operation.childIds[0]);
+        const rightTable = isTableId(operation.childIds[1])
+          ? selectTablesById(state, operation.childIds[1])
+          : selectOperationsById(state, operation.childIds[1]);
+        const [leftKey, rightKey] = selectColumnsById(state, [
+          operation.joinKey1,
+          operation.joinKey2,
+        ]);
+        console.log("Calculating match stats for operation:", operation.id, {
+          leftTable,
+          rightTable,
+          leftKey,
+          rightKey,
+        });
+        return {
+          leftTableName: leftTable.databaseName,
+          rightTableName: rightTable.databaseName,
+          leftColumnName: leftKey.databaseName,
+          rightColumnName: rightKey.databaseName,
+          joinType: operation.joinPredicate,
+        };
+      });
+      try {
+        const matchStats = yield call(
+          calcMatchStats, // TODO: rename to calcMatchStats
+          leftTableName,
+          rightTableName,
+          leftColumnName,
+          rightColumnName,
+          joinType
+        );
+        operationUpdate.matchStats = matchStats;
+        console.log("Calculated new match stats:", matchStats);
+      } catch (error) {
+        console.error(
+          "Error calculating match stats for operation:",
+          operation.id,
+          error
+        );
+      } finally {
+        // Remove operation from loading state
+        yield put(removeFromLoadingOperations(operation.id));
+      }
     }
+
     // TODO: need to update isInSync when table change their column order or are removed
     successfulUpdates.push(operationUpdate);
   }
