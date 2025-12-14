@@ -1,25 +1,24 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
 import exportTableToStreamManual from "../../lib/duckdb/exportTableToStreamManual";
 import "./ExportButton.css";
 
 export function ExportButton({
   exportName,
-  operationId,
+  databaseName,
   format,
   includeHeaders,
 }) {
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const isDisabled = operationId === undefined;
+  const isDisabled = databaseName === undefined;
 
   const handleExport = async () => {
     setIsExporting(true);
     setProgress(0);
 
     try {
-      await exportTableToStreamManual(operationId, `${exportName}.${format}`, {
+      await exportTableToStreamManual(databaseName, `${exportName}.${format}`, {
         chunkSize: 1000,
         onProgress: (progressInfo) => {
           setProgress(progressInfo.percentage);
@@ -54,10 +53,3 @@ export function ExportButton({
     </div>
   );
 }
-
-ExportButton.propTypes = {
-  exportName: PropTypes.string.isRequired,
-  operationId: PropTypes.string,
-  format: PropTypes.string.isRequired,
-  includeHeaders: PropTypes.bool,
-};

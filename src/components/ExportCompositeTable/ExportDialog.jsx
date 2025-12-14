@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
 
-function ExportDialog({ name, id, onClose }) {
+function ExportDialog({ name, databaseName, onClose }) {
   const [format, setFormat] = useState("csv");
   const [includeHeaders, setIncludeHeaders] = useState(true);
   const [exportName, setExportName] = useState(`${name || "export"}`);
@@ -33,7 +33,7 @@ function ExportDialog({ name, id, onClose }) {
           justifyContent: "space-between",
         }}
       >
-        {`Export ${name || id}`}
+        {`Export ${name || "table"}`}
         <IconButton aria-label="close" onClick={onClose} size="small">
           <CloseIcon fontSize="small" />
         </IconButton>
@@ -82,7 +82,7 @@ function ExportDialog({ name, id, onClose }) {
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <ExportButton
-          operationId={id}
+          databaseName={databaseName}
           exportName={exportName}
           format={format}
           includeHeaders={includeHeaders}
@@ -94,13 +94,13 @@ function ExportDialog({ name, id, onClose }) {
 
 const EnhancedExportDialog = (props) => {
   const { id } = props;
-  const { name } = useSelector((state) =>
+  const { name, databaseName } = useSelector((state) =>
     isTableId(id)
       ? selectTablesById(state, id)
       : selectOperationsById(state, id)
   );
 
-  return <ExportDialog {...props} name={name} />;
+  return <ExportDialog {...props} name={name} databaseName={databaseName} />;
 };
 
 export { ExportDialog, EnhancedExportDialog };

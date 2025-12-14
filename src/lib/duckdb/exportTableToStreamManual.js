@@ -4,7 +4,7 @@ import { getDuckDB } from "./duckdbClient";
  * Export a table/view to CSV/TSV with manual streaming and progress callback
  */
 export default async function exportTableToStreamManual(
-  operationId,
+  tableName,
   filename = "export.csv",
   options = {}
 ) {
@@ -21,12 +21,12 @@ export default async function exportTableToStreamManual(
   try {
     // Get total row count for progress tracking
     const countResult = await conn.query(
-      `SELECT COUNT(*) as count FROM "${operationId}"`
+      `SELECT COUNT(*) as count FROM "${tableName}"`
     );
     const totalRows = Number(countResult.toArray()[0].count);
 
     // Get column information
-    const columnsResult = await conn.query(`DESCRIBE "${operationId}"`);
+    const columnsResult = await conn.query(`DESCRIBE "${tableName}"`);
     const columns = columnsResult.toArray().map((col) => col.column_name); // TODO: column_names are IDs, not names
 
     const chunks = [];
@@ -44,7 +44,7 @@ export default async function exportTableToStreamManual(
     // Process data in chunks
     while (processedRows < totalRows) {
       const result = await conn.query(`
-        SELECT * FROM "${operationId}" 
+        SELECT * FROM "${tableName}" 
         LIMIT ${chunkSize} 
         OFFSET ${processedRows}
       `);
