@@ -76,6 +76,10 @@ export default function withOperationData(WrappedComponent) {
       selectSelectedColumnIdsByParentId(state, operation.childIds)
     );
 
+    const selectedChildColumnIdsSet = useMemo(() => {
+      return new Set(selectedChildColumnIds.flat());
+    }, [selectedChildColumnIds]);
+
     const activeColumnIds = operation.columnIds;
 
     const removedColumnIds = useMemo(() => {
@@ -277,7 +281,8 @@ export default function withOperationData(WrappedComponent) {
         isMaterialized={operation.isMaterialized}
         isInSync={operation.isInSync}
         activeChildColumnIds={activeChildColumnIds} // ColumnIDs of operation's child tables (not hidden)
-        selectedChildColumnIds={selectedChildColumnIds}
+        selectedChildColumnIds={selectedChildColumnIds} // A matrix of column IDs, each row is a child table
+        selectedChildColumnIdsSet={selectedChildColumnIdsSet} // a Set of all selected column IDs, including those from child tables
         childRowCounts={childRowCounts}
         depth={depth}
         maxDepth={maxDepth}

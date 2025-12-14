@@ -25,7 +25,9 @@ const PackRows = ({
   isLoading,
   isInSync,
   materializeOperation,
-  selectedChildColumnIds,
+  selectedChildColumnIdsSet,
+  selectColumns,
+  selectAllChildColumns,
   // Props passed from withAssociatedAlerts HOC
   errorCount,
   // Props passed directly from withPackOperationData HOC
@@ -56,7 +58,6 @@ const PackRows = ({
     const leftKeyColId = columnIds[leftKeyIndex];
     const rightKeyColId = columnIds[rightKeyIndex];
 
-    const selectedChildColumnIdsSet = new Set(selectedChildColumnIds.flat());
     const selectedParentColumnIds = [...leftColumnIds, ...rightColumnIds]
       .map((colId, index) => {
         return selectedChildColumnIdsSet.has(colId) &&
@@ -75,7 +76,7 @@ const PackRows = ({
     leftKey,
     rightColumnIds,
     rightKey,
-    selectedChildColumnIds,
+    selectedChildColumnIdsSet,
   ]);
 
   const initialOffset = useMemo(() => {
@@ -105,16 +106,7 @@ const PackRows = ({
     initialOffset,
     rowLimit
   );
-  const {
-    data,
-    minIndex,
-    maxIndex,
-    loading,
-    error,
-    hasMore,
-    loadMore,
-    refresh,
-  } = results;
+  const { data, loading, error, hasMore, loadMore, refresh } = results;
 
   const handleColumnSort = useCallback(
     (event, columnId) => {
@@ -128,20 +120,10 @@ const PackRows = ({
     [sortByColumnId, sortDirection]
   );
 
-  console.log("PackRows data", {
-    data,
-    minIndex,
-    maxIndex,
-    loading,
-    error,
-    hasMore,
-    loadMore,
-    refresh,
-  });
-
   const handleMaterializeView = useCallback(() => {
     materializeOperation();
-  }, [materializeOperation]);
+    selectAllChildColumns();
+  }, [materializeOperation, selectAllChildColumns]);
 
   const setRowMargin = useCallback(
     (rowData, index) => {

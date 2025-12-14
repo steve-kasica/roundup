@@ -9,15 +9,10 @@ import {
 import { EnhancedTableLabel } from "../TableView";
 import { EnhancedColumnSummary, StyledColumnCard } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
-import SchemaToolbar from "../ui/SchemaToolbar";
-import { EnhancedStackOperationLabel } from "./StackOperationLabel";
-import FocusIconButton from "../ui/icons/FocusIconButton";
-import HideIconButton from "../ui/HideIconButton";
-import SelectToggleIconButton from "../ui/SelectToggleIconButton";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
-import DeleteIconButton from "../ui/icons/DeleteIconButton";
 import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
+import { EnhancedStackSchemaToolbar } from "./StackSchemaToolbar";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)
 
@@ -25,28 +20,23 @@ const StackSchemaView = ({
   // Props passed via withOperationData
   childIds,
   id,
-  name,
-  rowCount,
-  deleteColumns,
-  // Props passed via withStackOperationData
-  activeColumnIds,
-  columnIdMatrix, // column IDs of child tables in a matrix
-  m, // width of the matrix (# of columns)
-  // Props passed via withAssociatedAlerts
-  alertIds,
-  totalCount,
-  errorCount,
-  //
+  selectedChildColumnIdsSet,
   selectColumns, // Sets global set of selected column IDs
   clearSelectedColumns, // Clears global set of selected column IDs
   focusColumns, // Sets global set of focused column IDs
-  swapColumns,
   insertColumnIntoChildAtIndex,
   setVisibleColumns: setVisibleColumnsInSlice,
+
+  // Props passed via withStackOperationData
+  columnIdMatrix, // column IDs of child tables in a matrix
+  m, // width of the matrix (# of columns)
+  swapColumns,
+
+  // Props passed via withAssociatedAlerts
+  totalCount,
 }) => {
   const [hiddenIndices, setHiddenIndices] = useState([]); // This array stores column indices that are hidden
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
-  const [selectedTableColumnIds, setSelectedTableColumnIds] = useState([]);
   const columnContainerRef = useRef(null);
   const [visibleColumns, setVisibleColumns] = useState([]);
 
@@ -85,8 +75,6 @@ const StackSchemaView = ({
         }
       });
 
-      console.log({ currentlyVisibleColumnIds, visibleColumns });
-
       if (
         JSON.stringify(currentlyVisibleColumnIds) !==
         JSON.stringify(visibleColumns)
@@ -102,15 +90,6 @@ const StackSchemaView = ({
     };
   }, [visibleColumns]);
 
-  // Call selectColumns whenever selectedTableColumnIds changes
-  useEffect(() => {
-    if (selectedTableColumnIds.length > 0) {
-      selectColumns(selectedTableColumnIds);
-    } else {
-      clearSelectedColumns();
-    }
-  }, [selectedTableColumnIds, selectColumns, clearSelectedColumns]);
-
   const onCellClick = useCallback(
     (event, columnId) => {
       const currentPosition = getIndexOfValue(columnIdMatrix, columnId);
@@ -124,29 +103,16 @@ const StackSchemaView = ({
           currentPosition
         ).filter((id) => id !== null);
 
-        setSelectedTableColumnIds(rangeColumnIds);
+        selectColumns(rangeColumnIds);
         // Don't update anchor cell on shift+click - keep the original anchor
-      } else if (event.metaKey || event.ctrlKey) {
-        // Ctrl/Meta+Click: toggle individual cell in selection (like Excel/Sheets)
-        setSelectedTableColumnIds((prev) => {
-          if (prev.includes(columnId)) {
-            // Remove from selection (unselect)
-            return prev.filter((id) => id !== columnId);
-          } else {
-            // Add to selection (select)
-            return [...prev, columnId];
-          }
-        });
-        // Update anchor for next shift+click operation
-        setSelectionAnchorCell(currentPosition);
       } else {
         // Single click: select only this cell (like Excel/Sheets)
-        setSelectedTableColumnIds([columnId]);
+        selectColumns([columnId]);
         // Update anchor for next shift+click operation
         setSelectionAnchorCell(currentPosition);
       }
     },
-    [columnIdMatrix, selectionAnchorCell]
+    [columnIdMatrix, selectColumns, selectionAnchorCell]
   );
   const onCellDoubleClick = useCallback(
     (event, columnId) => {
@@ -172,42 +138,19 @@ const StackSchemaView = ({
           .flat()
           .filter((id) => id !== null);
 
-        setSelectedTableColumnIds(columnIdsToSelect);
+        selectColumns(columnIdsToSelect);
         // Don't update anchor on shift+click
-      } else if (event.metaKey || event.ctrlKey) {
-        // Ctrl/Meta+Click: toggle all cells in this row
-        const rowColumnIds = columnIdMatrix[rowIndex].filter(
-          (id) => id !== null
-        );
-
-        setSelectedTableColumnIds((prev) => {
-          // Check if all cells in this row are already selected
-          const allRowCellsSelected = rowColumnIds.every((id) =>
-            prev.includes(id)
-          );
-
-          if (allRowCellsSelected) {
-            // Remove all cells from this row
-            return prev.filter((id) => !rowColumnIds.includes(id));
-          } else {
-            // Add all cells from this row (that aren't already selected)
-            const newIds = rowColumnIds.filter((id) => !prev.includes(id));
-            return [...prev, ...newIds];
-          }
-        });
-        // Update anchor for next shift+click operation
-        setSelectionAnchorCell([rowIndex, 0]);
       } else {
         // Single click: select only this entire row
         const columnIdsToSelect = columnIdMatrix[rowIndex].filter(
           (id) => id !== null
         );
-        setSelectedTableColumnIds(columnIdsToSelect);
+        selectColumns(columnIdsToSelect);
         // Update anchor for next shift+click operation
         setSelectionAnchorCell([rowIndex, 0]);
       }
     },
-    [columnIdMatrix, selectionAnchorCell]
+    [columnIdMatrix, selectColumns, selectionAnchorCell]
   );
 
   const onColumnLabelClick = useCallback(
@@ -227,43 +170,20 @@ const StackSchemaView = ({
           .flat()
           .filter((id) => id !== null);
 
-        setSelectedTableColumnIds(columnIdsToSelect);
+        selectColumns(columnIdsToSelect);
         // Don't update anchor on shift+click
-      } else if (event.metaKey || event.ctrlKey) {
-        // Ctrl/Meta+Click: toggle all cells in this column
-        const colColumnIds = columnIdMatrix
-          .map((row) => row[colIndex])
-          .filter((id) => id !== null);
-
-        setSelectedTableColumnIds((prev) => {
-          // Check if all cells in this column are already selected
-          const allColCellsSelected = colColumnIds.every((id) =>
-            prev.includes(id)
-          );
-
-          if (allColCellsSelected) {
-            // Remove all cells from this column
-            return prev.filter((id) => !colColumnIds.includes(id));
-          } else {
-            // Add all cells from this column (that aren't already selected)
-            const newIds = colColumnIds.filter((id) => !prev.includes(id));
-            return [...prev, ...newIds];
-          }
-        });
-        // Update anchor for next shift+click operation
-        setSelectionAnchorCell([0, colIndex]);
       } else {
         // Single click: select only this entire column
         const columnIdsToSelect = columnIdMatrix
           .map((row) => row[colIndex])
           .filter((id) => id !== null);
 
-        setSelectedTableColumnIds(columnIdsToSelect);
+        selectColumns(columnIdsToSelect);
         // Update anchor for next shift+click operation
         setSelectionAnchorCell([0, colIndex]);
       }
     },
-    [columnIdMatrix, selectionAnchorCell]
+    [selectionAnchorCell, columnIdMatrix, selectColumns]
   );
   const onInsertColumnIntoChildTable = useCallback(
     (i, j) => {
@@ -271,10 +191,6 @@ const StackSchemaView = ({
     },
     [insertColumnIntoChildAtIndex, childIds]
   );
-
-  const handleFocusColumns = useCallback(() => {
-    focusColumns(selectedTableColumnIds);
-  }, [focusColumns, selectedTableColumnIds]);
 
   const handleHideColumns = useCallback(() => {
     // Find all column indices where all cells are selected
@@ -286,7 +202,7 @@ const StackSchemaView = ({
         .filter((id) => id !== null);
 
       const allSelected = columnIds.every((id) =>
-        selectedTableColumnIds.includes(id)
+        selectedChildColumnIdsSet.has(id)
       );
 
       if (allSelected && columnIds.length > 0) {
@@ -298,43 +214,11 @@ const StackSchemaView = ({
     setHiddenIndices((prev) =>
       Array.from(new Set([...prev, ...indicesToHide]))
     );
-    setSelectedTableColumnIds((prev) =>
-      prev.filter((columnId) => !columnIdsToDeselect.includes(columnId))
-    ); // Remove from selection after hiding
-  }, [columnIdMatrix, m, selectedTableColumnIds]);
-
-  const handleDeleteColumns = useCallback(() => {
-    deleteColumns(selectedTableColumnIds);
-    setSelectedTableColumnIds([]); // Clear selection after deletion
-  }, [deleteColumns, selectedTableColumnIds]);
-
-  const handleSelectionAllColumns = useCallback(() => {
-    if (selectedTableColumnIds.length > 0) {
-      // Some selected - deselect all
-      setSelectedTableColumnIds([]);
-    } else {
-      // None selected - select all
-      setSelectedTableColumnIds(columnIdMatrix.flat());
-    }
-  }, [columnIdMatrix, selectedTableColumnIds.length]);
-
-  const isCompleteColumnSelected = useCallback(() => {
-    // Check if there's at least one column index where all cells are selected
-    for (let colIndex = 0; colIndex < m; colIndex++) {
-      const columnIds = columnIdMatrix
-        .map((row) => row[colIndex])
-        .filter((id) => id !== null);
-
-      const allSelected = columnIds.every((id) =>
-        selectedTableColumnIds.includes(id)
-      );
-
-      if (allSelected && columnIds.length > 0) {
-        return true;
-      }
-    }
-    return false;
-  }, [columnIdMatrix, m, selectedTableColumnIds]);
+    const nextColumnSelection = [...selectedChildColumnIdsSet].filter(
+      (columnId) => !columnIdsToDeselect.includes(columnId)
+    );
+    selectColumns(nextColumnSelection); // Remove from selection after hiding
+  }, [columnIdMatrix, m, selectedChildColumnIdsSet, selectColumns]);
 
   return (
     <Box
@@ -349,38 +233,10 @@ const StackSchemaView = ({
         padding: totalCount ? 1 : 0,
       }}
     >
-      <SchemaToolbar
-        columnIds={columnIdMatrix.flat()}
-        columnCount={activeColumnIds.length}
-        rowCount={rowCount}
-        name={name}
-        objectId={id}
-        alertIds={alertIds}
-        errorCount={errorCount}
-        totalCount={totalCount}
-        customMenuItems={
-          <>
-            <FocusIconButton
-              onClick={handleFocusColumns}
-              disabled={selectedTableColumnIds.length === 0}
-            />
-            <HideIconButton
-              onClick={handleHideColumns}
-              disabled={!isCompleteColumnSelected()}
-            />
-            <DeleteIconButton
-              onConfirm={handleDeleteColumns}
-              disabled={selectedTableColumnIds.length === 0}
-            />
-            <SelectToggleIconButton
-              onClick={handleSelectionAllColumns}
-              isSelected={selectedTableColumnIds.length > 0}
-            />
-          </>
-        }
-      >
-        <EnhancedStackOperationLabel id={id} />
-      </SchemaToolbar>
+      <EnhancedStackSchemaToolbar
+        id={id}
+        handleHideColumns={handleHideColumns}
+      />
       <Box
         sx={{
           display: "flex",
@@ -515,12 +371,12 @@ const StackSchemaView = ({
                       colIndex + 1
                     ) : (
                       <HiddenColumnsButton
+                        // TODO: make callback function
                         onClick={() => {
                           setHiddenIndices((prev) =>
                             prev.filter((idx) => !hiddenIndices.includes(idx))
                           );
-                          setSelectedTableColumnIds([]); // Clear selection on unhide
-                          console.log({ selectedTableColumnIds });
+                          clearSelectedColumns(); // Clear selection on unhide
                         }}
                       />
                     )}
@@ -596,9 +452,7 @@ const StackSchemaView = ({
                               key={columnId}
                               id={columnId}
                               columnIndex={colIndex}
-                              canDrag={selectedTableColumnIds.includes(
-                                columnId
-                              )}
+                              canDrag={selectedChildColumnIdsSet.has(columnId)}
                               onDrop={(draggedItem, targetItem) =>
                                 swapColumns(targetItem, draggedItem)
                               }
@@ -612,7 +466,7 @@ const StackSchemaView = ({
                                 onDoubleClick={(event) =>
                                   onCellDoubleClick(event, columnId)
                                 }
-                                isDraggable={selectedTableColumnIds.includes(
+                                isDraggable={selectedChildColumnIdsSet.has(
                                   columnId
                                 )}
                                 handleInsertColumnLeft={() =>
