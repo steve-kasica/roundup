@@ -49,7 +49,7 @@ const StackRows = ({
     // Lookup row count of the previous child table to use
     // as the initial offset, or zero if there is no previous child table
     // (i.e., firstSelectedChildIndex is zero).
-    const initialOffset = childRowCounts.get(childIds[firstIndex - 1]) || 0;
+    const initialOffset = childRowCounts.get(childIds[firstIndex - 1]) + 1 || 0;
 
     // Calculate the total number of rows to display by summing the row counts of all
     // child tables between the first and last selected child table indices.
@@ -116,16 +116,12 @@ const StackRows = ({
   const setRowMargin = useCallback(
     (rowData, index) => {
       const globalIndex = index + initialOffset; // Zero-indexed
-      const tableId = [...rowRanges.entries()].find(([, [start, end]]) => {
-        if (globalIndex >= start && globalIndex <= end) {
-          return true;
-        }
-        return false;
-      });
-      console.log(tableId);
+      const tableId = [...rowRanges.entries()].find(
+        ([, { start, end }]) => globalIndex >= start && globalIndex <= end
+      )[0];
       return (
         <Stack direction="row" alignItems="right">
-          {/* <Typography>{tableId[0]}: </Typography> */}
+          <Typography>{tableId}: </Typography>
           <Typography>{globalIndex + 1}.</Typography>
         </Stack>
       );

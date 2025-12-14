@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Stack, Typography } from "@mui/material";
-import PackOperationIcon from "./PackOperationIcon";
+import PackOperationIcon from "../ui/icons/PackOperationIcon";
 import withPackOperationData from "./withPackOperationData";
 
 const PackOperationLabel = ({
@@ -21,7 +21,9 @@ const PackOperationLabel = ({
 
   return (
     <Stack direction={"row"} spacing={1} alignItems="center">
-      {includeIcon && <PackOperationIcon totalCount={totalCount} />}
+      {includeIcon && (
+        <PackOperationIcon color={totalCount > 0 ? "error" : "inherit"} />
+      )}
       <Typography
         variant="h6"
         component="div"

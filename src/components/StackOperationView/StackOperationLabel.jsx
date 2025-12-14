@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Stack, Typography } from "@mui/material";
-import StackOperationIcon from "./StackOperationIcon";
+import StackOperationIcon from "./../ui/icons/StackOperationIcon";
 import withStackOperationData from "./withStackOperationData";
 
 const StackOperationLabel = ({
@@ -20,7 +20,9 @@ const StackOperationLabel = ({
 
   return (
     <Stack direction={"row"} spacing={1} alignItems="center">
-      {includeIcon && <StackOperationIcon totalCount={totalCount} />}
+      {includeIcon && (
+        <StackOperationIcon color={totalCount > 0 ? "error" : "inherit"} />
+      )}
       <Typography
         variant="h6"
         component="div"

@@ -1,17 +1,12 @@
-import React from "react";
-import PackOperationIcon from "./PackOperationIcon";
+import { SvgIcon } from "@mui/material";
+import { TableRowsSplit } from "lucide-react";
 
-const StackOperationIcon = ({
-  size = 24,
-  color = "currentColor",
-  ...props
-}) => (
-  <PackOperationIcon
-    size={size}
-    color={color}
-    {...props}
-    sx={{ transform: "rotate(90deg)" }}
-  />
-);
+const StackOperationIcon = ({ color, ...props }) => {
+  return (
+    <SvgIcon color={color}>
+      <TableRowsSplit {...props} />
+    </SvgIcon>
+  );
+};
 
 export default StackOperationIcon;

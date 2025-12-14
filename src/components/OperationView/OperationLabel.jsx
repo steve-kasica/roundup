@@ -4,8 +4,8 @@ import {
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
 import { Stack, Typography } from "@mui/material";
-import StackOperationIcon from "../StackOperationView/StackOperationIcon";
-import PackOperationIcon from "../PackOperationView/PackOperationIcon";
+import StackOperationIcon from "../ui/icons/StackOperationIcon";
+import PackOperationIcon from "../ui/icons/PackOperationIcon";
 import withOperationData from "../HOC/withOperationData";
 
 const OperationLabel = ({
@@ -26,10 +26,10 @@ const OperationLabel = ({
   return (
     <Stack direction={"row"} spacing={1} alignItems="center">
       {includeIcon && operationType === OPERATION_TYPE_STACK && (
-        <StackOperationIcon totalCount={totalCount} />
+        <StackOperationIcon color={totalCount > 0 ? "error" : "inherit"} />
       )}
       {includeIcon && operationType === OPERATION_TYPE_PACK && (
-        <PackOperationIcon totalCount={totalCount} />
+        <PackOperationIcon color={totalCount > 0 ? "error" : "inherit"} />
       )}
       <Typography
         variant="h6"

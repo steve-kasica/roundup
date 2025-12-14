@@ -43,7 +43,6 @@ export async function getValueCounts(
       value: String(row.value),
       count: typeof row.count === "bigint" ? Number(row.count) : row.count,
     }));
-    console.log("Value counts data:", { data, results: result.toArray() });
     return data;
   } catch (error) {
     alert(
