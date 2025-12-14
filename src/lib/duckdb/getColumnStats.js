@@ -3,7 +3,9 @@ import { getDuckDB } from "./duckdbClient";
 export async function getColumnStats(tableId, columnList) {
   const db = await getDuckDB();
   const conn = await db.connect();
-  const columnsClause = columnList ? columnList.join(", ") : "*";
+  const columnsClause = columnList
+    ? columnList.map((col) => `"${col}"`).join(", ")
+    : "*";
   // If columnList is provided, use it in the query; otherwise, select all columns
   // This allows for summarizing specific columns or the entire table
   const query = `SUMMARIZE SELECT ${columnsClause} FROM ${tableId};`;
