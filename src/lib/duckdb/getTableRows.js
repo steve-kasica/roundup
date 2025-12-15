@@ -28,7 +28,7 @@ export async function getTableRows(
   const conn = await db.connect();
   const columnsClause =
     columnsList !== null && columnsList.length > 0
-      ? columnsList.join(", ")
+      ? columnsList.map((databaseName) => `"${databaseName}"`).join(", ")
       : "*";
   const query = `
     SELECT ${columnsClause} 
