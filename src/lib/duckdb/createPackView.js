@@ -1,6 +1,6 @@
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { getDuckDB } from "./duckdbClient";
-import { escapeColumnName } from "./utils";
+import { escapeColumnName } from "./utilities";
 
 // With these UNION ALL query, the view will take on the column names of the first child.
 export async function createPackView(queryData, columnList = null) {
