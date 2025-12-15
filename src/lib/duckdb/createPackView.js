@@ -1,5 +1,6 @@
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { getDuckDB } from "./duckdbClient";
+import { escapeColumnName } from "./utils";
 
 // With these UNION ALL query, the view will take on the column names of the first child.
 export async function createPackView(queryData, columnList = null) {
@@ -18,10 +19,18 @@ export function formQuery(data, columnList = null) {
 
   // TODO: refactor to util file for DRY
   const predicates = {
-    EQUALS: `${leftTable}.${leftKey} = ${rightTable}.${rightKey}`,
-    CONTAINS: `contains(${leftTable}.${leftKey}, ${rightTable}.${rightKey})`,
-    STARTS_WITH: `starts_with(${leftTable}.${leftKey}, ${rightTable}.${rightKey})`,
-    ENDS_WITH: `ends_with(${leftTable}.${leftKey}, ${rightTable}.${rightKey})`,
+    EQUALS: `${leftTable}.${escapeColumnName(
+      leftKey
+    )} = ${rightTable}.${escapeColumnName(rightKey)}`,
+    CONTAINS: `contains(${leftTable}.${escapeColumnName(
+      leftKey
+    )}, ${rightTable}.${escapeColumnName(rightKey)})`,
+    STARTS_WITH: `starts_with(${leftTable}.${escapeColumnName(
+      leftKey
+    )}, ${rightTable}.${escapeColumnName(rightKey)})`,
+    ENDS_WITH: `ends_with(${leftTable}.${escapeColumnName(
+      leftKey
+    )}, ${rightTable}.${escapeColumnName(rightKey)})`,
   };
 
   let definition = "";
@@ -52,7 +61,9 @@ export function formQuery(data, columnList = null) {
       FROM ${leftTable} 
       FULL OUTER JOIN ${rightTable}
       ON ${predicates[joinPredicate]}
-      WHERE ${leftTable}.${leftKey} IS NULL OR ${rightTable}.${rightKey} IS NULL
+      WHERE ${leftTable}.${escapeColumnName(
+      leftKey
+    )} IS NULL OR ${rightTable}.${escapeColumnName(rightKey)} IS NULL
     `;
   } else if (joinType === JOIN_TYPES.FULL) {
     // Full outer join with custom ordering:
@@ -66,9 +77,21 @@ export function formQuery(data, columnList = null) {
       ON ${predicates[joinPredicate]}
       ORDER BY 
         CASE 
-          WHEN ${leftTable}.${leftKey} IS NOT NULL AND ${rightTable}.${rightKey} IS NOT NULL THEN 1
-          WHEN ${leftTable}.${leftKey} IS NOT NULL AND ${rightTable}.${rightKey} IS NULL THEN 2
-          WHEN ${leftTable}.${leftKey} IS NULL AND ${rightTable}.${rightKey} IS NOT NULL THEN 3
+          WHEN ${leftTable}.${escapeColumnName(
+      leftKey
+    )} IS NOT NULL AND ${rightTable}.${escapeColumnName(
+      rightKey
+    )} IS NOT NULL THEN 1
+          WHEN ${leftTable}.${escapeColumnName(
+      leftKey
+    )} IS NOT NULL AND ${rightTable}.${escapeColumnName(
+      rightKey
+    )} IS NULL THEN 2
+          WHEN ${leftTable}.${escapeColumnName(
+      leftKey
+    )} IS NULL AND ${rightTable}.${escapeColumnName(
+      rightKey
+    )} IS NOT NULL THEN 3
         END
     `;
   } else {

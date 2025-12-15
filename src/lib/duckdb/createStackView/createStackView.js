@@ -11,14 +11,18 @@ export async function createStackView(queryData, columnList = null) {
 }
 
 export function formQuery(queryData, columnList = null) {
-  const columnSpec = columnList ? `(${columnList.join(", ")})` : "";
+  const columnSpec = columnList
+    ? `(${columnList.map((databaseName) => `"${databaseName}"`).join(", ")})`
+    : "";
   return `CREATE OR REPLACE TABLE ${
     queryData.viewName
   }${columnSpec} AS SELECT * FROM (
     ${queryData.children
       .map(
         (child) =>
-          `\nSELECT ${child.columnNames.join(", ")} FROM ${child.tableName}\n`
+          `\nSELECT ${child.columnNames
+            .map((databaseName) => `"${databaseName}"`)
+            .join(", ")} FROM ${child.tableName}\n`
       )
       .join(" UNION ALL ")}
   )`;

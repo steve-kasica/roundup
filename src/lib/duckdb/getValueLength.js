@@ -1,5 +1,5 @@
 import { getDuckDB } from "./duckdbClient";
-
+import { escapeColumnName } from "./utilities";
 /**
  * Get unique values grouped by their length for a specific column from a table via DuckDB.
  * Returns the length, count of values with that length, and up to 5 example values.
@@ -25,10 +25,12 @@ export async function getValueLengths(
   const query = `
     WITH length_groups AS (
       SELECT 
-        LENGTH(CAST("${columnName}" AS VARCHAR)) as value_length,
-        "${columnName}" as value
+        LENGTH(CAST(${escapeColumnName(
+          columnName
+        )} AS VARCHAR)) as value_length,
+        ${escapeColumnName(columnName)} as value
       FROM "${tableName}"
-      WHERE "${columnName}" IS NOT NULL
+      WHERE ${escapeColumnName(columnName)} IS NOT NULL
     ),
     value_counts AS (
       SELECT 

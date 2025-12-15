@@ -1,4 +1,5 @@
 import duckdb from "@duckdb/duckdb-wasm";
+import { escapeColumnName } from "./utilities";
 
 /**
  * Get unique values for a specific column from an OpenRefine table via DuckDB.
@@ -10,7 +11,7 @@ import duckdb from "@duckdb/duckdb-wasm";
 async function getColumnUniqueValues(db, tableId, databaseName) {
   const conn = await db.connect();
   const result = await conn.query(
-    `select distinct ${databaseName} from ${tableId}`
+    `select distinct ${escapeColumnName(databaseName)} from ${tableId}`
   );
 
   await conn.close();

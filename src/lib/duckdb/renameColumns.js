@@ -1,4 +1,5 @@
 import { getDuckDB } from "./duckdbClient";
+import { escapeColumnName } from "./utilities";
 
 export async function renameColumns(tableId, oldNames, newNames) {
   if (oldNames.length !== newNames.length) {
@@ -9,7 +10,9 @@ export async function renameColumns(tableId, oldNames, newNames) {
   const query = oldNames
     .map(
       (oldName, i) =>
-        `ALTER TABLE "${tableId}" RENAME COLUMN "${oldName}" TO "${newNames[i]}"`
+        `ALTER TABLE "${tableId}" RENAME COLUMN ${escapeColumnName(
+          oldName
+        )} TO ${escapeColumnName(newNames[i])}`
     )
     .join(";\n");
   const result = await conn.query(query);

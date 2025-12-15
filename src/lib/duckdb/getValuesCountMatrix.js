@@ -1,5 +1,6 @@
 // See example here: https://observablehq.com/d/a57dc020b270136f#cell-18
 import { getDuckDB } from "./duckdbClient";
+import { escapeColumnName } from "./utilities";
 
 export async function getValuesCountMatrix(databaseNames, tableIds) {
   if (!Array.isArray(databaseNames) || !Array.isArray(tableIds)) {
@@ -37,7 +38,9 @@ export async function getValuesCountMatrix(databaseNames, tableIds) {
             ${tableIds
               .map(
                 (tableId, i) =>
-                  `SELECT ${databaseNames[i]} AS VAL, '${tableId}' AS SOURCE_TABLE FROM ${tableId}`
+                  `SELECT ${escapeColumnName(
+                    databaseNames[i]
+                  )} AS VAL, '${tableId}' AS SOURCE_TABLE FROM ${tableId}`
               )
               .join("\n            UNION ALL\n            ")}
         ) AS combined

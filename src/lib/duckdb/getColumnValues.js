@@ -1,4 +1,5 @@
 import { getDuckDB } from "./duckdbClient";
+import { escapeColumnName } from "./utilities";
 
 /**
  * Get unique values and their counts for a specific column from a table via DuckDB.
@@ -22,7 +23,7 @@ export async function getColumnValues(
 
   const query = `
       SELECT 
-        ${columnName} as values
+        ${escapeColumnName(columnName)} as values
       FROM ${tableName}
       ${limitClause}
       ${offsetClause}

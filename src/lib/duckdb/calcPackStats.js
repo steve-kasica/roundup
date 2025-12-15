@@ -1,4 +1,5 @@
 import { getDuckDB } from "./duckdbClient";
+import { escapeColumnName } from "./utilities";
 
 /**
  * Calculate statistics for a pack operation (join) between two tables.
@@ -23,8 +24,12 @@ export async function calcPackStats(
   rightColumnName,
   joinType
 ) {
-  const leftValue = `CAST(${leftTableName}.${leftColumnName} AS VARCHAR)`;
-  const rightValue = `CAST(${rightTableName}.${rightColumnName} AS VARCHAR)`;
+  const leftValue = `CAST(${leftTableName}.${escapeColumnName(
+    leftColumnName
+  )} AS VARCHAR)`;
+  const rightValue = `CAST(${rightTableName}.${escapeColumnName(
+    rightColumnName
+  )} AS VARCHAR)`;
   const db = await getDuckDB();
   const conn = await db.connect();
   const predicates = {
