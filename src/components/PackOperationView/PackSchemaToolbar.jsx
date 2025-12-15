@@ -16,7 +16,13 @@ import {
   Tooltip,
 } from "@mui/material";
 import { SwapHoriz } from "@mui/icons-material";
-import { JOIN_TYPES, MATCH_STATS_DEFAULT } from "../../slices/operationsSlice";
+import {
+  JOIN_TYPES,
+  MATCH_STATS_DEFAULT,
+  MATCH_TYPE_LEFT_UNMATCHED,
+  MATCH_TYPE_MATCHES,
+  MATCH_TYPE_RIGHT_UNMATCHED,
+} from "../../slices/operationsSlice";
 
 const PackSchemaToolbar = ({
   // Props defined in `withGlobalInterfaceData.jsx` HOC
@@ -38,6 +44,7 @@ const PackSchemaToolbar = ({
   matchStats,
   matchLabels,
   matchKeys,
+  validMatchGroups,
   joinType,
   setJoinType,
   leftColumnIds,
@@ -55,45 +62,43 @@ const PackSchemaToolbar = ({
   onSelectAllClick,
 }) => {
   const isSelectionEmpty = !areAnySelected;
-  const [toggledMatches, setToggledMatches] = useState([
-    ...MATCH_STATS_DEFAULT.keys(),
-  ]);
 
-  const handleToggleMatch = useCallback((event, newMatches) => {
-    setToggledMatches(newMatches);
-  }, []);
+  // Toggled matches is an object with keys as match types and values as booleans
 
-  // When toggle matches changes, update the join type
-  useEffect(() => {
-    const signature = matchKeys
-      .sort((a, b) => a.localeCompare(b))
-      .map((type) => (toggledMatches.includes(type) ? "1" : "0"))
-      .join("");
+  // When toggle match changes, update the join type
+  const handleToggleMatchChange = useCallback(
+    (_event, currentMatches) => {
+      const signature = matchKeys
+        .sort((a, b) => a.localeCompare(b))
+        .map((type) => (currentMatches.includes(type) ? "1" : "0"))
+        .join("");
 
-    const joinType = (function (sig) {
-      switch (sig) {
-        case "111":
-          return JOIN_TYPES.FULL_OUTER;
-        case "110":
-          return JOIN_TYPES.LEFT_OUTER;
-        case "101":
-          return JOIN_TYPES.FULL_ANTI;
-        case "100":
-          return JOIN_TYPES.LEFT_ANTI;
-        case "011":
-          return JOIN_TYPES.RIGHT_OUTER;
-        case "010":
-          return JOIN_TYPES.INNER;
-        case "001":
-          return JOIN_TYPES.RIGHT_ANTI;
-        case "000":
-        default:
-          return JOIN_TYPES.EMPTY;
-      }
-    })(signature);
+      const joinType = (function (sig) {
+        switch (sig) {
+          case "111":
+            return JOIN_TYPES.FULL_OUTER;
+          case "110":
+            return JOIN_TYPES.LEFT_OUTER;
+          case "101":
+            return JOIN_TYPES.FULL_ANTI;
+          case "100":
+            return JOIN_TYPES.LEFT_ANTI;
+          case "011":
+            return JOIN_TYPES.RIGHT_OUTER;
+          case "010":
+            return JOIN_TYPES.INNER;
+          case "001":
+            return JOIN_TYPES.RIGHT_ANTI;
+          case "000":
+          default:
+            return JOIN_TYPES.EMPTY;
+        }
+      })(signature);
 
-    setJoinType(joinType);
-  }, [matchKeys, setJoinType, toggledMatches]);
+      setJoinType(joinType);
+    },
+    [matchKeys, setJoinType]
+  );
 
   // Check if at least one complete column is selected
   const isCompleteColumnSelected = (function () {
@@ -158,7 +163,7 @@ const PackSchemaToolbar = ({
           {/* Match category filter buttons */}
           <Box sx={{ overflow: "hidden", flexShrink: 0 }}>
             <ToggleButtonGroup
-              value={toggledMatches}
+              value={validMatchGroups}
               exclusive={false}
               aria-label="Toggle match categories"
               size="small"
@@ -180,7 +185,7 @@ const PackSchemaToolbar = ({
                   borderBottomRightRadius: "10px",
                 },
               }}
-              onChange={handleToggleMatch}
+              onChange={handleToggleMatchChange}
             >
               <Tooltip title={`${joinType} join`}>
                 {Array.from(matchLabels.keys())

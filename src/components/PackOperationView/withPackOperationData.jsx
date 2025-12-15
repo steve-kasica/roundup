@@ -12,6 +12,7 @@ import {
   selectSelectedMatches,
 } from "../../slices/uiSlice";
 import {
+  JOIN_TYPES,
   MATCH_STATS_DEFAULT,
   MATCH_TYPE_LEFT_UNMATCHED,
   MATCH_TYPE_MATCHES,
@@ -59,6 +60,48 @@ export default function withPackOperationData(WrappedComponent) {
         }, new Map()),
       []
     );
+
+    // Match groups are invalid dependeing on two conditions:
+    //  1. If the user-specified join type exclude a certain match group,
+    //     e.g. INNER JOIN excludes left- and right-only matches
+    //  2. If the pack operation stats returned from the hook includes a
+    //     zero count for a certain match type/
+    const validMatchGroups = useMemo(() => {
+      let output = [];
+      switch (operation.joinType) {
+        case JOIN_TYPES.INNER:
+          output = [MATCH_TYPE_MATCHES];
+          break;
+        case JOIN_TYPES.LEFT_OUTER:
+          output = [MATCH_TYPE_MATCHES, MATCH_TYPE_LEFT_UNMATCHED];
+          break;
+        case JOIN_TYPES.RIGHT_OUTER:
+          output = [MATCH_TYPE_MATCHES, MATCH_TYPE_RIGHT_UNMATCHED];
+          break;
+        case JOIN_TYPES.FULL_OUTER:
+          output = [
+            MATCH_TYPE_MATCHES,
+            MATCH_TYPE_LEFT_UNMATCHED,
+            MATCH_TYPE_RIGHT_UNMATCHED,
+          ];
+          break;
+        case JOIN_TYPES.LEFT_ANTI:
+          output = [MATCH_TYPE_LEFT_UNMATCHED];
+          break;
+        case JOIN_TYPES.RIGHT_ANTI:
+          output = [MATCH_TYPE_RIGHT_UNMATCHED];
+          break;
+        case JOIN_TYPES.FULL_ANTI:
+          output = [MATCH_TYPE_LEFT_UNMATCHED, MATCH_TYPE_RIGHT_UNMATCHED];
+          break;
+        case JOIN_TYPES.EMPTY:
+          output = [];
+          break;
+        default:
+          throw new Error(`Unknown join type: ${operation.joinType}`);
+      }
+      return output.filter((type) => matchStats[type] > 0);
+    }, [operation.joinType, matchStats]);
 
     const rowCount = useMemo(() => {
       let total = 0;
@@ -235,6 +278,7 @@ export default function withPackOperationData(WrappedComponent) {
         matchStats={matchStats}
         matchKeys={matchKeys}
         matchLabels={matchLabels}
+        validMatchGroups={validMatchGroups}
         // Left table props
         leftTableId={leftTableId}
         leftKey={joinKey1}

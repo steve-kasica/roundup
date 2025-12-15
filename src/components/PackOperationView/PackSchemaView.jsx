@@ -18,6 +18,7 @@ import { isTableId } from "../../slices/tablesSlice";
 import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 import StyledBlockCell from "./StyledBlockCell";
 import {
+  JOIN_TYPES,
   MATCH_STATS_DEFAULT,
   MATCH_TYPE_LEFT_UNMATCHED,
   MATCH_TYPE_MATCHES,
@@ -43,6 +44,7 @@ const PackSchemaView = ({
   setMatchSelection,
   clearMatchSelection,
   insertColumnIntoChildAtIndex,
+  validMatchGroups,
   // Left table props (via withPackOperationData)
   setLeftTableJoinKey,
   leftTableId,
@@ -67,9 +69,6 @@ const PackSchemaView = ({
   const [hoveredColumn, setHoveredColumn] = useState(null);
 
   const [hiddenColumns, setHiddenColumns] = useState(new Set());
-  const [toggledMatches, setToggledMatches] = useState([
-    ...MATCH_STATS_DEFAULT.keys(),
-  ]);
 
   // Track which block cells have been clicked
   // Key format: `${columnId}:${matchLabel}`
@@ -96,29 +95,6 @@ const PackSchemaView = ({
   const areAnySelected = useMemo(() => {
     return clickedBlockCells.size > 0;
   }, [clickedBlockCells.size]);
-
-  // Auto-disable toggledMatches for any match type that has zero count
-  useEffect(() => {
-    if (!Object.values(matchStats).filter(Boolean).length > 0 || isLoading)
-      return;
-
-    setToggledMatches((prev) => {
-      const updated = [...prev];
-      let hasChanges = false;
-
-      Object.keys(matchStats).forEach((key) => {
-        if (matchStats[key] === 0 && prev.includes(key)) {
-          updated.splice(updated.indexOf(key), 1);
-          hasChanges = true;
-        } else if (matchStats[key] > 0 && !prev.includes(key)) {
-          updated.push(key);
-          hasChanges = true;
-        }
-      });
-
-      return hasChanges ? updated : prev;
-    });
-  }, [matchStats, isLoading]);
 
   // Update column selection when block cells change
   useEffect(() => {
@@ -183,7 +159,7 @@ const PackSchemaView = ({
 
         for (let m = matchStart; m <= matchEnd; m++) {
           const match = matchKeys[m];
-          if (!toggledMatches.includes(match)) continue;
+          if (!validMatchGroups.includes(match)) continue;
           for (let c = colStart; c <= colEnd; c++) {
             cellsInRange.add(`${allColumns[c]}:${match}`);
           }
@@ -206,7 +182,7 @@ const PackSchemaView = ({
         setLastClickedCell(cellKey);
       }
     },
-    [lastClickedCell, allColumns, matchKeys, toggledMatches]
+    [lastClickedCell, allColumns, matchKeys, validMatchGroups]
   );
 
   const handleMatchLabelClick = useCallback(
@@ -227,7 +203,7 @@ const PackSchemaView = ({
           // Select all cells for all match types in the range
           for (let m = matchStart; m <= matchEnd; m++) {
             const match = matchKeys[m];
-            if (!toggledMatches.includes(match)) continue;
+            if (!validMatchGroups.includes(match)) continue;
 
             // Add all columns for this match
             allColumns.forEach((columnId) => {
@@ -247,7 +223,7 @@ const PackSchemaView = ({
         const cellsToSelect = new Set();
 
         // Add all columns for this match
-        if (toggledMatches.includes(matchLabel)) {
+        if (validMatchGroups.includes(matchLabel)) {
           allColumns.forEach((columnId) => {
             cellsToSelect.add(`${columnId}:${matchLabel}`);
           });
@@ -262,7 +238,7 @@ const PackSchemaView = ({
       // Set last clicked cell to first cell in this match
       setLastClickedCell(`${leftColumnIds[0]}:${matchLabel}`);
     },
-    [allColumns, lastClickedMatch, leftColumnIds, matchKeys, toggledMatches]
+    [allColumns, lastClickedMatch, leftColumnIds, matchKeys, validMatchGroups]
   );
 
   const handleColumnContextMenu = useCallback((event, columnId) => {
@@ -333,7 +309,7 @@ const PackSchemaView = ({
           const newSet = new Set(prev);
           columnsToSelect.forEach((colId) => {
             matchKeys.forEach((match) => {
-              if (!toggledMatches.includes(match)) return;
+              if (!validMatchGroups.includes(match)) return;
               newSet.add(`${colId}:${match}`);
             });
           });
@@ -344,7 +320,7 @@ const PackSchemaView = ({
         const cellsToSelect = new Set();
 
         matchKeys.forEach((match) => {
-          if (!toggledMatches.includes(match)) return;
+          if (!validMatchGroups.includes(match)) return;
           cellsToSelect.add(`${columnId}:${match}`);
         });
 
@@ -357,7 +333,7 @@ const PackSchemaView = ({
       // Set last clicked cell to first cell in this column
       setLastClickedCell(`${columnId}:${matchKeys[0]}`);
     },
-    [lastClickedColumn, matchKeys, allColumns, toggledMatches]
+    [lastClickedColumn, matchKeys, allColumns, validMatchGroups]
   );
 
   const handleSelectAll = useCallback(() => {
@@ -640,7 +616,7 @@ const PackSchemaView = ({
               }
             );
             const label = matchLabels.get(key) || key;
-            const isMatchDisabled = !toggledMatches.includes(key);
+            const isMatchDisabled = !validMatchGroups.includes(key);
 
             return (
               <Box
