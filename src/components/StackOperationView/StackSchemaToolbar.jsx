@@ -57,7 +57,7 @@ const StackSchemaToolbar = ({
   }, [focusColumns, selectedChildColumnIdsSet]);
 
   const handleDeleteColumns = useCallback(() => {
-    deleteColumns(selectedChildColumnIdsSet);
+    deleteColumns(Array.from(selectedChildColumnIdsSet));
     selectColumns([]);
   }, [deleteColumns, selectColumns, selectedChildColumnIdsSet]);
 
@@ -87,7 +87,7 @@ const StackSchemaToolbar = ({
           />
           <HideIconButton
             onClick={handleHideColumns}
-            disabled={!isCompleteColumnSelected(selectedChildColumnIdsSet)}
+            disabled={!isCompleteColumnSelected()}
           />
           <DeleteIconButton
             onConfirm={handleDeleteColumns}
