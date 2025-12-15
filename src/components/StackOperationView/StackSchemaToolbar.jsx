@@ -1,8 +1,10 @@
 import SchemaToolbar from "../ui/SchemaToolbar";
-import FocusIconButton from "../ui/icons/FocusIconButton";
-import HideIconButton from "../ui/HideIconButton";
-import DeleteIconButton from "../ui/icons/DeleteIconButton";
-import SelectToggleIconButton from "../ui/SelectToggleIconButton";
+import {
+  SelectToggleIconButton,
+  FocusIconButton,
+  DeleteColumnsButton,
+  HideIconButton,
+} from "../ui/buttons";
 import { EnhancedStackOperationLabel } from "./StackOperationLabel";
 import { useCallback } from "react";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
@@ -89,7 +91,7 @@ const StackSchemaToolbar = ({
             onClick={handleHideColumns}
             disabled={!isCompleteColumnSelected()}
           />
-          <DeleteIconButton
+          <DeleteColumnsButton
             onConfirm={handleDeleteColumns}
             disabled={isSelectionEmpty}
           />

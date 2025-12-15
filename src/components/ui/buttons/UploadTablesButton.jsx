@@ -1,7 +1,11 @@
 import { Upload } from "@mui/icons-material";
-import { IconButton, Tooltip } from "@mui/material";
+import TooltipIconButton from "./TooltipIconButton";
+import { useCallback } from "react";
 
-const UploadTablesButton = ({ onFileUpload, title = "Upload Tables" }) => {
+const UploadTablesButton = ({
+  onFileUpload,
+  tooltipText = "Upload Tables",
+}) => {
   const handleFileUpload = (event) => {
     const files = event.target.files;
     if (files && files.length > 0 && onFileUpload) {
@@ -11,27 +15,22 @@ const UploadTablesButton = ({ onFileUpload, title = "Upload Tables" }) => {
     event.target.value = "";
   };
 
+  const onClick = useCallback(() => {
+    document.getElementById("file-upload-input")?.click();
+  }, []);
+
   return (
     <>
-      <Tooltip title={title}>
-        <span>
-          <IconButton
-            size="small"
-            onClick={() =>
-              document.getElementById("file-upload-input")?.click()
-            }
-          >
-            <Upload />
-          </IconButton>
-        </span>
-      </Tooltip>
+      <TooltipIconButton tooltipText={tooltipText} onClick={onClick}>
+        <Upload />
+      </TooltipIconButton>
       <input
         type="file"
         multiple
         onChange={handleFileUpload}
         style={{ display: "none" }}
         id="file-upload-input"
-        accept=".csv,.json,.txt,.xls,.xlsx,.tsv"
+        accept=".csv"
       />
     </>
   );

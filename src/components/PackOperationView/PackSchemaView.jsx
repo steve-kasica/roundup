@@ -15,7 +15,7 @@ import { Error } from "@mui/icons-material";
 import VennDiagram from "../ui/icons/VennDiagram";
 import { EnhancedTableName } from "../TableView/TableName";
 import { isTableId } from "../../slices/tablesSlice";
-import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
+import { HiddenColumnsButton } from "../ui/buttons";
 import StyledBlockCell from "./StyledBlockCell";
 import {
   JOIN_TYPES,

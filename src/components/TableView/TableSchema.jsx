@@ -50,12 +50,14 @@ import {
 } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import SchemaToolbar from "../ui/SchemaToolbar";
-import FocusIconButton from "../ui/icons/FocusIconButton";
-import HideIconButton from "../ui/HideIconButton";
-import SelectToggleIconButton from "../ui/SelectToggleIconButton";
+import {
+  FocusIconButton,
+  HideIconButton,
+  DeleteColumnsButton,
+  HiddenColumnsButton,
+  SelectToggleIconButton,
+} from "../ui/buttons";
 import { TableLabel } from "./TableLabel";
-import DeleteIconButton from "../ui/icons/DeleteIconButton";
-import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -284,7 +286,7 @@ const TableSchema = ({
               disabled={selectedColumnIds.length === 0}
               onClick={handleFocusColumns}
             />
-            <DeleteIconButton
+            <DeleteColumnsButton
               disabled={selectedColumnIds.length === 0}
               onConfirm={handleDeleteColumns}
             />

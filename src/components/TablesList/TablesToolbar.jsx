@@ -1,11 +1,13 @@
 import { Divider, Toolbar } from "@mui/material";
 import SearchTextBox from "../ui/SearchTextBox";
-import SelectToggleIconButton from "../ui/SelectToggleIconButton";
-import UploadTablesButton from "../ui/icons/UploadTablesButton";
-import InsertTableInOperationButton from "../ui/icons/InsertTableInOperationButton";
-import AddPackOperationButton from "../ui/icons/AddPackOperationButton";
-import AddStackOperationButton from "../ui/icons/AddStackOperationButton";
-import DeleteIconButton from "../ui/icons/DeleteIconButton";
+import {
+  DeleteColumnsButton,
+  AddStackOperationButton,
+  AddPackOperationButton,
+  SelectToggleIconButton,
+  UploadTablesButton,
+  InsertTableInOperationButton,
+} from "../ui/buttons";
 import withGlobalInterfaceData from "../HOC/withGlobalInterfaceData";
 import { isOperationId } from "../../slices/operationsSlice";
 
@@ -38,7 +40,7 @@ const TablesToolbar = ({
           onClick={handleSelectAllClick}
           isSelected={selectedTableIds.length > 0}
         />
-        <DeleteIconButton
+        <DeleteColumnsButton
           title={`Delete selected table${
             selectedTableIds.length !== 1 ? "s" : ""
           }`}

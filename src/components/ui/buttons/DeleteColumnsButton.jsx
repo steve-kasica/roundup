@@ -9,58 +9,44 @@ import {
   Tooltip,
 } from "@mui/material";
 import { DeleteForever } from "@mui/icons-material";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import TooltipIconButton from "./TooltipIconButton";
 
-const DeleteIconButton = ({
+const DeleteColumnsButton = ({
   onConfirm,
-  title = "Delete",
-  disabled,
+  tooltipText = "Delete columns",
   ...props
 }) => {
-  const [open, setOpen] = useState(false);
-
-  const handleClick = (e) => {
-    e.stopPropagation();
-    setOpen(true);
-  };
-
+  const [dialogOpen, setDialogOpen] = useState(false);
   const handleConfirm = () => {
-    setOpen(false);
+    setDialogOpen(false);
     if (typeof onConfirm === "function") {
       onConfirm();
     }
   };
 
   const handleCancel = () => {
-    setOpen(false);
+    setDialogOpen(false);
   };
 
   return (
     <>
-      <Tooltip title={title} disableHoverListener={disabled}>
-        <span>
-          <IconButton
-            size="small"
-            {...props}
-            title="Delete columns"
-            color="error"
-            onClick={handleClick}
-            disabled={disabled}
-          >
-            <DeleteForever fontSize="small" />
-          </IconButton>
-        </span>
-      </Tooltip>
-
+      <TooltipIconButton
+        tooltipText={tooltipText}
+        onClick={(event) => setDialogOpen(event.currentTarget)}
+        {...props}
+      >
+        <DeleteForever />
+      </TooltipIconButton>
       <Dialog
-        open={open}
+        open={dialogOpen}
         onClose={handleCancel}
         aria-labelledby="delete-dialog-title"
       >
-        <DialogTitle id="delete-dialog-title">Confirm Delete</DialogTitle>
+        <DialogTitle id="delete-dialog-title">Confirm deletion</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this? This action cannot be undone.
+            Are you sure? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -76,4 +62,4 @@ const DeleteIconButton = ({
   );
 };
 
-export default DeleteIconButton;
+export default DeleteColumnsButton;

@@ -11,7 +11,7 @@ import { EnhancedColumnSummary, StyledColumnCard } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../OperationView/OperationLabel";
-import HiddenColumnsButton from "../ui/icons/HiddenColumnsButton";
+import { HiddenColumnsButton } from "../ui/buttons";
 import { EnhancedStackSchemaToolbar } from "./StackSchemaToolbar";
 
 const topRowHeight = 25; // Fixed height for the top row (column headers)

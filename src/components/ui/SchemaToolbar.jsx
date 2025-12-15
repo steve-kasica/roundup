@@ -1,10 +1,5 @@
 /* eslint-disable react/prop-types */
 import {
-  FileDownload as ExportIcon,
-  ErrorOutline as AlertIcon,
-} from "@mui/icons-material";
-import {
-  IconButton,
   Toolbar,
   Box,
   Divider,
@@ -12,13 +7,13 @@ import {
   Popover,
   List,
   Typography,
-  Badge,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useCallback, useState } from "react";
 import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
 import { selectAlertsById } from "../../slices/alertsSlice/selectors";
 import { EnhancedAlertDescription } from "../Alerts/AlertDescription";
+import { ExportTableButton, SchemaAlertsButton } from "./buttons";
 
 const SchemaToolbar = ({
   // columnIds,
@@ -76,34 +71,17 @@ const SchemaToolbar = ({
       />
 
       {/* Alerts */}
-      <IconButton
-        size="small"
+      <SchemaAlertsButton
         onClick={handleOpenAlerts}
         disabled={totalCount === 0}
-        title={`View alerts (${totalCount})`}
+        badgeContent={totalCount}
         color={
           errorCount > 0 ? "error" : totalCount > 0 ? "warning" : "default"
         }
-      >
-        <Badge
-          badgeContent={totalCount}
-          color={
-            errorCount > 0 ? "error" : totalCount > 0 ? "warning" : "default"
-          }
-        >
-          <AlertIcon fontSize="small" />
-        </Badge>
-      </IconButton>
+      />
 
       {/* Export */}
-      <IconButton
-        size="small"
-        disabled={errorCount > 0}
-        onClick={handleExport}
-        title="Export"
-      >
-        <ExportIcon fontSize="small" />
-      </IconButton>
+      <ExportTableButton onClick={handleExport} disabled={errorCount > 0} />
 
       {/* Export Dialog */}
       <Dialog

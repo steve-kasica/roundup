@@ -1,44 +1,32 @@
 import SchemaToolbar from "../ui/SchemaToolbar";
-import FocusIconButton from "../ui/icons/FocusIconButton";
-import HideIconButton from "../ui/HideIconButton";
-import DeleteIconButton from "../ui/icons/DeleteIconButton";
-import SelectToggleIconButton from "../ui/SelectToggleIconButton";
+import {
+  SelectToggleIconButton,
+  FocusIconButton,
+  HideIconButton,
+  DeleteColumnsButton,
+  SwapTablesButton,
+} from "../ui/buttons";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback } from "react";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 import withPackOperationData from "./withPackOperationData";
 import {
   Box,
   Divider,
-  IconButton,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
 } from "@mui/material";
-import { SwapHoriz } from "@mui/icons-material";
-import {
-  JOIN_TYPES,
-  MATCH_STATS_DEFAULT,
-  MATCH_TYPE_LEFT_UNMATCHED,
-  MATCH_TYPE_MATCHES,
-  MATCH_TYPE_RIGHT_UNMATCHED,
-} from "../../slices/operationsSlice";
+import { JOIN_TYPES } from "../../slices/operationsSlice";
 
 const PackSchemaToolbar = ({
   // Props defined in `withGlobalInterfaceData.jsx` HOC
   focusColumns, // Sets focused column IDs globally
 
   // Props passed via `withOperationData.jsx` HOC
-  rowCount,
-  name,
   id,
-  selectedChildColumnIdsSet,
   deleteColumns, // Deletes columns globally
-
-  selectColumns, // Sets global set of selected column IDs
-  clearSelectedColumns, // Clears the global set of selected column IDs
   swapTablePositions, // Swaps the positions of children
-  selectAllChildColumns, // Selects all child columns
 
   // Props passed via `withPackOperationData.jsx` HOC
   matchStats,
@@ -154,7 +142,7 @@ const PackSchemaToolbar = ({
       //   columnCount={activeColumnIds.length}
       //   rowCount={rowCount}
       //   name={name}
-      //   objectId={id}
+      objectId={id}
       alertIds={alertIds}
       errorCount={errorCount}
       totalCount={totalCount}
@@ -205,13 +193,7 @@ const PackSchemaToolbar = ({
           </Box>
           <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
           {/* Swap tables */}
-          <IconButton
-            size="small"
-            onClick={handleSwapTables}
-            title="Swap table positions"
-          >
-            <SwapHoriz fontSize="small" />
-          </IconButton>
+          <SwapTablesButton onClick={handleSwapTables} />
           <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
           <FocusIconButton
             onClick={handleFocusColumns}
@@ -221,7 +203,7 @@ const PackSchemaToolbar = ({
             onClick={() => handleHideColumns()}
             disabled={!isCompleteColumnSelected}
           />
-          <DeleteIconButton
+          <DeleteColumnsButton
             onConfirm={handleDeleteColumns}
             disabled={!isCompleteColumnSelected}
           />

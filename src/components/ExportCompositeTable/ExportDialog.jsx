@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import PropTypes from "prop-types";
 import {
   DialogTitle,
   DialogContent,
@@ -11,13 +10,12 @@ import {
   TextField,
   FormControlLabel,
   Checkbox,
-  IconButton,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { ExportButton } from "./ExportButton";
 import { useSelector } from "react-redux";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
+import { ExportTableButton } from "../ui/buttons";
 
 function ExportDialog({ name, databaseName, onClose }) {
   const [format, setFormat] = useState("csv");
@@ -34,9 +32,7 @@ function ExportDialog({ name, databaseName, onClose }) {
         }}
       >
         {`Export ${name || "table"}`}
-        <IconButton aria-label="close" onClick={onClose} size="small">
-          <CloseIcon fontSize="small" />
-        </IconButton>
+        <ExportTableButton onClick={onClose} />
       </DialogTitle>
       <DialogContent>
         <Typography gutterBottom>
