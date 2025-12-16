@@ -41,6 +41,7 @@ const StyledColumnCard = styled(Card, {
     outlineWidth: "1px",
     outlineStyle: "solid",
     overflow: "hidden",
+    borderRadius: 0,
     ...theme.palette.column.default,
     cursor: isDragging ? "grabbing" : isDraggable ? "grab" : "pointer",
     // Column is hovered state

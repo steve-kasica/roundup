@@ -234,7 +234,7 @@ const StackSchemaView = ({
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-around",
-          marginLeft: `${30 + 2}px`,
+          marginLeft: `${30}px`,
         }}
       >
         {Array.from({ length: m }, (_, i) => i).map((colIndex) => (
@@ -497,19 +497,6 @@ const StackSchemaView = ({
                                   }}
                                 >
                                   Schema Mismatch
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{
-                                    fontSize: "0.75rem",
-                                    lineHeight: 1.3,
-                                    maxWidth: "90%",
-                                  }}
-                                >
-                                  Column structure
-                                  <br />
-                                  inconsistency detected
                                 </Typography>
                               </Box>
                             </StyledColumnCard>
