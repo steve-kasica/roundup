@@ -53,6 +53,9 @@ const TableLabel = ({
         component="div"
         sx={{
           userSelect: "none",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
           ...(totalCount && {
             color: "warning.dark",
             fontWeight: "bold",
