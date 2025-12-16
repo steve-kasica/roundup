@@ -49,7 +49,7 @@ const TableLabel = ({
         </Badge>
       )}
       <Typography
-        variant="h6"
+        variant="caption"
         component="div"
         sx={{
           userSelect: "none",

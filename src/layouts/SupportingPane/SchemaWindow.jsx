@@ -9,7 +9,7 @@ import {
 import { useSelector } from "react-redux";
 import { isTableId, selectAllTableIds } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
-import { EnhancedStackSchemaView } from "../../components/StackOperationView/StackSchemaView";
+import { EnhancedStackSchemaView } from "../../components/StackOperationView/StackSchemaView/StackSchemaView";
 import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
 import { selectFocusedObjectId } from "../../slices/uiSlice";

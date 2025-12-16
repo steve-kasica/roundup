@@ -96,7 +96,20 @@ const ColumnSummary = ({
               overflow: "hidden",
             }}
           >
-            <h3
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                minWidth: 0,
+                flex: 1,
+              }}
+            >
+              {name || databaseName || id}
+            </Typography>
+            {/* <h3
               style={{
                 margin: 0,
                 marginRight: "5px",
@@ -111,7 +124,7 @@ const ColumnSummary = ({
               }}
             >
               {name || databaseName || id}
-            </h3>
+            </h3> */}
             {/* TODO: handle alerts associated with columns
             {totalCount && (
               <Badge
@@ -122,18 +135,7 @@ const ColumnSummary = ({
                 <Warning color="warning" fontSize="small" />
               </Badge>
             )} */}
-            <Box
-              sx={{
-                "@container (min-width: 150px)": {
-                  display: "block",
-                },
-                "@container (max-width: 149px)": {
-                  display: "none",
-                },
-              }}
-            >
-              <ColumnTypeIcon columnType={columnType} />
-            </Box>
+            <ColumnTypeIcon columnType={columnType} />
           </Box>
         </Box>
 
@@ -284,8 +286,10 @@ const ColumnSummary = ({
   );
 };
 
-ColumnSummary.displayName = "ColumnSummary";
+ColumnSummary.displayName = "Column Summary";
 
 const EnhancedColumnSummary = withColumnData(ColumnSummary);
+
+EnhancedColumnSummary.displayName = "Enhanced Column Summary";
 
 export { EnhancedColumnSummary, ColumnSummary };
