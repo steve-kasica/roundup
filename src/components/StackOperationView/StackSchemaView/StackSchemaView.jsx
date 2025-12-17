@@ -22,7 +22,7 @@ import { EnhancedStackSchemaToolbar } from "../StackSchemaToolbar";
 import StyledTableCell from "./StyledTableCell";
 
 const topRowHeight = 5; // Fixed height for the top row (column headers)
-const leftMarginWidth = 50; // Fixed width for the left margin (row headers)
+const leftMarginWidth = 25; // Fixed width for the left margin (row headers)
 
 const StackSchemaView = ({
   // Props passed via withOperationData
@@ -358,23 +358,21 @@ const StackSchemaView = ({
                     position: "sticky",
                     left: 0,
                     zIndex: 1,
-                    width: 30,
-                    minWidth: 30,
-                    // boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.06)",
                     background: "white",
+                    cursor: "pointer",
                   }}
+                  onClick={(event) => onRowLabelClick(event, rowIndex)}
                 >
                   {isTableId(childId) ? (
                     <EnhancedTableLabel
                       id={childId}
-                      onClick={(event) => onRowLabelClick(event, rowIndex)}
                       includeIcon={false}
                       includeDimensions={false}
+                      sx={{ justifyContent: "flex-end" }}
                     />
                   ) : (
                     <EnhancedOperationLabel
                       id={childId}
-                      onClick={(event) => onRowLabelClick(event, rowIndex)}
                       includeIcon={false}
                       includeDimensions={false}
                     />

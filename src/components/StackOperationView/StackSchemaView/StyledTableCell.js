@@ -30,7 +30,7 @@ const StyledTableCell = styled(TableCell, {
 
     return {
       margin: borderWidth,
-      padding: `4px`,
+      padding: 0,
       backgroundColor: isSelected ? "rgba(25, 118, 210, 0.08)" : "inherit",
       border: `${borderWidth}px solid ${defaultBorderColor}`,
       ...(Object.keys(border).length > 0 && {
