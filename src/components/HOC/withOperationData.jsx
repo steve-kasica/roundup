@@ -246,8 +246,8 @@ export default function withOperationData(WrappedComponent) {
       const operationLabel = operation.operationType
         ? operation.operationType.charAt(0).toUpperCase() +
           operation.operationType.slice(1) +
-          " operation"
-        : "Operation";
+          " op."
+        : "Op.";
       if (operation.name && operation.name.trim().length > 0) {
         return operation.name;
       }
@@ -268,7 +268,6 @@ export default function withOperationData(WrappedComponent) {
 
     const setOperationName = useCallback(
       (name) => {
-        console.log("Setting operation name:", name);
         dispatch(updateOperationsRequest({ operationUpdates: [{ id, name }] }));
       },
       [dispatch, id]

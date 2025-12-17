@@ -22,7 +22,6 @@ import {
 
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
-import { updateColumnsRequest } from "../../sagas/updateColumnsSaga";
 import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
