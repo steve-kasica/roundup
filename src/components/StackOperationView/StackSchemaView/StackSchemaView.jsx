@@ -466,6 +466,7 @@ const StackSchemaView = ({
                   return (
                     <StyledTableCell
                       key={columnId}
+                      isSelected={selectedChildColumnIdsSet.has(columnId)}
                       highlightLeftBorder={highlightLeftBorder}
                       highlightRightBorder={highlightRightBorder}
                       highlightTopBorder={highlightTopBorder}

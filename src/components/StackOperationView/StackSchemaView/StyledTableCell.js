@@ -7,12 +7,14 @@ const defaultBorderColor = "rgba(0, 0, 0, 0.12)";
 
 const StyledTableCell = styled(TableCell, {
   shouldForwardProp: (prop) =>
+    prop !== "isSelected" &&
     prop !== "highlightLeftBorder" &&
     prop !== "highlightRightBorder" &&
     prop !== "highlightTopBorder" &&
     prop !== "highlightBottomBorder",
 })(
   ({
+    isSelected,
     highlightLeftBorder,
     highlightRightBorder,
     highlightTopBorder,
@@ -29,9 +31,9 @@ const StyledTableCell = styled(TableCell, {
     return {
       margin: borderWidth,
       padding: `4px`,
+      backgroundColor: isSelected ? "rgba(25, 118, 210, 0.08)" : "inherit",
       border: `${borderWidth}px solid ${defaultBorderColor}`,
       ...(Object.keys(border).length > 0 && {
-        backgroundColor: "rgba(25, 118, 210, 0.08)",
         ...border,
       }),
     };
