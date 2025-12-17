@@ -68,3 +68,16 @@ export const selectAlertErrorCount = createSelector(
     return errors.length;
   }
 );
+
+export const selectSilencedWarningCount = createSelector(
+  [(state) => state.alerts.byId, (state, sourceId) => sourceId],
+  (byId, sourceId) => {
+    const silenced = Object.values(byId).filter(
+      (alert) =>
+        alert.sourceId === sourceId &&
+        alert.severity === SEVERITY_WARNING &&
+        alert.isSilenced === true
+    );
+    return silenced.length;
+  }
+);

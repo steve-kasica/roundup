@@ -1,6 +1,7 @@
 export { default as AddPackOperationButton } from "./AddPackOperationButton";
 export { default as AddStackOperationButton } from "./AddStackOperationButton";
 export { default as ClearSearchTextButton } from "./ClearSearchTextButton";
+export { default as ColumnContextMenuButton } from "./ColumnContextMenuButton";
 export { default as DeleteColumnsButton } from "./DeleteColumnsButton";
 export { default as FocusIconButton } from "./FocusIconButton";
 export { default as HiddenColumnsButton } from "./HiddenColumnsButton";

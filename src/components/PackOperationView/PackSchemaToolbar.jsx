@@ -1,4 +1,4 @@
-import SchemaToolbar from "../ui/SchemaToolbar";
+import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
 import {
   SelectToggleIconButton,
   FocusIconButton,
@@ -137,15 +137,8 @@ const PackSchemaToolbar = ({
   }, [swapTablePositions]);
 
   return (
-    <SchemaToolbar
-      //   columnIds={columnIdMatrix.flat()}
-      //   columnCount={activeColumnIds.length}
-      //   rowCount={rowCount}
-      //   name={name}
-      objectId={id}
-      alertIds={alertIds}
-      errorCount={errorCount}
-      totalCount={totalCount}
+    <EnhancedSchemaToolbar
+      id={id}
       customMenuItems={
         <>
           {/* Match category filter buttons */}
@@ -215,12 +208,12 @@ const PackSchemaToolbar = ({
       }
     >
       <EnhancedPackOperationLabel id={id} />
-    </SchemaToolbar>
+    </EnhancedSchemaToolbar>
   );
 };
 
-const EnhancedPackSchemaToolbar = withAssociatedAlerts(
-  withPackOperationData(PackSchemaToolbar)
-);
+const EnhancedPackSchemaToolbar = withPackOperationData(PackSchemaToolbar);
+
+EnhancedPackSchemaToolbar.displayName = "Enhanced Pack Schema Toolbar";
 
 export { PackSchemaToolbar, EnhancedPackSchemaToolbar };

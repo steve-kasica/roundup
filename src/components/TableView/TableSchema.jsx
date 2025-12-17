@@ -49,7 +49,7 @@ import {
   EnhancedColumnSummary,
 } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
-import SchemaToolbar from "../ui/SchemaToolbar";
+import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
 import {
   FocusIconButton,
   HideIconButton,
@@ -273,13 +273,12 @@ const TableSchema = ({
       }}
     >
       {/* Toolbar with table info and action buttons */}
-      <SchemaToolbar
+      <EnhancedSchemaToolbar
         columnIds={activeColumnIds}
         columnCount={columnCount}
         rowCount={rowCount}
         name={name}
-        objectId={id}
-        alertIds={alertIds}
+        id={id}
         customMenuItems={
           <>
             <FocusIconButton
@@ -306,7 +305,7 @@ const TableSchema = ({
           rowCount={rowCount}
           columnCount={activeColumnIds.length}
         />
-      </SchemaToolbar>
+      </EnhancedSchemaToolbar>
 
       {/* Column Type Change Menu */}
       <Menu

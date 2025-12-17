@@ -5,8 +5,12 @@ import {
   selectAlertErrorCount,
   selectAlertIdsBySourceId,
   selectAlertWarningCount,
+  selectSilencedWarningCount,
 } from "../../slices/alertsSlice/selectors";
-import { deleteAlerts as deleteAlertsAction } from "../../slices/alertsSlice/alertsSlice";
+import {
+  deleteAlerts as deleteAlertsAction,
+  updateAlerts,
+} from "../../slices/alertsSlice/alertsSlice";
 import { useCallback } from "react";
 
 export default function withAssociatedAlerts(WrappedComponent) {
@@ -22,6 +26,10 @@ export default function withAssociatedAlerts(WrappedComponent) {
     );
     const errorCount = useSelector((state) => selectAlertErrorCount(state, id));
 
+    const silencedWarningCount = useSelector((state) =>
+      selectSilencedWarningCount(state, id)
+    );
+
     // Removing an alert delete the object from state
     // But it can instantiated again when associated objects are updated.
     const deleteAlerts = useCallback(
@@ -30,12 +38,6 @@ export default function withAssociatedAlerts(WrappedComponent) {
       },
       [dispatch]
     );
-
-    // Silencing an alert essentially mutes it without deleting it
-    const silenceAlerts = useCallback(() => {
-      // TODO: Implement silence functionality
-      console.warn("silenceAlerts not yet implemented");
-    }, []);
 
     return (
       <WrappedComponent
@@ -46,8 +48,8 @@ export default function withAssociatedAlerts(WrappedComponent) {
         totalCount={alertIds.length}
         errorCount={errorCount}
         warningCount={warningCount}
+        silencedWarningCount={silencedWarningCount}
         deleteAlerts={deleteAlerts} // Function to remove an alert by ID
-        silenceAlerts={silenceAlerts} // Function to silence an alert by ID
       />
     );
   };

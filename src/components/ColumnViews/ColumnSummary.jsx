@@ -1,11 +1,14 @@
 /* eslint-disable react/prop-types */
 import withColumnData from "./withColumnData";
-import { Box, Typography, Tooltip, Badge } from "@mui/material";
-import { Info, Warning } from "@mui/icons-material";
+import { Box, Typography, Tooltip, Menu } from "@mui/material";
+import { Info } from "@mui/icons-material";
 import SingleBar from "../visualization/SingleBar";
 import { scaleLinear } from "d3";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 import StyledColumnCard from "./StyledColumnCard";
+import { ColumnContextMenuButton } from "../ui/buttons";
+import { useCallback, useState } from "react";
+import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
 
 const ColumnSummary = ({
   topValues,
@@ -36,7 +39,18 @@ const ColumnSummary = ({
   totalCount,
   // Props passed directly from parent
   onContextMenu,
+  onHideColumn = () => {},
 }) => {
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+
+  const handleMenuOpen = useCallback((event) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+  }, []);
+
+  const handleMenuClose = useCallback(() => {
+    setMenuAnchorEl(null);
+  }, []);
   return (
     <StyledColumnCard
       data-column-id={id}
@@ -55,6 +69,8 @@ const ColumnSummary = ({
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
+      onMouseEnter={hoverColumn}
+      onMouseLeave={unhoverColumn}
       sx={{
         cursor: isSelected ? "grab" : "context-menu",
         boxShadow: 0,
@@ -92,6 +108,7 @@ const ColumnSummary = ({
             sx={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "flex-start",
               gap: 0.5,
               flex: 1,
               minWidth: 0,
@@ -106,38 +123,27 @@ const ColumnSummary = ({
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 minWidth: 0,
-                flex: 1,
               }}
             >
               {name || databaseName || id}
             </Typography>
-            {/* <h3
-              style={{
-                margin: 0,
-                marginRight: "5px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                minWidth: 0,
-                flex: 1,
-                ...(totalCount && {
-                  color: "#e65100", // warning.dark
-                }),
-              }}
-            >
-              {name || databaseName || id}
-            </h3> */}
-            {/* TODO: handle alerts associated with columns
-            {totalCount && (
-              <Badge
-                badgeContent={alertIds.length}
-                color="warning"
-                sx={{ mr: 0.5 }}
-              >
-                <Warning color="warning" fontSize="small" />
-              </Badge>
-            )} */}
             <ColumnTypeIcon columnType={columnType} />
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <ColumnContextMenuButton
+              size="small"
+              onClick={handleMenuOpen}
+              sx={{
+                height: "30px",
+                opacity: isHovered ? 1 : 0,
+                transition: "opacity 0.2s",
+              }}
+            />
           </Box>
         </Box>
 
@@ -284,6 +290,21 @@ const ColumnSummary = ({
           </Box>
         </Box>
       </Box>
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <EnhancedColumnContextMenuItems
+          id={id}
+          handleCloseMenu={handleMenuClose}
+          onInsertColumnLeftClick={handleInsertColumnLeft}
+          onInsertColumnRightClick={handleInsertColumnRight}
+          onHideColumn={onHideColumn}
+        />
+      </Menu>
     </StyledColumnCard>
   );
 };

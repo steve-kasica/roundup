@@ -1,4 +1,4 @@
-import SchemaToolbar from "../ui/SchemaToolbar";
+import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
 import {
   SelectToggleIconButton,
   FocusIconButton,
@@ -7,7 +7,6 @@ import {
 } from "../ui/buttons";
 import { EnhancedStackOperationLabel } from "./StackOperationLabel";
 import { useCallback } from "react";
-import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 import withStackOperationData from "./withStackOperationData";
 
 const StackSchemaToolbar = ({
@@ -25,11 +24,6 @@ const StackSchemaToolbar = ({
   columnIdMatrix,
   m,
   activeColumnIds,
-
-  // Props passed via `withAssociatedAlerts.jsx` HOC
-  alertIds,
-  errorCount,
-  totalCount,
 
   // Props passed directly from the parent component
   handleHideColumns,
@@ -72,15 +66,12 @@ const StackSchemaToolbar = ({
   }, [isSelectionEmpty, selectColumns, columnIdMatrix, clearSelectedColumns]);
 
   return (
-    <SchemaToolbar
+    <EnhancedSchemaToolbar
+      id={id}
       columnIds={columnIdMatrix.flat()}
       columnCount={activeColumnIds.length}
       rowCount={rowCount}
       name={name}
-      objectId={id}
-      alertIds={alertIds}
-      errorCount={errorCount}
-      totalCount={totalCount}
       customMenuItems={
         <>
           <FocusIconButton
@@ -103,12 +94,9 @@ const StackSchemaToolbar = ({
       }
     >
       <EnhancedStackOperationLabel id={id} />
-    </SchemaToolbar>
+    </EnhancedSchemaToolbar>
   );
 };
 
-const EnhancedStackSchemaToolbar = withAssociatedAlerts(
-  withStackOperationData(StackSchemaToolbar)
-);
-
+const EnhancedStackSchemaToolbar = withStackOperationData(StackSchemaToolbar);
 export { StackSchemaToolbar, EnhancedStackSchemaToolbar };

@@ -9,22 +9,32 @@ import {
   Typography,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
 import { selectAlertsById } from "../../slices/alertsSlice/selectors";
 import { EnhancedAlertDescription } from "../Alerts/AlertDescription";
 import { ExportTableButton, SchemaAlertsButton } from "./buttons";
+import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 
 const SchemaToolbar = ({
   // columnIds,
-  objectId,
+  id,
+  // Props passed via `withAssociatedAlerts.jsx` HOC
   alertIds,
   totalCount,
-  children,
   errorCount,
+  warningCount,
+  silencedWarningCount,
+
+  // Props passed directly from the parent component
+  children,
   customMenuItems = null,
 }) => {
   const alerts = useSelector((state) => selectAlertsById(state, alertIds));
+
+  const displayCount = useMemo(() => {
+    return totalCount - silencedWarningCount;
+  }, [totalCount, silencedWarningCount]);
 
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [alertAnchorEl, setAlertAnchorEl] = useState(null);
@@ -74,9 +84,13 @@ const SchemaToolbar = ({
       <SchemaAlertsButton
         onClick={handleOpenAlerts}
         disabled={totalCount === 0}
-        badgeContent={totalCount}
+        badgeContent={displayCount}
         color={
-          errorCount > 0 ? "error" : totalCount > 0 ? "warning" : "default"
+          errorCount > 0
+            ? "error"
+            : warningCount - silencedWarningCount > 0
+            ? "warning"
+            : "default"
         }
       />
 
@@ -91,7 +105,7 @@ const SchemaToolbar = ({
         fullWidth
       >
         <EnhancedExportDialog
-          id={objectId}
+          id={id}
           open={isExportDialogOpen}
           onClose={handleCloseExportDialog}
         />
@@ -138,4 +152,6 @@ const SchemaToolbar = ({
   );
 };
 
-export default SchemaToolbar;
+const EnhancedSchemaToolbar = withAssociatedAlerts(SchemaToolbar);
+
+export { SchemaToolbar, EnhancedSchemaToolbar };

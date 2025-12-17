@@ -383,7 +383,7 @@ const StackSchemaView = ({
                 {headerGroups.map(({ colIndex, indices, type }, idx) => {
                   if (type === "visible") {
                     const columnId = columnIdMatrix[rowIndex][colIndex];
-                    if (columnId !== null) {
+                    if (columnId) {
                       // Calculate which borders to highlight based on selected columns
                       const highlightLeftBorder =
                         selectedChildColumnIdsSet.has(columnId) &&
@@ -452,44 +452,48 @@ const StackSchemaView = ({
                           </ColumnDragContainer>
                         </StyledTableCell>
                       );
-                    } else {
+                    } else if (columnId === null) {
                       // Column is Null
-                      <StyledTableCell key={`null-${rowIndex}-${colIndex}`}>
-                        <StyledColumnCard
-                          isError={true}
-                          sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            textAlign: "center",
-                            height: "100%",
-                            background: "red",
-                          }}
-                        >
-                          <Box
+                      return (
+                        <StyledTableCell key={`null-${rowIndex}-${colIndex}`}>
+                          <StyledColumnCard
+                            isError={true}
                             sx={{
                               display: "flex",
                               flexDirection: "column",
                               alignItems: "center",
-                              gap: 1,
+                              justifyContent: "center",
+                              textAlign: "center",
+                              height: "100%",
+                              background: "red",
                             }}
                           >
-                            <Typography
-                              variant="caption"
-                              color="error"
+                            <Box
                               sx={{
-                                fontWeight: "medium",
-                                textTransform: "uppercase",
-                                letterSpacing: "0.5px",
-                                fontSize: "0.7rem",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: 1,
                               }}
                             >
-                              Schema Mismatch
-                            </Typography>
-                          </Box>
-                        </StyledColumnCard>
-                      </StyledTableCell>;
+                              <Typography
+                                variant="caption"
+                                color="error"
+                                sx={{
+                                  fontWeight: "medium",
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.5px",
+                                  fontSize: "0.7rem",
+                                }}
+                              >
+                                Schema Mismatch
+                              </Typography>
+                            </Box>
+                          </StyledColumnCard>
+                        </StyledTableCell>
+                      );
+                    } else {
+                      throw new Error("Unknown column ID value");
                     }
                   } else if (type === "hidden") {
                     return (
