@@ -1,7 +1,13 @@
-/* eslint-disable react/prop-types */
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import withStackOperationData from "../withStackOperationData";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import {
   getValuesInRange,
   getIndexOfValue,
@@ -13,9 +19,10 @@ import { isTableId } from "../../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../OperationView/OperationLabel";
 import { HiddenColumnsButton } from "../../ui/buttons";
 import { EnhancedStackSchemaToolbar } from "../StackSchemaToolbar";
-import StyledColumnsContainer from "./StyledColumnsContainer";
+import StyledTableCell from "./StyledTableCell";
 
-const topRowHeight = 25; // Fixed height for the top row (column headers)
+const topRowHeight = 5; // Fixed height for the top row (column headers)
+const leftMarginWidth = 50; // Fixed width for the left margin (row headers)
 
 const StackSchemaView = ({
   // Props passed via withOperationData
@@ -31,11 +38,7 @@ const StackSchemaView = ({
   // Props passed via withStackOperationData
   columnIdMatrix, // column IDs of child tables in a matrix
   m, // width of the matrix (# of columns)
-  n, // height of the matrix (# of children)
   swapColumns,
-
-  // Props passed via withAssociatedAlerts
-  totalCount,
 }) => {
   const [hiddenIndices, setHiddenIndices] = useState([]); // This array stores column indices that are hidden
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
@@ -222,340 +225,289 @@ const StackSchemaView = ({
     selectColumns(nextColumnSelection); // Remove from selection after hiding
   }, [columnIdMatrix, m, selectedChildColumnIdsSet, selectColumns]);
 
+  // Build header groups to render visible columns and runs of hidden columns
+  const headerGroups = Array.from({ length: m }, (_, i) => i).reduce(
+    (acc, i) => {
+      const isHidden = hiddenIndices.includes(i);
+      const prev = acc[acc.length - 1];
+      if (isHidden) {
+        if (prev && prev.type === "hidden") {
+          prev.indices.push(i);
+        } else {
+          acc.push({ type: "hidden", indices: [i] });
+        }
+      } else {
+        acc.push({ type: "visible", colIndex: i });
+      }
+      return acc;
+    },
+    []
+  );
+
   return (
     <Box display={"flex"} flexDirection="column" height="100%">
       <EnhancedStackSchemaToolbar
         id={id}
         handleHideColumns={handleHideColumns}
       />
-      <Box
-        className="x-axis-container"
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-around",
-          marginLeft: `${30}px`,
-        }}
-      >
-        {Array.from({ length: m }, (_, i) => i).map((colIndex) => (
-          <Box
-            key={colIndex}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "4px",
-              padding: "2px",
-              flex: hiddenIndices.includes(colIndex) ? "0 0 auto" : 1,
-              height: "100%",
-              minWidth: hiddenIndices.includes(colIndex) ? "30px" : "100px",
-              maxWidth: hiddenIndices.includes(colIndex) ? "30px" : undefined,
-              alignItems: "center",
-            }}
-            onClick={(event) => onColumnLabelClick(event, colIndex)}
-          >
-            <Typography
-              variant="caption"
-              sx={{
-                userSelect: "none",
-                cursor: "pointer",
-              }}
-            >
-              {colIndex + 1}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
-      {/* <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          // TODO: delete
-          // width: "100%",
-          // minHeight: "100%", // Take full height of parent when space is available
-          gap: "4px",
-        }}
-      > */}
-      {/* Left Column - Row Labels */}
-      {/* <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "4px",
-            paddingLeft: 1,
-            flexShrink: 0,
-            minHeight: "100%", // Take full height
-          }}
-        >
-          <Box
-            sx={{
-              height: `${topRowHeight}px`,
-              flexShrink: 0,
-            }}
-          ></Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-evenly",
-              gap: 1,
-              flex: 1,
-            }}
-          >
-            {childIds.map((childId, rowIndex) => (
-              <Box
-                key={childId}
-                sx={{
-                  fontWeight: "bold",
-                  minHeight: "27px", // Adjust manually to match ColumnSummary
-                  padding: "8px 0",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  height: "100%", // Match column card height
-                  cursor: "pointer",
-                }}
-              >
-                {isTableId(childId) ? (
-                  <EnhancedTableLabel
-                    id={childId}
-                    onClick={(event) => onRowLabelClick(event, rowIndex)}
-                    includeIcon={false}
-                    includeDimensions={false}
-                  />
-                ) : (
-                  <EnhancedOperationLabel
-                    id={childId}
-                    onClick={(event) => onRowLabelClick(event, rowIndex)}
-                    includeIcon={false}
-                    includeDimensions={false}
-                  />
-                )}
-              </Box>
-            ))}
-          </Box>
-        </Box> */}
 
-      {/* Data Columns Container - Takes remaining space */}
+      {/* Scroll container for the table */}
       <Box
         className="data-container"
         ref={columnContainerRef}
         sx={{
-          display: "flex",
-          flexDirection: "row",
           flex: 1,
-          flexGrow: 1,
           overflow: "auto",
-          // minHeight: "100%", // Take full height
+          borderRadius: 1,
+          border: (theme) => `1px solid ${theme.palette.divider}`,
+          backgroundColor: (theme) => theme.palette.background.paper,
         }}
       >
-        <Box
-          className="y-axis-container"
+        <Table
+          className="stack-schema-table"
           sx={{
-            display: "flex",
+            borderCollapse: "separate",
+            borderSpacing: 0,
+            width: "100%",
+            height: "100%",
+            tableLayout: "fixed",
           }}
         >
-          <StyledColumnsContainer
-            sx={{
-              maxWidth: "30px",
-              paddingRight: 0,
-            }}
-          >
-            {childIds.map((childId, i) => {
-              return (
-                <Box
-                  key={childId}
+          <TableHead className="x-axis-container">
+            <TableRow>
+              {/* Sticky top-left corner cell for the row labels column */}
+              <StyledTableCell
+                sx={{
+                  position: "sticky",
+                  top: 0,
+                  left: 0,
+                  zIndex: 3,
+                  height: `${topRowHeight}px`,
+                  width: `${leftMarginWidth}px`,
+                  minWidth: `${leftMarginWidth}px`,
+                  boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.1)",
+                  background: "white",
+                }}
+              />
+              {headerGroups.map((group, idx) => {
+                if (group.type === "visible") {
+                  const colIndex = group.colIndex;
+                  return (
+                    <StyledTableCell
+                      key={`h-${colIndex}`}
+                      onClick={(e) => onColumnLabelClick(e, colIndex)}
+                      sx={{
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 2,
+                        background: "inherit",
+                        height: `${topRowHeight}px`,
+                        fontWeight: 500,
+                        textAlign: "center",
+                        cursor: "pointer",
+                        minWidth: 125,
+                        width: 125,
+                        boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ userSelect: "none" }}>
+                        {colIndex + 1}
+                      </Typography>
+                    </StyledTableCell>
+                  );
+                }
+                // Hidden run header cell with colSpan
+                const runLen = group.indices.length;
+                return (
+                  <StyledTableCell
+                    key={`h-hidden-${idx}`}
+                    colSpan={runLen}
+                    sx={{
+                      position: "sticky",
+                      top: 0,
+                      zIndex: 2,
+                      background: "inherit",
+                      height: `${topRowHeight}px`,
+                      minWidth: runLen * 30,
+                      width: runLen * 30,
+                      textAlign: "center",
+                    }}
+                  >
+                    <HiddenColumnsButton
+                      onClick={() => {
+                        setHiddenIndices((prev) =>
+                          prev.filter((x) => !group.indices.includes(x))
+                        );
+                        clearSelectedColumns();
+                      }}
+                    />
+                  </StyledTableCell>
+                );
+              })}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {childIds.map((childId, rowIndex) => (
+              <TableRow key={childId}>
+                {/* Sticky first column: row label */}
+                <StyledTableCell
+                  className="y-axis-container"
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    cursor: "pointer",
-                    padding: "4px",
-                    minHeight: "25px",
+                    position: "sticky",
+                    left: 0,
+                    zIndex: 1,
+                    width: 30,
+                    minWidth: 30,
+                    // boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.06)",
+                    background: "white",
                   }}
                 >
                   {isTableId(childId) ? (
                     <EnhancedTableLabel
                       id={childId}
-                      onClick={(event) => onRowLabelClick(event, i)}
+                      onClick={(event) => onRowLabelClick(event, rowIndex)}
                       includeIcon={false}
                       includeDimensions={false}
                     />
                   ) : (
                     <EnhancedOperationLabel
                       id={childId}
-                      onClick={(event) => onRowLabelClick(event, i)}
+                      onClick={(event) => onRowLabelClick(event, rowIndex)}
                       includeIcon={false}
                       includeDimensions={false}
                     />
                   )}
-                </Box>
-              );
-            })}
-          </StyledColumnsContainer>
-        </Box>
-        <Box
-          className="data-matrix-container"
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            flex: 1,
-          }}
-        >
-          {Array.from({ length: m }, (_, i) => i)
-            .reduce((acc, i) => {
-              const isHidden = hiddenIndices.includes(i);
-              const prev = acc[acc.length - 1];
-              if (!isHidden) {
-                acc.push({ colIndex: i, isHidden });
-              } else {
-                if (prev?.isHidden) {
-                  prev.hiddenIndices.push(i);
-                } else {
-                  acc.push({ hiddenIndices: [i], isHidden });
-                }
-              }
-              return acc;
-            }, [])
-            .map(({ colIndex, hiddenIndices, isHidden }, i) => {
-              return (
-                <>
-                  {/* <Box
-                  key={`column-${isHidden ? `hidden-${i}` : i}`}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "4px",
-                    padding: "2px",
-                    flex: isHidden ? "0 0 auto" : 1,
-                    height: "100%",
-                    minWidth: isHidden ? "30px" : "125px",
-                    maxWidth: isHidden ? "30px" : undefined,
-                    overflow: "hidden",
-                  }}
-                > */}
-                  {/* Column Header */}
-                  {/* <Box
-                    sx={{
-                      fontWeight: "bold",
-                      display: "flex",
-                      height: `${topRowHeight}px`,
-                      flexShrink: 0,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                    }}
-                    onClick={(e) => onColumnLabelClick(e, colIndex)}
-                  >
-                    {!isHidden ? (
-                      colIndex + 1
-                    ) : (
-                      <HiddenColumnsButton
-                        // TODO: make callback function
-                        onClick={() => {
-                          setHiddenIndices((prev) =>
-                            prev.filter((idx) => !hiddenIndices.includes(idx))
-                          );
-                          clearSelectedColumns(); // Clear selection on unhide
+                </StyledTableCell>
+
+                {/* Data cells */}
+                {Array.from({ length: m }, (_, colIndex) => {
+                  const hidden = hiddenIndices.includes(colIndex);
+                  const columnId = columnIdMatrix[rowIndex][colIndex];
+
+                  if (hidden) {
+                    return (
+                      <StyledTableCell
+                        key={`empty-${rowIndex}-${colIndex}`}
+                        sx={{
+                          width: 30,
+                          minWidth: 30,
                         }}
                       />
-                    )}
-                  </Box> */}
-                  {!isHidden && (
-                    <StyledColumnsContainer className="column-index-container">
-                      {columnIdMatrix.map((row) => {
-                        const columnId = row[colIndex];
-                        if (columnId === null) {
-                          return (
-                            <StyledColumnCard
-                              key={`empty-${colIndex}`}
-                              isError={true}
+                    );
+                  }
+
+                  if (columnId === null) {
+                    return (
+                      <StyledTableCell key={`null-${rowIndex}-${colIndex}`}>
+                        <StyledColumnCard
+                          isError={true}
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            textAlign: "center",
+                            height: "100%",
+                            background: "red",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="error"
                               sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                textAlign: "center",
-                                // minHeight: "120px",
+                                fontWeight: "medium",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.5px",
+                                fontSize: "0.7rem",
                               }}
                             >
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  alignItems: "center",
-                                  gap: 1,
-                                }}
-                              >
-                                <Typography
-                                  variant="caption"
-                                  color="error"
-                                  sx={{
-                                    fontWeight: "medium",
-                                    textTransform: "uppercase",
-                                    letterSpacing: "0.5px",
-                                    fontSize: "0.7rem",
-                                  }}
-                                >
-                                  Schema Mismatch
-                                </Typography>
-                              </Box>
-                            </StyledColumnCard>
-                          );
-                        } else {
-                          return (
-                            <ColumnDragContainer
-                              key={columnId}
-                              id={columnId}
-                              columnIndex={colIndex}
-                              canDrag={selectedChildColumnIdsSet.has(columnId)}
-                              onDrop={(draggedItem, targetItem) =>
-                                swapColumns(targetItem, draggedItem)
-                              }
-                            >
-                              {/* Interactive Column Summary Card that includes [data-column-id] */}
-                              <EnhancedColumnSummary
-                                id={columnId}
-                                onClick={(event) =>
-                                  onCellClick(event, columnId)
-                                }
-                                onDoubleClick={(event) =>
-                                  onCellDoubleClick(event, columnId)
-                                }
-                                isDraggable={selectedChildColumnIdsSet.has(
-                                  columnId
-                                )}
-                                handleInsertColumnLeft={() =>
-                                  onInsertColumnIntoChildTable(
-                                    getIndexOfValue(
-                                      columnIdMatrix,
-                                      columnId
-                                    )[0],
-                                    colIndex
-                                  )
-                                }
-                                handleInsertColumnRight={() =>
-                                  onInsertColumnIntoChildTable(
-                                    getIndexOfValue(
-                                      columnIdMatrix,
-                                      columnId
-                                    )[0],
-                                    colIndex + 1
-                                  )
-                                }
-                              />
-                            </ColumnDragContainer>
-                          );
+                              Schema Mismatch
+                            </Typography>
+                          </Box>
+                        </StyledColumnCard>
+                      </StyledTableCell>
+                    );
+                  }
+
+                  // Calculate which borders to highlight based on selected columns
+                  const highlightLeftBorder =
+                    selectedChildColumnIdsSet.has(columnId) &&
+                    (colIndex === 0 ||
+                      !selectedChildColumnIdsSet.has(
+                        columnIdMatrix[rowIndex][colIndex - 1]
+                      ));
+                  const highlightRightBorder =
+                    selectedChildColumnIdsSet.has(columnId) &&
+                    (colIndex === m - 1 ||
+                      !selectedChildColumnIdsSet.has(
+                        columnIdMatrix[rowIndex][colIndex + 1]
+                      ));
+                  const highlightTopBorder =
+                    selectedChildColumnIdsSet.has(columnId) &&
+                    (rowIndex === 0 ||
+                      !selectedChildColumnIdsSet.has(
+                        columnIdMatrix[rowIndex - 1][colIndex]
+                      ));
+                  const highlightBottomBorder =
+                    selectedChildColumnIdsSet.has(columnId) &&
+                    (rowIndex === childIds.length - 1 ||
+                      !selectedChildColumnIdsSet.has(
+                        columnIdMatrix[rowIndex + 1][colIndex]
+                      ));
+
+                  return (
+                    <StyledTableCell
+                      key={columnId}
+                      highlightLeftBorder={highlightLeftBorder}
+                      highlightRightBorder={highlightRightBorder}
+                      highlightTopBorder={highlightTopBorder}
+                      highlightBottomBorder={highlightBottomBorder}
+                    >
+                      <ColumnDragContainer
+                        id={columnId}
+                        columnIndex={colIndex}
+                        canDrag={selectedChildColumnIdsSet.has(columnId)}
+                        onDrop={(draggedItem, targetItem) =>
+                          swapColumns(targetItem, draggedItem)
                         }
-                      })}
-                    </StyledColumnsContainer>
-                  )}
-                  {/* </Box> */}
-                </>
-              );
-            })}
-        </Box>
+                      >
+                        <EnhancedColumnSummary
+                          id={columnId}
+                          onClick={(event) => onCellClick(event, columnId)}
+                          onDoubleClick={(event) =>
+                            onCellDoubleClick(event, columnId)
+                          }
+                          isDraggable={selectedChildColumnIdsSet.has(columnId)}
+                          handleInsertColumnLeft={() =>
+                            onInsertColumnIntoChildTable(
+                              getIndexOfValue(columnIdMatrix, columnId)[0],
+                              colIndex
+                            )
+                          }
+                          handleInsertColumnRight={() =>
+                            onInsertColumnIntoChildTable(
+                              getIndexOfValue(columnIdMatrix, columnId)[0],
+                              colIndex + 1
+                            )
+                          }
+                        />
+                      </ColumnDragContainer>
+                    </StyledTableCell>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </Box>
-      {/* </Box> */}
     </Box>
   );
 };

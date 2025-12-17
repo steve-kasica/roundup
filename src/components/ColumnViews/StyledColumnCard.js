@@ -1,8 +1,6 @@
-import { Card } from "@mui/material";
-import { styled } from "@mui/system";
-import { GrabIcon } from "lucide-react";
+import { Box, styled } from "@mui/system";
 
-const StyledColumnCard = styled(Card, {
+const StyledColumnCard = styled(Box, {
   shouldForwardProp: (prop) =>
     ![
       "isHovered",

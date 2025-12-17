@@ -57,6 +57,9 @@ const ColumnSummary = ({
       onContextMenu={onContextMenu}
       sx={{
         cursor: isSelected ? "grab" : "context-menu",
+        boxShadow: 0,
+        height: "100%",
+        outline: 0,
         ...(totalCount && {
           borderColor: "warning.main",
           borderWidth: 2,
