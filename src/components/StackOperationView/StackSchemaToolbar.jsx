@@ -1,17 +1,13 @@
 import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
-import {
-  SelectToggleIconButton,
-  FocusIconButton,
-  DeleteColumnsButton,
-  HideIconButton,
-} from "../ui/buttons";
-import { EnhancedStackOperationLabel } from "./StackOperationLabel";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import withStackOperationData from "./withStackOperationData";
+import { Chip, Stack, Typography } from "@mui/material";
+import { StackOperationIcon } from "../ui/icons";
 
 const StackSchemaToolbar = ({
-  // Props passed via `withOeprationData.jsx` HOC
+  // Props passed via `withOperationData.jsx` HOC
   rowCount,
+  columnCount,
   name,
   id,
   selectedChildColumnIdsSet,
@@ -19,6 +15,7 @@ const StackSchemaToolbar = ({
   focusColumns, // Sets focused column IDs globally
   selectColumns, // Sets global set of selected column IDs
   clearSelectedColumns, // Clears the global set of selected column IDs
+  setOperationName,
 
   // Props passed via `withStackOperationData.jsx` HOC
   columnIdMatrix,
@@ -28,7 +25,11 @@ const StackSchemaToolbar = ({
   // Props passed directly from the parent component
   handleHideColumns,
 }) => {
-  const isSelectionEmpty = selectedChildColumnIdsSet.size === 0;
+  const isSelectionEmpty = useMemo(
+    () => selectedChildColumnIdsSet.size === 0,
+    [selectedChildColumnIdsSet]
+  );
+
   const isCompleteColumnSelected = useCallback(() => {
     // Check if there's at least one column index where all cells are selected
     for (let colIndex = 0; colIndex < m; colIndex++) {
@@ -65,36 +66,28 @@ const StackSchemaToolbar = ({
     }
   }, [isSelectionEmpty, selectColumns, columnIdMatrix, clearSelectedColumns]);
 
+  const handleRenameConfirm = useCallback(
+    (newName) => setOperationName(newName),
+    [setOperationName]
+  );
+
   return (
     <EnhancedSchemaToolbar
       id={id}
       columnIds={columnIdMatrix.flat()}
-      columnCount={activeColumnIds.length}
+      columnCount={columnCount}
       rowCount={rowCount}
-      name={name}
-      customMenuItems={
-        <>
-          <FocusIconButton
-            onClick={handleFocusColumns}
-            disabled={isSelectionEmpty}
-          />
-          <HideIconButton
-            onClick={handleHideColumns}
-            disabled={!isCompleteColumnSelected()}
-          />
-          <DeleteColumnsButton
-            onConfirm={handleDeleteColumns}
-            disabled={isSelectionEmpty}
-          />
-          <SelectToggleIconButton
-            onClick={handleSelectionAllColumns}
-            isSelected={!isSelectionEmpty}
-          />
-        </>
-      }
-    >
-      <EnhancedStackOperationLabel id={id} />
-    </EnhancedSchemaToolbar>
+      title={name}
+      onFocusColumns={handleFocusColumns}
+      isFocusedDisabled={isSelectionEmpty}
+      onHideColumns={handleHideColumns}
+      isHideDisabled={!isCompleteColumnSelected()}
+      onDeleteColumns={handleDeleteColumns}
+      isDeleteDisabled={isSelectionEmpty}
+      onSelectToggleColumns={handleSelectionAllColumns}
+      isSelectToggleSelected={!isSelectionEmpty}
+      onRenameConfirm={handleRenameConfirm}
+    />
   );
 };
 

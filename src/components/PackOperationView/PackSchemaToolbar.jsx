@@ -1,23 +1,15 @@
 import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
-import {
-  SelectToggleIconButton,
-  FocusIconButton,
-  HideIconButton,
-  DeleteColumnsButton,
-  SwapTablesButton,
-} from "../ui/buttons";
+import { SwapTablesButton, PackMatchToggleButtonGroup } from "../ui/buttons";
 import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 import { useCallback } from "react";
-import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 import withPackOperationData from "./withPackOperationData";
+import { Divider, Stack } from "@mui/material";
 import {
-  Box,
-  Divider,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip,
-} from "@mui/material";
-import { JOIN_TYPES } from "../../slices/operationsSlice";
+  JOIN_TYPES,
+  MATCH_TYPE_LEFT_UNMATCHED,
+  MATCH_TYPE_MATCHES,
+  MATCH_TYPE_RIGHT_UNMATCHED,
+} from "../../slices/operationsSlice";
 
 const PackSchemaToolbar = ({
   // Props defined in `withGlobalInterfaceData.jsx` HOC
@@ -25,6 +17,10 @@ const PackSchemaToolbar = ({
 
   // Props passed via `withOperationData.jsx` HOC
   id,
+  name,
+  rowCount,
+  columnCount,
+  setOperationName,
   deleteColumns, // Deletes columns globally
   swapTablePositions, // Swaps the positions of children
 
@@ -136,79 +132,49 @@ const PackSchemaToolbar = ({
     swapTablePositions(0, 1);
   }, [swapTablePositions]);
 
+  const handleRenameConfirm = useCallback(
+    (newName) => setOperationName(newName),
+    [setOperationName]
+  );
+
   return (
     <EnhancedSchemaToolbar
       id={id}
+      title={name}
+      rowCount={rowCount}
+      columnCount={columnCount}
+      objectType={"pack"}
+      onFocusColumns={handleFocusColumns}
+      onHideColumns={() => handleHideColumns()}
+      onDeleteColumns={handleDeleteColumns}
+      onRenameConfirm={handleRenameConfirm}
+      onSelectToggleColumns={onSelectAllClick}
+      isFocusedDisabled={!isCompleteColumnSelected}
+      isHideDisabled={!isCompleteColumnSelected}
+      isDeleteDisabled={!isCompleteColumnSelected}
+      isSelectToggleSelected={!isSelectionEmpty}
       customMenuItems={
         <>
           {/* Match category filter buttons */}
-          <Box sx={{ overflow: "hidden", flexShrink: 0 }}>
-            <ToggleButtonGroup
-              value={validMatchGroups}
-              exclusive={false}
-              aria-label="Toggle match categories"
-              size="small"
-              sx={{
-                flexWrap: "nowrap",
-                "& .MuiToggleButton-root": {
-                  fontSize: "0.75rem",
-                  textTransform: "none",
-                  px: 1.5,
-                  whiteSpace: "nowrap",
-                  borderRadius: 0,
-                },
-                "& .MuiToggleButton-root:first-of-type": {
-                  borderTopLeftRadius: "10px",
-                  borderBottomLeftRadius: "10px",
-                },
-                "& .MuiToggleButton-root:last-of-type": {
-                  borderTopRightRadius: "10px",
-                  borderBottomRightRadius: "10px",
-                },
-              }}
-              onChange={handleToggleMatchChange}
-            >
-              <Tooltip title={`${joinType} join`}>
-                {Array.from(matchLabels.keys())
-                  .sort((a, b) => a.localeCompare(b)) // Sort alphabetically to put matches in center
-                  .map((key) => (
-                    <ToggleButton
-                      key={key}
-                      value={key}
-                      aria-label={matchLabels.get(key)}
-                      disabled={matchStats[key] === 0 || errorCount > 0}
-                    >
-                      {matchLabels.get(key).replace("Only", "").trim()}
-                    </ToggleButton>
-                  ))}
-              </Tooltip>
-            </ToggleButtonGroup>
-          </Box>
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-          {/* Swap tables */}
+          <Divider orientation="vertical" flexItem />
+          <PackMatchToggleButtonGroup
+            value={validMatchGroups}
+            onChange={handleToggleMatchChange}
+            isLeftUnmatchedDisabled={
+              matchStats[MATCH_TYPE_LEFT_UNMATCHED] === 0 || errorCount > 0
+            }
+            isMatchDisabled={
+              matchStats[MATCH_TYPE_MATCHES] === 0 || errorCount > 0
+            }
+            isRightUnmatchedDisabled={
+              matchStats[MATCH_TYPE_RIGHT_UNMATCHED] === 0 || errorCount > 0
+            }
+          />
+          <Divider orientation="vertical" flexItem />
           <SwapTablesButton onClick={handleSwapTables} />
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-          <FocusIconButton
-            onClick={handleFocusColumns}
-            disabled={!isCompleteColumnSelected}
-          />
-          <HideIconButton
-            onClick={() => handleHideColumns()}
-            disabled={!isCompleteColumnSelected}
-          />
-          <DeleteColumnsButton
-            onConfirm={handleDeleteColumns}
-            disabled={!isCompleteColumnSelected}
-          />
-          <SelectToggleIconButton
-            onClick={onSelectAllClick}
-            isSelected={!isSelectionEmpty}
-          />
         </>
       }
-    >
-      <EnhancedPackOperationLabel id={id} />
-    </EnhancedSchemaToolbar>
+    />
   );
 };
 

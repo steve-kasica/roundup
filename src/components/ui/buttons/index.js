@@ -7,6 +7,8 @@ export { default as FocusIconButton } from "./FocusIconButton";
 export { default as HiddenColumnsButton } from "./HiddenColumnsButton";
 export { default as HideIconButton } from "./HideIconButton";
 export { default as InsertTableInOperationButton } from "./InsertTableInOperationButton";
+export { default as PackMatchToggleButtonGroup } from "./PackMatchToggleButtonGroup";
+export { default as RenameObjectButton } from "./RenameObjectButton";
 export { default as SchemaAlertsButton } from "./SchemaAlertsButton";
 export { default as SelectToggleIconButton } from "./SelectToggleIconButton";
 export { default as SilenceAlertButton } from "./SilenceAlertButton";

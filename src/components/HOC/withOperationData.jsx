@@ -266,6 +266,14 @@ export default function withOperationData(WrappedComponent) {
       selectColumns(activeChildColumnIds.flat());
     }, [selectColumns, activeChildColumnIds]);
 
+    const setOperationName = useCallback(
+      (name) => {
+        console.log("Setting operation name:", name);
+        dispatch(updateOperationsRequest({ operationUpdates: [{ id, name }] }));
+      },
+      [dispatch, id]
+    );
+
     return (
       <WrappedComponent
         // Pass along props directly from the parent component
@@ -339,6 +347,7 @@ export default function withOperationData(WrappedComponent) {
             })
           )
         }
+        setOperationName={setOperationName}
         materializeOperation={materializeOperation}
         // Callback function related to columns
         selectColumns={selectColumns}

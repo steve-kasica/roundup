@@ -58,6 +58,7 @@ import {
   SelectToggleIconButton,
 } from "../ui/buttons";
 import { TableLabel } from "./TableLabel";
+import { EnhancedTableSchemaToolbar } from "./TableSchemaToolbar";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -225,28 +226,6 @@ const TableSchema = ({
     [dispatch]
   );
 
-  const handleFocusColumns = useCallback(() => {
-    focusColumns(selectedColumnIds);
-  }, [focusColumns, selectedColumnIds]);
-
-  const handleHideColumns = useCallback(() => {
-    hideColumns(selectedColumnIds);
-  }, [hideColumns, selectedColumnIds]);
-
-  const handleDeleteColumns = useCallback(() => {
-    deleteColumns(selectedColumnIds);
-  }, [deleteColumns, selectedColumnIds]);
-
-  const handleSelectAllColumns = useCallback(() => {
-    if (selectedColumnIds.length > 0) {
-      // All selected - deselect all
-      selectColumns([]);
-    } else {
-      // Not all selected - select all
-      selectColumns(activeColumnIds);
-    }
-  }, [activeColumnIds, selectedColumnIds, selectColumns]);
-
   const handleContextMenu = useCallback((event, columnId) => {
     event.preventDefault();
     setContextMenuAnchor({ left: event.clientX, top: event.clientY });
@@ -273,39 +252,7 @@ const TableSchema = ({
       }}
     >
       {/* Toolbar with table info and action buttons */}
-      <EnhancedSchemaToolbar
-        columnIds={activeColumnIds}
-        columnCount={columnCount}
-        rowCount={rowCount}
-        name={name}
-        id={id}
-        customMenuItems={
-          <>
-            <FocusIconButton
-              disabled={selectedColumnIds.length === 0}
-              onClick={handleFocusColumns}
-            />
-            <DeleteColumnsButton
-              disabled={selectedColumnIds.length === 0}
-              onConfirm={handleDeleteColumns}
-            />
-            <HideIconButton
-              disabled={selectedColumnIds.length === 0}
-              onClick={handleHideColumns}
-            />
-            <SelectToggleIconButton
-              isSelected={selectedColumnIds.length > 0}
-              onClick={handleSelectAllColumns}
-            />
-          </>
-        }
-      >
-        <TableLabel
-          name={name}
-          rowCount={rowCount}
-          columnCount={activeColumnIds.length}
-        />
-      </EnhancedSchemaToolbar>
+      <EnhancedTableSchemaToolbar id={id} />
 
       {/* Column Type Change Menu */}
       <Menu

@@ -2,6 +2,7 @@
 import withTableData from "./withTableData";
 import { Stack, Typography, Badge } from "@mui/material";
 import { TableChart, Warning } from "@mui/icons-material";
+import { TableIcon } from "../ui/icons";
 
 const TableLabel = ({
   // props via withTableData
