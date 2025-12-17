@@ -226,6 +226,7 @@ const StackSchemaView = ({
   }, [columnIdMatrix, m, selectedChildColumnIdsSet, selectColumns]);
 
   // Build header groups to render visible columns and runs of hidden columns
+  //
   const headerGroups = Array.from({ length: m }, (_, i) => i).reduce(
     (acc, i) => {
       const isHidden = hiddenIndices.includes(i);
@@ -274,7 +275,7 @@ const StackSchemaView = ({
           }}
         >
           <TableHead className="x-axis-container">
-            <TableRow>
+            <TableRow sx={{ background: "white" }}>
               {/* Sticky top-left corner cell for the row labels column */}
               <StyledTableCell
                 sx={{
@@ -286,7 +287,7 @@ const StackSchemaView = ({
                   width: `${leftMarginWidth}px`,
                   minWidth: `${leftMarginWidth}px`,
                   boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.1)",
-                  background: "white",
+                  background: "inherit",
                 }}
               />
               {headerGroups.map((group, idx) => {
@@ -315,34 +316,35 @@ const StackSchemaView = ({
                       </Typography>
                     </StyledTableCell>
                   );
-                }
-                // Hidden run header cell with colSpan
-                const runLen = group.indices.length;
-                return (
-                  <StyledTableCell
-                    key={`h-hidden-${idx}`}
-                    colSpan={runLen}
-                    sx={{
-                      position: "sticky",
-                      top: 0,
-                      zIndex: 2,
-                      background: "inherit",
-                      height: `${topRowHeight}px`,
-                      minWidth: runLen * 30,
-                      width: runLen * 30,
-                      textAlign: "center",
-                    }}
-                  >
-                    <HiddenColumnsButton
-                      onClick={() => {
-                        setHiddenIndices((prev) =>
-                          prev.filter((x) => !group.indices.includes(x))
-                        );
-                        clearSelectedColumns();
+                } else {
+                  // Hidden run header cell with colSpan
+                  const runLen = group.indices.length;
+                  return (
+                    <StyledTableCell
+                      key={`h-hidden-${idx}`}
+                      colSpan={runLen}
+                      sx={{
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 2,
+                        background: "inherit",
+                        height: `${topRowHeight}px`,
+                        minWidth: runLen * 30,
+                        width: runLen * 30,
+                        textAlign: "center",
                       }}
-                    />
-                  </StyledTableCell>
-                );
+                    >
+                      <HiddenColumnsButton
+                        onClick={() => {
+                          setHiddenIndices((prev) =>
+                            prev.filter((x) => !group.indices.includes(x))
+                          );
+                          clearSelectedColumns();
+                        }}
+                      />
+                    </StyledTableCell>
+                  );
+                }
               })}
             </TableRow>
           </TableHead>
@@ -380,24 +382,80 @@ const StackSchemaView = ({
                 </StyledTableCell>
 
                 {/* Data cells */}
-                {Array.from({ length: m }, (_, colIndex) => {
-                  const hidden = hiddenIndices.includes(colIndex);
-                  const columnId = columnIdMatrix[rowIndex][colIndex];
+                {headerGroups.map(({ colIndex, indices, type }, idx) => {
+                  if (type === "visible") {
+                    const columnId = columnIdMatrix[rowIndex][colIndex];
+                    if (columnId !== null) {
+                      // Calculate which borders to highlight based on selected columns
+                      const highlightLeftBorder =
+                        selectedChildColumnIdsSet.has(columnId) &&
+                        (colIndex === 0 ||
+                          !selectedChildColumnIdsSet.has(
+                            columnIdMatrix[rowIndex][colIndex - 1]
+                          ));
+                      const highlightRightBorder =
+                        selectedChildColumnIdsSet.has(columnId) &&
+                        (colIndex === m - 1 ||
+                          !selectedChildColumnIdsSet.has(
+                            columnIdMatrix[rowIndex][colIndex + 1]
+                          ));
+                      const highlightTopBorder =
+                        selectedChildColumnIdsSet.has(columnId) &&
+                        (rowIndex === 0 ||
+                          !selectedChildColumnIdsSet.has(
+                            columnIdMatrix[rowIndex - 1][colIndex]
+                          ));
+                      const highlightBottomBorder =
+                        selectedChildColumnIdsSet.has(columnId) &&
+                        (rowIndex === childIds.length - 1 ||
+                          !selectedChildColumnIdsSet.has(
+                            columnIdMatrix[rowIndex + 1][colIndex]
+                          ));
 
-                  if (hidden) {
-                    return (
-                      <StyledTableCell
-                        key={`empty-${rowIndex}-${colIndex}`}
-                        sx={{
-                          width: 30,
-                          minWidth: 30,
-                        }}
-                      />
-                    );
-                  }
-
-                  if (columnId === null) {
-                    return (
+                      return (
+                        <StyledTableCell
+                          key={columnId}
+                          isSelected={selectedChildColumnIdsSet.has(columnId)}
+                          highlightLeftBorder={highlightLeftBorder}
+                          highlightRightBorder={highlightRightBorder}
+                          highlightTopBorder={highlightTopBorder}
+                          highlightBottomBorder={highlightBottomBorder}
+                        >
+                          <ColumnDragContainer
+                            id={columnId}
+                            columnIndex={colIndex}
+                            canDrag={selectedChildColumnIdsSet.has(columnId)}
+                            onDrop={(draggedItem, targetItem) =>
+                              swapColumns(targetItem, draggedItem)
+                            }
+                          >
+                            <EnhancedColumnSummary
+                              id={columnId}
+                              onClick={(event) => onCellClick(event, columnId)}
+                              onDoubleClick={(event) =>
+                                onCellDoubleClick(event, columnId)
+                              }
+                              isDraggable={selectedChildColumnIdsSet.has(
+                                columnId
+                              )}
+                              handleInsertColumnLeft={() =>
+                                onInsertColumnIntoChildTable(
+                                  getIndexOfValue(columnIdMatrix, columnId)[0],
+                                  colIndex
+                                )
+                              }
+                              handleInsertColumnRight={() =>
+                                onInsertColumnIntoChildTable(
+                                  getIndexOfValue(columnIdMatrix, columnId)[0],
+                                  colIndex + 1
+                                )
+                              }
+                            />
+                          </ColumnDragContainer>
+                        </StyledTableCell>
+                      );
+                    } else {
+                      // Column is Null
                       <StyledTableCell key={`null-${rowIndex}-${colIndex}`}>
                         <StyledColumnCard
                           isError={true}
@@ -433,76 +491,24 @@ const StackSchemaView = ({
                             </Typography>
                           </Box>
                         </StyledColumnCard>
-                      </StyledTableCell>
-                    );
-                  }
-
-                  // Calculate which borders to highlight based on selected columns
-                  const highlightLeftBorder =
-                    selectedChildColumnIdsSet.has(columnId) &&
-                    (colIndex === 0 ||
-                      !selectedChildColumnIdsSet.has(
-                        columnIdMatrix[rowIndex][colIndex - 1]
-                      ));
-                  const highlightRightBorder =
-                    selectedChildColumnIdsSet.has(columnId) &&
-                    (colIndex === m - 1 ||
-                      !selectedChildColumnIdsSet.has(
-                        columnIdMatrix[rowIndex][colIndex + 1]
-                      ));
-                  const highlightTopBorder =
-                    selectedChildColumnIdsSet.has(columnId) &&
-                    (rowIndex === 0 ||
-                      !selectedChildColumnIdsSet.has(
-                        columnIdMatrix[rowIndex - 1][colIndex]
-                      ));
-                  const highlightBottomBorder =
-                    selectedChildColumnIdsSet.has(columnId) &&
-                    (rowIndex === childIds.length - 1 ||
-                      !selectedChildColumnIdsSet.has(
-                        columnIdMatrix[rowIndex + 1][colIndex]
-                      ));
-
-                  return (
-                    <StyledTableCell
-                      key={columnId}
-                      isSelected={selectedChildColumnIdsSet.has(columnId)}
-                      highlightLeftBorder={highlightLeftBorder}
-                      highlightRightBorder={highlightRightBorder}
-                      highlightTopBorder={highlightTopBorder}
-                      highlightBottomBorder={highlightBottomBorder}
-                    >
-                      <ColumnDragContainer
-                        id={columnId}
-                        columnIndex={colIndex}
-                        canDrag={selectedChildColumnIdsSet.has(columnId)}
-                        onDrop={(draggedItem, targetItem) =>
-                          swapColumns(targetItem, draggedItem)
+                      </StyledTableCell>;
+                    }
+                  } else if (type === "hidden") {
+                    return (
+                      <StyledTableCell
+                        key={`empty-${rowIndex}-${idx}`}
+                        colSpan={indices.length}
+                        sx={
+                          {
+                            // width: 30,
+                            // minWidth: 30,
+                          }
                         }
-                      >
-                        <EnhancedColumnSummary
-                          id={columnId}
-                          onClick={(event) => onCellClick(event, columnId)}
-                          onDoubleClick={(event) =>
-                            onCellDoubleClick(event, columnId)
-                          }
-                          isDraggable={selectedChildColumnIdsSet.has(columnId)}
-                          handleInsertColumnLeft={() =>
-                            onInsertColumnIntoChildTable(
-                              getIndexOfValue(columnIdMatrix, columnId)[0],
-                              colIndex
-                            )
-                          }
-                          handleInsertColumnRight={() =>
-                            onInsertColumnIntoChildTable(
-                              getIndexOfValue(columnIdMatrix, columnId)[0],
-                              colIndex + 1
-                            )
-                          }
-                        />
-                      </ColumnDragContainer>
-                    </StyledTableCell>
-                  );
+                      />
+                    );
+                  } else {
+                    throw new Error("Unknown header group type");
+                  }
                 })}
               </TableRow>
             ))}
