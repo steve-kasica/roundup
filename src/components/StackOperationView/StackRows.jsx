@@ -35,7 +35,11 @@ const StackRows = ({
   const [sortDirection, setSortDirection] = useState("asc");
 
   const [initialOffset, rowLimit] = useMemo(() => {
-    // Which child  index has the first selectoed column?
+    // Which child  index has the first selected column?
+    if (selectedChildColumnIds.flat().length === 0) {
+      return [0, 0];
+    }
+
     const [firstIndex, lastIndex] = selectedChildColumnIds.reduce(
       (acc, colIds, index) => {
         if (colIds.length > 0) {
@@ -50,22 +54,11 @@ const StackRows = ({
     // Lookup row count of the previous child table to use
     // as the initial offset, or zero if there is no previous child table
     // (i.e., firstSelectedChildIndex is zero).
-    const initialOffset = childRowCounts.get(childIds[firstIndex - 1]) + 1 || 0;
-
-    // Calculate the total number of rows to display by summing the row counts of all
-    // child tables between the first and last selected child table indices.
-    const rowLimit = [...childRowCounts.values()].reduce(
-      (acc, rowCount, index) => {
-        if (index >= firstIndex && index <= lastIndex) {
-          acc += rowCount;
-        }
-        return acc;
-      },
-      0
-    );
-
-    return [initialOffset, rowLimit];
-  }, [childIds, childRowCounts, selectedChildColumnIds]);
+    return [
+      rowRanges.get(childIds[firstIndex]).start,
+      rowRanges.get(childIds[lastIndex]).end,
+    ];
+  }, [childIds, rowRanges, selectedChildColumnIds]);
 
   const displayColumnIds = useMemo(() => {
     const selectedChildColumnIdsSet = new Set(selectedChildColumnIds.flat());

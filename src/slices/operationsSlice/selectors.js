@@ -295,7 +295,6 @@ export const selectStackOperationRowRanges = createSelector(
       if (i === 0) {
         rowRanges.set(childId, { start: 0, end: rowCount - 1 });
       } else {
-        // TODO
         const start = rowRanges.get(children[i - 1]).end + 1;
         const end = start + rowCount - 1;
         rowRanges.set(childId, { start, end });

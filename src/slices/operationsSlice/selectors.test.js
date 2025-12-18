@@ -7,6 +7,7 @@ import {
   selectMaxOperationDepth,
   selectOperationQueryData,
   selectOperationChildRowCounts,
+  selectStackOperationRowRanges,
 } from "./selectors";
 import Operation, {
   JOIN_PREDICATES,
@@ -18,15 +19,15 @@ import { Table } from "../tablesSlice";
 import { Column } from "../columnsSlice";
 
 describe("operationsSelectors", () => {
-  let columns = Array.from({ length: 10 }, (_, i) =>
+  let columns = Array.from({ length: 12 }, (_, i) =>
       Column({
         databaseName: `column_${i}`,
       })
     ),
-    tables = Array.from({ length: 3 }, (_, i) =>
+    tables = Array.from({ length: 4 }, (_, i) =>
       Table({
         databaseName: `table_${i}`,
-        rowCount: Math.floor(Math.random() * 10000),
+        rowCount: 10 * (i + 1),
       })
     ),
     operations = Array.from({ length: 2 }, (_, i) =>
@@ -47,18 +48,20 @@ describe("operationsSelectors", () => {
     ),
     state;
 
-  operations[1].childIds = [operations[0].id, tables[2].id];
+  operations[1].childIds = [operations[0].id, tables[2].id, tables[3].id];
   operations[1].columnIds = [columns[8].id, columns[9].id];
   operations[0].childIds = [tables[0].id, tables[1].id];
   operations[0].columnIds = [columns[6].id, columns[7].id];
 
   operations[0].rowCount = tables[0].rowCount + tables[1].rowCount;
-  operations[1].rowCount = operations[0].rowCount + tables[2].rowCount;
+  operations[1].rowCount =
+    operations[0].rowCount + tables[2].rowCount + tables[3].rowCount;
 
   operations[1].parentId = operations[0].id;
   tables[0].parentId = operations[1].id;
   tables[1].parentId = operations[1].id;
   tables[2].parentId = operations[0].id;
+  tables[3].parentId = operations[1].id;
 
   columns[0].parentId = tables[0].id;
   columns[1].parentId = tables[0].id;
@@ -70,9 +73,13 @@ describe("operationsSelectors", () => {
   columns[7].parentId = operations[1].id;
   columns[8].parentId = operations[0].id;
   columns[9].parentId = operations[0].id;
+  columns[10].parentId = tables[3].id;
+  columns[11].parentId = tables[3].id;
 
   tables[0].columnIds = [columns[0].id, columns[1].id];
   tables[1].columnIds = [columns[2].id, columns[3].id];
+  tables[2].columnIds = [columns[4].id, columns[5].id];
+  tables[3].columnIds = [columns[10].id, columns[11].id];
 
   state = {
     columns: {
@@ -169,6 +176,27 @@ describe("operationsSelectors", () => {
           [tables[2].id, tables[2].rowCount],
         ])
       );
+    });
+  });
+  describe("selectStackOperationRowRanges", () => {
+    it("should return the row ranges of child tables/operations in a stack operation", () => {
+      const expected = new Map();
+      expected.set(operations[0].id, {
+        start: 0,
+        end: 29,
+      });
+      expected.set(tables[2].id, {
+        start: 30,
+        end: 29 + 30,
+      });
+      expected.set(tables[3].id, {
+        start: 29 + 30 + 1,
+        end: operations[1].rowCount - 1,
+      });
+
+      const actual = selectStackOperationRowRanges(state, operations[1].id);
+
+      expect(actual).toEqual(expected);
     });
   });
 });
