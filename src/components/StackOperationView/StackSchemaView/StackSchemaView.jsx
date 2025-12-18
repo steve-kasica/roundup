@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import withStackOperationData from "../withStackOperationData";
 import {
   Box,
+  Stack,
   Table,
   TableBody,
   TableHead,
@@ -20,6 +21,7 @@ import { EnhancedOperationLabel } from "../../OperationView/OperationLabel";
 import { HiddenColumnsButton } from "../../ui/buttons";
 import { EnhancedStackSchemaToolbar } from "../StackSchemaToolbar";
 import StyledTableCell from "./StyledTableCell";
+import { NumberIcon } from "../../ui/icons";
 
 const topRowHeight = 5; // Fixed height for the top row (column headers)
 const leftMarginWidth = 25; // Fixed width for the left margin (row headers)
@@ -363,20 +365,26 @@ const StackSchemaView = ({
                   }}
                   onClick={(event) => onRowLabelClick(event, rowIndex)}
                 >
-                  {isTableId(childId) ? (
-                    <EnhancedTableLabel
-                      id={childId}
-                      includeIcon={false}
-                      includeDimensions={false}
-                      sx={{ justifyContent: "flex-end" }}
+                  <Stack direction="column" alignItems="center" spacing={1}>
+                    <NumberIcon
+                      number={rowIndex + 1}
+                      tooltipText={`Table ${rowIndex + 1}`}
                     />
-                  ) : (
-                    <EnhancedOperationLabel
-                      id={childId}
-                      includeIcon={false}
-                      includeDimensions={false}
-                    />
-                  )}
+                    {isTableId(childId) ? (
+                      <EnhancedTableLabel
+                        id={childId}
+                        includeIcon={false}
+                        includeDimensions={false}
+                        sx={{ justifyContent: "flex-end" }}
+                      />
+                    ) : (
+                      <EnhancedOperationLabel
+                        id={childId}
+                        includeIcon={false}
+                        includeDimensions={false}
+                      />
+                    )}
+                  </Stack>
                 </StyledTableCell>
 
                 {/* Data cells */}
