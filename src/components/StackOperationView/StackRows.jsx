@@ -4,7 +4,7 @@ import withStackOperationData from "./withStackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
 import { Stack, Typography } from "@mui/material";
-import StackOperationChildIcon from "./StackOperationChildIcon.jsx";
+import { NumberIcon } from "../ui/icons";
 
 const pageSize = 50; // default page size for pagination
 
@@ -122,9 +122,9 @@ const StackRows = ({
             gap: "5px",
           }}
         >
-          <StackOperationChildIcon
-            count={childIds.length}
-            highlightIndex={tableIndex}
+          <NumberIcon
+            number={tableIndex + 1}
+            tooltipText={`Table ${tableIndex + 1} of ${childIds.length}`}
           />
           <Typography
             sx={{

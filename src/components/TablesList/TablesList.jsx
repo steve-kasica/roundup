@@ -19,6 +19,7 @@ import {
   TableCell,
   Button,
   TableBody,
+  TableContainer,
 } from "@mui/material";
 import {
   ArrowDown01,
@@ -186,7 +187,7 @@ function TablesList({
   }
 
   return (
-    <Box className="SourceTables">
+    <>
       <EnhancedTablesToolbar
         searchString={searchString}
         setSearchString={setSearchString}
@@ -200,9 +201,8 @@ function TablesList({
         handleAddStackOperationClick={handleAddStackOperationClick}
         handleInsertTablesInOperationClick={handleInsertTablesInOperationClick}
       />
-      <Box
+      <TableContainer
         sx={{
-          overflowX: "auto",
           width: "100%",
           containerType: "inline-size",
           containerName: "tableLayout",
@@ -214,7 +214,14 @@ function TablesList({
             borderCollapse: "collapse",
           }}
         >
-          <TableHead>
+          <TableHead
+            sx={{
+              position: "sticky",
+              top: 0,
+              zIndex: 1,
+              backgroundColor: (theme) => theme.palette.background.paper,
+            }}
+          >
             <TableRow
               style={{
                 borderBottom: "2px solid rgba(0, 0, 0, 0.12)",
@@ -222,7 +229,14 @@ function TablesList({
             >
               <TableCell></TableCell>
               {headers.map((header) => (
-                <TableCell key={header.attr} data-column={header.attr}>
+                <TableCell
+                  key={header.attr}
+                  data-column={header.attr}
+                  sx={{
+                    padding: 0,
+                    borderRight: "1px solid rgba(0, 0, 0, 0.12)",
+                  }}
+                >
                   <Button
                     color="inherit"
                     fullWidth
@@ -318,8 +332,8 @@ function TablesList({
             ))}
           </TableBody>
         </Table>
-      </Box>
-    </Box>
+      </TableContainer>
+    </>
   );
 }
 

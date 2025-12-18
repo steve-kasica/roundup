@@ -22,14 +22,15 @@ function CustomTabPanel(props) {
         <Box
           sx={{
             p: 3,
-            height: "90%", // TODO: Adjust height based on content
+            height: "100%", // TODO: Adjust height based on content
             boxSizing: "border-box",
             display: "flex",
             flexDirection: "column",
             minHeight: 0,
+            padding: 0,
           }}
         >
-          <Box sx={{ flex: 1, minHeight: 0 }}>{children}</Box>
+          {children}
         </Box>
       )}
     </div>
