@@ -75,13 +75,13 @@ export default createTheme(baseTheme, {
       hovered: {
         // backgroundColor: lighten(baseTheme.palette.action.hoverColor, 0.85), // Lightens by 85%
         // borderColor: baseTheme.palette.action.hoverColor,
-        transform: "scale(1.01)",
+        // transform: "scale(1.01)",
         zIndex: 10,
       },
       selected: {
         // backgroundColor: lighten(baseTheme.palette.action.selectedColor, 0.85),
         // outlineColor: baseTheme.palette.action.selectedColor,
-        transform: "scale(1.01)",
+        // transform: "scale(1.01)",
       },
       dragging: {
         backgroundColor: lighten(baseTheme.palette.action.draggingColor, 0.85),

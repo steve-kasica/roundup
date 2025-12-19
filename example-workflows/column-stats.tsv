@@ -69,3 +69,425 @@ workflow	file_name	column_name	total_values	null_values	unique_values
 2018-05-31-crime-and-heat-analysis	violent_crimes.csv	Count	64739	0	2
 2018-05-31-crime-and-heat-analysis	violent_crimes.csv	Crime	64739	0	147
 2018-05-31-crime-and-heat-analysis	violent_crimes.csv	Description	64739	0	202
+2019-04-democratic-candidate-codonors	candidates.csv	Candidate Name	15	0	15
+2019-04-democratic-candidate-codonors	candidates.csv	Candidate Sex	15	0	2
+2019-04-democratic-candidate-codonors	candidates.csv	Committee Name	15	0	15
+2019-04-democratic-candidate-codonors	candidates.csv	committee_id	15	0	15
+2019-04-democratic-candidate-codonors	filings.csv	Candidate Name	15	0	15
+2019-04-democratic-candidate-codonors	filings.csv	committee_id	15	0	15
+2019-04-democratic-candidate-codonors	filings.csv	filing_id	15	0	15
+2019-04-democratic-candidate-codonors	filings.csv	report_title	15	0	1
+2019-04-democratic-candidate-codonors	filings.csv	date_coverage_from	15	0	6
+2019-04-democratic-candidate-codonors	filings.csv	date_coverage_to	15	0	1
+2019-04-democratic-candidate-codonors	filings.csv	amended	15	0	1
+2019-04-democratic-candidate-codonors	1324749.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1324749.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1324749.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1324749.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1324922.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1324922.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1324922.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1324922.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326014.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326014.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326014.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326014.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326016.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326016.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326016.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326016.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326061.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326061.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326061.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326061.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326070.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326070.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326070.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326070.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326136.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326136.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326136.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326136.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326299.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326299.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326299.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326299.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326324.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326324.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326324.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326324.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326345.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326345.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326345.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326345.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326379.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326379.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326379.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326379.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326465.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326465.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326465.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326465.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326481.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326481.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326481.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326481.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326529.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326529.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326529.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326529.csv	filing_id	1	0	1
+2019-04-democratic-candidate-codonors	1326558.csv	col_a_individuals_itemized	1	0	1
+2019-04-democratic-candidate-codonors	1326558.csv	col_a_individuals_unitemized	1	0	1
+2019-04-democratic-candidate-codonors	1326558.csv	col_a_individual_contribution_total	1	0	1
+2019-04-democratic-candidate-codonors	1326558.csv	filing_id	1	0	1
+babyname_politics	AK.csv	ABBR	29755	0	1
+babyname_politics	AK.csv	GENDER	29755	0	2
+babyname_politics	AK.csv	YEAR	29755	0	112
+babyname_politics	AK.csv	NAME	29755	0	1672
+babyname_politics	AK.csv	VALUE	29755	0	175
+babyname_politics	AL.csv	ABBR	139293	0	1
+babyname_politics	AL.csv	GENDER	139293	0	2
+babyname_politics	AL.csv	YEAR	139293	0	112
+babyname_politics	AL.csv	NAME	139293	0	6929
+babyname_politics	AL.csv	VALUE	139293	0	1198
+babyname_politics	AR.csv	ABBR	105373	0	1
+babyname_politics	AR.csv	GENDER	105373	0	2
+babyname_politics	AR.csv	YEAR	105373	0	112
+babyname_politics	AR.csv	NAME	105373	0	5124
+babyname_politics	AR.csv	VALUE	105373	0	810
+babyname_politics	AZ.csv	ABBR	122085	0	1
+babyname_politics	AZ.csv	GENDER	122085	0	2
+babyname_politics	AZ.csv	YEAR	122085	0	112
+babyname_politics	AZ.csv	NAME	122085	0	5983
+babyname_politics	AZ.csv	VALUE	122085	0	679
+babyname_politics	CA.csv	ABBR	400762	0	1
+babyname_politics	CA.csv	GENDER	400762	0	2
+babyname_politics	CA.csv	YEAR	400762	0	112
+babyname_politics	CA.csv	NAME	400762	0	20239
+babyname_politics	CA.csv	VALUE	400762	0	3319
+babyname_politics	CO.csv	ABBR	112986	0	1
+babyname_politics	CO.csv	GENDER	112986	0	2
+babyname_politics	CO.csv	YEAR	112986	0	112
+babyname_politics	CO.csv	NAME	112986	0	5415
+babyname_politics	CO.csv	VALUE	112986	0	733
+babyname_politics	CT.csv	ABBR	84948	0	1
+babyname_politics	CT.csv	GENDER	84948	0	2
+babyname_politics	CT.csv	YEAR	84948	0	112
+babyname_politics	CT.csv	NAME	84948	0	3811
+babyname_politics	CT.csv	VALUE	84948	0	933
+babyname_politics	DC.csv	ABBR	57265	0	1
+babyname_politics	DC.csv	GENDER	57265	0	2
+babyname_politics	DC.csv	YEAR	57265	0	112
+babyname_politics	DC.csv	NAME	57265	0	2764
+babyname_politics	DC.csv	VALUE	57265	0	548
+babyname_politics	DE.csv	ABBR	33706	0	1
+babyname_politics	DE.csv	GENDER	33706	0	2
+babyname_politics	DE.csv	YEAR	33706	0	112
+babyname_politics	DE.csv	NAME	33706	0	1811
+babyname_politics	DE.csv	VALUE	33706	0	254
+babyname_politics	FL.csv	ABBR	218192	0	1
+babyname_politics	FL.csv	GENDER	218192	0	2
+babyname_politics	FL.csv	YEAR	218192	0	112
+babyname_politics	FL.csv	NAME	218192	0	11869
+babyname_politics	FL.csv	VALUE	218192	0	1618
+babyname_politics	GA.csv	ABBR	191367	0	1
+babyname_politics	GA.csv	GENDER	191367	0	2
+babyname_politics	GA.csv	YEAR	191367	0	112
+babyname_politics	GA.csv	NAME	191367	0	10284
+babyname_politics	GA.csv	VALUE	191367	0	1448
+babyname_politics	HI.csv	ABBR	56069	0	1
+babyname_politics	HI.csv	GENDER	56069	0	2
+babyname_politics	HI.csv	YEAR	56069	0	112
+babyname_politics	HI.csv	NAME	56069	0	2997
+babyname_politics	HI.csv	VALUE	56069	0	256
+babyname_politics	IA.csv	ABBR	97515	0	1
+babyname_politics	IA.csv	GENDER	97515	0	2
+babyname_politics	IA.csv	YEAR	97515	0	112
+babyname_politics	IA.csv	NAME	97515	0	4573
+babyname_politics	IA.csv	VALUE	97515	0	1037
+babyname_politics	ID.csv	ABBR	60445	0	1
+babyname_politics	ID.csv	GENDER	60445	0	2
+babyname_politics	ID.csv	YEAR	60445	0	112
+babyname_politics	ID.csv	NAME	60445	0	3078
+babyname_politics	ID.csv	VALUE	60445	0	295
+babyname_politics	IL.csv	ABBR	237839	0	1
+babyname_politics	IL.csv	GENDER	237839	0	2
+babyname_politics	IL.csv	YEAR	237839	0	112
+babyname_politics	IL.csv	NAME	237839	0	11493
+babyname_politics	IL.csv	VALUE	237839	0	2390
+babyname_politics	IN.csv	ABBR	145357	0	1
+babyname_politics	IN.csv	GENDER	145357	0	2
+babyname_politics	IN.csv	YEAR	145357	0	112
+babyname_politics	IN.csv	NAME	145357	0	6926
+babyname_politics	IN.csv	VALUE	145357	0	1506
+babyname_politics	KS.csv	ABBR	97839	0	1
+babyname_politics	KS.csv	GENDER	97839	0	2
+babyname_politics	KS.csv	YEAR	97839	0	112
+babyname_politics	KS.csv	NAME	97839	0	4614
+babyname_politics	KS.csv	VALUE	97839	0	795
+babyname_politics	KY.csv	ABBR	122608	0	1
+babyname_politics	KY.csv	GENDER	122608	0	2
+babyname_politics	KY.csv	YEAR	122608	0	112
+babyname_politics	KY.csv	NAME	122608	0	5550
+babyname_politics	KY.csv	VALUE	122608	0	1212
+babyname_politics	LA.csv	ABBR	153712	0	1
+babyname_politics	LA.csv	GENDER	153712	0	2
+babyname_politics	LA.csv	YEAR	153712	0	112
+babyname_politics	LA.csv	NAME	153712	0	7399
+babyname_politics	LA.csv	VALUE	153712	0	1052
+babyname_politics	MA.csv	ABBR	123558	0	1
+babyname_politics	MA.csv	GENDER	123558	0	2
+babyname_politics	MA.csv	YEAR	123558	0	112
+babyname_politics	MA.csv	NAME	123558	0	5593
+babyname_politics	MA.csv	VALUE	123558	0	1703
+babyname_politics	MD.csv	ABBR	116699	0	1
+babyname_politics	MD.csv	GENDER	116699	0	2
+babyname_politics	MD.csv	YEAR	116699	0	112
+babyname_politics	MD.csv	NAME	116699	0	5926
+babyname_politics	MD.csv	VALUE	116699	0	1067
+babyname_politics	ME.csv	ABBR	51852	0	1
+babyname_politics	ME.csv	GENDER	51852	0	2
+babyname_politics	ME.csv	YEAR	51852	0	112
+babyname_politics	ME.csv	NAME	51852	0	2252
+babyname_politics	ME.csv	VALUE	51852	0	453
+babyname_politics	MI.csv	ABBR	190023	0	1
+babyname_politics	MI.csv	GENDER	190023	0	2
+babyname_politics	MI.csv	YEAR	190023	0	112
+babyname_politics	MI.csv	NAME	190023	0	9178
+babyname_politics	MI.csv	VALUE	190023	0	2092
+babyname_politics	MN.csv	ABBR	119310	0	1
+babyname_politics	MN.csv	GENDER	119310	0	2
+babyname_politics	MN.csv	YEAR	119310	0	112
+babyname_politics	MN.csv	NAME	119310	0	5797
+babyname_politics	MN.csv	VALUE	119310	0	1237
+babyname_politics	MO.csv	ABBR	144136	0	1
+babyname_politics	MO.csv	GENDER	144136	0	2
+babyname_politics	MO.csv	YEAR	144136	0	112
+babyname_politics	MO.csv	NAME	144136	0	6792
+babyname_politics	MO.csv	VALUE	144136	0	1399
+babyname_politics	MS.csv	ABBR	117316	0	1
+babyname_politics	MS.csv	GENDER	117316	0	2
+babyname_politics	MS.csv	YEAR	117316	0	112
+babyname_politics	MS.csv	NAME	117316	0	5821
+babyname_politics	MS.csv	VALUE	117316	0	939
+babyname_politics	MT.csv	ABBR	47144	0	1
+babyname_politics	MT.csv	GENDER	47144	0	2
+babyname_politics	MT.csv	YEAR	47144	0	112
+babyname_politics	MT.csv	NAME	47144	0	2316
+babyname_politics	MT.csv	VALUE	47144	0	328
+babyname_politics	NC.csv	ABBR	181647	0	1
+babyname_politics	NC.csv	GENDER	181647	0	2
+babyname_politics	NC.csv	YEAR	181647	0	112
+babyname_politics	NC.csv	NAME	181647	0	9345
+babyname_politics	NC.csv	VALUE	181647	0	1511
+babyname_politics	ND.csv	ABBR	47666	0	1
+babyname_politics	ND.csv	GENDER	47666	0	2
+babyname_politics	ND.csv	YEAR	47666	0	112
+babyname_politics	ND.csv	NAME	47666	0	2438
+babyname_politics	ND.csv	VALUE	47666	0	315
+babyname_politics	NE.csv	ABBR	74699	0	1
+babyname_politics	NE.csv	GENDER	74699	0	2
+babyname_politics	NE.csv	YEAR	74699	0	112
+babyname_politics	NE.csv	NAME	74699	0	3640
+babyname_politics	NE.csv	VALUE	74699	0	632
+babyname_politics	NH.csv	ABBR	40557	0	1
+babyname_politics	NH.csv	GENDER	40557	0	2
+babyname_politics	NH.csv	YEAR	40557	0	112
+babyname_politics	NH.csv	NAME	40557	0	1879
+babyname_politics	NH.csv	VALUE	40557	0	335
+babyname_politics	NJ.csv	ABBR	159695	0	1
+babyname_politics	NJ.csv	GENDER	159695	0	2
+babyname_politics	NJ.csv	YEAR	159695	0	112
+babyname_politics	NJ.csv	NAME	159695	0	7981
+babyname_politics	NJ.csv	VALUE	159695	0	1690
+babyname_politics	NM.csv	ABBR	77755	0	1
+babyname_politics	NM.csv	GENDER	77755	0	2
+babyname_politics	NM.csv	YEAR	77755	0	112
+babyname_politics	NM.csv	NAME	77755	0	3500
+babyname_politics	NM.csv	VALUE	77755	0	417
+babyname_politics	NV.csv	ABBR	50829	0	1
+babyname_politics	NV.csv	GENDER	50829	0	2
+babyname_politics	NV.csv	YEAR	50829	0	112
+babyname_politics	NV.csv	NAME	50829	0	3186
+babyname_politics	NV.csv	VALUE	50829	0	252
+babyname_politics	NY.csv	ABBR	309532	0	1
+babyname_politics	NY.csv	GENDER	309532	0	2
+babyname_politics	NY.csv	YEAR	309532	0	112
+babyname_politics	NY.csv	NAME	309532	0	14997
+babyname_politics	NY.csv	VALUE	309532	0	3175
+babyname_politics	OH.csv	ABBR	204165	0	1
+babyname_politics	OH.csv	GENDER	204165	0	2
+babyname_politics	OH.csv	YEAR	204165	0	112
+babyname_politics	OH.csv	NAME	204165	0	9844
+babyname_politics	OH.csv	VALUE	204165	0	2385
+babyname_politics	OK.csv	ABBR	121465	0	1
+babyname_politics	OK.csv	GENDER	121465	0	2
+babyname_politics	OK.csv	YEAR	121465	0	112
+babyname_politics	OK.csv	NAME	121465	0	5912
+babyname_politics	OK.csv	VALUE	121465	0	913
+babyname_politics	OR.csv	ABBR	92410	0	1
+babyname_politics	OR.csv	GENDER	92410	0	2
+babyname_politics	OR.csv	YEAR	92410	0	112
+babyname_politics	OR.csv	NAME	92410	0	4436
+babyname_politics	OR.csv	VALUE	92410	0	654
+babyname_politics	PA.csv	ABBR	206944	0	1
+babyname_politics	PA.csv	GENDER	206944	0	2
+babyname_politics	PA.csv	YEAR	206944	0	112
+babyname_politics	PA.csv	NAME	206944	0	9582
+babyname_politics	PA.csv	VALUE	206944	0	2739
+babyname_politics	RI.csv	ABBR	41540	0	1
+babyname_politics	RI.csv	GENDER	41540	0	2
+babyname_politics	RI.csv	YEAR	41540	0	112
+babyname_politics	RI.csv	NAME	41540	0	1922
+babyname_politics	RI.csv	VALUE	41540	0	458
+babyname_politics	SC.csv	ABBR	122527	0	1
+babyname_politics	SC.csv	GENDER	122527	0	2
+babyname_politics	SC.csv	YEAR	122527	0	112
+babyname_politics	SC.csv	NAME	122527	0	6043
+babyname_politics	SC.csv	VALUE	122527	0	993
+babyname_politics	SD.csv	ABBR	48865	0	1
+babyname_politics	SD.csv	GENDER	48865	0	2
+babyname_politics	SD.csv	YEAR	48865	0	112
+babyname_politics	SD.csv	NAME	48865	0	2461
+babyname_politics	SD.csv	VALUE	48865	0	337
+babyname_politics	TN.csv	ABBR	147212	0	1
+babyname_politics	TN.csv	GENDER	147212	0	2
+babyname_politics	TN.csv	YEAR	147212	0	112
+babyname_politics	TN.csv	NAME	147212	0	7370
+babyname_politics	TN.csv	VALUE	147212	0	1308
+babyname_politics	TX.csv	ABBR	368987	0	1
+babyname_politics	TX.csv	GENDER	368987	0	2
+babyname_politics	TX.csv	YEAR	368987	0	112
+babyname_politics	TX.csv	NAME	368987	0	18238
+babyname_politics	TX.csv	VALUE	368987	0	2500
+babyname_politics	UT.csv	ABBR	93764	0	1
+babyname_politics	UT.csv	GENDER	93764	0	2
+babyname_politics	UT.csv	YEAR	93764	0	112
+babyname_politics	UT.csv	NAME	93764	0	4815
+babyname_politics	UT.csv	VALUE	93764	0	500
+babyname_politics	VA.csv	ABBR	154400	0	1
+babyname_politics	VA.csv	GENDER	154400	0	2
+babyname_politics	VA.csv	YEAR	154400	0	112
+babyname_politics	VA.csv	NAME	154400	0	7727
+babyname_politics	VA.csv	VALUE	154400	0	1342
+babyname_politics	VT.csv	ABBR	29483	0	1
+babyname_politics	VT.csv	GENDER	29483	0	2
+babyname_politics	VT.csv	YEAR	29483	0	112
+babyname_politics	VT.csv	NAME	29483	0	1431
+babyname_politics	VT.csv	VALUE	29483	0	218
+babyname_politics	WA.csv	ABBR	130809	0	1
+babyname_politics	WA.csv	GENDER	130809	0	2
+babyname_politics	WA.csv	YEAR	130809	0	112
+babyname_politics	WA.csv	NAME	130809	0	6482
+babyname_politics	WA.csv	VALUE	130809	0	966
+babyname_politics	WI.csv	ABBR	121398	0	1
+babyname_politics	WI.csv	GENDER	121398	0	2
+babyname_politics	WI.csv	YEAR	121398	0	112
+babyname_politics	WI.csv	NAME	121398	0	5781
+babyname_politics	WI.csv	VALUE	121398	0	1399
+babyname_politics	WV.csv	ABBR	79250	0	1
+babyname_politics	WV.csv	GENDER	79250	0	2
+babyname_politics	WV.csv	YEAR	79250	0	112
+babyname_politics	WV.csv	NAME	79250	0	3484
+babyname_politics	WV.csv	VALUE	79250	0	892
+babyname_politics	WY.csv	ABBR	28751	0	1
+babyname_politics	WY.csv	GENDER	28751	0	2
+babyname_politics	WY.csv	YEAR	28751	0	112
+babyname_politics	WY.csv	NAME	28751	0	1608
+babyname_politics	WY.csv	VALUE	28751	0	176
+nyc-trips	Gett_Trips_NYC_2016.csv	Base License Number	110	0	2
+nyc-trips	Gett_Trips_NYC_2016.csv	Wave Number	110	0	1
+nyc-trips	Gett_Trips_NYC_2016.csv	Base Name	110	0	2
+nyc-trips	Gett_Trips_NYC_2016.csv	DBA	110	0	1
+nyc-trips	Gett_Trips_NYC_2016.csv	Years	110	0	2
+nyc-trips	Gett_Trips_NYC_2016.csv	Week Number	110	0	53
+nyc-trips	Gett_Trips_NYC_2016.csv	Pickup Start Date	110	0	57
+nyc-trips	Gett_Trips_NYC_2016.csv	Pickup End Date	110	0	57
+nyc-trips	Gett_Trips_NYC_2016.csv	Total Dispatched Trips	110	0	109
+nyc-trips	Gett_Trips_NYC_2016.csv	Unique Dispatched Vehicle	110	0	86
+nyc-trips	Lyft_Trips_NYC_2016.csv	Base License Number	110	0	1
+nyc-trips	Lyft_Trips_NYC_2016.csv	Wave Number	110	0	1
+nyc-trips	Lyft_Trips_NYC_2016.csv	Base Name	110	0	1
+nyc-trips	Lyft_Trips_NYC_2016.csv	DBA	110	0	1
+nyc-trips	Lyft_Trips_NYC_2016.csv	Years	110	0	3
+nyc-trips	Lyft_Trips_NYC_2016.csv	Week Number	110	0	53
+nyc-trips	Lyft_Trips_NYC_2016.csv	Pickup Start Date	110	0	110
+nyc-trips	Lyft_Trips_NYC_2016.csv	Pickup End Date	110	0	110
+nyc-trips	Lyft_Trips_NYC_2016.csv	Total Dispatched Trips	110	0	110
+nyc-trips	Lyft_Trips_NYC_2016.csv	Unique Dispatched Vehicle	110	0	109
+nyc-trips	Uber_Trips_NYC_2016.csv	Base License Number	2619	0	29
+nyc-trips	Uber_Trips_NYC_2016.csv	Wave Number	2619	0	3
+nyc-trips	Uber_Trips_NYC_2016.csv	Base Name	2619	0	29
+nyc-trips	Uber_Trips_NYC_2016.csv	DBA	2619	0	29
+nyc-trips	Uber_Trips_NYC_2016.csv	Years	2619	0	3
+nyc-trips	Uber_Trips_NYC_2016.csv	Week Number	2619	0	53
+nyc-trips	Uber_Trips_NYC_2016.csv	Pickup Start Date	2619	0	123
+nyc-trips	Uber_Trips_NYC_2016.csv	Pickup End Date	2619	0	123
+nyc-trips	Uber_Trips_NYC_2016.csv	Total Dispatched Trips	2619	0	2536
+nyc-trips	Uber_Trips_NYC_2016.csv	Unique Dispatched Vehicle	2619	0	1466
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Month/Year	88	0	88
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Trips Per Day	88	0	88
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Farebox Per Day	88	0	88
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Unique Drivers	88	0	87
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Unique Medallions	88	0	77
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Medallions Per Day	88	0	82
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Avg Days Medallions on Road	88	0	32
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Avg Hours Per Day Per Medallion	88	0	28
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Avg Days Drivers on Road	88	0	28
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Avg Hours Per Day Per Driver	88	0	7
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Avg Minutes Per Trip	88	6	45
+nyc-trips	data_reports_monthly_indicators_yellow (3).csv	Percent of Trips Paid with Credit Card	88	0	30
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	﻿NCESSCH	102173	0	102173
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	NAME	102173	0	89889
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	OPSTFIPS	102173	0	57
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	STREET	102173	0	93306
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	CITY	102173	0	14723
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	STATE	102173	0	57
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	ZIP	102173	0	22743
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	STFIP	102173	0	56
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	CNTY	102173	0	3224
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	NMCNTY	102173	0	1960
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	LOCALE	102173	0	13
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	LAT	102173	0	98844
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	LON	102173	0	99036
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	CBSA	102173	0	946
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	NMCBSA	102173	0	946
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	CBSATYPE	102173	0	3
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	CSA	102173	0	175
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	NMCSA	102173	0	175
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	NECTA	102173	0	40
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	NMNECTA	102173	0	40
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	CD	102173	0	441
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	SLDL	102173	0	4804
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	SLDU	102173	0	1955
+school-star-ratings-2018	EDGE_GEOCODE_PUBLICSCH_1617.csv	SURVYEAR	102173	0	1
+school-star-ratings-2018	School_Directory_2018.csv	﻿Academic Year	1429	0	1
+school-star-ratings-2018	School_Directory_2018.csv	LEA Number	1429	0	25
+school-star-ratings-2018	School_Directory_2018.csv	LEA Name	1429	0	25
+school-star-ratings-2018	School_Directory_2018.csv	School Number	1429	0	845
+school-star-ratings-2018	School_Directory_2018.csv	School Name	1429	0	1398
+school-star-ratings-2018	School_Directory_2018.csv	School Type	1429	42	7
+school-star-ratings-2018	School_Directory_2018.csv	Address	1429	0	1406
+school-star-ratings-2018	School_Directory_2018.csv	City	1429	0	256
+school-star-ratings-2018	School_Directory_2018.csv	State	1429	0	1
+school-star-ratings-2018	School_Directory_2018.csv	Zip	1429	0	1042
+school-star-ratings-2018	School_Directory_2018.csv	Phone	1429	0	1414
+school-star-ratings-2018	School_Directory_2018.csv	NCES Number	1429	0	1429
+school-star-ratings-2018	School_Directory_2018.csv	Create Date	1429	0	1
+school-star-ratings-2018	accountability_schools_download_file.csv	#academic_year	1319	0	1
+school-star-ratings-2018	accountability_schools_download_file.csv	lea_number	1319	0	25
+school-star-ratings-2018	accountability_schools_download_file.csv	lea_name	1319	0	25
+school-star-ratings-2018	accountability_schools_download_file.csv	school_number	1319	0	794
+school-star-ratings-2018	accountability_schools_download_file.csv	school_name	1319	0	1290
+school-star-ratings-2018	accountability_schools_download_file.csv	star_rating	1319	0	5
+school-star-ratings-2018	accountability_schools_download_file.csv	total_earned_points_percent	1319	0	78
+school-star-ratings-2018	accountability_schools_download_file.csv	percentile_rank_elementary	1319	0	101
+school-star-ratings-2018	accountability_schools_download_file.csv	percentile_rank_middle	1319	0	101
+school-star-ratings-2018	accountability_schools_download_file.csv	percentile_rank_high	1319	0	101
+school-star-ratings-2018	addresses_add.csv	﻿lea_number	3	0	3
+school-star-ratings-2018	addresses_add.csv	school_number	3	0	3
+school-star-ratings-2018	addresses_add.csv	school_name	3	0	3
+school-star-ratings-2018	addresses_add.csv	lat	3	0	3
+school-star-ratings-2018	addresses_add.csv	lon	3	0	3
+school-star-ratings-2018	addresses_add.csv	address	3	0	3
+school-star-ratings-2018	addresses_add.csv	city_msde	3	0	3
