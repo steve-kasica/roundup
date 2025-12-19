@@ -8,7 +8,7 @@ function convertBigIntsToNumbers(obj) {
   }
   return converted;
 }
-
+// TODO: is this being used anymore?
 export async function rankColumnsKeyness(databaseNames, tableId) {
   const db = await getDuckDB();
   const conn = await db.connect();

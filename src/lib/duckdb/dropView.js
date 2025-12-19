@@ -1,5 +1,6 @@
 import { getDuckDB } from "./duckdbClient";
 
+// TODO: need to update this since operations are now tables
 export async function dropView(operationId) {
   const db = await getDuckDB();
   const conn = await db.connect();

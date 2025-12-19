@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useDispatch } from "react-redux";
 import { EnhancedColumnDetails } from "../../components/ColumnViews/ColumnDetails";
-import { Typography, IconButton, Box } from "@mui/material";
+import { IconButton, Box } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
-import ColumnIndexDetails from "../../components/ColumnIndexDetails";
 import { setFocusedColumnIds } from "../../slices/uiSlice";
+import ColumnValuesComparison from "../../components/ColumnValuesComparison/ColumnValuesComparison";
 
 const RightSidebar = ({ columnIds }) => {
   const dispatch = useDispatch();
@@ -35,8 +35,11 @@ const RightSidebar = ({ columnIds }) => {
       >
         <CloseIcon fontSize="small" />
       </IconButton>
-      {isSingleColumn && <EnhancedColumnDetails id={columnIds[0]} />}
-      {isMultipleColumnsInStack && <ColumnIndexDetails columnIds={columnIds} />}
+      {isSingleColumn ? (
+        <EnhancedColumnDetails id={columnIds[0]} />
+      ) : isMultipleColumnsInStack ? (
+        <ColumnValuesComparison columnIds={columnIds} />
+      ) : null}
     </Box>
   );
 };

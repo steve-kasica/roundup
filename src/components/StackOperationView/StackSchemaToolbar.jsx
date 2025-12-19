@@ -49,8 +49,8 @@ const StackSchemaToolbar = ({
   }, [columnIdMatrix, m, selectedChildColumnIdsSet]);
 
   const handleFocusColumns = useCallback(() => {
-    focusColumns(selectedChildColumnIdsSet);
-    // Implementation for handling focus columns
+    console.log("Focusing columns:", selectedChildColumnIdsSet);
+    focusColumns(Array.from(selectedChildColumnIdsSet));
   }, [focusColumns, selectedChildColumnIdsSet]);
 
   const handleDeleteColumns = useCallback(() => {

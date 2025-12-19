@@ -9,11 +9,11 @@ const TableName = ({ name, sx = {} }) => {
       component="div"
       sx={{
         userSelect: "none",
-        fontWeight: "bold",
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
         maxWidth: "100%",
+        fontSize: "0.75rem",
         ...sx,
       }}
     >

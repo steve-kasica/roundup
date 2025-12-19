@@ -2,11 +2,27 @@
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";
 
-export async function getValuesCountMatrix(databaseNames, tableIds) {
-  if (!Array.isArray(databaseNames) || !Array.isArray(tableIds)) {
-    throw new Error("Both databaseNames and tableIds must be arrays");
-  } else if (databaseNames.length !== tableIds.length) {
-    throw new Error("databaseNames and tableIds must have the same length");
+// Returns a matrix of value counts for the specified columns across multiple tables.
+// In each row:
+// - First column is the value (uniqueValue)
+// - Next N columns are the counts for each table in tableDatabaseNames
+// - Second to last column is the degree (number of tables the value appears in)
+// - Last column is a signature string for sorting
+export async function getValuesCountMatrix(
+  columnDatabaseNames,
+  tableDatabaseNames
+) {
+  if (
+    !Array.isArray(columnDatabaseNames) ||
+    !Array.isArray(tableDatabaseNames)
+  ) {
+    throw new Error(
+      "Both columnDatabaseNames and tableDatabaseNames must be arrays"
+    );
+  } else if (columnDatabaseNames.length !== tableDatabaseNames.length) {
+    throw new Error(
+      "columnDatabaseNames and tableDatabaseNames must have the same length"
+    );
   }
 
   const db = await getDuckDB();
@@ -14,33 +30,33 @@ export async function getValuesCountMatrix(databaseNames, tableIds) {
   const query = `
     SELECT
         VAL,
-        ${tableIds
+        ${tableDatabaseNames
           .map(
-            (tableId) =>
-              `CAST(SUM((SOURCE_TABLE = '${tableId}')::INTEGER) AS INTEGER) AS ${tableId}`
+            (tableDatabaseName) =>
+              `CAST(SUM((SOURCE_TABLE = '${tableDatabaseName}')::INTEGER) AS INTEGER) AS ${tableDatabaseName}`
           )
           .join(",\n        ")},
         -- Calculate degree as the sum of nonzero columns
-        (${tableIds
+        (${tableDatabaseNames
           .map(
-            (tableId) =>
-              `CASE WHEN SUM((SOURCE_TABLE = '${tableId}')::INTEGER) > 0 THEN 1 ELSE 0 END`
+            (tableDatabaseName) =>
+              `CASE WHEN SUM((SOURCE_TABLE = '${tableDatabaseName}')::INTEGER) > 0 THEN 1 ELSE 0 END`
           )
           .join(" + ")}) AS DEGREE,
         --- Create a signature string for sorting
-        (${tableIds
+        (${tableDatabaseNames
           .map(
-            (tableId) =>
-              `CASE WHEN SUM((SOURCE_TABLE = '${tableId}')::INTEGER) > 0 THEN '1' ELSE '0' END`
+            (tableDatabaseName) =>
+              `CASE WHEN SUM((SOURCE_TABLE = '${tableDatabaseName}')::INTEGER) > 0 THEN '1' ELSE '0' END`
           )
           .join(" || ")}) AS SIGNATURE
         FROM (
-            ${tableIds
+            ${tableDatabaseNames
               .map(
-                (tableId, i) =>
+                (tableDatabaseName, i) =>
                   `SELECT ${escapeColumnName(
-                    databaseNames[i]
-                  )} AS VAL, '${tableId}' AS SOURCE_TABLE FROM ${tableId}`
+                    columnDatabaseNames[i]
+                  )} AS VAL, '${tableDatabaseName}' AS SOURCE_TABLE FROM ${tableDatabaseName}`
               )
               .join("\n            UNION ALL\n            ")}
         ) AS combined

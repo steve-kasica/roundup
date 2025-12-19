@@ -7,7 +7,6 @@ import Typography from "@mui/material/Typography";
 // import Drawer from "@mui/material/Drawer";
 // import { useDispatch, useSelector } from "react-redux";
 // import { COMPONENT_ID as FOCUSED_TABLE_VIEW } from "../components/TablePeek/TablePeek";
-// import { COMPONENT_ID as COLUMN_INDEX_VALUES_COMPONENT } from "../components/ColumnIndexDetails";
 // import { Button, IconButton } from "@mui/material";
 // import CloseIcon from "@mui/icons-material/Close";
 
