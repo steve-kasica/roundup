@@ -10,6 +10,8 @@ import {
   selectStackOperationRowRanges,
 } from "./selectors";
 import Operation, {
+  DEFAULT_JOIN_PREDICATE,
+  DEFAULT_JOIN_TYPE,
   JOIN_PREDICATES,
   JOIN_TYPES,
   OPERATION_TYPE_PACK,
@@ -17,6 +19,7 @@ import Operation, {
 } from "./Operation";
 import { Table } from "../tablesSlice";
 import { Column } from "../columnsSlice";
+import { join } from "path";
 
 describe("operationsSelectors", () => {
   let columns = Array.from({ length: 12 }, (_, i) =>
@@ -38,11 +41,15 @@ describe("operationsSelectors", () => {
               operationType: OPERATION_TYPE_PACK,
               joinKey1: columns[6].id,
               joinKey2: columns[8].id,
-              joinPredicate: JOIN_PREDICATES.EQUALS,
-              joinType: JOIN_TYPES.FULL_OUTER,
+              joinPredicate: DEFAULT_JOIN_PREDICATE,
+              joinType: DEFAULT_JOIN_TYPE,
             }
           : {
               operationType: OPERATION_TYPE_STACK,
+              joinKey1: undefined,
+              joinKey2: undefined,
+              joinPredicate: undefined,
+              joinType: undefined,
             }),
       })
     ),

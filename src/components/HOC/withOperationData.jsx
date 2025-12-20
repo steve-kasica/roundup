@@ -8,6 +8,9 @@ import {
   isOperationId,
   selectRootOperationId,
   selectMaxOperationDepth,
+  OPERATION_TYPE_PACK,
+  DEFAULT_JOIN_PREDICATE,
+  DEFAULT_JOIN_TYPE,
 } from "../../slices/operationsSlice";
 import {
   selectActiveColumnIdsByParentId,
@@ -332,13 +335,27 @@ export default function withOperationData(WrappedComponent) {
           )
         }
         focusOperation={focusOperation}
-        setOperationType={(operationType) =>
+        setOperationType={(nextOperationType) =>
           dispatch(
             updateOperationsRequest({
               operationUpdates: [
                 {
                   id,
-                  operationType,
+                  operationType: nextOperationType,
+                  // Reset join parameters if changing away from PACK
+                  ...(nextOperationType === OPERATION_TYPE_PACK
+                    ? {
+                        joinKey1: null,
+                        joinKey2: null,
+                        joinPredicate: DEFAULT_JOIN_PREDICATE,
+                        joinType: DEFAULT_JOIN_TYPE,
+                      }
+                    : {
+                        joinKey1: undefined,
+                        joinKey2: undefined,
+                        joinPredicate: undefined,
+                        joinType: undefined,
+                      }),
                 },
               ],
             })

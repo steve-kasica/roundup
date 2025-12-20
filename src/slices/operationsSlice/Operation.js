@@ -18,12 +18,16 @@ export const JOIN_TYPES = {
   EMPTY: "EMPTY",
 };
 
+export const DEFAULT_JOIN_TYPE = JOIN_TYPES.FULL_OUTER;
+
 export const JOIN_PREDICATES = {
   EQUALS: "EQUALS",
   CONTAINS: "CONTAINS",
   STARTS_WITH: "STARTS_WITH",
   ENDS_WITH: "ENDS_WITH",
 };
+
+export const DEFAULT_JOIN_PREDICATE = JOIN_PREDICATES.EQUALS;
 
 export const MATCH_TYPE_LEFT_UNMATCHED = "left_unmatched";
 export const MATCH_TYPE_MATCHES = "matches";

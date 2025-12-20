@@ -9,6 +9,8 @@ import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import { updateTablesSuccess } from "../updateTablesSaga";
 import {
+  DEFAULT_JOIN_PREDICATE,
+  DEFAULT_JOIN_TYPE,
   JOIN_PREDICATES,
   JOIN_TYPES,
   OPERATION_TYPE_PACK,
@@ -21,6 +23,7 @@ export default function* updateOperationsWatcher() {
   yield takeEvery(updateOperationsRequest.type, updateOperationsWorker);
 
   // When an operation is newly created, we need to set its columnCount
+  // If the operation is a PACK, we also need to set default join parameters.
   yield takeEvery(createOperationsSuccess.type, function* (action) {
     const { operationIds } = action.payload;
     const operationUpdates = [];
@@ -34,8 +37,8 @@ export default function* updateOperationsWatcher() {
         columnCount: null, // will be set
         // Set default metadata properties if the newly created operation is a PACK
         ...(operationType === OPERATION_TYPE_PACK && {
-          joinType: JOIN_TYPES.FULL_OUTER,
-          joinPredicate: JOIN_PREDICATES.EQUALS,
+          joinType: DEFAULT_JOIN_TYPE,
+          joinPredicate: DEFAULT_JOIN_PREDICATE,
         }),
       });
     }

@@ -13,6 +13,8 @@ import {
   JOIN_TYPES,
   JOIN_PREDICATES,
   selectOperationsById,
+  DEFAULT_JOIN_TYPE,
+  DEFAULT_JOIN_PREDICATE,
 } from "../../slices/operationsSlice";
 import { Table, selectTablesById } from "../../slices/tablesSlice";
 import { Column } from "../../slices/columnsSlice";
@@ -108,8 +110,8 @@ describe("updateOperationsSaga watcher", () => {
       expect(updatePayload.operationUpdates[0]).toEqual({
         id: packOp.id,
         columnCount: null,
-        joinType: JOIN_TYPES.FULL_OUTER,
-        joinPredicate: JOIN_PREDICATES.EQUALS,
+        joinType: DEFAULT_JOIN_TYPE,
+        joinPredicate: DEFAULT_JOIN_PREDICATE,
       });
     });
 
