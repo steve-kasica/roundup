@@ -39,6 +39,8 @@ export default function SchemaWindow() {
         >
           <pre>No tables uploaded</pre>
         </Box>
+      ) : isFocusedTable ? (
+        <EnhancedTableSchema id={focusedObjectId} />
       ) : operations.length === 0 || focusedOperation?.childIds.length === 0 ? (
         <Box sx={{ flex: 1, height: "100%" }}>
           <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
@@ -53,8 +55,6 @@ export default function SchemaWindow() {
         </Box>
       ) : focusedOperation?.operationType === OPERATION_TYPE_NO_OP ? (
         <EnhancedTableSchema id={focusedOperation.childIds[0]} />
-      ) : isFocusedTable ? (
-        <EnhancedTableSchema id={focusedObjectId} />
       ) : (
         <Box
           sx={{

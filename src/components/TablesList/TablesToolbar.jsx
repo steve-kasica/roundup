@@ -26,7 +26,14 @@ const TablesToolbar = ({
   handleInsertTablesInOperationClick,
   focusedObjectHasAlerts,
 }) => {
-  // menu items written in JSX below (so dividers can be added manually)
+  const isSelectionEmpty = selectedTableIds.length === 0;
+
+  // Halt user's progress in adding new operations if:
+  //   - There are no selected tables OR
+  //   - The focused object has alerts OR
+  //   - The focused object is not an operation
+  const disableNextOperation = isSelectionEmpty || focusedObjectHasAlerts;
+  // (focusedObjectId !== null && !isOperationId(focusedObjectId))
   return (
     <>
       <Toolbar disableGutters>
@@ -44,32 +51,20 @@ const TablesToolbar = ({
           title={`Delete selected table${
             selectedTableIds.length !== 1 ? "s" : ""
           }`}
-          disabled={selectedTableIds.length === 0}
+          disabled={isSelectionEmpty}
           onConfirm={handleDeleteClick}
         />
         <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
         <InsertTableInOperationButton
-          disabled={
-            selectedTableIds.length === 0 ||
-            !focusedObjectId ||
-            !isOperationId(focusedObjectId)
-          }
+          disabled={disableNextOperation}
           onClick={handleInsertTablesInOperationClick}
         />
         <AddPackOperationButton
-          disabled={
-            selectedTableIds.length === 0 ||
-            focusedObjectHasAlerts ||
-            (focusedObjectId !== null && !isOperationId(focusedObjectId))
-          }
+          disabled={disableNextOperation}
           onClick={handleAddPackOperationClick}
         />
         <AddStackOperationButton
-          disabled={
-            selectedTableIds.length === 0 ||
-            focusedObjectHasAlerts ||
-            (focusedObjectId !== null && !isOperationId(focusedObjectId))
-          }
+          disabled={disableNextOperation}
           onClick={handleAddStackOperationClick}
         />
       </Toolbar>
