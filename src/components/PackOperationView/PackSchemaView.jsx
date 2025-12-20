@@ -18,8 +18,6 @@ import { isTableId } from "../../slices/tablesSlice";
 import { HiddenColumnsButton } from "../ui/buttons";
 import StyledBlockCell from "./StyledBlockCell";
 import {
-  JOIN_TYPES,
-  MATCH_STATS_DEFAULT,
   MATCH_TYPE_LEFT_UNMATCHED,
   MATCH_TYPE_MATCHES,
   MATCH_TYPE_RIGHT_UNMATCHED,

@@ -49,15 +49,7 @@ import {
   EnhancedColumnSummary,
 } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
-import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
-import {
-  FocusIconButton,
-  HideIconButton,
-  DeleteColumnsButton,
-  HiddenColumnsButton,
-  SelectToggleIconButton,
-} from "../ui/buttons";
-import { TableLabel } from "./TableLabel";
+import { HiddenColumnsButton } from "../ui/buttons";
 import { EnhancedTableSchemaToolbar } from "./TableSchemaToolbar";
 
 /**
