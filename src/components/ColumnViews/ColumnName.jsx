@@ -4,19 +4,22 @@ import { Warning } from "@mui/icons-material";
 import withColumnData from "./withColumnData";
 
 const ColumnName = ({
+  // Props passed from withColumnData HOC
   id,
   name,
   databaseName,
   onClick,
-  sx = {},
+  hoverColumn,
+  unhoverColumn,
   isSelected,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
-  alertIds,
   totalCount,
   // Props passed from parent component
+  sx = {},
   selectedSx = {},
   containerSx = {},
 }) => {
+  const text = name || databaseName || id;
   const handleClick = (event) => {
     if (onClick) {
       onClick(event, id);
@@ -37,6 +40,9 @@ const ColumnName = ({
     >
       <Typography
         onClick={handleClick}
+        onMouseEnter={hoverColumn}
+        onMouseLeave={unhoverColumn}
+        title={text}
         sx={{
           cursor: onClick ? "pointer" : "default",
           transition: "color 0.2s ease, text-decoration 0.2s ease",
@@ -62,7 +68,7 @@ const ColumnName = ({
           }),
         }}
       >
-        {name || databaseName || id}
+        {text}
       </Typography>
       {/* Address column alerts (TODO) */}
       {/* {totalCount && (
