@@ -104,10 +104,12 @@ export default function SupportingPane() {
                       order={2}
                       style={{ padding: "5px" }}
                     >
-                      <Typography variant="window-label">
-                        Composite Table Schema
-                      </Typography>
-                      <CompositeTableSchema />
+                      <Box display="flex" flexDirection="column" height="100%">
+                        <Typography variant="window-label">
+                          Composite Table Schema
+                        </Typography>
+                        <CompositeTableSchema />
+                      </Box>
                     </Panel>
                   </>
                 )}

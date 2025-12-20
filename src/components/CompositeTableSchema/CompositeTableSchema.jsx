@@ -20,9 +20,11 @@ import AddIcon from "@mui/icons-material/Add";
 import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
 import { selectAlertErrorCount } from "../../slices/alertsSlice";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
+import { stack } from "d3";
 
 const gridColumns = 12;
 const gridWidth = gridColumns - 1;
+const stackDropTargetHeight = 50;
 
 // Each root operation type condition also needs to catch
 // the edge case where there are no children (e.g. all tables have been removed)
@@ -43,34 +45,58 @@ export default function CompositeTableSchema() {
     (errorCount && errorCount > 0);
 
   return (
-    <Box className="CompositeTableSchema" sx={{ height: "100%" }}>
+    <Box
+      className="CompositeTableSchema"
+      display="flex"
+      flexDirection="column"
+      sx={{ height: "100%" }}
+    >
       {rootOperation ? (
-        <Grid container spacing={0} sx={{ height: "100%" }}>
-          <Grid size={gridWidth}>
+        <Box display="flex" flexDirection="row" width="100%" flex={1}>
+          <Box
+            flexGrow={1}
+            sx={{ height: "100%" }}
+            display={"flex"}
+            flexDirection={"column"}
+          >
             {rootOperation.childIds.length > 0 ? (
-              <EnhancedOperationBlock
-                id={rootOperation.id}
-                sx={{ height: "100%" }}
-              />
+              <>
+                <EnhancedOperationBlock
+                  id={rootOperation.id}
+                  sx={{ height: "100%", flexGrow: 1 }}
+                />
+                <TableDropTarget
+                  disabled={isAddingOperationsDisabled}
+                  operationType={OPERATION_TYPE_STACK}
+                  sx={{
+                    height: `${stackDropTargetHeight}px`,
+                    margin: "0 3px",
+                  }}
+                >
+                  <AddIcon />
+                </TableDropTarget>
+              </>
             ) : null}
-          </Grid>
-          <Grid size={gridColumns - gridWidth}>
+          </Box>
+          <Box
+            height="100%"
+            display="flex"
+            alignItems="top"
+            justifyContent="center"
+          >
             <TableDropTarget
               disabled={isAddingOperationsDisabled}
               operationType={OPERATION_TYPE_PACK}
+              sx={{
+                height: `calc(100% - ${stackDropTargetHeight + 1}px)`,
+                width: `${stackDropTargetHeight}px`,
+                marginTop: "3px",
+              }}
             >
               <AddIcon />
             </TableDropTarget>
-          </Grid>
-          <Grid size={gridWidth}>
-            <TableDropTarget
-              disabled={isAddingOperationsDisabled}
-              operationType={OPERATION_TYPE_STACK}
-            >
-              <AddIcon />
-            </TableDropTarget>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       ) : (
         <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
           <Typography>Drag to add a source table</Typography>

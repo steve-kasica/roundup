@@ -28,7 +28,12 @@ import {
 } from "../CustomDragLayer";
 import StyledDropZone from "../ui/StyledDropZone";
 
-export default function TableDropTarget({ disabled, operationType, children }) {
+export default function TableDropTarget({
+  disabled,
+  operationType,
+  children,
+  sx,
+}) {
   const dispatch = useDispatch();
   const rootOperation = useSelector(selectRootOperation);
 
@@ -118,6 +123,7 @@ export default function TableDropTarget({ disabled, operationType, children }) {
       canDrop={canDrop}
       variant="default"
       size="auto"
+      sx={sx}
     >
       {children}
     </StyledDropZone>

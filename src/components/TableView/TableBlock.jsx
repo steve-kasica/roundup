@@ -42,6 +42,7 @@ function TableBlock({
         alignItems: "stretch",
         position: "relative",
         backgroundColor,
+        containerType: "size",
         // Visual indication of alerts
         ...(totalCount && {
           backgroundColor: "warning.light",
@@ -50,13 +51,41 @@ function TableBlock({
         ...sx,
       }}
     >
-      <Typography variant="treemap label">
+      <Typography
+        variant="treemap label"
+        sx={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          width: "100%",
+          "@container (min-height: 15px)": {
+            display: "block",
+          },
+          "@container (max-height: 14px)": {
+            display: "none",
+          },
+          "@container (max-width: 15px)": {
+            display: "none",
+          },
+        }}
+      >
         {name || id}
         {totalCount.length > 0 ? `⚠` : ""}
         <br />
-        <small style={{ color: "#555" }}>
+        <Box
+          component="small"
+          sx={{
+            color: "#555",
+            "@container (min-height: 40px)": {
+              display: "inline",
+            },
+            "@container (max-height: 39px)": {
+              display: "none",
+            },
+          }}
+        >
           {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
-        </small>
+        </Box>
       </Typography>
       {ticks.map((columnId, index) => {
         const childSx = {

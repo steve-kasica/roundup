@@ -33,7 +33,6 @@ const StyledColumnTick = styled(Box, {
     isError,
   }) => ({
     flex: "1 1 0",
-    minHeight: "25px",
     display: "flex",
     flexDirection: "column",
     paddingLeft: "5px",

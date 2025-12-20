@@ -59,10 +59,17 @@ function PackOperationBlock({
         ...sx,
       }}
     >
-      <Typography variant="treemap label">
+      {/* TODO: move these styles into a shared variant in theme */}
+      <Typography
+        variant="treemap label"
+        sx={{
+          wordWrap: "none",
+        }}
+      >
         {totalCount > 0 ? `⚠` : ""} {name || id}{" "}
         <small style={{ color: "#555" }}>
-          {columnCountDisplay} x {rowCountDisplay}
+          {columnCountDisplay.toLocaleString()} x{" "}
+          {rowCountDisplay.toLocaleString()}
         </small>
       </Typography>
       {childIds.map((childId, index, array) => {
@@ -71,9 +78,7 @@ function PackOperationBlock({
             ((index === 0 ? leftColumnCount : rightColumnCount) / columnCount) *
               100 +
             "%",
-          ...(index === array.length - 1 && {
-            paddingLeft: "1px",
-          }),
+          marginLeft: index === 0 ? "0px" : "2px",
         };
         if (isTableId(childId)) {
           return (

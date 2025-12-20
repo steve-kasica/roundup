@@ -13,7 +13,7 @@ const StyledDropZone = styled(ForwardedBox, {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    border: "1px dashed #000",
+    border: "2px dashed #000",
     color: "#999",
     transition: "all 0.2s ease-in-out",
     position: "relative",
