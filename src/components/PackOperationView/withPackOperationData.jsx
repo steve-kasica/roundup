@@ -31,6 +31,7 @@ export default function withPackOperationData(WrappedComponent) {
     columnIds,
     selectedColumnIds,
     activeChildColumnIds,
+    rowCount: dbRowCount,
     // Props passed directly from parent
     ...props
   }) {
@@ -103,13 +104,26 @@ export default function withPackOperationData(WrappedComponent) {
       return output.filter((type) => matchStats[type] > 0);
     }, [operation.joinType, matchStats]);
 
+    // When an operation is materialized, we get its row count and
+    // it's stored in the operation. But until we create the table
+    // we may need to estimate the row count from the matchStats.
+    // Views that use `withPackOperationData` can use this `rowCount` prop
+    // but need to guard against when it's null.
     const rowCount = useMemo(() => {
-      let total = 0;
-      Object.values(matchStats).reduce((acc, val) => {
-        total += val;
-      }, 0);
-      return total;
-    }, [matchStats]);
+      if (dbRowCount && dbRowCount >= 0) {
+        return dbRowCount;
+      } else {
+        let total = Object.values(matchStats).reduce((acc, val) => {
+          acc += val;
+          return acc;
+        }, 0);
+        if (total > 0) {
+          return total;
+        } else {
+          return null;
+        }
+      }
+    }, [dbRowCount, matchStats]);
 
     // Handle case where there is only one child table
     const [leftTableId, rightTableId] = useMemo(

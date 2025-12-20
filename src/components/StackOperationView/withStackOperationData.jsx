@@ -24,11 +24,11 @@ import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 export default function withStackOperationData(WrappedComponent) {
   function EnhancedComponent({
     // Props passed from withOperationData
-    // rowCount,
     columnIds,
     selectedColumnIds,
     childIds,
     activeChildColumnIds,
+    rowCount: dbRowCount,
     // Props passed from withAssociatedAlerts
     alertIds,
     totalCount,
@@ -98,12 +98,19 @@ export default function withStackOperationData(WrappedComponent) {
       selectStackOperationRowRanges(state, id)
     );
 
+    // When we materialize a table, we get its dimensions and
+    // store them in the operation. But until we create the table
+    // we may need to estimate the row count from the rowRanges.
     const rowCount = useMemo(() => {
-      return [...Object.entries(rowRanges)].reduce(
-        (acc, [, { end }]) => Math.max(acc, end),
-        0
-      );
-    }, [rowRanges]);
+      if (dbRowCount && dbRowCount >= 0) {
+        return dbRowCount;
+      } else {
+        return [...rowRanges.entries()].reduce(
+          (acc, [, { end }]) => Math.max(acc, end),
+          0
+        );
+      }
+    }, [dbRowCount, rowRanges]);
 
     // TODO: is no one using this?
     const selectedTableIds = useMemo(() => {

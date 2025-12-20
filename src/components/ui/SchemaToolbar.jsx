@@ -113,7 +113,9 @@ const SchemaToolbar = ({
           {title}
         </Typography>
         <Chip
-          label={`${columnCount.toLocaleString()} x ${rowCount.toLocaleString()}`}
+          label={`${columnCount.toLocaleString()} x ${
+            rowCount && rowCount >= 0 ? rowCount.toLocaleString() : "???"
+          }`}
           sx={{
             userSelect: "none",
           }}
