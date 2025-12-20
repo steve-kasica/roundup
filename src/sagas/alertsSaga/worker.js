@@ -34,7 +34,6 @@ export default function* alertsSagaWorker(raisedAlerts) {
       }
     }
 
-    console.log("alertsToAdd:", alertsToAdd);
     // Any remaining alerts in existingAlerts are no longer raised
     for (const alertId of existingAlerts) {
       alertsToDelete.push(alertId);

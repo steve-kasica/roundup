@@ -11,8 +11,6 @@ import { updateTablesSuccess } from "../updateTablesSaga";
 import {
   DEFAULT_JOIN_PREDICATE,
   DEFAULT_JOIN_TYPE,
-  JOIN_PREDICATES,
-  JOIN_TYPES,
   OPERATION_TYPE_PACK,
   selectOperationsById,
 } from "../../slices/operationsSlice";

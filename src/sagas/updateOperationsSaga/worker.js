@@ -87,7 +87,11 @@ export default function* updateOperationsWorker(action) {
         console.error("Error materializing operation:", error, queryData);
         operationUpdate.isMaterialized = false;
       }
-    } else if (Object.hasOwnProperty.call(operationUpdate, "operationType")) {
+    } else if (
+      Object.hasOwnProperty.call(operationUpdate, "operationType") ||
+      Object.hasOwnProperty.call(operationUpdate, "joinType") ||
+      Object.hasOwnProperty.call(operationUpdate, "joinPredicate")
+    ) {
       operationUpdate.isInSync = false; // Mark as out-of-sync due to type change
     } else if (Object.hasOwnProperty.call(operationUpdate, "matchStats")) {
       // This parameter can be a long-running process, so mark this operation
@@ -111,12 +115,6 @@ export default function* updateOperationsWorker(action) {
           operation.joinKey1,
           operation.joinKey2,
         ]);
-        console.log("Calculating match stats for operation:", operation.id, {
-          leftTable,
-          rightTable,
-          leftKey,
-          rightKey,
-        });
         return {
           leftTableName: leftTable.databaseName,
           rightTableName: rightTable.databaseName,
