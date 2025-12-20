@@ -99,7 +99,17 @@ const SchemaToolbar = ({
         ) : (
           <TableIcon />
         )}
-        <Typography variant="h6" component="div" sx={{ userSelect: "none" }}>
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{
+            userSelect: "none",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: 200,
+          }}
+        >
           {title}
         </Typography>
         <Chip
