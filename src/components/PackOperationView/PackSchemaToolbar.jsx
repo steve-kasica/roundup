@@ -1,9 +1,8 @@
 import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
 import { SwapTablesButton, PackMatchToggleButtonGroup } from "../ui/buttons";
-import { EnhancedPackOperationLabel } from "./PackOperationLabel";
 import { useCallback } from "react";
 import withPackOperationData from "./withPackOperationData";
-import { Divider, Stack } from "@mui/material";
+import { Divider } from "@mui/material";
 import {
   JOIN_TYPES,
   MATCH_TYPE_LEFT_UNMATCHED,
@@ -35,9 +34,7 @@ const PackSchemaToolbar = ({
   rightColumnIds,
 
   // Props passed via `withAssociatedAlerts.jsx` HOC
-  alertIds,
   errorCount,
-  totalCount,
 
   // Props passed directly from the parent component
   handleHideColumns,
@@ -87,10 +84,15 @@ const PackSchemaToolbar = ({
   // Check if at least one complete column is selected
   const isCompleteColumnSelected = (function () {
     for (const columnId of [...leftColumnIds, ...rightColumnIds]) {
-      const allCellsSelected = matchKeys.every((matchLabel) => {
-        const cellKey = `${columnId}:${matchLabel}`;
-        return clickedBlockCells.has(cellKey);
-      });
+      const allCellsSelected = Object.entries(matchStats)
+        .filter(
+          ([matchLabel, count]) =>
+            count > 0 && validMatchGroups.includes(matchLabel)
+        )
+        .every(([matchLabel]) => {
+          const cellKey = `${columnId}:${matchLabel}`;
+          return clickedBlockCells.has(cellKey);
+        });
       if (allCellsSelected && matchKeys.length > 0) {
         return true;
       }
