@@ -51,7 +51,10 @@ export default function* updateAlertsSagaWatcher() {
           `Unsupported operation type "${operation.operationType}" for alert checking.`
         );
       }
-      raisedAlerts.push(...testResults.fatalErrors, ...testResults.warnings);
+      raisedAlerts.push({
+        id: operationId,
+        alerts: [...testResults.fatalErrors, ...testResults.warnings],
+      });
     }
     if (raisedAlerts.length > 0) {
       yield call(alertsSagaWorker, raisedAlerts);

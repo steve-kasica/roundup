@@ -5,33 +5,48 @@ import {
   addAlerts as addAlertsToSlice,
   deleteAlerts as deleteAlertsFromSlice,
 } from "../../slices/alertsSlice/alertsSlice";
-import { selectAllAlertIds } from "../../slices/alertsSlice";
+import { selectAlertIdsBySourceId } from "../../slices/alertsSlice";
 
+// The raised alerts payload includes an array of source Ids and their associated alerts
 export default function* alertsSagaWorker(raisedAlerts) {
   const alertsToAdd = [];
   const alertsToDelete = [];
-  const alertIds = yield select(selectAllAlertIds);
 
-  for (const alert of raisedAlerts) {
-    const isRaised = alertIds.includes(alert.id);
-    if (isRaised && !alert.isPassing) {
-      // Alert already exists, skip
-      continue;
-    } else if (isRaised && alert.isPassing) {
-      // Alert is passing, clear it
-      alertsToDelete.push(alert.id);
-    } else if (!isRaised && !alert.isPassing) {
-      // New alert is raised
-      alertsToAdd.push(alert);
+  for (const { id, alerts } of raisedAlerts) {
+    const associatedAlerts = yield select((state) =>
+      selectAlertIdsBySourceId(state, id)
+    );
+    const existingAlerts = new Set(associatedAlerts);
+
+    for (const alert of alerts) {
+      const isRaised = existingAlerts.has(alert.id);
+      if (isRaised && !alert.isPassing) {
+        // Alert already exists, and is not resolved, so no action needed
+        // Silenced alerts will also fall into this category
+        existingAlerts.delete(alert.id);
+      } else if (isRaised && alert.isPassing) {
+        // Alert was raised but it is now passing, so clear it
+        alertsToDelete.push(alert.id);
+        existingAlerts.delete(alert.id);
+      } else if (!isRaised && !alert.isPassing) {
+        // New alert is raised
+        alertsToAdd.push(alert);
+      }
     }
-  }
 
-  if (alertsToAdd.length > 0) {
-    yield put(addAlertsToSlice(alertsToAdd));
-  }
+    console.log("alertsToAdd:", alertsToAdd);
+    // Any remaining alerts in existingAlerts are no longer raised
+    for (const alertId of existingAlerts) {
+      alertsToDelete.push(alertId);
+    }
 
-  // If any objects were validation and no alerts were raised, clear existing alerts
-  if (alertsToDelete.length > 0) {
-    yield put(deleteAlertsFromSlice(alertsToDelete));
+    if (alertsToAdd.length > 0) {
+      yield put(addAlertsToSlice(alertsToAdd));
+    }
+
+    // If any objects were validation and no alerts were raised, clear existing alerts
+    if (alertsToDelete.length > 0) {
+      yield put(deleteAlertsFromSlice(alertsToDelete));
+    }
   }
 }
