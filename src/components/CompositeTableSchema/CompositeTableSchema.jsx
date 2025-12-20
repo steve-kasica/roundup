@@ -70,7 +70,7 @@ export default function CompositeTableSchema() {
                   operationType={OPERATION_TYPE_STACK}
                   sx={{
                     height: `${stackDropTargetHeight}px`,
-                    margin: "0 3px",
+                    marginTop: "3px",
                   }}
                 >
                   <AddIcon />
@@ -83,14 +83,14 @@ export default function CompositeTableSchema() {
             display="flex"
             alignItems="top"
             justifyContent="center"
+            sx={{ marginTop: "0px", marginBottom: "3px", marginLeft: "3px" }}
           >
             <TableDropTarget
               disabled={isAddingOperationsDisabled}
               operationType={OPERATION_TYPE_PACK}
               sx={{
-                height: `calc(100% - ${stackDropTargetHeight + 1}px)`,
+                height: `calc(100% - ${stackDropTargetHeight + 6}px)`,
                 width: `${stackDropTargetHeight}px`,
-                marginTop: "3px",
               }}
             >
               <AddIcon />

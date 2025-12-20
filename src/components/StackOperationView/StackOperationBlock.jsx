@@ -14,8 +14,8 @@ import {
   isOperationId,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
-import { Box, styled, Typography } from "@mui/material";
-import { EnhancedTableBlock, TableBlock } from "../TableView/TableBlock";
+import { Typography } from "@mui/material";
+import { EnhancedTableBlock } from "../TableView/TableBlock";
 import { EnhancedOperationBlock } from "../OperationView/OperationBlock.jsx";
 import React from "react";
 import StyledBlock from "../ui/StyledBlock.js";
@@ -28,10 +28,11 @@ function StackOperationBlock({
   id,
   isFocused,
   isRootOperation,
-  activeColumnIds,
   name,
   rowCount,
   depth,
+  focusedDepth,
+  focusOperation,
   // props via withStackOperationData
   childIds,
   columnCount,
@@ -47,61 +48,59 @@ function StackOperationBlock({
   sx = {},
 }) {
   const isParentRender = isFocused || isRootOperation;
-  console.log({ color: colorScale(depth) });
   return (
     <StyledBlock
-      data-operation-type="stack"
+      className="StackOperationBlock"
       hasError={totalCount}
       isFocused={isFocused}
+      onClick={(event) => {
+        event.stopPropagation();
+        focusOperation();
+      }}
       sx={{
-        ...sx,
         flexDirection: "column",
         boxSizing: "border-box",
-        alignItems: "stretch",
-        position: "relative",
-        paddingTop: "20px",
-        paddingLeft: "2px",
-        paddingRight: "2px",
-        paddingBottom: "2px",
         backgroundColor: colorScale(depth),
+        cursor: focusedDepth > 0 ? "pointer" : "default",
+        ...sx,
       }}
     >
       <Typography variant="treemap label">
-        {totalCount > 0 ? `⚠` : ""} {name || id}{" "}
+        {totalCount > 0 ? `⚠` : ""} {name || id} <br></br>
         <small style={{ color: "#555" }}>
           {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
         </small>
       </Typography>
-      {/* <Box height={"100%"} padding={2}> */}
-      {childIds.map((id, index, array) => {
-        const childSx = {
-          height: `${(1 / childIds.length) * 100}%`,
-          ...(index < array.length - 1 && {
-            marginBottom: isParentRender ? "2px" : undefined,
-          }),
-        };
-        return (
-          <React.Fragment key={id}>
-            {isOperationId(id) ? (
-              <EnhancedOperationBlock
-                id={id}
-                parentOperationType={OPERATION_TYPE_STACK}
-                parentColumnCount={columnCount}
-                sx={childSx}
-              />
-            ) : (
-              <EnhancedTableBlock
-                id={id}
-                parentOperationType={OPERATION_TYPE_STACK}
-                parentColumnCount={columnCount}
-                backgroundColor={colorScale(depth + 1)}
-                sx={childSx}
-              />
-            )}
-          </React.Fragment>
-        );
-      })}
-      {/* </Box> */}
+      {focusedDepth < 1
+        ? childIds.map((id, index, array) => {
+            const childSx = {
+              height: `${(1 / childIds.length) * 100}%`,
+              ...(index < array.length - 1 && {
+                marginBottom: isParentRender ? "2px" : undefined,
+              }),
+            };
+            return (
+              <React.Fragment key={id}>
+                {isOperationId(id) ? (
+                  <EnhancedOperationBlock
+                    id={id}
+                    parentOperationType={OPERATION_TYPE_STACK}
+                    parentColumnCount={columnCount}
+                    sx={childSx}
+                  />
+                ) : (
+                  <EnhancedTableBlock
+                    id={id}
+                    parentOperationType={OPERATION_TYPE_STACK}
+                    parentColumnCount={columnCount}
+                    backgroundColor={colorScale(depth + 1)}
+                    sx={childSx}
+                  />
+                )}
+              </React.Fragment>
+            );
+          })
+        : null}
     </StyledBlock>
   );
 }

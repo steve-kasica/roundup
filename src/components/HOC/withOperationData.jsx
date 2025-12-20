@@ -48,7 +48,25 @@ export default function withOperationData(WrappedComponent) {
   }) {
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperationsById(state, id));
+
+    // The absolute depth of this operation from the root of the tree
     const depth = useSelector((state) => selectOperationDepthById(state, id));
+
+    // The relative depth of this operation from the currently focused operation
+    // TODO: if this is glitchy, then just create a new selector and test it.
+    const focusedDepth = useSelector((state) => {
+      const focusedOperationId = selectFocusedObjectId(state);
+      if (isTableId(focusedOperationId)) {
+        return null;
+      } else {
+        const focusedOperationDepth = selectOperationDepthById(
+          state,
+          focusedOperationId
+        );
+        return depth - focusedOperationDepth;
+      }
+    });
+
     const rootOperationId = useSelector(selectRootOperationId);
     const isRootOperation = useMemo(
       () => id === rootOperationId,
@@ -293,6 +311,7 @@ export default function withOperationData(WrappedComponent) {
         selectedChildColumnIdsSet={selectedChildColumnIdsSet} // a Set of all selected column IDs, including those from child tables
         childRowCounts={childRowCounts}
         depth={depth}
+        focusedDepth={focusedDepth}
         maxDepth={maxDepth}
         isRootOperation={isRootOperation}
         colorScale={colorScale}

@@ -44,17 +44,11 @@ function PackOperationBlock({
 
   return (
     <StyledBlock
-      className="pack-operation-block"
+      className="PackOperationBlock"
       isFocused={isFocused}
       hasError={totalCount}
       sx={{
-        paddingTop: "20px",
-        paddingLeft: "2px",
-        paddingRight: "2px",
-        paddingBottom: "2px",
-        boxSizing: "border-box",
         alignItems: "stretch",
-        position: "relative",
         backgroundColor: colorScale(depth),
         ...sx,
       }}

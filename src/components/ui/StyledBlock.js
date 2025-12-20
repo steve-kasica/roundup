@@ -5,12 +5,12 @@ const StyledBlock = styled(Box, {
 })(({ theme, hasError }) => ({
   display: "flex",
   flexDirection: "row",
-  //   border: `2px solid ${"#000"}`,
-  margin: "3px",
+  position: "relative",
   boxSizing: "border-box",
-  //   ...(hasError && {
-  //     borderColor: theme.palette.error.dark,
-  //   }),
+  paddingTop: "20px",
+  paddingLeft: "2px",
+  paddingRight: "2px",
+  paddingBottom: "2px",
 }));
 
 export default StyledBlock;
