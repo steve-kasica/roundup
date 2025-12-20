@@ -22,9 +22,6 @@ import {
   setFocusedObjectId,
   setSelectedMatches,
 } from "../../slices/uiSlice/uiSlice";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { selectOperationsById } from "../../slices/operationsSlice";
-import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 
 /**
  * Higher-Order Component that provides UI state and interaction handlers

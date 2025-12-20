@@ -1,17 +1,9 @@
-import { createTheme, lighten, alpha } from "@mui/material/styles";
-
+import { createTheme, lighten } from "@mui/material/styles";
+import colors from "./colors";
 // Create base theme first
 const baseTheme = createTheme({
   palette: {
-    action: {
-      loadingColor: "#fff3e0",
-      selectedColor: "#2196f3",
-      hoverColor: "#9c27b0",
-      draggingColor: "#ff9800",
-      dropTargetColor: "#4caf50",
-      errorColor: "#f44336",
-      focusedColor: "#fbc02d",
-    },
+    action: { ...colors },
   },
   typography: {
     "description term": {
@@ -68,20 +60,13 @@ export default createTheme(baseTheme, {
     // Column-specific state colors
     column: {
       default: {
-        // outline: `1px solid ${alpha(baseTheme.palette.text.primary, 0.12)}`,
-        // backgroundColor: baseTheme.palette.background.paper,
         transition: "all 0.2s ease-in-out",
       },
       hovered: {
-        // backgroundColor: lighten(baseTheme.palette.action.hoverColor, 0.85), // Lightens by 85%
-        // borderColor: baseTheme.palette.action.hoverColor,
-        // transform: "scale(1.01)",
-        zIndex: 10,
+        backgroundColor: baseTheme.palette.action.hoverColor,
       },
       selected: {
-        // backgroundColor: lighten(baseTheme.palette.action.selectedColor, 0.85),
-        // outlineColor: baseTheme.palette.action.selectedColor,
-        // transform: "scale(1.01)",
+        backgroundColor: baseTheme.palette.action.selectedColor,
       },
       dragging: {
         backgroundColor: lighten(baseTheme.palette.action.draggingColor, 0.85),

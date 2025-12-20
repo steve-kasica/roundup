@@ -9,9 +9,11 @@ import SkeletonRow from "./SkeletonRow";
 import DummyRow from "./DummyRow";
 import StyledAlternatingTableRow from "./StyledAlternatingTableRow";
 import StyledTableCell from "./StyledTableCell";
-
-const placeholderRowCount = 30;
-const maxColumnWidth = 20;
+import {
+  PLACEHOLDER_COLUMN_COUNT,
+  PLACEHOLDER_ROW_COUNT,
+  MAX_COLUMN_WIDTH,
+} from "./index.js";
 
 const rowMarginStyle = {
   userSelect: "none",
@@ -32,11 +34,10 @@ const TableBody = ({
   isInSync,
   rowMargin,
   hasMore,
-  placeholderColumnCount,
 }) => {
-  const columnCount = columnIds?.length || placeholderColumnCount;
+  const columnCount = columnIds?.length || PLACEHOLDER_COLUMN_COUNT;
   const rowCount =
-    loading || columnIds.length === 0 ? placeholderRowCount : data.length;
+    loading || columnIds.length === 0 ? PLACEHOLDER_ROW_COUNT : data.length;
   return (
     <MuiTableBody>
       {columnIds?.length === 0 ? (
@@ -47,7 +48,7 @@ const TableBody = ({
               rowIndex={rowIndex}
               columnCount={columnCount}
               rowMarginStyle={rowMarginStyle}
-              maxColumnWidth={maxColumnWidth}
+              MAX_COLUMN_WIDTH={MAX_COLUMN_WIDTH}
             />
           ))}
         </>
@@ -59,7 +60,7 @@ const TableBody = ({
               rowIndex={rowIndex + 1}
               columnCount={columnCount}
               rowMarginStyle={rowMarginStyle}
-              maxColumnWidth={maxColumnWidth}
+              MAX_COLUMN_WIDTH={MAX_COLUMN_WIDTH}
             />
           ))}
         </>
@@ -103,7 +104,7 @@ const TableBody = ({
                     key={i}
                     isEven={rowIndex % 2 === 0}
                     sx={{
-                      maxWidth: maxColumnWidth,
+                      maxWidth: MAX_COLUMN_WIDTH,
                     }}
                   >
                     {value === null ? (

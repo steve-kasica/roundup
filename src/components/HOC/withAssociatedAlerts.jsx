@@ -6,11 +6,8 @@ import {
   selectAlertIdsBySourceId,
   selectAlertWarningCount,
   selectSilencedWarningCount,
-} from "../../slices/alertsSlice/selectors";
-import {
   deleteAlerts as deleteAlertsAction,
-  updateAlerts,
-} from "../../slices/alertsSlice/alertsSlice";
+} from "../../slices/alertsSlice";
 import { useCallback } from "react";
 
 export default function withAssociatedAlerts(WrappedComponent) {

@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useCallback, useMemo } from "react";
 import {
   selectOperationsById,
   selectOperationDepthById,
@@ -8,30 +9,27 @@ import {
   selectRootOperationId,
   selectMaxOperationDepth,
 } from "../../slices/operationsSlice";
-import { useDispatch } from "react-redux";
 import {
   selectActiveColumnIdsByParentId,
   selectColumnIdsByParentId,
   selectSelectedColumnIdsByParentId,
 } from "../../slices/columnsSlice";
 import {
+  selectFocusedObjectId,
+  selectLoadingOperations,
   setFocusedColumnIds,
   setFocusedObjectId,
   setSelectedColumnIds,
   setVisibleColumnIds as setVisibleColumnsAction,
-} from "../../slices/uiSlice/uiSlice";
-import { updateOperationsRequest } from "../../sagas/updateOperationsSaga/actions";
-import { useCallback, useMemo } from "react";
+} from "../../slices/uiSlice";
+import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
 import withAssociatedAlerts from "./withAssociatedAlerts";
-import {
-  selectFocusedObjectId,
-  selectLoadingOperations,
-} from "../../slices/uiSlice";
-import { group, interpolateMagma, scaleSequential } from "d3";
+
+import { group, interpolateGreys, interpolateMagma, scaleSequential } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
@@ -256,7 +254,7 @@ export default function withOperationData(WrappedComponent) {
 
     const colorScale = useCallback(
       (depth) => {
-        const scale = scaleSequential([maxDepth + 1, 0], interpolateMagma);
+        const scale = scaleSequential([maxDepth + 1, 0], interpolateGreys);
         return scale(depth);
       },
       [maxDepth]
@@ -362,5 +360,6 @@ export default function withOperationData(WrappedComponent) {
   }
 
   // Wrap the EnhancedComponent with withAssociatedAlerts to inject alert props
+  // TODO: don't wrap associated alerts in another HOC. It's redundant.
   return withAssociatedAlerts(EnhancedComponent);
 }

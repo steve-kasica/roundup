@@ -6,8 +6,6 @@ import MaterializeViewIconButton from "../MaterializeViewIconButton";
 import RoundupTableBody from "./TableBody";
 import RoundupTableHead from "./TableHead";
 
-const placeholderColumnCount = 10;
-
 const Table = ({
   columnIds,
   data,
@@ -90,9 +88,7 @@ const Table = ({
         <StyledTable size="small" stickyHeader>
           {/* Table Header - Sortable column headers with hover effects */}
           <RoundupTableHead
-            loading={loading}
             columnIds={columnIds}
-            placeholderColumnCount={placeholderColumnCount}
             sortConfig={sortConfig}
             onColumnSort={onColumnSort}
             rowMargin={rowMargin}
@@ -107,7 +103,6 @@ const Table = ({
             isInSync={isInSync}
             rowMargin={rowMargin}
             hasMore={hasMore}
-            placeholderColumnCount={placeholderColumnCount}
           />
         </StyledTable>
       </StyledTableContainer>

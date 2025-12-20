@@ -63,12 +63,10 @@ const ColumnSummary = ({
       isDraggable={isDraggable}
       isFocused={isFocused}
       isError={isError || totalCount}
-      // TODO: why does this cause a re-render when it's not used?
-      // onMouseEnter={hoverColumn}
-      // onMouseLeave={unhoverColumn}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
+      // TODO: why does this cause a re-render when it's not used?
       onMouseEnter={hoverColumn}
       onMouseLeave={unhoverColumn}
       sx={{

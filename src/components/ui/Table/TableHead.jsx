@@ -1,21 +1,14 @@
 import {
   TableHead as MuiTableHead,
-  Skeleton,
   TableCell,
   TableRow,
   Typography,
 } from "@mui/material";
 import StyledTableCell from "./StyledTableCell";
 import { EnhancedColumnHeader } from "../../ColumnViews";
+import { PLACEHOLDER_COLUMN_COUNT } from "./index.js";
 
-const TableHead = ({
-  loading,
-  columnIds,
-  placeholderColumnCount,
-  sortConfig,
-  onColumnSort,
-  rowMargin,
-}) => {
+const TableHead = ({ columnIds, sortConfig, onColumnSort }) => {
   return (
     <MuiTableHead>
       <TableRow>
@@ -34,16 +27,8 @@ const TableHead = ({
         ></StyledTableCell>
 
         {/* Column Headers with Sorting */}
-        {loading
-          ? Array.from({
-              length: columnIds?.length || placeholderColumnCount,
-            }).map((_, i) => (
-              <StyledTableCell key={i}>
-                <Skeleton variant="text" height={24} />
-              </StyledTableCell>
-            ))
-          : columnIds.length === 0
-          ? Array.from({ length: placeholderColumnCount }).map((_, i) => {
+        {columnIds.length === 0
+          ? Array.from({ length: PLACEHOLDER_COLUMN_COUNT }).map((_, i) => {
               return (
                 <TableCell
                   key={i}

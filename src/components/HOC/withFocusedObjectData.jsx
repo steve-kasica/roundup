@@ -1,12 +1,14 @@
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectFocusedObjectId } from "../../slices/uiSlice";
+import {
+  selectFocusedObjectId,
+  setFocusedObjectId,
+} from "../../slices/uiSlice";
 import {
   isOperationId,
   selectOperationsById,
 } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { setFocusedObjectId } from "../../slices/uiSlice/uiSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 
 /**

@@ -34,13 +34,14 @@ function TableBlock({
 
   return (
     <Box
-      data-table="table-block" // Added className for easier targeting during debugging
+      className="TableBlock"
       sx={{
         display: "flex",
         boxSizing: "border-box",
         flexDirection: "row",
         alignItems: "stretch",
         position: "relative",
+        backgroundColor,
         // Visual indication of alerts
         ...(totalCount && {
           backgroundColor: "warning.light",
@@ -59,7 +60,6 @@ function TableBlock({
       </Typography>
       {ticks.map((columnId, index) => {
         const childSx = {
-          backgroundColor, // apply background color defined in operation
           borderLeft: "1px dotted rgba(0, 0, 0, 0.1)",
           ...(index === 0 && {
             borderLeft: "none", // no border on the first tick, as it's the left edge
