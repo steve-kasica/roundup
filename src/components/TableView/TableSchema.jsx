@@ -415,6 +415,9 @@ const TableSchema = ({
                         isDraggable={selectedColumnIds.includes(columnIds[0])}
                         handleInsertColumnLeft={() => insertColumn(i)}
                         handleInsertColumnRight={() => insertColumn(i + 1)}
+                        sx={{
+                          backgroundColor: "#fff",
+                        }}
                       />
                     </ColumnDragContainer>
                   </>

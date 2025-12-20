@@ -40,6 +40,7 @@ const ColumnSummary = ({
   // Props passed directly from parent
   onContextMenu,
   onHideColumn = () => {},
+  sx = {},
 }) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
@@ -79,6 +80,7 @@ const ColumnSummary = ({
           backgroundColor: "warning.light",
           opacity: 0.95,
         }),
+        ...sx,
       }}
     >
       <Box
