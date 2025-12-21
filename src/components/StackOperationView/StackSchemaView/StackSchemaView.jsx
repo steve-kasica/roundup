@@ -444,16 +444,18 @@ const StackSchemaView = ({
                               isDraggable={selectedChildColumnIdsSet.has(
                                 columnId
                               )}
-                              handleInsertColumnLeft={() =>
+                              handleInsertColumnLeft={(data) =>
                                 onInsertColumnIntoChildTable(
                                   getIndexOfValue(columnIdMatrix, columnId)[0],
-                                  colIndex
+                                  colIndex,
+                                  data
                                 )
                               }
-                              handleInsertColumnRight={() =>
+                              handleInsertColumnRight={(data) =>
                                 onInsertColumnIntoChildTable(
                                   getIndexOfValue(columnIdMatrix, columnId)[0],
-                                  colIndex + 1
+                                  colIndex + 1,
+                                  data
                                 )
                               }
                             />

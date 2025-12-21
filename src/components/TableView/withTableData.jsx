@@ -172,15 +172,16 @@ export default function withTableData(WrappedComponent) {
     }, [dispatch, id]);
 
     const insertColumn = useCallback(
-      (newColumnIndex, value) => {
+      (index, { name, fillValue }) => {
         dispatch(
           createColumnsRequest({
             mode: CREATION_MODE_INSERTION,
             columnLocations: [
               {
                 parentId: id,
-                index: newColumnIndex,
-                fillValue: value,
+                index,
+                fillValue,
+                name,
               },
             ],
           })

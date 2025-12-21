@@ -28,7 +28,7 @@ import {
   COLUMN_TYPE_NUMERICAL,
 } from "../../slices/columnsSlice";
 import { RoundupToDuckDBTypes } from "../../lib/duckdb";
-import { FreeTextDialog } from "../ui/dialogs";
+import { FreeTextDialog, InsertColumnDialog } from "../ui/dialogs";
 
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
@@ -155,11 +155,11 @@ const ColumnContextMenu = ({
   }, []);
 
   const handleInsertConfirm = useCallback(
-    (event, value) => {
+    (event, data) => {
       if (insertDirection === "left" && onInsertColumnLeftClick) {
-        onInsertColumnLeftClick(value);
+        onInsertColumnLeftClick(data);
       } else if (insertDirection === "right" && onInsertColumnRightClick) {
-        onInsertColumnRightClick(value);
+        onInsertColumnRightClick(data);
       }
       setInsertDialogOpen(false);
       setInsertDirection(null);
@@ -304,13 +304,11 @@ const ColumnContextMenu = ({
         </DialogActions>
       </Dialog>
 
-      <FreeTextDialog
-        title={`Insert column ${insertDirection}`}
-        contentText="Specify a value to fill the inserting column. Blank values will be rendered as null."
+      <InsertColumnDialog
+        direction={insertDirection}
         open={insertDialogOpen}
         onClose={handleInsertCancel}
-        onConfirm={handleInsertConfirm}
-        label="Column Value"
+        onSubmit={handleInsertConfirm}
       />
     </>
   );

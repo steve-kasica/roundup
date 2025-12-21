@@ -140,11 +140,13 @@ export default function withOperationData(WrappedComponent) {
     }, [dispatch]);
 
     const insertColumnIntoChildAtIndex = useCallback(
-      (childId, targetIndex) => {
+      (childId, targetIndex, fillValue, name) => {
         dispatch(
           createColumnsRequest({
             mode: CREATION_MODE_INSERTION,
-            columnLocations: [{ parentId: childId, index: targetIndex }],
+            columnLocations: [
+              { parentId: childId, index: targetIndex, fillValue, name },
+            ],
           })
         );
       },

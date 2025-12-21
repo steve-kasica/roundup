@@ -36,13 +36,13 @@ export default function* createColumnsWorker(action) {
   const operationUpdates = {};
 
   if (mode === CREATION_MODE_INSERTION) {
-    for (const { parentId, index, fillValue } of columnLocations) {
+    for (const { parentId, index, fillValue, name } of columnLocations) {
       const parentTable = yield select((state) =>
         selectTablesById(state, parentId)
       );
       const column = Column({
         parentId,
-        name: "New column",
+        name: name || "New column",
         databaseName: generateUUID("col_"),
       });
       // For insertion mode, we need to handle things slightly differenly

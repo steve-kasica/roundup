@@ -65,18 +65,13 @@ import { EnhancedTableSchemaToolbar } from "./TableSchemaToolbar";
  */
 const TableSchema = ({
   id,
-  rowCount,
-  name,
   activeColumnIds,
   selectedColumnIds,
-  columnCount,
   swapColumns,
   selectColumns,
   hideColumns,
   unhideColumns,
   hiddenColumnIds,
-  deleteColumns,
-  focusColumns,
   insertColumn,
   setVisibleColumns: setVisibleColumnsInSlice,
 
@@ -287,11 +282,19 @@ const TableSchema = ({
           <EnhancedColumnContextMenuItems
             id={contextMenuColumnId}
             handleCloseMenu={handleContextMenuClose}
-            onInsertColumnLeftClick={() =>
-              insertColumn(activeColumnIds.indexOf(contextMenuColumnId))
+            onInsertColumnLeftClick={({ name, fillValue }) =>
+              insertColumn(
+                activeColumnIds.indexOf(contextMenuColumnId),
+                name,
+                fillValue
+              )
             }
-            onInsertColumnRightClick={() =>
-              insertColumn(activeColumnIds.indexOf(contextMenuColumnId) + 1)
+            onInsertColumnRightClick={({ name, fillValue }) =>
+              insertColumn(
+                activeColumnIds.indexOf(contextMenuColumnId) + 1,
+                name,
+                fillValue
+              )
             }
             onHideColumn={() =>
               hideColumns([...hiddenColumnIds, contextMenuColumnId])
