@@ -6,7 +6,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Button,
   RadioGroup,
   FormControlLabel,
@@ -20,18 +19,16 @@ import {
   KeyboardArrowLeft,
   KeyboardArrowRight,
   VisibilityOff,
-  Delete,
   DeleteForever,
 } from "@mui/icons-material";
 import { useCallback, useState } from "react";
 import withColumnData from "./withColumnData";
 import {
   COLUMN_TYPE_CATEGORICAL,
-  COLUMN_TYPE_DATE,
   COLUMN_TYPE_NUMERICAL,
-  COLUMN_TYPE_VARCHAR,
 } from "../../slices/columnsSlice";
 import { RoundupToDuckDBTypes } from "../../lib/duckdb";
+import { FreeTextDialog } from "../ui/dialogs";
 
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
@@ -52,45 +49,39 @@ const ColumnContextMenu = ({
   handleCloseMenu,
 }) => {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-  const [newColumnName, setNewColumnName] = useState("");
+  const [insertDialogOpen, setInsertDialogOpen] = useState(false);
+  const [insertDirection, setInsertDirection] = useState(null);
   const [columnTypeDialogOpen, setColumnTypeDialogOpen] = useState(false);
+
   const [selectedColumnType, setSelectedColumnType] = useState(
     columnType || ""
   );
 
-  const handleRenameColumn = useCallback(() => {
-    setNewColumnName(name || databaseName || ""); // Pre-fill with current name
+  // Callback for handling column rename
+  const handleRenameColumnClick = useCallback(() => {
     setRenameDialogOpen(true);
-  }, [name, databaseName]);
+  }, []);
 
-  const handleRenameDialogClose = useCallback(
+  const handleRenameConfirm = useCallback(
+    (event, newColumnName) => {
+      if (newColumnName.trim() && renameColumn) {
+        renameColumn(newColumnName.trim());
+      }
+      setRenameDialogOpen(false);
+      handleCloseMenu(event);
+    },
+    [handleCloseMenu, renameColumn]
+  );
+
+  const handleRenameCancel = useCallback(
     (event) => {
       setRenameDialogOpen(false);
-      setNewColumnName("");
       handleCloseMenu(event);
     },
     [handleCloseMenu]
   );
 
-  const handleRenameConfirm = useCallback(
-    (event) => {
-      if (newColumnName.trim() && renameColumn) {
-        renameColumn(newColumnName.trim());
-      }
-      handleRenameDialogClose();
-      handleCloseMenu(event);
-    },
-    [newColumnName, renameColumn, handleRenameDialogClose, handleCloseMenu]
-  );
-
-  const handleRenameCancel = useCallback(
-    (event) => {
-      handleRenameDialogClose();
-      handleCloseMenu(event);
-    },
-    [handleRenameDialogClose, handleCloseMenu]
-  );
-
+  // Callback for handling column type change
   const handleColumnTypeDialogClose = useCallback(
     (event) => {
       setColumnTypeDialogOpen(false);
@@ -153,20 +144,42 @@ const ColumnContextMenu = ({
     [handleCloseMenu, focusColumn]
   );
 
-  const handleInsertColumnLeft = useCallback(
-    (event) => {
-      onInsertColumnLeftClick();
+  const handleInsertColumnLeft = useCallback(() => {
+    setInsertDirection("left");
+    setInsertDialogOpen(true);
+  }, []);
+
+  const handleInsertColumnRight = useCallback(() => {
+    setInsertDirection("right");
+    setInsertDialogOpen(true);
+  }, []);
+
+  const handleInsertConfirm = useCallback(
+    (event, value) => {
+      if (insertDirection === "left" && onInsertColumnLeftClick) {
+        onInsertColumnLeftClick(value);
+      } else if (insertDirection === "right" && onInsertColumnRightClick) {
+        onInsertColumnRightClick(value);
+      }
+      setInsertDialogOpen(false);
+      setInsertDirection(null);
       handleCloseMenu(event);
     },
-    [handleCloseMenu, onInsertColumnLeftClick]
+    [
+      handleCloseMenu,
+      insertDirection,
+      onInsertColumnLeftClick,
+      onInsertColumnRightClick,
+    ]
   );
 
-  const handleInsertColumnRight = useCallback(
+  const handleInsertCancel = useCallback(
     (event) => {
-      onInsertColumnRightClick();
+      setInsertDialogOpen(false);
+      setInsertDirection(null);
       handleCloseMenu(event);
     },
-    [handleCloseMenu, onInsertColumnRightClick]
+    [handleCloseMenu]
   );
 
   const menuItemSx = isError
@@ -187,7 +200,7 @@ const ColumnContextMenu = ({
 
   return (
     <>
-      <MenuItem onClick={handleRenameColumn} sx={menuItemSx}>
+      <MenuItem onClick={handleRenameColumnClick} sx={menuItemSx}>
         <ListItemIcon sx={iconSx}>
           <Edit fontSize="small" />
         </ListItemIcon>
@@ -240,42 +253,13 @@ const ColumnContextMenu = ({
       )}
 
       {/* Rename Column Dialog */}
-      <Dialog
+      <FreeTextDialog
+        title="Rename Column"
         open={renameDialogOpen}
         onClose={handleRenameCancel}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Rename Column</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Column Name"
-            fullWidth
-            variant="outlined"
-            value={newColumnName}
-            onChange={(e) => setNewColumnName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleRenameConfirm();
-              } else if (e.key === "Escape") {
-                handleRenameCancel();
-              }
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleRenameCancel}>Cancel</Button>
-          <Button
-            onClick={handleRenameConfirm}
-            variant="contained"
-            disabled={!newColumnName.trim()}
-          >
-            Rename
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={handleRenameConfirm}
+        label="Column Name"
+      />
 
       {/* Change Column Type Dialog */}
       <Dialog
@@ -319,6 +303,15 @@ const ColumnContextMenu = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      <FreeTextDialog
+        title={`Insert column ${insertDirection}`}
+        contentText="Specify a value to fill the inserting column. Blank values will be rendered as null."
+        open={insertDialogOpen}
+        onClose={handleInsertCancel}
+        onConfirm={handleInsertConfirm}
+        label="Column Value"
+      />
     </>
   );
 };

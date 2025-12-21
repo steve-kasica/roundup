@@ -413,8 +413,12 @@ const TableSchema = ({
                           handleContextMenu(event, columnIds[0])
                         }
                         isDraggable={selectedColumnIds.includes(columnIds[0])}
-                        handleInsertColumnLeft={() => insertColumn(i)}
-                        handleInsertColumnRight={() => insertColumn(i + 1)}
+                        handleInsertColumnLeft={(value) =>
+                          insertColumn(i, value)
+                        }
+                        handleInsertColumnRight={(value) =>
+                          insertColumn(i + 1, value)
+                        }
                         sx={{
                           backgroundColor: "#fff",
                         }}

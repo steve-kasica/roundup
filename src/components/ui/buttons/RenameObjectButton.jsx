@@ -1,43 +1,51 @@
 import { useCallback, useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-} from "@mui/material";
 import { DriveFileRenameOutline as Icon } from "@mui/icons-material";
 import TooltipIconButton from "./TooltipIconButton";
+import FreeTextDialog from "../dialogs/FreeTextDialog";
+import {
+  OBJECT_TYPE_COLUMN,
+  OBJECT_TYPE_PACK,
+  OBJECT_TYPE_STACK,
+  OBJECT_TYPE_TABLE,
+} from "../SchemaToolbar";
 
 const RenameObjectButton = ({
-  //   color = "info",
   tooltipText = "Rename",
-  currentName = "",
-  dialogTitle = "Rename",
+  objectType = "Object",
   inputLabel = "Name",
   onConfirm,
   ...props
 }) => {
+  const title =
+    "Rename " +
+    (objectType === OBJECT_TYPE_TABLE
+      ? "Table"
+      : objectType === OBJECT_TYPE_PACK || objectType === OBJECT_TYPE_STACK
+      ? "Operation"
+      : objectType === OBJECT_TYPE_COLUMN
+      ? "Column"
+      : "Object");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newName, setNewName] = useState("");
 
   const openDialog = useCallback(() => {
-    setNewName(currentName || "");
     setDialogOpen(true);
-  }, [currentName]);
+  }, []);
 
   const handleClose = useCallback(() => {
+    console.log("Closing rename dialog");
     setDialogOpen(false);
   }, []);
 
-  const handleConfirm = useCallback(() => {
-    const next = newName.trim();
-    if (next && typeof onConfirm === "function") {
-      onConfirm(next);
-    }
-    setDialogOpen(false);
-  }, [newName, onConfirm]);
+  const handleConfirm = useCallback(
+    (_event, nextName) => {
+      const trimmed = nextName.trim();
+      if (trimmed.length > 0 && typeof onConfirm === "function") {
+        onConfirm(trimmed);
+      }
+      setDialogOpen(false);
+    },
+    [onConfirm]
+  );
 
   return (
     <>
@@ -49,37 +57,13 @@ const RenameObjectButton = ({
         <Icon />
       </TooltipIconButton>
 
-      <Dialog open={dialogOpen} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>{dialogTitle}</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label={inputLabel}
-            fullWidth
-            variant="outlined"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleConfirm();
-              } else if (e.key === "Escape") {
-                handleClose();
-              }
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button
-            onClick={handleConfirm}
-            variant="contained"
-            disabled={!newName.trim()}
-          >
-            Rename
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <FreeTextDialog
+        title={title}
+        open={dialogOpen}
+        onClose={handleClose}
+        onConfirm={handleConfirm}
+        inputLabel={inputLabel}
+      />
     </>
   );
 };

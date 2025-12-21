@@ -36,7 +36,7 @@ export default function* createColumnsWorker(action) {
   const operationUpdates = {};
 
   if (mode === CREATION_MODE_INSERTION) {
-    for (const { parentId, index } of columnLocations) {
+    for (const { parentId, index, fillValue } of columnLocations) {
       const parentTable = yield select((state) =>
         selectTablesById(state, parentId)
       );
@@ -50,7 +50,9 @@ export default function* createColumnsWorker(action) {
         insertColumn,
         parentTable.databaseName,
         column.databaseName,
-        index
+        index,
+        "TEXT",
+        fillValue
       );
       successfulCreations.push(column);
 

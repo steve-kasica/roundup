@@ -1,4 +1,4 @@
-import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
+import { EnhancedSchemaToolbar, OBJECT_TYPE_STACK } from "../ui/SchemaToolbar";
 import { useCallback, useMemo } from "react";
 import withStackOperationData from "./withStackOperationData";
 import { Chip, Stack, Typography } from "@mui/material";
@@ -74,6 +74,7 @@ const StackSchemaToolbar = ({
   return (
     <EnhancedSchemaToolbar
       id={id}
+      objectType={OBJECT_TYPE_STACK}
       columnIds={columnIdMatrix.flat()}
       columnCount={columnCount}
       rowCount={rowCount}

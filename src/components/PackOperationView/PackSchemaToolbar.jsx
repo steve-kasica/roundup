@@ -1,4 +1,4 @@
-import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
+import { EnhancedSchemaToolbar, OBJECT_TYPE_PACK } from "../ui/SchemaToolbar";
 import { SwapTablesButton, PackMatchToggleButtonGroup } from "../ui/buttons";
 import { useCallback } from "react";
 import withPackOperationData from "./withPackOperationData";
@@ -145,7 +145,7 @@ const PackSchemaToolbar = ({
       title={name}
       rowCount={rowCount}
       columnCount={columnCount}
-      objectType={"pack"}
+      objectType={OBJECT_TYPE_PACK}
       onFocusColumns={handleFocusColumns}
       onHideColumns={() => handleHideColumns()}
       onDeleteColumns={handleDeleteColumns}

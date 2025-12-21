@@ -27,6 +27,11 @@ import {
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 import { PackOperationIcon, StackOperationIcon, TableIcon } from "./icons";
 
+export const OBJECT_TYPE_TABLE = "table";
+export const OBJECT_TYPE_STACK = "stack";
+export const OBJECT_TYPE_PACK = "pack";
+export const OBJECT_TYPE_COLUMN = "column";
+
 const SchemaToolbar = ({
   // Props passed via `withAssociatedAlerts.jsx` HOC
   alertIds,
@@ -92,9 +97,9 @@ const SchemaToolbar = ({
       }}
     >
       <Stack direction="row" alignItems="center" spacing={1}>
-        {objectType === "stack" ? (
+        {objectType === OBJECT_TYPE_STACK ? (
           <StackOperationIcon />
-        ) : objectType === "pack" ? (
+        ) : objectType === OBJECT_TYPE_PACK ? (
           <PackOperationIcon />
         ) : (
           <TableIcon />
@@ -125,7 +130,11 @@ const SchemaToolbar = ({
       <Box display="flex" gap={1}>
         {customMenuItems}
         <Divider orientation="vertical" flexItem />
-        <RenameObjectButton onConfirm={onRenameConfirm} currentName={title} />
+        <RenameObjectButton
+          objectType={objectType}
+          onConfirm={onRenameConfirm}
+          currentName={title}
+        />
         <Divider orientation="vertical" flexItem />
         <FocusIconButton
           onClick={onFocusColumns}

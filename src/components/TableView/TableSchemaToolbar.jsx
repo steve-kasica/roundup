@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { EnhancedSchemaToolbar } from "../ui/SchemaToolbar";
+import { EnhancedSchemaToolbar, OBJECT_TYPE_TABLE } from "../ui/SchemaToolbar";
 import withTableData from "./withTableData";
 import { TableLabel } from "./TableLabel";
 import { Chip, Stack, Typography } from "@mui/material";
@@ -52,6 +52,7 @@ const TableSchemaToolbar = ({
       title={name}
       rowCount={rowCount}
       columnCount={columnCount}
+      objectType={OBJECT_TYPE_TABLE}
       onFocusColumns={handleFocusColumns}
       onHideColumns={handleHideColumns}
       onDeleteColumns={handleDeleteColumns}
