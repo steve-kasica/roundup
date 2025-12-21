@@ -22,11 +22,14 @@ const InsertColumnDialog = ({ direction, onSubmit, onClose, ...props }) => {
       handleSubmit(e);
     } else if (e.key === "Escape") {
       onClose();
+    } else {
+      // See https://stackoverflow.com/a/56285545/3734991
+      e.stopPropagation();
     }
   };
 
   return (
-    <Dialog {...props}>
+    <Dialog onClose={onClose} {...props}>
       <DialogTitle>Insert New Column ({direction})</DialogTitle>
       <DialogContent>
         <DialogContentText>
