@@ -9,12 +9,16 @@
  * **Table Tree**, by design.
  */
 
-import { EnhancedTableBlock, TableBlock } from "../TableView";
+import { EnhancedTableBlock } from "../TableView";
 import { OPERATION_TYPE_PACK } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
-import { Box, styled, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
-import withPackOperationData from "./withPackOperationData";
+import {
+  withPackOperationData,
+  withOperationData,
+  withAssociatedAlerts,
+} from "../HOC";
 import StyledBlock from "../ui/StyledBlock";
 
 function PackOperationBlock({
@@ -23,7 +27,6 @@ function PackOperationBlock({
   id,
   name,
   depth,
-  activeColumnIds,
   isFocused,
   isRootOperation,
   rowCount,
@@ -66,7 +69,7 @@ function PackOperationBlock({
           {rowCountDisplay.toLocaleString()}
         </small>
       </Typography>
-      {childIds.map((childId, index, array) => {
+      {childIds.map((childId, index) => {
         const childSx = {
           width:
             ((index === 0 ? leftColumnCount : rightColumnCount) / columnCount) *
@@ -102,6 +105,8 @@ function PackOperationBlock({
   );
 }
 
-const EnhancedPackOperationBlock = withPackOperationData(PackOperationBlock);
+const EnhancedPackOperationBlock = withOperationData(
+  withAssociatedAlerts(withPackOperationData(PackOperationBlock))
+);
 
 export { PackOperationBlock, EnhancedPackOperationBlock };

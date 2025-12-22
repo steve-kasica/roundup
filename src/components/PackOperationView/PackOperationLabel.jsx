@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Stack, Typography } from "@mui/material";
 import PackOperationIcon from "../ui/icons/PackOperationIcon";
-import withPackOperationData from "./withPackOperationData";
+import { withPackOperationData, withOperationData } from "../HOC";
 
 const PackOperationLabel = ({
   id,
@@ -49,7 +49,9 @@ const PackOperationLabel = ({
 
 PackOperationLabel.displayName = "PackOperationLabel";
 
-const EnhancedPackOperationLabel = withPackOperationData(PackOperationLabel);
+const EnhancedPackOperationLabel = withOperationData(
+  withPackOperationData(PackOperationLabel)
+);
 
 EnhancedPackOperationLabel.displayName = "EnhancedPackOperationLabel";
 

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import withPackOperationData from "./withPackOperationData";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
 import VennDiagram from "../ui/icons/VennDiagram";
@@ -9,6 +8,11 @@ import {
   MATCH_TYPE_RIGHT_UNMATCHED,
 } from "../../slices/operationsSlice/Operation.js";
 import { Stack, Typography } from "@mui/material";
+import {
+  withOperationData,
+  withPackOperationData,
+  withAssociatedAlerts,
+} from "../HOC";
 
 const pageSize = 50;
 /**
@@ -206,7 +210,9 @@ const PackRows = ({
 
 PackRows.displayName = "Pack Rows";
 
-const EnhancedPackRows = withPackOperationData(PackRows);
+const EnhancedPackRows = withOperationData(
+  withAssociatedAlerts(withPackOperationData(PackRows))
+);
 
 EnhancedPackRows.displayName = "Enhanced Pack Rows";
 

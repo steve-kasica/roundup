@@ -1,6 +1,10 @@
 /* eslint-disable react/prop-types */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import withStackOperationData from "./withStackOperationData";
+import {
+  withOperationData,
+  withAssociatedAlerts,
+  withStackOperationData,
+} from "../HOC";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
 import { Stack, Typography } from "@mui/material";
@@ -20,7 +24,7 @@ const StackRows = ({
   materializeOperation,
   isMaterialized,
   isInSync,
-  activeColumnIds,
+  columnIds, // ColumnIDs of this operation
   childIds, // an array of child operation/table IDs
   childRowCounts, // a map of childId to row count
   selectedChildColumnIds,
@@ -70,8 +74,8 @@ const StackRows = ({
         }
       });
     });
-    return activeColumnIds.filter((colId, index) => selectedIndices.has(index));
-  }, [activeColumnIds, columnIdMatrix, selectedChildColumnIds]);
+    return columnIds.filter((_colId, index) => selectedIndices.has(index));
+  }, [columnIds, columnIdMatrix, selectedChildColumnIds]);
 
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
@@ -169,7 +173,9 @@ const StackRows = ({
 
 StackRows.displayName = "Stack Rows";
 
-const EnhancedStackRows = withStackOperationData(StackRows);
+const EnhancedStackRows = withAssociatedAlerts(
+  withOperationData(withStackOperationData(StackRows))
+);
 
 EnhancedStackRows.displayName = "Enhanced Stack Rows";
 

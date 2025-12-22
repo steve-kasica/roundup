@@ -9,11 +9,9 @@ import {
 } from "@mui/material";
 import SwapIcon from "@mui/icons-material/SwapHoriz";
 import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 import { JOIN_PREDICATES } from "../../../slices/operationsSlice";
 import OperationKeyColumnSelect from "./OperationKeyColumnSelect";
-import withPackOperationData from "../../PackOperationView/withPackOperationData";
-import PackOutputDetails from "./PackOutputDetails";
+import { withPackOperationData } from "../../HOC";
 
 const PackOperationParams = ({
   operation,

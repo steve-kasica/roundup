@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Typography } from "@mui/material";
-import withTableData from "./withTableData";
+import { withTableData } from "../HOC";
 
 const TableName = ({ name, sx = {} }) => {
   return (

@@ -35,8 +35,8 @@ import {
   Divider,
   Tooltip,
 } from "@mui/material";
-import withTableData from "./withTableData";
-import { useCallback, useRef, useState, useEffect } from "react";
+import { withTableData, withAssociatedAlerts } from "../HOC";
+import { useCallback, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setFocusedColumnIds } from "../../slices/uiSlice"; // TODO: this should be in HOC
 import {
@@ -58,25 +58,20 @@ import { EnhancedTableSchemaToolbar } from "./TableSchemaToolbar";
  * @param {Object} props - Component props
  * @param {Object} props.table - Table object containing schema information
  * @param {string} props.name - Name of the table
- * @param {string[]} props.activeColumnIds - Array of column IDs in the table
+ * @param {string[]} props.columnIds - Array of column IDs in the table
  * @param {number} [props.rowCount] - Number of rows in the table
  * @param {string[]} [props.selectedColumnIds=[]] - Array of currently selected column IDs
  * @returns {JSX.Element} The rendered TableSchema component
  */
 const TableSchema = ({
   id,
-  activeColumnIds,
+  columnIds,
   selectedColumnIds,
   swapColumns,
   selectColumns,
-  hideColumns,
-  unhideColumns,
-  hiddenColumnIds,
   insertColumn,
-  setVisibleColumns: setVisibleColumnsInSlice,
 
   // Props from withAssociatedAlerts via withTableData
-  alertIds, // eslint-disable-line no-unused-vars
   totalCount,
 }) => {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
@@ -87,57 +82,58 @@ const TableSchema = ({
   const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
   const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
   const columnContainerRef = useRef(null);
-  const [visibleColumns, setVisibleColumns] = useState([]);
+  //  const [visibleColumns, setVisibleColumns] = useState([]);
+  const [hiddenColumnIds, setHiddenColumnIds] = useState([]);
 
   /**
    * Sync local visible columns state to parent/slice whenever it changes
    */
-  useEffect(() => {
-    setVisibleColumnsInSlice(visibleColumns);
-  }, [visibleColumns, setVisibleColumnsInSlice]);
+  // useEffect(() => {
+  //   setVisibleColumnsInSlice(visibleColumns);
+  // }, [visibleColumns, setVisibleColumnsInSlice]);
 
   /**
    * Set up scroll event listener on the column container
    */
-  useEffect(() => {
-    const container = columnContainerRef.current;
+  // useEffect(() => {
+  //   const container = columnContainerRef.current;
 
-    if (!container) return;
+  //   if (!container) return;
 
-    const handleScroll = () => {
-      // Get all column elements within the container
-      const columnElements = container.querySelectorAll("[data-column-id]");
-      const containerRect = container.getBoundingClientRect();
-      const currentlyVisibleColumnIds = [];
+  //   const handleScroll = () => {
+  //     // Get all column elements within the container
+  //     const columnElements = container.querySelectorAll("[data-column-id]");
+  //     const containerRect = container.getBoundingClientRect();
+  //     const currentlyVisibleColumnIds = [];
 
-      columnElements.forEach((element) => {
-        const elementRect = element.getBoundingClientRect();
+  //     columnElements.forEach((element) => {
+  //       const elementRect = element.getBoundingClientRect();
 
-        // Check if element is at least partially visible within the container
-        const isVisible =
-          elementRect.left > containerRect.left &&
-          elementRect.right < containerRect.right;
+  //       // Check if element is at least partially visible within the container
+  //       const isVisible =
+  //         elementRect.left > containerRect.left &&
+  //         elementRect.right < containerRect.right;
 
-        if (isVisible) {
-          const columnId = element.getAttribute("data-column-id");
-          currentlyVisibleColumnIds.push(columnId);
-        }
-      });
+  //       if (isVisible) {
+  //         const columnId = element.getAttribute("data-column-id");
+  //         currentlyVisibleColumnIds.push(columnId);
+  //       }
+  //     });
 
-      if (
-        JSON.stringify(currentlyVisibleColumnIds) !==
-        JSON.stringify(visibleColumns)
-      ) {
-        setVisibleColumns(currentlyVisibleColumnIds);
-      }
-    };
+  //     if (
+  //       JSON.stringify(currentlyVisibleColumnIds) !==
+  //       JSON.stringify(visibleColumns)
+  //     ) {
+  //       setVisibleColumns(currentlyVisibleColumnIds);
+  //     }
+  //   };
 
-    container.addEventListener("scroll", handleScroll);
+  //   container.addEventListener("scroll", handleScroll);
 
-    return () => {
-      container.removeEventListener("scroll", handleScroll);
-    };
-  }, [visibleColumns]);
+  //   return () => {
+  //     container.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, [visibleColumns]);
 
   /**
    * Closes the column type dropdown menu
@@ -171,20 +167,17 @@ const TableSchema = ({
   const handleColumnClick = useCallback(
     (event, columnId) => {
       const isShift = event.shiftKey;
-      const currentColumnIndex = activeColumnIds.indexOf(columnId);
+      const currentColumnIndex = columnIds.indexOf(columnId);
 
       if (isShift && selectedColumnIds.length > 0) {
         // Shift+click: Select range from last selected column to clicked column
         const lastSelectedColumnId = selectedColumnIds[0];
-        const lastSelectedIndex = activeColumnIds.indexOf(lastSelectedColumnId);
+        const lastSelectedIndex = columnIds.indexOf(lastSelectedColumnId);
 
         if (lastSelectedIndex !== -1) {
           const startIndex = Math.min(currentColumnIndex, lastSelectedIndex);
           const endIndex = Math.max(currentColumnIndex, lastSelectedIndex);
-          const rangeColumnIds = activeColumnIds.slice(
-            startIndex,
-            endIndex + 1
-          );
+          const rangeColumnIds = columnIds.slice(startIndex, endIndex + 1);
 
           // Add the range to selection (keeping existing selection)
           selectColumns(rangeColumnIds);
@@ -197,7 +190,7 @@ const TableSchema = ({
         selectColumns([columnId]);
       }
     },
-    [activeColumnIds, selectedColumnIds, selectColumns]
+    [columnIds, selectedColumnIds, selectColumns]
   );
 
   /**
@@ -224,6 +217,10 @@ const TableSchema = ({
     setContextMenuColumnId(null);
   }, []);
 
+  const handleHideColumns = useCallback(() => {
+    setHiddenColumnIds([...hiddenColumnIds, ...selectedColumnIds]);
+  }, [hiddenColumnIds, selectedColumnIds]);
+
   return (
     <Box
       display="flex"
@@ -239,7 +236,7 @@ const TableSchema = ({
       }}
     >
       {/* Toolbar with table info and action buttons */}
-      <EnhancedTableSchemaToolbar id={id} />
+      <EnhancedTableSchemaToolbar id={id} hideColumns={handleHideColumns} />
 
       {/* Column Type Change Menu */}
       <Menu
@@ -284,20 +281,20 @@ const TableSchema = ({
             handleCloseMenu={handleContextMenuClose}
             onInsertColumnLeftClick={({ name, fillValue }) =>
               insertColumn(
-                activeColumnIds.indexOf(contextMenuColumnId),
+                columnIds.indexOf(contextMenuColumnId),
                 name,
                 fillValue
               )
             }
             onInsertColumnRightClick={({ name, fillValue }) =>
               insertColumn(
-                activeColumnIds.indexOf(contextMenuColumnId) + 1,
+                columnIds.indexOf(contextMenuColumnId) + 1,
                 name,
                 fillValue
               )
             }
             onHideColumn={() =>
-              hideColumns([...hiddenColumnIds, contextMenuColumnId])
+              setHiddenColumnIds([...hiddenColumnIds, contextMenuColumnId])
             }
           />
         )}
@@ -318,7 +315,7 @@ const TableSchema = ({
         }}
       >
         {/* Individual Column Cards - Each column rendered as a numbered card with summary */}
-        {activeColumnIds
+        {columnIds
           .reduce((acc, columnId, i) => {
             const isVisible = !hiddenColumnIds.includes(columnId);
             if (isVisible) {
@@ -354,7 +351,12 @@ const TableSchema = ({
                 <IconButton
                   size="small"
                   onClick={() => {
-                    !isVisible ? unhideColumns(columnIds) : null;
+                    !isVisible
+                      ? // TODO
+                        setHiddenColumnIds((prev) =>
+                          prev.filter((hid) => !columnIds.includes(hid))
+                        )
+                      : null;
                   }}
                   sx={{ borderRadius: 0 }}
                 >
@@ -457,7 +459,7 @@ TableSchema.displayName = "TableSchema";
  * @param {string} props.id - Table ID to load data for
  * @returns {JSX.Element} The enhanced TableSchema component with automatic data loading
  */
-const EnhancedTableSchema = withTableData(TableSchema);
+const EnhancedTableSchema = withAssociatedAlerts(withTableData(TableSchema));
 
 EnhancedTableSchema.displayName = "EnhancedTableSchema";
 

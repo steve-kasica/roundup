@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { Typography, MenuItem, Box, Chip, ListItemText } from "@mui/material";
-import withTableData from "../../TableView/withTableData";
+import { withTableData } from "../../HOC";
 import { descending } from "d3";
 import { useSelector } from "react-redux";
 import { selectColumnsById } from "../../../slices/columnsSlice";
@@ -11,12 +11,12 @@ const thresholds = [0.75, 0.5]; // Uniqueness ratio thresholds for color coding
 
 function OperationKeyColumnSelect({
   table,
-  activeColumnIds,
+  columnIds,
   currentValue,
   onChange,
 }) {
   const columns = useSelector((state) =>
-    activeColumnIds.map((id) => selectColumnsById(state, id))
+    columnIds.map((id) => selectColumnsById(state, id))
   );
 
   const sortedColumns = [...columns].sort((a, b) =>
@@ -169,7 +169,7 @@ OperationKeyColumnSelect.propTypes = {
     name: PropTypes.string.isRequired,
     id: PropTypes.string,
   }).isRequired,
-  activeColumnIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+  columnIds: PropTypes.arrayOf(PropTypes.string).isRequired,
   currentValue: PropTypes.string,
   onChange: PropTypes.func.isRequired,
 };

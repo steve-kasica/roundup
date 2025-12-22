@@ -19,7 +19,7 @@
  */
 
 /* eslint-disable react/prop-types */
-import withTableData from "./withTableData.jsx";
+import { withTableData } from "../HOC";
 import { useRef, useCallback, useState, useEffect } from "react";
 import { usePaginatedTableRows } from "../../hooks/index.js";
 import RoundupTable from "../ui/Table/Table.jsx";

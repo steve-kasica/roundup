@@ -8,7 +8,7 @@ import {
   CircularProgress,
   Badge,
 } from "@mui/material";
-import withPackOperationData from "./withPackOperationData";
+import { withOperationData, withPackOperationData } from "../HOC";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { EnhancedColumnName } from "../ColumnViews";
 import { Error } from "@mui/icons-material";
@@ -859,7 +859,9 @@ const PackSchemaView = ({
 
 PackSchemaView.displayName = "Pack Schema View";
 
-const EnhancedPackSchemaView = withPackOperationData(PackSchemaView);
+const EnhancedPackSchemaView = withOperationData(
+  withPackOperationData(PackSchemaView)
+);
 
 EnhancedPackSchemaView.displayName = "Enhanced Pack Schema View";
 

@@ -1,6 +1,6 @@
 import { ColumnTick, EnhancedColumnTick } from "../ColumnViews";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
-import withTableData from "./withTableData.jsx";
+import { withTableData, withAssociatedAlerts } from "../HOC";
 import { Box, Typography } from "@mui/material";
 
 function TableBlock({
@@ -9,10 +9,9 @@ function TableBlock({
   // props via withTableData
   id,
   name,
-  activeColumnIds,
-  activeColumnsCount,
-  rowCount = 0,
-  columnCount = 0,
+  columnIds,
+  columnCount,
+  rowCount,
   // Props passed directly from parent
   parentOperationType,
   parentColumnCount,
@@ -27,9 +26,9 @@ function TableBlock({
       length:
         parentOperationType === OPERATION_TYPE_STACK
           ? parentColumnCount
-          : activeColumnsCount,
+          : columnCount,
     },
-    (_, i) => (i < activeColumnsCount ? activeColumnIds[i] : null)
+    (_, i) => (i < columnCount ? columnIds[i] : null)
   );
 
   return (
@@ -118,7 +117,7 @@ function TableBlock({
 
 TableBlock.displayName = "TableBlock";
 
-const EnhancedTableBlock = withTableData(TableBlock);
+const EnhancedTableBlock = withAssociatedAlerts(withTableData(TableBlock));
 
 EnhancedTableBlock.displayName = "EnhancedTableBlock";
 

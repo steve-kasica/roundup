@@ -27,8 +27,6 @@ function OperationView({
   columnCount,
   isFocused,
   index,
-  // peekTable,
-  // renameOperation,
   focusOperation,
   error,
 }) {

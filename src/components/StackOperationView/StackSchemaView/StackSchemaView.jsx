@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import withStackOperationData from "../withStackOperationData";
+import { withOperationData, withStackOperationData } from "../../HOC";
 import {
   Box,
   Stack,
@@ -533,7 +533,9 @@ const StackSchemaView = ({
 
 StackSchemaView.displayName = "Stack Schema View";
 
-const EnhancedStackSchemaView = withStackOperationData(StackSchemaView);
+const EnhancedStackSchemaView = withOperationData(
+  withStackOperationData(StackSchemaView)
+);
 
 EnhancedStackSchemaView.displayName = "Enhanced Stack Schema View";
 export { EnhancedStackSchemaView, StackSchemaView };

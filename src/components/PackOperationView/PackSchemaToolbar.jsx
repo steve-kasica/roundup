@@ -1,7 +1,7 @@
 import { EnhancedSchemaToolbar, OBJECT_TYPE_PACK } from "../ui/SchemaToolbar";
 import { SwapTablesButton, PackMatchToggleButtonGroup } from "../ui/buttons";
 import { useCallback } from "react";
-import withPackOperationData from "./withPackOperationData";
+import { withPackOperationData, withOperationData } from "../HOC";
 import { Divider } from "@mui/material";
 import {
   JOIN_TYPES,
@@ -180,7 +180,9 @@ const PackSchemaToolbar = ({
   );
 };
 
-const EnhancedPackSchemaToolbar = withPackOperationData(PackSchemaToolbar);
+const EnhancedPackSchemaToolbar = withOperationData(
+  withPackOperationData(PackSchemaToolbar)
+);
 
 EnhancedPackSchemaToolbar.displayName = "Enhanced Pack Schema Toolbar";
 

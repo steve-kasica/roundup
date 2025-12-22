@@ -1,8 +1,6 @@
-/* eslint-disable react/prop-types */
-import withTableData from "./withTableData";
+import { withTableData, withAssociatedAlerts } from "../HOC";
 import { Stack, Typography, Badge } from "@mui/material";
 import { TableChart, Warning } from "@mui/icons-material";
-import { TableIcon } from "../ui/icons";
 
 const TableLabel = ({
   // props via withTableData
@@ -76,7 +74,7 @@ const TableLabel = ({
 
 TableLabel.displayName = "TableLabel";
 
-const EnhancedTableLabel = withTableData(TableLabel);
+const EnhancedTableLabel = withAssociatedAlerts(withTableData(TableLabel));
 
 EnhancedTableLabel.displayName = "EnhancedTableLabel";
 

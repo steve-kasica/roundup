@@ -3,8 +3,7 @@
 import { useRef, cloneElement, isValidElement, useEffect } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-import withTableData from "./withTableData";
-import { useDispatch } from "react-redux";
+import { withTableData } from "../HOC";
 
 /**
  * TableDragContainer - A container component that handles drag functionality for columns

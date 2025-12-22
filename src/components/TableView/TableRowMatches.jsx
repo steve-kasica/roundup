@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Box, styled } from "@mui/material";
-import withTableData from "./withTableData";
+import { withTableData, withAssociatedAlerts } from "../HOC";
 import { EnhancedTableLabel } from "./TableLabel";
 import { EnhancedColumnName } from "../ColumnViews";
 import { useCallback } from "react";
@@ -47,7 +47,7 @@ const RowBlock = styled(Box)(({ height, isHovered, isToggled, isNull }) => ({
 const TableRowMatches = ({
   id,
   columnCount,
-  activeColumnIds,
+  columnIds,
   // Props from withAssociatedAlerts via withTableData
   alertIds, // eslint-disable-line no-unused-vars
   totalCount,
@@ -107,7 +107,7 @@ const TableRowMatches = ({
               onMouseLeave={(event) => onBlockLeave(event, label)}
               onClick={(event) => onBlockClick(event, id, label)}
             >
-              {activeColumnIds.map((columnId) => (
+              {columnIds.map((columnId) => (
                 <Box
                   key={columnId}
                   sx={{
@@ -129,6 +129,8 @@ const TableRowMatches = ({
   );
 };
 
-const EnhancedTableRowMatches = withTableData(TableRowMatches);
+const EnhancedTableRowMatches = withAssociatedAlerts(
+  withTableData(TableRowMatches)
+);
 
 export { EnhancedTableRowMatches, TableRowMatches };

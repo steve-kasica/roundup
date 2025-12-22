@@ -4,7 +4,8 @@ import withOperationData from "../HOC/withOperationData";
 import { EnhancedColumnName } from "../ColumnViews";
 
 const OperationHeader = ({
-  activeColumnIds,
+  // Props passed via withOperationData HOC
+  columnIds,
   columnCount,
   // Props passed directly from parent component
   keyColumnId,
@@ -14,7 +15,7 @@ const OperationHeader = ({
 
   return (
     <Box display="flex" width="100%" gap={"1px"}>
-      {activeColumnIds.map((columnId) => (
+      {columnIds.map((columnId) => (
         <Box
           key={columnId}
           backgroundColor="#ddd"
@@ -52,7 +53,6 @@ const OperationHeader = ({
         >
           <EnhancedColumnName
             id={columnId}
-            // isSelected={selectedOperationColumnIds.includes(columnId)}
             sx={{
               fontSize: "0.8rem",
               cursor: "pointer",
@@ -60,16 +60,6 @@ const OperationHeader = ({
               "&:hover": {
                 backgroundColor: "#555",
               },
-              //   ...(selectedOperationColumnIds.includes(columnId) && {
-              //     backgroundColor: "secondary.light",
-              //     border: "2px solid",
-              //     borderColor: "secondary.main",
-              //     fontWeight: "bold",
-              //     "&:hover": {
-              //       backgroundColor: "secondary.main",
-              //       color: "secondary.contrastText",
-              //     },
-              //   }),
             }}
           />
         </Box>

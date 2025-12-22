@@ -1,8 +1,6 @@
 import { EnhancedSchemaToolbar, OBJECT_TYPE_STACK } from "../ui/SchemaToolbar";
 import { useCallback, useMemo } from "react";
-import withStackOperationData from "./withStackOperationData";
-import { Chip, Stack, Typography } from "@mui/material";
-import { StackOperationIcon } from "../ui/icons";
+import { withOperationData, withStackOperationData } from "../HOC";
 
 const StackSchemaToolbar = ({
   // Props passed via `withOperationData.jsx` HOC
@@ -20,7 +18,6 @@ const StackSchemaToolbar = ({
   // Props passed via `withStackOperationData.jsx` HOC
   columnIdMatrix,
   m,
-  activeColumnIds,
 
   // Props passed directly from the parent component
   handleHideColumns,
@@ -92,5 +89,12 @@ const StackSchemaToolbar = ({
   );
 };
 
-const EnhancedStackSchemaToolbar = withStackOperationData(StackSchemaToolbar);
+StackSchemaToolbar.displayName = "Stack Schema Toolbar";
+
+const EnhancedStackSchemaToolbar = withOperationData(
+  withStackOperationData(StackSchemaToolbar)
+);
+
+EnhancedStackSchemaToolbar.displayName = "Enhanced Stack Schema Toolbar";
+
 export { StackSchemaToolbar, EnhancedStackSchemaToolbar };

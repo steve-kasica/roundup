@@ -38,8 +38,6 @@ export default function withAssociatedAlerts(WrappedComponent) {
 
     return (
       <WrappedComponent
-        // Pass along props directly from the parent component
-        {...props}
         id={id} // Need to pass id explicitly for composition
         alertIds={alertIds} // IDs of alerts associated with this id
         totalCount={alertIds.length}
@@ -47,6 +45,7 @@ export default function withAssociatedAlerts(WrappedComponent) {
         warningCount={warningCount}
         silencedWarningCount={silencedWarningCount}
         deleteAlerts={deleteAlerts} // Function to remove an alert by ID
+        {...props}
       />
     );
   };

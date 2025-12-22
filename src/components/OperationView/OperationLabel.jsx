@@ -7,8 +7,10 @@ import { Stack, Typography } from "@mui/material";
 import StackOperationIcon from "../ui/icons/StackOperationIcon";
 import PackOperationIcon from "../ui/icons/PackOperationIcon";
 import withOperationData from "../HOC/withOperationData";
+import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 
 const OperationLabel = ({
+  // Props defined in `withOperationData` HOC
   id,
   name,
   operationType,
@@ -51,10 +53,12 @@ const OperationLabel = ({
   );
 };
 
-OperationLabel.displayName = "OperationLabel";
+OperationLabel.displayName = "Operation Label";
 
-const EnhancedOperationLabel = withOperationData(OperationLabel);
+const EnhancedOperationLabel = withAssociatedAlerts(
+  withOperationData(OperationLabel)
+);
 
-EnhancedOperationLabel.displayName = "EnhancedOperationLabel";
+EnhancedOperationLabel.displayName = "Enhanced Operation Label";
 
 export { OperationLabel, EnhancedOperationLabel };

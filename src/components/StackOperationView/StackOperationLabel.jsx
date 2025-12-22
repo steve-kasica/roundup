@@ -1,7 +1,11 @@
 /* eslint-disable react/prop-types */
 import { Stack, Typography } from "@mui/material";
 import StackOperationIcon from "./../ui/icons/StackOperationIcon";
-import withStackOperationData from "./withStackOperationData";
+import {
+  withAssociatedAlerts,
+  withOperationData,
+  withStackOperationData,
+} from "../HOC";
 
 const StackOperationLabel = ({
   id,
@@ -48,7 +52,9 @@ const StackOperationLabel = ({
 
 StackOperationLabel.displayName = "StackOperationLabel";
 
-const EnhancedStackOperationLabel = withStackOperationData(StackOperationLabel);
+const EnhancedStackOperationLabel = withOperationData(
+  withStackOperationData(withAssociatedAlerts(StackOperationLabel))
+);
 
 EnhancedStackOperationLabel.displayName = "EnhancedStackOperationLabel";
 

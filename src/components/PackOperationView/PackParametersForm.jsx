@@ -10,7 +10,7 @@ import {
   CircularProgress,
   FormHelperText,
 } from "@mui/material";
-import withPackOperationData from "./withPackOperationData";
+import { withPackOperationData, withOperationData } from "../HOC";
 import {
   JOIN_PREDICATES,
   OPERATION_TYPE_PACK,
@@ -32,7 +32,7 @@ const PackParametersForm = ({
   setLeftTableJoinKey,
   setRightTableJoinKey,
   setOperationType,
-  setName,
+  setOperationName,
 }) => {
   const totalCount = alerts.length > 0;
   const [formData, setFormData] = useState({
@@ -75,7 +75,7 @@ const PackParametersForm = ({
         fullWidth
         label="Operation Name"
         value={name}
-        onChange={(event) => setName(event.target.value)}
+        onChange={(event) => setOperationName(event.target.value)}
         helperText={errors.name}
         placeholder={name}
         error={totalCount}
@@ -161,7 +161,9 @@ const PackParametersForm = ({
 
 PackParametersForm.displayName = "PackParametersForm";
 
-const EnhancedPackParametersForm = withPackOperationData(PackParametersForm);
+const EnhancedPackParametersForm = withOperationData(
+  withPackOperationData(PackParametersForm)
+);
 
 EnhancedPackParametersForm.displayName = "EnhancedPackParametersForm";
 

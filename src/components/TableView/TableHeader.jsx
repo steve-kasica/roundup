@@ -1,11 +1,10 @@
 /* eslint-disable react/prop-types */
 import { Box, Tooltip } from "@mui/material";
-import withTableData from "./withTableData";
+import { withTableData } from "../HOC";
 import { EnhancedColumnName } from "../ColumnViews";
-import { useSelector } from "react-redux";
 
 const TableHeader = ({
-  activeColumnIds,
+  columnIds,
   columnCount,
   // Props passed directly from parent component
   keyColumnId,
@@ -15,14 +14,14 @@ const TableHeader = ({
     console.debug("Rendering TableHeader:", {
       keyColumnId,
       columnCount,
-      activeColumnIds,
+      columnIds,
     });
   }
   const columnWidth = (1 / columnCount) * 100 + "%";
 
   return (
     <Box display="flex" width="100%" gap={"1px"}>
-      {activeColumnIds.map((columnId) => {
+      {columnIds.map((columnId) => {
         return (
           <Box
             key={columnId}

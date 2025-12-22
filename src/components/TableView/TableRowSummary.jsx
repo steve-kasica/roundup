@@ -1,21 +1,20 @@
-import { DragIndicator, Warning } from "@mui/icons-material";
+import { DragIndicator } from "@mui/icons-material";
 import HighlightText from "../ui/HighlightText";
-import { Typography, Checkbox, Stack, Box, Badge } from "@mui/material";
-import { memo, useState } from "react";
+import { Typography, Checkbox, Stack, Box } from "@mui/material";
+import { useState } from "react";
 import { Menu, MenuItem } from "@mui/material";
 import { formatDate, formatNumber, formatBytes } from "../../lib/utilities";
-import withTableData from "./withTableData";
+import { withTableData, withAssociatedAlerts } from "../HOC";
 import StyledTableRow from "./StyledTableRow";
 import BarChartCell from "./BarChartCell";
 
 export const TABLE_ROW_VIEW_CLASS = "TableRowSummary";
 
 const TableRowSummary = ({
-  // props from withTableData
-  // Props from withAssociatedAlerts via withTableData
-  alertIds,
+  // Props from withAssociatedAlerts
   totalCount,
 
+  // props from withTableData
   id,
   name,
   mimeType,
@@ -23,7 +22,6 @@ const TableRowSummary = ({
   dateLastModified,
   rowCount,
   columnCount,
-  removedColumnCount,
   isInSchema,
 
   setTableName,
@@ -222,9 +220,6 @@ const TableRowSummary = ({
         data-column="columnCount"
       >
         {`${formatNumber(columnCount)}`}
-        <sup style={{ display: removedColumnCount > 0 ? "inline" : "none" }}>
-          *
-        </sup>
       </BarChartCell>
       <Typography
         component="td"
@@ -261,5 +256,7 @@ const TableRowSummary = ({
   );
 };
 
-const EnhancedTableRowSummary = withTableData(TableRowSummary);
+const EnhancedTableRowSummary = withAssociatedAlerts(
+  withTableData(TableRowSummary)
+);
 export { EnhancedTableRowSummary, TableRowSummary };

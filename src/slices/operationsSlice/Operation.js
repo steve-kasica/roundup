@@ -60,7 +60,7 @@ export default function Operation({
   parentId = null,
   childIds = [],
   columnIds = [],
-  hiddenColumnIds = [],
+  hiddenColumnIds = [], // TODO: remove hidden columns for now
   rowCount = null,
   joinKey1 = null,
   joinKey2 = null,
@@ -73,12 +73,12 @@ export default function Operation({
     id,
     name,
     databaseName,
+    operationType,
     parentId,
     childIds,
     columnIds,
-    hiddenColumnIds,
+    hiddenColumnIds, // TODO: delete
     rowCount,
-    operationType,
     isMaterialized: false, // Initially false, can be updated later
     isInSync: false, // Initially false, can be updated later
 
@@ -89,7 +89,7 @@ export default function Operation({
           joinPredicate,
           joinKey1,
           joinKey2,
-          matchStats: { ...MATCH_STATS_DEFAULT }, // to be calculated: match counts and cardinality breakdown
+          matchStats: Object.fromEntries(MATCH_STATS_DEFAULT.entries()), // to be calculated: match counts and cardinality breakdown
         }
       : {}),
   };

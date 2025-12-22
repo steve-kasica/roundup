@@ -11,7 +11,7 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
-import withStackOperationData from "./withStackOperationData";
+import { withOperationData, withStackOperationData } from "../HOC";
 
 /* eslint-disable react/prop-types */
 
@@ -21,8 +21,8 @@ const StackParametersForm = ({
   operationType,
   isLoading,
   setOperationType,
-  setName,
-  alerts = [],
+  setOperationName,
+  alerts = [], // TODO? where is this coming from?
 }) => {
   const totalCount = alerts.length > 0;
 
@@ -57,7 +57,7 @@ const StackParametersForm = ({
         fullWidth
         label="Operation Name"
         value={name}
-        onChange={(event) => setName(event.target.value)}
+        onChange={(event) => setOperationName(event.target.value)}
         placeholder={name || id}
         error={totalCount}
       />
@@ -80,7 +80,9 @@ const StackParametersForm = ({
 
 StackParametersForm.displayName = "StackParametersForm";
 
-const EnhancedStackParametersForm = withStackOperationData(StackParametersForm);
+const EnhancedStackParametersForm = withOperationData(
+  withStackOperationData(StackParametersForm)
+);
 EnhancedStackParametersForm.displayName = "EnhancedStackParametersForm";
 
 export default EnhancedStackParametersForm;

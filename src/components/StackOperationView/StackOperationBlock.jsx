@@ -9,7 +9,11 @@
  * **Table Tree**, by design.
  */
 
-import withStackOperationData from "./withStackOperationData.jsx";
+import {
+  withAssociatedAlerts,
+  withOperationData,
+  withStackOperationData,
+} from "../HOC";
 import {
   isOperationId,
   OPERATION_TYPE_STACK,
@@ -107,7 +111,9 @@ function StackOperationBlock({
 
 StackOperationBlock.displayName = "Stack Operation Block";
 
-const EnhancedStackOperationBlock = withStackOperationData(StackOperationBlock);
+const EnhancedStackOperationBlock = withOperationData(
+  withStackOperationData(withAssociatedAlerts(StackOperationBlock))
+);
 
 EnhancedStackOperationBlock.displayName = "Enhanced Stack Operation Block";
 

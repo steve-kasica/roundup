@@ -1,20 +1,30 @@
-/* eslint-disable react/prop-types */
+/**
+ * @fileoverview
+ * Higher-Order Component (HOC) for injecting operation-related data and actions into
+ * wrapped React components. This HOC connects to the Redux store to provide operation as well
+ * as a suite of callbacks for manipulating operations, columns, and UI state.
+ *
+ * Exports a function `withOperationData` that takes a component and returns an enhanced
+ * component with additional props and logic for operation management.
+ *
+ * @module components/HOC/withOperationData
+ */
+
 import { useSelector, useDispatch } from "react-redux";
 import { useCallback, useMemo } from "react";
 import {
   selectOperationsById,
   selectOperationDepthById,
   selectOperationChildRowCounts,
-  isOperationId,
   selectRootOperationId,
   selectMaxOperationDepth,
   OPERATION_TYPE_PACK,
   DEFAULT_JOIN_PREDICATE,
   DEFAULT_JOIN_TYPE,
+  MATCH_STATS_DEFAULT,
 } from "../../slices/operationsSlice";
 import {
   selectActiveColumnIdsByParentId,
-  selectColumnIdsByParentId,
   selectSelectedColumnIdsByParentId,
 } from "../../slices/columnsSlice";
 import {
@@ -30,30 +40,165 @@ import {
   createColumnsRequest,
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
-import withAssociatedAlerts from "./withAssociatedAlerts";
 
-import { group, interpolateGreys, interpolateMagma, scaleSequential } from "d3";
+import { group, interpolateGreys, scaleSequential } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 
+/**
+ * Higher-Order Component that injects operation data, column data, alert data, and
+ * related action dispatchers into the wrapped component.
+ *
+ * Identity & Metadata:
+ *  - `id` (string): The operation's unique identifier
+ *  - `name` (string): Display name for the operation (falls back to operation type label if not set)
+ *  - `databaseName` (string): Name of table in the database associated with this operation
+ *  - `operationType` (string): Type of operation
+ *  - `focusOperation` (function): Sets this operation as the focused operation
+ *  - `setOperationType` (function): Changes the operation type
+ *  - `setOperationName` (function): Updates the operation name
+ *  - `swapTablePositions` (function): Swaps positions of two child tables
+ *
+ * Hierarchy & Structure:
+ *  - `childIds` (array): IDs of child tables/operations
+ *  - `depth` (number): Absolute depth of this operation from the root of the tree
+ *  - `focusedDepth` (number|null): Relative depth from the currently focused operation
+ *  - `maxDepth` (number): Maximum depth in the operation tree
+ *  - `isRootOperation` (boolean): Whether this is the root operation
+ *  - `colorScale` (function): `(depth) => color` - Function to get color based on depth
+ *
+ * Sync & Materialization Status:
+ *  - `isMaterialized` (boolean): Whether the operation is materialized
+ *  - `isInSync` (boolean): Whether the operation is synchronized
+ *  - `isLoading` (boolean): Whether this operation is currently loading
+ *  - `materializeOperation` (function): Trigger a materialization request for this operation
+ *
+ * Column Data:
+ *  - `columnIds` (array): All column IDs directly associated with this operation
+ *  - `selectedColumnIds` (array): Currently selected column IDs
+ *  - `childColumnIds` (array): Column IDs of child tables/operations
+ *  - `selectedChildColumnIds` (array): Matrix of selected column IDs, each row represents a child table
+ *  - `selectedChildColumnIdsSet` (Set): Set of all selected column IDs including those from child tables
+ *  - `selectColumns` (columnIds): Selects specified columns
+ *  - `selectAllChildColumns` (function): Selects all columns from child tables
+ *  - `clearSelectedColumns` (function): Clears all selected columns
+ *  - `deleteColumns` (function): Deletes specified columns
+ *  - `setVisibleColumns` (function): Sets which columns are visible
+ *  - `focusColumns` (function): Sets focused columns
+ *  - `insertColumnIntoChildAtIndex` (function): Inserts a new column into a child table at specified index
+ *
+ * Row Data:
+ *  - `childRowCounts` (array): Array of row counts for child operations, is parallel to `childIds`
+ *
+ * Interaction State:
+ *  - `isFocused` (boolean): Whether this operation is currently focused
+ *
+ *
+ * @function
+ * @param {React.ComponentType} WrappedComponent - The component to enhance.
+ * @returns {React.ComponentType} Enhanced component with operation-related props.
+ *
+ */
 export default function withOperationData(WrappedComponent) {
-  function EnhancedComponent({
-    id,
-    alertIds,
-    totalCount,
-    deleteAlerts,
-    silenceAlerts,
-    ...props
-  }) {
+  function EnhancedComponent({ id, ...props }) {
     const dispatch = useDispatch();
     const operation = useSelector((state) => selectOperationsById(state, id));
 
+    // Identity & Metadata
+    // -------------------------------------------------------------
+
+    // The name database table associated with this operation
+    const databaseName = useMemo(
+      () => operation.databaseName,
+      [operation.databaseName]
+    );
+
+    // The type of this operation
+    const operationType = useMemo(
+      () => operation.operationType,
+      [operation.operationType]
+    );
+
+    // The display name of this operation
+    const name = useMemo(() => {
+      if (operation.name && operation.name.trim().length > 0) {
+        return operation.name;
+      } else {
+        const operationLabel = operationType
+          ? operationType.charAt(0).toUpperCase() +
+            operationType.slice(1) +
+            " op."
+          : "Op.";
+        return operationLabel;
+      }
+    }, [operation.name, operationType]);
+
+    // Function to change the operation name (not database name)
+    const setOperationName = useCallback(
+      (name) => {
+        dispatch(updateOperationsRequest({ operationUpdates: [{ id, name }] }));
+      },
+      [dispatch, id]
+    );
+
+    // Function to change the operation type
+    const setOperationType = useCallback(
+      (nextOperationType) =>
+        dispatch(
+          updateOperationsRequest({
+            operationUpdates: [
+              {
+                id,
+                operationType: nextOperationType,
+                // Reset join parameters if changing away from PACK
+                ...(nextOperationType === OPERATION_TYPE_PACK
+                  ? {
+                      joinKey1: null,
+                      joinKey2: null,
+                      joinPredicate: DEFAULT_JOIN_PREDICATE,
+                      joinType: DEFAULT_JOIN_TYPE,
+                      matchStats: Object.fromEntries(
+                        MATCH_STATS_DEFAULT.entries()
+                      ),
+                    }
+                  : {
+                      joinKey1: undefined,
+                      joinKey2: undefined,
+                      joinPredicate: undefined,
+                      joinType: undefined,
+                      matchStats: undefined,
+                    }),
+              },
+            ],
+          })
+        ),
+      [dispatch, id]
+    );
+
+    // Hierarchy & Structure
+    // -------------------------------------------------------------
+
+    // The IDs of child tables/operations
+    const childIds = useMemo(
+      () => operation.childIds || [],
+      [operation.childIds]
+    );
+
     // The absolute depth of this operation from the root of the tree
+    // Dependencies (via `selectOperationDepthById`):
+    //  - `state.operations.rootOperationId`,
+    //  - `state.operations.byId`,
+    //  - `operation.id`
     const depth = useSelector((state) => selectOperationDepthById(state, id));
 
     // The relative depth of this operation from the currently focused operation
     // TODO: if this is glitchy, then just create a new selector and test it.
+    // Dependencies:
+    //  - `ui.focusedObjectId` (via `selectFocusedObjectid`)
+    //  - via `selectOperationDepthById`:
+    //    - `operations.rootOperationId`
+    //    - `operations.byId`
     const focusedDepth = useSelector((state) => {
       const focusedOperationId = selectFocusedObjectId(state);
       if (isTableId(focusedOperationId)) {
@@ -67,43 +212,70 @@ export default function withOperationData(WrappedComponent) {
       }
     });
 
-    const rootOperationId = useSelector(selectRootOperationId);
-    const isRootOperation = useMemo(
-      () => id === rootOperationId,
-      [id, rootOperationId]
-    );
+    // The maximum depth of the operation tree
+    // Dependencies (via `selectMaxOperationDepth`):
+    //  - `state.operations.rootOperationId`
+    //  - `state.operations.byId`
     const maxDepth = useSelector(selectMaxOperationDepth);
 
-    const loadingOperations = useSelector(selectLoadingOperations);
-    const isLoading = useMemo(
-      () => loadingOperations.includes(id),
-      [loadingOperations, id]
+    // The root operation ID
+    // Dependencies: `state.operations.rootOperationId`
+    const isRootOperation = useSelector((state) => {
+      return id === selectRootOperationId(state);
+    });
+
+    // Function to get a color based on depth within the operation tree
+    // Depends on `maxDepth`
+    const colorScale = useCallback(
+      (depth) => {
+        const scale = scaleSequential([maxDepth + 1, 0], interpolateGreys);
+        return scale(depth);
+      },
+      [maxDepth]
     );
 
-    // Get columnIds associated with this table, both active and "removed"
-    const columnIds = useSelector((state) =>
-      selectColumnIdsByParentId(state, id)
+    // Sync & Materialization Status
+    // -------------------------------------------------------------
+
+    // is the operation materialized?
+    const isMaterialized = useMemo(
+      () => operation.isMaterialized,
+      [operation.isMaterialized]
     );
 
-    // Get columnIds of child tables that are active (not hidden)
-    const activeChildColumnIds = useSelector((state) =>
-      selectActiveColumnIdsByParentId(state, operation.childIds)
+    // is the materialized operation in sync with the schema?
+    const isInSync = useMemo(() => operation.isInSync, [operation.isInSync]);
+
+    // is the operation Id in the loading operations array?
+    // Dependencies: `ui.loadingOperations`
+    const isLoading = useSelector((state) => {
+      return selectLoadingOperations(state).includes(id);
+    });
+
+    // Column Data
+    // -------------------------------------------------------------
+
+    // All column IDs associated directly with this operation
+    const columnIds = useMemo(
+      () => operation.columnIds || [],
+      [operation.columnIds]
+    );
+
+    // Get columnIds of child tables/operations
+    // Is this deprecated
+    const childColumnIds = useSelector((state) =>
+      selectActiveColumnIdsByParentId(state, childIds)
     );
 
     // Get active columnIds of child tables that are selected
+    // TODO: should this be here?
     const selectedChildColumnIds = useSelector((state) =>
-      selectSelectedColumnIdsByParentId(state, operation.childIds)
+      selectSelectedColumnIdsByParentId(state, childIds)
     );
 
     const selectedChildColumnIdsSet = useMemo(() => {
       return new Set(selectedChildColumnIds.flat());
     }, [selectedChildColumnIds]);
-
-    const activeColumnIds = operation.columnIds;
-
-    const removedColumnIds = useMemo(() => {
-      return columnIds.filter((colId) => !activeColumnIds.includes(colId));
-    }, [columnIds, activeColumnIds]);
 
     // Column objects for all columns associated directly with this operation
     // TODO: should this be a selector of should the selector draw straight
@@ -119,7 +291,6 @@ export default function withOperationData(WrappedComponent) {
     );
 
     const isFocused = focusedObjectId === id;
-    const isHovered = false; // TODO
 
     // Define callback functions used by all operation types
     // ----------------------------------------------------------------------------
@@ -160,7 +331,7 @@ export default function withOperationData(WrappedComponent) {
 
     const swapTablePositions = useCallback(
       (aIndex, bIndex) => {
-        const updatedChildren = [...(operation.childIds || [])];
+        const updatedChildren = [...(childIds || [])];
         // Swap the two table IDs
         [updatedChildren[aIndex], updatedChildren[bIndex]] = [
           updatedChildren[bIndex],
@@ -185,53 +356,7 @@ export default function withOperationData(WrappedComponent) {
           })
         );
       },
-      [dispatch, id, operation.childIds, operation.joinKey1, operation.joinKey2]
-    );
-
-    const hideColumns = useCallback(
-      (columnIdsToHide) => {
-        const columnIdsToHideByParentId = Array.from(
-          group(columnIdsToHide, (columnId) => {
-            let parentId = null;
-            for (const childColumns of activeChildColumnIds) {
-              if (childColumns.includes(columnId)) {
-                parentId =
-                  operation.childIds[
-                    activeChildColumnIds.indexOf(childColumns)
-                  ];
-                break;
-              }
-            }
-            return parentId;
-          }),
-          ([parentId, columnIds]) => ({ parentId, columnIds })
-        );
-
-        const columnIdsToIncludeByParentId = columnIdsToHideByParentId.map(
-          ({ parentId, columnIds }) => {
-            return {
-              id: parentId,
-              hiddenColumnIds: columnIds,
-            };
-          }
-        );
-
-        const tableUpdates = columnIdsToIncludeByParentId.filter(({ id }) =>
-          isTableId(id)
-        );
-        const operationUpdates = columnIdsToIncludeByParentId.filter(({ id }) =>
-          isOperationId(id)
-        );
-
-        if (tableUpdates.length > 0) {
-          dispatch(updateTablesRequest({ tableUpdates }));
-        }
-        if (operationUpdates.length > 0) {
-          dispatch(updateOperationsRequest({ operationUpdates }));
-        }
-        dispatch(setSelectedColumnIds([]));
-      },
-      [activeChildColumnIds, dispatch, operation.childIds]
+      [dispatch, id, childIds, operation.joinKey1, operation.joinKey2]
     );
 
     const deleteColumns = useCallback(
@@ -263,141 +388,55 @@ export default function withOperationData(WrappedComponent) {
       [dispatch, id]
     );
 
-    const name = useMemo(() => {
-      const operationLabel = operation.operationType
-        ? operation.operationType.charAt(0).toUpperCase() +
-          operation.operationType.slice(1) +
-          " op."
-        : "Op.";
-      if (operation.name && operation.name.trim().length > 0) {
-        return operation.name;
-      }
-      return operationLabel;
-    }, [operation.name, operation.operationType]);
-
-    const colorScale = useCallback(
-      (depth) => {
-        const scale = scaleSequential([maxDepth + 1, 0], interpolateGreys);
-        return scale(depth);
-      },
-      [maxDepth]
-    );
-
     const selectAllChildColumns = useCallback(() => {
-      selectColumns(activeChildColumnIds.flat());
-    }, [selectColumns, activeChildColumnIds]);
-
-    const setOperationName = useCallback(
-      (name) => {
-        dispatch(updateOperationsRequest({ operationUpdates: [{ id, name }] }));
-      },
-      [dispatch, id]
-    );
+      selectColumns(childColumnIds.flat());
+    }, [selectColumns, childColumnIds]);
 
     return (
       <WrappedComponent
-        // Pass along props directly from the parent component
-        {...props}
+        // Identity & Metadata
         id={id}
-        // Props via this HOC
-        operation={operation}
         name={name}
-        databaseName={operation.databaseName}
-        operationType={operation.operationType}
-        childIds={operation.childIds}
-        doesViewExist={operation.doesViewExist}
-        isMaterialized={operation.isMaterialized}
-        isInSync={operation.isInSync}
-        activeChildColumnIds={activeChildColumnIds} // ColumnIDs of operation's child tables (not hidden)
-        selectedChildColumnIds={selectedChildColumnIds} // A matrix of column IDs, each row is a child table
-        selectedChildColumnIdsSet={selectedChildColumnIdsSet} // a Set of all selected column IDs, including those from child tables
-        childRowCounts={childRowCounts}
+        databaseName={databaseName}
+        operationType={operationType}
+        setOperationType={setOperationType}
+        setOperationName={setOperationName}
+        swapTablePositions={swapTablePositions}
+        // Hierarchy & Structure
+        childIds={childIds}
         depth={depth}
         focusedDepth={focusedDepth}
         maxDepth={maxDepth}
         isRootOperation={isRootOperation}
         colorScale={colorScale}
+        // Sync & Materialization Status
+        isMaterialized={isMaterialized}
+        isInSync={isInSync}
         isLoading={isLoading}
-        // Pack-related operations
-        joinKey1={operation.joinKey1}
-        joinKey2={operation.joinKey2}
-        joinPredicate={operation.joinPredicate}
-        joinType={operation.joinType}
-        // Directly associated columns
-        columnIds={columnIds} // All column IDs associated with this operation
-        activeColumnIds={activeColumnIds} // columns not hidden
-        selectedColumnIds={selectedColumnIds}
-        removedColumnIds={removedColumnIds} // TODO: @deprecated?
-        // Row stuff
-        rowCount={operation.rowCount}
-        // Directly associated alerts (from withAssociatedAlerts)
-        alertIds={alertIds}
-        totalCount={totalCount}
-        deleteAlerts={deleteAlerts}
-        silenceAlerts={silenceAlerts}
-        // Interaction props (TODO, is this deprecated?)
-        isFocused={isFocused}
-        isHovered={isHovered}
-        // Interaction handlers
-        onHover={() => {}} // TODO
-        onUnhover={() => {}} // TODO
-        // Operation specific callbacks
-        swapTablePositions={swapTablePositions}
-        renameOperation={(newName) =>
-          dispatch(
-            updateOperationsRequest({
-              operationUpdates: [{ id, name: newName }],
-            })
-          )
-        }
-        setName={(name) =>
-          dispatch(
-            updateOperationsRequest({ operationUpdates: [{ id, name }] })
-          )
-        }
-        focusOperation={focusOperation}
-        setOperationType={(nextOperationType) =>
-          dispatch(
-            updateOperationsRequest({
-              operationUpdates: [
-                {
-                  id,
-                  operationType: nextOperationType,
-                  // Reset join parameters if changing away from PACK
-                  ...(nextOperationType === OPERATION_TYPE_PACK
-                    ? {
-                        joinKey1: null,
-                        joinKey2: null,
-                        joinPredicate: DEFAULT_JOIN_PREDICATE,
-                        joinType: DEFAULT_JOIN_TYPE,
-                      }
-                    : {
-                        joinKey1: undefined,
-                        joinKey2: undefined,
-                        joinPredicate: undefined,
-                        joinType: undefined,
-                      }),
-                },
-              ],
-            })
-          )
-        }
-        setOperationName={setOperationName}
         materializeOperation={materializeOperation}
-        // Callback function related to columns
+        // Column Data
+        columnIds={columnIds} // All column IDs associated with this operation
+        childColumnIds={childColumnIds} // ColumnIDs of operation's child tables (not hidden)
+        selectedColumnIds={selectedColumnIds}
+        selectedChildColumnIds={selectedChildColumnIds} // A matrix of column IDs, each row is a child table
+        selectedChildColumnIdsSet={selectedChildColumnIdsSet} // a Set of all selected column IDs, including those from child tables
         selectColumns={selectColumns}
-        hideColumns={hideColumns}
-        deleteColumns={deleteColumns}
+        selectAllChildColumns={selectAllChildColumns}
         clearSelectedColumns={clearSelectedColumns}
-        insertColumnIntoChildAtIndex={insertColumnIntoChildAtIndex}
+        deleteColumns={deleteColumns}
         setVisibleColumns={setVisibleColumns}
         focusColumns={focusColumns}
-        selectAllChildColumns={selectAllChildColumns}
+        insertColumnIntoChildAtIndex={insertColumnIntoChildAtIndex}
+        // Row Data
+        childRowCounts={childRowCounts}
+        // Interaction state
+        isFocused={isFocused}
+        focusOperation={focusOperation}
+        // Pass along props directly from the parent component
+        {...props}
       />
     );
   }
 
-  // Wrap the EnhancedComponent with withAssociatedAlerts to inject alert props
-  // TODO: don't wrap associated alerts in another HOC. It's redundant.
-  return withAssociatedAlerts(EnhancedComponent);
+  return EnhancedComponent;
 }

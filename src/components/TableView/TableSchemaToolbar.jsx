@@ -1,9 +1,6 @@
 import { useCallback } from "react";
 import { EnhancedSchemaToolbar, OBJECT_TYPE_TABLE } from "../ui/SchemaToolbar";
-import withTableData from "./withTableData";
-import { TableLabel } from "./TableLabel";
-import { Chip, Stack, Typography } from "@mui/material";
-import { TableIcon } from "../ui/icons";
+import { withTableData } from "../HOC";
 
 const TableSchemaToolbar = ({
   id,
@@ -11,13 +8,15 @@ const TableSchemaToolbar = ({
   name,
   rowCount,
   columnCount,
-  focusColumns, // Sets focused column IDs globally
-  hideColumns, // Hides columns globally
-  deleteColumns, // Deletes columns globally
-  selectColumns, // Sets global set of selected column IDs
-  activeColumnIds,
+  focusColumns,
+  deleteColumns,
+  selectColumns,
+  columnIds,
   selectedColumnIds,
-  setTableName, // Sets the table name globally
+  setTableName,
+
+  // Props passed directly from parent component (TableSchema.jsx)
+  hideColumns,
 }) => {
   const handleFocusColumns = useCallback(() => {
     focusColumns(selectedColumnIds);
@@ -37,9 +36,9 @@ const TableSchemaToolbar = ({
       selectColumns([]);
     } else {
       // Not all selected - select all
-      selectColumns(activeColumnIds);
+      selectColumns(columnIds);
     }
-  }, [activeColumnIds, selectedColumnIds, selectColumns]);
+  }, [columnIds, selectedColumnIds, selectColumns]);
 
   const handleRenameConfirm = useCallback(
     (newName) => setTableName(newName),
@@ -62,8 +61,7 @@ const TableSchemaToolbar = ({
       isHideDisabled={selectedColumnIds.length === 0}
       isDeleteDisabled={selectedColumnIds.length === 0}
       isSelectToggleSelected={
-        selectedColumnIds.length === activeColumnIds.length &&
-        activeColumnIds.length > 0
+        selectedColumnIds.length === columnIds.length && columnIds.length > 0
       }
     />
   );
