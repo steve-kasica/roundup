@@ -137,13 +137,6 @@ export function usePaginatedTableRows(
         return;
       }
 
-      if (!columnIds || columnIds.length === 0) {
-        const noColumnsError = new Error("No columns have been selected");
-        setError(noColumnsError);
-        setLoading(false);
-        return;
-      }
-
       setLoading(true);
       setError(null);
 
