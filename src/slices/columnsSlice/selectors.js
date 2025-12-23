@@ -71,9 +71,12 @@ export const selectColumnNamesById = createSelector(
 );
 
 /**
- * Select selected (and active) column IDs for a specific table.
- *
- * This selector provides the intersection of active columns (from columns.idsByTable) and selected columns (from columns.selected). It's useful for operations that should only apply to columns that are both visible/active in the table AND currently selected by the user. Excluded columns are automatically filtered out since they won't be in the active columns list.
+ * Select selected column IDs for specific tables.
+ * This selector provides the intersection of active columns (from `state.columns.idsByTable`) and
+ * selected columns (from `state.ui.selectedColumnIds`). It's useful for operations that should
+ * only apply to columns that are both visible/active in the table AND currently selected
+ * by the user. Excluded columns are automatically filtered out
+ * since they won't be in the active columns list.
  *
  * The returned array maintains the same order as `selectTableColumnIds`,
  * preserving the column ordering defined in the table's `childIds` array.
@@ -86,19 +89,24 @@ export const selectColumnNamesById = createSelector(
  */
 export const selectSelectedColumnIdsByParentId = createSelector(
   [
-    (state, parentIds) =>
-      (Array.isArray(parentIds) ? parentIds : [parentIds]).map((parentId) =>
-        isTableId(parentId)
-          ? selectTablesById(state, parentId).columnIds
-          : selectOperationsById(state, parentId).columnIds
-      ),
+    (state, parentIds) => parentIds,
+    (state) => state.tables.byId,
+    (state) => state.operations.byId,
     (state) => selectSelectedColumnIds(state),
   ],
-  (activeColumnIdsByParent, selectedColumnIds) => {
+  (parentIds, tablesById, operationsById, selectedColumnIds) => {
     const selectedSet = new Set(selectedColumnIds);
-    const output = activeColumnIdsByParent.map((colIds) =>
-      colIds.filter((colId) => selectedSet.has(colId))
-    );
+    const normalizedParentIds = Array.isArray(parentIds)
+      ? parentIds
+      : [parentIds];
+
+    const output = normalizedParentIds.map((parentId) => {
+      const columnIds = isTableId(parentId)
+        ? tablesById[parentId].columnIds
+        : operationsById[parentId].columnIds;
+      return columnIds.filter((colId) => selectedSet.has(colId));
+    });
+
     return output.length === 1 ? output[0] : output;
   }
 );

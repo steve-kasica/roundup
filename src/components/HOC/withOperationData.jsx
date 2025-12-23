@@ -41,9 +41,8 @@ import {
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
 
-import { group, interpolateGreys, scaleSequential } from "d3";
+import { interpolateGreys, scaleSequential } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
-import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 
 /**
@@ -261,18 +260,27 @@ export default function withOperationData(WrappedComponent) {
       [operation.columnIds]
     );
 
-    // Get columnIds of child tables/operations
-    // Is this deprecated
+    /**
+     * Column IDs of child tables/operations
+     * @type {Array<Array<string>>}
+     */
     const childColumnIds = useSelector((state) =>
       selectActiveColumnIdsByParentId(state, childIds)
     );
 
-    // Get active columnIds of child tables that are selected
-    // TODO: should this be here?
+    /**
+     * Matrix of selected column IDs, each row represents a child table
+     * Is dependent upon `state.ui.selectedColumnIds`
+     * @type {Array<Array<string>>}
+     */
     const selectedChildColumnIds = useSelector((state) =>
       selectSelectedColumnIdsByParentId(state, childIds)
     );
 
+    /**
+     * Set of all selected column IDs including those from child tables
+     * @type {Set<string>}
+     */
     const selectedChildColumnIdsSet = useMemo(() => {
       return new Set(selectedChildColumnIds.flat());
     }, [selectedChildColumnIds]);
@@ -284,6 +292,10 @@ export default function withOperationData(WrappedComponent) {
       selectSelectedColumnIdsByParentId(state, id)
     );
 
+    /**
+     * The currently focused object ID from the UI state
+     * @type {string|null}
+     */
     const focusedObjectId = useSelector(selectFocusedObjectId);
 
     const childRowCounts = useSelector((state) =>

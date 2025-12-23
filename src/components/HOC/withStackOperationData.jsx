@@ -1,3 +1,17 @@
+/**
+ * @fileoverview Higher-order component to provide stack operation data
+ * to wrapped components. This HOC connects to the Redux store to
+ * retrieve and compute relevant data about stack operations, including
+ * child table column IDs, matrix dimensions, and row ranges.
+ *
+ * The principle export from this component is a rectangular matrix of
+ * column IDs for each child table, with null values used to backfill
+ * shorter rows to ensure a consistent shape. This matrix is useful
+ * for rendering stack operation UIs where columns may need to be
+ * manipulated across multiple child tables.
+ *
+ * @module components/HOC/withStackOperationData
+ */
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useMemo } from "react";
 import {
@@ -8,16 +22,22 @@ import { updateTablesRequest } from "../../sagas/updateTablesSaga";
 import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
 
 /**
- * This HOC produces a matrix of column IDs for each table ID provided
- * in row-major order while filling uneven rows, which represent
- * tables with different numbers of columns, with null values to ensure
- * that the matrix is rectangular. For example,
- *
- *
- * It also passes, on via props, some useful metadata about
- * the matrix: the number of rows (n),  columns (m), and column names.
- * @param {*} WrappedComponent
- * @returns
+ * @typedef {Object} WithStackOperationDataProps
+ * @property {string} id - The ID of the stack operation
+ * @property {Array<Array<string|null>>} columnIdMatrix - 2D array of column IDs with nulls
+ * @property {number} m - Number of columns in the column ID matrix
+ * @property {number} n - Number of rows in the column ID matrix
+ * @property {function} swapColumns - Function to swap two columns in child tables
+ * @property {number} columnCount - Number of columns in the stack operation
+ * @property {Map<string, {start: number, end: number}>} rowRanges - Map of table ID to row range
+ * @property {number} rowCount - Number of rows in the stack operation
+ */
+
+/**
+ * @function withStackOperationData
+ * @template T
+ * @param {React.ComponentType<WithStackOperationDataProps>} WrappedComponent
+ * @returns {React.ComponentType<Omit<WithStackOperationDataProps, 'columnIdMatrix' | 'm' | 'n' | 'swapColumns' | 'columnCount' | 'rowRanges' | 'rowCount'>>} Enhanced component with stack operation data
  */
 export default function withStackOperationData(WrappedComponent) {
   function EnhancedComponent({ id, ...props }) {

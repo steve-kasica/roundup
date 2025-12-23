@@ -11,11 +11,10 @@ import { createSelector } from "@reduxjs/toolkit";
 /**
  * Select all currently selected column IDs across all tables.
  *
- * This selector returns the global selection state for columns. When a user selects
- * columns in the UI (via click, shift-click, etc.), their IDs are stored in the
- * columns.selected array. This is a global list that can include columns from
- * multiple tables. Use `selectSelectedColumnIdsByParentId` to filter selected columns
- * for a specific table.
+ * This selector returns the global selection state for columns,
+ * stored in `state.ui.selectedColumnIDs`. This is a global list includes columns
+ * from multiple tables. Use `selectSelectedColumnIdsByParentId` to filter
+ * selected columns for a specific table.
  *
  * @function
  * @param {Object} state - The Redux state.
@@ -102,13 +101,17 @@ export const selectDropTargetColumnIds = (state) =>
 export const selectVisibleColumnIds = (state) => state.ui.visibleColumnIds;
 
 /**
- * Selects the currently focused object from the UI slice of the Redux state.
+ * Selects the currently focused object from the UI slice of the Redux state,
+ * specifically `state.ui.focusedObjectId`.
  *
  * @function
  * @param {Object} state - The Redux state object.
- * @returns {*} The currently focused object from the UI state.
+ * @returns {string|null} The currently focused object ID, e.g. table or operation
  */
-export const selectFocusedObjectId = (state) => state.ui.focusedObjectId;
+export const selectFocusedObjectId = createSelector(
+  (state) => state.ui.focusedObjectId,
+  (focusedObjectId) => focusedObjectId
+);
 
 /**
  * Selector to determine if a specific column ID is currently hovered.

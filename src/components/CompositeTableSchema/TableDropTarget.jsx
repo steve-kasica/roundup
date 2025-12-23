@@ -76,7 +76,7 @@ export default function TableDropTarget({
                   joinType: JOIN_TYPES["FULL_OUTER"],
                   joinKey1: null,
                   joinKey2: null,
-                  matchStats: { ...MATCH_STATS_DEFAULT },
+                  matchStats: Object.fromEntries(MATCH_STATS_DEFAULT.entries()),
                 }),
               },
             ],

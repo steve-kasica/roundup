@@ -24,9 +24,9 @@ const StackRows = ({
   materializeOperation,
   isMaterialized,
   isInSync,
-  columnIds, // ColumnIDs of this operation
-  childIds, // an array of child operation/table IDs
-  childRowCounts, // a map of childId to row count
+  columnIds,
+  childIds,
+  childRowCounts,
   selectedChildColumnIds,
   selectAllChildColumns,
   // Props defined in withStackOperationData
