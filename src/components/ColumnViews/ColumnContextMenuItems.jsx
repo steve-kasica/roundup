@@ -22,7 +22,7 @@ import {
   DeleteForever,
 } from "@mui/icons-material";
 import { useCallback, useState } from "react";
-import withColumnData from "./withColumnData";
+import { withColumnData } from "../HOC";
 import {
   COLUMN_TYPE_CATEGORICAL,
   COLUMN_TYPE_NUMERICAL,
@@ -33,14 +33,13 @@ import { FreeTextDialog, InsertColumnDialog } from "../ui/dialogs";
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
   columnType,
-  name,
-  databaseName,
   setColumnType,
   focusColumn,
 
   deleteColumn,
   renameColumn,
   // Props passed directly from parent component
+  // eslint-disable-next-line no-unused-vars
   includeInsert = true,
   isError = false,
   onHideColumn,

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import withColumnData from "./withColumnData";
+import { withColumnData, withAssociatedAlerts } from "../HOC";
 import { Box, Typography, Tooltip, Menu } from "@mui/material";
 import { Info } from "@mui/icons-material";
 import SingleBar from "../visualization/SingleBar";
@@ -17,7 +17,7 @@ const ColumnSummary = ({
   columnType,
   id,
   nullCount,
-  uniqueCount,
+  approxUnique,
   completeCount,
   hoverColumn,
   unhoverColumn,
@@ -279,7 +279,7 @@ const ColumnSummary = ({
           </Box>
           <Box sx={{ width: "100%", overflow: "hidden" }}>
             <SingleBar
-              value={completeCount - uniqueCount}
+              value={completeCount - approxUnique}
               xAxisScale={scaleLinear().domain([0, completeCount])}
               height={20}
               color="#424242"
@@ -311,7 +311,9 @@ const ColumnSummary = ({
 
 ColumnSummary.displayName = "Column Summary";
 
-const EnhancedColumnSummary = withColumnData(ColumnSummary);
+const EnhancedColumnSummary = withAssociatedAlerts(
+  withColumnData(ColumnSummary)
+);
 
 EnhancedColumnSummary.displayName = "Enhanced Column Summary";
 

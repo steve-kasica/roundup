@@ -3,7 +3,7 @@ import { IconButton, Menu, TableSortLabel } from "@mui/material";
 // import EditableText from "../ui/EditableText";
 import { useCallback, useState } from "react";
 import { MoreVert } from "@mui/icons-material";
-import withColumnData from "./withColumnData";
+import { withColumnData, withAssociatedAlerts } from "../HOC";
 import { EnhancedColumnName } from "./ColumnName";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
 import StyledColumnCard from "./StyledColumnCard";
@@ -134,7 +134,7 @@ const ColumnHeader = ({
 
 ColumnHeader.displayName = "ColumnHeader";
 
-const EnhancedColumnHeader = withColumnData(ColumnHeader);
+const EnhancedColumnHeader = withAssociatedAlerts(withColumnData(ColumnHeader));
 
 EnhancedColumnHeader.displayName = "EnhancedColumnHeader";
 

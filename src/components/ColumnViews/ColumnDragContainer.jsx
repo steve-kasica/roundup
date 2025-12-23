@@ -8,7 +8,7 @@ import {
   useMemo,
 } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import withColumnData from "./withColumnData";
+import { withColumnData } from "../HOC";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToHoveredColumnIds,
@@ -26,10 +26,10 @@ import { selectOperationsById } from "../../slices/operationsSlice";
  * Passes dragDropRef to its children instead of wrapping them
  */
 const ColumnDragContainer = withColumnData(
-  ({ column, children, onDragEnd, onDrop, canDrag = true }) => {
+  ({ id, parentId, children, onDragEnd, onDrop, canDrag = true }) => {
     const dispatch = useDispatch();
     const ref = useRef(null);
-    const dragType = `${column.parentId}_Column`; // Unique drag type per table
+    const dragType = `${parentId}_Column`; // Unique drag type per table
 
     // Get sibling column IDs (all columns in table except current one)
     // TODO: this selector is catywampus - needs to handle operations as parents too
@@ -37,14 +37,14 @@ const ColumnDragContainer = withColumnData(
     // for that kind of selection that just deals with selecting from state
     const parentColumnIds = useSelector(
       (state) =>
-        (isTableId(column.parentId)
-          ? selectTablesById(state, column.parentId)
-          : selectOperationsById(state, column.parentId)
+        (isTableId(parentId)
+          ? selectTablesById(state, parentId)
+          : selectOperationsById(state, parentId)
         ).columnIds
     );
     const siblingColumnIds = useMemo(() => {
-      return parentColumnIds.filter((id) => id !== column.id);
-    }, [parentColumnIds, column.id]);
+      return parentColumnIds.filter((id) => id !== id);
+    }, [parentColumnIds, id]);
 
     const dropTargetColumnIds = useSelector((state) =>
       selectDropTargetColumnIds(state)
@@ -52,8 +52,8 @@ const ColumnDragContainer = withColumnData(
 
     // Check if this column is a drop target
     const canDropHere = useMemo(
-      () => dropTargetColumnIds.includes(column?.id),
-      [dropTargetColumnIds, column?.id]
+      () => dropTargetColumnIds.includes(id),
+      [dropTargetColumnIds, id]
     );
 
     // Drag functionality
@@ -61,8 +61,8 @@ const ColumnDragContainer = withColumnData(
       type: dragType,
       item: () => {
         // Dispatch action to add column to dragging state when item is created
-        if (column?.id) {
-          dispatch(setDraggingColumnIds(column.id));
+        if (id) {
+          dispatch(setDraggingColumnIds(id));
 
           // Set all sibling columns as drop targets
           if (siblingColumnIds.length > 0) {
@@ -81,7 +81,7 @@ const ColumnDragContainer = withColumnData(
       }),
       end: (item, monitor) => {
         // Remove from dragging state when drag ends
-        if (column?.id) {
+        if (id) {
           dispatch(setDraggingColumnIds([]));
         }
 
@@ -106,14 +106,14 @@ const ColumnDragContainer = withColumnData(
         }
 
         // Don't drop on self
-        if (draggedItem.id === column?.id) {
+        if (draggedItem.id === id) {
           return;
         }
 
         const dropResult = onDrop ? onDrop(draggedItem, column, monitor) : {};
         return { ...dropResult, droppedOn: column };
       },
-      canDrop: (item) => item.id !== column?.id, // Can't drop on self
+      canDrop: (item) => item.id !== id, // Can't drop on self
       collect: (monitor) => ({
         isOver: monitor.isOver({ shallow: true }),
       }),
@@ -121,14 +121,13 @@ const ColumnDragContainer = withColumnData(
 
     useEffect(() => {
       // This effect runs whenever isOver changes
-      if (isOver && column?.id) {
-        dispatch(addToHoveredColumnIds(column.id));
-      } else if (!isOver && column?.id) {
+      if (isOver && id) {
+        dispatch(addToHoveredColumnIds(id));
+      } else if (!isOver && id) {
         // TODO: remove column from hover targets
-        dispatch(removeFromHoveredColumnIds(column.id));
+        dispatch(removeFromHoveredColumnIds(id));
       }
-    }, [isOver, column?.id, dispatch]);
-
+    }, [isOver, id, dispatch]);
     // Combine drag and drop refs
     const dragDropRef = (node) => {
       ref.current = node;

@@ -9,7 +9,7 @@
  * This stats aid the user in the precusory EDA that occurs during the Wrangling stage of
  * data work.
  */
-import withColumnData from "./withColumnData";
+import { withColumnData, withAssociatedAlerts } from "../HOC";
 import { Box, Divider, Typography, Chip, Stack } from "@mui/material";
 import { Warning } from "@mui/icons-material";
 import DescriptionList from "../ui/DescriptionList";
@@ -33,7 +33,7 @@ const ColumnDetails = ({
   modeValue,
   modeCount,
   databaseName,
-  uniqueCount,
+  approxUnique,
   duplicateCount,
   nullCount,
   completeness,
@@ -91,7 +91,7 @@ const ColumnDetails = ({
           type: `${duckDBToRoundupTypes(columnType)} (${columnType})`,
           null: nullCount.toLocaleString(),
           completeness: `${completeness * 100}%`,
-          unique: uniqueCount.toLocaleString(),
+          unique: approxUnique.toLocaleString(),
           duplicate: duplicateCount.toLocaleString(),
           mode: `${modeValue || 0} (${modeCount?.toLocaleString() || 0})`,
         }}
@@ -115,7 +115,7 @@ const ColumnDetails = ({
       </Box>
       <Box sx={{ mt: "10px", flexGrow: 1, overflow: "auto" }}>
         {view === VALUE_COUNTS_VIEW ? (
-          <ColumnValueCounts id={id} uniqueCount={uniqueCount} />
+          <ColumnValueCounts id={id} uniqueCount={approxUnique} />
         ) : view === RAW_VALUES_VIEW ? (
           <EnhancedColumnValues id={id} />
         ) : view === STRING_LENGTH_VIEW ? (
@@ -128,7 +128,9 @@ const ColumnDetails = ({
 
 ColumnDetails.displayName = "ColumnDetails";
 
-const EnhancedColumnDetails = withColumnData(ColumnDetails);
+const EnhancedColumnDetails = withAssociatedAlerts(
+  withColumnData(ColumnDetails)
+);
 
 EnhancedColumnDetails.displayName = "EnhancedColumnDetails";
 

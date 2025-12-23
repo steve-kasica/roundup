@@ -10,7 +10,7 @@ import { usePaginatedValueCounts } from "../../hooks/useValueCounts";
 import { formatNumber } from "../../lib/utilities";
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
 
-const ColumnValuesCounts = ({ id, uniqueCount, limit = 20 }) => {
+const ColumnValuesCounts = ({ id, approxUnique, limit = 20 }) => {
   const { data, loading, error, total, loadMore } = usePaginatedValueCounts(
     id,
     limit
@@ -64,7 +64,7 @@ const ColumnValuesCounts = ({ id, uniqueCount, limit = 20 }) => {
         sx={{ mt: 1, display: "block", flexShrink: 0 }}
       >
         Showing {data.length.toLocaleString()} of{" "}
-        {total.toLocaleString() || uniqueCount.toLocaleString()} unique values
+        {total.toLocaleString() || approxUnique.toLocaleString()} unique values
       </Typography>
     </Box>
   );

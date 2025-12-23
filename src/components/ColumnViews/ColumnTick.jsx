@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Box, styled } from "@mui/material";
-import withColumnData from "./withColumnData";
+import { withColumnData } from "../HOC";
 
 const StyledColumnTick = styled(Box, {
   shouldForwardProp: (prop) =>

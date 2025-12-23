@@ -3,7 +3,7 @@ import { getColumnValues } from "../../../lib/duckdb";
 import PropTypes from "prop-types";
 import { Box, Typography } from "@mui/material";
 import ColumnContainer from "../ColumnContainer";
-import withColumnData from "../../ColumnViews/withColumnData";
+import { withColumnData } from "../../HOC";
 import { DRAG_MODE_COLUMN, DRAG_MODE_DISABLED } from "../StackOperationView";
 import EditableText from "../../ui/EditableText";
 

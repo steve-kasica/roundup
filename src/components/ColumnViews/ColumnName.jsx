@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
-import { Typography, Box, Tooltip } from "@mui/material";
-import { Warning } from "@mui/icons-material";
-import withColumnData from "./withColumnData";
+import { Typography, Box } from "@mui/material";
+import { withColumnData, withAssociatedAlerts } from "../HOC";
 
 const ColumnName = ({
   // Props passed from withColumnData HOC
@@ -84,7 +83,7 @@ const ColumnName = ({
 
 ColumnName.displayName = "ColumnName";
 
-const EnhancedColumnName = withColumnData(ColumnName);
+const EnhancedColumnName = withAssociatedAlerts(withColumnData(ColumnName));
 EnhancedColumnName.displayName = "EnhancedColumnName";
 
 export { EnhancedColumnName, ColumnName };

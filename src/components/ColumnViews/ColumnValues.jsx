@@ -2,7 +2,7 @@
 import { Box, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { getColumnValues } from "../../lib/duckdb";
-import withColumnData from "./withColumnData";
+import { withColumnData } from "../HOC";
 import { useSelector } from "react-redux";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";

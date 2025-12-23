@@ -1,4 +1,4 @@
-import withColumnData from "../../../../ColumnViews/withColumnData";
+import { withColumnData } from "../../../../HOC";
 function ColumnView({ column }) {
   return column.name || column.databaseName || column.id;
 }
