@@ -20,6 +20,10 @@ import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useState } from "react";
 import { duckDBToRoundupTypes } from "../../lib/duckdb";
 import ColumnIcon from "./ColumnIcon";
+import SingleBar from "../visualization/SingleBar";
+import { ProportionBar } from "../visualization";
+import { InfoIcon } from "../ui/icons";
+import { EnhancedTableName, TableName } from "../TableView/TableName";
 
 const VALUE_COUNTS_VIEW = "value_counts";
 const RAW_VALUES_VIEW = "raw_values";
@@ -29,6 +33,7 @@ const ColumnDetails = ({
   // Props passed via `withColumnData` HOC
   name,
   columnType,
+  parentId,
   id,
   modeValue,
   modeCount,
@@ -36,9 +41,9 @@ const ColumnDetails = ({
   approxUnique,
   duplicateCount,
   nullCount,
-  completeness,
+  count,
+  nonNullCount,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
-  alertIds,
   totalCount,
 }) => {
   const [view, setView] = useState(VALUE_COUNTS_VIEW);
@@ -50,6 +55,7 @@ const ColumnDetails = ({
   };
   return (
     <Box
+      className="ColumnDetails"
       sx={{
         p: 1,
         display: "flex",
@@ -68,35 +74,161 @@ const ColumnDetails = ({
           <ColumnIcon />
           <Typography
             variant="h5"
-            sx={{ ...(totalCount && { color: "warning.dark" }) }}
+            sx={{
+              userSelect: "none",
+              ...(totalCount && { color: "warning.dark" }),
+            }}
           >
             {name || databaseName || id}
           </Typography>
         </Stack>
-
-        {totalCount && (
-          <Chip
-            icon={<Warning />}
-            label={`${alertIds.length} alert${
-              alertIds.length !== 1 ? "s" : ""
-            }`}
-            color="warning"
-            size="small"
-          />
-        )}
       </Box>
       <Divider sx={{ my: 1 }} />
-      <DescriptionList
-        data={{
-          type: `${duckDBToRoundupTypes(columnType)} (${columnType})`,
-          null: nullCount.toLocaleString(),
-          completeness: `${completeness * 100}%`,
-          unique: approxUnique.toLocaleString(),
-          duplicate: duplicateCount.toLocaleString(),
-          mode: `${modeValue || 0} (${modeCount?.toLocaleString() || 0})`,
+      <Box
+        sx={{
+          userSelect: "none",
         }}
-      />
+      >
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent={"space-between"}
+          alignItems="center"
+          sx={{ mb: 1 }}
+        >
+          <Typography variant="subtitle1" color="text.secondary">
+            Parent Table
+          </Typography>
+          <EnhancedTableName id={parentId} />
+        </Stack>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 1 }}
+        >
+          <Typography variant="subtitle1" color="text.secondary">
+            Column Type
+          </Typography>
+          <Typography variant="body2">
+            {duckDBToRoundupTypes(columnType)}
+          </Typography>
+        </Stack>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 1 }}
+        >
+          <Typography variant="subtitle1" color="text.secondary">
+            Count
+          </Typography>
+          <Typography variant="body2">{count.toLocaleString()}</Typography>
+        </Stack>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 1 }}
+        >
+          <Typography variant="subtitle1" color="text.secondary">
+            Mode
+          </Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography
+              variant="body2"
+              title={modeValue !== null ? `${modeValue}` : "N/A"}
+              sx={{
+                maxWidth: "100px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {modeValue !== null ? `${modeValue}` : "N/A"}
+            </Typography>
+            <Chip label={`${modeCount?.toLocaleString() || 0}`} size="small" />
+          </Stack>
+        </Stack>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 1 }}
+        >
+          <Typography variant="subtitle1" color="text.secondary">
+            Unique Values
+          </Typography>
+          <Typography variant="body2">
+            {approxUnique.toLocaleString()}
+          </Typography>
+        </Stack>
+      </Box>
       <Divider sx={{ my: 1 }} />
+      <Box sx={{ width: "100%", marginBottom: 2 }}>
+        <Typography gutterBottom>
+          Completeness
+          <sup>
+            <InfoIcon
+              tooltipText={"The ratio of null to non-null values in a column."}
+            />
+          </sup>
+        </Typography>
+        <ProportionBar
+          data={{
+            "Null values": nullCount,
+            "Non-null values": nonNullCount,
+          }}
+          colorScale={(key) => {
+            switch (key) {
+              case "Non-null values":
+                return "#555";
+              case "Null values":
+                return "#ccc";
+              default:
+                return "#ccc";
+            }
+          }}
+        />
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          marginBottom: 2,
+        }}
+      >
+        <Typography gutterBottom>
+          Uniqueness
+          <sup>
+            <InfoIcon
+              tooltipText={
+                "The ratio of unique values to total values in a column."
+              }
+            />
+          </sup>
+        </Typography>
+        <ProportionBar
+          data={{
+            "Duplicate values": duplicateCount,
+            "Unique values": approxUnique,
+          }}
+          colorScale={(key) => {
+            switch (key) {
+              case "Duplicate values":
+                return "#555";
+              case "Unique values":
+                return "#ccc";
+              default:
+                return "#ccc";
+            }
+          }}
+        />
+      </Box>
+      <Divider />
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Typography variant="h6" color="text.secondary">
           Values

@@ -1,10 +1,6 @@
-/* eslint-disable react/prop-types */
 import { useSelector, useDispatch } from "react-redux";
 
-import {
-  selectColumnsById,
-  selectColumnIndexById,
-} from "../../slices/columnsSlice";
+import { selectColumnsById } from "../../slices/columnsSlice";
 import {
   setFocusedColumnIds,
   removeFromHoveredColumnIds,
@@ -139,16 +135,19 @@ export default function withColumnData(WrappedComponent) {
      * @type {number|null}
      * @return {number|null} A value between 0 and 1 representing completeness.
      */
-    const completeness = useMemo(() => 1 - nullPercentage, [nullPercentage]);
+    const completePercentage = useMemo(
+      () => 1 - nullPercentage,
+      [nullPercentage]
+    );
 
     /**
      * The total number of non-null values in the column.
      * @type {number|null}
      * @return {number|null} A count of non-null values (integer).
      */
-    const completeCount = useMemo(
-      () => Math.floor(count * completeness),
-      [count, completeness]
+    const nonNullCount = useMemo(
+      () => Math.floor(count * completePercentage),
+      [count, completePercentage]
     );
 
     /**
@@ -321,8 +320,8 @@ export default function withColumnData(WrappedComponent) {
         min={min}
         nullPercentage={nullPercentage}
         nullCount={nullCount}
-        completeness={completeness}
-        completeCount={completeCount}
+        completePercentage={completePercentage}
+        nonNullCount={nonNullCount}
         p25={p25}
         p50={p50}
         p75={p75}

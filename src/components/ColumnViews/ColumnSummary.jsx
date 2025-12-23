@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { withColumnData, withAssociatedAlerts } from "../HOC";
-import { Box, Typography, Tooltip, Menu } from "@mui/material";
+import { Box, Typography, Tooltip, Menu, Chip } from "@mui/material";
 import { Info } from "@mui/icons-material";
 import SingleBar from "../visualization/SingleBar";
 import { scaleLinear } from "d3";
@@ -18,7 +18,7 @@ const ColumnSummary = ({
   id,
   nullCount,
   approxUnique,
-  completeCount,
+  nonNullCount,
   hoverColumn,
   unhoverColumn,
   onClick,
@@ -71,7 +71,7 @@ const ColumnSummary = ({
       onMouseEnter={hoverColumn}
       onMouseLeave={unhoverColumn}
       sx={{
-        cursor: isSelected ? "grab" : "context-menu",
+        cursor: isSelected ? "grab" : "pointer",
         boxShadow: 0,
         height: "100%",
         ...(totalCount && {
@@ -147,7 +147,6 @@ const ColumnSummary = ({
           </Box>
         </Box>
 
-        {/* Sample Values - Hidden when height < 200px */}
         <Box
           sx={{
             "@container (min-height: 50px)": {
@@ -179,115 +178,28 @@ const ColumnSummary = ({
             {(topValues && topValues.length) || 0 > 10 ? ", ..." : ""}
           </Typography>
         </Box>
-
-        {/* Null Values - Hidden when height < 150px */}
         <Box
           sx={{
-            "@container (min-height: 90px)": {
+            "@container (min-height: 75px)": {
               display: "block",
             },
-            "@container (max-height: 89px)": {
+            "@container (max-height: 74px)": {
               display: "none",
             },
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-              mb: 0.5,
-            }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              Null values
-            </Typography>
-            <Box>
-              <Tooltip
-                title="Shows the proportion of non-null values versus null/missing values in this column. Higher completeness indicates fewer missing values."
-                placement="top"
-                arrow
-              >
-                <Info
-                  fontSize="small"
-                  sx={{
-                    fontSize: 12,
-                    color: "text.disabled",
-                    cursor: "help",
-                    "&:hover": {
-                      color: "text.secondary",
-                    },
-                  }}
-                />
-              </Tooltip>
-            </Box>
-          </Box>
-          <Box sx={{ width: "100%", overflow: "hidden" }}>
-            <SingleBar
-              value={nullCount}
-              xAxisScale={scaleLinear().domain([0, completeCount])}
-              height={20}
-              color="#424242"
-              backgroundColor="#eee"
-              showPercentage={true}
-              maxValue={completeCount}
-            />
-          </Box>
-        </Box>
-
-        {/* Duplicate Values - Hidden when height < 175px */}
-        <Box
-          sx={{
-            "@container (min-height: 140px)": {
-              display: "block",
-            },
-            "@container (max-height: 139px)": {
-              display: "none",
-            },
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-              mt: 1,
-            }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              Duplicate values
-            </Typography>
-            <Box>
-              <Tooltip
-                title="Shows the proportion of unique values versus duplicate values in this column. Higher uniqueness indicates more distinct values."
-                placement="top"
-                arrow
-              >
-                <Info
-                  fontSize="small"
-                  sx={{
-                    fontSize: 12,
-                    color: "text.disabled",
-                    cursor: "help",
-                    "&:hover": {
-                      color: "text.secondary",
-                    },
-                  }}
-                />
-              </Tooltip>
-            </Box>
-          </Box>
-          <Box sx={{ width: "100%", overflow: "hidden" }}>
-            <SingleBar
-              value={completeCount - approxUnique}
-              xAxisScale={scaleLinear().domain([0, completeCount])}
-              height={20}
-              color="#424242"
-              backgroundColor="#eee"
-              showPercentage={true}
-              maxValue={completeCount}
-            />
-          </Box>
+          <Chip
+            label={`${nullCount || 0} nulls`}
+            size="small"
+            color={nullCount && nullCount > 0 ? "error" : "default"}
+            sx={{ marginTop: 0.5, fontSize: "0.6rem" }}
+          />
+          <Chip
+            label={`${approxUnique || 0} uniq.`}
+            size="small"
+            color={approxUnique && approxUnique < 2 ? "error" : "default"}
+            sx={{ marginTop: 0.5, fontSize: "0.6rem" }}
+          />
         </Box>
       </Box>
       <Menu
