@@ -357,7 +357,9 @@ export default function withOperationData(WrappedComponent) {
                 id,
                 childIds: updatedChildren,
                 // If join keys are set, we may need to swap them as well
-                ...(operation.joinKey1 && operation.joinKey2
+                ...(operation.operationType === OPERATION_TYPE_PACK &&
+                operation.joinKey1 &&
+                operation.joinKey2
                   ? {
                       joinKey1: operation.joinKey2,
                       joinKey2: operation.joinKey1,

@@ -129,7 +129,9 @@ const PackSchemaToolbar = ({
    */
   const handleSwapTables = useCallback(() => {
     swapTablePositions(0, 1);
-  }, [swapTablePositions]);
+    clearSelectedColumns();
+    clearSelectedMatches();
+  }, [swapTablePositions, clearSelectedColumns, clearSelectedMatches]);
 
   /**
    * @function handleRenameConfirm
@@ -154,7 +156,9 @@ const PackSchemaToolbar = ({
       onDeleteColumns={handleDeleteColumns}
       onRenameConfirm={handleRenameConfirm}
       onSelectToggleColumns={onSelectAllClick}
-      isFocusedDisabled={!isCompleteColumnSelected}
+      isFocusedDisabled={
+        !isCompleteColumnSelected || selectedChildColumnIdsSet.size > 2
+      }
       isHideDisabled={
         !isCompleteColumnSelected || selectedChildColumnIdsSet.size < 2
       }

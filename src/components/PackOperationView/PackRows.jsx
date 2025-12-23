@@ -40,8 +40,10 @@ const PackRows = ({
   leftColumnIds,
   rightKey,
   rightColumnIds,
+  validMatchGroups,
   // Props passed directly from withGlobalInterfaceData HOC
   selectedMatches,
+  selectMatches,
 }) => {
   const [sortByColumnId, setSortByColumnId] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -128,7 +130,13 @@ const PackRows = ({
   const handleMaterializeView = useCallback(() => {
     materializeOperation();
     selectAllChildColumns();
-  }, [materializeOperation, selectAllChildColumns]);
+    selectMatches(validMatchGroups);
+  }, [
+    materializeOperation,
+    selectAllChildColumns,
+    selectMatches,
+    validMatchGroups,
+  ]);
 
   const setRowMargin = useCallback(
     (rowData, index) => {
