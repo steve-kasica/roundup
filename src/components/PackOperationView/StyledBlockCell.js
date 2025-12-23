@@ -5,6 +5,7 @@ const StyledBlockCell = styled(Box, {
     ![
       "disabled",
       "isEmpty",
+      "isSelected",
       "isLastLeftColumn",
       "highlightTopBorder",
       "highlightBottomBorder",
@@ -18,6 +19,7 @@ const StyledBlockCell = styled(Box, {
     theme,
     disabled,
     isEmpty,
+    isSelected,
     isLastLeftColumn,
     highlightTopBorder,
     highlightBottomBorder,
@@ -29,11 +31,6 @@ const StyledBlockCell = styled(Box, {
     backgroundColor,
   }) => {
     const selectedBorderColor = theme.palette.primary.main;
-    const isSelected =
-      highlightTopBorder ||
-      highlightBottomBorder ||
-      highlightLeftBorder ||
-      highlightRightBorder;
 
     return {
       flex: 1,
@@ -69,7 +66,7 @@ const StyledBlockCell = styled(Box, {
         opacity: disabled ? 1 : 0.8,
       },
       ...(isSelected && {
-        opacity: 1,
+        backgroundColor: lighten(theme.palette.primary.main, 0.85),
       }),
     };
   }

@@ -12,6 +12,7 @@ import {
   withOperationData,
   withPackOperationData,
   withAssociatedAlerts,
+  withGlobalInterfaceData,
 } from "../HOC";
 
 const pageSize = 50;
@@ -24,55 +25,67 @@ const pageSize = 50;
 const PackRows = ({
   // Props passed via withOperationData
   id,
-  columnIds, // ColumnIDs of this operation
+  columnIds,
   isMaterialized,
   isLoading,
   isInSync,
   materializeOperation,
   selectedChildColumnIdsSet,
-  selectColumns,
   selectAllChildColumns,
   // Props passed from withAssociatedAlerts HOC
   errorCount,
   // Props passed directly from withPackOperationData HOC
   matchStats,
-  selectedMatchTypes,
   leftKey,
   leftColumnIds,
   rightKey,
   rightColumnIds,
+  // Props passed directly from withGlobalInterfaceData HOC
+  selectedMatches,
 }) => {
   const [sortByColumnId, setSortByColumnId] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
 
+  const handleColumnSort = useCallback(
+    (_event, columnId) => {
+      let newDirection = "asc";
+      if (sortByColumnId === columnId) {
+        newDirection = sortDirection === "asc" ? "desc" : "asc";
+      }
+      setSortByColumnId(columnId);
+      setSortDirection(newDirection);
+    },
+    [sortByColumnId, sortDirection]
+  );
+
+  /**
+   * Get pack operation column IDs to display based on selected child columns
+   */
   const displayColumnIds = useMemo(() => {
     if (
       !isMaterialized ||
       leftKey == null ||
       rightKey == null ||
+      selectedChildColumnIdsSet.size === 0 ||
       columnIds.length === 0
     ) {
       return [];
+    } else {
+      const allChildColumns = [...leftColumnIds, ...rightColumnIds];
+      const selectedTableIndices = allChildColumns.reduce(
+        (acc, colId, index) => {
+          if (selectedChildColumnIdsSet.has(colId)) {
+            acc.push(index);
+          }
+          return acc;
+        },
+        []
+      );
+      const selectedOperationColumnIds = selectedTableIndices.map(
+        (index) => columnIds[index]
+      );
+      return selectedOperationColumnIds;
     }
-    const leftKeyIndex = leftColumnIds.indexOf(leftKey);
-    const rightKeyIndex =
-      leftColumnIds.length + rightColumnIds.indexOf(rightKey);
-
-    // Get the key column IDs
-    const leftKeyColId = columnIds[leftKeyIndex];
-    const rightKeyColId = columnIds[rightKeyIndex];
-
-    const selectedParentColumnIds = [...leftColumnIds, ...rightColumnIds]
-      .map((colId, index) => {
-        return selectedChildColumnIdsSet.has(colId) &&
-          ![leftKeyColId, rightKeyColId].includes(colId)
-          ? index
-          : null;
-      })
-      .filter(Boolean)
-      .map((idx) => columnIds[idx]);
-
-    return selectedParentColumnIds;
   }, [
     columnIds,
     isMaterialized,
@@ -84,22 +97,22 @@ const PackRows = ({
   ]);
 
   const initialOffset = useMemo(() => {
-    if (selectedMatchTypes.includes(MATCH_TYPE_MATCHES)) {
+    if (selectedMatches.includes(MATCH_TYPE_MATCHES)) {
       return 0;
-    } else if (selectedMatchTypes.includes(MATCH_TYPE_LEFT_UNMATCHED)) {
+    } else if (selectedMatches.includes(MATCH_TYPE_LEFT_UNMATCHED)) {
       return matchStats.matches;
-    } else if (selectedMatchTypes.includes(MATCH_TYPE_RIGHT_UNMATCHED)) {
+    } else if (selectedMatches.includes(MATCH_TYPE_RIGHT_UNMATCHED)) {
       return matchStats.matches + matchStats.left_unmatched;
     }
     return null;
-  }, [matchStats, selectedMatchTypes]);
+  }, [matchStats, selectedMatches]);
 
   const rowLimit = useMemo(() => {
-    const filteredMatchStats = selectedMatchTypes.reduce((acc, type) => {
+    const filteredMatchStats = selectedMatches.reduce((acc, type) => {
       return acc + matchStats[type];
     }, 0);
     return filteredMatchStats;
-  }, [matchStats, selectedMatchTypes]);
+  }, [matchStats, selectedMatches]);
 
   const results = usePaginatedTableRows(
     id,
@@ -111,18 +124,6 @@ const PackRows = ({
     rowLimit
   );
   const { data, loading, error, hasMore, loadMore, refresh } = results;
-
-  const handleColumnSort = useCallback(
-    (event, columnId) => {
-      let newDirection = "asc";
-      if (sortByColumnId === columnId) {
-        newDirection = sortDirection === "asc" ? "desc" : "asc";
-      }
-      setSortByColumnId(columnId);
-      setSortDirection(newDirection);
-    },
-    [sortByColumnId, sortDirection]
-  );
 
   const handleMaterializeView = useCallback(() => {
     materializeOperation();
@@ -211,7 +212,7 @@ const PackRows = ({
 PackRows.displayName = "Pack Rows";
 
 const EnhancedPackRows = withOperationData(
-  withAssociatedAlerts(withPackOperationData(PackRows))
+  withAssociatedAlerts(withPackOperationData(withGlobalInterfaceData(PackRows)))
 );
 
 EnhancedPackRows.displayName = "Enhanced Pack Rows";

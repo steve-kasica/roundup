@@ -39,27 +39,59 @@ export default function withGlobalInterfaceData(WrappedComponent) {
     const dispatch = useDispatch();
 
     // Selectors for UI state
-    const selectedColumnIds = useSelector(selectSelectedColumnIds);
-    const hoveredColumnIds = useSelector(selectHoveredColumnIds);
     const focusedColumnIds = useSelector(selectFocusedColumnIds);
     const visibleColumnIds = useSelector(selectVisibleColumnIds);
     const draggingColumnIds = useSelector(selectDraggingColumnIds);
     const dropTargetColumnIds = useSelector(selectDropTargetColumnIds);
     const focusedObjectId = useSelector(selectFocusedObjectId);
-    const selectedMatches = useSelector(selectSelectedMatches);
 
-    // Column selection handlers
+    // Column selection state
+    // -----------------------------------------------
+
+    const selectedColumnIds = useSelector(selectSelectedColumnIds);
+
+    /**
+     * @function selectColumns
+     * Sets the selected column IDs in the global UI state
+     * @param {Array} columnIds - The column IDs to select
+     * @return {void}
+     */
     const selectColumns = useCallback(
       (columnIds) => dispatch(setSelectedColumnIds(columnIds)),
       [dispatch]
     );
 
+    /**
+     * @function removeFromSelectedColumns
+     * Removes specified column IDs from the selectedColumnIds state
+     * @param {Array} columnIds - The column IDs to remove from selection
+     * @return {void}
+     */
     const clearSelectedColumns = useCallback(
       () => dispatch(setSelectedColumnIds([])),
       [dispatch]
     );
 
-    // Hover handlers
+    /**
+     * @function removeFromSelectedColumns
+     * Removes specified column IDs from the selectedColumnIds state
+     * @param {Array} columnIds - The column IDs to remove from selection
+     * @return {void}
+     */
+    const removeFromSelectedColumns = useCallback(
+      (columnIds) =>
+        dispatch(
+          setSelectedColumnIds(
+            selectedColumnIds.filter((id) => !columnIds.includes(id))
+          )
+        ),
+      [dispatch, selectedColumnIds]
+    );
+
+    // Hover state
+    // -----------------------------------------------
+    const hoveredColumnIds = useSelector(selectHoveredColumnIds);
+
     const setHoveredColumns = useCallback(
       (columnIds) => dispatch(setHoveredColumnIds(columnIds)),
       [dispatch]
@@ -134,6 +166,17 @@ export default function withGlobalInterfaceData(WrappedComponent) {
       [dispatch]
     );
 
+    // Match selection state
+    // -----------------------------------------------
+
+    /**
+     * @function selectMatches
+     * Sets the selected matches in the global UI state
+     * @param {Array} matches - The matches to select
+     * @return {void}
+     */
+    const selectedMatches = useSelector(selectSelectedMatches);
+
     // Match selection handlers
     const selectMatches = useCallback(
       (matches) => dispatch(setSelectedMatches(matches)),
@@ -145,23 +188,51 @@ export default function withGlobalInterfaceData(WrappedComponent) {
       [dispatch]
     );
 
+    /**
+     * @function addToSelectedMatches
+     * Adds specified matches to the selectedMatches state
+     * @param {Array} matches - The matches to add to selection
+     * @return {void}
+     */
+    const addToSelectedMatches = useCallback(
+      (matches) =>
+        dispatch(setSelectedMatches([...selectedMatches, ...matches])),
+      [dispatch, selectedMatches]
+    );
+
+    /**
+     * @function removeFromSelectedMatches
+     * Removes specified matches from the selectedMatches state
+     * @param {Array} matches - The matches to remove from selection
+     * @return {void}
+     */
+    const removeFromSelectedMatches = useCallback(
+      (matches) =>
+        dispatch(
+          setSelectedMatches(
+            selectedMatches.filter((m) => !matches.includes(m))
+          )
+        ),
+      [dispatch, selectedMatches]
+    );
+
     return (
       <WrappedComponent
         // Pass through all original props
         {...props}
         id={id}
         // UI State
-        selectedColumnIds={selectedColumnIds}
         hoveredColumnIds={hoveredColumnIds}
         focusedColumnIds={focusedColumnIds}
         visibleColumnIds={visibleColumnIds}
         draggingColumnIds={draggingColumnIds}
         dropTargetColumnIds={dropTargetColumnIds}
         focusedObjectId={focusedObjectId}
-        selectedMatches={selectedMatches}
         // Column selection actions
+        selectedColumnIds={selectedColumnIds}
         selectColumns={selectColumns}
         clearSelectedColumns={clearSelectedColumns}
+        removeFromSelectedColumns={removeFromSelectedColumns}
         // Hover actions
         setHoveredColumns={setHoveredColumns}
         addToHoveredColumns={addToHoveredColumns}
@@ -181,9 +252,12 @@ export default function withGlobalInterfaceData(WrappedComponent) {
         // Focus object actions
         setFocusedObject={setFocusedObject}
         clearFocusedObject={clearFocusedObject}
-        // Match selection actions
+        // Match selection
+        selectedMatches={selectedMatches}
         selectMatches={selectMatches}
         clearSelectedMatches={clearSelectedMatches}
+        addToSelectedMatches={addToSelectedMatches}
+        removeFromSelectedMatches={removeFromSelectedMatches}
       />
     );
   };

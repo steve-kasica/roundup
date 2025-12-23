@@ -400,6 +400,12 @@ export default function withOperationData(WrappedComponent) {
       [dispatch, id]
     );
 
+    /**
+     * Selects all columns from the child tables of this operation.
+     *
+     * @function
+     * @returns {void}
+     */
     const selectAllChildColumns = useCallback(() => {
       selectColumns(childColumnIds.flat());
     }, [selectColumns, childColumnIds]);

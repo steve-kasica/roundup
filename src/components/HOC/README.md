@@ -33,5 +33,6 @@ This module include TK high-order components (HOCs)
 - Interface Segregation: Components receive only props they need
 - Dependency Inversion: High-level components depend on abstractions (props), not concrete Redux store structure
 - Can pass JavaScript objects like `Map` and `Set` that can't be serialized as props, therefore they can't be properties of objects stored in slices
+- It's better to have a simplified Saga actions b/c some actions listen for each other and it'd be too complicated to watch for events for all the variations of adding and removing items to an array for exampling (setting, adding, removing, clearing).
 
 This is fundamentally different from classical inheritance because there's no shared mutable state between layers, so it's close to Scala's tarit system or Haskell's type classes where behaviors are composed rather than inherited, but implemented using JavaScript's first-class functions rather than language-level features. This pattern is very well-suited to TypeScript which would provide type safety through the composition chain, inference and autocomplete, generic constraints, and utility types for cleaner function signatures. But I don't know TypeScript, so oh well.

@@ -1,7 +1,11 @@
 import { EnhancedSchemaToolbar, OBJECT_TYPE_PACK } from "../ui/SchemaToolbar";
 import { SwapTablesButton, PackMatchToggleButtonGroup } from "../ui/buttons";
-import { useCallback } from "react";
-import { withPackOperationData, withOperationData } from "../HOC";
+import { useCallback, useMemo } from "react";
+import {
+  withPackOperationData,
+  withOperationData,
+  withGlobalInterfaceData,
+} from "../HOC";
 import { Divider } from "@mui/material";
 import {
   JOIN_TYPES,
@@ -12,7 +16,10 @@ import {
 
 const PackSchemaToolbar = ({
   // Props defined in `withGlobalInterfaceData.jsx` HOC
-  focusColumns, // Sets focused column IDs globally
+  focusColumns,
+  clearSelectedColumns,
+  selectedMatches,
+  clearSelectedMatches,
 
   // Props passed via `withOperationData.jsx` HOC
   id,
@@ -20,33 +27,39 @@ const PackSchemaToolbar = ({
   rowCount,
   columnCount,
   setOperationName,
-  deleteColumns, // Deletes columns globally
-  swapTablePositions, // Swaps the positions of children
+  deleteColumns,
+  swapTablePositions,
+  selectedChildColumnIdsSet,
 
   // Props passed via `withPackOperationData.jsx` HOC
   matchStats,
-  matchLabels,
   matchKeys,
   validMatchGroups,
-  joinType,
   setJoinType,
-  leftColumnIds,
-  rightColumnIds,
 
   // Props passed via `withAssociatedAlerts.jsx` HOC
   errorCount,
 
   // Props passed directly from the parent component
   handleHideColumns,
-  clickedBlockCells,
   areAnySelected,
   onSelectAllClick,
 }) => {
-  const isSelectionEmpty = !areAnySelected;
+  // Check if at least one complete column is selected
+  const isCompleteColumnSelected = useMemo(
+    () =>
+      selectedMatches.length > 0 &&
+      selectedMatches.length === validMatchGroups.length,
+    [selectedMatches, validMatchGroups]
+  );
 
-  // Toggled matches is an object with keys as match types and values as booleans
-
-  // When toggle match changes, update the join type
+  /**
+   * @function handleToggleMatchChange
+   * Handle changes to the match category toggle buttons
+   * @param {Event} _event - The change event
+   * @param {Array} currentMatches - The currently selected match categories
+   * @returns {void}
+   */
   const handleToggleMatchChange = useCallback(
     (_event, currentMatches) => {
       const signature = matchKeys
@@ -77,63 +90,53 @@ const PackSchemaToolbar = ({
       })(signature);
 
       setJoinType(joinType);
+      clearSelectedColumns();
+      clearSelectedMatches();
     },
-    [matchKeys, setJoinType]
+    [matchKeys, setJoinType, clearSelectedColumns, clearSelectedMatches]
   );
 
-  // Check if at least one complete column is selected
-  const isCompleteColumnSelected = (function () {
-    for (const columnId of [...leftColumnIds, ...rightColumnIds]) {
-      const allCellsSelected = Object.entries(matchStats)
-        .filter(
-          ([matchLabel, count]) =>
-            count > 0 && validMatchGroups.includes(matchLabel)
-        )
-        .every(([matchLabel]) => {
-          const cellKey = `${columnId}:${matchLabel}`;
-          return clickedBlockCells.has(cellKey);
-        });
-      if (allCellsSelected && matchKeys.length > 0) {
-        return true;
-      }
-    }
-
-    return false;
-  })();
-
-  const handleFocusColumns = useCallback(() => {
-    focusColumns(
-      Array.from(
-        Array.from(clickedBlockCells).reduce((acc, cellKey) => {
-          const [columnId] = cellKey.split(":");
-          acc.add(columnId);
-          return acc;
-        }, new Set())
-      )
-    );
-  }, [clickedBlockCells, focusColumns]);
-
-  const handleDeleteColumns = useCallback(
-    (columnId) => {
-      const columnsToDelete = new Set();
-      if (columnId) {
-        columnsToDelete.add(columnId);
-      } else {
-        clickedBlockCells.forEach((cellKey) => {
-          const [columnId] = cellKey.split(":");
-          columnsToDelete.add(columnId);
-        });
-      }
-      deleteColumns(Array.from(columnsToDelete));
-      onSelectAllClick(); // Clear selection after deletion
-    },
-    [clickedBlockCells, deleteColumns, onSelectAllClick]
+  /**
+   * @function handleFocusColumns
+   * Focus the selected columns in the pack operation
+   * @returns {void}
+   */
+  const handleFocusColumns = useCallback(
+    () => focusColumns([...selectedChildColumnIdsSet]),
+    [focusColumns, selectedChildColumnIdsSet]
   );
 
+  /**
+   * @function handleDeleteColumns
+   * Delete selected columns from the pack operation
+   * @returns {void}
+   */
+  const handleDeleteColumns = useCallback(() => {
+    deleteColumns([...selectedChildColumnIdsSet]);
+    clearSelectedColumns();
+    clearSelectedMatches();
+  }, [
+    deleteColumns,
+    clearSelectedColumns,
+    clearSelectedMatches,
+    selectedChildColumnIdsSet,
+  ]);
+
+  /**
+   * @function handleSwapTables
+   * Swap the positions of the two tables in the pack operation
+   * @returns {void}
+   */
   const handleSwapTables = useCallback(() => {
     swapTablePositions(0, 1);
   }, [swapTablePositions]);
 
+  /**
+   * @function handleRenameConfirm
+   * Handle confirming the rename of the operation
+   * @param {string} newName - The new name for the operation
+   * @returns {void}
+   */
   const handleRenameConfirm = useCallback(
     (newName) => setOperationName(newName),
     [setOperationName]
@@ -152,9 +155,11 @@ const PackSchemaToolbar = ({
       onRenameConfirm={handleRenameConfirm}
       onSelectToggleColumns={onSelectAllClick}
       isFocusedDisabled={!isCompleteColumnSelected}
-      isHideDisabled={!isCompleteColumnSelected}
+      isHideDisabled={
+        !isCompleteColumnSelected || selectedChildColumnIdsSet.size < 2
+      }
       isDeleteDisabled={!isCompleteColumnSelected}
-      isSelectToggleSelected={!isSelectionEmpty}
+      isSelectToggleSelected={areAnySelected}
       customMenuItems={
         <>
           {/* Match category filter buttons */}
@@ -181,7 +186,7 @@ const PackSchemaToolbar = ({
 };
 
 const EnhancedPackSchemaToolbar = withOperationData(
-  withPackOperationData(PackSchemaToolbar)
+  withPackOperationData(withGlobalInterfaceData(PackSchemaToolbar))
 );
 
 EnhancedPackSchemaToolbar.displayName = "Enhanced Pack Schema Toolbar";

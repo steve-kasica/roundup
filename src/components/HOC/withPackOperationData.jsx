@@ -17,10 +17,6 @@ import {
 } from "../../slices/columnsSlice/selectors";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import {
-  setSelectedMatches,
-  selectSelectedMatches,
-} from "../../slices/uiSlice";
-import {
   JOIN_TYPES,
   MATCH_STATS_DEFAULT,
   MATCH_TYPE_LEFT_UNMATCHED,
@@ -60,9 +56,6 @@ import {
  * @property {Array<string>} matchKeys - Array of match type keys (e.g., LEFT_UNMATCHED, MATCHES)
  * @property {Map<string, string>} matchLabels - Map of match type keys to labels (e.g., "Left Only", "Matches")
  * @property {Array<string>} validMatchGroups - Array of valid match type keys based on join type
- * @property {Array<string>} selectedMatchTypes - Array of currently selected match type keys
- * @property {(selectedMatches: Array<string>) => void} setMatchSelection - Sets the selected match types
- * @property {() => void} clearMatchSelection - Clears the selected match types
  *
  * Table dimensions:
  * @property {number|null} rowCount - Estimated or actual row count of the pack operation
@@ -352,37 +345,6 @@ export default function withPackOperationData(WrappedComponent) {
       return output.filter((type) => matchStats[type] > 0);
     }, [operation.joinType, matchStats]);
 
-    /**
-     * Get the currently selected match types for this pack operation from the Redux store.
-     * @returns {Array} selectedMatchTypes - An array of currently selected match type keys.
-     */
-    const selectedMatchTypes = useSelector(selectSelectedMatches);
-
-    /**
-     * Sets the selected match types for this pack operation.
-     *
-     * @function
-     * @param {Array} selectedMatches - An array of selected match type keys.
-     * @returns {void}
-     */
-    const setMatchSelection = useCallback(
-      (selectedMatches) => {
-        dispatch(setSelectedMatches(selectedMatches));
-      },
-      [dispatch]
-    );
-
-    /**
-     * Clears the selected match types for this pack operation.
-     *
-     * @function
-     * @returns {void}
-     */
-    const clearMatchSelection = useCallback(
-      () => dispatch(setSelectedMatches([])),
-      [dispatch]
-    );
-
     // Table dimensions
     // --------------------------------------------------------------
 
@@ -428,6 +390,15 @@ export default function withPackOperationData(WrappedComponent) {
       ]
     );
 
+    /**
+     * Combined child column IDs from both left and right tables
+     * @returns {Array<string>} combinedChildColumnIds - An array of column IDs from both child tables.
+     */
+    const combinedChildColumnIds = useMemo(
+      () => [...leftColumnIds, ...rightColumnIds],
+      [leftColumnIds, rightColumnIds]
+    );
+
     return (
       <WrappedComponent
         id={id}
@@ -455,12 +426,11 @@ export default function withPackOperationData(WrappedComponent) {
         matchKeys={matchKeys}
         matchLabels={matchLabels}
         validMatchGroups={validMatchGroups}
-        selectedMatchTypes={selectedMatchTypes}
-        setMatchSelection={setMatchSelection}
-        clearMatchSelection={clearMatchSelection}
         // Table dimensions
         rowCount={rowCount}
         columnCount={columnCount}
+        // Misc
+        combinedChildColumnIds={combinedChildColumnIds}
         {...props}
       />
     );

@@ -8,8 +8,13 @@ import {
   CircularProgress,
   Badge,
 } from "@mui/material";
-import { withOperationData, withPackOperationData } from "../HOC";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import {
+  withOperationData,
+  withPackOperationData,
+  withAssociatedAlerts,
+  withGlobalInterfaceData,
+} from "../HOC";
+import { useCallback, useState, useMemo } from "react";
 import { EnhancedColumnName } from "../ColumnViews";
 import { Error } from "@mui/icons-material";
 import VennDiagram from "../ui/icons/VennDiagram";
@@ -33,22 +38,20 @@ const cellBorderColor = "rgba(0, 0, 255, 0.05)";
 const PackSchemaView = ({
   // Props defined in `withOperationData`
   id,
+  selectedColumnIds,
+  selectedChildColumnIdsSet,
   selectColumns,
   clearSelectedColumns,
   isLoading,
   colorScale,
   depth,
-  // Pack-specific props
-  setMatchSelection,
-  clearMatchSelection,
+  // Props defined in `withPackOperationData`
   insertColumnIntoChildAtIndex,
   validMatchGroups,
-  // Left table props (via withPackOperationData)
   setLeftTableJoinKey,
   leftTableId,
   leftColumnIds,
   leftKey,
-  // Right table props (via withPackOperationData)
   setRightTableJoinKey,
   rightTableId,
   rightKey,
@@ -56,24 +59,23 @@ const PackSchemaView = ({
   matchStats,
   matchKeys,
   matchLabels,
+  combinedChildColumnIds,
   // Props defined in `withAssociatedAlerts`
   totalCount,
   errorCount,
+
+  // Props defined in `withGlobalInterfaceData`
+  selectedMatches,
+  selectMatches,
+  clearSelectedMatches,
 }) => {
   // Add hover state for coordinating between tables
   const [hoveredMatch, setHoveredMatch] = useState(null);
 
-  // Add hover state for columns
-  const [hoveredColumn, setHoveredColumn] = useState(null);
-
   const [hiddenColumns, setHiddenColumns] = useState(new Set());
 
-  // Track which block cells have been clicked
-  // Key format: `${columnId}:${matchLabel}`
-  const [clickedBlockCells, setClickedBlockCells] = useState(new Set());
-
   // Track the last clicked cell for range selection
-  const [lastClickedCell, setLastClickedCell] = useState(null);
+  const [selectionAnchor, setSelectionAnchor] = useState(null);
 
   // Track the last clicked match label for range selection
   const [lastClickedMatch, setLastClickedMatch] = useState(null);
@@ -85,158 +87,114 @@ const PackSchemaView = ({
   const [contextMenu, setContextMenu] = useState(null);
   const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
 
-  const allColumns = useMemo(
-    () => [...leftColumnIds, ...rightColumnIds],
-    [leftColumnIds, rightColumnIds]
-  );
-
   const areAnySelected = useMemo(() => {
-    return clickedBlockCells.size > 0;
-  }, [clickedBlockCells.size]);
+    return selectedChildColumnIdsSet.size > 0;
+  }, [selectedChildColumnIdsSet.size]);
 
-  // Update column selection when block cells change
-  useEffect(() => {
-    const selectedColumnIds = new Set();
-    const selectedMatchCategories = new Set();
-
-    // Extract unique column IDs from clicked block cells
-    clickedBlockCells.forEach((cellKey) => {
-      const [columnId, matchType] = cellKey.split(":");
-      selectedColumnIds.add(columnId);
-      selectedMatchCategories.add(matchType);
-    });
-
-    // Call selectColumns with array of column IDs
-    if (selectedColumnIds.size > 0) {
-      selectColumns(Array.from(selectedColumnIds));
-    } else {
-      clearSelectedColumns();
-    }
-
-    if (selectedMatchCategories.size > 0) {
-      setMatchSelection(Array.from(selectedMatchCategories));
-    } else {
-      clearMatchSelection();
-    }
-  }, [
-    clearSelectedColumns,
-    clickedBlockCells,
-    selectColumns,
-    clearMatchSelection,
-    setMatchSelection,
-  ]);
-
-  const handleBlockCellClick = useCallback(
-    (event, tableId, columnId, matchLabel) => {
+  /**
+   * @function handleCellClick
+   * Handles click on a block cell to select/deselect it
+   * @param {Object} event - The click event
+   * @param {string} columnId - The column ID of the clicked cell, e.g. `c1`, `c2`, etc
+   * @param {string} matchLabel - The match label of the clicked cell
+   * @return {void}
+   */
+  const handleCellClick = useCallback(
+    (event, columnId, matchKey) => {
       event.stopPropagation();
 
-      const cellKey = `${columnId}:${matchLabel}`;
+      if (event.shiftKey && selectionAnchor) {
+        // Shift click: Select range of cells
+        const [anchorColumnId, anchorMatchLabel] = selectionAnchor.split(":");
 
-      if (event.shiftKey && lastClickedCell) {
-        // Shift click: Rectangular selection like a spreadsheet
+        // Find indices for both dimensions
+        const anchorColIndex = combinedChildColumnIds.indexOf(anchorColumnId);
+        const currentColIndex = combinedChildColumnIds.indexOf(columnId);
+        const anchorMatchIndex = matchKeys.indexOf(anchorMatchLabel);
+        const currentMatchIndex = matchKeys.indexOf(matchKey);
 
-        // Parse the last clicked cell
-        const [lastColumnId, lastMatchLabel] = lastClickedCell.split(":");
+        // Calculate the rectangular range
+        const colStart = Math.min(anchorColIndex, currentColIndex);
+        const colEnd = Math.max(anchorColIndex, currentColIndex);
+        const matchStart = Math.min(anchorMatchIndex, currentMatchIndex);
+        const matchEnd = Math.max(anchorMatchIndex, currentMatchIndex);
 
-        // Find column indices
-        const lastColIndex = allColumns.indexOf(lastColumnId);
-        const currentColIndex = allColumns.indexOf(columnId);
-        const colStart = Math.min(lastColIndex, currentColIndex);
-        const colEnd = Math.max(lastColIndex, currentColIndex);
+        // Collect all column IDs and match labels in the range
+        const columnsToSelect = combinedChildColumnIds.slice(
+          colStart,
+          colEnd + 1
+        );
+        const matchesToSelect = matchKeys
+          .slice(matchStart, matchEnd + 1)
+          .filter((match) => validMatchGroups.includes(match));
 
-        // Find match type indices
-        const lastMatchIndex = matchKeys.indexOf(lastMatchLabel);
-        const currentMatchIndex = matchKeys.indexOf(matchLabel);
-
-        // Calculate match type range
-        const matchStart = Math.min(lastMatchIndex, currentMatchIndex);
-        const matchEnd = Math.max(lastMatchIndex, currentMatchIndex);
-
-        // Build selection range
-        const cellsInRange = new Set();
-
-        for (let m = matchStart; m <= matchEnd; m++) {
-          const match = matchKeys[m];
-          if (!validMatchGroups.includes(match)) continue;
-          for (let c = colStart; c <= colEnd; c++) {
-            cellsInRange.add(`${allColumns[c]}:${match}`);
-          }
-        }
-
-        setClickedBlockCells((prev) => {
-          const newSet = new Set(prev);
-          cellsInRange.forEach((key) => newSet.add(key));
-          return newSet;
-        });
+        // Select the range
+        selectColumns(columnsToSelect);
+        selectMatches(matchesToSelect);
       } else {
-        // Regular click: Toggle single cell, clear others
-        setClickedBlockCells((prev) => {
-          const newSet = new Set();
-          if (!prev.has(cellKey)) {
-            newSet.add(cellKey);
-          }
-          return newSet;
-        });
-        setLastClickedCell(cellKey);
+        // Is a single click
+        selectColumns(columnId);
+        selectMatches(matchKey);
+
+        const cellKey = `${columnId}:${matchKey}`;
+        setSelectionAnchor(cellKey);
       }
     },
-    [lastClickedCell, allColumns, matchKeys, validMatchGroups]
+    [
+      selectionAnchor,
+      combinedChildColumnIds,
+      matchKeys,
+      selectColumns,
+      selectMatches,
+      validMatchGroups,
+    ]
   );
 
+  /**
+   * @function handleMatchLabelClick
+   * Handles click on a match label to select/deselect it
+   * @param {Object} event - The click event
+   * @param {string} matchKey - The match key of the clicked label
+   * @return {void}
+   */
   const handleMatchLabelClick = useCallback(
-    (event, matchLabel) => {
+    (event, matchKey) => {
       event.stopPropagation();
 
       if (event.shiftKey && lastClickedMatch) {
-        // Shift click: Select range of match categories
-        const lastMatchIndex = matchKeys.indexOf(lastClickedMatch);
-        const currentMatchIndex = matchKeys.indexOf(matchLabel);
+        // Shift click: Select range of matches
+        const anchorMatchIndex = matchKeys.indexOf(lastClickedMatch);
+        const currentMatchIndex = matchKeys.indexOf(matchKey);
 
-        if (lastMatchIndex !== -1 && currentMatchIndex !== -1) {
-          const matchStart = Math.min(lastMatchIndex, currentMatchIndex);
-          const matchEnd = Math.max(lastMatchIndex, currentMatchIndex);
+        const matchStart = Math.min(anchorMatchIndex, currentMatchIndex);
+        const matchEnd = Math.max(anchorMatchIndex, currentMatchIndex);
 
-          const cellsToSelect = new Set();
+        const matchesToSelect = matchKeys
+          .slice(matchStart, matchEnd + 1)
+          .filter((match) => validMatchGroups.includes(match));
 
-          // Select all cells for all match types in the range
-          for (let m = matchStart; m <= matchEnd; m++) {
-            const match = matchKeys[m];
-            if (!validMatchGroups.includes(match)) continue;
-
-            // Add all columns for this match
-            allColumns.forEach((columnId) => {
-              cellsToSelect.add(`${columnId}:${match}`);
-            });
-          }
-
-          // Add to existing selection
-          setClickedBlockCells((prev) => {
-            const newSet = new Set(prev);
-            cellsToSelect.forEach((cell) => newSet.add(cell));
-            return newSet;
-          });
-        }
+        selectColumns(combinedChildColumnIds);
+        selectMatches(matchesToSelect);
       } else {
-        // Regular click: Replace selection with this match category
-        const cellsToSelect = new Set();
+        // Regular click: Select this match
+        selectColumns(combinedChildColumnIds);
+        selectMatches([matchKey]);
 
-        // Add all columns for this match
-        if (validMatchGroups.includes(matchLabel)) {
-          allColumns.forEach((columnId) => {
-            cellsToSelect.add(`${columnId}:${matchLabel}`);
-          });
-        }
-
-        setClickedBlockCells(cellsToSelect);
+        setLastClickedMatch(matchKey);
       }
 
-      // Set last clicked match for future range operations
-      setLastClickedMatch(matchLabel);
-
       // Set last clicked cell to first cell in this match
-      setLastClickedCell(`${leftColumnIds[0]}:${matchLabel}`);
+      setSelectionAnchor(`${leftColumnIds[0]}:${matchKey}`);
     },
-    [allColumns, lastClickedMatch, leftColumnIds, matchKeys, validMatchGroups]
+    [
+      combinedChildColumnIds,
+      lastClickedMatch,
+      leftColumnIds,
+      matchKeys,
+      selectColumns,
+      selectMatches,
+      validMatchGroups,
+    ]
   );
 
   const handleColumnContextMenu = useCallback((event, columnId) => {
@@ -259,7 +217,7 @@ const PackSchemaView = ({
       const columnId = contextMenuColumnId;
 
       // Determine which child table/operation this column belongs to
-      const columnIndex = allColumns.indexOf(columnId);
+      const columnIndex = combinedChildColumnIds.indexOf(columnId);
 
       let childId;
       let indexInChild;
@@ -281,7 +239,7 @@ const PackSchemaView = ({
     },
     [
       contextMenuColumnId,
-      allColumns,
+      combinedChildColumnIds,
       leftColumnIds.length,
       insertColumnIntoChildAtIndex,
       handleCloseContextMenu,
@@ -290,82 +248,87 @@ const PackSchemaView = ({
     ]
   );
 
-  const handleColumnClick = useCallback(
+  /**
+   * @function handleColumnLabelClick
+   * Handles click on a column label to select/deselect it
+   * @param {Object} event - The click event
+   * @param {string} columnId - The column ID of the clicked label
+   * @return {void}
+   */
+  const handleColumnLabelClick = useCallback(
     (event, columnId) => {
       if (event.shiftKey && lastClickedColumn) {
         // Shift click: Select range of columns
-        const lastColIndex = allColumns.indexOf(lastClickedColumn);
-        const currentColIndex = allColumns.indexOf(columnId);
+        const anchorColIndex =
+          combinedChildColumnIds.indexOf(lastClickedColumn);
+        const currentColIndex = combinedChildColumnIds.indexOf(columnId);
 
-        const colStart = Math.min(lastColIndex, currentColIndex);
-        const colEnd = Math.max(lastColIndex, currentColIndex);
+        const colStart = Math.min(anchorColIndex, currentColIndex);
+        const colEnd = Math.max(anchorColIndex, currentColIndex);
 
-        const columnsToSelect = allColumns.slice(colStart, colEnd + 1);
+        const columnsToSelect = combinedChildColumnIds.slice(
+          colStart,
+          colEnd + 1
+        );
 
-        // Add all cells for selected columns across enabled match types
-        setClickedBlockCells((prev) => {
-          const newSet = new Set(prev);
-          columnsToSelect.forEach((colId) => {
-            matchKeys.forEach((match) => {
-              if (!validMatchGroups.includes(match)) return;
-              newSet.add(`${colId}:${match}`);
-            });
-          });
-          return newSet;
-        });
+        selectColumns(columnsToSelect);
+        selectMatches(validMatchGroups);
       } else {
-        // Regular click: Select all cells in this column across all match types
-        const cellsToSelect = new Set();
+        // Regular click: Select this column
+        selectColumns(columnId);
+        selectMatches(validMatchGroups);
 
-        matchKeys.forEach((match) => {
-          if (!validMatchGroups.includes(match)) return;
-          cellsToSelect.add(`${columnId}:${match}`);
-        });
-
-        setClickedBlockCells(cellsToSelect);
+        setLastClickedColumn(columnId);
       }
-
-      // Set last clicked column for future range operations
-      setLastClickedColumn(columnId);
-
-      // Set last clicked cell to first cell in this column
-      setLastClickedCell(`${columnId}:${matchKeys[0]}`);
     },
-    [lastClickedColumn, matchKeys, allColumns, validMatchGroups]
+    [
+      combinedChildColumnIds,
+      lastClickedColumn,
+      selectColumns,
+      selectMatches,
+      validMatchGroups,
+    ]
   );
 
+  /**
+   * @function handleSelectAll
+   * Handles select all / clear all button click
+   * @return {void}
+   */
   const handleSelectAll = useCallback(() => {
     if (areAnySelected) {
-      setClickedBlockCells(new Set());
-      return;
+      clearSelectedColumns();
+      clearSelectedMatches();
+    } else {
+      selectColumns(combinedChildColumnIds);
+      selectMatches(validMatchGroups);
     }
-    const allCells = new Set();
+  }, [
+    areAnySelected,
+    clearSelectedColumns,
+    clearSelectedMatches,
+    selectColumns,
+    combinedChildColumnIds,
+    selectMatches,
+    validMatchGroups,
+  ]);
 
-    // Select all cells across all columns and match types
-    matchKeys.forEach((match) => {
-      allColumns.forEach((columnId) => {
-        allCells.add(`${columnId}:${match}`);
-      });
-    });
-
-    setClickedBlockCells(allCells);
-  }, [areAnySelected, matchKeys, allColumns]);
-
+  /**
+   * @function handleHideColumns
+   * Handles hiding columns
+   * @param {string} [columnId] - Optional column ID to hide; if not provided, hides all selected columns
+   */
   const handleHideColumns = useCallback(
     (columnId) => {
       if (columnId) {
         setHiddenColumns((prev) => new Set(prev).add(columnId));
       } else {
-        const columnsToHide = new Set();
-        clickedBlockCells.forEach((cellKey) => {
-          const [columnId] = cellKey.split(":");
-          columnsToHide.add(columnId);
-        });
-        setHiddenColumns((prev) => new Set([...prev, ...columnsToHide]));
+        setHiddenColumns(selectedChildColumnIdsSet);
       }
-      setClickedBlockCells(new Set());
+      clearSelectedColumns();
+      clearSelectedMatches();
     },
-    [clickedBlockCells]
+    [clearSelectedColumns, clearSelectedMatches, selectedChildColumnIdsSet]
   );
 
   const handleSetAsKeyClick = useCallback(
@@ -383,12 +346,12 @@ const PackSchemaView = ({
   // This memoized variable groups columns into contiguous visible/hidden segments
   const columnIdVisibilityGroups = useMemo(
     () =>
-      allColumns.reduce((acc, columnId, i) => {
+      combinedChildColumnIds.reduce((acc, columnId, i) => {
         const isHidden = hiddenColumns.has(columnId);
-        const prev = acc[acc.length - 1];
         if (!isHidden) {
           acc.push({ columnIds: [columnId], isHidden });
         } else {
+          const prev = acc[acc.length - 1];
           if (prev?.isHidden) {
             prev.columnIds.push(columnId);
           } else {
@@ -400,14 +363,15 @@ const PackSchemaView = ({
         }
         return acc;
       }, []),
-    [allColumns, hiddenColumns]
+    [combinedChildColumnIds, hiddenColumns]
   );
 
   return (
     <Box display={"flex"} flexDirection="column" height="100%">
       <EnhancedPackSchemaToolbar
         id={id}
-        clickedBlockCells={clickedBlockCells}
+        // clickedBlockCells={clickedBlockCells}
+        clickedBlockCells={new Set()}
         areAnySelected={areAnySelected}
         onSelectAllClick={handleSelectAll}
         handleHideColumns={handleHideColumns}
@@ -466,8 +430,8 @@ const PackSchemaView = ({
                         fontWeight: "none",
                         // borderRight: `${childTablesSeparatorWidth}px solid ${cellBorderColor}`,
                       }}
-                      onMouseEnter={() => setHoveredColumn(`${childId}:`)}
-                      onMouseLeave={() => setHoveredColumn(null)}
+                      // onMouseEnter={() => setHoveredColumn(`${childId}:`)}
+                      // onMouseLeave={() => setHoveredColumn(null)}
                     />
                   ) : (
                     <p>{childId}</p>
@@ -597,7 +561,7 @@ const PackSchemaView = ({
                           marginTop: "12.5px",
                         },
                       }}
-                      onClick={handleColumnClick}
+                      onClick={handleColumnLabelClick}
                     />
                   )}
                 </Box>
@@ -607,12 +571,6 @@ const PackSchemaView = ({
           {matchKeys.map((key) => {
             const value = matchStats[key];
             // Check if any cells in this match category are selected
-            const hasSelectedCells = Array.from(clickedBlockCells).some(
-              (cellKey) => {
-                const [, matchLabel] = cellKey.split(":");
-                return matchLabel === key;
-              }
-            );
             const label = matchLabels.get(key) || key;
             const isMatchDisabled = !validMatchGroups.includes(key);
 
@@ -715,8 +673,11 @@ const PackSchemaView = ({
                   const isLastLeftColumn = j === leftColumnIds.length - 1;
                   const tableId =
                     j < leftColumnIds.length ? leftTableId : rightTableId;
-                  const cellKey = `${columnId}:${key}`;
-                  const isClicked = clickedBlockCells.has(cellKey);
+                  // const cellKey = `${columnId}:${key}`;
+                  // const isClicked = clickedBlockCells.has(cellKey);
+                  const isClicked =
+                    selectedChildColumnIdsSet.has(columnId) &&
+                    selectedMatches.includes(key);
 
                   // Calculate which borders to show for contiguous selection
                   let highlightTopBorder = false;
@@ -724,58 +685,61 @@ const PackSchemaView = ({
                   let highlightLeftBorder = false;
                   let highlightRightBorder = false;
 
-                  if (isClicked) {
-                    // Find the match type index for this row
-                    const currentMatchIndex = matchKeys.indexOf(key);
-                    const currentColIndex = allColumns.indexOf(columnId);
+                  // if (isClicked) {
+                  //   // Find the match type index for this row
+                  //   const currentMatchIndex = matchKeys.indexOf(key);
+                  //   const currentColIndex =
+                  //     combinedChildColumnIds.indexOf(columnId);
 
-                    // Check cell above (previous match type)
-                    if (currentMatchIndex > 0) {
-                      const matchAbove = matchKeys[currentMatchIndex - 1];
-                      const cellKeyAbove = `${columnId}:${matchAbove}`;
-                      highlightTopBorder = !clickedBlockCells.has(cellKeyAbove);
-                    } else {
-                      highlightTopBorder = true; // First row
-                    }
+                  //   // Check cell above (previous match type)
+                  //   if (currentMatchIndex > 0) {
+                  //     const matchAbove = matchKeys[currentMatchIndex - 1];
+                  //     const cellKeyAbove = `${columnId}:${matchAbove}`;
+                  //     highlightTopBorder = !clickedBlockCells.has(cellKeyAbove);
+                  //   } else {
+                  //     highlightTopBorder = true; // First row
+                  //   }
 
-                    // Check cell below (next match type)
-                    if (currentMatchIndex < matchKeys.length - 1) {
-                      const matchBelow = matchKeys[currentMatchIndex + 1];
-                      const cellKeyBelow = `${columnId}:${matchBelow}`;
-                      highlightBottomBorder =
-                        !clickedBlockCells.has(cellKeyBelow);
-                    } else {
-                      highlightBottomBorder = true; // Last row
-                    }
+                  //   // Check cell below (next match type)
+                  //   if (currentMatchIndex < matchKeys.length - 1) {
+                  //     const matchBelow = matchKeys[currentMatchIndex + 1];
+                  //     const cellKeyBelow = `${columnId}:${matchBelow}`;
+                  //     highlightBottomBorder =
+                  //       !clickedBlockCells.has(cellKeyBelow);
+                  //   } else {
+                  //     highlightBottomBorder = true; // Last row
+                  //   }
 
-                    // Check cell to the left
-                    if (currentColIndex > 0) {
-                      const colLeft = allColumns[currentColIndex - 1];
-                      const cellKeyLeft = `${colLeft}:${key}`;
-                      highlightLeftBorder = !clickedBlockCells.has(cellKeyLeft);
-                    } else {
-                      highlightLeftBorder = true; // First column
-                    }
+                  //   // Check cell to the left
+                  //   if (currentColIndex > 0) {
+                  //     const colLeft =
+                  //       combinedChildColumnIds[currentColIndex - 1];
+                  //     const cellKeyLeft = `${colLeft}:${key}`;
+                  //     highlightLeftBorder = !clickedBlockCells.has(cellKeyLeft);
+                  //   } else {
+                  //     highlightLeftBorder = true; // First column
+                  //   }
 
-                    // Check cell to the right
-                    if (currentColIndex < allColumns.length - 1) {
-                      const colRight = allColumns[currentColIndex + 1];
-                      const cellKeyRight = `${colRight}:${key}`;
-                      highlightRightBorder =
-                        !clickedBlockCells.has(cellKeyRight);
-                    } else {
-                      highlightRightBorder = true; // Last column
-                    }
-                  }
+                  //   // Check cell to the right
+                  //   if (currentColIndex < combinedChildColumnIds.length - 1) {
+                  //     const colRight =
+                  //       combinedChildColumnIds[currentColIndex + 1];
+                  //     const cellKeyRight = `${colRight}:${key}`;
+                  //     highlightRightBorder =
+                  //       !clickedBlockCells.has(cellKeyRight);
+                  //   } else {
+                  //     highlightRightBorder = true; // Last column
+                  //   }
+                  // }
 
                   // const borderWidth = "2px";
 
                   // Check if the cell to the right is also selected
-                  // const currentColIndex = allColumns.indexOf(columnId);
+                  // const currentColIndex = combinedChildColumnIds.indexOf(columnId);
                   // const hasRightNeighbor =
-                  //   currentColIndex < allColumns.length - 1;
+                  //   currentColIndex < combinedChildColumnIds.length - 1;
                   // const colRight = hasRightNeighbor
-                  //   ? allColumns[currentColIndex + 1]
+                  //   ? combinedChildColumnIds[currentColIndex + 1]
                   //   : null;
 
                   return (
@@ -796,10 +760,10 @@ const PackSchemaView = ({
                       backgroundColor={colorScale(depth + 1)}
                       tableBorderWidth={childTablesSeparatorWidth}
                       defaultBorderColor={cellBorderColor}
-                      isClicked={isClicked}
+                      isSelected={isClicked}
                       onClick={(event) => {
                         if (!isMatchDisabled) {
-                          handleBlockCellClick(event, tableId, columnId, key);
+                          handleCellClick(event, columnId, key);
                         }
                       }}
                     />
@@ -860,7 +824,9 @@ const PackSchemaView = ({
 PackSchemaView.displayName = "Pack Schema View";
 
 const EnhancedPackSchemaView = withOperationData(
-  withPackOperationData(PackSchemaView)
+  withAssociatedAlerts(
+    withPackOperationData(withGlobalInterfaceData(PackSchemaView))
+  )
 );
 
 EnhancedPackSchemaView.displayName = "Enhanced Pack Schema View";
