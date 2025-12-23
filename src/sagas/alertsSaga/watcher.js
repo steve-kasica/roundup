@@ -18,8 +18,12 @@ import {
 } from "../../slices/columnsSlice";
 import { updateTablesSuccess } from "../updateTablesSaga";
 import { selectTablesById } from "../../slices/tablesSlice";
+import { createOperationsSuccess } from "../createOperationsSaga/actions";
 
 export default function* updateAlertsSagaWatcher() {
+  // When an explicit request to check operations for alerts is made,
+  // handle it here. This callback function will run the tests appropriately
+  // depending on the operation type.
   yield takeEvery(checkOperationForAlertsRequest.type, function* (action) {
     const { operationIds } = action.payload;
     const raisedAlerts = [];
@@ -61,10 +65,19 @@ export default function* updateAlertsSagaWatcher() {
     }
   });
 
+  // When new operations are created, we need to check them for alerts.
+  yield takeEvery(createOperationsSuccess.type, function* (action) {
+    console.log("createOperationsSuccess - checking for alerts");
+    const { operationIds } = action.payload;
+    yield put(checkOperationForAlertsRequest({ operationIds }));
+  });
+
   // If certain schema-related operation metadata properties are modified,
   // we need to re-check that operation for alerts.
   yield takeEvery(updateOperationsSuccess.type, function* (action) {
     const operationIdsToCheck = [];
+
+    // TODO: these need to be constants shared with operationsSlice
     const relevantChangedProperties = [
       "operationType",
       "childIds",
@@ -91,8 +104,9 @@ export default function* updateAlertsSagaWatcher() {
     );
   });
 
-  // When tables are updated, we need to check if any operations that depend on those tables need to be re-checked for alerts.
-  // For example, if the columnIds of a table change, a stack operation using that table may now have mismatched columns.
+  // When tables are updated, we need to check if any operations that depend on
+  // those tables need to be re-checked for alerts. For example, if the columnIds of
+  // a table change, a stack operation using that table may now have mismatched columns.
   yield takeEvery(updateTablesSuccess.type, function* (action) {
     const propertiesToCheck = ["columnIds"];
     const { changedPropertiesById } = action.payload;
