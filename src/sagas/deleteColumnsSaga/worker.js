@@ -17,36 +17,42 @@ export default function* deleteColumnsWorker(tablesToAlter) {
   const failedDeletions = [];
   const tableUpdates = [];
 
-  for (let { tableId, columnsToDelete } of tablesToAlter) {
+  for (let { tableId, columnsToDelete, deleteFromDatabase } of tablesToAlter) {
     const columnIdsToDelete = columnsToDelete.map((col) => col.id);
-    const { databaseName: parentDatabaseName, columnIds: allTableColumnIds } =
-      yield select((state) => selectTablesById(state, tableId));
-    const columnDatabaseNames = columnsToDelete.map((col) => col.databaseName);
-    try {
-      // Call the database function to drop columns
-      yield dropColumns(parentDatabaseName, columnDatabaseNames);
-    } catch (error) {
-      alert(`Error deleting columns: ${error.message}`);
-      console.error(
-        `Failed to drop columns [${columnDatabaseNames.join(
-          ", "
-        )}] from table ${tableId}:`,
-        error
+    if (deleteFromDatabase) {
+      const { databaseName: parentDatabaseName, columnIds: allTableColumnIds } =
+        yield select((state) => selectTablesById(state, tableId));
+      const columnDatabaseNames = columnsToDelete.map(
+        (col) => col.databaseName
       );
-      failedDeletions.push(...columnIdsToDelete);
+      try {
+        // Call the database function to drop columns
+        yield dropColumns(parentDatabaseName, columnDatabaseNames);
+        successfulDeletions.push(...columnIdsToDelete);
+        tableUpdates.push({
+          id: tableId,
+          columnIds: allTableColumnIds.filter(
+            (id) => !columnIdsToDelete.includes(id)
+          ),
+        });
+      } catch (error) {
+        alert(`Error deleting columns: ${error.message}`);
+        console.error(
+          `Failed to drop columns [${columnDatabaseNames.join(
+            ", "
+          )}] from table ${tableId}:`,
+          error
+        );
+        failedDeletions.push(...columnIdsToDelete);
+      }
+    } else {
+      // Do not delete from database, just from state
+      successfulDeletions.push(...columnIdsToDelete);
     }
-
-    successfulDeletions.push(...columnIdsToDelete);
-    tableUpdates.push({
-      id: tableId,
-      columnIds: allTableColumnIds.filter(
-        (id) => !columnIdsToDelete.includes(id)
-      ),
-    });
   }
 
   if (successfulDeletions.length > 0) {
-    yield put(deleteColumnsFromSlice(...successfulDeletions));
+    yield put(deleteColumnsFromSlice(successfulDeletions));
     yield put(deleteColumnsSuccess(successfulDeletions));
   }
 

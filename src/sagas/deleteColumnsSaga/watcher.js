@@ -35,6 +35,7 @@ export default function* deleteColumnsSaga() {
         tablesToAlter.push({
           tableId: parentId,
           columnsToDelete,
+          deleteFromDatabase: true,
         });
       } else {
         // If we're deleting operation columns, then we need to recurse into the children
@@ -92,7 +93,16 @@ export default function* deleteColumnsSaga() {
           (id) => !currentColumnIds.includes(id)
         );
         if (orphanedColumnIds.length > 0) {
-          yield put(deleteColumnsRequest({ columnIds: orphanedColumnIds }));
+          // Bypass deleteColumnsRequest to avoid recursing into table columns
+          // since we're just swapping out operation columns here.
+          yield call(deleteColumnsWorker, [
+            {
+              tableId: operationId,
+              columnsToDelete: orphanedColumnIds.map((id) => ({ id })),
+              deleteFromDatabase: false,
+            },
+          ]);
+          // yield put(deleteColumnsRequest({ columnIds: orphanedColumnIds }));
         }
       }
     }

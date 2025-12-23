@@ -133,7 +133,6 @@ export default function* updateOperationsWorker(action) {
           joinType
         );
         operationUpdate.matchStats = matchStats;
-        console.log("Calculated new match stats:", matchStats);
       } catch (error) {
         console.error(
           "Error calculating match stats for operation:",
