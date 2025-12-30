@@ -15,6 +15,7 @@
     "@duckdb/duckdb-wasm": "^1.29.1-dev132.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@fontsource/inter": "^5.2.8",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@mui/icons-material": "^6.3.1",

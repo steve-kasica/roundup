@@ -7,7 +7,7 @@
  */
 import "./App.css";
 import { ThemeProvider } from "@mui/material/styles";
-import theme from "./themes/theme-default";
+import { themeDefault } from "./themes";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import SupportingPane from "./layouts/SupportingPane";
@@ -15,7 +15,7 @@ import CustomDragLayer from "./components/CustomDragLayer";
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={themeDefault}>
       <DndProvider backend={HTML5Backend}>
         <CustomDragLayer />
         <SupportingPane />
