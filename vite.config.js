@@ -1,37 +1,43 @@
 /**
- * vite.config.js
- * -----------------------------------------------
- * A configuration file used by Vite
- * See these https://vite.dev/config for more.
+ * @fileoverview Vite build and development configuration.
+ * @module vite.config
+ * @see {@link https://vite.dev/config} for Vite configuration options
+ *
+ * Configures the Vite bundler for React development with SWC,
+ * Vitest testing, and production build settings.
+ *
+ * Features:
+ * - React plugin with SWC for fast compilation
+ * - Vitest configuration with jsdom environment
+ * - Custom build output to module directory
+ * - Path alias (@) for src directory imports
+ * - Relative base path for deployment flexibility
  */
-
 import path from "path";
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
   },
   build: {
-    outDir: path.resolve(__dirname, '../../module'),
+    outDir: path.resolve(__dirname, "../../module"),
     rollupOptions: {
       output: {
-        entryFileNames: 'open-roundup.js',
-        assetFileNames: 'open-roundup.[ext]'
+        entryFileNames: "open-roundup.js",
+        assetFileNames: "open-roundup.[ext]",
       },
-      external: [
-        'public/command'
-      ]
-    }
-  },
-  base: './',
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src")
+      external: ["public/command"],
     },
   },
-})
+  base: "./",
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+});

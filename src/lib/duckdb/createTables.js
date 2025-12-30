@@ -1,3 +1,21 @@
+/**
+ * @fileoverview createTables Module
+ *
+ * DuckDB utility for creating tables from CSV files. Handles file parsing, type
+ * detection, and table creation with automatic type inference.
+ *
+ * Features:
+ * - CSV file parsing and import
+ * - Automatic type detection using DuckDB sniffer
+ * - Custom type candidate configuration
+ * - Table creation from uploaded files
+ *
+ * @module lib/duckdb/createTables
+ *
+ * @example
+ * const results = await createTables('my_table', 'data.csv');
+ */
+
 // TODO: I might need to get more into sniff
 // https://motherduck.com/blog/taming-wild-csvs-with-duckdb-data-engineering/
 import { DUCKDB_TYPE_VARCHAR } from "./columnTypes";

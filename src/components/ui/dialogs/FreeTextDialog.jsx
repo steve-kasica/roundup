@@ -1,3 +1,29 @@
+/**
+ * @fileoverview FreeTextDialog Component
+ *
+ * A reusable dialog component for collecting free text input from users. Provides
+ * a simple interface with title, description, input field, and confirm/cancel buttons.
+ *
+ * Features:
+ * - Customizable title and description
+ * - Text input field with label
+ * - Confirm and cancel buttons
+ * - Callback on submission
+ * - Controlled open state
+ *
+ * @module components/ui/dialogs/FreeTextDialog
+ *
+ * @example
+ * <FreeTextDialog
+ *   title="Rename Table"
+ *   description="Enter a new name for the table"
+ *   label="Table name"
+ *   open={dialogOpen}
+ *   onClose={handleClose}
+ *   onSubmit={handleSubmit}
+ * />
+ */
+
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";

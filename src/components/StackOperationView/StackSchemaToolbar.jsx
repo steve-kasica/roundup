@@ -1,7 +1,52 @@
+/**
+ * @fileoverview StackSchemaToolbar Component
+ *
+ * A specialized toolbar for STACK operation schema views providing controls for
+ * column operations across multiple stacked tables. Handles operations that affect
+ * columns across all child tables in the stack.
+ *
+ * Features:
+ * - Column selection across all stacked tables
+ * - Focus, hide, and delete operations
+ * - Complete column detection (columns present in all stacked tables)
+ * - Operation renaming
+ *
+ * @module components/StackOperationView/StackSchemaToolbar
+ *
+ * @example
+ * <EnhancedStackSchemaToolbar
+ *   id="stack-operation-123"
+ *   handleHideColumns={handleHide}
+ * />
+ */
+
 import { EnhancedSchemaToolbar, OBJECT_TYPE_STACK } from "../ui/SchemaToolbar";
 import { useCallback, useMemo } from "react";
 import { withOperationData, withStackOperationData } from "../HOC";
 
+/**
+ * StackSchemaToolbar Component
+ *
+ * Toolbar for managing columns in STACK operations.
+ *
+ * @component
+ * @param {Object} props - Component props (provided via HOCs)
+ * @param {number} props.rowCount - Total row count
+ * @param {number} props.columnCount - Total column count
+ * @param {string} props.name - Operation name
+ * @param {string} props.id - Operation ID
+ * @param {Set} props.selectedChildColumnIdsSet - Set of selected column IDs
+ * @param {Function} props.deleteColumns - Delete columns globally
+ * @param {Function} props.focusColumns - Set focused column IDs globally
+ * @param {Function} props.selectColumns - Set selected column IDs
+ * @param {Function} props.clearSelectedColumns - Clear selection
+ * @param {Function} props.setOperationName - Update operation name
+ * @param {Array[]} props.columnIdMatrix - 2D array of column IDs by position
+ * @param {number} props.m - Number of columns in matrix
+ * @param {Function} props.handleHideColumns - Hide columns callback
+ *
+ * @returns {React.ReactElement} A toolbar with stack-specific operations
+ */
 const StackSchemaToolbar = ({
   // Props passed via `withOperationData.jsx` HOC
   rowCount,

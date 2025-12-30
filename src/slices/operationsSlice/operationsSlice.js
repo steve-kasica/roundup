@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Redux slice for managing operations.
+ * @module slices/operationsSlice/operationsSlice
+ *
+ * Manages operation state in normalized byId/allIds structure.
+ * Operations represent PACK (join) and STACK (union) transformations
+ * on tables, forming a tree structure.
+ *
+ * Features:
+ * - Add operations (becomes new root)
+ * - Update operation properties
+ * - Delete operations by ID
+ * - Track root operation ID
+ * - Normalized state for efficient lookups
+ *
+ * @example
+ * import { addOperations, updateOperations } from './operationsSlice';
+ * dispatch(addOperations(Operation({ operationType: 'pack', childIds: ['t1', 't2'] })));
+ */
 import { createSlice } from "@reduxjs/toolkit";
 import { isOperationId } from "./Operation";
 import { normalizeInputToArray } from "../utilities";

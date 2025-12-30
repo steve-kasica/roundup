@@ -1,3 +1,33 @@
+/**
+ * @fileoverview useMatchValues Hook
+ *
+ * A custom React hook for fetching match values between two tables in a join operation.
+ * Provides detailed match information including counts and value pairs based on join
+ * predicate and match type filters.
+ *
+ * Features:
+ * - Fetch join match values between two tables
+ * - Support for multiple join predicates (EQUALS, CONTAINS, etc.)
+ * - Match type filtering (MATCHES, LEFT_UNJOINED, RIGHT_UNJOINED)
+ * - Pagination with configurable limits
+ * - Ordering by count or value
+ * - Enable/disable query execution
+ * - Loading and error states
+ *
+ * @module hooks/useMatchValues
+ *
+ * @example
+ * const { data, loading, error } = useMatchValues(
+ *   'left-table-id',
+ *   'right-table-id',
+ *   'left_column',
+ *   'right_column',
+ *   'EQUALS',
+ *   'MATCHES',
+ *   { limit: 100, order: 'total_count', orderDirection: 'DESC' }
+ * );
+ */
+
 import { useState, useEffect, useCallback } from "react";
 import { getMatchValues } from "../lib/duckdb/getMatchValues";
 

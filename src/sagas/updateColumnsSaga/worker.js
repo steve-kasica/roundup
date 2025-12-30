@@ -1,3 +1,21 @@
+/**
+ * @fileoverview Update columns saga worker.
+ * @module sagas/updateColumnsSaga/worker
+ *
+ * Worker saga that updates column properties, including fetching
+ * statistics from DuckDB and updating column types.
+ *
+ * Features:
+ * - Updates column types in DuckDB
+ * - Fetches column statistics (min, max, nullCount, etc.)
+ * - Retrieves top value counts for value distribution
+ * - Handles both table and operation columns
+ * - Batch updates Redux state
+ *
+ * @example
+ * // Called by watcher saga
+ * yield call(updateColumnsWorker, action);
+ */
 import { call, put, select } from "redux-saga/effects";
 import {
   selectColumnsById,

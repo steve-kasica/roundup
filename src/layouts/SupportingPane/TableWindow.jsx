@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Table/operation rows view window component.
+ * @module layouts/SupportingPane/TableWindow
+ *
+ * Displays the appropriate row view based on the focused object type
+ * (table, stack operation, pack operation, or no-op).
+ *
+ * Features:
+ * - Table rows view for focused tables
+ * - Stack rows view for STACK operations
+ * - Pack rows view for PACK operations
+ * - Empty state for NO_OP operations
+ * - Error alert for unknown view modes
+ *
+ * @example
+ * <TableWindow id="t1" />
+ */
 /* eslint-disable react/prop-types */
 import { Alert, Box } from "@mui/material";
 import { useSelector } from "react-redux";

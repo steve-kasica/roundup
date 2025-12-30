@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Create columns saga worker.
+ * @module sagas/createColumnsSaga/worker
+ *
+ * Worker saga that creates column objects in Redux state mapped to
+ * underlying database columns. Handles both initialization (reading
+ * existing columns) and insertion (adding new columns) modes.
+ *
+ * Features:
+ * - Creates Column objects in Redux state
+ * - Inserts new columns into DuckDB tables
+ * - Fetches column names from database for initialization
+ * - Updates table/operation columnIds arrays
+ * - Generates unique database column identifiers
+ *
+ * @example
+ * // Called by watcher saga
+ * yield call(createColumnsWorker, action);
+ */
 import { call, put, select } from "redux-saga/effects";
 import {
   addColumns as addColumnsToSlice,

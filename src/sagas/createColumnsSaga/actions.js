@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Create columns saga action creators.
+ * @module sagas/createColumnsSaga/actions
+ *
+ * Redux action creators for column creation saga operations.
+ *
+ * Actions:
+ * - createColumnsRequest: Initiates column creation process
+ * - createColumnsSuccess: Signals successful column creation
+ * - createColumnsFailure: Signals column creation failure
+ *
+ * @example
+ * import { createColumnsRequest } from './actions';
+ * dispatch(createColumnsRequest({ columnLocations: [...], mode: 'insertion' }));
+ */
 import { createAction } from "@reduxjs/toolkit";
 
 /**

@@ -1,9 +1,19 @@
 /**
- * App.jsx
+ * @fileoverview Root application component for Roundup UI.
+ * @module App
  *
- * This file handles theming, and layout logic depending on user's state in
- * the overall roundup workflow.
+ * Main entry point that configures global providers and renders the
+ * primary application layout. Handles theming and drag-and-drop setup.
  *
+ * Features:
+ * - Material-UI theme provider with custom theme
+ * - React DnD provider with HTML5 backend for drag-and-drop
+ * - Custom drag layer for visual drag feedback
+ * - Supporting pane layout as main content area
+ *
+ * @example
+ * import App from './App';
+ * <App />
  */
 import "./App.css";
 import { ThemeProvider } from "@mui/material/styles";

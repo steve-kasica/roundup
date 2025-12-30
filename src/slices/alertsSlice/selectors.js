@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Redux selectors for alerts state.
+ * @module slices/alertsSlice/selectors
+ *
+ * Provides memoized selectors for querying alert state including
+ * filtering by source, counting by severity, and retrieving alert data.
+ *
+ * Features:
+ * - Select alerts by source ID
+ * - Select alerts by alert ID
+ * - Get all source IDs with active alerts
+ * - Count warnings and errors separately
+ *
+ * @example
+ * import { selectAlertIdsBySourceId, selectAlertsById } from './selectors';
+ * const alertIds = selectAlertIdsBySourceId(state, 'op_1');
+ */
 import { createSelector } from "@reduxjs/toolkit";
 import { SEVERITY_ERROR, SEVERITY_WARNING } from ".";
 

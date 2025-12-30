@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Delete operations saga watcher.
+ * @module sagas/deleteOperationsSaga/watcher
+ *
+ * Watches for operation deletion requests and triggers the worker saga.
+ * Auto-deletes operations that become childless after updates.
+ *
+ * Features:
+ * - Handles deleteOperationsRequest actions
+ * - Auto-deletes operations with no children
+ * - Coordinates with updateOperationsSuccess
+ *
+ * @example
+ * // Watcher is started automatically by rootSaga
+ */
 import { deleteOperationsRequest, deleteOperationsSuccess } from "./actions";
 import { put, select, takeEvery, takeLatest } from "redux-saga/effects";
 import deleteOperationsWorker from "./worker";

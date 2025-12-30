@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Update columns saga watcher.
+ * @module sagas/updateColumnsSaga/watcher
+ *
+ * Watches for column update requests and triggers the worker saga.
+ * Auto-fetches column statistics when new columns are created.
+ *
+ * Features:
+ * - Handles updateColumnsRequest actions
+ * - Auto-updates column stats after createColumnsSuccess
+ * - Fetches summary attributes and top values
+ *
+ * @example
+ * // Watcher is started automatically by rootSaga
+ */
 import { put, select, takeEvery } from "redux-saga/effects";
 import { updateColumnsRequest } from "./actions";
 import updateColumnsWorker from "./worker";

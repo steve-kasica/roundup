@@ -1,6 +1,20 @@
 /**
- * Redux slice for managing columns in a data table.
+ * @fileoverview Redux slice for managing column metadata.
+ * @module slices/columnsSlice/columnsSlice
  *
+ * Manages column state in normalized byId/allIds structure.
+ * Columns belong to tables or operations and store metadata
+ * like type, statistics, and display properties.
+ *
+ * Features:
+ * - Add columns (validates no duplicates)
+ * - Update column properties
+ * - Delete columns by ID
+ * - Normalized state for efficient lookups
+ *
+ * @example
+ * import { addColumns, updateColumns, deleteColumns } from './columnsSlice';
+ * dispatch(addColumns([{ id: 'col_1', parentId: 't1', name: 'Name' }]));
  */
 
 import { normalizeInputToArray } from "../utilities";

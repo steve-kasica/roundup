@@ -1,3 +1,27 @@
+/**
+ * @fileoverview getVirtualStackRows Module
+ *
+ * DuckDB utility for fetching stacked (UNION ALL) rows from multiple tables. Combines
+ * rows vertically with column mapping and supports pagination and sorting.
+ *
+ * Features:
+ * - UNION ALL across multiple tables
+ * - Column mapping per table
+ * - NULL handling for missing columns
+ * - Pagination support
+ * - Sorting by column index
+ * - Edge case handling (empty inputs, single column)
+ *
+ * @module lib/duckdb/getVirtualStackRows
+ *
+ * @example
+ * const rows = await getTableRows(
+ *   ['table1', 'table2'],
+ *   [['col_a', 'col_b'], ['col_x', 'col_y']],
+ *   50, 0, 0, 'asc'
+ * );
+ */
+
 import { getDuckDB } from "./duckdbClient";
 
 /**

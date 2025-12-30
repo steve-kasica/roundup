@@ -1,7 +1,62 @@
+/**
+ * @fileoverview ColumnTick Component
+ *
+ * A styled container component that represents a single column in a minimal,
+ * "tick" or marker format. This component provides visual feedback for various
+ * column states including hover, selection, dragging, focus, loading, and errors.
+ *
+ * The component uses MUI's styled API to create a responsive visual system that
+ * adapts to different interaction states, making it suitable for compact column
+ * representations in schema views or column lists.
+ *
+ * @module components/ColumnViews/ColumnTick
+ *
+ * @example
+ * <EnhancedColumnTick
+ *   id="column-123"
+ *   isHovered={false}
+ *   isSelected={true}
+ * />
+ */
+
 /* eslint-disable react/prop-types */
 import { Box, styled } from "@mui/material";
 import { withColumnData } from "../HOC";
 
+/**
+ * StyledColumnTick
+ *
+ * A styled Box component that provides visual states for column markers.
+ * Uses theme palette values to maintain consistent styling across the application.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {boolean} props.isHovered - Column is being hovered
+ * @param {boolean} props.isDragging - Column is being dragged
+ * @param {boolean} props.isLoading - Column data is loading
+ * @param {boolean} props.isFocused - Column has focus
+ * @param {boolean} props.isDropTarget - Column can accept drops
+ * @param {boolean} props.isSelected - Column is selected
+ * @param {boolean} props.isOver - Dragged item is over this column
+ * @param {boolean} props.isVisible - Column is visible (false for hidden columns)
+ * @param {boolean} props.isNull - Column contains null value
+ * @param {boolean} props.isDraggable - Column can be dragged
+ * @param {boolean} props.isError - Column has errors
+ *
+ * @description
+ * Visual state hierarchy (applied in order):
+ * 1. Default state from theme.palette.column.default
+ * 2. Hovered state
+ * 3. Selected state
+ * 4. Dragging state
+ * 5. Drop target state
+ * 6. Over drop target state
+ * 7. Loading state
+ * 8. Error state
+ * 9. Focused state
+ * 10. Hidden state
+ * 11. Null value state
+ */
 const StyledColumnTick = styled(Box, {
   shouldForwardProp: (prop) =>
     ![

@@ -1,3 +1,19 @@
+/**
+ * @fileoverview Heterogeneous column types warning alert for STACK operations.
+ * @module slices/alertsSlice/Alerts/Warnings/HeterogeneousColumnTypes
+ *
+ * Warning triggered when columns in corresponding positions across child
+ * tables have different data types (e.g., INTEGER vs VARCHAR).
+ *
+ * Features:
+ * - Transposes column type matrix to compare by position
+ * - Identifies which column indices have mismatched types
+ * - Provides user-friendly 1-based index references
+ *
+ * @example
+ * import { validateHeterogeneousColumnTypes } from './HeterogeneousColumnTypes';
+ * const alert = validateHeterogeneousColumnTypes(operation, [['INT', 'TEXT'], ['INT', 'INT']]);
+ */
 import { transpose } from "d3";
 import { Alert } from "../Alert.js";
 import { SEVERITY_WARNING } from "../index.js";

@@ -1,3 +1,26 @@
+/**
+ * @fileoverview SearchTextBox Component
+ *
+ * A search input component with debounced updates and a context menu for search options.
+ * Provides a clean interface for filtering data with advanced search settings.
+ *
+ * Features:
+ * - Debounced search input to reduce update frequency
+ * - Clear button for quick reset
+ * - Context menu with search options
+ * - Search icon with visual feedback
+ * - Customizable placeholder
+ * - Controlled input with local state management
+ *
+ * @module components/ui/SearchTextBox
+ *
+ * @example
+ * <SearchTextBox
+ *   placeholder="Search tables..."
+ *   setSearchString={handleSearch}
+ * />
+ */
+
 import { MoreVert } from "@mui/icons-material";
 import {
   Divider,

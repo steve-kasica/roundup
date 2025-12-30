@@ -1,3 +1,21 @@
+/**
+ * @fileoverview Column factory and type constants.
+ * @module slices/columnsSlice/Column
+ *
+ * Defines the Column factory function for creating column metadata objects
+ * and exports column type constants for type safety.
+ *
+ * Features:
+ * - Factory function for serializable column objects
+ * - Column type constants (CATEGORICAL, NUMERICAL, DATE, etc.)
+ * - Summary attribute definitions for column statistics
+ * - Auto-generated unique IDs
+ *
+ * @example
+ * import { Column, COLUMN_TYPE_NUMERICAL } from './Column';
+ * const col = Column({ parentId: 't1', name: 'amount', columnType: COLUMN_TYPE_NUMERICAL });
+ */
+
 /*
  * Column.js
  *

@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Materialize operation saga action creators.
+ * @module sagas/materializeOperationSaga/actions
+ *
+ * Redux action creators for materializing database views from operations.
+ *
+ * Actions:
+ * - materializeOperationRequest: Initiates view materialization
+ * - materializeOperationSuccess: Signals successful view creation
+ * - materializeOperationFailure: Signals view creation failure
+ *
+ * @example
+ * import { materializeOperationRequest } from './actions';
+ * dispatch(materializeOperationRequest({ operationId: 'op_1' }));
+ */
 import { createAction } from "@reduxjs/toolkit";
 
 /**

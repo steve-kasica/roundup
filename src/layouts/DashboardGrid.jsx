@@ -1,3 +1,21 @@
+/**
+ * @fileoverview Dashboard grid layout component.
+ * @module layouts/DashboardGrid
+ *
+ * Arranges components in a responsive Material-UI grid with optional
+ * card containers and titles. Supports lazy-loaded drawer components.
+ *
+ * Features:
+ * - Responsive grid layout using MUI Grid2
+ * - Optional card wrappers with elevation
+ * - Configurable spacing between items
+ * - Support for component titles
+ * - Lazy-loaded drawer support (commented out)
+ *
+ * @example
+ * import { DashboardGrid } from './layouts';
+ * <DashboardGrid components={[<Chart />, <Table />]} titles={['Sales', 'Data']} />
+ */
 import { lazy, Suspense } from "react";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";

@@ -1,3 +1,27 @@
+/**
+ * @fileoverview createPackView Module
+ *
+ * DuckDB utility for creating PACK (join) views between two tables. Generates SQL
+ * queries for various join types and executes them against DuckDB.
+ *
+ * Features:
+ * - Support for multiple join types (INNER, LEFT, RIGHT, FULL, CROSS)
+ * - Column selection and aliasing
+ * - Join predicate support (EQUALS, CONTAINS, STARTS_WITH, ENDS_WITH)
+ * - View creation and query execution
+ *
+ * @module lib/duckdb/createPackView
+ *
+ * @example
+ * const result = await createPackView({
+ *   leftTable: 'customers',
+ *   rightTable: 'orders',
+ *   leftKey: 'id',
+ *   rightKey: 'customer_id',
+ *   joinType: 'LEFT'
+ * });
+ */
+
 import { JOIN_TYPES } from "../../slices/operationsSlice";
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";

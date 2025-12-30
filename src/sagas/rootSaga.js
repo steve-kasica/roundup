@@ -1,5 +1,20 @@
 /**
- * rootSaga.js
+ * @fileoverview Root saga combining all saga watchers.
+ * @module sagas/rootSaga
+ *
+ * Aggregates all saga watchers for CRUD operations on tables, columns,
+ * and operations, plus alert handling and materialization.
+ *
+ * Features:
+ * - Combines all saga watchers using `all` effect
+ * - Handles table CRUD operations
+ * - Handles column CRUD operations
+ * - Handles operation CRUD operations
+ * - Manages alerts and materialization
+ *
+ * @example
+ * import rootSaga from './rootSaga';
+ * sagaMiddleware.run(rootSaga);
  */
 import { all, call } from "redux-saga/effects";
 import { watcher as createColumnsWatcher } from "./createColumnsSaga";

@@ -1,3 +1,22 @@
+/**
+ * @fileoverview AnimatedEllipsis Component
+ *
+ * A simple animated loading indicator that displays an ellipsis with a configurable
+ * number of dots that animate in sequence. Useful for indicating loading states or
+ * ongoing processes.
+ *
+ * Features:
+ * - Configurable animation speed
+ * - Customizable ellipsis length
+ * - Automatic cleanup of intervals
+ * - Lightweight implementation
+ *
+ * @module components/ui/AnimatedElipse
+ *
+ * @example
+ * <AnimatedEllipsis speed={250} elipseLength={3} />
+ */
+
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 

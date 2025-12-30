@@ -1,3 +1,24 @@
+/**
+ * @fileoverview ColumnValueLengths Component
+ *
+ * Displays a distribution chart of string lengths within a column, showing how many
+ * values have each length and providing examples of values for each length category.
+ * This is particularly useful for analyzing text data patterns and validating expected
+ * string formats.
+ *
+ * Features:
+ * - Bar chart visualization of length distribution
+ * - Tooltip examples showing actual values for each length
+ * - Paginated loading for performance
+ * - Scroll-based lazy loading
+ * - Formatted count display
+ *
+ * @module components/ColumnViews/ColumnValueLengths
+ *
+ * @example
+ * <ColumnValueLengths id="column-123" limit={20} />
+ */
+
 /* eslint-disable react/prop-types */
 /**
  * ColumnValueLengths.jsx
@@ -11,6 +32,32 @@ import { usePaginatedValueLength } from "../../hooks/useValueLength";
 import { formatNumber } from "../../lib/utilities";
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
 
+/**
+ * ColumnValueLengths Component
+ *
+ * Renders a bar chart showing the distribution of string lengths in a column,
+ * with paginated loading and example values in tooltips.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.id - Column identifier
+ * @param {number} [props.limit=20] - Number of length categories to load per page
+ *
+ * @returns {React.ReactElement} A scrollable bar chart of string length frequencies
+ *
+ * @description
+ * Loading behavior:
+ * - Shows loading spinner on initial load
+ * - Displays bar chart with existing data during subsequent loads
+ * - Automatically loads more data when scrolling near bottom
+ * - Shows progress text indicating loaded vs total unique lengths
+ *
+ * Chart features:
+ * - X-axis shows count of values with each length
+ * - Y-axis shows "Length N" labels
+ * - Tooltips display example values for each length with their counts
+ * - Green color scheme to differentiate from value counts
+ */
 const ColumnValueLengths = ({ id, limit = 20 }) => {
   const { data, loading, error, total, loadMore } = usePaginatedValueLength(
     id,

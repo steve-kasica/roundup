@@ -1,3 +1,25 @@
+/**
+ * @fileoverview withAllTablesData HOC
+ *
+ * A Higher-Order Component that provides comprehensive table management data and
+ * actions to wrapped components. Injects Redux-connected table data, statistics,
+ * and action dispatchers for table and operation management.
+ *
+ * Injected props:
+ * - tables: Array of all table objects
+ * - selectedTableIds: Currently selected table IDs
+ * - setSelectedTableIds: Update selection
+ * - rowMax/columnMax/bytesMax: Statistics for scaling
+ * - createTables: Create new tables
+ * - deleteTables: Delete tables
+ * - addNewOperation: Create operation with tables
+ *
+ * @module components/TablesList/withAllTablesData
+ *
+ * @example
+ * const EnhancedComponent = withAllTablesData(MyComponent);
+ */
+
 import { useSelector } from "react-redux";
 import { selectAllTablesData } from "../../slices/tablesSlice";
 import { useCallback, useMemo, useState } from "react";
@@ -7,6 +29,15 @@ import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 import { createOperationsRequest } from "../../sagas/createOperationsSaga/actions";
 import { selectRootOperationId } from "../../slices/operationsSlice";
 
+/**
+ * withAllTablesData HOC
+ *
+ * Wraps a component with table data and management functions.
+ *
+ * @function
+ * @param {React.Component} WrappedComponent - Component to enhance
+ * @returns {React.Component} Enhanced component with table data props
+ */
 const withAllTablesData = (WrappedComponent) => {
   return function EnhancedComponent(props) {
     const dispatch = useDispatch();

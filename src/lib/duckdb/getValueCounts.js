@@ -1,3 +1,22 @@
+/**
+ * @fileoverview getValueCounts Module
+ *
+ * DuckDB utility for retrieving value frequency counts for a column. Returns unique
+ * values with occurrence counts, supporting pagination and minimum count filtering.
+ *
+ * Features:
+ * - Value frequency counting
+ * - Pagination support (limit/offset)
+ * - Minimum count threshold
+ * - Ordered by count (descending)
+ * - Object result format (value -> count)
+ *
+ * @module lib/duckdb/getValueCounts
+ *
+ * @example
+ * const counts = await getValueCounts('my_table', 'category', 100, 0, 10);
+ */
+
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";
 

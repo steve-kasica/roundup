@@ -1,4 +1,25 @@
 /**
+ * @fileoverview TableSchema Component
+ *
+ * A comprehensive table schema viewer that displays a table's columns as interactive cards
+ * with a toolbar for performing bulk operations. This component provides a visual overview
+ * of table structure and allows users to select, manipulate, and analyze columns.
+ *
+ * Features:
+ * - Column selection (single, multi-select with Ctrl/Cmd, range selection with Shift)
+ * - Bulk operations (select all, delete, focus, change column types)
+ * - Interactive column cards showing statistics and data previews
+ * - Horizontal scrolling for tables with many columns
+ * - Real-time updates through Redux state management
+ * - Integration with HOCs for table data
+ *
+ * @module components/TableView/TableSchema
+ *
+ * @example
+ * <EnhancedTableSchema id={tableId} />
+ */
+
+/**
  * TableSchema Component
  *
  * A comprehensive table schema viewer that displays a table's columns as interactive cards

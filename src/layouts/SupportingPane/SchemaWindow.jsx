@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Schema view window component.
+ * @module layouts/SupportingPane/SchemaWindow
+ *
+ * Main content area that displays the appropriate schema view based
+ * on the currently focused object (table or operation type).
+ *
+ * Features:
+ * - Empty state when no tables uploaded
+ * - Table schema view for focused tables
+ * - Stack schema view for STACK operations
+ * - Pack schema view for PACK operations
+ * - Drop target for adding source tables
+ *
+ * @example
+ * <SchemaWindow />
+ */
 import { Alert, Box, Typography } from "@mui/material";
 import {
   OPERATION_TYPE_STACK,

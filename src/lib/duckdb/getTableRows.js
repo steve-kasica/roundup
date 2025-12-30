@@ -1,3 +1,24 @@
+/**
+ * @fileoverview getTableRows Module
+ *
+ * DuckDB utility for fetching table rows with optional column selection, sorting,
+ * and pagination. Handles value parsing for various data types.
+ *
+ * Features:
+ * - Row fetching with column selection
+ * - Sorting by column with direction
+ * - Pagination (limit/offset)
+ * - Value parsing (BigInt, Date, objects)
+ * - Array result format
+ *
+ * @module lib/duckdb/getTableRows
+ *
+ * @example
+ * const rows = await getTableRows(
+ *   'my_table', ['col1', 'col2'], 50, 0, 'col1', 'asc'
+ * );
+ */
+
 import { getDuckDB } from "./duckdbClient";
 
 function parseValue(value) {

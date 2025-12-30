@@ -1,12 +1,44 @@
 /**
+ * @fileoverview ColumnDetails Component
+ *
+ * Provides comprehensive statistical analysis and visualization for a single column,
+ * displaying detailed metrics similar to those found in commercial data wrangling
+ * software like Pandas' `.describe()` method.
+ *
+ * This component serves as the main details panel for column exploration during the
+ * Exploratory Data Analysis (EDA) phase of data wrangling workflows.
+ *
+ * Key features:
+ * - Column metadata (name, type, parent table)
+ * - Statistical measures (count, nulls, duplicates, unique values)
+ * - Data quality metrics (completeness, uniqueness)
+ * - Multiple visualization views:
+ *   - Value counts distribution
+ *   - Raw values preview
+ *   - String length distribution (for text columns)
+ * - Alert/warning indicators for data quality issues
+ *
+ * The component integrates with Redux state through the withColumnData and
+ * withAssociatedAlerts HOCs to access column statistics and related alerts.
+ *
+ * @module components/ColumnViews/ColumnDetails
+ *
+ * @example
+ * <EnhancedColumnDetails id="column-123" />
+ *
+ * @see {@link https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.describe.html}
+ *      Pandas describe() for comparison
+ */
+
+/**
  * ColumnDetails.jsx
  * ------------------------------------------------------------------------------
  *
- * This component provides many of the same statistics available in commerical data wrangling
+ * This component provides many of the same statistics available in commercial data wrangling
  * software, including:
  *   - Pandas: Column name, Non-null count, Dtype (columnType) via `.describe`
  *
- * This stats aid the user in the precusory EDA that occurs during the Wrangling stage of
+ * This stats aid the user in the precursory EDA that occurs during the Wrangling stage of
  * data work.
  */
 import { withColumnData, withAssociatedAlerts } from "../HOC";
@@ -29,6 +61,36 @@ const VALUE_COUNTS_VIEW = "value_counts";
 const RAW_VALUES_VIEW = "raw_values";
 const STRING_LENGTH_VIEW = "string_length";
 
+/**
+ * ColumnDetails Component
+ *
+ * Displays comprehensive statistical information and visualizations for a column,
+ * with toggleable views for different analysis perspectives.
+ *
+ * @component
+ * @param {Object} props - Component props (provided via HOCs)
+ * @param {string} props.name - Display name of the column
+ * @param {string} props.columnType - DuckDB data type of the column
+ * @param {string} props.parentId - ID of the parent table or operation
+ * @param {string} props.id - Unique identifier for the column
+ * @param {*} props.modeValue - Most frequently occurring value
+ * @param {number} props.modeCount - Count of the mode value
+ * @param {string} props.databaseName - Internal database name for the column
+ * @param {number} props.approxUnique - Approximate count of unique values
+ * @param {number} props.duplicateCount - Number of duplicate values
+ * @param {number} props.nullCount - Number of null values
+ * @param {number} props.count - Total number of values (including nulls)
+ * @param {number} props.nonNullCount - Count of non-null values
+ * @param {number} props.totalCount - Total count of associated alerts
+ *
+ * @returns {React.ReactElement} A detailed column analysis panel with statistics and visualizations
+ *
+ * @description
+ * View modes:
+ * - VALUE_COUNTS_VIEW: Bar chart of value frequency distribution
+ * - RAW_VALUES_VIEW: List of actual values in the column
+ * - STRING_LENGTH_VIEW: Distribution of string lengths (for text columns)
+ */
 const ColumnDetails = ({
   // Props passed via `withColumnData` HOC
   name,

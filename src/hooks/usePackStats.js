@@ -1,3 +1,32 @@
+/**
+ * @fileoverview usePackStats Hook
+ *
+ * A custom React hook for calculating PACK (join) statistics using DuckDB. Provides
+ * comprehensive join statistics including match counts, unjoined row counts, and
+ * cardinality breakdown (one-to-one vs many-to-many relationships).
+ *
+ * Features:
+ * - Calculate join statistics for two tables
+ * - Support for multiple join types (EQUALS, CONTAINS, STARTS_WITH, ENDS_WITH)
+ * - Match count breakdowns (matched, left_unjoined, right_unjoined)
+ * - Cardinality analysis (one-to-one, one-to-many, many-to-many)
+ * - Auto-fetch on dependency changes
+ * - Manual refetch and reset capabilities
+ * - Integration with Redux for table/column metadata
+ *
+ * @module hooks/usePackStats
+ *
+ * @example
+ * const { data, loading, error, refetch } = usePackStats(
+ *   'left-table-id',
+ *   'right-table-id',
+ *   'left_key_column',
+ *   'right_key_column',
+ *   'EQUALS',
+ *   true  // autoFetch
+ * );
+ */
+
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { calcPackStats } from "../lib/duckdb/calcPackStats.js";
 import { useSelector } from "react-redux";

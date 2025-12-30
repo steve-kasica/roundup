@@ -1,3 +1,35 @@
+/**
+ * @fileoverview StyledDraggableRow Component
+ *
+ * A comprehensive styled table row component with integrated drag-and-drop functionality,
+ * selection state, hover effects, and visual feedback for all interaction states. Combines
+ * styled-components patterns with react-dnd for rich table interactions.
+ *
+ * Features:
+ * - Drag-and-drop source with drag indicator
+ * - Drop target with visual feedback
+ * - Selection state styling
+ * - Hover effects
+ * - Disabled state support
+ * - Transition animations
+ * - Ref forwarding for react-dnd
+ * - Context menu integration
+ *
+ * @module components/ui/StyledDraggableRow
+ *
+ * @example
+ * <StyledDraggableRow
+ *   isDragging={isDragging}
+ *   isOver={isOver}
+ *   canDropHere={canDrop}
+ *   isSelected={true}
+ *   isHovered={false}
+ *   ref={dragDropRef}
+ * >
+ *   <td>Row content</td>
+ * </StyledDraggableRow>
+ */
+
 import { styled } from "@mui/material/styles";
 import { DragIndicator } from "@mui/icons-material";
 import { useState, forwardRef } from "react";

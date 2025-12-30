@@ -1,3 +1,34 @@
+/**
+ * @fileoverview BarChart Component
+ *
+ * A comprehensive horizontal bar chart component with tooltips, infinite scrolling,
+ * and loading states. Built with D3 for scaling and SVG rendering, supporting
+ * large datasets with dynamic height adjustment.
+ *
+ * Features:
+ * - Horizontal bar chart with D3 scales
+ * - Tooltip with hover interactions
+ * - Infinite scrolling support
+ * - Loading state with skeleton bars
+ * - Dynamic height based on data
+ * - Customizable margins and formatting
+ * - Scroll threshold detection
+ * - Value and label display
+ *
+ * @module components/visualization/BarChart
+ *
+ * @example
+ * <BarChart
+ *   data={{ 'Category A': 100, 'Category B': 75 }}
+ *   tooltipData={{ 'Category A': 'Details about A' }}
+ *   title="Sales by Category"
+ *   color="#3b82f6"
+ *   xAxisLabel="Count"
+ *   onScrollNearBottom={loadMore}
+ *   isLoading={false}
+ * />
+ */
+
 import PropTypes from "prop-types";
 import { useEffect, useRef, useCallback, useState } from "react";
 

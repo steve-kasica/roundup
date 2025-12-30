@@ -1,3 +1,27 @@
+/**
+ * @fileoverview calcPackStats Module
+ *
+ * DuckDB utility for calculating PACK (join) statistics between two tables. Performs
+ * a full outer join and returns counts of matched and unmatched rows for each table.
+ *
+ * Features:
+ * - Full outer join analysis
+ * - Support for multiple join predicates (EQUALS, CONTAINS, STARTS_WITH, ENDS_WITH)
+ * - Match count breakdown (matched, left unjoined, right unjoined)
+ * - Cardinality analysis (one-to-one vs many relationships)
+ *
+ * @module lib/duckdb/calcPackStats
+ *
+ * @example
+ * const stats = await calcPackStats(
+ *   'customers',
+ *   'orders',
+ *   'customer_id',
+ *   'cust_id',
+ *   'EQUALS'
+ * );
+ */
+
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";
 

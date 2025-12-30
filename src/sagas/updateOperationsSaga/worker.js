@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Update operations saga worker.
+ * @module sagas/updateOperationsSaga/worker
+ *
+ * Worker saga that updates operation properties and recreates database
+ * views when operation configuration changes.
+ *
+ * Features:
+ * - Updates operation Redux state
+ * - Manages parent-child relationships
+ * - Recreates PACK/STACK views on child changes
+ * - Calculates match statistics for PACK operations
+ * - Syncs column counts with database
+ * - Handles loading states during view creation
+ *
+ * @example
+ * // Called by watcher saga
+ * yield call(updateOperationsWorker, action);
+ */
 import { call, put, select } from "redux-saga/effects";
 import {
   OPERATION_TYPE_PACK,

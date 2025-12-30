@@ -1,3 +1,31 @@
+/**
+ * @fileoverview useValueMatrixData Hook
+ *
+ * A custom React hook for querying value counts across a matrix of columns. Enables
+ * comparison of value distributions across multiple columns from different tables,
+ * useful for UpSet plots and column value comparison views.
+ *
+ * Features:
+ * - Fetch value counts for a matrix of column IDs
+ * - Multi-table, multi-column comparison
+ * - Grouped results by value
+ * - Auto-fetch on mount or dependency changes
+ * - Manual refetch and reset capabilities
+ * - Integration with Redux for table/column/operation metadata
+ * - Database name resolution for views
+ *
+ * @module hooks/useValueMatrixData
+ *
+ * @example
+ * const { data, loading, error, refetch } = useValueMatrixData(
+ *   [
+ *     [{ tableId: 'table1', columnId: 'col1' }],
+ *     [{ tableId: 'table2', columnId: 'colA' }]
+ *   ],
+ *   true  // autoFetch
+ * );
+ */
+
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { getDuckDB } from "../lib/duckdb/duckdbClient";
 import { escapeColumnName } from "../lib/duckdb/utilities";

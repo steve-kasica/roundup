@@ -1,3 +1,29 @@
+/**
+ * @fileoverview VennDiagram Component
+ *
+ * A customizable Venn diagram SVG icon for visualizing set intersections and join
+ * operations. Supports customization of fill colors, opacity, labels, and dimensions
+ * to represent different join match types.
+ *
+ * Features:
+ * - Two overlapping circles with customizable fills
+ * - Individual opacity control for each region
+ * - Text label in overlap region
+ * - Customizable stroke and dimensions
+ * - Perfect for visualizing PACK (join) match types
+ *
+ * @module components/ui/icons/VennDiagram
+ *
+ * @example
+ * <VennDiagram
+ *   label="M"
+ *   leftFill="#90caf9"
+ *   rightFill="#a5d6a7"
+ *   overlapFill="#fff176"
+ *   size="24"
+ * />
+ */
+
 import SvgIcon from "@mui/material/SvgIcon";
 
 function VennDiagram(props) {

@@ -1,3 +1,25 @@
+/**
+ * @fileoverview TableDragContainer HOC
+ *
+ * A Higher-Order Component providing drag-and-drop functionality for table components
+ * using react-dnd. Handles both drag (for moving tables) and drop (for receiving
+ * columns or other tables) interactions with custom preview rendering.
+ *
+ * Features:
+ * - React-dnd drag source integration
+ * - React-dnd drop target integration
+ * - Custom drag preview hiding
+ * - Table metadata in drag payload
+ * - Ref forwarding to children
+ * - Integration with table data HOC
+ *
+ * @module components/TableView/TableDragContainer
+ *
+ * @example
+ * const DraggableTable = TableDragContainer(TableComponent);
+ * <DraggableTable id={tableId} />
+ */
+
 /* eslint-disable react/prop-types */
 
 import { useRef, cloneElement, isValidElement, useEffect } from "react";

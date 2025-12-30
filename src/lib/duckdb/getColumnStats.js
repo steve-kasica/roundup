@@ -1,3 +1,21 @@
+/**
+ * @fileoverview getColumnStats Module
+ *
+ * DuckDB utility for retrieving column statistics using SUMMARIZE. Provides detailed
+ * statistics for specified columns including min, max, nulls, unique counts, etc.
+ *
+ * Features:
+ * - Column statistics via SUMMARIZE
+ * - Single or multiple column support
+ * - Statistics include min, max, unique, nulls, avg, std, percentiles
+ * - Type-aware statistics
+ *
+ * @module lib/duckdb/getColumnStats
+ *
+ * @example
+ * const stats = await getColumnStats('my_table', ['age', 'salary']);
+ */
+
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";
 

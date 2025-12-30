@@ -1,5 +1,60 @@
+/**
+ * @fileoverview ParentValueSpread Component
+ *
+ * Displays a horizontal bar chart showing the distribution of unique values across
+ * different column categories (all columns, some columns, one column). Each category
+ * is represented by a bar whose width corresponds to the proportion of values in that
+ * category relative to the total unique value count.
+ *
+ * The component provides interactive functionality, allowing users to click on category
+ * labels to scroll to the corresponding values in the main value matrix view.
+ *
+ * @module components/ColumnValuesComparison/ParentValueSpread
+ *
+ * @example
+ * <ParentValueSpread
+ *   categories={{
+ *     all: { label: "all columns", count: 50, firstIndex: 0 },
+ *     some: { label: "some columns", count: 30, firstIndex: 50 },
+ *     one: { label: "one column", count: 20, firstIndex: 80 }
+ *   }}
+ *   valueCount={100}
+ *   scrollToDegree={(index) => console.log(index)}
+ *   loading={false}
+ * />
+ */
+
 import { Typography, Box, Skeleton } from "@mui/material";
 
+/**
+ * ParentValueSpread Component
+ *
+ * Renders a visual distribution chart showing how unique values are spread across
+ * different column categories with interactive scrolling capabilities.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.categories - Category definitions with counts and indices
+ * @param {Object} props.categories.all - Values appearing in all columns
+ * @param {string} props.categories.all.label - Display label for the category
+ * @param {number} props.categories.all.count - Number of values in this category
+ * @param {number} props.categories.all.firstIndex - Index of first value in this category
+ * @param {Object} props.categories.some - Values appearing in some columns
+ * @param {Object} props.categories.one - Values appearing in one column only
+ * @param {number} props.valueCount - Total number of unique values across all categories
+ * @param {Function} props.scrollToDegree - Callback function to scroll to a specific index in the value matrix
+ * @param {boolean} [props.loading=true] - Loading state indicator, shows skeleton when true
+ *
+ * @returns {React.ReactElement} A box containing horizontal bar charts for each category
+ *
+ * @description
+ * Visual features:
+ * - Bars are proportionally sized based on value count
+ * - Categories with 0 values are grayed out
+ * - Click interaction on labels triggers scrolling to corresponding values
+ * - Loading state displays skeleton placeholders
+ * - Shows count values at the end of each bar
+ */
 const ParentValueSpread = ({
   categories,
   valueCount,

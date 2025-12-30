@@ -1,3 +1,21 @@
+/**
+ * @fileoverview Redux selectors for table state.
+ * @module slices/tablesSlice/selectors
+ *
+ * Provides memoized selectors for querying table state including
+ * table metadata, column references, and query data generation.
+ *
+ * Features:
+ * - Select tables by ID
+ * - Get all table IDs
+ * - Get column IDs for tables
+ * - Generate query data for database operations
+ * - Get all tables as array
+ *
+ * @example
+ * import { selectTablesById, selectTableColumnIds } from './selectors';
+ * const table = selectTablesById(state, 't1');
+ */
 import { createSelector } from "reselect";
 import { normalizeInputToArray } from "../utilities";
 import { selectColumnsById } from "../columnsSlice";

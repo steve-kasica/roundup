@@ -1,3 +1,26 @@
+/**
+ * @fileoverview PackMatchToggleButtonGroup Component
+ *
+ * A toggle button group for controlling PACK (join) match display modes. Allows
+ * users to filter displayed rows by join match type (all, matched, unmatched left,
+ * unmatched right).
+ *
+ * Features:
+ * - Toggle buttons with Venn diagram visualizations
+ * - Match type filtering (all, matched, left-only, right-only)
+ * - Styled buttons with color coding
+ * - Tooltips explaining each match type
+ * - Integration with PACK operation state
+ *
+ * @module components/ui/buttons/PackMatchToggleButtonGroup
+ *
+ * @example
+ * <PackMatchToggleButtonGroup
+ *   value="all"
+ *   onChange={handleMatchTypeChange}
+ * />
+ */
+
 import {
   lighten,
   styled,

@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Missing join type error alert for PACK operations.
+ * @module slices/alertsSlice/Alerts/Errors/MissingJoinType
+ *
+ * Alert triggered when a PACK operation is missing its join type
+ * (INNER, LEFT OUTER, FULL OUTER, etc.).
+ *
+ * @example
+ * import { validateMissingJoinType } from './MissingJoinType';
+ * const alert = validateMissingJoinType(operation);
+ */
 import { Alert } from "../Alert.js";
 import { SEVERITY_ERROR } from "../../index.js";
 

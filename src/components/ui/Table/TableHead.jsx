@@ -1,3 +1,26 @@
+/**
+ * @fileoverview TableHead Component (Roundup)
+ *
+ * A table header component rendering column headers with sort indicators and a sticky
+ * row number column. Integrates with EnhancedColumnHeader for rich column interactions.
+ *
+ * Features:
+ * - Sticky row number header
+ * - Column headers with sort support
+ * - Placeholder columns when no data
+ * - Integration with ColumnHeader component
+ * - Sort configuration display
+ *
+ * @module components/ui/Table/TableHead
+ *
+ * @example
+ * <TableHead
+ *   columnIds={['col1', 'col2']}
+ *   sortConfig={{ column: 'col1', direction: 'asc' }}
+ *   onColumnSort={handleSort}
+ * />
+ */
+
 import {
   TableHead as MuiTableHead,
   TableCell,

@@ -1,5 +1,22 @@
 /**
- * uiSlice.js
+ * @fileoverview Redux slice for managing UI interaction state.
+ * @module slices/uiSlice/uiSlice
+ *
+ * Manages all UI interaction state including column selection, hovering,
+ * dragging, focus, and loading states. Provides actions for all UI
+ * interactions that need to be coordinated across components.
+ *
+ * Features:
+ * - Column selection (multi-select support)
+ * - Column hover state
+ * - Drag and drop state tracking
+ * - Focused object (table/operation) tracking
+ * - Loading operation indicators
+ * - Match type selection for PACK operations
+ *
+ * @example
+ * import { setSelectedColumnIds, setFocusedObjectId } from './uiSlice';
+ * dispatch(setSelectedColumnIds(['col_1', 'col_2']));
  */
 
 import { createSlice } from "@reduxjs/toolkit";

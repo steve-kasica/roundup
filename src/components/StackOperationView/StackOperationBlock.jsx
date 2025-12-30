@@ -1,3 +1,23 @@
+/**
+ * @fileoverview StackOperationBlock Component
+ *
+ * Renders a STACK (union) operation block in the hierarchical schema tree visualization.
+ * Shows the operation label and recursively renders child tables/operations stacked
+ * vertically with heights proportional to their row counts.
+ *
+ * STACK operations combine tables vertically (union/concatenate), and this visualization
+ * reflects that by stacking children vertically with heights based on their row contributions.
+ *
+ * @module components/StackOperationView/StackOperationBlock
+ *
+ * @example
+ * <EnhancedStackOperationBlock
+ *   id="stack-operation-123"
+ *   depth={1}
+ *   colorScale={d3ScaleFunction}
+ * />
+ */
+
 /* eslint-disable react/prop-types */
 /**
  * CompositeTableSchema/Operation.jsx

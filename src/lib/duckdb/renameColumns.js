@@ -1,3 +1,22 @@
+/**
+ * @fileoverview DuckDB column renaming utility.
+ * @module lib/duckdb/renameColumns
+ *
+ * Provides functionality to rename multiple columns in a DuckDB table.
+ *
+ * Features:
+ * - Batch rename multiple columns in a single operation
+ * - Safe column name escaping for special characters
+ * - Validates matching array lengths
+ * - Generates optimized multi-statement SQL
+ *
+ * @example
+ * import { renameColumns } from './renameColumns';
+ * await renameColumns('users',
+ *   ['first', 'last'],
+ *   ['firstName', 'lastName']
+ * );
+ */
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";
 

@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Main supporting pane layout component.
+ * @module layouts/SupportingPane/SupportingPane
+ *
+ * Primary application layout with resizable panels containing the
+ * sidebar, schema view, table view, and column detail windows.
+ *
+ * Features:
+ * - Three-panel horizontal layout with resize handles
+ * - Left sidebar with tables/operations lists
+ * - Center area with schema and table views
+ * - Right column detail window (conditionally shown)
+ * - Styled resize handles with hover effects
+ * - Persistent panel sizes
+ *
+ * @example
+ * import SupportingPane from './SupportingPane';
+ * <SupportingPane />
+ */
 import { name as APP_NAME } from "../../../package.json";
 import { Typography, Box, styled } from "@mui/material";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";

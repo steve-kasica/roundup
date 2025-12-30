@@ -1,3 +1,23 @@
+/**
+ * @fileoverview getValueLength Module
+ *
+ * DuckDB utility for analyzing string lengths in a column. Returns length distribution
+ * with counts and example values for each length.
+ *
+ * Features:
+ * - String length analysis
+ * - Count per length
+ * - Example values (up to 5)
+ * - Pagination support
+ * - Array result format
+ *
+ * @module lib/duckdb/getValueLength
+ *
+ * @example
+ * const lengths = await getValueLengths('my_table', 'name', 100, 0);
+ * // Returns: [{ length: 5, count: 100, examples: ['Alice', 'Bobby'] }, ...]
+ */
+
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";
 /**

@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Redux slice for managing application alerts.
+ * @module slices/alertsSlice/alertsSlice
+ *
+ * Manages alert state for validation errors, warnings, and notifications.
+ * Uses normalized state structure with byId/allIds pattern.
+ *
+ * Features:
+ * - Add new alerts (skips duplicates)
+ * - Update existing alert properties
+ * - Delete alerts by ID
+ * - Normalized state for efficient lookups
+ *
+ * @example
+ * import { addAlerts, deleteAlerts } from './alertsSlice';
+ * dispatch(addAlerts([{ id: 'alert_1', severity: 'error', ... }]));
+ */
 import { createSlice } from "@reduxjs/toolkit";
 import { normalizeInputToArray } from "../utilities";
 

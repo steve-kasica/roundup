@@ -1,3 +1,27 @@
+/**
+ * @fileoverview DummyRow Component
+ *
+ * A placeholder table row component displaying "No columns" message when a table
+ * has no column data. Provides visual feedback for empty tables with consistent
+ * styling and layout.
+ *
+ * Features:
+ * - Alternating row colors
+ * - Centered "No columns" message
+ * - Colspan handling for full-width display
+ * - Row number column support
+ * - Customizable row margins and column width
+ *
+ * @module components/ui/Table/DummyRow
+ *
+ * @example
+ * <DummyRow
+ *   columnCount={5}
+ *   rowIndex={0}
+ *   maxColumnWidth={200}
+ * />
+ */
+
 import { Typography } from "@mui/material";
 import StyledTableCell from "./StyledTableCell";
 import StyledAlternatingTableRow from "./StyledAlternatingTableRow";

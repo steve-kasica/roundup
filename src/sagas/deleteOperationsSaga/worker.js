@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Delete operations saga worker.
+ * @module sagas/deleteOperationsSaga/worker
+ *
+ * Worker saga that removes operations (and their database views) from
+ * DuckDB and Redux state.
+ *
+ * Features:
+ * - Drops views from DuckDB for PACK/STACK operations
+ * - Removes operations from Redux state
+ * - Handles NO_OP operations (state-only deletion)
+ * - Reports successful and failed deletions
+ *
+ * @example
+ * // Called by watcher saga
+ * yield call(deleteOperationsWorker, action);
+ */
 import { call, put, select } from "redux-saga/effects";
 import {
   OPERATION_TYPE_NO_OP,

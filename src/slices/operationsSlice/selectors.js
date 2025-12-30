@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Redux selectors for operations state.
+ * @module slices/operationsSlice/selectors
+ *
+ * Provides memoized selectors for querying operation state including
+ * tree traversal, query data generation, and child relationship lookups.
+ *
+ * Features:
+ * - Select operations by ID
+ * - Find parent operation by child ID
+ * - Calculate operation depth in tree
+ * - Generate query data for database views
+ * - Get active columns for operations
+ * - Traverse operation tree (ancestors, descendants)
+ *
+ * @example
+ * import { selectOperationsById, selectOperationQueryData } from './selectors';
+ * const operation = selectOperationsById(state, 'op_1');
+ */
 import { createSelector } from "@reduxjs/toolkit";
 import {
   // selectActiveColumnDBNamesByTableId,

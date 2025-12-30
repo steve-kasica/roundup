@@ -1,3 +1,22 @@
+/**
+ * @fileoverview DuckDB Module Index
+ *
+ * Central export file for all DuckDB utility functions. Provides re-exports
+ * for table operations, column operations, statistics, and data retrieval.
+ *
+ * Exported modules include:
+ * - Table operations: createTables, dropTable, getTableRows, getTableDimensions
+ * - Column operations: getColumnStats, getColumnNames, getValueCounts
+ * - Join operations: calcPackStats, createPackView, getMatchValues
+ * - Stack operations: createStackView, getVirtualStackRows
+ * - File operations: registerFiles, exportTableToStreamManual
+ *
+ * @module lib/duckdb
+ *
+ * @example
+ * import { getTableRows, calcPackStats, createTables } from './lib/duckdb';
+ */
+
 export * from "./getTableRows";
 export * from "./getValuesCountMatrix";
 export * from "./createStackView";

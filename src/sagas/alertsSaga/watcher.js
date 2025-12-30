@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Alert saga watcher for operation validation.
+ * @module sagas/alertsSaga/watcher
+ *
+ * Watches for operation and table updates to trigger alert validation.
+ * Automatically checks operations for fatal errors after changes.
+ *
+ * Features:
+ * - Responds to explicit alert check requests
+ * - Auto-validates after operation updates
+ * - Auto-validates after table updates
+ * - Handles PACK and STACK operation-specific validations
+ * - Triggers worker saga with raised alerts
+ *
+ * @example
+ * // Watcher is started automatically by rootSaga
+ */
 import { call, put, select, takeEvery } from "redux-saga/effects";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
 import alertsSagaWorker from "./worker";

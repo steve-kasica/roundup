@@ -1,3 +1,33 @@
+/**
+ * @fileoverview StyledDropZone Component
+ *
+ * A versatile styled drop zone component with multiple visual variants and size options.
+ * Provides consistent drag-and-drop visual feedback across the application with support
+ * for different UI contexts (default, outline, solid styles).
+ *
+ * Features:
+ * - Multiple visual variants (default, outline, solid)
+ * - Size options (small, medium, large)
+ * - State-based styling (isOver, canDrop)
+ * - Ref forwarding for react-dnd
+ * - Theme-aware colors and transitions
+ * - Flexible layout with centering
+ * - Border animations on hover/drag
+ *
+ * @module components/ui/StyledDropZone
+ *
+ * @example
+ * <StyledDropZone
+ *   ref={dropRef}
+ *   isOver={isOver}
+ *   canDrop={canDrop}
+ *   variant="outline"
+ *   size="large"
+ * >
+ *   Drop content here
+ * </StyledDropZone>
+ */
+
 import { Box, styled } from "@mui/material";
 import { forwardRef } from "react";
 

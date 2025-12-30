@@ -1,3 +1,19 @@
+/**
+ * @fileoverview Update operations saga watcher.
+ * @module sagas/updateOperationsSaga/watcher
+ *
+ * Watches for operation update requests and syncs database views with
+ * Redux store state. Handles post-creation setup and table migrations.
+ *
+ * Features:
+ * - Handles updateOperationsRequest actions
+ * - Sets default join parameters for new PACK operations
+ * - Updates operations when tables change parents
+ * - Coordinates child-parent relationships
+ *
+ * @example
+ * // Watcher is started automatically by rootSaga
+ */
 // Watcher Saga
 // Unlike other sagas, this saga is only in charge of
 // syncing database views with operations in the redux store.

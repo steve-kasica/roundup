@@ -1,3 +1,25 @@
+/**
+ * @fileoverview DuckDB column insertion utility.
+ * @module lib/duckdb/insertColumn
+ *
+ * Provides functionality to add new columns to existing DuckDB tables.
+ *
+ * Features:
+ * - Adds new columns to existing tables
+ * - Supports custom column types
+ * - Optional default value specification
+ * - Optional insertion index positioning
+ * - Safe column name escaping
+ *
+ * @example
+ * // Add a text column with default value
+ * import { insertColumn } from './insertColumn';
+ * const result = await insertColumn('users', 'status', null, 'TEXT', 'active');
+ *
+ * @example
+ * // Add an integer column
+ * const result = await insertColumn('orders', 'quantity', null, 'INTEGER', 0);
+ */
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";
 

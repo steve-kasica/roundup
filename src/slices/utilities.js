@@ -1,4 +1,21 @@
 /**
+ * @fileoverview Shared utility functions for Redux slices.
+ * @module slices/utilities
+ *
+ * Common utility functions used across all Redux slices for input
+ * normalization and data processing.
+ *
+ * Features:
+ * - Input normalization for flexible API
+ * - Handles single values and arrays uniformly
+ * - Reduces complexity in slice reducers
+ *
+ * @example
+ * import { normalizeInputToArray } from './utilities';
+ * const items = normalizeInputToArray(payload); // Always an array
+ */
+
+/**
  * Normalizes the input to always return an array.
  * Input normalization is a programming concept where inputs to a function
  * or method are transformed into a consistent format before processing.

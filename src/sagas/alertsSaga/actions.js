@@ -1,3 +1,17 @@
+/**
+ * @fileoverview Alert saga action creators.
+ * @module sagas/alertsSaga/actions
+ *
+ * Redux action creators for triggering alert-related saga operations.
+ *
+ * Actions:
+ * - updateAlertsRequest: Triggers full alert recalculation
+ * - checkOperationForAlertsRequest: Checks specific operations for alerts
+ *
+ * @example
+ * import { checkOperationForAlertsRequest } from './actions';
+ * dispatch(checkOperationForAlertsRequest({ operationIds: ['op_1'] }));
+ */
 import { createAction } from "@reduxjs/toolkit";
 
 /**

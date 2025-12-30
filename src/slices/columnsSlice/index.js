@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Barrel export for columnsSlice module.
+ * @module slices/columnsSlice
+ *
+ * Re-exports all column-related actions, selectors, types, and the Column factory.
+ *
+ * @example
+ * import { addColumns, selectColumnsById, Column, COLUMN_TYPE_NUMERICAL } from './columnsSlice';
+ */
 export * from "./columnsSlice.js"; // exports all actions
 export * from "./Column.js";
 export {

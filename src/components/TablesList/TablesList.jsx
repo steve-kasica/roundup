@@ -1,3 +1,23 @@
+/**
+ * @fileoverview TablesList Component
+ *
+ * The main source tables management component, displaying all available tables in
+ * a sortable, interactive list with drag-and-drop support for creating operations.
+ *
+ * Features:
+ * - Sortable table list (by name, type, size, rows, columns, etc.)
+ * - Drag-and-drop to create operations or add to schema
+ * - File upload via drag-and-drop zone
+ * - Table selection for bulk operations
+ * - Search/filter functionality
+ * - Integration with operation creation
+ *
+ * @module components/TablesList/TablesList
+ *
+ * @example
+ * <EnhancedTablesList />
+ */
+
 /* eslint-disable react/prop-types */
 /**
  * SourceTables.jsx

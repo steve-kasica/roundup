@@ -1,3 +1,29 @@
+/**
+ * @fileoverview useColumnValues Hook
+ *
+ * A custom React hook for fetching column values from DuckDB. Provides loading states,
+ * error handling, pagination support, and manual/automatic fetch control.
+ *
+ * Features:
+ * - Fetch column values by table and column ID
+ * - Pagination with limit and offset
+ * - Auto-fetch on mount or dependency changes
+ * - Manual refetch capability
+ * - Reset to initial state
+ * - Loading and error states
+ *
+ * @module hooks/useColumnValues
+ *
+ * @example
+ * const { data, loading, error, refetch } = useColumnValues(
+ *   'table-1',
+ *   'column-name',
+ *   100,  // limit
+ *   0,    // offset
+ *   true  // autoFetch
+ * );
+ */
+
 import { useState, useEffect, useCallback } from "react";
 import { getColumnValues } from "../lib/duckdb/getColumnValues.js";
 

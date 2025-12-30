@@ -1,23 +1,19 @@
 /**
- * updateTablesSaga.js
+ * @fileoverview Update tables saga worker.
+ * @module sagas/updateTablesSaga/worker
  *
- * This file defines Redux Saga logic for updating tables within the application state from information an
- * external source, e.g. DuckDB.
+ * Worker saga that updates table properties from database state,
+ * including fetching row counts and column metadata.
  *
- * It updates the following properties in `updateData`:
- *    - rowCount <Number>
- *    - columnIds <Array>
+ * Features:
+ * - Fetches table statistics from DuckDB
+ * - Updates rowCount and columnIds properties
+ * - Tracks which properties changed for downstream sagas
+ * - Handles update failures gracefully
  *
- * Exports:
- * - updateTablesRequest: Redux action creator to trigger the saga for updating tables.
- * - updateTablesSuccess: Redux action creator to indicate successful table updates.
- * - updateTablesFailure: Redux action creator to indicate failed table updates.
- * - updateTablesSagaWatcher: Saga watcher that listens for updateTablesRequest action and invokes the worker saga.
- *
- * Main Logic:
- * - The saga worker (updateTablesSagaWorker) manages the process of updating table data.
- * - Handles loading states, error handling, and success scenarios.
- * - Updates the application state based on the table update results.
+ * @example
+ * // Called by watcher saga
+ * yield call(updateTablesWorker, action);
  */
 
 import { put, call, select } from "redux-saga/effects";

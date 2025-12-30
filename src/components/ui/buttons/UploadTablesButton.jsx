@@ -1,3 +1,25 @@
+/**
+ * @fileoverview UploadTablesButton Component
+ *
+ * A button for uploading table files. Provides a hidden file input with upload
+ * icon button interface. Supports multiple file selection.
+ *
+ * Features:
+ * - Upload icon button
+ * - Hidden file input
+ * - Multiple file selection
+ * - File upload callback
+ * - Customizable tooltip text
+ *
+ * @module components/ui/buttons/UploadTablesButton
+ *
+ * @example
+ * <UploadTablesButton
+ *   onFileUpload={handleFilesUploaded}
+ *   tooltipText="Upload CSV files"
+ * />
+ */
+
 import { Upload } from "@mui/icons-material";
 import TooltipIconButton from "./TooltipIconButton";
 import { useCallback } from "react";

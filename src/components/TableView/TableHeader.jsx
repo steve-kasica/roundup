@@ -1,3 +1,27 @@
+/**
+ * @fileoverview TableHeader Component
+ *
+ * A table header component displaying column names in a horizontal row. Renders column
+ * headers with click handlers and highlights the key column used for joins or operations.
+ * Integrates with table data to display all column names consistently.
+ *
+ * Features:
+ * - Horizontal column name display
+ * - Key column highlighting
+ * - Click handlers for column selection
+ * - Integration with table data HOC
+ * - Debug logging for development
+ *
+ * @module components/TableView/TableHeader
+ *
+ * @example
+ * <EnhancedTableHeader
+ *   id={tableId}
+ *   keyColumnId={keyColId}
+ *   onColumnClick={handleClick}
+ * />
+ */
+
 /* eslint-disable react/prop-types */
 import { Box, Tooltip } from "@mui/material";
 import { withTableData } from "../HOC";

@@ -1,3 +1,21 @@
+/**
+ * @fileoverview getColumnValues Module
+ *
+ * DuckDB utility for retrieving column values with counts. Returns unique values
+ * and their occurrence frequencies for a specified column.
+ *
+ * Features:
+ * - Unique value retrieval with counts
+ * - Pagination support (limit/offset)
+ * - Column name escaping
+ * - Object result format (value -> count)
+ *
+ * @module lib/duckdb/getColumnValues
+ *
+ * @example
+ * const values = await getColumnValues('my_table', 'category', 100, 0);
+ */
+
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";
 

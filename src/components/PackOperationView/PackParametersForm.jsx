@@ -1,3 +1,26 @@
+/**
+ * @fileoverview PackParametersForm Component
+ *
+ * A form component for configuring PACK (join) operation parameters including operation
+ * name, type, join predicate, and join keys for both left and right tables.
+ *
+ * This form provides the main interface for users to configure how tables should be
+ * joined together, including all necessary join configuration options.
+ *
+ * Features:
+ * - Operation name editing
+ * - Operation type switching (PACK/STACK)
+ * - Join predicate selection (EQUALS, etc.)
+ * - Left and right join key selection
+ * - Error state visualization
+ * - Loading state handling
+ *
+ * @module components/PackOperationView/PackParametersForm
+ *
+ * @example
+ * <EnhancedPackParametersForm id="pack-operation-123" />
+ */
+
 import { useState, useEffect } from "react";
 
 import {
@@ -18,6 +41,30 @@ import {
 } from "../../slices/operationsSlice";
 import { EnhancedColumnName } from "../ColumnViews";
 
+/**
+ * PackParametersForm Component
+ *
+ * Form for configuring PACK operation join parameters.
+ *
+ * @component
+ * @param {Object} props - Component props (provided via HOCs)
+ * @param {string} props.name - Current operation name
+ * @param {string} props.joinPredicate - Join predicate type (EQUALS, etc.)
+ * @param {string} props.leftKey - Left table join column ID
+ * @param {string} props.rightKey - Right table join column ID
+ * @param {string} props.operationType - Current operation type
+ * @param {string[]} props.rightColumnIds - Available columns from right table
+ * @param {string[]} props.leftColumnIds - Available columns from left table
+ * @param {boolean} props.isLoading - Loading state
+ * @param {Array} [props.alerts=[]] - Array of alerts for this operation
+ * @param {Function} props.setJoinPredicate - Update join predicate
+ * @param {Function} props.setLeftTableJoinKey - Update left join key
+ * @param {Function} props.setRightTableJoinKey - Update right join key
+ * @param {Function} props.setOperationType - Update operation type
+ * @param {Function} props.setOperationName - Update operation name
+ *
+ * @returns {React.ReactElement} A form with all join configuration fields
+ */
 const PackParametersForm = ({
   name,
   joinPredicate,

@@ -1,4 +1,30 @@
 /**
+ * @fileoverview CompositeTableSchema Component
+ *
+ * An interactive hierarchical visualization of the table operation tree, displaying
+ * how tables are combined through operations like STACK (union) and PACK (join).
+ * This component serves as the main schema editor where users can add, remove, and
+ * reorganize tables to build complex data transformations.
+ *
+ * The schema tree starts with a root operation that can be:
+ * - NO_OP: Single table with no operations
+ * - STACK: Multiple tables stacked vertically (union)
+ * - PACK: Multiple tables packed horizontally (join)
+ *
+ * Features:
+ * - Visual representation of operation hierarchy
+ * - Drag-and-drop zones for adding tables
+ * - Automatic layout management
+ * - Error state handling (disables operations when errors exist)
+ * - Material sync state awareness
+ *
+ * @module components/CompositeTableSchema/CompositeTableSchema
+ *
+ * @example
+ * <CompositeTableSchema />
+ */
+
+/**
  * CompositeTableSchema.js
  * ------------------------------------------------------------------------------------------------
  * An interactive hierarchical visualization of the table tree
@@ -26,10 +52,33 @@ const gridColumns = 12;
 const gridWidth = gridColumns - 1;
 const stackDropTargetHeight = 50;
 
-// Each root operation type condition also needs to catch
-// the edge case where there are no children (e.g. all tables have been removed)
-// A watcher for deleting operations will handle this cleanup after operation update
-// request finishes.
+/**
+ * CompositeTableSchema Component
+ *
+ * Renders the main schema visualization with drop targets for adding tables
+ * through STACK or PACK operations.
+ *
+ * @component
+ * @returns {React.ReactElement} The complete schema visualization with drop zones
+ *
+ * @description
+ * Layout structure:
+ * - Left/main area: Operation blocks showing the current schema hierarchy
+ * - Bottom drop zone: Add tables via STACK operation (vertical union)
+ * - Right drop zone: Add tables via PACK operation (horizontal join)
+ * - Center drop zone: Initial drop zone when no tables exist (NO_OP)
+ *
+ * Operation constraints:
+ * - Adding operations is disabled when:
+ *   - Root operation is not materialized
+ *   - Root operation is out of sync
+ *   - There are existing errors in the schema
+ *
+ * Edge cases:
+ * - Empty state (no children): Shows only the appropriate drop target
+ * - Single table: Can evolve to STACK or PACK when another table is added
+ * - Errors: Drop zones are disabled until errors are resolved
+ */
 export default function CompositeTableSchema() {
   const rootOperation = useSelector(selectRootOperation);
   const errorCount = useSelector((state) => {

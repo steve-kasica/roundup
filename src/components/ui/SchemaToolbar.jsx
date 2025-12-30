@@ -1,3 +1,32 @@
+/**
+ * @fileoverview SchemaToolbar Component
+ *
+ * A comprehensive toolbar component for schema views providing column/table management
+ * actions, export functionality, and metadata display. Serves as a reusable toolbar
+ * for both table and operation schema views.
+ *
+ * Features:
+ * - Column selection controls (select all/none)
+ * - Column deletion with confirmation
+ * - Column focusing for detail view
+ * - Export to CSV/TSV/Parquet
+ * - Hidden columns management
+ * - Schema alerts display
+ * - Metadata chips (name, rows, columns)
+ * - Integration with DuckDB for exports
+ *
+ * @module components/ui/SchemaToolbar
+ *
+ * @example
+ * <EnhancedSchemaToolbar
+ *   id={tableId}
+ *   objectType={OBJECT_TYPE_TABLE}
+ *   name="My Table"
+ *   rowCount={1000}
+ *   columnCount={10}
+ * />
+ */
+
 /* eslint-disable react/prop-types */
 import {
   Toolbar,

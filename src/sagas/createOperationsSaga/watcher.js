@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Create operations saga watcher.
+ * @module sagas/createOperationsSaga/watcher
+ *
+ * Watches for operation creation requests and triggers the worker saga.
+ * Ensures database views are created when operations are added.
+ *
+ * @example
+ * // Watcher is started automatically by rootSaga
+ */
 import { takeEvery } from "redux-saga/effects";
 import { createOperationsRequest } from "./actions";
 import createOperationsWorker from "./worker";

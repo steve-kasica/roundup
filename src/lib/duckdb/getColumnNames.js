@@ -1,3 +1,21 @@
+/**
+ * @fileoverview getColumnNames Module
+ *
+ * DuckDB utility for retrieving column names from a table. Queries the information
+ * schema to get ordered column names.
+ *
+ * Features:
+ * - Column name retrieval by table ID
+ * - Ordered by ordinal position
+ * - Information schema query
+ *
+ * @module lib/duckdb/getColumnNames
+ *
+ * @example
+ * const columnNames = await getColumnNames('my_table');
+ * // Returns: ['id', 'name', 'email', ...]
+ */
+
 import { getDuckDB } from "./duckdbClient";
 
 export async function getColumnNames(tableId) {

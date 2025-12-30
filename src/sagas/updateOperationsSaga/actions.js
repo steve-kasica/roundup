@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Update operations saga action creators.
+ * @module sagas/updateOperationsSaga/actions
+ *
+ * Redux action creators for operation update saga operations.
+ *
+ * Actions:
+ * - updateOperationsRequest: Initiates operation update process
+ * - updateOperationsSuccess: Signals successful operation updates (includes changed properties)
+ * - updateOperationsFailure: Signals operation update failure
+ *
+ * @example
+ * import { updateOperationsRequest } from './actions';
+ * dispatch(updateOperationsRequest({
+ *   operationUpdates: [{ id: 'op_1', childIds: ['t_1', 't_2'] }]
+ * }));
+ */
 import { createAction } from "@reduxjs/toolkit";
 
 /**

@@ -1,3 +1,21 @@
+/**
+ * @fileoverview Create tables saga worker.
+ * @module sagas/createTablesSaga/worker
+ *
+ * Worker saga that creates DuckDB tables from uploaded files and
+ * corresponding Table objects in Redux state.
+ *
+ * Features:
+ * - Creates tables in DuckDB from file content
+ * - Generates unique database identifiers
+ * - Fetches initial row/column counts
+ * - Creates Table objects in Redux state
+ * - Handles creation failures gracefully
+ *
+ * @example
+ * // Called by watcher saga
+ * yield call(createTablesWorker, action);
+ */
 import { call, put } from "redux-saga/effects";
 import { addTables, Table } from "../../slices/tablesSlice";
 import {

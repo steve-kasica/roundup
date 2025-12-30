@@ -1,3 +1,27 @@
+/**
+ * @fileoverview DeleteColumnsButton Component
+ *
+ * A button for deleting columns or tables with confirmation dialog. Provides
+ * safety confirmation before performing destructive operations.
+ *
+ * Features:
+ * - Delete icon button
+ * - Confirmation dialog
+ * - Customizable tooltip and dialog text
+ * - Support for deleting columns or tables
+ * - Disabled state support
+ *
+ * @module components/ui/buttons/DeleteColumnsButton
+ *
+ * @example
+ * <DeleteColumnsButton
+ *   onClick={handleDelete}
+ *   tooltipText="Delete 3 columns"
+ *   disabled={false}
+ *   objectType="column"
+ * />
+ */
+
 import {
   IconButton,
   Dialog,

@@ -1,3 +1,31 @@
+/**
+ * @fileoverview SingleBar Component
+ *
+ * A simple horizontal bar visualization component for displaying a single value
+ * as a proportional bar. Supports optional value/percentage labels and custom
+ * scaling via D3 scales or max values.
+ *
+ * Features:
+ * - Horizontal bar with proportional width
+ * - Optional D3 scale integration
+ * - Value and percentage label display
+ * - Customizable colors (bar and background)
+ * - Adjustable height
+ * - Automatic width clamping to 100%
+ *
+ * @module components/visualization/SingleBar
+ *
+ * @example
+ * <SingleBar
+ *   value={75}
+ *   maxValue={100}
+ *   height={20}
+ *   color="#1976d2"
+ *   showValue={true}
+ *   showPercentage={true}
+ * />
+ */
+
 /* eslint-disable react/prop-types */
 
 const SingleBar = ({

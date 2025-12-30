@@ -1,3 +1,27 @@
+/**
+ * @fileoverview ColumnTypeIcon Component
+ *
+ * Displays an icon representing a column's data type (categorical/varchar, numeric,
+ * date, or key) with tooltip and click handling. Provides visual indication of column
+ * types throughout the application.
+ *
+ * Features:
+ * - Icon mapping for different column types
+ * - Tooltip with type description
+ * - Click handler support
+ * - Customizable styling via sx prop
+ * - Default icon for unknown types
+ *
+ * @module components/ui/ColumnTypeIcon
+ *
+ * @example
+ * <ColumnTypeIcon
+ *   column={columnObject}
+ *   onClick={handleClick}
+ *   sx={{ color: 'primary.main' }}
+ * />
+ */
+
 import {
   Abc as CategoricalIcon,
   Numbers as NumericIcon,

@@ -1,3 +1,27 @@
+/**
+ * @fileoverview InsertColumnDialog Component
+ *
+ * A dialog component for inserting new columns into tables. Collects column name,
+ * type, and default value from the user and submits the data for column creation.
+ *
+ * Features:
+ * - Column name input field
+ * - Direction specification (left/right of target column)
+ * - Form submission with validation
+ * - Confirm and cancel buttons
+ * - Controlled dialog state
+ *
+ * @module components/ui/dialogs/InsertColumnDialog
+ *
+ * @example
+ * <InsertColumnDialog
+ *   direction="right"
+ *   onSubmit={handleInsertColumn}
+ *   onClose={handleClose}
+ *   open={dialogOpen}
+ * />
+ */
+
 import {
   Button,
   Dialog,

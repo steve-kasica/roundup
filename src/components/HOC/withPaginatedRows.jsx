@@ -1,3 +1,24 @@
+/**
+ * @fileoverview Higher-Order Component for paginated database row fetching.
+ * @module components/HOC/withPaginatedRows
+ *
+ * Provides infinite scroll pagination for database table rows using
+ * DuckDB queries with configurable page size and scroll threshold.
+ *
+ * Features:
+ * - Lazy loading of database rows on scroll
+ * - Configurable page size and scroll threshold
+ * - Sort by column with direction control
+ * - Automatic pagination reset on ID/column changes
+ * - Loading and error state management
+ * - Scroll event handling with threshold detection
+ * - Manual refresh and load next page controls
+ *
+ * @example
+ * import withPaginatedRows from './withPaginatedRows';
+ * const PaginatedTable = withPaginatedRows(TableComponent, { pageSize: 50 });
+ * <PaginatedTable id="t1" columnIds={['c1', 'c2']} />
+ */
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { getTableRows } from "../../lib/duckdb";
 

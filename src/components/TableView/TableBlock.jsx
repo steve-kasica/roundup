@@ -1,3 +1,23 @@
+/**
+ * @fileoverview TableBlock Component
+ *
+ * A compact block visualization component for displaying table information in the
+ * tree/schema view. Shows table metadata, column ticks for visual representation,
+ * and integrates with alert and table data systems.
+ *
+ * Features:
+ * - Table name and metadata display
+ * - Column tick visualization
+ * - Alert count display
+ * - Integration with HOCs for data
+ * - Compact tree node representation
+ *
+ * @module components/TableView/TableBlock
+ *
+ * @example
+ * <EnhancedTableBlock id={tableId} />
+ */
+
 import { ColumnTick, EnhancedColumnTick } from "../ColumnViews";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
 import { withTableData, withAssociatedAlerts } from "../HOC";

@@ -1,7 +1,20 @@
 /**
- * Operation.js
+ * @fileoverview Operation factory and type constants.
+ * @module slices/operationsSlice/Operation
  *
+ * Defines the Operation factory function for creating operation objects
+ * and exports operation type, join type, and predicate constants.
  *
+ * Features:
+ * - Factory function for serializable operation objects
+ * - Operation types: STACK, PACK, NO_OP
+ * - Join types: INNER, LEFT OUTER, FULL OUTER, etc.
+ * - Join predicates: EQUALS, CONTAINS, STARTS_WITH, etc.
+ * - Match statistics structure for PACK operations
+ *
+ * @example
+ * import { Operation, OPERATION_TYPE_PACK, JOIN_TYPES } from './Operation';
+ * const op = Operation({ operationType: OPERATION_TYPE_PACK, childIds: ['t1', 't2'] });
  */
 export const OPERATION_TYPE_STACK = "stack";
 export const OPERATION_TYPE_PACK = "pack";

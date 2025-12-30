@@ -1,3 +1,32 @@
+/**
+ * @fileoverview EditableText Component
+ *
+ * An inline editable text component with debounced updates, read-only mode support,
+ * and automatic focus management. Allows users to edit text directly in place with
+ * visual feedback for hover and edit states.
+ *
+ * Features:
+ * - Inline editing with double-click to activate
+ * - Debounced onChange to reduce update frequency
+ * - Read-only mode for non-editable display
+ * - Automatic focus management
+ * - Placeholder support
+ * - Customizable font size
+ * - Edit state change callbacks
+ * - Click-away to save
+ *
+ * @module components/ui/EditableText
+ *
+ * @example
+ * <EditableText
+ *   initialValue="Table Name"
+ *   onChange={(newValue) => updateName(newValue)}
+ *   isEditable={true}
+ *   debounceDelay={300}
+ *   placeholder="Enter name"
+ * />
+ */
+
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 

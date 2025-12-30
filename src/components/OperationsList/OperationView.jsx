@@ -1,3 +1,26 @@
+/**
+ * @fileoverview OperationView Component (List Item)
+ *
+ * Renders a single operation as an expandable accordion item in the operations list.
+ * Shows operation metadata (name, type, dimensions) and provides an interface for
+ * editing operation parameters.
+ *
+ * This component displays operations in a compact list format and is different from
+ * the schema visualization OperationBlock components.
+ *
+ * Features:
+ * - Expandable accordion for parameter editing
+ * - Focus indicator when operation is selected
+ * - Error message display
+ * - Type-specific parameter forms (PACK/STACK)
+ * - Dimension display (columns x rows)
+ *
+ * @module components/OperationsList/OperationView
+ *
+ * @example
+ * <OperationView id="operation-123" index={0} />
+ */
+
 /* eslint-disable react/prop-types */
 import {
   Accordion,
@@ -19,6 +42,32 @@ import { EnhancedPackParametersForm } from "../PackOperationView/PackParametersF
 
 export const LAYOUT_ID = "operationListItem";
 
+/**
+ * OperationView Component
+ *
+ * An accordion list item displaying operation details with expandable parameters form.
+ *
+ * @component
+ * @param {Object} props - Component props (provided via withOperationData HOC)
+ * @param {string} props.id - Operation identifier
+ * @param {string} props.name - Operation name
+ * @param {string[]} props.childIds - IDs of child tables/operations
+ * @param {string} props.operationType - Type of operation (PACK/STACK/NO_OP)
+ * @param {number} props.columnCount - Number of columns in result
+ * @param {boolean} props.isFocused - Whether this operation is currently focused
+ * @param {number} props.index - Position in the list
+ * @param {Function} props.focusOperation - Callback to focus this operation
+ * @param {string|Object} [props.error] - Error message or object if operation failed
+ *
+ * @returns {React.ReactElement} An expandable accordion with operation details
+ *
+ * @description
+ * Visual features:
+ * - Left border highlight when focused
+ * - Hover effect for better interactivity
+ * - Error message parsing from JSON strings
+ * - Type-specific parameter forms in expanded state
+ */
 function OperationView({
   id,
   name,

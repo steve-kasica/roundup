@@ -1,3 +1,26 @@
+/**
+ * @fileoverview getValuesCountMatrix Module
+ *
+ * DuckDB utility for creating a value count matrix across multiple columns/tables.
+ * Returns a matrix showing value presence and counts across different data sources,
+ * useful for UpSet plots and column comparison views.
+ *
+ * Features:
+ * - Cross-table value comparison
+ * - Count per column per value
+ * - Degree calculation (tables containing value)
+ * - Signature for sorting
+ * - Matrix result format
+ *
+ * @module lib/duckdb/getValuesCountMatrix
+ *
+ * @example
+ * const matrix = await getValuesCountMatrix(
+ *   ['col1', 'col2'],
+ *   ['table1', 'table2']
+ * );
+ */
+
 // See example here: https://observablehq.com/d/a57dc020b270136f#cell-18
 import { getDuckDB } from "./duckdbClient";
 import { escapeColumnName } from "./utilities";

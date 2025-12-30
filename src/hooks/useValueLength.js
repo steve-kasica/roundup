@@ -1,3 +1,31 @@
+/**
+ * @fileoverview useValueLength Hook
+ *
+ * A custom React hook for querying value lengths (string length distribution) for a
+ * column from DuckDB. Returns length statistics with counts and example values,
+ * supporting pagination for large datasets.
+ *
+ * Features:
+ * - Fetch value length distribution (length -> count + examples)
+ * - Pagination with limit and offset
+ * - Paginated version for infinite scrolling
+ * - Auto-fetch on mount or dependency changes
+ * - Manual refetch and reset capabilities
+ * - Integration with Redux for table/column/operation metadata
+ * - Database name resolution for views
+ *
+ * @module hooks/useValueLength
+ *
+ * @example
+ * const { data, loading, error, refetch } = useValueLength(
+ *   'table-id',
+ *   'column_name',
+ *   100,  // limit
+ *   0,    // offset
+ *   true  // autoFetch
+ * );
+ */
+
 import { useState, useEffect, useCallback } from "react";
 import {
   getValueLengths,

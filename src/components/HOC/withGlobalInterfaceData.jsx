@@ -1,3 +1,24 @@
+/**
+ * @fileoverview Higher-Order Component for global UI state management.
+ * @module components/HOC/withGlobalInterfaceData
+ *
+ * Provides comprehensive access to global UI state from uiSlice including
+ * column selections, hover states, focus management, and drag-and-drop.
+ *
+ * Features:
+ * - Column selection state and actions
+ * - Hover state management (add, remove, clear)
+ * - Focus column management
+ * - Visibility column management
+ * - Drag and drop state (dragging, drop targets)
+ * - Focused object management
+ * - Selected matches state for comparisons
+ *
+ * @example
+ * import withGlobalInterfaceData from './withGlobalInterfaceData';
+ * const EnhancedView = withGlobalInterfaceData(ViewComponent);
+ * <EnhancedView id="v1" />
+ */
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {

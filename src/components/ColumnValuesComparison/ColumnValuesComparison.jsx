@@ -1,3 +1,28 @@
+/**
+ * @fileoverview ColumnValuesComparison Component
+ *
+ * Provides a comprehensive comparison view for analyzing unique values across multiple
+ * columns from different tables or operations. This component calculates and displays
+ * various metrics and visualizations to help users understand the overlap and distribution
+ * of values across selected columns.
+ *
+ * Key features:
+ * - Displays statistics including unique value count, column count, and Jaccard similarity
+ * - Shows value distribution across columns (all, some, or one column)
+ * - Renders an interactive value matrix visualization (upset plot style)
+ * - Provides scrollable navigation to specific value categories
+ * - Uses real-time data fetching through DuckDB queries
+ *
+ * The Jaccard Index is used to measure the similarity between columns, calculated as the
+ * ratio of values that appear in all columns to the total number of unique values.
+ *
+ * @module components/ColumnValuesComparison/ColumnValuesComparison
+ *
+ * @example
+ * // Compare values across multiple columns
+ * <ColumnValuesComparison columnIds={['col1', 'col2', 'col3']} />
+ */
+
 import { useCallback, useMemo, useRef } from "react";
 import { useValueMatrixData } from "../../hooks/useValueMatrixData";
 import { Box, Divider, Typography } from "@mui/material";
@@ -6,6 +31,23 @@ import ParentValueSpread from "./ParentValueSpread";
 import DescriptionList from "../ui/DescriptionList";
 import { InfoIcon } from "../ui/icons";
 
+/**
+ * Categorizes a Jaccard Index value into a human-readable similarity level.
+ *
+ * The Jaccard Index measures the similarity between finite sets and ranges from 0 to 1,
+ * where 0 means no overlap and 1 means complete overlap.
+ *
+ * @function
+ * @param {number} jaccardIndex - The Jaccard Index value (0-1)
+ * @returns {string} A categorical label describing the similarity level:
+ *   - "none" (0)
+ *   - "very low" (< 0.1)
+ *   - "low" (0.1 - 0.3)
+ *   - "moderate" (0.3 - 0.5)
+ *   - "high" (0.5 - 0.7)
+ *   - "very high" (0.7 - 1.0)
+ *   - "complete" (1.0)
+ */
 function categorizeJaccardIndex(jaccardIndex) {
   if (jaccardIndex === 0) {
     return "none";
@@ -24,6 +66,33 @@ function categorizeJaccardIndex(jaccardIndex) {
   }
 }
 
+/**
+ * ColumnValuesComparison Component
+ *
+ * Displays a comprehensive comparison of unique values across multiple columns,
+ * including statistics, distribution charts, and an interactive matrix visualization.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string[]} [props.columnIds=[]] - Array of column IDs to compare
+ *
+ * @returns {React.ReactElement} A full-height box containing comparison visualizations
+ *
+ * @description
+ * This component:
+ * 1. Fetches value data for all specified columns using useValueMatrixData hook
+ * 2. Calculates the Jaccard Index to measure column similarity
+ * 3. Categorizes values by their distribution across columns (all/some/one)
+ * 4. Provides interactive scrolling to specific value categories
+ * 5. Renders a matrix visualization showing which values appear in which columns
+ *
+ * The component manages refs for smooth scrolling to value rows and handles
+ * loading and error states appropriately.
+ *
+ * @see {@link module:hooks/useValueMatrixData}
+ * @see {@link module:components/ColumnValuesComparison/ValueCountUpset}
+ * @see {@link module:components/ColumnValuesComparison/ParentValueSpread}
+ */
 const ColumnValuesComparison = ({ columnIds = [] }) => {
   // Refs for each value row
   const valueRowRefs = useRef([]);

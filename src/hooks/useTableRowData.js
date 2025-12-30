@@ -1,3 +1,33 @@
+/**
+ * @fileoverview useTableRowData Hook
+ *
+ * A custom React hook for fetching table row data from DuckDB with sorting and
+ * pagination support. Also exports usePaginatedTableRows for infinite scrolling
+ * use cases.
+ *
+ * Features:
+ * - Fetch table rows with column selection
+ * - Sorting by column with direction control
+ * - Pagination with limit and offset
+ * - Auto-fetch on mount or dependency changes
+ * - Manual refetch and reset capabilities
+ * - Integration with Redux for table/column/operation metadata
+ * - Database name resolution for views
+ *
+ * @module hooks/useTableRowData
+ *
+ * @example
+ * const { data, loading, error, refetch } = useTableRowData(
+ *   'table-id',
+ *   ['col1', 'col2'],
+ *   50,     // limit
+ *   0,      // offset
+ *   'col1', // sortBy
+ *   'asc',  // sortDirection
+ *   true    // autoFetch
+ * );
+ */
+
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { getTableRows } from "../lib/duckdb/getTableRows.js";
 import { useSelector } from "react-redux";

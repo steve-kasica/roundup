@@ -1,3 +1,24 @@
+/**
+ * @fileoverview PackOperationBlock Component
+ *
+ * Renders a PACK (join) operation block in the hierarchical schema tree visualization.
+ * Shows the operation label and recursively renders child tables/operations with
+ * proportional widths based on their column counts.
+ *
+ * PACK operations combine tables horizontally (joining), and this visualization
+ * reflects that by placing children side-by-side with widths proportional to their
+ * contribution to the final column count.
+ *
+ * @module components/PackOperationView/PackOperationBlock
+ *
+ * @example
+ * <EnhancedPackOperationBlock
+ *   id="pack-operation-123"
+ *   depth={1}
+ *   colorScale={d3ScaleFunction}
+ * />
+ */
+
 /* eslint-disable react/prop-types */
 /**
  * CompositeTableSchema/Operation.jsx

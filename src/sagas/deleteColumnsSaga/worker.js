@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Delete columns saga worker.
+ * @module sagas/deleteColumnsSaga/worker
+ *
+ * Worker saga that removes columns from DuckDB tables and Redux state.
+ *
+ * Features:
+ * - Drops columns from DuckDB tables
+ * - Removes columns from Redux state
+ * - Updates parent table columnIds arrays
+ * - Supports state-only deletion (no DB operation)
+ * - Handles deletion failures gracefully
+ *
+ * @example
+ * // Called by watcher saga
+ * yield call(deleteColumnsWorker, tablesToAlter);
+ */
 import { put, select } from "redux-saga/effects";
 import { deleteColumns as deleteColumnsFromSlice } from "../../slices/columnsSlice";
 import { deleteColumnsSuccess, deleteColumnsFailure } from "./actions";

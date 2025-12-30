@@ -1,3 +1,31 @@
+/**
+ * @fileoverview useValueCounts Hook
+ *
+ * A custom React hook for querying value counts (frequency distribution) for a column
+ * from DuckDB. Returns unique values with their occurrence counts, supporting pagination
+ * for large datasets.
+ *
+ * Features:
+ * - Fetch value counts (value -> count mapping)
+ * - Pagination with limit and offset
+ * - Paginated version for infinite scrolling
+ * - Auto-fetch on mount or dependency changes
+ * - Manual refetch and reset capabilities
+ * - Integration with Redux for table/column/operation metadata
+ * - Database name resolution for views
+ *
+ * @module hooks/useValueCounts
+ *
+ * @example
+ * const { data, loading, error, refetch } = useValueCounts(
+ *   'table-id',
+ *   'column_name',
+ *   100,  // limit
+ *   0,    // offset
+ *   true  // autoFetch
+ * );
+ */
+
 import { useState, useEffect, useCallback } from "react";
 import {
   getValueCounts,

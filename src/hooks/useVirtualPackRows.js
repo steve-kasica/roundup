@@ -1,3 +1,36 @@
+/**
+ * @fileoverview useVirtualPackRows Hook
+ *
+ * A custom React hook for fetching and managing PACK (joined) table rows from DuckDB.
+ * Provides pagination for joined data filtered by match type (matched, left-only,
+ * right-only) with infinite scrolling support.
+ *
+ * Features:
+ * - Fetch joined rows from two tables
+ * - Filter by match type (matches, left unmatched, right unmatched)
+ * - Multiple join predicates (EQUALS, CONTAINS, STARTS_WITH, ENDS_WITH)
+ * - Pagination with page-based loading
+ * - Infinite scroll with loadMore
+ * - Visible range tracking for virtualization
+ * - Integration with Redux for column metadata
+ * - Loading and error states
+ *
+ * @module hooks/useVirtualPackRows
+ *
+ * @example
+ * const { data, loading, hasMore, loadMore } = useVirtualPackRows(
+ *   'left-table-id',
+ *   'right-table-id',
+ *   ['left-col-1', 'left-col-2'],
+ *   ['right-col-1', 'right-col-2'],
+ *   'left-key-col',
+ *   'right-key-col',
+ *   'EQUALS',
+ *   [MATCH_TYPE_MATCHES],
+ *   50  // pageSize
+ * );
+ */
+
 import { useState, useEffect, useCallback } from "react";
 import { getPackVirtualRows } from "../lib/duckdb/getPackVirtualRows";
 import { useSelector, shallowEqual } from "react-redux";

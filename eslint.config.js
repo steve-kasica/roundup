@@ -1,3 +1,18 @@
+/**
+ * @fileoverview ESLint flat configuration for React project.
+ * @module eslint.config
+ *
+ * Configures ESLint with React-specific rules using the new
+ * flat config format (ESLint 9+).
+ *
+ * Features:
+ * - JavaScript recommended rules
+ * - React and JSX runtime rules
+ * - React Hooks linting (rules of hooks)
+ * - React Refresh for hot module replacement
+ * - Browser globals environment
+ * - Prop-types validation disabled (using TypeScript/JSDoc)
+ */
 import js from "@eslint/js";
 import globals from "globals";
 import react from "eslint-plugin-react";

@@ -1,3 +1,28 @@
+/**
+ * @fileoverview TooltipIconButton Component (Icons Directory)
+ *
+ * A reusable icon button with integrated tooltip functionality. Provides click-to-close
+ * tooltip behavior and disabled state support. (Note: This appears to be a duplicate
+ * of the button in ui/buttons directory.)
+ *
+ * Features:
+ * - Integrated tooltip with customizable text
+ * - Click to close tooltip
+ * - Disabled state support
+ * - Props forwarding to IconButton
+ * - Automatic tooltip state management
+ *
+ * @module components/ui/icons/TooltipIconButton
+ *
+ * @example
+ * <TooltipIconButton
+ *   tooltipText="Delete"
+ *   onClick={handleDelete}
+ * >
+ *   <DeleteIcon />
+ * </TooltipIconButton>
+ */
+
 import { IconButton, Tooltip } from "@mui/material";
 import { useState } from "react";
 

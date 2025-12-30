@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Alert saga worker for managing alert state.
+ * @module sagas/alertsSaga/worker
+ *
+ * Processes raised alerts and manages alert lifecycle in Redux state.
+ * Handles adding new alerts, clearing resolved alerts, and cleaning up
+ * orphaned alerts.
+ *
+ * Features:
+ * - Compares new alerts against existing alerts
+ * - Adds newly raised alerts to state
+ * - Removes resolved/passing alerts
+ * - Cleans up orphaned alerts
+ * - Batch updates for efficiency
+ *
+ * @example
+ * // Called by watcher saga with raised alerts
+ * yield call(alertsSagaWorker, [{ id: 'source_1', alerts: [...] }]);
+ */
 // Worker saga
 
 import { put, select } from "redux-saga/effects";

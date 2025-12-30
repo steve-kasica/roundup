@@ -1,9 +1,65 @@
+/**
+ * @fileoverview ValueCountUpset Component
+ *
+ * Renders an UpSet plot-style visualization for comparing unique values across multiple
+ * columns. This component displays a matrix where each row represents a unique value and
+ * each column represents a parent table/operation. Circle marks indicate the presence of
+ * values, and connecting lines show which combinations of columns share specific values.
+ *
+ * The UpSet plot is particularly effective for visualizing set intersections and is
+ * superior to Venn diagrams when comparing more than 3 sets. This implementation includes
+ * interactive features like scrollable content and ref-based navigation.
+ *
+ * @module components/ColumnValuesComparison/ValueCountUpset
+ *
+ * @example
+ * <ValueCountUpset
+ *   signatures={['101', '110', '011']}
+ *   data={[[5, 0, 3], [2, 4, 0]]}
+ *   uniqueValues={['value1', 'value2']}
+ *   valueDegrees={[2, 2]}
+ *   parentIds={['table1', 'table2', 'table3']}
+ *   rowHeight={32}
+ *   yAxisWidth={100}
+ *   valueRowRefs={valueRefs}
+ *   bodyRef={containerRef}
+ * />
+ */
+
 import { Box } from "@mui/material";
 import { extent, scaleLinear } from "d3";
 import { useMemo } from "react";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedTableName } from "../TableView/TableName";
 
+/**
+ * ValueCountUpset Component
+ *
+ * An UpSet plot visualization showing the distribution and overlap of unique values
+ * across multiple columns/tables.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string[]} props.signatures - Binary signatures indicating value presence (e.g., '101' means present in columns 0 and 2)
+ * @param {number[][]} [props.data=[]] - 2D array of value counts, rows are values, columns are parents
+ * @param {string[]} [props.uniqueValues=[]] - Array of unique value strings for row labels
+ * @param {number[]} [props.valueDegrees=[]] - Array indicating how many columns each value appears in
+ * @param {string[]} [props.parentIds=[]] - Array of parent IDs (table or operation IDs) for column headers
+ * @param {number} [props.rowHeight=32] - Height in pixels for each value row
+ * @param {number} [props.yAxisWidth=100] - Width in pixels for the y-axis label area
+ * @param {React.MutableRefObject} props.valueRowRefs - Ref array for accessing individual row elements
+ * @param {React.MutableRefObject} props.bodyRef - Ref for the scrollable body container
+ *
+ * @returns {React.ReactElement} A scrollable matrix visualization with column headers and value rows
+ *
+ * @description
+ * Visual elements:
+ * - Column headers display table/operation names
+ * - Each row shows a unique value with circle marks indicating presence
+ * - Horizontal lines connect circles for values appearing in multiple columns
+ * - Rows are scrollable with ref-based navigation support
+ * - Circle marks use color coding (black for present, gray for absent)
+ */
 const ValueCountUpset = ({
   signatures,
   data = [],
@@ -166,6 +222,23 @@ const ValueCountUpset = ({
   );
 };
 
+/**
+ * CircleMark Component
+ *
+ * Renders a circular mark used in the UpSet plot to indicate the presence of a value
+ * in a specific column. The circle's appearance can be customized with colors.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} [props.backgroundColor="#000"] - Fill color for the circle
+ * @param {number} [props.size=13] - Diameter of the circle in pixels
+ * @param {string} [props.strokeColor="#000"] - Border color for the circle
+ * @param {number|string} props.value - Value to display in the title tooltip
+ *
+ * @returns {React.ReactElement} A circular mark element
+ *
+ * @private
+ */
 function CircleMark({
   backgroundColor = "#000",
   size = 13,

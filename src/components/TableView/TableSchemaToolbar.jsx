@@ -1,3 +1,23 @@
+/**
+ * @fileoverview TableSchemaToolbar Component
+ *
+ * A specialized toolbar for table schema views, providing column management actions
+ * and table metadata display. Wraps the generic SchemaToolbar component with table-
+ * specific props and actions via the withTableData HOC.
+ *
+ * Features:
+ * - Column selection controls
+ * - Column deletion
+ * - Column focusing
+ * - Table metadata display (name, rows, columns)
+ * - Integration with table data HOC
+ *
+ * @module components/TableView/TableSchemaToolbar
+ *
+ * @example
+ * <EnhancedTableSchemaToolbar id={tableId} />
+ */
+
 import { useCallback } from "react";
 import { EnhancedSchemaToolbar, OBJECT_TYPE_TABLE } from "../ui/SchemaToolbar";
 import { withTableData } from "../HOC";

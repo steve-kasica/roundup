@@ -1,3 +1,28 @@
+/**
+ * @fileoverview getPackVirtualRows Module
+ *
+ * DuckDB utility for fetching joined (PACK) rows filtered by match type. Performs
+ * full outer joins and returns rows matching specified criteria (matched, left-only,
+ * right-only).
+ *
+ * Features:
+ * - Full outer join execution
+ * - Match type filtering
+ * - Multiple join predicates (EQUALS, CONTAINS, etc.)
+ * - Pagination support
+ * - Column selection from both tables
+ *
+ * @module lib/duckdb/getPackVirtualRows
+ *
+ * @example
+ * const rows = await getPackVirtualRows(
+ *   'left_table', 'right_table',
+ *   ['col1', 'col2'], ['colA', 'colB'],
+ *   'key_col', 'key_col', 'EQUALS',
+ *   [MATCH_TYPE_MATCHES], 50, 0
+ * );
+ */
+
 import {
   MATCH_TYPE_LEFT_UNMATCHED,
   MATCH_TYPE_MATCHES,

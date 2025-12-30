@@ -1,3 +1,27 @@
+/**
+ * @fileoverview RenameObjectButton Component
+ *
+ * A button for renaming tables, columns, or operations. Opens a FreeTextDialog
+ * to collect the new name and dispatches appropriate rename actions.
+ *
+ * Features:
+ * - Rename icon button
+ * - FreeTextDialog integration
+ * - Support for multiple object types (table, column, pack, stack)
+ * - Redux action dispatching
+ * - Validation and state management
+ *
+ * @module components/ui/buttons/RenameObjectButton
+ *
+ * @example
+ * <RenameObjectButton
+ *   id={objectId}
+ *   name="Current Name"
+ *   objectType={OBJECT_TYPE_TABLE}
+ *   tooltipText="Rename table"
+ * />
+ */
+
 import { useCallback, useState } from "react";
 import { DriveFileRenameOutline as Icon } from "@mui/icons-material";
 import TooltipIconButton from "./TooltipIconButton";

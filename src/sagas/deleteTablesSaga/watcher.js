@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Delete tables saga watcher.
+ * @module sagas/deleteTablesSaga/watcher
+ *
+ * Watches for table deletion requests and triggers the worker saga.
+ * Auto-deletes tables that lose all their columns.
+ *
+ * Features:
+ * - Handles deleteTablesRequest actions
+ * - Auto-deletes tables with empty columnIds after updates
+ * - Coordinates with updateTablesSuccess
+ *
+ * @example
+ * // Watcher is started automatically by rootSaga
+ */
 import { put, select, takeEvery } from "redux-saga/effects";
 import { deleteTablesRequest } from "./actions";
 import { updateTablesSuccess } from "../updateTablesSaga";

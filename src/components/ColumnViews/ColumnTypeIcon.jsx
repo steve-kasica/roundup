@@ -1,4 +1,33 @@
 /**
+ * @fileoverview ColumnTypeIcon Component
+ *
+ * Displays an appropriate icon representing the data type of a column, with support
+ * for all DuckDB data types including numeric, categorical, date/time, boolean, and
+ * null types. The component provides visual feedback with hover effects and tooltips.
+ *
+ * Supported DuckDB data types:
+ * - Numeric: INTEGER, BIGINT, FLOAT, DOUBLE, DECIMAL, etc.
+ * - Text: VARCHAR, CHAR, TEXT, STRING
+ * - Date/Time: DATE, TIME, TIMESTAMP, INTERVAL
+ * - Boolean: BOOLEAN, BOOL, LOGICAL
+ * - Binary: BLOB, BYTEA, BINARY
+ * - Special: UUID, JSON, BIT
+ *
+ * @module components/ColumnViews/ColumnTypeIcon
+ *
+ * @example
+ * <ColumnTypeIcon
+ *   columnType="INTEGER"
+ *   placement="right"
+ *   onClick={handleClick}
+ * />
+ *
+ * @see {@link https://duckdb.org/docs/sql/data_types/overview.html} DuckDB Data Types Documentation
+ */
+
+/**
+ * DuckDB Data Type Reference:
+ *
  * Name                       Description                                 Alias
  * ------------------------   -----------------------------------------   ------------------------------
  * BOOLEAN	                  Logical Boolean (true/false)	              BOOL, LOGICAL
@@ -38,6 +67,30 @@ import {
 } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 
+/**
+ * ColumnTypeIcon Component
+ *
+ * Renders an icon representing the data type of a column with interactive hover effects
+ * and a tooltip showing the full type name.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.columnType - The DuckDB data type of the column
+ * @param {string} [props.placement="right"] - Tooltip placement position
+ * @param {Function} [props.onClick] - Click handler for the icon
+ * @param {Object} [props.sx={}] - Additional MUI sx styling props
+ *
+ * @returns {React.ReactElement} An icon with tooltip representing the column type
+ *
+ * @description
+ * Icon mappings:
+ * - NumericIcon: All numeric types (INTEGER, FLOAT, DECIMAL, etc.)
+ * - DateIcon: All date/time types (DATE, TIME, TIMESTAMP, INTERVAL)
+ * - CategoricalIcon: All text types (VARCHAR, CHAR, TEXT, STRING)
+ * - KeyIcon: Boolean types
+ * - NullIcon: NULL type
+ * - UndefinedIcon: Unknown or unrecognized types
+ */
 export default function ColumnTypeIcon({
   columnType,
   placement = "right",

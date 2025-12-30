@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Create tables saga action creators.
+ * @module sagas/createTablesSaga/actions
+ *
+ * Redux action creators for table creation saga operations.
+ *
+ * Actions:
+ * - createTablesRequest: Initiates table creation from uploaded files
+ * - createTablesSuccess: Signals successful table creation in DB and state
+ * - createTablesFailure: Signals table creation failure (DB failed, state exists)
+ *
+ * @example
+ * import { createTablesRequest } from './actions';
+ * dispatch(createTablesRequest({ tablesInfo: [{ fileName: 'data.csv', ... }] }));
+ */
 import { createAction } from "@reduxjs/toolkit";
 
 export const createTablesRequest = createAction("sagas/createTables/request");

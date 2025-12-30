@@ -1,3 +1,33 @@
+/**
+ * @fileoverview Table Component (Roundup)
+ *
+ * A comprehensive data table component with sorting, infinite scrolling, column hover,
+ * and loading states. Integrates TableHead and TableBody with scroll threshold detection
+ * for pagination.
+ *
+ * Features:
+ * - Sortable columns with visual indicators
+ * - Infinite scroll with threshold detection
+ * - Column hover effects
+ * - Loading states with skeletons
+ * - Error handling with alerts
+ * - Materialize view button
+ * - Sticky headers
+ *
+ * @module components/ui/Table/Table
+ *
+ * @example
+ * <Table
+ *   columnIds={['col1', 'col2']}
+ *   data={rowsArray}
+ *   loading={false}
+ *   error={null}
+ *   onScrollThreshold={loadMore}
+ *   onColumnSort={handleSort}
+ *   sortConfig={{ column: 'col1', direction: 'asc' }}
+ * />
+ */
+
 import React, { useCallback } from "react";
 import { Alert, CircularProgress } from "@mui/material";
 import StyledTableContainer from "./StyledTableContainer";

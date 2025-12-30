@@ -1,9 +1,11 @@
 /**
- * index.js
+ * @fileoverview Barrel export for updateTablesSaga module.
+ * @module sagas/updateTablesSaga
  *
- * Entry point for the updateTablesSaga module.
- * Exports the main saga watcher function.
+ * Re-exports actions and saga watcher for table updates.
+ *
+ * @example
+ * import { updateTablesRequest, watcher } from './updateTablesSaga';
  */
-
 export * from "./actions";
 export { default as watcher } from "./watcher";

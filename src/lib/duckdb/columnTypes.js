@@ -1,3 +1,22 @@
+/**
+ * @fileoverview columnTypes Module
+ *
+ * DuckDB column type constants and mapping utilities. Provides type definitions for
+ * all supported DuckDB types and functions to map between DuckDB types and application
+ * column types (categorical, numerical, date, boolean).
+ *
+ * Features:
+ * - All DuckDB type constants
+ * - Type mapping to application types
+ * - Supported types list for auto-detection
+ * - Type category classification
+ *
+ * @module lib/duckdb/columnTypes
+ *
+ * @example
+ * import { DUCKDB_TYPE_VARCHAR, mapDuckDBTypeToColumnType } from './columnTypes';
+ */
+
 // https://duckdb.org/docs/stable/sql/data_types/typecasting#:~:text=Implicit%20Casting,passed%20to%20the%20sin%20function.
 import {
   COLUMN_TYPE_BOOLEAN,

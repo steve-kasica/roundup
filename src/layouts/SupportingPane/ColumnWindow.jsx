@@ -1,3 +1,19 @@
+/**
+ * @fileoverview Column detail window component.
+ * @module layouts/SupportingPane/ColumnWindow
+ *
+ * Right sidebar component that displays column details or column
+ * comparison views based on the number of focused columns.
+ *
+ * Features:
+ * - Single column: Shows EnhancedColumnDetails
+ * - Multiple columns: Shows ColumnValuesComparison
+ * - Close button to clear focused columns
+ * - Positioned absolutely within parent container
+ *
+ * @example
+ * <ColumnWindow columnIds={['col_1', 'col_2']} />
+ */
 /* eslint-disable react/prop-types */
 import { useDispatch } from "react-redux";
 import { EnhancedColumnDetails } from "../../components/ColumnViews/ColumnDetails";

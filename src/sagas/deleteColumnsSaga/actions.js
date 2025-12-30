@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Delete columns saga action creators.
+ * @module sagas/deleteColumnsSaga/actions
+ *
+ * Redux action creators for column deletion saga operations.
+ *
+ * Actions:
+ * - deleteColumnsRequest: Initiates column deletion process
+ * - deleteColumnsSuccess: Signals successful column deletion
+ * - deleteColumnsFailure: Signals column deletion failure
+ *
+ * @example
+ * import { deleteColumnsRequest } from './actions';
+ * dispatch(deleteColumnsRequest({ columnIds: ['col_1', 'col_2'] }));
+ */
 import { createAction } from "@reduxjs/toolkit";
 
 /**

@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Delete columns saga watcher.
+ * @module sagas/deleteColumnsSaga/watcher
+ *
+ * Watches for column deletion requests and coordinates the deletion process.
+ * Handles recursive deletion for operation columns by propagating to child
+ * tables/operations.
+ *
+ * Features:
+ * - Handles deleteColumnsRequest actions
+ * - Expands operation column deletes to child tables
+ * - Groups columns by parent for batch processing
+ * - Supports PACK and STACK operation column propagation
+ *
+ * @example
+ * // Watcher is started automatically by rootSaga
+ */
 import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
 import { deleteColumnsRequest } from "./actions";
 import { updateOperationsSuccess } from "../updateOperationsSaga";

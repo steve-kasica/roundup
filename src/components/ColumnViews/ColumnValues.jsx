@@ -1,3 +1,31 @@
+/**
+ * @fileoverview ColumnValues Component
+ *
+ * Displays a scrollable list of raw values from a column, providing a direct view
+ * into the actual data. This component implements infinite scroll with lazy loading
+ * to efficiently handle columns with large numbers of rows.
+ *
+ * The component also supports scroll position synchronization, making it useful for
+ * side-by-side comparisons or synchronized scrolling scenarios.
+ *
+ * Features:
+ * - Lazy loading with infinite scroll
+ * - Scroll position tracking and synchronization
+ * - Automatic reset when column or parent changes
+ * - Error handling with user feedback
+ * - Null value display with italic styling
+ *
+ * @module components/ColumnViews/ColumnValues
+ *
+ * @example
+ * <EnhancedColumnValues
+ *   id="column-123"
+ *   limit={20}
+ *   scrollTop={0}
+ *   onScroll={handleScroll}
+ * />
+ */
+
 /* eslint-disable react/prop-types */
 import { Box, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
@@ -7,6 +35,36 @@ import { useSelector } from "react-redux";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
 
+/**
+ * ColumnValues Component
+ *
+ * Renders a scrollable list of column values with lazy loading.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.id - Column identifier
+ * @param {string} props.databaseName - Internal database name for the column
+ * @param {string} props.parentId - ID of parent table or operation
+ * @param {number} [props.limit=20] - Number of values to load per page
+ * @param {number} [props.scrollTop=0] - External scroll position to sync to
+ * @param {Function} [props.onScroll] - Callback when scroll position changes
+ *
+ * @returns {React.ReactElement} A scrollable list of column values
+ *
+ * @description
+ * Loading behavior:
+ * - Fetches initial batch of values on mount
+ * - Loads more values when scrolled near bottom
+ * - Resets and refetches when column changes
+ * - Syncs scroll position with external control
+ *
+ * The component maintains internal state for:
+ * - Current values array
+ * - Loading state
+ * - Error state
+ * - Current offset for pagination
+ * - Whether more data is available
+ */
 const ColumnValues = ({
   id,
   databaseName: columnDatabaseName,

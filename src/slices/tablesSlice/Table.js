@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Table factory function.
+ * @module slices/tablesSlice/Table
+ *
+ * Defines the Table factory function for creating table metadata objects
+ * that represent uploaded data files in the application.
+ *
+ * Features:
+ * - Factory function for serializable table objects
+ * - Auto-generated unique IDs with 't' prefix
+ * - File metadata (name, size, type, extension)
+ * - Column ID references
+ * - Parent operation reference
+ *
+ * @example
+ * import { Table } from './Table';
+ * const table = Table({ name: 'Sales', fileName: 'sales.csv', columnIds: ['c1', 'c2'] });
+ */
+
 /*
  * Table.js
  *

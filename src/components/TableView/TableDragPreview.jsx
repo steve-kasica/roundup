@@ -1,3 +1,24 @@
+/**
+ * @fileoverview TableDragPreview Component
+ *
+ * A custom drag preview component for displaying multiple tables during drag-and-drop
+ * operations. Shows a stacked visualization of dragged tables with icons, names, and
+ * metadata, providing clear visual feedback during drag interactions.
+ *
+ * Features:
+ * - Stacked table visualization
+ * - Table icons and names
+ * - Metadata display (rows x columns)
+ * - Multiple table support
+ * - Custom drag preview styling
+ * - Integration with Redux for table data
+ *
+ * @module components/TableView/TableDragPreview
+ *
+ * @example
+ * <TableDragPreview tableIds={[tableId1, tableId2]} />
+ */
+
 /* eslint-disable react/prop-types */
 import { Typography, Box } from "@mui/material";
 import { DragIndicator, TableChart } from "@mui/icons-material";

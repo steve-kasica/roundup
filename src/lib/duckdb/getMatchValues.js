@@ -1,3 +1,24 @@
+/**
+ * @fileoverview getMatchValues Module
+ *
+ * DuckDB utility for retrieving match values between two tables in a join operation.
+ * Returns matching value pairs with counts based on join predicate and match type.
+ *
+ * Features:
+ * - Join match value retrieval
+ * - Multiple join predicates (EQUALS, CONTAINS, etc.)
+ * - Match type filtering (matches, left/right unmatched)
+ * - Ordering and pagination
+ * - Count aggregation
+ *
+ * @module lib/duckdb/getMatchValues
+ *
+ * @example
+ * const matches = await getMatchValues(
+ *   'table1', 'table2', 'col1', 'col2', 'EQUALS', 'MATCHES', 100
+ * );
+ */
+
 import { getDuckDB } from "./duckdbClient";
 import { MATCH_TYPES } from "../../components/OperationsList/PackOperationParams/PackOutputDetails/MatchDetail/withMatchDetailData";
 import { escapeColumnName } from "./utilities";

@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Higher-Order Component for focused object management.
+ * @module components/HOC/withFocusedObjectData
+ *
+ * Provides access to the currently focused object (table or operation)
+ * and focus management actions from Redux state.
+ *
+ * Features:
+ * - Focused object ID and type detection (table vs operation)
+ * - Focused object data retrieval
+ * - Focus/unfocus action dispatching
+ * - Table insertion into focused operations
+ * - Focus state comparison with component ID
+ *
+ * @example
+ * import withFocusedObjectData from './withFocusedObjectData';
+ * const EnhancedSchema = withFocusedObjectData(SchemaComponent);
+ * <EnhancedSchema id="op1" />
+ */
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {

@@ -1,3 +1,31 @@
+/**
+ * @fileoverview useDragAndDrop Hook
+ *
+ * A unified drag-and-drop hook combining react-dnd drag and drop functionality.
+ * Provides a hook-based alternative to HOCs for components that need drag-and-drop
+ * interactions.
+ *
+ * Features:
+ * - Combined drag and drop in single hook
+ * - Configurable drag and drop types
+ * - Custom drag item generation
+ * - Can-drag and can-drop predicates
+ * - Drag start/end callbacks
+ * - Optional default preview hiding
+ * - Returns drag/drop refs and state
+ *
+ * @module hooks/useDragAndDrop
+ *
+ * @example
+ * const { drag, drop, isDragging, isOver, canDrop } = useDragAndDrop({
+ *   dragType: 'COLUMN',
+ *   dropType: 'COLUMN',
+ *   getDragItem: () => ({ columnId }),
+ *   canDrop: (item) => item.columnId !== myColumnId,
+ *   onDrop: handleDrop,
+ * });
+ */
+
 import { useEffect } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";

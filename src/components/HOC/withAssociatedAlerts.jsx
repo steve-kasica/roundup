@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Higher-Order Component for associated alerts data.
+ * @module components/HOC/withAssociatedAlerts
+ *
+ * Provides access to alerts associated with a specific source entity
+ * (table, operation, column) from Redux state.
+ *
+ * Features:
+ * - Alert IDs lookup by source ID
+ * - Warning and error count aggregation
+ * - Silenced warning count tracking
+ * - Bulk alert deletion by ID
+ * - Total alert count computation
+ *
+ * @example
+ * import withAssociatedAlerts from './withAssociatedAlerts';
+ * const EnhancedTable = withAssociatedAlerts(TableComponent);
+ * <EnhancedTable id="t1" />
+ */
 /* eslint-disable react/prop-types */
 
 import { useDispatch, useSelector } from "react-redux";

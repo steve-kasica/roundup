@@ -1,3 +1,26 @@
+/**
+ * @fileoverview DragDropFileUpload Component
+ *
+ * A drag-and-drop file upload zone with progress tracking and validation. Supports
+ * uploading CSV files with visual feedback for drag states, upload progress, and errors.
+ *
+ * Features:
+ * - Drag-and-drop interface with visual feedback
+ * - File validation (size, type)
+ * - Progress bars for individual files
+ * - Error display with specific messages
+ * - Upload history tracking
+ * - Chunked processing callback support
+ *
+ * @module components/TablesList/DragDropFileUpload
+ *
+ * @example
+ * <DragDropFileUpload
+ *   handleFileUpload={async (files) => { ... }}
+ *   acceptedTypes="*"
+ * />
+ */
+
 import { CloudUpload } from "@mui/icons-material";
 import { useState } from "react";
 import PropTypes from "prop-types";

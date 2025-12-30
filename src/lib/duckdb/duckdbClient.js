@@ -1,3 +1,23 @@
+/**
+ * @fileoverview duckdbClient Module
+ *
+ * Singleton DuckDB WASM client initialization and management. Handles bundle selection,
+ * worker initialization, and provides a single database instance for the application.
+ *
+ * Features:
+ * - DuckDB WASM initialization
+ * - Bundle selection (MVP or EH)
+ * - Singleton pattern for database instance
+ * - Worker management
+ *
+ * @module lib/duckdb/duckdbClient
+ *
+ * @example
+ * import { getDuckDB } from './duckdbClient';
+ * const db = await getDuckDB();
+ * const conn = await db.connect();
+ */
+
 import * as duckdb from "@duckdb/duckdb-wasm";
 import duckdb_wasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import mvp_worker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";

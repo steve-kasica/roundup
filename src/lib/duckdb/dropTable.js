@@ -1,3 +1,19 @@
+/**
+ * @fileoverview dropTable Module
+ *
+ * DuckDB utility for dropping tables from the database. Executes DROP TABLE
+ * statements to remove tables.
+ *
+ * Features:
+ * - Table deletion by name
+ * - Connection management
+ *
+ * @module lib/duckdb/dropTable
+ *
+ * @example
+ * await dropTable('my_table');
+ */
+
 import { getDuckDB } from "./duckdbClient";
 
 // TODO: replace with table.id

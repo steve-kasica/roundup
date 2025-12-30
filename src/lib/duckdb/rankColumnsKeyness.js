@@ -1,3 +1,23 @@
+/**
+ * @fileoverview DuckDB column keyness ranking utility.
+ * @module lib/duckdb/rankColumnsKeyness
+ *
+ * Provides functionality to analyze columns for potential key identification.
+ * Evaluates columns based on uniqueness and null values to determine
+ * suitability as primary or foreign keys.
+ *
+ * Features:
+ * - Calculates uniqueness ratio for each column
+ * - Counts non-null values per column
+ * - Ranks columns by keyness potential
+ * - Handles BigInt to Number conversion
+ * - Aggregates statistics across multiple columns
+ *
+ * @example
+ * import { rankColumnsKeyness } from './rankColumnsKeyness';
+ * const rankings = await rankColumnsKeyness(['id', 'email', 'name'], 'users');
+ * // Returns columns ranked by uniqueness (higher = better key candidate)
+ */
 import { getDuckDB } from "./duckdbClient";
 
 // Helper function to convert BigInt values to Numbers

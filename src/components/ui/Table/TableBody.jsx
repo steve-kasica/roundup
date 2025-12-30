@@ -1,3 +1,34 @@
+/**
+ * @fileoverview TableBody Component (Roundup)
+ *
+ * A sophisticated table body component handling multiple states: loading, empty,
+ * error, and data display. Supports infinite scrolling with skeleton rows, column
+ * hover effects, and cell value truncation.
+ *
+ * Features:
+ * - Skeleton loading rows
+ * - Empty state with dummy rows
+ * - Error state display
+ * - Infinite scroll detection
+ * - Column hover tracking
+ * - Cell value truncation
+ * - Row alternation
+ * - Sticky row numbers
+ *
+ * @module components/ui/Table/TableBody
+ *
+ * @example
+ * <TableBody
+ *   columnIds={['col1', 'col2']}
+ *   data={rows}
+ *   loading={false}
+ *   error={null}
+ *   onScrollThreshold={loadMore}
+ *   hoveredColumnIndex={2}
+ *   onColumnHover={setHovered}
+ * />
+ */
+
 import {
   CircularProgress,
   TableBody as MuiTableBody,

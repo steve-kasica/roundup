@@ -1,3 +1,23 @@
+/**
+ * @fileoverview TableLabel Component
+ *
+ * A compact label component displaying table metadata including name, icon, dimensions
+ * (rows x columns), and alert badges. Used throughout the application for table
+ * identification in lists, trees, and schema views.
+ *
+ * Features:
+ * - Table name display with icon
+ * - Row and column counts
+ * - Alert badge with count
+ * - Integration with HOCs for data
+ * - Compact layout for various contexts
+ *
+ * @module components/TableView/TableLabel
+ *
+ * @example
+ * <EnhancedTableLabel id={tableId} />
+ */
+
 import { withTableData, withAssociatedAlerts } from "../HOC";
 import { Stack, Typography, Badge } from "@mui/material";
 import { TableChart, Warning } from "@mui/icons-material";

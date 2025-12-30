@@ -1,3 +1,23 @@
+/**
+ * @fileoverview StackRows Component
+ *
+ * Displays the result rows of a STACK (union) operation in a virtualized table,
+ * combining data from multiple stacked tables. Intelligently handles pagination
+ * based on which child tables contain selected columns.
+ *
+ * Features:
+ * - Virtualized table for performance with large datasets
+ * - Smart pagination starting from first relevant child table
+ * - Column sorting
+ * - Row range indicators showing which child table each row comes from
+ * - Infinite scroll with automatic loading
+ *
+ * @module components/StackOperationView/StackRows
+ *
+ * @example
+ * <EnhancedStackRows id="stack-operation-123" />
+ */
+
 /* eslint-disable react/prop-types */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {

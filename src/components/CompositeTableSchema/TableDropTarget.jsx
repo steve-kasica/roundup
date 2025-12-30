@@ -1,4 +1,31 @@
 /**
+ * @fileoverview TableDropTarget Component
+ *
+ * A specialized drop zone component for accepting table drops and creating or updating
+ * operations in the schema tree. This component handles the logic for adding tables
+ * to the composite schema through different operation types (NO_OP, STACK, PACK).
+ *
+ * The component uses react-dnd for drop functionality and dispatches Redux actions
+ * to create or update operations based on the current schema state.
+ *
+ * Drop scenarios:
+ * 1. First table(s): Creates initial root operation (NO_OP or STACK)
+ * 2. Adding to NO_OP: Converts to STACK or PACK operation
+ * 3. Adding to existing operation: Appends tables to operation's children
+ *
+ * @module components/CompositeTableSchema/TableDropTarget
+ *
+ * @example
+ * <TableDropTarget
+ *   operationType={OPERATION_TYPE_STACK}
+ *   disabled={false}
+ *   sx={{ height: '50px' }}
+ * >
+ *   <AddIcon />
+ * </TableDropTarget>
+ */
+
+/**
  * TableDropTarget.jsx
  *
  * Notes:
@@ -28,6 +55,37 @@ import {
 } from "../CustomDragLayer";
 import StyledDropZone from "../ui/StyledDropZone";
 
+/**
+ * TableDropTarget Component
+ *
+ * A drop zone that accepts dragged tables and creates/updates operations accordingly.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {boolean} props.disabled - Whether the drop target is disabled
+ * @param {('NO_OP'|'STACK'|'PACK')} props.operationType - Type of operation to create/update
+ * @param {React.ReactNode} props.children - Content to display in the drop zone
+ * @param {Object} [props.sx] - MUI sx styling props
+ *
+ * @returns {React.ReactElement} A styled drop zone that accepts table drags
+ *
+ * @description
+ * Operation type behaviors:
+ * - NO_OP: Used for initial schema setup (single table)
+ * - STACK: Vertically stacks tables (union operation)
+ * - PACK: Horizontally packs tables (join operation)
+ *
+ * Drop handling logic:
+ * 1. Checks if drop was already handled by nested target
+ * 2. Determines if creating new operation or updating existing
+ * 3. Dispatches appropriate Redux action (create or update)
+ * 4. Sets default join configuration for PACK operations
+ *
+ * Visual states:
+ * - Shows hover effect when valid table is dragged over
+ * - Displays disabled state when operations are blocked
+ * - Indicates whether drop is allowed
+ */
 export default function TableDropTarget({
   disabled,
   operationType,

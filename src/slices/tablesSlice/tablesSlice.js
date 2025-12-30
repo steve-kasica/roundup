@@ -1,5 +1,21 @@
 /**
- * @name tablesSlice
+ * @fileoverview Redux slice for managing table metadata.
+ * @module slices/tablesSlice/tablesSlice
+ *
+ * Manages table state in normalized byId/allIds structure.
+ * Tables represent uploaded data files and store metadata
+ * like file info, row counts, and column references.
+ *
+ * Features:
+ * - Add tables (validates no duplicates)
+ * - Update table properties
+ * - Delete tables by ID
+ * - Database attributes list for DuckDB sync
+ * - Normalized state for efficient lookups
+ *
+ * @example
+ * import { addTables, updateTables, deleteTables } from './tablesSlice';
+ * dispatch(addTables(Table({ name: 'Sales', fileName: 'sales.csv' })));
  */
 import { createSlice } from "@reduxjs/toolkit";
 import { normalizeInputToArray } from "../utilities";

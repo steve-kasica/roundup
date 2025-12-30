@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Create columns saga watcher.
+ * @module sagas/createColumnsSaga/watcher
+ *
+ * Watches for column creation requests and coordinates the creation process.
+ * Handles both initialization (new table columns) and insertion (adding columns)
+ * modes. Supports recursive column creation for operation hierarchies.
+ *
+ * Features:
+ * - Handles createColumnsRequest actions
+ * - Auto-creates columns after successful table creation
+ * - Expands operation column inserts to child tables
+ * - Supports PACK and STACK operation column propagation
+ *
+ * @example
+ * // Watcher is started automatically by rootSaga
+ */
 import { call, put, select, takeEvery } from "redux-saga/effects";
 import createColumnsWorker from "./worker";
 import { createColumnsRequest } from "./actions";

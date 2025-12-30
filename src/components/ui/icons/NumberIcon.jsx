@@ -1,3 +1,25 @@
+/**
+ * @fileoverview NumberIcon Component
+ *
+ * A custom SVG icon displaying a number inside a circle. Useful for showing
+ * counts, indices, or numbered indicators with tooltip support.
+ *
+ * Features:
+ * - Custom SVG with circle background
+ * - Centered text display
+ * - Tooltip with number information
+ * - Fallback "?" for non-integer values
+ * - Customizable styling via props
+ *
+ * @module components/ui/icons/NumberIcon
+ *
+ * @example
+ * <NumberIcon
+ *   number={5}
+ *   tooltipText="5 tables selected"
+ * />
+ */
+
 import { SvgIcon, Tooltip } from "@mui/material";
 
 const NumberIcon = ({ number, tooltipText, ...props }) => {

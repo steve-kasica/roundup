@@ -1,3 +1,22 @@
+/**
+ * @fileoverview StackParametersForm Component
+ *
+ * A form component for configuring STACK (union) operation parameters including
+ * operation name and type. Simpler than PackParametersForm since STACK operations
+ * don't require join keys or predicates.
+ *
+ * Features:
+ * - Operation name editing
+ * - Operation type switching (STACK/PACK)
+ * - Error state visualization
+ * - Loading state handling
+ *
+ * @module components/StackOperationView/StackParametersForm
+ *
+ * @example
+ * <EnhancedStackParametersForm id="stack-operation-123" />
+ */
+
 import {
   Box,
   TextField,
@@ -15,6 +34,23 @@ import { withOperationData, withStackOperationData } from "../HOC";
 
 /* eslint-disable react/prop-types */
 
+/**
+ * StackParametersForm Component
+ *
+ * Form for configuring STACK operation parameters.
+ *
+ * @component
+ * @param {Object} props - Component props (provided via HOCs)
+ * @param {string} props.id - Operation identifier
+ * @param {string} props.name - Current operation name
+ * @param {string} props.operationType - Current operation type
+ * @param {boolean} props.isLoading - Loading state
+ * @param {Function} props.setOperationType - Update operation type
+ * @param {Function} props.setOperationName - Update operation name
+ * @param {Array} [props.alerts=[]] - Array of alerts
+ *
+ * @returns {React.ReactElement} A form with operation name and type fields
+ */
 const StackParametersForm = ({
   id,
   name,

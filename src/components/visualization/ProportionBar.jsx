@@ -1,3 +1,29 @@
+/**
+ * @fileoverview ProportionBar Component
+ *
+ * A horizontal proportion bar chart component showing relative proportions of
+ * multiple categories in a stacked bar. Each segment represents a proportion
+ * of the total with customizable colors and styles.
+ *
+ * Features:
+ * - Stacked horizontal bar segments
+ * - Proportional width calculations
+ * - Color scale integration for automatic coloring
+ * - Custom styles per segment
+ * - Optional title display
+ * - Flexible height adjustment
+ *
+ * @module components/visualization/ProportionBar
+ *
+ * @example
+ * <ProportionBar
+ *   title="Distribution"
+ *   data={{ 'Type A': 30, 'Type B': 50, 'Type C': 20 }}
+ *   colorScale={d3.scaleOrdinal(d3.schemeCategory10)}
+ *   height="20px"
+ * />
+ */
+
 import { Box } from "@mui/material";
 
 /**

@@ -1,3 +1,27 @@
+/**
+ * @fileoverview DuckDB stack view creation utility.
+ * @module lib/duckdb/createStackView/createStackView
+ *
+ * Provides functionality to create stacked (UNION ALL) views from multiple tables.
+ * Combines rows from multiple child tables into a single unified view.
+ *
+ * Features:
+ * - Creates views using UNION ALL operations
+ * - Supports custom column name specifications
+ * - Column names inherited from first child table
+ * - Dynamic query generation based on child table configuration
+ * - Replaces existing view if one exists
+ *
+ * @example
+ * import { createStackView } from './createStackView';
+ * await createStackView({
+ *   viewName: 'all_orders',
+ *   children: [
+ *     { tableName: 'orders_2022', columnNames: ['id', 'amount'] },
+ *     { tableName: 'orders_2023', columnNames: ['id', 'amount'] }
+ *   ]
+ * });
+ */
 import { getDuckDB } from "../duckdbClient";
 
 // With these UNION ALL query, the view will take on the column names of the first child.

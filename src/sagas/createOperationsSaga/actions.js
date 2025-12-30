@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Create operations saga action creators.
+ * @module sagas/createOperationsSaga/actions
+ *
+ * Redux action creators for operation creation saga operations.
+ *
+ * Actions:
+ * - createOperationsRequest: Initiates operation creation process
+ * - createOperationsSuccess: Signals successful operation creation
+ * - createOperationsFailure: Signals operation creation failure
+ *
+ * @example
+ * import { createOperationsRequest } from './actions';
+ * dispatch(createOperationsRequest({
+ *   operationData: [{ operationType: 'PACK', childIds: ['t_1', 't_2'] }]
+ * }));
+ */
 import { createAction } from "@reduxjs/toolkit";
 
 /**

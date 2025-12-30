@@ -1,3 +1,28 @@
+/**
+ * @fileoverview TableRowMatches Component
+ *
+ * A row-level visualization component for displaying table rows with hover and toggle
+ * interactions. Uses styled components for visual feedback on row states (hover, toggle,
+ * null values) and provides a compact row block representation.
+ *
+ * Features:
+ * - Styled row blocks with state-based styling
+ * - Hover and toggle interactions
+ * - Null value visualization with striped pattern
+ * - Integration with table and alert data
+ * - Row click handling
+ *
+ * @module components/TableView/TableRowMatches
+ *
+ * @example
+ * <RowBlock
+ *   height="20px"
+ *   isHovered={true}
+ *   isToggled={false}
+ *   isNull={false}
+ * />
+ */
+
 /* eslint-disable react/prop-types */
 import { Box, styled } from "@mui/material";
 import { withTableData, withAssociatedAlerts } from "../HOC";

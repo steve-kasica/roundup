@@ -1,3 +1,28 @@
+/**
+ * @fileoverview exportTableToStreamManual Module
+ *
+ * DuckDB utility for exporting tables to CSV/TSV with streaming and progress callbacks.
+ * Provides chunked export with progress reporting for large datasets.
+ *
+ * Features:
+ * - CSV and TSV export formats
+ * - Chunked streaming for large tables
+ * - Progress callback with row counts
+ * - Configurable chunk size
+ * - Header inclusion options
+ * - File download trigger
+ *
+ * @module lib/duckdb/exportTableToStreamManual
+ *
+ * @example
+ * await exportTableToStreamManual('my_table', 'export.csv', {
+ *   chunkSize: 1000,
+ *   onProgress: (current, total) => console.log(`${current}/${total}`),
+ *   delimiter: ',',
+ *   includeHeaders: true
+ * });
+ */
+
 import { getDuckDB } from "./duckdbClient";
 
 /**

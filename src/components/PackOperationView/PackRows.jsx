@@ -1,3 +1,24 @@
+/**
+ * @fileoverview PackRows Component
+ *
+ * Displays the result rows of a PACK (join) operation in a virtualized table with
+ * match statistics visualization. Shows matched, left-unmatched, and right-unmatched
+ * rows with interactive filtering based on match type selection.
+ *
+ * Features:
+ * - Virtualized table for performance with large datasets
+ * - Match type filtering (matched, left-only, right-only)
+ * - Column sorting
+ * - Match statistics Venn diagram
+ * - Pagination with infinite scroll
+ * - Column selection integration
+ *
+ * @module components/PackOperationView/PackRows
+ *
+ * @example
+ * <EnhancedPackRows id="pack-operation-123" />
+ */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";

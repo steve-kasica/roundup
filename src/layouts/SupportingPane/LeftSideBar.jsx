@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Left sidebar with tabbed navigation.
+ * @module layouts/SupportingPane/LeftSideBar
+ *
+ * Tabbed sidebar component containing TablesList and OperationsList
+ * with conditional tab disabling based on data availability.
+ *
+ * Features:
+ * - Tabbed interface for Tables and Operations
+ * - Disables Operations tab when no operations exist
+ * - Shows table/operation counts as chips
+ * - Scrollable content within tabs
+ * - Custom tab panel implementation
+ *
+ * @example
+ * <LeftSideBar />
+ */
 import React from "react";
 import { Box, Tabs, Tab, Chip } from "@mui/material";
 import { useSelector } from "react-redux";

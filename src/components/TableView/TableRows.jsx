@@ -1,4 +1,28 @@
 /**
+ * @fileoverview TableRows Component
+ *
+ * A comprehensive data table component that renders table data with advanced features
+ * including sorting, pagination, column hovering, and infinite scrolling. This component
+ * displays tabular data in a Material-UI Table with enhanced user interactions.
+ *
+ * Key Features:
+ * - Sortable columns with visual indicators (asc/desc/none cycling)
+ * - Infinite scrolling with automatic pagination
+ * - Column hover effects and highlighting
+ * - Sticky row numbers for easy row identification
+ * - Loading states and error handling
+ * - Responsive column widths with text truncation
+ * - Alternating row colors for better readability
+ * - Sticky header that remains visible during scrolling
+ * - Integration with DuckDB for data queries
+ *
+ * @module components/TableView/TableRows
+ *
+ * @example
+ * <EnhancedTableRows id={tableId} />
+ */
+
+/**
  * TableRows Component
  *
  * A comprehensive data table component that renders table data with advanced features

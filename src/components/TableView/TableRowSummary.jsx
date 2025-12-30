@@ -1,3 +1,30 @@
+/**
+ * @fileoverview TableRowSummary Component
+ *
+ * A comprehensive table row component for displaying table summary information in a
+ * tabular format. Includes selection checkboxes, drag indicators, context menus,
+ * and bar chart visualizations for table statistics.
+ *
+ * Features:
+ * - Checkbox selection
+ * - Drag-and-drop indicators
+ * - Context menu for actions
+ * - Text highlighting for search
+ * - Bar chart cells for visual statistics
+ * - Date, number, and byte formatting
+ * - Integration with table and alert data
+ *
+ * @module components/TableView/TableRowSummary
+ *
+ * @example
+ * <EnhancedTableRowSummary
+ *   id={tableId}
+ *   isSelected={true}
+ *   handleClick={handleRowClick}
+ *   searchString="sales"
+ * />
+ */
+
 import { DragIndicator } from "@mui/icons-material";
 import HighlightText from "../ui/HighlightText";
 import { Typography, Checkbox, Stack, Box } from "@mui/material";

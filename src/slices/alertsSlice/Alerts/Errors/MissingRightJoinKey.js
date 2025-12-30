@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Missing right join key error alert for PACK operations.
+ * @module slices/alertsSlice/Alerts/Errors/MissingRightJoinKey
+ *
+ * Alert triggered when a PACK operation is missing the join key
+ * for the right-hand table.
+ *
+ * @example
+ * import { validateMissingRightJoinKey } from './MissingRightJoinKey';
+ * const alert = validateMissingRightJoinKey(operation);
+ */
 import { Alert } from "../Alert.js";
 import { SEVERITY_ERROR } from "../../index.js";
 

@@ -1,3 +1,31 @@
+/**
+ * @fileoverview useVirtualStackRows Hook
+ *
+ * A custom React hook for fetching and managing STACK (unioned) table rows from DuckDB.
+ * Provides pagination for vertically stacked data from multiple tables with sorting
+ * support and infinite scrolling.
+ *
+ * Features:
+ * - Fetch stacked rows from multiple tables (UNION ALL)
+ * - Column mapping via database name matrix
+ * - Sorting by column index with direction control
+ * - Pagination with page-based loading
+ * - Infinite scroll with loadMore
+ * - Visible range tracking for virtualization
+ * - Loading and error states
+ *
+ * @module hooks/useVirtualStackRows
+ *
+ * @example
+ * const { data, loading, hasMore, loadMore, refresh } = useVirtualStackRows(
+ *   ['table-1', 'table-2'],
+ *   [['col_a', 'col_b'], ['col_x', 'col_y']],  // column mapping per table
+ *   50,       // pageSize
+ *   0,        // sortBy column index
+ *   'asc'     // sortDirection
+ * );
+ */
+
 import { useState, useEffect, useCallback } from "react";
 import { getTableRows } from "../lib/duckdb/getVirtualStackRows";
 

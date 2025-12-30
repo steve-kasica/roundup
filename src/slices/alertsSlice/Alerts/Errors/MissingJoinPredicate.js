@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Missing join predicate error alert for PACK operations.
+ * @module slices/alertsSlice/Alerts/Errors/MissingJoinPredicate
+ *
+ * Alert triggered when a PACK operation is missing its join predicate
+ * (how values in join key columns are matched).
+ *
+ * @example
+ * import { validateMissingJoinPredicate } from './MissingJoinPredicate';
+ * const alert = validateMissingJoinPredicate(operation);
+ */
 import { Alert } from "../Alert.js";
 import { SEVERITY_ERROR } from "../../index.js";
 

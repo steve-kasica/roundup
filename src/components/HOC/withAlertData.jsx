@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Higher-Order Component for individual alert data access.
+ * @module components/HOC/withAlertData
+ *
+ * Provides access to a single alert's data and actions from Redux state.
+ * Wraps components to inject alert properties and handlers.
+ *
+ * Features:
+ * - Alert data retrieval by ID from Redux store
+ * - Delete alert action dispatch
+ * - Toggle silence alert functionality
+ * - Alert existence checking
+ * - Full alert property injection (title, message, severity, etc.)
+ *
+ * @example
+ * import withAlertData from './withAlertData';
+ * const EnhancedAlert = withAlertData(AlertComponent);
+ * <EnhancedAlert id="alert-123" />
+ */
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAlertsById } from "../../slices/alertsSlice/selectors";

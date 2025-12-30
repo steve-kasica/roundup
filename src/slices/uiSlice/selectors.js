@@ -1,3 +1,21 @@
+/**
+ * @fileoverview Redux selectors for UI interaction state.
+ * @module slices/uiSlice/selectors
+ *
+ * Provides selectors for querying UI interaction state including
+ * column selection, hovering, dragging, and focus states.
+ *
+ * Features:
+ * - Get selected/hovered/dragged column IDs
+ * - Get focused object (table or operation)
+ * - Get loading operation IDs
+ * - Filter selections by parent ID
+ * - Get visible column IDs
+ *
+ * @example
+ * import { selectSelectedColumnIds, selectFocusedObjectId } from './selectors';
+ * const selected = selectSelectedColumnIds(state);
+ */
 import { createSelector } from "@reduxjs/toolkit";
 
 // =============================================================================

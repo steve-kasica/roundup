@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Incongruent tables error alert for STACK operations.
+ * @module slices/alertsSlice/Alerts/Errors/IncongruentTables
+ *
+ * Alert triggered when child tables in a STACK operation have different
+ * column counts, preventing view creation.
+ *
+ * @example
+ * import { validateIncongruentTables } from './IncongruentTables';
+ * const alert = validateIncongruentTables(operation, [5, 5, 3]);
+ */
 import { Alert } from "../Alert.js";
 import { SEVERITY_ERROR } from "../index.js";
 

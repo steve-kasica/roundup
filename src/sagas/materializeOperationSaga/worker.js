@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Materialize operation saga worker.
+ * @module sagas/materializeOperationSaga/worker
+ *
+ * Worker saga that creates DuckDB views for PACK and STACK operations.
+ * Syncs database view state with operation configuration.
+ *
+ * Features:
+ * - Creates PACK views (column joins)
+ * - Creates STACK views (row unions)
+ * - Fetches view dimensions after creation
+ * - Reports success with dimensions or failure with error
+ *
+ * @example
+ * // Called by watcher saga
+ * yield call(materializeOperationWorker, action);
+ */
 import { call, put, select } from "redux-saga/effects";
 import {
   materializeOperationFailure,

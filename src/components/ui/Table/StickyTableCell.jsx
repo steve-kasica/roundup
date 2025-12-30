@@ -1,3 +1,22 @@
+/**
+ * @fileoverview StickyTableCell Component
+ *
+ * A styled table cell component that remains fixed (sticky) during horizontal scrolling.
+ * Primarily used for row number columns to provide persistent row identification.
+ *
+ * Features:
+ * - Sticky positioning (left: 0)
+ * - Inherits background color from parent
+ * - Right-aligned text for numbers
+ * - Muted color (#888) for subtle appearance
+ * - Z-index for proper layering
+ *
+ * @module components/ui/Table/StickyTableCell
+ *
+ * @example
+ * <StickyTableCell>1</StickyTableCell>
+ */
+
 import { TableCell, styled } from "@mui/material";
 /**
  * Sticky row number cell that remains fixed during horizontal scrolling

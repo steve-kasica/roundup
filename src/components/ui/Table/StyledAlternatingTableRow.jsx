@@ -1,3 +1,24 @@
+/**
+ * @fileoverview StyledAlternatingTableRow Component
+ *
+ * A styled table row component with alternating background colors and hover effects.
+ * Provides consistent visual feedback for row interactions across the application.
+ *
+ * Features:
+ * - Alternating row colors (white/gray)
+ * - Hover effects with blue tints
+ * - Disabled state support
+ * - Cell background inheritance
+ * - Pointer cursor on hover
+ *
+ * @module components/ui/Table/StyledAlternatingTableRow
+ *
+ * @example
+ * <StyledAlternatingTableRow isEven={true} isDisabled={false}>
+ *   <TableCell>Content</TableCell>
+ * </StyledAlternatingTableRow>
+ */
+
 import { TableRow } from "@mui/material";
 import { styled } from "@mui/system";
 /**

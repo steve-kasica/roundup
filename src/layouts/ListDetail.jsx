@@ -1,9 +1,22 @@
 /**
- * ListDetail.jsx
+ * @fileoverview List-detail canonical layout component.
+ * @module layouts/ListDetail
  *
- * This file handles component position in the list-detail layout
- * See:
- *  - [Canonical layouts, List-detail](https://m3.material.io/foundations/layout/canonical-layouts/list-detail)
+ * Implements Material Design 3 list-detail canonical layout pattern
+ * with resizable panels for master-detail navigation.
+ *
+ * Features:
+ * - Resizable panel layout using react-resizable-panels
+ * - Navigation sidebar
+ * - Collapsible first pane
+ * - Persistent layout state (autoSaveId)
+ * - Configurable min/max/default sizes
+ *
+ * @see https://m3.material.io/foundations/layout/canonical-layouts/list-detail
+ *
+ * @example
+ * import ListDetail from './ListDetail';
+ * <ListDetail navigation={<Nav />} firstPane={<List />} secondPane={<Detail />} />
  */
 import { PanelGroup, Panel } from "react-resizable-panels";
 

@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Delete tables saga action creators.
+ * @module sagas/deleteTablesSaga/actions
+ *
+ * Redux action creators for table deletion saga operations.
+ *
+ * Actions:
+ * - deleteTablesRequest: Initiates table deletion process
+ * - deleteTablesSuccess: Signals successful table deletion
+ * - deleteTablesFailure: Signals table deletion failure
+ *
+ * @example
+ * import { deleteTablesRequest } from './actions';
+ * dispatch(deleteTablesRequest({ tableIds: ['t_1', 't_2'] }));
+ */
 import { createAction } from "@reduxjs/toolkit";
 
 /**

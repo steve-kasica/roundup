@@ -1,3 +1,25 @@
+/**
+ * @fileoverview HiddenColumnsButton Component
+ *
+ * A button indicating the number of hidden columns. Displays a count of hidden
+ * columns with ellipsis indicators (⋯) to show filtered/hidden content.
+ *
+ * Features:
+ * - Hidden column count display
+ * - Unicode ellipsis character (⋯)
+ * - Small button size
+ * - Non-focusable (tabIndex -1)
+ * - Props forwarding to IconButton
+ *
+ * @module components/ui/buttons/HiddenColumnsButton
+ *
+ * @example
+ * <HiddenColumnsButton
+ *   count={5}
+ *   onClick={handleShowHidden}
+ * />
+ */
+
 // See https://www.unicode.org/charts/nameslist/n_2B00.html
 import { IconButton } from "@mui/material";
 // import { ArrowLeft, ArrowRight } from "@mui/icons-material";

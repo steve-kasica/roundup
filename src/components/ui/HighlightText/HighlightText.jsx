@@ -1,3 +1,27 @@
+/**
+ * @fileoverview HighlightText Component
+ *
+ * A text highlighting component that searches for a pattern within text and highlights
+ * the first match with custom styling. Case-insensitive search with visual emphasis
+ * on matched substring.
+ *
+ * Features:
+ * - Case-insensitive pattern matching
+ * - Custom styling for highlighted text
+ * - Graceful handling of no matches
+ * - Typography integration
+ * - PropTypes validation
+ *
+ * @module components/ui/HighlightText
+ *
+ * @example
+ * <HighlightText
+ *   pattern="search"
+ *   text="This is a searchable text"
+ *   matchSx={{ backgroundColor: 'yellow', fontWeight: 'bold' }}
+ * />
+ */
+
 import { Typography } from "@mui/material";
 import PropTypes from "prop-types";
 

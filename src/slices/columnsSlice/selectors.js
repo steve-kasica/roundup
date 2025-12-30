@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Redux selectors for column state.
+ * @module slices/columnsSlice/selectors
+ *
+ * Provides memoized selectors for querying column state including
+ * filtering by parent, getting column details, and cross-referencing
+ * with UI selection state.
+ *
+ * Features:
+ * - Select columns by ID or parent ID
+ * - Get column database names for queries
+ * - Filter active vs hidden columns
+ * - Get selected columns by parent
+ * - Find column index within parent
+ *
+ * @example
+ * import { selectColumnsById, selectColumnIdsByParentId } from './selectors';
+ * const column = selectColumnsById(state, 'col_1');
+ */
 import { createSelector } from "reselect";
 import { selectSelectedColumnIds } from "../uiSlice";
 import {

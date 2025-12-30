@@ -1,3 +1,27 @@
+/**
+ * @fileoverview PackSchemaView Component
+ *
+ * An interactive schema visualization for PACK (join) operations showing how columns
+ * from two tables are combined. Displays a grid where rows represent match groups
+ * (matched, left-only, right-only) and columns represent the combined column set.
+ *
+ * This is one of the most complex visualizations in the application, providing:
+ * - Visual join key indicators
+ * - Match type coloring and selection
+ * - Column selection and hiding
+ * - Context menus for column operations
+ * - Venn diagram match statistics
+ * - Range selection support
+ *
+ * The component uses a block-based grid layout similar to UpSet plots to show
+ * which values appear in which match categories.
+ *
+ * @module components/PackOperationView/PackSchemaView
+ *
+ * @example
+ * <EnhancedPackSchemaView id="pack-operation-123" />
+ */
+
 /* eslint-disable no-unused-vars */
 import {
   Box,

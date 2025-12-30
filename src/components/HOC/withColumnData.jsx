@@ -1,3 +1,23 @@
+/**
+ * @fileoverview Higher-Order Component for column data and interactions.
+ * @module components/HOC/withColumnData
+ *
+ * Provides comprehensive access to column data, metadata, statistics,
+ * and interaction handlers from Redux state.
+ *
+ * Features:
+ * - Column identity and metadata (name, type, database name)
+ * - Column statistics (count, unique values, duplicates, null count)
+ * - Interaction state (hover, selected, focused, dragging, drop target)
+ * - Column update and delete actions
+ * - Focus and visibility management
+ * - Parent table/operation association
+ *
+ * @example
+ * import withColumnData from './withColumnData';
+ * const EnhancedColumn = withColumnData(ColumnComponent);
+ * <EnhancedColumn id="c1" />
+ */
 import { useSelector, useDispatch } from "react-redux";
 
 import { selectColumnsById } from "../../slices/columnsSlice";

@@ -1,3 +1,28 @@
+/**
+ * @fileoverview ExportDialog Component
+ *
+ * A dialog component for configuring and executing table exports. Provides user interface
+ * for selecting export format, filename, and options before triggering the export process.
+ *
+ * The component comes in two variants:
+ * - ExportDialog: Base component accepting props directly
+ * - EnhancedExportDialog: Redux-connected version that fetches table/operation data
+ *
+ * @module components/ExportCompositeTable/ExportDialog
+ *
+ * @example
+ * // Using the enhanced version (recommended)
+ * <EnhancedExportDialog id="table-123" onClose={handleClose} />
+ *
+ * @example
+ * // Using the base component
+ * <ExportDialog
+ *   name="my_table"
+ *   databaseName="table_db_123"
+ *   onClose={handleClose}
+ * />
+ */
+
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import {
@@ -17,6 +42,28 @@ import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
 import { ExportTableButton } from "../ui/buttons";
 
+/**
+ * ExportDialog Component
+ *
+ * Renders a dialog for configuring table export settings.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.name - Display name of the table/operation being exported
+ * @param {string} props.databaseName - Internal database name for the export
+ * @param {Function} props.onClose - Callback to close the dialog
+ *
+ * @returns {React.ReactElement} A dialog with export configuration options
+ *
+ * @description
+ * Configuration options:
+ * - File name (automatically lowercased, extension auto-appended)
+ * - Format selection (CSV or TSV)
+ * - Include headers checkbox
+ *
+ * The dialog displays a preview of the final filename and provides
+ * Cancel and Export buttons.
+ */
 function ExportDialog({ name, databaseName, onClose }) {
   const [format, setFormat] = useState("csv");
   const [includeHeaders, setIncludeHeaders] = useState(true);

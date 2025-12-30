@@ -1,3 +1,34 @@
+/**
+ * @fileoverview TablesToolbar Component
+ *
+ * Toolbar component for the tables list providing table management actions and
+ * operation creation buttons. Enables bulk operations on selected tables and
+ * integration with the schema composition system.
+ *
+ * Features:
+ * - Search functionality
+ * - Upload button
+ * - Select all/none toggle
+ * - Delete selected tables
+ * - Create PACK/STACK operations from selected tables
+ * - Insert tables into focused operation
+ *
+ * @module components/TablesList/TablesToolbar
+ *
+ * @example
+ * <EnhancedTablesToolbar
+ *   setSearchString={setSearch}
+ *   onFileUpload={handleUpload}
+ *   selectedTableIds={selected}
+ *   handleSelectAllClick={handleSelectAll}
+ *   handleDeleteClick={handleDelete}
+ *   handleAddPackOperationClick={handleAddPack}
+ *   handleAddStackOperationClick={handleAddStack}
+ *   handleInsertTablesInOperationClick={handleInsert}
+ *   focusedObjectHasAlerts={false}
+ * />
+ */
+
 import { Divider, Toolbar } from "@mui/material";
 import SearchTextBox from "../ui/SearchTextBox";
 import {
@@ -11,6 +42,27 @@ import {
 import withGlobalInterfaceData from "../HOC/withGlobalInterfaceData";
 import { isOperationId } from "../../slices/operationsSlice";
 
+/**
+ * TablesToolbar Component
+ *
+ * Provides table management and operation creation controls.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.focusedObjectId - Currently focused object ID
+ * @param {Function} props.insertTablesInFocusedOperation - Insert tables callback
+ * @param {Function} props.setSearchString - Update search filter
+ * @param {Function} props.onFileUpload - File upload handler
+ * @param {string[]} [props.selectedTableIds=[]] - Selected table IDs
+ * @param {Function} props.handleSelectAllClick - Select all/none toggle
+ * @param {Function} props.handleDeleteClick - Delete selected tables
+ * @param {Function} props.handleAddPackOperationClick - Create PACK operation
+ * @param {Function} props.handleAddStackOperationClick - Create STACK operation
+ * @param {Function} props.handleInsertTablesInOperationClick - Insert into operation
+ * @param {boolean} props.focusedObjectHasAlerts - Whether focused object has errors
+ *
+ * @returns {React.ReactElement} A toolbar with table management buttons
+ */
 const TablesToolbar = ({
   // Props defined in withGlobalInterfaceData HOC
   focusedObjectId,

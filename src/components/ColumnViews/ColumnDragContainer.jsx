@@ -1,3 +1,33 @@
+/**
+ * @fileoverview ColumnDragContainer Component
+ *
+ * A Higher-Order Component that adds drag-and-drop functionality to column components.
+ * This container manages the drag state, drop targets, and hover interactions for
+ * columns within a table, enabling column reordering and other drag-based operations.
+ *
+ * The component uses react-dnd for drag-and-drop functionality and integrates with
+ * Redux to manage global UI state for dragging, hovering, and drop targeting.
+ *
+ * Key responsibilities:
+ * - Enable drag functionality for columns
+ * - Define valid drop targets (sibling columns)
+ * - Track hover and drag states
+ * - Dispatch Redux actions to update global UI state
+ * - Pass dragDropRef to children for DOM manipulation
+ *
+ * @module components/ColumnViews/ColumnDragContainer
+ *
+ * @example
+ * <ColumnDragContainer
+ *   id="column-123"
+ *   onDragEnd={handleDragEnd}
+ *   onDrop={handleDrop}
+ *   canDrag={true}
+ * >
+ *   <ColumnComponent />
+ * </ColumnDragContainer>
+ */
+
 /* eslint-disable react/prop-types */
 
 import {
@@ -22,8 +52,35 @@ import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
 
 /**
- * ColumnDragContainer - A container component that handles drag functionality for columns
- * Passes dragDropRef to its children instead of wrapping them
+ * ColumnDragContainer Component
+ *
+ * A container that wraps column components to provide drag-and-drop functionality.
+ * Manages drag state and passes a ref to children for DOM manipulation.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.id - Column identifier
+ * @param {string} props.parentId - ID of the parent table or operation
+ * @param {React.ReactNode} props.children - Child component to wrap with drag functionality
+ * @param {Function} [props.onDragEnd] - Callback when drag operation ends
+ * @param {Function} [props.onDrop] - Callback when item is dropped on this column
+ * @param {boolean} [props.canDrag=true] - Whether dragging is enabled
+ *
+ * @returns {React.ReactElement} Children with drag-drop capabilities
+ *
+ * @description
+ * The component:
+ * - Creates a unique drag type per parent table/operation
+ * - Identifies sibling columns as potential drop targets
+ * - Updates Redux state during drag lifecycle (start, hover, end)
+ * - Passes dragDropRef to children via cloneElement
+ * - Handles both drag and drop events
+ *
+ * Drag lifecycle:
+ * 1. Drag start: Sets dragging state and identifies drop targets
+ * 2. Drag over: Updates hover state
+ * 3. Drag end: Clears all drag-related states
+ * 4. Drop: Executes drop callback if provided
  */
 const ColumnDragContainer = withColumnData(
   ({ id, parentId, children, onDragEnd, onDrop, canDrag = true }) => {

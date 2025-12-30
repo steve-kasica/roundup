@@ -1,3 +1,31 @@
+/**
+ * @fileoverview PackSchemaToolbar Component
+ *
+ * A specialized toolbar for PACK operation schema views providing controls for
+ * column operations, match type filtering, table position swapping, and join type
+ * configuration.
+ *
+ * This toolbar extends the base SchemaToolbar with PACK-specific features like
+ * match filtering and table swapping.
+ *
+ * Features:
+ * - Match type toggle buttons (matched, left-only, right-only)
+ * - Swap tables button
+ * - Column selection, focus, hide, delete operations
+ * - Operation naming
+ * - Join type configuration through match selection
+ *
+ * @module components/PackOperationView/PackSchemaToolbar
+ *
+ * @example
+ * <EnhancedPackSchemaToolbar
+ *   id="pack-operation-123"
+ *   handleHideColumns={handleHide}
+ *   areAnySelected={true}
+ *   onSelectAllClick={handleSelectAll}
+ * />
+ */
+
 import { EnhancedSchemaToolbar, OBJECT_TYPE_PACK } from "../ui/SchemaToolbar";
 import { SwapTablesButton, PackMatchToggleButtonGroup } from "../ui/buttons";
 import { useCallback, useMemo } from "react";
