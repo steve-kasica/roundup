@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules # Important: exclude node_modules from the volumne mount to prevent permissions issues
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WDS_SOCKET_PORT=0 # Prevents websocket connection issues
+    stdin_open: true
+    tty: true
