@@ -30,7 +30,6 @@ import { useCallback, useState } from "react";
 import DragDropFileUpload from "./DragDropFileUpload";
 import withAllTablesData from "./withAllTablesData";
 import { registerFiles } from "../../lib/duckdb";
-import "./SourceTables.scss";
 import {
   Box,
   TableHead,

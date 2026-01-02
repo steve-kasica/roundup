@@ -17,8 +17,6 @@
 import { useSelector } from "react-redux";
 import { selectAllOperationIds } from "../../slices/operationsSlice";
 import OperationView from "./OperationView";
-
-import "./OperationsList.scss";
 import { Box } from "@mui/material";
 
 /**
