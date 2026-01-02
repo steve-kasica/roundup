@@ -115,9 +115,9 @@ const ColumnValueLengths = ({ id, limit = 20 }) => {
       </Box>
 
       <Typography
-        variant="caption"
+        variant="data-secondary"
         color="text.secondary"
-        sx={{ mt: 1, display: "block", flexShrink: 0 }}
+        sx={{ mt: 1 }}
       >
         Showing {data.length.toLocaleString()} of {total.toLocaleString()}{" "}
         unique lengths

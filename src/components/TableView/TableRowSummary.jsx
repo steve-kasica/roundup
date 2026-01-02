@@ -27,7 +27,7 @@
 
 import { DragIndicator } from "@mui/icons-material";
 import HighlightText from "../ui/HighlightText";
-import { Typography, Checkbox, Stack, Box } from "@mui/material";
+import { Typography, Checkbox, Stack, Box, TableCell } from "@mui/material";
 import { useState } from "react";
 import { Menu, MenuItem } from "@mui/material";
 import { formatDate, formatNumber, formatBytes } from "../../lib/utilities";
@@ -139,7 +139,7 @@ const TableRowSummary = ({
       onDoubleClick={focusTable}
     >
       <Typography
-        component="td"
+        variant="data-primary"
         color={isDisabled ? "textDisabled" : "normal"}
         data-column="checkbox"
       >
@@ -182,15 +182,14 @@ const TableRowSummary = ({
           />
         </Stack>
       </Typography>
+      <TableCell sx={{ padding: 0}}>
       <Typography
-        component="td"
-        sx={{ fontSize: "13px" }}
+        variant="data-primary"
         color={
           isDisabled ? "textDisabled" : totalCount ? "warning.dark" : "normal"
         }
         data-column="name"
       >
-        <Stack direction="row" alignItems="center" spacing={0.5}>
           <HighlightText
             pattern={searchString}
             text={name}
@@ -198,29 +197,20 @@ const TableRowSummary = ({
               backgroundColor: "yellow",
             }}
           />
-          {/* TODO signal errors on table */}
-          {/* {totalCount && (
-            <Badge
-              badgeContent={alertIds.length}
-              color="warning"
-              sx={{ ml: 0.5 }}
-            >
-              <Warning color="warning" fontSize="small" />
-            </Badge>
-          )} */}
-        </Stack>
       </Typography>
+</TableCell>      
+      <TableCell sx={{ padding: 0}}>
       <Typography
-        component="td"
-        sx={{ fontSize: "13px" }}
+        variant="data-primary"
         color={isDisabled ? "textDisabled" : "normal"}
         data-column="mimeType"
       >
         {mimeType || "N/A"}
       </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: 0}}>
       <BarChartCell
-        component="td"
-        sx={{ fontSize: "13px" }}
+        variant="data-primary"
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(size / bytesMax) * 100}
         isDisabled={isDisabled}
@@ -228,9 +218,10 @@ const TableRowSummary = ({
       >
         {formatBytes(size)}
       </BarChartCell>
+      </TableCell>      
+      <TableCell sx={{ padding: 0}}>
       <BarChartCell
-        component="td"
-        sx={{ fontSize: "13px" }}
+        variant="data-primary"
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(rowCount / rowMax) * 100}
         isDisabled={isDisabled}
@@ -238,9 +229,10 @@ const TableRowSummary = ({
       >
         {formatNumber(rowCount)}
       </BarChartCell>
+      </TableCell>
+      <TableCell sx={{padding: 0}}>      
       <BarChartCell
-        component="td"
-        sx={{ fontSize: "13px", padding: "0 4px" }}
+        variant="data-primary"
         color={isDisabled ? "textDisabled" : "normal"}
         percentage={(columnCount / columnMax) * 100}
         isDisabled={isDisabled}
@@ -248,14 +240,16 @@ const TableRowSummary = ({
       >
         {`${formatNumber(columnCount)}`}
       </BarChartCell>
+      </TableCell>
+      <TableCell sx={{ padding: 0}}>
       <Typography
-        component="td"
-        sx={{ fontSize: "13px" }}
+        variant="data-primary"
         color={isDisabled ? "textDisabled" : "normal"}
         data-column="dateLastModified"
       >
         {formatDate(new Date(dateLastModified))}
       </Typography>
+      </TableCell>
       <td className="more-options">
         <Menu
           anchorEl={null}

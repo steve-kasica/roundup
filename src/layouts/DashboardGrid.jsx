@@ -99,7 +99,7 @@ const DashboardGrid = ({
               position: "relative",
             }}
           >
-            <Typography variant="h5">
+            <Typography variant="analytics-section-title">
               {drawer ? drawer.label : "Drawer"}
             </Typography>
             <IconButton
@@ -126,7 +126,7 @@ const DashboardGrid = ({
             >
               <CardContent>
                 {gridTitles[index] && (
-                  <Typography variant="h6" component="div" gutterBottom>
+                  <Typography variant="analytics-subsection-title" component="div" gutterBottom>
                     {gridTitles[index]}
                   </Typography>
                 )}

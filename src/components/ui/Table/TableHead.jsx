@@ -61,13 +61,8 @@ const TableHead = ({ columnIds, sortConfig, onColumnSort }) => {
                   }}
                 >
                   <Typography
+                    variant="label"
                     color="text.secondary"
-                    sx={{
-                      fontStyle: "italic",
-                      fontWeight: 600,
-                      opacity: 0.6,
-                      userSelect: "none",
-                    }}
                   >
                     Column {i + 1}
                   </Typography>

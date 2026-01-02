@@ -29,7 +29,7 @@ function MatchDetail({
   if (!matches || matches.length === 0) {
     return (
       <Box sx={{ padding: 2, textAlign: "center" }}>
-        <Typography variant="body2" color="textSecondary">
+        <Typography variant="data-secondary" color="textSecondary">
           No matches found.
         </Typography>
       </Box>
@@ -233,11 +233,9 @@ function MatchDetail({
       >
         <div style={{ width: "40%" }}>
           <Typography
-            variant="body2"
+            variant="data-secondary"
             sx={{
               fontSize,
-              cursor: "pointer",
-              userSelect: "none",
               "&:hover": {
                 color: barColor,
               },
@@ -250,11 +248,9 @@ function MatchDetail({
         </div>
         <div style={{ width: "40%" }}>
           <Typography
-            variant="body2"
+            variant="data-secondary"
             sx={{
               fontSize,
-              cursor: "pointer",
-              userSelect: "none",
               "&:hover": {
                 color: barColor,
               },
@@ -267,11 +263,9 @@ function MatchDetail({
         </div>
         <div style={{ width: "20%" }}>
           <Typography
-            variant="body2"
+            variant="data-secondary"
             sx={{
               fontSize,
-              cursor: "pointer",
-              userSelect: "none",
               "&:hover": {
                 color: barColor,
               },

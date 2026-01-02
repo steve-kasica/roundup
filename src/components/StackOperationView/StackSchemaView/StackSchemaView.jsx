@@ -313,7 +313,7 @@ const StackSchemaView = ({
                         boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.08)",
                       }}
                     >
-                      <Typography variant="caption" sx={{ userSelect: "none" }}>
+                      <Typography variant="data-small" sx={{ userSelect: "none" }}>
                         {colIndex + 1}
                       </Typography>
                     </StyledTableCell>

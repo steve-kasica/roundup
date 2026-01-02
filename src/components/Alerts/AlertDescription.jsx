@@ -128,13 +128,13 @@ const AlertDescription = ({
           maxWidth: "calc(100% - 90px)",
         }}
         primary={
-          <Typography variant="description">
+          <Typography variant="data-secondary">
             {title || message || "Alert"}
           </Typography>
         }
         secondary={
           description || details ? (
-            <Typography variant="sub-description">
+            <Typography variant="data-small">
               {description || details}
             </Typography>
           ) : null

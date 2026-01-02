@@ -108,7 +108,7 @@ const TableBody = ({
                 flexDirection: "column",
               }}
             >
-              <Typography variant="body1" color="error" sx={{ mb: 1 }}>
+              <Typography variant="data-primary" color="error" sx={{ mb: 1 }}>
                 Failed to load table data
               </Typography>
             </Box>
@@ -140,8 +140,8 @@ const TableBody = ({
                   >
                     {value === null ? (
                       <Typography
+                        variant="data-small"
                         color="text.secondary"
-                        sx={{ fontStyle: "italic", opacity: 0.6 }}
                       >
                         NULL
                       </Typography>
@@ -169,7 +169,7 @@ const TableBody = ({
                   }}
                 >
                   <CircularProgress size={20} />
-                  <Typography variant="body2" sx={{ ml: 1 }}>
+                  <Typography variant="data-secondary" sx={{ ml: 1 }}>
                     Loading more rows...
                   </Typography>
                 </Box>

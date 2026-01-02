@@ -24,17 +24,9 @@ import { withTableData } from "../HOC";
 const TableName = ({ name, sx = {} }) => {
   return (
     <Typography
-      variant="h6"
+      variant="data-small"
       component="div"
-      sx={{
-        userSelect: "none",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-        maxWidth: "100%",
-        fontSize: "0.75rem",
-        ...sx,
-      }}
+      sx={sx}
     >
       {name}
     </Typography>

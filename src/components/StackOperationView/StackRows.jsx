@@ -151,10 +151,7 @@ const StackRows = ({
             tooltipText={`Table ${tableIndex + 1} of ${childIds.length}`}
           />
           <Typography
-            sx={{
-              fontSize: "0.9rem",
-              color: "text.secondary",
-            }}
+            variant="data-small"
           >
             {globalIndex + 1}.
           </Typography>

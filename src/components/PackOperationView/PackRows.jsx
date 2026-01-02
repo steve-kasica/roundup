@@ -197,7 +197,7 @@ const PackRows = ({
       return (
         <Stack direction="row" alignItems="right">
           <VennDiagram {...vennProps} />
-          <Typography>{globalIndex + 1}.</Typography>
+          <Typography variant="data-small">{globalIndex + 1}.</Typography>
         </Stack>
       );
     },

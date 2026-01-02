@@ -66,10 +66,9 @@ const PackOperationLabel = ({
         <PackOperationIcon color={totalCount > 0 ? "error" : "inherit"} />
       )}
       <Typography
-        variant="h6"
+        variant="label"
         component="div"
         sx={{
-          userSelect: "none",
           color: totalCount ? "error.main" : "inherit",
           fontWeight: totalCount ? 600 : "inherit",
         }}

@@ -1,0 +1,241 @@
+import { createTheme, lighten } from "@mui/material/styles";
+import baseTheme from "./base";
+// import typography, { variantMapping } from "./typography";
+
+// colors
+const loadingColor = "#fff3e0";
+const selectedColor = "rgb(198, 228, 252)";
+const hoverColor = lighten(selectedColor, 0.7);
+const draggingColor = "#ff9800";
+const dropTargetColor = "#4caf50";
+const errorColor = "#f44336";
+const focusedColor = "#fbc02d";
+
+// Extend theme with column palette that references base theme
+const theme = createTheme(baseTheme, {
+  palette: {
+    // Column-specific state colors
+    column: {
+      default: {
+        transition: "all 0.2s ease-in-out",
+      },
+      hovered: {
+        backgroundColor: hoverColor,
+      },
+      selected: {
+        backgroundColor: selectedColor,
+      },
+      dragging: {
+        backgroundColor: lighten(draggingColor, 0.85),
+        transform: "scale(0.95) rotate(2deg)",
+        opacity: 0.8,
+        zIndex: 1000,
+        outline: `2px solid ${draggingColor}`,
+      },
+      dropTarget: {
+        outline: `2px solid ${dropTargetColor}`,
+        background: lighten(dropTargetColor, 0.85),
+        // borderStyle: "dashed",
+        // outlineWidth: "1px",
+        // outlineColor: baseTheme.palette.action.dropTargetColor,
+        // outlineStyle: "dashed",
+        // boxShadow: "0 2px 4px rgba(76, 175, 80, 0.3)",
+      },
+      overDropTarget: {
+        // backgroundColor: lighten(
+        //   baseTheme.palette.action.dropTargetColor,
+        //   0.85
+        // ),
+        // outlineColor: baseTheme.palette.action.dropTargetColor,
+        // outlineStyle: "dashed",
+        boxShadow: "0 2px 4px rgba(76, 175, 80, 0.3)",
+        transform: "scale(1.05)",
+      },
+      loading: {
+        // background: lighten(baseTheme.palette.action.loadingColor, 0.85),
+        // outlineColor: baseTheme.palette.action.loadingColor,
+        animation: "pulse 1.5s ease-in-out infinite",
+        "@keyframes pulse": {
+          "0%": { opacity: 0.6 },
+          "50%": { opacity: 1 },
+          "100%": { opacity: 0.6 },
+        },
+      },
+      error: {
+        // background: lighten(baseTheme.palette.action.errorColor, 0.85),
+        // outlineColor: baseTheme.palette.action.errorColor,
+      },
+      null: {
+        // background: "#fafafa", // Very light grey
+        border: "#bdbdbd", // Grey
+      },
+      focused: {
+        // background: lighten(baseTheme.palette.action.focusedColor, 0.85),
+        // outlineColor: baseTheme.palette.action.focusedColor,
+        shadow: "rgba(251, 192, 45, 0.2)",
+      },
+      hidden: {
+        // opacity: 0.3,
+      },
+    },
+  },
+  typography: {
+    // ============================================
+    // TYPOGRAPHY HIERARCHY FOR VISUAL ANALYTICS
+    // ============================================
+    
+    // LEVEL 1: Page/Dashboard Titles (largest, most prominent)
+    // Usage: Main dashboard titles, primary page headings
+    "title": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "2rem",           // 32px
+      fontWeight: 700,
+      lineHeight: 1.2,
+      letterSpacing: "-0.02em",
+      color: baseTheme.palette.text.primary,
+    },
+    
+    // LEVEL 2: Section Headers
+    // Usage: Major section dividers, panel titles, workflow titles
+    "section-title": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "1.5rem",         // 24px
+      fontWeight: 600,
+      lineHeight: 1.3,
+      letterSpacing: "-0.01em",
+      color: baseTheme.palette.text.primary,
+    },
+    
+    // LEVEL 3: Subsection Headers
+    // Usage: Component headers, table titles, chart titles
+    "subsection-title": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "1.125rem",       // 18px
+      fontWeight: 600,
+      lineHeight: 1.4,
+      letterSpacing: "0em",
+      color: baseTheme.palette.text.primary,
+    },
+    
+    // LEVEL 4: Component Labels
+    // Usage: Operation labels, metric labels, axis titles
+    "label": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "0.875rem",       // 14px
+      fontWeight: 600,
+      lineHeight: 1.43,
+      letterSpacing: "0.01em",
+      textTransform: "uppercase",
+      color: baseTheme.palette.text.secondary,
+    },
+    
+    // LEVEL 5: Primary Data Text
+    // Usage: Data table cells, metric values, primary content
+    "data-primary": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "1rem",           // 16px
+      fontWeight: 400,
+      lineHeight: 1.5,
+      letterSpacing: "0em",
+      color: baseTheme.palette.text.primary,
+    },
+    
+    // LEVEL 6: Secondary Data Text
+    // Usage: Supporting data, metadata, timestamps
+    "data-secondary": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "0.875rem",       // 14px
+      fontWeight: 400,
+      lineHeight: 1.43,
+      letterSpacing: "0.01em",
+      color: baseTheme.palette.text.secondary,
+    },
+    
+    // LEVEL 7: Tertiary/Small Data
+    // Usage: Small annotations, hints, footnotes, badges
+    "data-small": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "0.75rem",        // 12px
+      fontWeight: 400,
+      lineHeight: 1.5,
+      letterSpacing: "0.02em",
+      color: baseTheme.palette.text.secondary,
+    },
+    
+    // LEVEL 8: Micro Text
+    // Usage: Very small labels, counts in compact spaces
+    "data-micro": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "0.625rem",       // 10px
+      fontWeight: 500,
+      lineHeight: 1.4,
+      letterSpacing: "0.03em",
+      color: baseTheme.palette.text.secondary,
+    },
+    
+    // SPECIAL: Emphasized Metrics
+    // Usage: Key performance indicators, highlighted values
+    "metric-large": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "2.5rem",         // 40px
+      fontWeight: 700,
+      lineHeight: 1.2,
+      letterSpacing: "-0.02em",
+      color: baseTheme.palette.text.primary,
+    },
+    
+    "metric-medium": {
+      fontFamily: baseTheme.typography.fontFamily,
+      fontSize: "1.75rem",        // 28px
+      fontWeight: 600,
+      lineHeight: 1.3,
+      letterSpacing: "-0.01em",
+      color: baseTheme.palette.text.primary,
+    },
+    
+    // SPECIAL: Monospace for Code/Technical Data
+    // Usage: SQL queries, technical IDs, code snippets
+    "code": {
+      fontFamily: ["Consolas", "Monaco", "Courier New", "monospace"].join(","),
+      fontSize: "0.875rem",       // 14px
+      fontWeight: 400,
+      lineHeight: 1.6,
+      letterSpacing: "0em",
+      color: baseTheme.palette.text.primary,
+    },
+    
+    "code-small": {
+      fontFamily: ["Consolas", "Monaco", "Courier New", "monospace"].join(","),
+      fontSize: "0.75rem",        // 12px
+      fontWeight: 400,
+      lineHeight: 1.5,
+      letterSpacing: "0em",
+      color: baseTheme.palette.text.secondary,
+    },
+
+
+  },
+  components: {
+    MuiTypography: {
+      defaultProps: {
+        variantMapping: {
+          // Analytics hierarchy mappings
+          "title": "h1",
+          "section-title": "h2",
+          "subsection-title": "h3",
+          "label": "span",
+          "data-primary": "div",
+          "data-secondary": "span",
+          "data-small": "span",
+          "data-micro": "span",
+          "metric-large": "div",
+          "metric-medium": "div",
+          "code": "code",
+          "code-small": "code",
+        },
+      },
+    },
+  },
+});
+
+export default theme;

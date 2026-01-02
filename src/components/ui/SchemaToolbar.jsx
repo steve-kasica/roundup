@@ -134,15 +134,8 @@ const SchemaToolbar = ({
           <TableIcon />
         )}
         <Typography
-          variant="h6"
+          variant="subsection-title"
           component="div"
-          sx={{
-            userSelect: "none",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            maxWidth: 200,
-          }}
         >
           {title}
         </Typography>
@@ -234,7 +227,7 @@ const SchemaToolbar = ({
               backgroundColor: "#f5f5f5",
             }}
           >
-            <Typography variant="subtitle2" fontWeight="bold">
+            <Typography variant="label" fontWeight="bold">
               Alerts ({totalCount})
             </Typography>
           </Box>

@@ -222,20 +222,8 @@ const ColumnSummary = ({
           }}
         >
           <Typography
-            variant="caption"
+            variant="data-small"
             component="div"
-            sx={{
-              fontSize: "0.7rem",
-              fontStyle: "italic",
-              fontWeight: 300,
-              overflow: "hidden",
-              textAlign: "left",
-              textOverflow: "ellipsis",
-              color: "text.secondary",
-              whiteSpace: "nowrap",
-              maxWidth: "100%",
-              width: "100%",
-            }}
           >
             {/* TODO: should I use Chips instead of comma b/c values may include commas */}
             {topValues ? topValues.map(({ value }) => value).join(", ") : ""}

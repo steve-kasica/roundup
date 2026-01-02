@@ -399,11 +399,9 @@ const TableSchema = ({
                     >
                       {isVisible ? (
                         <Typography
-                          variant="h6"
+                          variant="data-small"
                           textAlign="center"
                           width="100%"
-                          fontSize={"0.75rem"}
-                          height="20px"
                           gutterBottom
                         >
                           {indices[0] + 1}

@@ -89,7 +89,7 @@ function StackOperationBlock({
         ...sx,
       }}
     >
-      <Typography variant="treemap label">
+      <Typography variant="data-small">
         {totalCount > 0 ? `⚠` : ""} {name || id} <br></br>
         <small style={{ color: "#555" }}>
           {columnCount.toLocaleString()} x {rowCount.toLocaleString()}

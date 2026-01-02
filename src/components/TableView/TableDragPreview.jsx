@@ -100,24 +100,13 @@ function TableDragPreview({ tableIds }) {
                 />
                 <Box sx={{ flexGrow: 1 }}>
                   <Typography
-                    variant="body2"
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: "14px",
-                      textShadow: "0 1px 2px rgba(0,0,0,0.5)",
-                    }}
+                    variant="data-primary"
                   >
                     {primaryTable.name}
                   </Typography>
                   {tableIds.length > 1 && (
                     <Typography
-                      variant="caption"
-                      sx={{
-                        color: "rgba(255,255,255,0.9)",
-                        fontSize: "11px",
-                        textShadow: "0 1px 2px rgba(0,0,0,0.3)",
-                      }}
+                      variant="data-secondary"
                     >
                       +{tableIds.length - 1} more table
                       {tableIds.length - 1 > 1 ? "s" : ""}
@@ -134,13 +123,7 @@ function TableDragPreview({ tableIds }) {
                   }}
                 >
                   <Typography
-                    variant="caption"
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: "12px",
-                      textShadow: "0 1px 2px rgba(0,0,0,0.5)",
-                    }}
+                    variant="data-small"
                   >
                     {tableIds.length}
                   </Typography>
@@ -174,13 +157,7 @@ function TableDragPreview({ tableIds }) {
           }}
         >
           <Typography
-            variant="caption"
-            sx={{
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "10px",
-              textShadow: "0 1px 2px rgba(0,0,0,0.5)",
-            }}
+            variant="data-micro"
           >
             +{tableIds.length - maxStackCount}
           </Typography>

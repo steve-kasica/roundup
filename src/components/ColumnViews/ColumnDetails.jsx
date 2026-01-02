@@ -158,7 +158,7 @@ const ColumnDetails = ({
           alignItems="center"
           sx={{ mb: 1 }}
         >
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography variant="data-secondary" color="text.secondary">
             Parent Table
           </Typography>
           <EnhancedTableName id={parentId} />
@@ -170,10 +170,10 @@ const ColumnDetails = ({
           alignItems="center"
           sx={{ mb: 1 }}
         >
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography variant="data-secondary" color="text.secondary">
             Column Type
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="data-secondary">
             {duckDBToRoundupTypes(columnType)}
           </Typography>
         </Stack>
@@ -184,10 +184,10 @@ const ColumnDetails = ({
           alignItems="center"
           sx={{ mb: 1 }}
         >
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography variant="data-secondary" color="text.secondary">
             Count
           </Typography>
-          <Typography variant="body2">{count.toLocaleString()}</Typography>
+          <Typography variant="data-secondary">{count.toLocaleString()}</Typography>
         </Stack>
         <Stack
           direction="row"
@@ -196,12 +196,12 @@ const ColumnDetails = ({
           alignItems="center"
           sx={{ mb: 1 }}
         >
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography variant="data-secondary" color="text.secondary">
             Mode
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography
-              variant="body2"
+              variant="data-secondary"
               title={modeValue !== null ? `${modeValue}` : "N/A"}
               sx={{
                 maxWidth: "100px",
@@ -222,10 +222,10 @@ const ColumnDetails = ({
           alignItems="center"
           sx={{ mb: 1 }}
         >
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography variant="data-secondary" color="text.secondary">
             Unique Values
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="data-secondary">
             {approxUnique.toLocaleString()}
           </Typography>
         </Stack>
@@ -292,7 +292,7 @@ const ColumnDetails = ({
       </Box>
       <Divider />
       <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Typography variant="h6" color="text.secondary">
+        <Typography variant="subsection-title" color="text.secondary">
           Values
         </Typography>
         <ToggleButtonGroup

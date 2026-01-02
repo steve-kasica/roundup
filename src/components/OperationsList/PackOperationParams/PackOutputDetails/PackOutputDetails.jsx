@@ -109,12 +109,10 @@ function PackOutputDetails({
           disabled={left_unjoined === 0}
         >
           <Typography
+            variant="label"
             component="span"
             sx={{
               width: `${marginLeft * 100}%`,
-              flexShrink: 0,
-              textAlign: "right",
-              paddingRight: "8px",
               fontSize,
             }}
           >
@@ -160,12 +158,10 @@ function PackOutputDetails({
           disabled={one_to_one_matches + many_to_many_matches === 0}
         >
           <Typography
+            variant="label"
             component="span"
             sx={{
               width: `${marginLeft * 100}%`,
-              flexShrink: 0,
-              textAlign: "right",
-              paddingRight: "8px",
               fontSize,
             }}
           >
@@ -213,12 +209,10 @@ function PackOutputDetails({
           disabled={right_unjoined === 0}
         >
           <Typography
+            variant="label"
             component="span"
             sx={{
               width: `${marginLeft * 100}%`,
-              flexShrink: 0,
-              textAlign: "right",
-              paddingRight: "8px",
               fontSize,
             }}
           >

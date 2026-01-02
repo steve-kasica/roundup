@@ -68,13 +68,9 @@ const TableLabel = ({
         </Badge>
       )}
       <Typography
-        variant="caption"
+        variant="data-secondary"
         component="div"
         sx={{
-          userSelect: "none",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
           ...(totalCount && {
             color: "warning.dark",
             fontWeight: "bold",

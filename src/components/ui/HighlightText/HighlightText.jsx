@@ -22,7 +22,6 @@
  * />
  */
 
-import { Typography } from "@mui/material";
 import PropTypes from "prop-types";
 
 export default function HighlightText({ pattern, text, matchSx }) {
@@ -43,13 +42,13 @@ export default function HighlightText({ pattern, text, matchSx }) {
 
     return (
       <>
-        <Typography component={"span"}>
+        <span>
           {beginning}
-          <Typography component={"span"} className="highlight" sx={matchSx}>
+          <span className="highlight" style={matchSx}>
             {middle}
-          </Typography>
+          </span>
           {end}
-        </Typography>
+        </span>
       </>
     );
   }

@@ -76,7 +76,7 @@ export default function SupportingPane() {
           flexShrink: 0,
         }}
       >
-        <Typography variant="h6" component="div">
+        <Typography variant="analytics-subsection-title" component="div">
           {APP_NAME}
         </Typography>
       </Box>
@@ -124,7 +124,7 @@ export default function SupportingPane() {
                       style={{ padding: "5px" }}
                     >
                       <Box display="flex" flexDirection="column" height="100%">
-                        <Typography variant="window-label">
+                        <Typography variant="analytics-data-secondary">
                           Composite Table Schema
                         </Typography>
                         <CompositeTableSchema />

@@ -223,23 +223,23 @@ const DragDropFileUpload = ({ handleFileUpload, acceptedTypes = "*" }) => {
             mb: 2,
           }}
         />
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="subsection-title" gutterBottom>
           {isDragActive
             ? "Drop files here"
             : "Drag & drop files here, or click to select"}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="data-secondary" color="text.secondary">
           Supports CSV files (max 100MB each)
         </Typography>
       </FileUploadZone>
 
       {errors.length > 0 && (
         <Alert severity="error" onClose={clearErrors} sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" gutterBottom>
+          <Typography variant="label" gutterBottom>
             Upload Errors:
           </Typography>
           {errors.map((error, index) => (
-            <Typography key={index} variant="body2">
+            <Typography key={index} variant="data-secondary">
               • {error}
             </Typography>
           ))}
@@ -248,12 +248,12 @@ const DragDropFileUpload = ({ handleFileUpload, acceptedTypes = "*" }) => {
 
       {Object.keys(uploadProgress).length > 0 && (
         <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" gutterBottom>
+          <Typography variant="label" gutterBottom>
             Uploading files...
           </Typography>
           {Object.entries(uploadProgress).map(([fileId, progress]) => (
             <Box key={fileId} sx={{ mb: 1 }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="data-secondary" color="text.secondary">
                 {fileId.split("-")[0]}
               </Typography>
               <LinearProgress variant="determinate" value={progress} />

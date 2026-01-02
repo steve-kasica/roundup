@@ -31,7 +31,6 @@ import DragDropFileUpload from "./DragDropFileUpload";
 import withAllTablesData from "./withAllTablesData";
 import { registerFiles } from "../../lib/duckdb";
 import {
-  Box,
   TableHead,
   TableRow,
   Table,
@@ -39,6 +38,7 @@ import {
   Button,
   TableBody,
   TableContainer,
+  Typography, 
 } from "@mui/material";
 import {
   ArrowDown01,
@@ -259,7 +259,6 @@ function TablesList({
                   <Button
                     color="inherit"
                     fullWidth
-                    sx={{ fontSize: "13px" }}
                     onClick={() => {
                       if (header.attr === sortAttribute) {
                         setIsAscending(!isAscending);
@@ -268,9 +267,9 @@ function TablesList({
                       }
                     }}
                   >
-                    {/* <Tooltip placement="top" title={header.tooltip}> */}
+                    <Typography variant="subsection-title">
                     {header.label}
-                    {/* </Tooltip> */}
+                    </Typography>
                     &nbsp;
                     <SortIcon
                       attr={header.attr}

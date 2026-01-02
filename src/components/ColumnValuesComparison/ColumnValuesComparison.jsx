@@ -177,12 +177,12 @@ const ColumnValuesComparison = ({ columnIds = [] }) => {
       padding={0.5}
       boxSizing={"border-box"}
     >
-      <Typography variant="window-title">Compare Columns</Typography>
-      <Typography variant="window-subtitle">
+      <Typography variant="section-title">Compare Columns</Typography>
+      <Typography variant="data-secondary">
         Compaing column values between tables
       </Typography>
       <br></br>
-      <Typography variant="window-section-title" sx={{ mb: 1 }}>
+      <Typography variant="subsection-title" sx={{ mb: 1 }}>
         Stats
       </Typography>
       <DescriptionList
@@ -195,7 +195,7 @@ const ColumnValuesComparison = ({ columnIds = [] }) => {
         }}
       />
       <Divider sx={{ my: 1 }} />
-      <Typography variant="window-section-title" sx={{ mb: 1 }}>
+      <Typography variant="subsection-title" sx={{ mb: 1 }}>
         Value Distribution
         <sup>
           <InfoIcon tooltipText="Shows the distribution of unique values across the selected columns." />
@@ -208,7 +208,7 @@ const ColumnValuesComparison = ({ columnIds = [] }) => {
         loading={loading}
       />
       <Divider sx={{ my: 1 }} />
-      <Typography variant="window-section-title" sx={{ mb: 1 }}>
+      <Typography variant="subsection-title" sx={{ mb: 1 }}>
         Value Matrix
         <sup>
           <InfoIcon tooltipText="Shows the proportion of non-null values versus null/missing values in this column. Higher completeness indicates fewer missing values." />

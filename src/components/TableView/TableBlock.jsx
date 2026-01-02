@@ -71,12 +71,8 @@ function TableBlock({
       }}
     >
       <Typography
-        variant="treemap label"
+        variant="data-small"
         sx={{
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          width: "100%",
           "@container (min-height: 15px)": {
             display: "block",
           },

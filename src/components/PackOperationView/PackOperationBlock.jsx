@@ -79,7 +79,7 @@ function PackOperationBlock({
     >
       {/* TODO: move these styles into a shared variant in theme */}
       <Typography
-        variant="treemap label"
+        variant="data-small"
         sx={{
           wordWrap: "none",
         }}

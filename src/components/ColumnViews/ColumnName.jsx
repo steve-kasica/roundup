@@ -92,17 +92,13 @@ const ColumnName = ({
       }}
     >
       <Typography
+        variant="data-secondary"
         onClick={handleClick}
         onMouseEnter={hoverColumn}
         onMouseLeave={unhoverColumn}
         title={text}
         sx={{
           cursor: onClick ? "pointer" : "default",
-          transition: "color 0.2s ease, text-decoration 0.2s ease",
-          userSelect: "none",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
           "&:hover": onClick
             ? {
                 color: "primary.main",
