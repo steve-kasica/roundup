@@ -1,15 +1,96 @@
 # Columns Slice
 
-This module contains JavaScript code related to columns in the global data state. It includes:
+This module manages column metadata in the global data state. Columns represent individual data fields within tables or operations and store metadata about types, statistics, and display properties.
 
-- `Column.js`: A serializable factory function for creating columns intended to be stored in Redux.
-- `columnSlice.js`:
-  - `byId`:
-  - `allIds`: an array of all column IDs
-- `selectors.js`: Memoized selectors for accessing data related to columns. This file of selectors includes selectors that return data related to columns, including selectors that work across multiple slices to return column Ids. Some of the more salient selectors include function to select columns that pretain to data-related partitions, e.g. hided vs. active columns.
+## Purpose
 
-Columns have a _polymorphic association_ between other objects, they can belong to either a table or an operation, but not both.
+The columns slice tracks:
 
-## Input normalization
+- Column metadata (name, type, statistics)
+- Parent relationships (table or operation)
+- Database mappings for query generation
 
-In some contexts, Roundup updates data state objects one at a time or multiple objects in a batch. In order to simplify our source code, we normalize the input of many reducers and selectors so that the codebase only passes a single string as an argument to return a single object or an array of objects to return an array of objects in return. This allows use to not write singular and plural versions of all reducers and selectors and is semantically more straightforward instead of passing just an array of one item in the singlteton context.
+## Polymorphic Association
+
+Columns have a _polymorphic association_ with their parent objects—they can belong to either a table or an operation, but not both. The `parentId` property stores the ID of the owning object.
+
+## State Structure
+
+```javascript
+{
+  allIds: ['c1', 'c2', 'c3', ...],
+  byId: {
+    'c1': {
+      id: 'c1',
+      parentId: 't1',
+      name: 'customer_id',
+      databaseName: 'customer_id',
+      columnType: 'NUMERICAL',
+      approxUnique: 1000,
+      ...
+    }
+  }
+}
+```
+
+## Column Properties
+
+| Property       | Type           | Description                                    |
+| -------------- | -------------- | ---------------------------------------------- |
+| `id`           | string         | Unique identifier with 'c' prefix              |
+| `parentId`     | string         | ID of parent table or operation                |
+| `name`         | string         | User-facing display name (mutable)             |
+| `databaseName` | string         | Actual column name in DuckDB                   |
+| `columnType`   | string \| null | Data type (NUMERICAL, CATEGORICAL, etc.)       |
+| `approxUnique` | number \| null | Approximate unique value count                 |
+| `min`          | any            | Minimum value (for numerical columns)          |
+| `max`          | any            | Maximum value (for numerical columns)          |
+| `topValues`    | array          | Most frequent values (for categorical columns) |
+
+## Column Types
+
+| Constant                  | Value           | Description        |
+| ------------------------- | --------------- | ------------------ |
+| `COLUMN_TYPE_NUMERICAL`   | `'NUMERICAL'`   | Numeric data       |
+| `COLUMN_TYPE_CATEGORICAL` | `'CATEGORICAL'` | Category/enum data |
+| `COLUMN_TYPE_DATE`        | `'DATE'`        | Date/time data     |
+| `COLUMN_TYPE_VARCHAR`     | `'VARCHAR'`     | Text/string data   |
+| `COLUMN_TYPE_BOOLEAN`     | `'BOOLEAN'`     | Boolean data       |
+
+## Reducers
+
+| Reducer         | Description                          |
+| --------------- | ------------------------------------ |
+| `addColumns`    | Adds column(s), throws on duplicates |
+| `updateColumns` | Updates existing column properties   |
+| `deleteColumns` | Removes columns by ID                |
+
+## Selectors
+
+| Selector                            | Description                                      |
+| ----------------------------------- | ------------------------------------------------ |
+| `selectColumnsById`                 | Returns column(s) by ID                          |
+| `selectColumnIdsByParentId`         | Returns all column IDs for a parent              |
+| `selectColumnNamesById`             | Returns database name(s) for column ID(s)        |
+| `selectSelectedColumnIdsByParentId` | Returns selected columns for a parent            |
+| `selectActiveColumnIdsByParentId`   | Returns active (non-hidden) columns for a parent |
+
+## Input Normalization
+
+Reducers and selectors accept both single values and arrays:
+
+```javascript
+// Both are valid:
+selectColumnsById(state, "c1"); // Returns single column
+selectColumnsById(state, ["c1", "c2"]); // Returns array of columns
+```
+
+This eliminates the need for singular/plural versions of functions.
+
+## Files
+
+| File              | Description                         |
+| ----------------- | ----------------------------------- |
+| `Column.js`       | Factory function and type constants |
+| `columnsSlice.js` | Redux slice with reducers           |
+| `selectors.js`    | Memoized selectors                  |
