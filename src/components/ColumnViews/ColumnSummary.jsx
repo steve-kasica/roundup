@@ -26,12 +26,9 @@
 
 /* eslint-disable react/prop-types */
 import { withColumnData, withAssociatedAlerts } from "../HOC";
-import { Box, Typography, Tooltip, Menu, Chip } from "@mui/material";
-import { Info } from "@mui/icons-material";
-import SingleBar from "../visualization/SingleBar";
-import { scaleLinear } from "d3";
+import { Box, Typography, Menu, Chip } from "@mui/material";
 import ColumnTypeIcon from "./ColumnTypeIcon";
-import StyledColumnCard from "./StyledColumnCard";
+import StyledColumnContainer from "./StyledColumnCard";
 import { ColumnContextMenuButton } from "../ui/buttons";
 import { useCallback, useState } from "react";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
@@ -117,7 +114,7 @@ const ColumnSummary = ({
     setMenuAnchorEl(null);
   }, []);
   return (
-    <StyledColumnCard
+    <StyledColumnContainer
       data-column-id={id}
       ref={dragDropRef}
       isHovered={isHovered}
@@ -165,7 +162,6 @@ const ColumnSummary = ({
             alignItems: "center",
             justifyContent: "space-between",
             userSelect: "none",
-            //   mb: 1,
           }}
         >
           <Box
@@ -269,7 +265,7 @@ const ColumnSummary = ({
           onHideColumn={onHideColumn}
         />
       </Menu>
-    </StyledColumnCard>
+    </StyledColumnContainer>
   );
 };
 

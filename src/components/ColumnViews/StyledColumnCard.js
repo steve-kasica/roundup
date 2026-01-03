@@ -1,6 +1,6 @@
 import { Box, styled } from "@mui/system";
 
-const StyledColumnCard = styled(Box, {
+const StyledColumnContainer = styled(Box, {
   shouldForwardProp: (prop) =>
     ![
       "isHovered",
@@ -40,6 +40,7 @@ const StyledColumnCard = styled(Box, {
     borderRadius: 0,
     ...theme.palette.column.default,
     cursor: isDragging ? "grabbing" : isDraggable ? "grab" : "pointer",
+    backgroundColor: '#ddd', // TODO: Set in theme
     // Column is hovered state
     ...(isHovered && {
       ...theme.palette.column.hovered,
@@ -79,4 +80,4 @@ const StyledColumnCard = styled(Box, {
   })
 );
 
-export default StyledColumnCard;
+export default StyledColumnContainer;
