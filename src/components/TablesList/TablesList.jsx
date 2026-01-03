@@ -27,9 +27,8 @@
 
 import { useCallback, useState } from "react";
 
-import DragDropFileUpload from "./DragDropFileUpload";
+
 import withAllTablesData from "./withAllTablesData";
-import { registerFiles } from "../../lib/duckdb";
 import {
   TableHead,
   TableRow,
@@ -38,7 +37,9 @@ import {
   Button,
   TableBody,
   TableContainer,
-  Typography, 
+  Typography,
+  Box,
+  LinearProgress,
 } from "@mui/material";
 import {
   ArrowDown01,
@@ -114,7 +115,6 @@ function TablesList({
   rowMax,
   columnMax,
   bytesMax,
-  createTables, // callback for creating tables from uploaded files
   deleteTables, // callback for deleting tables from Roundup
   addNewOperation, // callback for adding a new operation
   insertTablesInFocusedOperation, // callback for inserting tables into an existing operation
@@ -139,29 +139,6 @@ function TablesList({
       ? ascending(a[sortAttribute], b[sortAttribute])
       : descending(a[sortAttribute], b[sortAttribute])
   );
-
-  async function handleFileUpload(files) {
-    if (!files.length) return;
-    registerFiles(files)
-      .then(() =>
-        createTables(
-          files.map((f) => ({
-            source: "file upload",
-            name: f.name
-              .replace(/\.[^/.]+$/, "")
-              .replace(/[^a-zA-Z0-9_]/g, "_"),
-            fileName: f.name,
-            extension: f.name.split(".").pop().toLowerCase(),
-            size: f.size,
-            mimeType: f.type,
-            dateLastModified: f.lastModified,
-          }))
-        )
-      )
-      .catch((error) => {
-        alert("Error uploading files: " + error.message);
-      });
-  }
 
   const handleSelectAllClick = useCallback(() => {
     if (selectedTableIds.length > 0) {
@@ -196,21 +173,12 @@ function TablesList({
     clearSelectedTableIds();
   }, [insertTablesInFocusedOperation, selectedTableIds, clearSelectedTableIds]);
 
-  if (tables.length === 0) {
-    return (
-      <DragDropFileUpload
-        handleFileUpload={handleFileUpload}
-        acceptedTypes="*"
-      />
-    );
-  }
-
   return (
     <>
       <EnhancedTablesToolbar
         searchString={searchString}
         setSearchString={setSearchString}
-        onFileUpload={handleFileUpload}
+        // onFileUpload={handleFileUpload} TODO
         selectedTableIds={selectedTableIds}
         setSelectedTableIds={setSelectedTableIds}
         focusedObjectHasAlerts={focusedObjectHasAlerts}
@@ -267,7 +235,7 @@ function TablesList({
                       }
                     }}
                   >
-                    <Typography variant="subsection-title">
+                    <Typography variant="label">
                     {header.label}
                     </Typography>
                     &nbsp;

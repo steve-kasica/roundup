@@ -35,6 +35,7 @@ import {
   selectFocusedColumnIds,
   selectFocusedObjectId,
 } from "../../slices/uiSlice";
+import FileUpload from "../../components/FileUpload";
 // Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -83,11 +84,9 @@ export default function SupportingPane() {
 
       {/* Main Content Area */}
       <Box sx={{ flex: 1, overflow: "hidden" }}>
-        {/* If there are no uploaded tables, show the left sidebar at full width */}
+        {/* If there are no uploaded tables, show the fileUpload component */}
         {!isOpen ? (
-          <Box sx={{ height: "100%", width: "100%", overflow: "auto" }}>
-            <LeftSideBar />
-          </Box>
+            <FileUpload />
         ) : (
           <PanelGroup autoSaveId="SupportingPane" direction="horizontal">
             <Panel
