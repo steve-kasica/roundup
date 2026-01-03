@@ -1,12 +1,15 @@
 [submodule "example-workflows/2018-05-31-crime-and-heat-analysis"]
 	path = example-workflows/2018-05-31-crime-and-heat-analysis
 	url = git@github.com:steve-kasica/2018-05-31-crime-and-heat-analysis.git
+	branch = roundup
 [submodule "example-workflows/2019-04-democratic-candidate-codonors"]
 	path = example-workflows/2019-04-democratic-candidate-codonors
 	url = git@github.com:steve-kasica/2019-04-democratic-candidate-codonors.git
+	branch = roundup
 [submodule "example-workflows/babyname_politics"]
 	path = example-workflows/babyname_politics
 	url = git@github.com:steve-kasica/babyname_politics.git
+	branch = open-roundup
 [submodule "src/lib/hierarchy"]
 	path = src/lib/hierarchy
 	url = git@github.com:steve-kasica/d3-hierarchy.git
@@ -16,3 +19,4 @@
 [submodule "example-workflows/nyc-trips"]
 	path = example-workflows/nyc-trips
 	url = https://github.com/steve-kasica/nyc-trips
+	branch = roundup

@@ -178,7 +178,6 @@ function TablesList({
       <EnhancedTablesToolbar
         searchString={searchString}
         setSearchString={setSearchString}
-        // onFileUpload={handleFileUpload} TODO
         selectedTableIds={selectedTableIds}
         setSelectedTableIds={setSelectedTableIds}
         focusedObjectHasAlerts={focusedObjectHasAlerts}

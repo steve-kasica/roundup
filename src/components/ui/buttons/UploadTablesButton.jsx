@@ -20,25 +20,23 @@
  * />
  */
 
-import { Upload } from "@mui/icons-material";
+import { Upload, Close } from "@mui/icons-material";
+import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
 import TooltipIconButton from "./TooltipIconButton";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
+import FileUpload from "../../FileUpload";
 
 const UploadTablesButton = ({
-  onFileUpload,
   tooltipText = "Upload Tables",
 }) => {
-  const handleFileUpload = (event) => {
-    const files = event.target.files;
-    if (files && files.length > 0 && onFileUpload) {
-      onFileUpload(Array.from(files));
-    }
-    // Reset input value to allow selecting the same file again
-    event.target.value = "";
-  };
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const onClick = useCallback(() => {
-    document.getElementById("file-upload-input")?.click();
+    setDialogOpen(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setDialogOpen(false);
   }, []);
 
   return (
@@ -46,14 +44,26 @@ const UploadTablesButton = ({
       <TooltipIconButton tooltipText={tooltipText} onClick={onClick}>
         <Upload />
       </TooltipIconButton>
-      <input
-        type="file"
-        multiple
-        onChange={handleFileUpload}
-        style={{ display: "none" }}
-        id="file-upload-input"
-        accept=".csv"
-      />
+      <Dialog open={dialogOpen} onClose={handleClose} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ m: 0, p: 2 }}>
+          Upload Tables
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <FileUpload onComplete={() => setDialogOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

@@ -69,7 +69,6 @@ const TablesToolbar = ({
   insertTablesInFocusedOperation,
   // Props defined directly in parent component
   setSearchString,
-  onFileUpload,
   selectedTableIds = [],
   handleSelectAllClick,
   handleDeleteClick,
@@ -94,7 +93,7 @@ const TablesToolbar = ({
           // searchString={searchString}
           onChange={setSearchString}
         />
-        <UploadTablesButton onFileUpload={onFileUpload} />
+        <UploadTablesButton />
         <SelectToggleIconButton
           onClick={handleSelectAllClick}
           isSelected={selectedTableIds.length > 0}

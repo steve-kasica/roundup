@@ -39,9 +39,3 @@ A multi-file component module for uploading files via drag-and-drop or file brow
 | Size    | < 100MB              | "File too large (max 100MB)" |
 | Content | Valid delimiters     | "Unable to parse file"       |
 | Headers | First row as headers | "No headers detected"        |
-
-## Performance Considerations
-
-1. **Lazy Parsing**: Large files parsed incrementally
-2. **Background Import**: Imports run in Web Worker
-4. **Chunked Loading**: Very large files loaded in chunks
