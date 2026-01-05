@@ -231,13 +231,13 @@ export default function withOperationData(WrappedComponent) {
     });
 
     // Function to get a color based on depth within the operation tree
-    const colorScale = useCallback((depth) => {
-      const scale = scaleSequential(
-        [TREE_MAX_DEPTH, 0],
-        OPERATION_COLOR_PALETTE
-      );
-      return scale(depth);
-    }, []);
+    const colorScale = useCallback(
+      (depth) => {
+        const scale = scaleSequential([5, 0], OPERATION_COLOR_PALETTE);
+        return scale(depth);
+      },
+      [maxDepth]
+    );
 
     // Simple algorithm to determine if text should be light or dark based on background color
     const isDarkBackground = useCallback(

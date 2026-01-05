@@ -1,4 +1,5 @@
 import { Box, styled } from "@mui/material";
+import { BLOCK_BREAKPOINTS } from "../CompositeTableSchema/settings";
 
 const StyledBlock = styled(Box, {
   shouldForwardProp: (prop) => !["isFocused", "hasError"].includes(prop),
@@ -7,10 +8,8 @@ const StyledBlock = styled(Box, {
   flexDirection: "row",
   position: "relative",
   boxSizing: "border-box",
-  paddingTop: "5px",
-  paddingLeft: "5px",
-  paddingRight: "5px",
-  paddingBottom: "5px",
+  padding: "0.5%",
+  overflow: "hidden",
 }));
 
 export default StyledBlock;

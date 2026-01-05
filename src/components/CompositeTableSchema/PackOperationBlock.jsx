@@ -9,7 +9,7 @@
  * reflects that by placing children side-by-side with widths proportional to their
  * contribution to the final column count.
  *
- * @module components/PackOperationView/PackOperationBlock
+ * @module components/CompositeTableSchema/PackOperationBlock
  *
  * @example
  * <EnhancedPackOperationBlock
@@ -34,7 +34,7 @@ import { EnhancedTableBlock } from "../TableView";
 import { OPERATION_TYPE_PACK } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
 import { Typography, Box } from "@mui/material";
-import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
+import { EnhancedOperationBlock } from "./OperationBlock";
 import {
   withPackOperationData,
   withOperationData,

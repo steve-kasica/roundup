@@ -147,8 +147,8 @@ const ColumnTick = ({
   isDraggable,
   isNull,
   isVisible,
-  hoverColumn,
-  unhoverColumn,
+  // hoverColumn,
+  // unhoverColumn,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
   totalCount,
   sx = {},
@@ -165,8 +165,8 @@ const ColumnTick = ({
     isNull={isNull}
     isError={totalCount}
     isVisible={isVisible}
-    onMouseEnter={hoverColumn}
-    onMouseLeave={unhoverColumn}
+    // onMouseEnter={hoverColumn}
+    // onMouseLeave={unhoverColumn}
     sx={sx}
   />
 );

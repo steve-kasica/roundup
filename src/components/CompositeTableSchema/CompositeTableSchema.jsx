@@ -1,65 +1,11 @@
 /**
  * @fileoverview CompositeTableSchema Component
  *
- * An interactive hierarchical visualization of the table operation tree, displaying
- * how tables are combined through operations like STACK (union) and PACK (join).
- * This component serves as the main schema editor where users can add, remove, and
- * reorganize tables to build complex data transformations.
- *
- * The schema tree starts with a root operation that can be:
- * - NO_OP: Single table with no operations
- * - STACK: Multiple tables stacked vertically (union)
- * - PACK: Multiple tables packed horizontally (join)
- *
- * Features:
- * - Visual representation of operation hierarchy
- * - Drag-and-drop zones for adding tables
- * - Automatic layout management
- * - Error state handling (disables operations when errors exist)
- * - Material sync state awareness
+ * This component serves as the main entry point for the module. It renders the
+ * hierarchical schema visualization, including drop targets for adding tables
+ * via STACK or PACK operations.
  *
  * @module components/CompositeTableSchema/CompositeTableSchema
- *
- * @example
- * <CompositeTableSchema />
- */
-
-/**
- * CompositeTableSchema.js
- * ------------------------------------------------------------------------------------------------
- * An interactive hierarchical visualization of the table tree
- */
-
-import { useSelector } from "react-redux";
-import {
-  isOperationId,
-  OPERATION_TYPE_NO_OP,
-  OPERATION_TYPE_PACK,
-  OPERATION_TYPE_STACK,
-  selectRootOperation,
-} from "../../slices/operationsSlice";
-
-import TableDropTarget from "./TableDropTarget";
-import { Box, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
-import AddIcon from "@mui/icons-material/Add";
-import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
-import { selectAlertErrorCount } from "../../slices/alertsSlice";
-import { selectFocusedObjectId } from "../../slices/uiSlice";
-import { stack } from "d3";
-
-const gridColumns = 12;
-const gridWidth = gridColumns - 1;
-const stackDropTargetHeight = 50;
-
-/**
- * CompositeTableSchema Component
- *
- * Renders the main schema visualization with drop targets for adding tables
- * through STACK or PACK operations.
- *
- * @component
- * @returns {React.ReactElement} The complete schema visualization with drop zones
  *
  * @description
  * Layout structure:
@@ -78,6 +24,38 @@ const stackDropTargetHeight = 50;
  * - Empty state (no children): Shows only the appropriate drop target
  * - Single table: Can evolve to STACK or PACK when another table is added
  * - Errors: Drop zones are disabled until errors are resolved
+ *
+ * @example
+ * <CompositeTableSchema />
+ */
+
+import { useSelector } from "react-redux";
+import {
+  isOperationId,
+  OPERATION_TYPE_NO_OP,
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
+  selectRootOperation,
+} from "../../slices/operationsSlice";
+
+import TableDropTarget from "./TableDropTarget";
+import { Box, Typography } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import { EnhancedOperationBlock } from "./OperationBlock";
+import { selectAlertErrorCount } from "../../slices/alertsSlice";
+import { selectFocusedObjectId } from "../../slices/uiSlice";
+
+const stackDropTargetHeight = 50;
+
+/**
+ * CompositeTableSchema Component
+ *
+ * Renders the main schema visualization with drop targets for adding tables
+ * through STACK or PACK operations.
+ *
+ * @component
+ * @returns {React.ReactElement} The complete schema visualization with drop zones
+ *
  */
 export default function CompositeTableSchema() {
   const rootOperation = useSelector(selectRootOperation);

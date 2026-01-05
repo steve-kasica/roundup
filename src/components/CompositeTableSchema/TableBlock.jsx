@@ -12,16 +12,17 @@
  * - Integration with HOCs for data
  * - Compact tree node representation
  *
- * @module components/TableView/TableBlock
+ * @module components/CompositeTableSchema/TableBlock
  *
  * @example
  * <EnhancedTableBlock id={tableId} />
  */
 
-import { ColumnTick, EnhancedColumnTick } from "../ColumnViews";
+import { ColumnTick, EnhancedColumnTick } from "../ColumnViews/index.js";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
-import { withTableData, withAssociatedAlerts } from "../HOC";
+import { withTableData, withAssociatedAlerts } from "../HOC/index.js";
 import { Box, Typography } from "@mui/material";
+import { BLOCK_BREAKPOINTS } from "./settings.js";
 
 function TableBlock({
   // Props from withAssociatedAlerts via withTableData
@@ -35,11 +36,20 @@ function TableBlock({
   // Props passed directly from parent
   parentOperationType,
   parentColumnCount,
+  parentRowCount,
   sx = {},
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering TableBlock for table:", id);
   }
+  console.log("TableBlock render:", {
+    id,
+    name,
+    columnCount,
+    rowCount,
+    parentRowCount,
+  });
+  const height = (rowCount / parentRowCount) * 100; // height as percentage of parent operation's row count
   const ticks = Array.from(
     {
       length:
@@ -61,6 +71,7 @@ function TableBlock({
         position: "relative",
         containerType: "size",
         ...sx,
+        height: `${height}%`,
         // Visual indication of alerts
         ...(totalCount && {
           backgroundColor: "warning.light",
@@ -71,42 +82,43 @@ function TableBlock({
       <Typography
         variant="data-small"
         sx={{
-          // Float in top-left without affecting layout
-          position: "absolute",
-          top: 2,
-          left: 2,
-          zIndex: 1,
           // Inherit color to adapt to background changes
           color: "inherit",
           fontWeight: "bold",
-          "@container (min-height: 15px)": {
-            display: "block",
-          },
-          "@container (max-height: 14px)": {
-            display: "none",
-          },
-          "@container (max-width: 15px)": {
-            display: "none",
+          position: "absolute",
+          top: 4,
+          left: 4,
+          textAlign: "left",
+          whiteSpace: "nowrap",
+          wordBreak: "keep-all",
+          transition: "opacity 0.3s ease",
+          [`@container (max-height: ${BLOCK_BREAKPOINTS.HEIGHT.SMALL}px)`]: {
+            opacity: "0",
           },
         }}
       >
         {name || id}
-        {totalCount.length > 0 ? `⚠` : ""}
-        <br />
-        <Box
-          component="small"
-          fontWeight={"normal"}
-          sx={{
-            "@container (min-height: 40px)": {
-              display: "inline",
-            },
-            "@container (max-height: 39px)": {
-              display: "none",
-            },
-          }}
-        >
-          {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
-        </Box>
+      </Typography>
+      <Typography
+        variant="data-small"
+        component="small"
+        sx={{
+          position: "absolute",
+          top: 14,
+          left: 4,
+          whiteSpace: "nowrap",
+          color: "inherit",
+          wordBreak: "keep-all",
+          transition: "opacity 0.3s ease",
+          [`@container (max-height: ${BLOCK_BREAKPOINTS.HEIGHT.MEDIUM}px)`]: {
+            opacity: "0",
+          },
+          [`@container (max-width: ${BLOCK_BREAKPOINTS.WIDTH.SMALL}px)`]: {
+            opacity: "0",
+          },
+        }}
+      >
+        {`${columnCount.toLocaleString()} x ${rowCount.toLocaleString()}`}
       </Typography>
       {ticks.map((columnId, index) => {
         return columnId === null ? (
