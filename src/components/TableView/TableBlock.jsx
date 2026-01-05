@@ -35,7 +35,6 @@ function TableBlock({
   // Props passed directly from parent
   parentOperationType,
   parentColumnCount,
-  backgroundColor,
   sx = {},
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
@@ -60,19 +59,26 @@ function TableBlock({
         flexDirection: "row",
         alignItems: "stretch",
         position: "relative",
-        backgroundColor,
         containerType: "size",
+        ...sx,
         // Visual indication of alerts
         ...(totalCount && {
           backgroundColor: "warning.light",
           opacity: 0.9,
         }),
-        ...sx,
       }}
     >
       <Typography
         variant="data-small"
         sx={{
+          // Float in top-left without affecting layout
+          position: "absolute",
+          top: 2,
+          left: 2,
+          zIndex: 1,
+          // Inherit color to adapt to background changes
+          color: "inherit",
+          fontWeight: "bold",
           "@container (min-height: 15px)": {
             display: "block",
           },
@@ -89,8 +95,8 @@ function TableBlock({
         <br />
         <Box
           component="small"
+          fontWeight={"normal"}
           sx={{
-            color: "#555",
             "@container (min-height: 40px)": {
               display: "inline",
             },
@@ -103,28 +109,18 @@ function TableBlock({
         </Box>
       </Typography>
       {ticks.map((columnId, index) => {
-        const childSx = {
-          borderLeft: "1px dotted rgba(0, 0, 0, 0.1)",
-          ...(index === 0 && {
-            borderLeft: "none", // no border on the first tick, as it's the left edge
-          }),
-        };
         return columnId === null ? (
           <ColumnTick
             key={`empty-${index}`} // Ensure unique key even when columnId is null
             id={null}
             sx={{
-              ...childSx,
-              background:
-                "repeating-linear-gradient(45deg, #666, #666 10px, #888 10px, #888 20px)",
+              background: (theme) => theme.palette.error.main,
+              // background:
+              //   "repeating-linear-gradient(45deg, #666, #666 10px, #888 10px, #888 20px)",
             }}
           />
         ) : (
-          <EnhancedColumnTick
-            key={`${columnId}-${index}`}
-            id={columnId}
-            sx={childSx}
-          />
+          <EnhancedColumnTick key={`${columnId}-${index}`} id={columnId} />
         );
       })}
     </Box>

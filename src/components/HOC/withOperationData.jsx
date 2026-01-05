@@ -41,9 +41,14 @@ import {
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
 
-import { interpolateGreys, scaleSequential } from "d3";
+import { scaleSequential } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
+import {
+  TREE_MAX_DEPTH,
+  OPERATION_COLOR_PALETTE,
+  TEXT_LUMINANCE_THRESHOLD,
+} from "../../config";
 
 /**
  * Higher-Order Component that injects operation data, column data, alert data, and
@@ -66,6 +71,7 @@ import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
  *  - `maxDepth` (number): Maximum depth in the operation tree
  *  - `isRootOperation` (boolean): Whether this is the root operation
  *  - `colorScale` (function): `(depth) => color` - Function to get color based on depth
+ *  - `isDarkBackground` (function): `(depth) => boolean` - Function to determine if background is dark at a given depth
  *
  * Sync & Materialization Status:
  *  - `isMaterialized` (boolean): Whether the operation is materialized
@@ -99,6 +105,7 @@ import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
  * @returns {React.ComponentType} Enhanced component with operation-related props.
  *
  */
+
 export default function withOperationData(WrappedComponent) {
   function EnhancedComponent({ id, ...props }) {
     const dispatch = useDispatch();
@@ -224,13 +231,26 @@ export default function withOperationData(WrappedComponent) {
     });
 
     // Function to get a color based on depth within the operation tree
-    // Depends on `maxDepth`
-    const colorScale = useCallback(
+    const colorScale = useCallback((depth) => {
+      const scale = scaleSequential(
+        [TREE_MAX_DEPTH, 0],
+        OPERATION_COLOR_PALETTE
+      );
+      return scale(depth);
+    }, []);
+
+    // Simple algorithm to determine if text should be light or dark based on background color
+    const isDarkBackground = useCallback(
       (depth) => {
-        const scale = scaleSequential([maxDepth + 1, 0], interpolateGreys);
-        return scale(depth);
+        const backgroundColor = colorScale(depth);
+        const rgb = parseInt(backgroundColor.slice(1), 16); // Convert hex to integer
+        const r = (rgb >> 16) & 0xff;
+        const g = (rgb >> 8) & 0xff;
+        const b = rgb & 0xff;
+        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+        return luminance < TEXT_LUMINANCE_THRESHOLD;
       },
-      [maxDepth]
+      [colorScale]
     );
 
     // Sync & Materialization Status
@@ -429,6 +449,7 @@ export default function withOperationData(WrappedComponent) {
         maxDepth={maxDepth}
         isRootOperation={isRootOperation}
         colorScale={colorScale}
+        isDarkBackground={isDarkBackground}
         // Sync & Materialization Status
         isMaterialized={isMaterialized}
         isInSync={isInSync}

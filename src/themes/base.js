@@ -1,6 +1,10 @@
 import { createTheme } from "@mui/material";
 
 const baseTheme = createTheme({
+  palette: {
+    textLight: "#FFFFFF",
+    textDark: "#000000",
+  },
   typography: {
     fontFamily: ["Inter", "sans-serif"].join(","),
   },

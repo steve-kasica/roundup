@@ -65,6 +65,7 @@ function StackOperationBlock({
 
   // Props defined in `OperationBlock` parent component
   colorScale,
+  isDarkBackground,
 
   // Optional props passed recursively via parent operation
   // eslint-disable-next-line no-unused-vars
@@ -72,6 +73,9 @@ function StackOperationBlock({
   sx = {},
 }) {
   const isParentRender = isFocused || isRootOperation;
+  const useLightText = isDarkBackground(depth);
+  const childBackgroundColor = colorScale(depth + 1);
+  const useLightTextInChildren = isDarkBackground(depth + 1);
   return (
     <StyledBlock
       className="StackOperationBlock"
@@ -85,13 +89,19 @@ function StackOperationBlock({
         flexDirection: "column",
         boxSizing: "border-box",
         backgroundColor: colorScale(depth),
+        color: (theme) =>
+          useLightText ? theme.palette.textLight : theme.palette.textDark,
         cursor: focusedDepth > 0 ? "pointer" : "default",
         ...sx,
       }}
     >
-      <Typography variant="data-small">
-        {totalCount > 0 ? `⚠` : ""} {name || id} <br></br>
-        <small style={{ color: "#555" }}>
+      <Typography
+        variant="data-small"
+        sx={{ color: "inherit", fontWeight: "bold" }}
+      >
+        {name || id} {totalCount > 0 ? `⚠` : ""}
+        <br></br>
+        <small style={{ fontWeight: "normal" }}>
           {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
         </small>
       </Typography>
@@ -117,8 +127,14 @@ function StackOperationBlock({
                     id={id}
                     parentOperationType={OPERATION_TYPE_STACK}
                     parentColumnCount={columnCount}
-                    backgroundColor={colorScale(depth + 1)}
-                    sx={childSx}
+                    sx={{
+                      ...childSx,
+                      backgroundColor: childBackgroundColor,
+                      color: (theme) =>
+                        useLightTextInChildren
+                          ? theme.palette.textLight
+                          : theme.palette.textDark,
+                    }}
                   />
                 )}
               </React.Fragment>

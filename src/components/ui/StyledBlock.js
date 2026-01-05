@@ -7,10 +7,10 @@ const StyledBlock = styled(Box, {
   flexDirection: "row",
   position: "relative",
   boxSizing: "border-box",
-  paddingTop: "20px",
-  paddingLeft: "2px",
-  paddingRight: "2px",
-  paddingBottom: "2px",
+  paddingTop: "5px",
+  paddingLeft: "5px",
+  paddingRight: "5px",
+  paddingBottom: "5px",
 }));
 
 export default StyledBlock;
