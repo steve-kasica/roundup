@@ -2,7 +2,7 @@
  * @file config.js
  * @description Configuration constants for the entire application.
  */
-import { interpolateBlues } from "d3";
+import { interpolateBlues, schemeTableau10 } from "d3";
 
 /**
  * The maximum depth allowed for the operation tree.
@@ -20,4 +20,4 @@ export const TEXT_LUMINANCE_THRESHOLD = 186;
  * The color palette function for operations, using D3's interpolateBlues.
  * @type {function}
  */
-export const OPERATION_COLOR_PALETTE = interpolateBlues;
+export const OPERATION_COLOR_PALETTE = schemeTableau10;

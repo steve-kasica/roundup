@@ -21,7 +21,7 @@
 import { ColumnTick, EnhancedColumnTick } from "../ColumnViews/index.js";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
 import { withTableData, withAssociatedAlerts } from "../HOC/index.js";
-import { Box, Typography } from "@mui/material";
+import { Box, darken, Typography } from "@mui/material";
 import { BLOCK_BREAKPOINTS } from "./settings.js";
 
 function TableBlock({
@@ -33,23 +33,18 @@ function TableBlock({
   columnIds,
   columnCount,
   rowCount,
+  operationIndex,
   // Props passed directly from parent
   parentOperationType,
   parentColumnCount,
+  // Parent row count will be null if parent operation is a NO_OP (single table)
   parentRowCount,
   sx = {},
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering TableBlock for table:", id);
   }
-  console.log("TableBlock render:", {
-    id,
-    name,
-    columnCount,
-    rowCount,
-    parentRowCount,
-  });
-  const height = (rowCount / parentRowCount) * 100; // height as percentage of parent operation's row count
+  const height = (rowCount / parentRowCount || rowCount) * 100; // height as percentage of parent operation's row count
   const ticks = Array.from(
     {
       length:
@@ -120,19 +115,29 @@ function TableBlock({
       >
         {`${columnCount.toLocaleString()} x ${rowCount.toLocaleString()}`}
       </Typography>
-      {ticks.map((columnId, index) => {
+      {ticks.map((columnId, index, array) => {
+        const sx = {
+          borderRight: index < array.length - 1 ? "1px solid" : "none",
+        };
         return columnId === null ? (
           <ColumnTick
             key={`empty-${index}`} // Ensure unique key even when columnId is null
             id={null}
+            isNull={true}
             sx={{
-              background: (theme) => theme.palette.error.main,
-              // background:
-              //   "repeating-linear-gradient(45deg, #666, #666 10px, #888 10px, #888 20px)",
+              ...sx,
             }}
           />
         ) : (
-          <EnhancedColumnTick key={`${columnId}-${index}`} id={columnId} />
+          <EnhancedColumnTick
+            key={`${columnId}-${index}`}
+            id={columnId}
+            sx={{
+              ...sx,
+              borderColor: (theme) =>
+                darken(theme.palette.operationColors[operationIndex], 0.1),
+            }}
+          />
         );
       })}
     </Box>

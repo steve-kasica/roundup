@@ -8,7 +8,6 @@ const StyledBlock = styled(Box, {
   flexDirection: "row",
   position: "relative",
   boxSizing: "border-box",
-  padding: "0.5%",
   overflow: "hidden",
 }));
 

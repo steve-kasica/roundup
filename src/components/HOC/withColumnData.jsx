@@ -35,12 +35,24 @@ import {
 import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import { useCallback, useMemo } from "react";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectOperationsById } from "../../slices/operationsSlice";
 
 export default function withColumnData(WrappedComponent) {
   function EnhancedComponent({ id, ...props }) {
     const dispatch = useDispatch();
 
     const column = useSelector((state) => selectColumnsById(state, id));
+
+    // TODO: memoize
+    const operationIndex = useSelector((state) => {
+      if (isTableId(column.parentId)) {
+        const parent = selectTablesById(state, column.parentId);
+        return state.operations.allIds.indexOf(parent.parentId);
+      } else {
+        return state.operations.allIds.indexOf(column.parentId);
+      }
+    });
 
     // Identity and metadata
     // --------------------------------------------------------------------
@@ -321,6 +333,7 @@ export default function withColumnData(WrappedComponent) {
       <WrappedComponent
         id={id}
         // Identity and metadata
+        operationIndex={operationIndex}
         parentId={parentId}
         databaseName={databaseName}
         name={name}

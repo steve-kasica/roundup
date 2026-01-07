@@ -65,7 +65,14 @@ export default function SupportingPane() {
   const isOpen = tables.length > 0;
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: (theme) => theme.palette.background.default, // TODO: apply to whole app?
+      }}
+    >
       {/* Header */}
       <Box
         sx={{
@@ -86,7 +93,7 @@ export default function SupportingPane() {
       <Box sx={{ flex: 1, overflow: "hidden" }}>
         {/* If there are no uploaded tables, show the fileUpload component */}
         {!isOpen ? (
-            <FileUpload />
+          <FileUpload />
         ) : (
           <PanelGroup autoSaveId="SupportingPane" direction="horizontal">
             <Panel

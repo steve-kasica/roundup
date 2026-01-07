@@ -47,10 +47,7 @@ import { BLOCK_BREAKPOINTS } from "./settings.js";
 
 function StackOperationBlock({
   // Props defined in `withOperationData` HOC
-  id,
   isFocused,
-  isRootOperation,
-  name,
   rowCount,
   depth,
   focusedDepth,
@@ -62,7 +59,6 @@ function StackOperationBlock({
   totalCount,
 
   // Props defined in `OperationBlock` parent component
-  colorScale,
   isDarkBackground,
 
   // Optional props passed recursively via parent operation
@@ -73,7 +69,6 @@ function StackOperationBlock({
 }) {
   const height = parentRowCount ? (rowCount / parentRowCount) * 100 : 100; // height as percentage of parent operation's row count
   const useLightText = isDarkBackground(depth);
-  const childBackgroundColor = colorScale(depth + 1);
   const useLightTextInChildren = isDarkBackground(depth + 1);
   return (
     <StyledBlock
@@ -87,7 +82,6 @@ function StackOperationBlock({
       sx={{
         flexDirection: "column",
         boxSizing: "border-box",
-        backgroundColor: colorScale(depth),
         containerType: "size",
         color: (theme) =>
           useLightText ? theme.palette.textLight : theme.palette.textDark,
@@ -96,35 +90,6 @@ function StackOperationBlock({
         ...sx,
       }}
     >
-      <Typography
-        variant="data-small"
-        sx={{
-          // Inherit color to adapt to background changes
-          color: "inherit",
-          fontWeight: "bold",
-          textAlign: "left",
-          whiteSpace: "nowrap",
-          wordBreak: "keep-all",
-          [`@container (max-height: ${BLOCK_BREAKPOINTS.HEIGHT.SMALL}px)`]: {
-            opacity: "0",
-          },
-        }}
-      >
-        {name || id}&nbsp;
-        <Typography
-          variant="data-small"
-          component="small"
-          sx={{
-            color: "inherit",
-            transition: "opacity 0.3s ease",
-            [`@container (max-width: ${BLOCK_BREAKPOINTS.WIDTH.SMALL}px)`]: {
-              opacity: "0",
-            },
-          }}
-        >
-          {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
-        </Typography>
-      </Typography>
       <Box
         sx={{
           flex: 1,
@@ -138,7 +103,7 @@ function StackOperationBlock({
           },
         }}
       >
-        {childIds.map((id, index, array) => {
+        {childIds.map((id) => {
           return (
             <React.Fragment key={id}>
               {isOperationId(id) ? (
@@ -155,7 +120,6 @@ function StackOperationBlock({
                   parentColumnCount={columnCount}
                   parentRowCount={rowCount}
                   sx={{
-                    backgroundColor: childBackgroundColor,
                     color: (theme) =>
                       useLightTextInChildren
                         ? theme.palette.textLight

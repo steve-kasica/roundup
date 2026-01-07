@@ -26,10 +26,7 @@
 
 /* eslint-disable react/prop-types */
 import { withColumnData, withAssociatedAlerts } from "../HOC";
-import { Box, Typography, Tooltip, Menu, Chip } from "@mui/material";
-import { Info } from "@mui/icons-material";
-import SingleBar from "../visualization/SingleBar";
-import { scaleLinear } from "d3";
+import { Box, Typography, Menu, Chip } from "@mui/material";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 import StyledColumnCard from "./StyledColumnCard";
 import { ColumnContextMenuButton } from "../ui/buttons";
@@ -76,6 +73,7 @@ import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
  */
 const ColumnSummary = ({
   topValues,
+  operationIndex,
   name,
   databaseName,
   columnType,
@@ -134,6 +132,7 @@ const ColumnSummary = ({
       // TODO: why does this cause a re-render when it's not used?
       onMouseEnter={hoverColumn}
       onMouseLeave={unhoverColumn}
+      operationIndex={operationIndex}
       sx={{
         cursor: isSelected ? "grab" : "pointer",
         boxShadow: 0,
@@ -221,10 +220,7 @@ const ColumnSummary = ({
             },
           }}
         >
-          <Typography
-            variant="data-small"
-            component="div"
-          >
+          <Typography variant="data-small" component="div">
             {/* TODO: should I use Chips instead of comma b/c values may include commas */}
             {topValues ? topValues.map(({ value }) => value).join(", ") : ""}
             {(topValues && topValues.length) || 0 > 10 ? ", ..." : ""}

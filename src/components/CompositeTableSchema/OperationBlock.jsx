@@ -65,12 +65,8 @@ const OperationBlock = ({
   } else if (operationType === OPERATION_TYPE_PACK) {
     return <EnhancedPackOperationBlock {...props} />;
   } else {
-    const backgroundColor = colorScale(depth);
     return (
-      <EnhancedTableBlock
-        id={childIds[0]}
-        sx={{ height: "100%", backgroundColor }}
-      />
+      <EnhancedTableBlock id={childIds[0]} parentRowCount={props.rowCount} />
     );
   }
 };

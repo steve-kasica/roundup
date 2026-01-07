@@ -41,7 +41,7 @@ import {
   CREATION_MODE_INSERTION,
 } from "../../sagas/createColumnsSaga";
 
-import { scaleSequential } from "d3";
+import { scaleOrdinal, scaleSequential } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import {
@@ -230,13 +230,21 @@ export default function withOperationData(WrappedComponent) {
       return id === selectRootOperationId(state);
     });
 
+    // TODO: memoize?
+    const allOperationIds = useSelector((state) => {
+      return state.operations.allIds;
+    });
+
     // Function to get a color based on depth within the operation tree
     const colorScale = useCallback(
-      (depth) => {
-        const scale = scaleSequential([5, 0], OPERATION_COLOR_PALETTE);
-        return scale(depth);
+      (operationId) => {
+        const scale = scaleOrdinal(allOperationIds, OPERATION_COLOR_PALETTE);
+        // const scale = scaleOrdinal(, )
+        // const scale = scaleSequential([5, 0], OPERATION_COLOR_PALETTE);
+        // return scale(depth);
+        return scale(operationId);
       },
-      [maxDepth]
+      [allOperationIds]
     );
 
     // Simple algorithm to determine if text should be light or dark based on background color

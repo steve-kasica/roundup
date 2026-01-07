@@ -1,4 +1,4 @@
-import { Box, styled } from "@mui/system";
+import { Box, darken, lighten, styled } from "@mui/system";
 
 const StyledColumnCard = styled(Box, {
   shouldForwardProp: (prop) =>
@@ -14,6 +14,7 @@ const StyledColumnCard = styled(Box, {
       "isNull",
       "isDraggable",
       "isError",
+      "operationIndex",
     ].includes(prop),
 })(
   ({
@@ -29,6 +30,7 @@ const StyledColumnCard = styled(Box, {
     isFocused,
     isDraggable,
     isError,
+    operationIndex,
   }) => ({
     // padding: 4,
     flex: "1 1 0",
@@ -38,27 +40,46 @@ const StyledColumnCard = styled(Box, {
     flexDirection: "column",
     overflow: "hidden",
     borderRadius: 0,
-    ...theme.palette.column.default,
     cursor: isDragging ? "grabbing" : isDraggable ? "grab" : "pointer",
+    transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+    opacity: 1,
+
+    // Define column container default styles
+    backgroundColor:
+      operationIndex !== undefined
+        ? theme.palette.operationColors[operationIndex]
+        : theme.palette.orphanedTableBackgroundColor,
     // Column is hovered state
     ...(isHovered && {
-      ...theme.palette.column.hovered,
+      backgroundColor: lighten(
+        operationIndex !== undefined
+          ? theme.palette.operationColors[operationIndex]
+          : theme.palette.orphanedTableBackgroundColor,
+        0.3
+      ),
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+      transform: "scale(1.01)",
     }),
     // Column is selected state
     ...(isSelected && {
-      ...theme.palette.column.selected,
+      backgroundColor: lighten(
+        operationIndex !== undefined
+          ? theme.palette.operationColors[operationIndex]
+          : theme.palette.orphanedTableBackgroundColor,
+        0.4
+      ),
     }),
     // Column is being dragged state
     ...(isDragging && {
-      ...theme.palette.column.dragging,
+      opacity: 0,
     }),
     // Column is a valid drop target state
     ...(isDropTarget && {
-      ...theme.palette.column.dropTarget,
+      outline: `2px solid ${"#ddd"}`,
     }),
     // Column is over a drop target state
     ...(isOver && {
-      ...theme.palette.column.overDropTarget,
+      backgroundColor: "blue",
     }),
     ...(isLoading && {
       ...theme.palette.column.loading,
@@ -67,12 +88,15 @@ const StyledColumnCard = styled(Box, {
       ...theme.palette.column.error,
     }),
     ...(isFocused && {
-      ...theme.palette.column.focused,
+      outline: "2px solid #000",
+      transform: "scale(1.05)",
+      zIndex: 1000,
     }),
     ...(isVisible === false && {
       ...theme.palette.column.hidden,
     }),
     ...(isNull && {
+      backgroundColor: "black",
       fontStyle: "italic",
       color: theme.palette.text.disabled,
     }),

@@ -29,6 +29,7 @@ import {
 } from "../../sagas/createColumnsSaga";
 import { setFocusedObjectId } from "../../slices/uiSlice";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
+import { scaleOrdinal } from "d3";
 
 /**
  * @typedef {Object} TableDataProps
@@ -71,6 +72,11 @@ export default function withTableData(WrappedComponent) {
 
     // Get table data from the Redux store
     const table = useSelector((state) => selectTablesById(state, id));
+    const allOperationIds = useSelector((state) => state.operations.allIds);
+
+    const operationIndex = allOperationIds.findIndex((opId) =>
+      table ? opId === table.parentId : false
+    );
 
     // Table identity and metadata
     // ------------------------------------------------------------
@@ -319,6 +325,7 @@ export default function withTableData(WrappedComponent) {
         databaseName={databaseName}
         name={name}
         fileName={fileName}
+        operationIndex={operationIndex}
         extension={extension}
         size={size}
         mimeType={mimeType}

@@ -45,29 +45,18 @@ import StyledBlock from "../ui/StyledBlock";
 function PackOperationBlock({
   // props via withOperationData
   childIds,
-  id,
-  name,
   depth,
   isFocused,
-  isRootOperation,
-  rowCount,
   isDarkBackground,
-  colorScale,
   // Props via withPackOperationData
   leftColumnCount,
   rightColumnCount,
   columnCount,
   // Props via withAssociatedAlerts HOC
   totalCount,
-  // Props passed via parent
-  parentColumnCount,
-  // colorScale,
   sx = {},
 }) {
-  const rowCountDisplay = rowCount?.toLocaleString() || "???";
-  const columnCountDisplay = columnCount?.toLocaleString() || "???";
   const useLightText = isDarkBackground(depth);
-  const childBackgroundColor = colorScale(depth + 1);
   const useLightTextInChildren = isDarkBackground(depth + 1);
 
   return (
@@ -78,29 +67,11 @@ function PackOperationBlock({
       sx={{
         flexDirection: "column",
         justifyContent: "flex-start",
-        // alignItems: "stretch",
-        backgroundColor: colorScale(depth),
         color: (theme) =>
           useLightText ? theme.palette.textLight : theme.palette.textDark,
         ...sx,
       }}
     >
-      <Typography
-        variant="data-small"
-        component={"div"}
-        sx={{
-          color: "inherit",
-          fontWeight: "bold",
-          wordWrap: "none",
-        }}
-      >
-        {name || id} {totalCount > 0 ? `⚠` : ""}
-        <br></br>
-        <small style={{ fontWeight: "normal" }}>
-          {columnCountDisplay.toLocaleString()} x{" "}
-          {rowCountDisplay.toLocaleString()}
-        </small>
-      </Typography>
       <Box
         display={"flex"}
         flexDirection={"row"}
@@ -124,10 +95,8 @@ function PackOperationBlock({
                 isDraggable={false}
                 parentOperationType={OPERATION_TYPE_PACK}
                 parentColumnCount={columnCount}
-                backgroundColor={colorScale(depth + 1)}
                 sx={{
                   ...childSx,
-                  backgroundColor: childBackgroundColor,
                   color: (theme) =>
                     useLightTextInChildren
                       ? theme.palette.textLight

@@ -443,9 +443,6 @@ const TableSchema = ({
                         handleInsertColumnRight={(value) =>
                           insertColumn(i + 1, value)
                         }
-                        sx={{
-                          backgroundColor: "#fff",
-                        }}
                       />
                     </ColumnDragContainer>
                   </>
