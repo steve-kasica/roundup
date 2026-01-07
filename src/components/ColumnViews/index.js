@@ -8,4 +8,4 @@ export * from "../CompositeTableSchema/ColumnTick";
 export * from "./ColumnTypeIcon";
 export * from "./ColumnValueCounts";
 export * from "./ColumnValues";
-export { default as StyledColumnCard } from "./StyledColumnCard";
+export { default as StyledColumnContainer } from "./StyledColumnContainer";

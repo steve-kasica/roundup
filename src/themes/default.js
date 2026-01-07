@@ -1,15 +1,9 @@
-import { createTheme, lighten } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 import baseTheme from "./base";
 // import typography, { variantMapping } from "./typography";
 
 // colors
-const loadingColor = "#fff3e0";
 const selectedColor = "rgb(198, 228, 252)";
-const hoverColor = lighten(selectedColor, 0.7);
-const draggingColor = "#ff9800";
-const dropTargetColor = "#4caf50";
-const errorColor = "#f44336";
-const focusedColor = "#fbc02d";
 
 // Extend theme with column palette that references base theme
 const theme = createTheme(baseTheme, {
@@ -27,45 +21,6 @@ const theme = createTheme(baseTheme, {
       "#17becf",
     ],
     orphanedTableBackgroundColor: "#e0e0e0",
-    // Column-specific state colors
-    column: {
-      dropTarget: {
-        outline: `2px solid ${dropTargetColor}`,
-        background: lighten(dropTargetColor, 0.85),
-        // borderStyle: "dashed",
-        // outlineWidth: "1px",
-        // outlineColor: baseTheme.palette.action.dropTargetColor,
-        // outlineStyle: "dashed",
-        // boxShadow: "0 2px 4px rgba(76, 175, 80, 0.3)",
-      },
-      overDropTarget: {
-        // backgroundColor: lighten(
-        //   baseTheme.palette.action.dropTargetColor,
-        //   0.85
-        // ),
-        // outlineColor: baseTheme.palette.action.dropTargetColor,
-        // outlineStyle: "dashed",
-        boxShadow: "0 2px 4px rgba(76, 175, 80, 0.3)",
-        transform: "scale(1.05)",
-      },
-      loading: {
-        // background: lighten(baseTheme.palette.action.loadingColor, 0.85),
-        // outlineColor: baseTheme.palette.action.loadingColor,
-        animation: "pulse 1.5s ease-in-out infinite",
-        "@keyframes pulse": {
-          "0%": { opacity: 0.6 },
-          "50%": { opacity: 1 },
-          "100%": { opacity: 0.6 },
-        },
-      },
-      null: {
-        // background: "#fafafa", // Very light grey
-        border: "#bdbdbd", // Grey
-      },
-      hidden: {
-        // opacity: 0.3,
-      },
-    },
   },
   typography: {
     // ============================================

@@ -159,9 +159,21 @@ export const isColumnIdDropTarget = createSelector(
   (dropTargetColumnIds, columnId) => dropTargetColumnIds.includes(columnId)
 );
 
+/**
+ * Selector to determine if a specific column ID is currently focused.
+ *
+ * @function
+ * @param {Object} state - The Redux state.
+ * @param {string|number} columnId - The ID of the column to check.
+ * @returns {boolean|undefined} True if the column ID is focused, false if not focused,
+ *                              or undefined if no columns are focused.
+ */
 export const isColumnIdFocused = createSelector(
   [(state) => selectFocusedColumnIds(state), (state, columnId) => columnId],
-  (focusedColumnIds, columnId) => focusedColumnIds.includes(columnId)
+  (focusedColumnIds, columnId) =>
+    focusedColumnIds.length > 0
+      ? focusedColumnIds.includes(columnId)
+      : undefined
 );
 
 export const isColumnIdVisible = createSelector(

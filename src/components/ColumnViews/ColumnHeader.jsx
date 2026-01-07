@@ -31,7 +31,7 @@ import { MoreVert } from "@mui/icons-material";
 import { withColumnData, withAssociatedAlerts } from "../HOC";
 import { EnhancedColumnName } from "./ColumnName";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
-import StyledColumnCard from "./StyledColumnCard";
+import StyledColumnContainer from "./StyledColumnContainer";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 
 /**
@@ -100,7 +100,7 @@ const ColumnHeader = ({
 
   return (
     <>
-      <StyledColumnCard
+      <StyledColumnContainer
         isHovered={isHovered}
         isDragging={isDragging}
         isDropTarget={isDropTarget}
@@ -156,7 +156,7 @@ const ColumnHeader = ({
           <MoreVert fontSize="small" />
         </IconButton>
         {/* </Box> */}
-      </StyledColumnCard>
+      </StyledColumnContainer>
       {/* Context Menu */}
       <Menu
         anchorEl={menuAnchorEl}

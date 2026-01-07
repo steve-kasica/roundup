@@ -1,6 +1,6 @@
 import { Box, darken, lighten, styled } from "@mui/system";
 
-const StyledColumnCard = styled(Box, {
+const StyledColumnContainer = styled(Box, {
   shouldForwardProp: (prop) =>
     ![
       "isHovered",
@@ -40,15 +40,15 @@ const StyledColumnCard = styled(Box, {
     flexDirection: "column",
     overflow: "hidden",
     borderRadius: 0,
-    cursor: isDragging ? "grabbing" : isDraggable ? "grab" : "pointer",
     transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
-    opacity: 1,
 
     // Define column container default styles
+    cursor: "pointer",
     backgroundColor:
       operationIndex !== undefined
         ? theme.palette.operationColors[operationIndex]
         : theme.palette.orphanedTableBackgroundColor,
+    opacity: isFocused === false ? 0.5 : 1,
     // Column is hovered state
     ...(isHovered && {
       backgroundColor: lighten(
@@ -68,9 +68,13 @@ const StyledColumnCard = styled(Box, {
         0.4
       ),
     }),
+    ...(isDraggable && {
+      cursor: "grab",
+    }),
     // Column is being dragged state
     ...(isDragging && {
       opacity: 0,
+      cursor: "grabbing",
     }),
     ...(isDropTarget && {
       outline: `2px solid ${darken(
@@ -100,20 +104,17 @@ const StyledColumnCard = styled(Box, {
     ...(isOver && {
       transform: "scale(1.03)",
     }),
-    ...(isLoading && {
-      ...theme.palette.column.loading,
-    }),
-    ...(isError && {
-      ...theme.palette.column.error,
-    }),
+    ...(isLoading && {}),
+    ...(isError && {}),
     ...(isFocused && {
-      outline: "2px solid #000",
-      transform: "scale(1.05)",
+      outlineWidth: "2px",
+      outlineStyle: "solid",
+      outlineColor:
+        theme.palette.operationColors[operationIndex] ||
+        theme.palette.orphanedTableBackgroundColor,
       zIndex: 1000,
     }),
-    ...(isVisible === false && {
-      ...theme.palette.column.hidden,
-    }),
+    ...(isVisible === false && {}),
     ...(isNull && {
       backgroundColor: "black",
       fontStyle: "italic",
@@ -122,4 +123,4 @@ const StyledColumnCard = styled(Box, {
   })
 );
 
-export default StyledColumnCard;
+export default StyledColumnContainer;

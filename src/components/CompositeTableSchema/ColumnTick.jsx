@@ -20,7 +20,7 @@
  */
 
 import { withColumnData } from "../HOC";
-import { StyledColumnCard } from "../ColumnViews";
+import { StyledColumnContainer } from "../ColumnViews";
 import { lighten } from "@mui/material";
 
 const ColumnTick = ({
@@ -41,7 +41,7 @@ const ColumnTick = ({
   operationIndex,
   sx = {},
 }) => (
-  <StyledColumnCard
+  <StyledColumnContainer
     isHovered={isHovered}
     isDragging={isDragging}
     isDropTarget={isDropTarget}

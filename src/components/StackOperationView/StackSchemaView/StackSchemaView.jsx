@@ -14,7 +14,10 @@ import {
   getIndexOfValue,
 } from "../selectionUtils/selectionUtils";
 import { EnhancedTableLabel } from "../../TableView";
-import { EnhancedColumnSummary, StyledColumnCard } from "../../ColumnViews";
+import {
+  EnhancedColumnSummary,
+  StyledColumnContainer,
+} from "../../ColumnViews";
 import ColumnDragContainer from "../../ColumnViews/ColumnDragContainer";
 import { isTableId } from "../../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../OperationView/OperationLabel";
@@ -313,7 +316,10 @@ const StackSchemaView = ({
                         boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.08)",
                       }}
                     >
-                      <Typography variant="data-small" sx={{ userSelect: "none" }}>
+                      <Typography
+                        variant="data-small"
+                        sx={{ userSelect: "none" }}
+                      >
                         {colIndex + 1}
                       </Typography>
                     </StyledTableCell>
@@ -466,7 +472,7 @@ const StackSchemaView = ({
                       // Column is Null
                       return (
                         <StyledTableCell key={`null-${rowIndex}-${colIndex}`}>
-                          <StyledColumnCard
+                          <StyledColumnContainer
                             isError={true}
                             sx={{
                               display: "flex",
@@ -499,7 +505,7 @@ const StackSchemaView = ({
                                 Schema Mismatch
                               </Typography>
                             </Box>
-                          </StyledColumnCard>
+                          </StyledColumnContainer>
                         </StyledTableCell>
                       );
                     } else {
