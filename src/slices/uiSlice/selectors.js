@@ -154,9 +154,21 @@ export const isColumnIdDragging = createSelector(
   (draggingColumnIds, columnId) => draggingColumnIds.includes(columnId)
 );
 
+/**
+ * Selector to determine if a specific column ID is currently a drop target.
+ *
+ * @function
+ * @param {Object} state - The Redux state.
+ * @param {string|number} columnId - The ID of the column to check.
+ * @returns {boolean|undefined} True if the column ID is a drop target, false if not,
+ *                              or undefined if there are no drop targets.
+ */
 export const isColumnIdDropTarget = createSelector(
-  [(state) => selectDropTargetColumnIds(state), (state, columnId) => columnId],
-  (dropTargetColumnIds, columnId) => dropTargetColumnIds.includes(columnId)
+  [(state) => selectDropTargetColumnIds(state), (_state, columnId) => columnId],
+  (dropTargetColumnIds, columnId) =>
+    dropTargetColumnIds.length > 0
+      ? dropTargetColumnIds.includes(columnId)
+      : undefined
 );
 
 /**

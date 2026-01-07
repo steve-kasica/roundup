@@ -45,7 +45,6 @@ import {
   removeFromHoveredColumnIds,
   setDraggingColumnIds,
   setDropTargetColumnIds,
-  selectDropTargetColumnIds,
   setHoveredColumnIds,
   setSelectedColumnIds,
 } from "../../slices/uiSlice";
@@ -103,16 +102,6 @@ const ColumnDragContainer = withColumnData(
     const siblingColumnIds = useMemo(() => {
       return parentColumnIds.filter((cid) => cid !== id);
     }, [parentColumnIds, id]);
-
-    const dropTargetColumnIds = useSelector((state) =>
-      selectDropTargetColumnIds(state)
-    );
-
-    // Check if this column is a drop target
-    const canDropHere = useMemo(
-      () => dropTargetColumnIds.includes(id),
-      [dropTargetColumnIds, id]
-    );
 
     // Drag functionality
     const [, drag] = useDrag({
@@ -201,7 +190,6 @@ const ColumnDragContainer = withColumnData(
     if (isValidElement(children)) {
       return cloneElement(children, {
         dragDropRef,
-        canDropHere,
         ...children.props,
       });
     }

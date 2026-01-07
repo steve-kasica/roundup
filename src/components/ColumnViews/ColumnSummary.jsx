@@ -88,7 +88,7 @@ const ColumnSummary = ({
   isSelected,
   isDragging,
   isOver,
-  canDropHere: isDropTarget,
+  isDropTarget,
   isDraggable = false,
   isError = false,
   isFocused,

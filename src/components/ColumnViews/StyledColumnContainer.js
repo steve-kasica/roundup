@@ -48,7 +48,7 @@ const StyledColumnContainer = styled(Box, {
       operationIndex !== undefined
         ? theme.palette.operationColors[operationIndex]
         : theme.palette.orphanedTableBackgroundColor,
-    opacity: isFocused === false ? 0.5 : 1,
+    opacity: 1,
     // Column is hovered state
     ...(isHovered && {
       backgroundColor: lighten(
@@ -76,12 +76,22 @@ const StyledColumnContainer = styled(Box, {
       opacity: 0,
       cursor: "grabbing",
     }),
-    ...(isDropTarget && {
+    // Column is drop target state
+    ...(isDropTarget === true && {
       outline: `2px solid ${darken(
         theme.palette.operationColors[operationIndex] ||
           theme.palette.orphanedTableBackgroundColor,
         0.2
       )}`,
+    }),
+    ...(isDropTarget === false && {
+      opacity: 0.5,
+    }),
+    // Column is over a drop target state
+    ...(isOver && {
+      transform: "scale(1.03)",
+    }),
+    ...(isLoading && {
       animation: "pulse 1.5s ease-in-out infinite",
       "@keyframes pulse": {
         "0%, 100%": {
@@ -100,19 +110,17 @@ const StyledColumnContainer = styled(Box, {
         },
       },
     }),
-    // Column is over a drop target state
-    ...(isOver && {
-      transform: "scale(1.03)",
-    }),
-    ...(isLoading && {}),
     ...(isError && {}),
-    ...(isFocused && {
+    ...(isFocused === true && {
       outlineWidth: "2px",
       outlineStyle: "solid",
       outlineColor:
         theme.palette.operationColors[operationIndex] ||
         theme.palette.orphanedTableBackgroundColor,
       zIndex: 1000,
+    }),
+    ...(isFocused === false && {
+      opacity: 0.5,
     }),
     ...(isVisible === false && {}),
     ...(isNull && {
