@@ -242,6 +242,17 @@ const TableSchema = ({
     setHiddenColumnIds([...hiddenColumnIds, ...selectedColumnIds]);
   }, [hiddenColumnIds, selectedColumnIds]);
 
+  const handleColumnDrop = useCallback(
+    (draggedItem, targetItem) => {
+      console.log("Swapping columns:", {
+        draggedItem,
+        targetItem,
+      });
+      swapColumns(targetItem.id, draggedItem.id);
+    },
+    [swapColumns]
+  );
+
   return (
     <Box
       display="flex"
@@ -416,11 +427,10 @@ const TableSchema = ({
                   <>
                     <ColumnDragContainer
                       id={columnIds[0]}
+                      parentId={id}
                       columnIndex={i}
                       canDrag={selectedColumnIds.includes(columnIds[0])}
-                      onDrop={(draggedItem, targetItem) => {
-                        swapColumns(targetItem.id, draggedItem.id);
-                      }}
+                      onDrop={handleColumnDrop}
                     >
                       {/* Interactive Column Summary Card that includes [data-column-id] */}
                       <EnhancedColumnSummary

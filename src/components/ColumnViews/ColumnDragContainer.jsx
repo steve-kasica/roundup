@@ -87,7 +87,7 @@ const ColumnDragContainer = withColumnData(
   ({ id, parentId, children, onDragEnd, onDrop, canDrag = true }) => {
     const dispatch = useDispatch();
     const ref = useRef(null);
-    const dragType = `${parentId}_Column`; // Unique drag type per table
+    const dragType = `${parentId}-column`; // Unique drag type per table
 
     // Get sibling column IDs (all columns in table except current one)
     // TODO: this selector is catywampus - needs to handle operations as parents too
@@ -122,8 +122,7 @@ const ColumnDragContainer = withColumnData(
         if (id) {
           dispatch(setDraggingColumnIds(id));
 
-          // Set all sibling columns as drop targets
-          console.log("Setting drop targets to siblings:", siblingColumnIds);
+          // Set sibling columns as drop targets
           if (siblingColumnIds.length > 0) {
             dispatch(setDropTargetColumnIds(siblingColumnIds));
           }

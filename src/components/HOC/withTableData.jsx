@@ -29,7 +29,6 @@ import {
 } from "../../sagas/createColumnsSaga";
 import { setFocusedObjectId } from "../../slices/uiSlice";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
-import { scaleOrdinal } from "d3";
 
 /**
  * @typedef {Object} TableDataProps
@@ -204,9 +203,7 @@ export default function withTableData(WrappedComponent) {
      * The column IDs of the table
      * @returns {Array<string>} The column IDs of the table
      */
-    const columnIds = useSelector((state) =>
-      selectColumnIdsByParentId(state, id)
-    );
+    const columnIds = useMemo(() => table.columnIds, [table.columnIds]);
 
     // Current number of non-hided columns
     const columnCount = useMemo(() => columnIds.length, [columnIds]);
