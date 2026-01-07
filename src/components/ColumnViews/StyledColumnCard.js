@@ -58,7 +58,6 @@ const StyledColumnCard = styled(Box, {
         0.3
       ),
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-      transform: "scale(1.01)",
     }),
     // Column is selected state
     ...(isSelected && {
@@ -73,13 +72,33 @@ const StyledColumnCard = styled(Box, {
     ...(isDragging && {
       opacity: 0,
     }),
-    // Column is a valid drop target state
     ...(isDropTarget && {
-      outline: `2px solid ${"#ddd"}`,
+      outline: `2px solid ${darken(
+        theme.palette.operationColors[operationIndex] ||
+          theme.palette.orphanedTableBackgroundColor,
+        0.2
+      )}`,
+      animation: "pulse 1.5s ease-in-out infinite",
+      "@keyframes pulse": {
+        "0%, 100%": {
+          backgroundColor:
+            operationIndex !== undefined
+              ? theme.palette.operationColors[operationIndex]
+              : theme.palette.orphanedTableBackgroundColor,
+        },
+        "50%": {
+          backgroundColor: lighten(
+            operationIndex !== undefined
+              ? theme.palette.operationColors[operationIndex]
+              : theme.palette.orphanedTableBackgroundColor,
+            0.2
+          ),
+        },
+      },
     }),
     // Column is over a drop target state
     ...(isOver && {
-      backgroundColor: "blue",
+      transform: "scale(1.03)",
     }),
     ...(isLoading && {
       ...theme.palette.column.loading,
