@@ -417,9 +417,7 @@ const TableSchema = ({
                     <ColumnDragContainer
                       id={columnIds[0]}
                       columnIndex={i}
-                      canDrag={
-                        selectedColumnIds.includes(columnIds[0]) && isVisible
-                      }
+                      canDrag={selectedColumnIds.includes(columnIds[0])}
                       onDrop={(draggedItem, targetItem) => {
                         swapColumns(targetItem.id, draggedItem.id);
                       }}

@@ -100,7 +100,7 @@ const ColumnDragContainer = withColumnData(
         ).columnIds
     );
     const siblingColumnIds = useMemo(() => {
-      return parentColumnIds.filter((id) => id !== id);
+      return parentColumnIds.filter((cid) => cid !== id);
     }, [parentColumnIds, id]);
 
     const dropTargetColumnIds = useSelector((state) =>
@@ -122,6 +122,7 @@ const ColumnDragContainer = withColumnData(
           dispatch(setDraggingColumnIds(id));
 
           // Set all sibling columns as drop targets
+          console.log("Setting drop targets to siblings:", siblingColumnIds);
           if (siblingColumnIds.length > 0) {
             dispatch(setDropTargetColumnIds(siblingColumnIds));
           }
