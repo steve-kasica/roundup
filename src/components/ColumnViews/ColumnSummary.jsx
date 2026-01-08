@@ -26,12 +26,13 @@
 
 /* eslint-disable react/prop-types */
 import { withColumnData, withAssociatedAlerts } from "../HOC";
-import { Box, Typography, Menu, Chip } from "@mui/material";
+import { Box, Typography, Menu, Chip, Divider, Stack } from "@mui/material";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 import StyledColumnContainer from "./StyledColumnContainer";
 import { ColumnContextMenuButton } from "../ui/buttons";
 import { useCallback, useState } from "react";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
+import DescriptionList from "../ui/DescriptionList";
 
 /**
  * ColumnSummary Component
@@ -152,7 +153,7 @@ const ColumnSummary = ({
           overflow: "hidden",
           containerType: "size",
           display: "flex",
-          justifyContent: "space-evenly",
+          justifyContent: "flex-start",
           flexDirection: "column",
           width: "100%",
         }}
@@ -164,7 +165,6 @@ const ColumnSummary = ({
             alignItems: "center",
             justifyContent: "space-between",
             userSelect: "none",
-            //   mb: 1,
           }}
         >
           <Box
@@ -172,14 +172,14 @@ const ColumnSummary = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-start",
-              gap: 0.5,
+              gap: 0.25,
               flex: 1,
               minWidth: 0,
               overflow: "hidden",
             }}
           >
             <Typography
-              variant="caption"
+              variant="data-primary"
               color="text.secondary"
               sx={{
                 whiteSpace: "nowrap",
@@ -210,22 +210,44 @@ const ColumnSummary = ({
           </Box>
         </Box>
 
+        <Typography
+          variant="data-primary"
+          sx={{ fontSize: "0.7rem", color: "text.secondary", mr: 0.5 }}
+        >
+          Top values
+        </Typography>
         <Box
           sx={{
             "@container (min-height: 50px)": {
-              display: "block",
+              display: "flex",
             },
             "@container (max-height: 49px)": {
               display: "none",
             },
+            height: "25px",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            justifyContent: "flex-start",
+            gap: "1px",
+            overflow: "hidden",
           }}
         >
-          <Typography variant="data-small" component="div">
-            {/* TODO: should I use Chips instead of comma b/c values may include commas */}
-            {topValues ? topValues.map(({ value }) => value).join(", ") : ""}
-            {(topValues && topValues.length) || 0 > 10 ? ", ..." : ""}
-          </Typography>
+          {topValues.map(({ value }) => (
+            <Chip
+              key={value}
+              label={`${value}`}
+              title={`${value}`}
+              size="small"
+              sx={{
+                fontSize: "0.6rem",
+                borderRadius: "4px",
+                height: "12.5px",
+                "& .MuiChip-label": { padding: "0 4px" },
+              }}
+            />
+          ))}
         </Box>
+        <Divider sx={{ my: 0.5 }} />
         <Box
           sx={{
             "@container (min-height: 75px)": {
@@ -236,7 +258,29 @@ const ColumnSummary = ({
             },
           }}
         >
-          <Chip
+          <Stack>
+            <Typography
+              variant="data-primary"
+              sx={{ fontSize: "0.7rem", color: "text.secondary", mr: 0.5 }}
+            >
+              Completeness
+            </Typography>
+            <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
+              0
+            </Typography>
+          </Stack>
+          <Stack>
+            <Typography
+              variant="data-primary"
+              sx={{ fontSize: "0.7rem", color: "text.secondary", mr: 0.5 }}
+            >
+              Uniqueness
+            </Typography>
+            <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
+              0
+            </Typography>
+          </Stack>
+          {/* <Chip
             label={`${nullCount || 0} nulls`}
             size="small"
             color={nullCount && nullCount > 0 ? "error" : "default"}
@@ -247,7 +291,7 @@ const ColumnSummary = ({
             size="small"
             color={approxUnique && approxUnique < 2 ? "error" : "default"}
             sx={{ marginTop: 0.5, fontSize: "0.6rem" }}
-          />
+          /> */}
         </Box>
       </Box>
       <Menu

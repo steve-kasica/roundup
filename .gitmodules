@@ -16,6 +16,7 @@
 [submodule "example-workflows/school-star-ratings-2018"]
 	path = example-workflows/school-star-ratings-2018
 	url = https://github.com/steve-kasica/school-star-ratings-2018
+	branch = roundup
 [submodule "example-workflows/nyc-trips"]
 	path = example-workflows/nyc-trips
 	url = https://github.com/steve-kasica/nyc-trips
