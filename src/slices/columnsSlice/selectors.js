@@ -36,17 +36,22 @@ import { normalizeInputToArray } from "../utilities";
  * @type {import('@reduxjs/toolkit').Selector<any, string|string[], Array<string>|Array<Array<string>>>}
  */
 export const selectColumnIdsByParentId = createSelector(
-  [(state) => state.columns.byId, (_, parentId) => parentId],
-  (byId, parentId) => {
+  [
+    (state) => state.tables.byId,
+    (state) => state.operations.byId,
+    (_, parentIds) => parentIds,
+  ],
+  (tablesById, operationsById, parentIds) => {
     const getColumnIds = (id) =>
-      Object.values(byId)
-        .filter((col) => col.parentId === id)
-        .map((col) => col.id);
+      isTableId(id)
+        ? selectTablesById({ tables: { byId: tablesById } }, id).columnIds
+        : selectOperationsById({ operations: { byId: operationsById } }, id)
+            .columnIds;
 
-    if (Array.isArray(parentId)) {
-      return parentId.map(getColumnIds);
+    if (Array.isArray(parentIds)) {
+      return parentIds.map(getColumnIds);
     }
-    return getColumnIds(parentId);
+    return getColumnIds(parentIds);
   }
 );
 
