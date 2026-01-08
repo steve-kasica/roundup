@@ -8,7 +8,7 @@
  * STACK operations combine tables vertically (union/concatenate), and this visualization
  * reflects that by stacking children vertically with heights based on their row contributions.
  *
- * @module components/StackOperationView/StackOperationBlock
+ * @module components/CompsiteTableSchema/StackOperationBlock
  *
  * @example
  * <EnhancedStackOperationBlock
@@ -33,26 +33,21 @@ import {
   withAssociatedAlerts,
   withOperationData,
   withStackOperationData,
-} from "../HOC";
+} from "../HOC/index.js";
 import {
   isOperationId,
   OPERATION_TYPE_STACK,
-} from "../../slices/operationsSlice";
-import { Typography } from "@mui/material";
-import { EnhancedTableBlock } from "../TableView/TableBlock";
-import { EnhancedOperationBlock } from "../OperationView/OperationBlock.jsx";
+} from "../../slices/operationsSlice/index.js";
+import { Box, Typography } from "@mui/material";
+import { EnhancedTableBlock } from "./TableBlock.jsx";
+import { EnhancedOperationBlock } from "./OperationBlock.jsx";
 import React from "react";
 import StyledBlock from "../ui/StyledBlock.js";
-
-// TODO: when addressing this layout, consider using
-// styled components, but module SCSS will overwrite
+import { BLOCK_BREAKPOINTS } from "./settings.js";
 
 function StackOperationBlock({
   // Props defined in `withOperationData` HOC
-  id,
   isFocused,
-  isRootOperation,
-  name,
   rowCount,
   depth,
   focusedDepth,
@@ -64,14 +59,17 @@ function StackOperationBlock({
   totalCount,
 
   // Props defined in `OperationBlock` parent component
-  colorScale,
+  isDarkBackground,
 
   // Optional props passed recursively via parent operation
   // eslint-disable-next-line no-unused-vars
   parentColumnCount,
+  parentRowCount,
   sx = {},
 }) {
-  const isParentRender = isFocused || isRootOperation;
+  const height = parentRowCount ? (rowCount / parentRowCount) * 100 : 100; // height as percentage of parent operation's row count
+  const useLightText = isDarkBackground(depth);
+  const useLightTextInChildren = isDarkBackground(depth + 1);
   return (
     <StyledBlock
       className="StackOperationBlock"
@@ -84,47 +82,55 @@ function StackOperationBlock({
       sx={{
         flexDirection: "column",
         boxSizing: "border-box",
-        backgroundColor: colorScale(depth),
+        containerType: "size",
+        color: (theme) =>
+          useLightText ? theme.palette.textLight : theme.palette.textDark,
         cursor: focusedDepth > 0 ? "pointer" : "default",
+        height: `${height}%`,
         ...sx,
       }}
     >
-      <Typography variant="data-small">
-        {totalCount > 0 ? `⚠` : ""} {name || id} <br></br>
-        <small style={{ color: "#555" }}>
-          {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
-        </small>
-      </Typography>
-      {focusedDepth < 1
-        ? childIds.map((id, index, array) => {
-            const childSx = {
-              height: `${(1 / childIds.length) * 100}%`,
-              ...(index < array.length - 1 && {
-                marginBottom: isParentRender ? "2px" : undefined,
-              }),
-            };
-            return (
-              <React.Fragment key={id}>
-                {isOperationId(id) ? (
-                  <EnhancedOperationBlock
-                    id={id}
-                    parentOperationType={OPERATION_TYPE_STACK}
-                    parentColumnCount={columnCount}
-                    sx={childSx}
-                  />
-                ) : (
-                  <EnhancedTableBlock
-                    id={id}
-                    parentOperationType={OPERATION_TYPE_STACK}
-                    parentColumnCount={columnCount}
-                    backgroundColor={colorScale(depth + 1)}
-                    sx={childSx}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })
-        : null}
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: "1%",
+          width: "100%",
+          transition: "opacity 0.3s ease",
+          [`@container (max-height: ${BLOCK_BREAKPOINTS.HEIGHT.MEDIUM}px)`]: {
+            opacity: 0,
+          },
+        }}
+      >
+        {childIds.map((id) => {
+          return (
+            <React.Fragment key={id}>
+              {isOperationId(id) ? (
+                <EnhancedOperationBlock
+                  id={id}
+                  parentOperationType={OPERATION_TYPE_STACK}
+                  parentColumnCount={columnCount}
+                  parentRowCount={rowCount}
+                />
+              ) : (
+                <EnhancedTableBlock
+                  id={id}
+                  parentOperationType={OPERATION_TYPE_STACK}
+                  parentColumnCount={columnCount}
+                  parentRowCount={rowCount}
+                  sx={{
+                    color: (theme) =>
+                      useLightTextInChildren
+                        ? theme.palette.textLight
+                        : theme.palette.textDark,
+                  }}
+                />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </Box>
     </StyledBlock>
   );
 }

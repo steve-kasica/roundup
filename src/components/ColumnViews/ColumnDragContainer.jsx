@@ -47,6 +47,7 @@ import {
   setDropTargetColumnIds,
   selectDropTargetColumnIds,
   setHoveredColumnIds,
+  setSelectedColumnIds,
 } from "../../slices/uiSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
@@ -100,7 +101,7 @@ const ColumnDragContainer = withColumnData(
         ).columnIds
     );
     const siblingColumnIds = useMemo(() => {
-      return parentColumnIds.filter((id) => id !== id);
+      return parentColumnIds.filter((cid) => cid !== id);
     }, [parentColumnIds, id]);
 
     const dropTargetColumnIds = useSelector((state) =>
@@ -114,7 +115,7 @@ const ColumnDragContainer = withColumnData(
     );
 
     // Drag functionality
-    const [{ isDragging }, drag] = useDrag({
+    const [, drag] = useDrag({
       type: dragType,
       item: () => {
         // Dispatch action to add column to dragging state when item is created
@@ -122,13 +123,15 @@ const ColumnDragContainer = withColumnData(
           dispatch(setDraggingColumnIds(id));
 
           // Set all sibling columns as drop targets
+          console.log("Setting drop targets to siblings:", siblingColumnIds);
           if (siblingColumnIds.length > 0) {
             dispatch(setDropTargetColumnIds(siblingColumnIds));
           }
         }
 
         return {
-          ...column,
+          id,
+          parentId,
           type: dragType,
         };
       },
@@ -140,6 +143,7 @@ const ColumnDragContainer = withColumnData(
         // Remove from dragging state when drag ends
         if (id) {
           dispatch(setDraggingColumnIds([]));
+          dispatch(setSelectedColumnIds([]));
         }
 
         // Clear all drop targets and hover targets when drag ends
@@ -167,8 +171,10 @@ const ColumnDragContainer = withColumnData(
           return;
         }
 
-        const dropResult = onDrop ? onDrop(draggedItem, column, monitor) : {};
-        return { ...dropResult, droppedOn: column };
+        const dropResult = onDrop
+          ? onDrop(draggedItem, { id, parentId }, monitor)
+          : {};
+        return { ...dropResult, droppedOn: { id, parentId } };
       },
       canDrop: (item) => item.id !== id, // Can't drop on self
       collect: (monitor) => ({

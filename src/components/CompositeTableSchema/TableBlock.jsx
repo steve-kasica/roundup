@@ -12,16 +12,17 @@
  * - Integration with HOCs for data
  * - Compact tree node representation
  *
- * @module components/TableView/TableBlock
+ * @module components/CompositeTableSchema/TableBlock
  *
  * @example
  * <EnhancedTableBlock id={tableId} />
  */
 
-import { ColumnTick, EnhancedColumnTick } from "../ColumnViews";
+import { ColumnTick, EnhancedColumnTick } from "../ColumnViews/index.js";
 import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
-import { withTableData, withAssociatedAlerts } from "../HOC";
-import { Box, Typography } from "@mui/material";
+import { withTableData, withAssociatedAlerts } from "../HOC/index.js";
+import { Box, darken, Typography } from "@mui/material";
+import { BLOCK_BREAKPOINTS } from "./settings.js";
 
 function TableBlock({
   // Props from withAssociatedAlerts via withTableData
@@ -32,15 +33,18 @@ function TableBlock({
   columnIds,
   columnCount,
   rowCount,
+  operationIndex,
   // Props passed directly from parent
   parentOperationType,
   parentColumnCount,
-  backgroundColor,
+  // Parent row count will be null if parent operation is a NO_OP (single table)
+  parentRowCount,
   sx = {},
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering TableBlock for table:", id);
   }
+  const height = (rowCount / parentRowCount || rowCount) * 100; // height as percentage of parent operation's row count
   const ticks = Array.from(
     {
       length:
@@ -60,70 +64,79 @@ function TableBlock({
         flexDirection: "row",
         alignItems: "stretch",
         position: "relative",
-        backgroundColor,
         containerType: "size",
+        ...sx,
+        height: `${height}%`,
         // Visual indication of alerts
         ...(totalCount && {
           backgroundColor: "warning.light",
           opacity: 0.9,
         }),
-        ...sx,
       }}
     >
       <Typography
         variant="data-small"
         sx={{
-          "@container (min-height: 15px)": {
-            display: "block",
-          },
-          "@container (max-height: 14px)": {
-            display: "none",
-          },
-          "@container (max-width: 15px)": {
-            display: "none",
+          // Inherit color to adapt to background changes
+          color: "inherit",
+          fontWeight: "bold",
+          position: "absolute",
+          top: 4,
+          left: 4,
+          textAlign: "left",
+          whiteSpace: "nowrap",
+          wordBreak: "keep-all",
+          transition: "opacity 0.3s ease",
+          [`@container (max-height: ${BLOCK_BREAKPOINTS.HEIGHT.SMALL}px)`]: {
+            opacity: "0",
           },
         }}
       >
         {name || id}
-        {totalCount.length > 0 ? `⚠` : ""}
-        <br />
-        <Box
-          component="small"
-          sx={{
-            color: "#555",
-            "@container (min-height: 40px)": {
-              display: "inline",
-            },
-            "@container (max-height: 39px)": {
-              display: "none",
-            },
-          }}
-        >
-          {columnCount.toLocaleString()} x {rowCount.toLocaleString()}
-        </Box>
       </Typography>
-      {ticks.map((columnId, index) => {
-        const childSx = {
-          borderLeft: "1px dotted rgba(0, 0, 0, 0.1)",
-          ...(index === 0 && {
-            borderLeft: "none", // no border on the first tick, as it's the left edge
-          }),
+      <Typography
+        variant="data-small"
+        component="small"
+        sx={{
+          position: "absolute",
+          top: 14,
+          left: 4,
+          whiteSpace: "nowrap",
+          color: "inherit",
+          wordBreak: "keep-all",
+          transition: "opacity 0.3s ease",
+          [`@container (max-height: ${BLOCK_BREAKPOINTS.HEIGHT.MEDIUM}px)`]: {
+            opacity: "0",
+          },
+          [`@container (max-width: ${BLOCK_BREAKPOINTS.WIDTH.SMALL}px)`]: {
+            opacity: "0",
+          },
+        }}
+      >
+        {`${columnCount.toLocaleString()} x ${rowCount.toLocaleString()}`}
+      </Typography>
+      {ticks.map((columnId, index, array) => {
+        const sx = {
+          borderRight: index < array.length - 1 ? "1px solid" : "none",
         };
         return columnId === null ? (
           <ColumnTick
             key={`empty-${index}`} // Ensure unique key even when columnId is null
             id={null}
+            isNull={true}
             sx={{
-              ...childSx,
-              background:
-                "repeating-linear-gradient(45deg, #666, #666 10px, #888 10px, #888 20px)",
+              ...sx,
             }}
           />
         ) : (
           <EnhancedColumnTick
             key={`${columnId}-${index}`}
             id={columnId}
-            sx={childSx}
+            sx={{
+              ...sx,
+              borderColor: (theme) =>
+                darken(theme.palette.operationColors[operationIndex], 0.1),
+            }}
           />
         );
       })}

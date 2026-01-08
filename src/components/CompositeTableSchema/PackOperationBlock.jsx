@@ -9,7 +9,7 @@
  * reflects that by placing children side-by-side with widths proportional to their
  * contribution to the final column count.
  *
- * @module components/PackOperationView/PackOperationBlock
+ * @module components/CompositeTableSchema/PackOperationBlock
  *
  * @example
  * <EnhancedPackOperationBlock
@@ -33,8 +33,8 @@
 import { EnhancedTableBlock } from "../TableView";
 import { OPERATION_TYPE_PACK } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
-import { Typography } from "@mui/material";
-import { EnhancedOperationBlock } from "../OperationView/OperationBlock";
+import { Typography, Box } from "@mui/material";
+import { EnhancedOperationBlock } from "./OperationBlock";
 import {
   withPackOperationData,
   withOperationData,
@@ -45,26 +45,19 @@ import StyledBlock from "../ui/StyledBlock";
 function PackOperationBlock({
   // props via withOperationData
   childIds,
-  id,
-  name,
   depth,
   isFocused,
-  isRootOperation,
-  rowCount,
+  isDarkBackground,
   // Props via withPackOperationData
   leftColumnCount,
   rightColumnCount,
   columnCount,
   // Props via withAssociatedAlerts HOC
   totalCount,
-  // Props passed via parent
-  parentColumnCount,
-  colorScale,
   sx = {},
 }) {
-  const isParentRender = isFocused || isRootOperation;
-  const rowCountDisplay = rowCount?.toLocaleString() || "???";
-  const columnCountDisplay = columnCount?.toLocaleString() || "???";
+  const useLightText = isDarkBackground(depth);
+  const useLightTextInChildren = isDarkBackground(depth + 1);
 
   return (
     <StyledBlock
@@ -72,56 +65,58 @@ function PackOperationBlock({
       isFocused={isFocused}
       hasError={totalCount}
       sx={{
-        alignItems: "stretch",
-        backgroundColor: colorScale(depth),
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        color: (theme) =>
+          useLightText ? theme.palette.textLight : theme.palette.textDark,
         ...sx,
       }}
     >
-      {/* TODO: move these styles into a shared variant in theme */}
-      <Typography
-        variant="data-small"
-        sx={{
-          wordWrap: "none",
-        }}
+      <Box
+        display={"flex"}
+        flexDirection={"row"}
+        boxSizing={"border-box"}
+        flexGrow={1}
       >
-        {totalCount > 0 ? `⚠` : ""} {name || id}{" "}
-        <small style={{ color: "#555" }}>
-          {columnCountDisplay.toLocaleString()} x{" "}
-          {rowCountDisplay.toLocaleString()}
-        </small>
-      </Typography>
-      {childIds.map((childId, index) => {
-        const childSx = {
-          width:
-            ((index === 0 ? leftColumnCount : rightColumnCount) / columnCount) *
-              100 +
-            "%",
-          marginLeft: index === 0 ? "0px" : "2px",
-        };
-        if (isTableId(childId)) {
-          return (
-            <EnhancedTableBlock
-              key={childId}
-              id={childId}
-              isDraggable={false}
-              parentOperationType={OPERATION_TYPE_PACK}
-              parentColumnCount={columnCount}
-              backgroundColor={colorScale(depth + 1)}
-              sx={childSx}
-            />
-          );
-        } else {
-          return (
-            <EnhancedOperationBlock
-              id={childId}
-              key={childId}
-              parentOperationType={OPERATION_TYPE_PACK}
-              parentColumnCount={columnCount}
-              sx={childSx}
-            />
-          );
-        }
-      })}
+        {childIds.map((childId, index) => {
+          const childSx = {
+            width:
+              ((index === 0 ? leftColumnCount : rightColumnCount) /
+                columnCount) *
+                100 +
+              "%",
+            marginLeft: index === 0 ? "0px" : "2px",
+          };
+          if (isTableId(childId)) {
+            return (
+              <EnhancedTableBlock
+                key={childId}
+                id={childId}
+                isDraggable={false}
+                parentOperationType={OPERATION_TYPE_PACK}
+                parentColumnCount={columnCount}
+                sx={{
+                  ...childSx,
+                  color: (theme) =>
+                    useLightTextInChildren
+                      ? theme.palette.textLight
+                      : theme.palette.textDark,
+                }}
+              />
+            );
+          } else {
+            return (
+              <EnhancedOperationBlock
+                id={childId}
+                key={childId}
+                parentOperationType={OPERATION_TYPE_PACK}
+                parentColumnCount={columnCount}
+                sx={childSx}
+              />
+            );
+          }
+        })}
+      </Box>
     </StyledBlock>
   );
 }

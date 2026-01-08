@@ -8,7 +8,7 @@
  * This component is part of the hierarchical schema visualization system and handles
  * the recursive rendering of nested operations and tables.
  *
- * @module components/OperationView/OperationBlock
+ * @module components/CompositeTableSchema/OperationBlock
  *
  * @example
  * <EnhancedOperationBlock
@@ -24,8 +24,8 @@ import {
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
 import withOperationData from "../HOC/withOperationData";
-import { EnhancedPackOperationBlock } from "../PackOperationView/PackOperationBlock";
-import { EnhancedStackOperationBlock } from "../StackOperationView/StackOperationBlock";
+import { EnhancedPackOperationBlock } from "./PackOperationBlock";
+import { EnhancedStackOperationBlock } from "./StackOperationBlock";
 import { EnhancedTableBlock } from "../TableView";
 
 /**
@@ -65,12 +65,8 @@ const OperationBlock = ({
   } else if (operationType === OPERATION_TYPE_PACK) {
     return <EnhancedPackOperationBlock {...props} />;
   } else {
-    const backgroundColor = colorScale(depth);
     return (
-      <EnhancedTableBlock
-        id={childIds[0]}
-        sx={{ height: "100%", backgroundColor }}
-      />
+      <EnhancedTableBlock id={childIds[0]} parentRowCount={props.rowCount} />
     );
   }
 };

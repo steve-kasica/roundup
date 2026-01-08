@@ -6,7 +6,6 @@ This directory contains the routing component that renders the appropriate view 
 
 ```
 OperationView/
-├── OperationBlock.jsx          # Main routing component (85 lines)
 ├── OperationHeader.jsx         # Operation header with controls
 ├── OperationViewContainer.jsx  # Container with layout
 ├── index.js                    # Public exports
@@ -85,39 +84,6 @@ function SchemaPanel({ operationId }) {
     <div className="schema-panel">
       <EnhancedOperationBlock operationId={operationId} showHeader />
     </div>
-  );
-}
-```
-
-### Compact List Item
-
-```jsx
-function OperationListItem({ operationId }) {
-  return (
-    <ListItem>
-      <EnhancedOperationBlock
-        operationId={operationId}
-        compact
-        showHeader={false}
-      />
-    </ListItem>
-  );
-}
-```
-
-### With Focus State
-
-```jsx
-import { selectFocusedObjectId } from "../../slices/uiSlice";
-
-function FocusableOperation({ operationId }) {
-  const focusedId = useSelector(selectFocusedObjectId);
-  const isFocused = focusedId === operationId;
-
-  return (
-    <Box sx={{ border: isFocused ? 2 : 0, borderColor: "primary.main" }}>
-      <EnhancedOperationBlock operationId={operationId} />
-    </Box>
   );
 }
 ```

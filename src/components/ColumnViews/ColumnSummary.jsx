@@ -74,6 +74,7 @@ import DescriptionList from "../ui/DescriptionList";
  */
 const ColumnSummary = ({
   topValues,
+  operationIndex,
   name,
   databaseName,
   columnType,
@@ -132,6 +133,7 @@ const ColumnSummary = ({
       // TODO: why does this cause a re-render when it's not used?
       onMouseEnter={hoverColumn}
       onMouseLeave={unhoverColumn}
+      operationIndex={operationIndex}
       sx={{
         cursor: isSelected ? "grab" : "pointer",
         boxShadow: 0,

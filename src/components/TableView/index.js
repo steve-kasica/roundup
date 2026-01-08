@@ -1,4 +1,4 @@
-export * from "./TableBlock";
+export * from "../CompositeTableSchema/TableBlock";
 export * from "./TableDragContainer";
 export * from "./TableDragPreview";
 export * from "./TableHeader";

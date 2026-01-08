@@ -4,7 +4,7 @@ export * from "./ColumnDragContainer";
 export * from "./ColumnHeader";
 export * from "./ColumnName";
 export * from "./ColumnSummary";
-export * from "./ColumnTick";
+export * from "../CompositeTableSchema/ColumnTick";
 export * from "./ColumnTypeIcon";
 export * from "./ColumnValueCounts";
 export * from "./ColumnValues";
