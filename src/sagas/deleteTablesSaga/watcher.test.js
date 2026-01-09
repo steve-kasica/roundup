@@ -19,6 +19,7 @@ import { deleteTables as deleteTablesInSlice } from "../../slices/tablesSlice";
 import { deleteColumns as deleteColumnsInSlice } from "../../slices/columnsSlice";
 import { updateTablesSuccess } from "../updateTablesSaga";
 import { dropTable } from "../../lib/duckdb";
+import { deleteOperationsSuccess } from "../deleteOperationsSaga/actions";
 
 /**
  * Helper to create a mock state with tables
@@ -35,7 +36,7 @@ describe("deleteTablesSagaWatcher", () => {
     vi.clearAllMocks();
   });
 
-  describe("deleteTablesRequest handling", () => {
+  describe("handling deleteTablesRequest actions", () => {
     it("should invoke worker and delete table from state", async () => {
       const mockState = createMockState({
         t_1: {
@@ -174,7 +175,7 @@ describe("deleteTablesSagaWatcher", () => {
     });
   });
 
-  describe("auto-deletion of tables with empty columnIds", () => {
+  describe("handling updateTablesSuccess actions", () => {
     it("should dispatch deleteTablesRequest when table has empty columnIds", async () => {
       // Need to have the table in state so the worker can look it up
       const mockState = createMockState({
@@ -345,6 +346,66 @@ describe("deleteTablesSagaWatcher", () => {
       expect(deleteRequest.payload.action.payload.tableIds).not.toContain(
         "t_2"
       );
+    });
+  });
+
+  describe("handling deleteOperationsSuccess actions", () => {
+    it("should trigger deletion of associated tables", async () => {
+      const mockState = {
+        tables: {
+          byId: {
+            t_1: {
+              id: "t_1",
+              name: "OpTable1",
+              parentId: "op_1",
+              databaseName: "op_table_1_db",
+              columnIds: ["c_1"],
+            },
+            t_2: {
+              id: "t_2",
+              name: "OpTable2",
+              parentId: "op_1",
+              databaseName: "op_table_2_db",
+              columnIds: ["c_2"],
+            },
+            t_3: {
+              id: "t_3",
+              name: "OtherTable",
+              parentId: "op_2",
+              databaseName: "other_table_db",
+              columnIds: ["c_3"],
+            },
+          },
+          allIds: ["t_1", "t_2", "t_3"],
+        },
+        operations: {
+          byId: {
+            op_1: {
+              id: "op_1",
+              name: "Operation 1",
+              childIds: ["t_1", "t_2"],
+              columnIds: [],
+            },
+          },
+        },
+      };
+
+      const action = deleteOperationsSuccess({
+        operationIds: ["op_1"],
+      });
+
+      const { effects } = await expectSaga(deleteTablesSagaWatcher)
+        .withState(mockState)
+        .provide([[matchers.call.fn(dropTable), undefined]])
+        .dispatch(action)
+        .silentRun(100);
+
+      const deleteRequest = effects.put.find(
+        (effect) => effect.payload?.action?.type === deleteTablesRequest.type
+      );
+      expect(deleteRequest).toBeDefined();
+      expect(deleteRequest.payload.action.payload.tableIds).toContain("t_1");
+      expect(deleteRequest.payload.action.payload.tableIds).toContain("t_2");
     });
   });
 

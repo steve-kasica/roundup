@@ -98,3 +98,32 @@ export const selectTableQueryData = createSelector(
     };
   }
 );
+
+/**
+ * Selector to get all table IDs associated with given parent operation IDs.
+ *
+ * @function
+ * @param {Object} state - The Redux state object.
+ * @param {string|string[]} parentIds - A single parent operation ID or an array of parent operation IDs.
+ * @returns {string[]|string[][]} An array of table IDs if a single parent ID is provided,
+ *                                or an array of arrays of table IDs if multiple parent IDs are provided.
+ *
+ * @example
+ * // For a single parent ID
+ * const tableIds = selectAllTableIdsByParentId(state, 'op1');
+ * // Returns: ['t1', 't2']
+ */
+export const selectAllTableIdsByParentId = createSelector(
+  [
+    (state) => state.tables.byId,
+    (state, parentIds) => normalizeInputToArray(parentIds),
+  ],
+  (tablesById, parentIds) => {
+    const output = parentIds.map((parentId) => {
+      return Object.values(tablesById)
+        .filter((table) => table.parentId === parentId)
+        .map((table) => table.id);
+    });
+    return parentIds.length === 1 ? output[0] : output;
+  }
+);

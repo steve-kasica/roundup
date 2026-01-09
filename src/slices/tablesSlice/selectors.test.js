@@ -4,8 +4,9 @@ import {
   selectAllTablesData,
   selectTableColumnIds,
   selectTableQueryData,
+  selectAllTableIdsByParentId,
 } from "./selectors";
-import { initialState, Table } from "../tablesSlice";
+import { Table } from "../tablesSlice";
 import { Column } from "../columnsSlice";
 
 describe("tableSelectors", () => {
@@ -89,6 +90,46 @@ describe("tableSelectors", () => {
         columnNames: [column1.databaseName, column2.databaseName],
       };
       expect(selectTableQueryData(mockState, table1.id)).toEqual(expected);
+    });
+  });
+  describe("selectAllTableIdsByParentId", () => {
+    it("should return table IDs for a single parent ID", () => {
+      const operation1 = { id: "op1" };
+      const tableA = Table({ id: "t1", parentId: operation1.id });
+      const tableB = Table({ id: "t2", parentId: operation1.id });
+      const state = {
+        tables: {
+          byId: {
+            [tableA.id]: tableA,
+            [tableB.id]: tableB,
+          },
+          allIds: [tableA.id, tableB.id],
+        },
+      };
+      expect(selectAllTableIdsByParentId(state, operation1.id)).toEqual([
+        tableA.id,
+        tableB.id,
+      ]);
+    });
+    it("should return a matrix of table IDs for multiple parent IDs", () => {
+      const operation1 = { id: "op1" };
+      const operation2 = { id: "op2" };
+      const tableA = Table({ id: "t1", parentId: operation1.id });
+      const tableB = Table({ id: "t2", parentId: operation1.id });
+      const tableC = Table({ id: "t3", parentId: operation2.id });
+      const state = {
+        tables: {
+          byId: {
+            [tableA.id]: tableA,
+            [tableB.id]: tableB,
+            [tableC.id]: tableC,
+          },
+          allIds: [tableA.id, tableB.id, tableC.id],
+        },
+      };
+      expect(
+        selectAllTableIdsByParentId(state, [operation1.id, operation2.id])
+      ).toEqual([[tableA.id, tableB.id], [tableC.id]]);
     });
   });
 });
