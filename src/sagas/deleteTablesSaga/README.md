@@ -22,6 +22,7 @@ Due to a DuckDB limitation, you cannot delete all columns from a table via `ALTE
   deleteTables:Delete tables saga
   updateTables:Update tables saga
   deleteOps:Delete operations saga
+
   updateTables-->deleteTables: Deleting all columns
   deleteOps-->deleteTables: Delete any child tables
 ```

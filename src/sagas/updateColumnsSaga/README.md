@@ -8,5 +8,6 @@ The update columns saga is responsible for handling the updating of column prope
 stateDiagram
     updateCols:Update columns saga
     createCols:Create columns saga
+
     createCols --> updateCols: Update newly created columns
 ```

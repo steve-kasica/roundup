@@ -15,6 +15,7 @@ The delete operations saga handles the removal of _stack_ and _pack_ operations 
   stateDiagram
   deleteOps: Delete operations saga
   updateOps: Update operations saga
+
   updateOps --> deleteOps: Update creates a childless operation
   deleteOps --> deleteOps: If operation has operation children
 ```
