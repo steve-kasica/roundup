@@ -1,40 +1,21 @@
 # Delete Columns Saga
 
-The delete columns saga handles the removal of columns from both DuckDB tables and Redux state. It supports recursive deletion for operation columns by propagating deletions to child tables.
-
-## Purpose
-
-This saga:
+The delete columns saga handles the removal of columns from both DuckDB tables and Redux state. It supports recursive deletion for _stack_ and _pack_ operation columns by propagating deletions to child tables. Deletion of a column in Roundup specifically means:
 
 - Drops columns from DuckDB tables using `ALTER TABLE`
 - Removes column metadata from Redux state
-- Handles operation column deletions by recursing into child tables
-- Supports both PACK and STACK operation column propagation
 
-## Process
+## Relationship to other sagas
 
 ```mermaid
 ---
-title: Delete Columns Saga Process
+title: Delete Columns Saga
 ---
-flowchart LR
-    A[Start] --> B[Group columns<br>by parent]
-    B --> C{More<br>parents?}
-    C -->|yes| D{Is parent<br>a table?}
-    D -->|yes| E[Queue for<br>DB deletion]
-    D -->|no| F[Map to child<br>columns]
-    F --> G[Dispatch recursive<br>delete request]
-    E --> C
-    G --> C
-    C -->|no| H[[Worker:<br>Execute deletions]]
-    H --> I{DB deletion<br>success?}
-    I -->|yes| J[Remove from<br>Redux state]
-    I -->|no| K[Add to<br>failures]
-    J --> L{More<br>deletions?}
-    K --> L
-    L -->|yes| H
-    L -->|no| M(Dispatch<br>success/failure)
-    M --> End
+  stateDiagram
+    deleteCols:Delete columns Saga
+    updateOps:Update operations saga
+    deleteCols --> deleteCols: columns' parent is an operation
+    updateOps --> deleteCols: update orphans columns
 ```
 
 ## Recursive Deletion

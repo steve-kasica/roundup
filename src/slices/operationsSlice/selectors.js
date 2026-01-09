@@ -18,12 +18,9 @@
  * const operation = selectOperationsById(state, 'op_1');
  */
 import { createSelector } from "@reduxjs/toolkit";
-import {
-  // selectActiveColumnDBNamesByTableId,
-  selectColumnsById,
-} from "../columnsSlice";
+import { selectColumnsById } from "../columnsSlice";
 import { isTableId, selectTableQueryData } from "../tablesSlice";
-import { OPERATION_TYPE_PACK, OPERATION_TYPE_STACK } from "./Operation";
+import { OPERATION_TYPE_PACK } from "./Operation";
 
 /**
  * Selects an operation by its ID from the Redux state.

@@ -237,7 +237,14 @@ export default function withColumnData(WrappedComponent) {
      * Delete the column.
      */
     const deleteColumn = useCallback(
-      () => dispatch(deleteColumnsRequest({ columnIds: [id] })),
+      () =>
+        dispatch(
+          deleteColumnsRequest({
+            columnIds: [id],
+            recurse: true,
+            deleteFromDatabase: true,
+          })
+        ),
       [dispatch, id]
     );
 

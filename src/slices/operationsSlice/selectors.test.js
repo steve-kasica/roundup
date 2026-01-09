@@ -13,13 +13,11 @@ import Operation, {
   DEFAULT_JOIN_PREDICATE,
   DEFAULT_JOIN_TYPE,
   JOIN_PREDICATES,
-  JOIN_TYPES,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "./Operation";
 import { Table } from "../tablesSlice";
 import { Column } from "../columnsSlice";
-import { join } from "path";
 
 describe("operationsSelectors", () => {
   let columns = Array.from({ length: 12 }, (_, i) =>
@@ -171,6 +169,12 @@ describe("operationsSelectors", () => {
               (id) => state.columns.byId[id].databaseName
             ),
           },
+          {
+            tableName: tables[3].databaseName,
+            columnNames: tables[3].columnIds.map(
+              (id) => state.columns.byId[id].databaseName
+            ),
+          },
         ],
       });
     });
@@ -181,6 +185,7 @@ describe("operationsSelectors", () => {
         new Map([
           [operations[0].id, operations[0].rowCount],
           [tables[2].id, tables[2].rowCount],
+          [tables[3].id, tables[3].rowCount],
         ])
       );
     });

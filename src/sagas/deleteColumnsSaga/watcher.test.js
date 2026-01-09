@@ -63,190 +63,231 @@ describe("deleteColumnsSaga watcher", () => {
     };
   });
 
-  describe("requests to delete a table's columns", () => {
-    it("should call the delete columns worker with the table ID and an array column IDs", async () => {
-      const action = deleteColumnsRequest({
-        columnIds: [columns[0].id, columns[1].id],
+  describe("handling deleteColumnsRequest", () => {
+    describe("when the parent is a table", () => {
+      it("should call the delete columns worker with the table ID and an array column IDs", async () => {
+        const action = deleteColumnsRequest({
+          columnIds: [columns[0].id, columns[1].id],
+        });
+
+        const { effects } = await expectSaga(deleteColumnsWatcher)
+          .provide([[deleteColumnsWorker, {}]])
+          .withState(state)
+          .dispatch(action)
+          .silentRun(100);
+
+        const callEffect = effects.call.find(
+          (effect) => effect.payload.fn === deleteColumnsWorker
+        );
+        const [tablesToAlter] = callEffect.payload.args;
+
+        expect(tablesToAlter).toHaveLength(1);
+        expect(tablesToAlter[0].tableId).toBe(tables[0].id);
+        expect(tablesToAlter[0].columnsToDelete).toHaveLength(2);
+        expect(tablesToAlter[0].columnsToDelete.map((col) => col.id)).toEqual([
+          columns[0].id,
+          columns[1].id,
+        ]);
+      });
+    });
+    describe("when the parent is an operation", () => {
+      it("should identify child tables and map operation columns to table columns for PACK operations", async () => {
+        operations[0].operationType = "pack";
+        const action = deleteColumnsRequest({
+          columnIds: [columns[4].id],
+          deleteFromDatabase: true,
+          recurse: true,
+        });
+
+        const { effects } = await expectSaga(deleteColumnsWatcher)
+          .withState(state)
+          .dispatch(action)
+          .silentRun(100);
+
+        // Should dispatch a delete columns request for child columns
+        const putEffect = effects.put.find(
+          (effect) => effect.payload.action.type === deleteColumnsRequest.type
+        );
+
+        expect(putEffect).toBeDefined();
+        expect(putEffect.payload.action.payload.columnIds).toContain(
+          columns[0].id
+        );
       });
 
-      const { effects } = await expectSaga(deleteColumnsWatcher)
-        .provide([[deleteColumnsWorker, {}]])
-        .withState(state)
-        .dispatch(action)
-        .silentRun(100);
+      it("should recursively handle deletion through child tables for PACK operations", async () => {
+        operations[0].operationType = OPERATION_TYPE_PACK;
+        const action = deleteColumnsRequest({
+          columnIds: [columns[4].id],
+          deleteFromDatabase: true,
+          recurse: true,
+        });
 
-      const callEffect = effects.call.find(
-        (effect) => effect.payload.fn === deleteColumnsWorker
-      );
-      const [tablesToAlter] = callEffect.payload.args;
+        const { effects } = await expectSaga(deleteColumnsWatcher)
+          .provide([[deleteColumnsWorker, {}]])
+          .withState(state)
+          .dispatch(action)
+          .silentRun(100);
 
-      expect(tablesToAlter).toHaveLength(1);
-      expect(tablesToAlter[0].tableId).toBe(tables[0].id);
-      expect(tablesToAlter[0].columnsToDelete).toHaveLength(2);
-      expect(tablesToAlter[0].columnsToDelete.map((col) => col.id)).toEqual([
-        columns[0].id,
-        columns[1].id,
-      ]);
+        // Should call the worker with the child table's columns after recursion
+        const callEffects = effects.call.filter(
+          (effect) => effect.payload.fn === deleteColumnsWorker
+        );
+
+        // First call: empty (operation column doesn't directly alter tables)
+        // Second call: after recursion, should have the child table column
+        expect(callEffects.length).toBeGreaterThanOrEqual(1);
+        const finalCall = callEffects[callEffects.length - 1];
+        const [tablesToAlter] = finalCall.payload.args;
+
+        expect(tablesToAlter).toHaveLength(1);
+        expect(tablesToAlter[0].tableId).toBe(tables[0].id);
+        expect(tablesToAlter[0].columnsToDelete.map((col) => col.id)).toContain(
+          columns[0].id
+        );
+      });
+
+      it("should identify child tables and map operation columns to table columns for STACK operations", async () => {
+        operations[0].operationType = OPERATION_TYPE_STACK;
+        const action = deleteColumnsRequest({
+          columnIds: [columns[4].id],
+          deleteFromDatabase: true,
+          recurse: true,
+        });
+
+        const { effects } = await expectSaga(deleteColumnsWatcher)
+          .withState(state)
+          .dispatch(action)
+          .silentRun(100);
+
+        // Should dispatch a delete columns request for child columns from all tables
+        const putEffect = effects.put.find(
+          (effect) => effect.payload.action.type === deleteColumnsRequest.type
+        );
+
+        expect(putEffect).toBeDefined();
+        // For stack operations, should include columns from both tables at the same index
+        expect(putEffect.payload.action.payload.columnIds).toContain(
+          columns[0].id
+        );
+        expect(putEffect.payload.action.payload.columnIds).toContain(
+          columns[2].id
+        );
+      });
+
+      it("should recursively handle deletion through child tables for STACK operations", async () => {
+        operations[0].operationType = OPERATION_TYPE_STACK;
+        const action = deleteColumnsRequest({
+          columnIds: [columns[4].id],
+          deleteFromDatabase: true,
+          recurse: true,
+        });
+
+        const { effects } = await expectSaga(deleteColumnsWatcher)
+          .provide([[deleteColumnsWorker, {}]])
+          .withState(state)
+          .dispatch(action)
+          .silentRun(100);
+
+        // Should call the worker with both child tables' columns after recursion
+        const callEffects = effects.call.filter(
+          (effect) => effect.payload.fn === deleteColumnsWorker
+        );
+
+        expect(callEffects.length).toBeGreaterThanOrEqual(1);
+        const finalCall = callEffects[callEffects.length - 1];
+        const [tablesToAlter] = finalCall.payload.args;
+
+        // For STACK, should have entries for both tables
+        expect(tablesToAlter.length).toBeGreaterThanOrEqual(1);
+        const allDeletedColumnIds = tablesToAlter.flatMap((t) =>
+          t.columnsToDelete.map((col) => col.id)
+        );
+        expect(allDeletedColumnIds).toContain(columns[0].id);
+        expect(allDeletedColumnIds).toContain(columns[2].id);
+      });
     });
   });
 
-  describe("requests to delete an operation's columns", () => {
-    it("should identify child tables and map operation columns to table columns for PACK operations", async () => {
-      operations[0].operationType = "pack";
-      const action = deleteColumnsRequest({
-        columnIds: [columns[4].id],
-      });
-
-      const { effects } = await expectSaga(deleteColumnsWatcher)
-        .withState(state)
-        .dispatch(action)
-        .silentRun(100);
-
-      // Should dispatch a delete columns request for child columns
-      const putEffect = effects.put.find(
-        (effect) => effect.payload.action.type === deleteColumnsRequest.type
-      );
-
-      expect(putEffect).toBeDefined();
-      expect(putEffect.payload.action.payload.columnIds).toContain(
-        columns[0].id
-      );
-    });
-
-    it("should recursively handle deletion through child tables for PACK operations", async () => {
-      operations[0].operationType = OPERATION_TYPE_PACK;
-      const action = deleteColumnsRequest({
-        columnIds: [columns[4].id],
-      });
-
-      const { effects } = await expectSaga(deleteColumnsWatcher)
-        .provide([[deleteColumnsWorker, {}]])
-        .withState(state)
-        .dispatch(action)
-        .silentRun(100);
-
-      // Should call the worker with the child table's columns after recursion
-      const callEffects = effects.call.filter(
-        (effect) => effect.payload.fn === deleteColumnsWorker
-      );
-
-      // First call: empty (operation column doesn't directly alter tables)
-      // Second call: after recursion, should have the child table column
-      expect(callEffects.length).toBeGreaterThanOrEqual(1);
-      const finalCall = callEffects[callEffects.length - 1];
-      const [tablesToAlter] = finalCall.payload.args;
-
-      expect(tablesToAlter).toHaveLength(1);
-      expect(tablesToAlter[0].tableId).toBe(tables[0].id);
-      expect(tablesToAlter[0].columnsToDelete.map((col) => col.id)).toContain(
-        columns[0].id
-      );
-    });
-
-    it("should identify child tables and map operation columns to table columns for STACK operations", async () => {
-      operations[0].operationType = OPERATION_TYPE_STACK;
-      const action = deleteColumnsRequest({
-        columnIds: [columns[4].id],
-      });
-
-      const { effects } = await expectSaga(deleteColumnsWatcher)
-        .withState(state)
-        .dispatch(action)
-        .silentRun(100);
-
-      // Should dispatch a delete columns request for child columns from all tables
-      const putEffect = effects.put.find(
-        (effect) => effect.payload.action.type === deleteColumnsRequest.type
-      );
-
-      expect(putEffect).toBeDefined();
-      // For stack operations, should include columns from both tables at the same index
-      expect(putEffect.payload.action.payload.columnIds).toContain(
-        columns[0].id
-      );
-      expect(putEffect.payload.action.payload.columnIds).toContain(
-        columns[2].id
-      );
-    });
-
-    it("should recursively handle deletion through child tables for STACK operations", async () => {
-      operations[0].operationType = OPERATION_TYPE_STACK;
-      const action = deleteColumnsRequest({
-        columnIds: [columns[4].id],
-      });
-
-      const { effects } = await expectSaga(deleteColumnsWatcher)
-        .provide([[deleteColumnsWorker, {}]])
-        .withState(state)
-        .dispatch(action)
-        .silentRun(100);
-
-      // Should call the worker with both child tables' columns after recursion
-      const callEffects = effects.call.filter(
-        (effect) => effect.payload.fn === deleteColumnsWorker
-      );
-
-      expect(callEffects.length).toBeGreaterThanOrEqual(1);
-      const finalCall = callEffects[callEffects.length - 1];
-      const [tablesToAlter] = finalCall.payload.args;
-
-      // For STACK, should have entries for both tables
-      expect(tablesToAlter.length).toBeGreaterThanOrEqual(1);
-      const allDeletedColumnIds = tablesToAlter.flatMap((t) =>
-        t.columnsToDelete.map((col) => col.id)
-      );
-      expect(allDeletedColumnIds).toContain(columns[0].id);
-      expect(allDeletedColumnIds).toContain(columns[2].id);
-    });
-  });
-
-  describe("in response to newly created operations", () => {
-    it("should delete orphaned columns when operation columnIds are updated", async () => {
-      // Add an extra column that will become orphaned
+  describe("handling updateOperationsSuccess", () => {
+    it("puts a deleteColumnsRequest if there are orphaned columns with the correct columnIds", async () => {
+      const localState = JSON.parse(JSON.stringify(state));
       const orphanedColumn = Column();
       orphanedColumn.parentId = operations[0].id;
-      state.columns.byId[orphanedColumn.id] = orphanedColumn;
-      state.columns.allIds.push(orphanedColumn.id);
-
-      // Operation has fewer columnIds than total columns with this parentId
+      localState.columns.byId[orphanedColumn.id] = orphanedColumn;
+      localState.columns.allIds.push(orphanedColumn.id);
       const action = updateOperationsSuccess({
         changedPropertiesById: {
           [operations[0].id]: ["columnIds"],
         },
       });
-
       const { effects } = await expectSaga(deleteColumnsWatcher)
-        .withState(state)
+        .withState(localState)
         .dispatch(action)
         .silentRun(100);
 
-      // Should dispatch deleteColumnsRequest for the orphaned column
-      const putEffects = effects.put;
-      expect(putEffects.length).toBeGreaterThan(0);
-      const deleteAction = putEffects.find((effect) =>
-        effect.payload.action.payload.columnIds.includes(orphanedColumn.id)
+      const putEffect = effects.put.find(
+        (effect) => effect.payload.action.type === deleteColumnsRequest.type
       );
-      expect(deleteAction).toBeDefined();
+
+      expect(putEffect).toBeDefined();
+      expect(putEffect.payload.action.payload.columnIds).toContain(
+        orphanedColumn.id
+      );
     });
 
-    it("should not delete columns when columnIds property was not changed", async () => {
+    it("does not call deleteColumnsRequest if there are no orphaned columns", async () => {
       const action = updateOperationsSuccess({
         changedPropertiesById: {
-          [operations[0].id]: ["name", "operationType"],
+          [operations[0].id]: ["columnIds"],
         },
       });
-
-      const { effects } = await expectSaga(deleteColumnsWatcher)
+      const result = await expectSaga(deleteColumnsWatcher)
         .withState(state)
         .dispatch(action)
         .silentRun(100);
 
-      // Should not dispatch any delete columns requests
-      const putEffects = effects.put?.filter(
-        (effect) => effect.action.type === deleteColumnsRequest.type
+      const putEffects = result.allEffects.filter(
+        (effect) =>
+          effect.type === "PUT" &&
+          effect.payload.action.type === deleteColumnsRequest.type
       );
 
-      expect(putEffects).toBeUndefined();
+      expect(putEffects.length).toBe(0);
     });
+
+    // beforeEach(async () => {
+    //   orphanedColumn = Column();
+    //   orphanedColumn.parentId = operations[0].id;
+    //   state.columns.byId[orphanedColumn.id] = orphanedColumn;
+    //   state.columns.allIds.push(orphanedColumn.id);
+
+    //   action = updateOperationsSuccess({
+    //     changedPropertiesById: {
+    //       [operations[0].id]: ["columnIds"],
+    //     },
+    //   });
+    //   result = await expectSaga(deleteColumnsWatcher)
+    //     .withState(state)
+    //     .dispatch(action)
+    //     .silentRun(100);
+    // });
+
+    // it("should call handleOrphanedColumns", async () => {
+    //   // Should call the worker to handle orphaned columns
+    //   const handleOrphanedColumnsCalls = result.allEffects.filter(
+    //     (effect) =>
+    //       effect.type === "FORK" && effect.payload.fn == handleOrphanedColumns
+    //   );
+
+    //   // Expect handleOrphanedColumns to be called once
+    //   expect(handleOrphanedColumnsCalls.length).toEqual(1);
+    // });
+
+    // describe("handleOrphanedColumns", () => {
+    //   it("should call deleteColumnsRequest if there are orphaned columns", async () => {
+
+    //   });
+    // });
   });
 });

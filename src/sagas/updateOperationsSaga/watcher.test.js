@@ -110,6 +110,7 @@ describe("updateOperationsSaga watcher", () => {
       expect(updatePayload.operationUpdates[0]).toEqual({
         id: packOp.id,
         columnCount: null,
+        isInSync: false,
         joinType: DEFAULT_JOIN_TYPE,
         joinPredicate: DEFAULT_JOIN_PREDICATE,
       });

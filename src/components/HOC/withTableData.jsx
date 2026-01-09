@@ -297,7 +297,13 @@ export default function withTableData(WrappedComponent) {
      */
     const deleteColumns = useCallback(
       (columnIdsToDelete) =>
-        dispatch(deleteColumnsRequest({ columnIds: columnIdsToDelete })),
+        dispatch(
+          deleteColumnsRequest({
+            columnIds: columnIdsToDelete,
+            recurse: false,
+            deleteFromDatabase: true,
+          })
+        ),
       [dispatch]
     );
 

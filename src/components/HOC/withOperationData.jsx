@@ -403,7 +403,13 @@ export default function withOperationData(WrappedComponent) {
 
     const deleteColumns = useCallback(
       (columnIdsToDelete) => {
-        dispatch(deleteColumnsRequest({ columnIds: columnIdsToDelete }));
+        dispatch(
+          deleteColumnsRequest({
+            columnIds: columnIdsToDelete,
+            recurse: true,
+            deleteFromDatabase: true,
+          })
+        );
       },
       [dispatch]
     );

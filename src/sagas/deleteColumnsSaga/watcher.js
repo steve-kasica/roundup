@@ -24,6 +24,7 @@ import {
   selectColumnsById,
 } from "../../slices/columnsSlice";
 import {
+  isOperationId,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectOperationsById,
@@ -40,22 +41,24 @@ export default function* deleteColumnsSaga() {
   // will recurse into the child tables/operations to delete the appropriate
   // columns as well.
   yield takeEvery(deleteColumnsRequest.type, function* (action) {
-    const tablesToAlter = [];
-    let { columnIds } = action.payload;
+    let { columnIds, recurse, deleteFromDatabase } = action.payload;
     columnIds = Array.isArray(columnIds) ? columnIds : [columnIds];
+
     const columns = yield select((state) =>
       selectColumnsById(state, columnIds)
     );
+
     const columnsToDeleteByParentId = group(columns, (col) => col.parentId);
 
+    const tablesToAlter = [];
     for (let [parentId, columnsToDelete] of columnsToDeleteByParentId) {
-      if (isTableId(parentId)) {
+      if (isTableId(parentId) || (!isOperationId(parentId) && !recurse)) {
         tablesToAlter.push({
           tableId: parentId,
           columnsToDelete,
-          deleteFromDatabase: true,
+          deleteFromDatabase,
         });
-      } else {
+      } else if (isOperationId(parentId) && recurse) {
         // If we're deleting operation columns, then we need to recurse into the children
         // tables/operations, map the operation columns to the appropriate table columns
         // and dispatch a delete columns request with those child columns.
@@ -85,7 +88,13 @@ export default function* deleteColumnsSaga() {
             );
           }
         }
-        yield put(deleteColumnsRequest({ columnIds: childColumnIdsToDelete }));
+        yield put(
+          deleteColumnsRequest({
+            columnIds: childColumnIdsToDelete,
+            recurse: true,
+            deleteFromDatabase,
+          })
+        );
       }
     }
     yield call(deleteColumnsWorker, tablesToAlter);
@@ -107,17 +116,16 @@ export default function* deleteColumnsSaga() {
         if (orphanedColumnIds.length > 0) {
           // Bypass deleteColumnsRequest to avoid recursing into table columns
           // since we're just swapping out operation columns here.
-          yield call(deleteColumnsWorker, [
-            {
-              tableId: operationId,
-              columnsToDelete: orphanedColumnIds.map((id) => ({ id })),
+          yield put(
+            deleteColumnsRequest({
+              columnIds: orphanedColumnIds,
+              recurse: false,
               deleteFromDatabase: false,
-            },
-          ]);
+            })
+          );
         }
       }
     }
-    yield null;
   });
 
   // If tables are deleted, we need to delete their columns as well
