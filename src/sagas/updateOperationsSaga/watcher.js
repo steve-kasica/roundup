@@ -67,44 +67,38 @@ export default function* updateOperationsWatcher() {
   // When a table is updated, if it's columnIds property has changed
   // and the table is the child of a operation, we need to flag that
   // the operation is out-of-sync.
-  yield takeEvery(updateTablesSuccess.type, handleRematerializations);
-  yield takeEvery(updateOperationsSuccess.type, handleRematerializations);
-
-  // When a Pack operation's join parameters change, we need to
-  // recalculate its pack statistics.
-  yield takeEvery(updateOperationsSuccess.type, function* (action) {
+  yield takeEvery(updateTablesSuccess.type, function* (action) {
+    const rematerializationProperteies = ["columnIds", "childIds"];
     const { changedPropertiesById } = action.payload;
     const operationUpdates = [];
+    const focusedOperationId = yield select(selectFocusedObjectId);
 
     for (const [id, changedProperties] of Object.entries(
       changedPropertiesById
     )) {
-      const hasJoinParamChange = changedProperties.some((prop) =>
-        ["joinPredicate", "joinKey1", "joinKey2", "childIds"].includes(prop)
+      const hasSchemaChange = changedProperties.some((prop) =>
+        rematerializationProperteies.includes(prop)
       );
-      if (!hasJoinParamChange) {
-        continue;
-      }
-
-      const hasValidParams = yield select((state) => {
-        const operation = selectOperationsById(state, id);
-        return (
-          operation.operationType === OPERATION_TYPE_PACK &&
-          operation.joinKey1 &&
-          operation.joinKey2 &&
-          operation.joinPredicate &&
-          operation.childIds.length === 2
+      if (hasSchemaChange) {
+        const { parentId } = yield select((state) =>
+          isTableId(id)
+            ? selectTablesById(state, id)
+            : selectOperationsById(state, id)
         );
-      });
 
-      if (hasValidParams) {
-        const operation = yield select((state) =>
-          selectOperationsById(state, id)
-        );
-        if (operation.operationType === OPERATION_TYPE_PACK) {
+        if (parentId) {
           operationUpdates.push({
-            id,
-            matchStats: {}, // matchStats will be recalculated in the worker
+            id: parentId,
+            ...(parentId === focusedOperationId
+              ? {
+                  // If the operation is focused, we can set it to out-of-sync
+                  isInSync: false,
+                }
+              : {
+                  // If the operation is not focused, we set isMaterialized to null
+                  // so that when the user focuses on it, it will re-materialize
+                  isMaterialized: null,
+                }),
           });
         }
       }
@@ -118,50 +112,78 @@ export default function* updateOperationsWatcher() {
       );
     }
   });
-}
 
-// Note: both tables and operation update success actions will pass
-// the same object key in their payloads, `changedPropertiesById`
-function* handleRematerializations(action) {
-  const rematerializationProperteies = ["columnIds", "childIds"];
-  const { changedPropertiesById } = action.payload;
-  const operationUpdates = [];
-  const focusedOperationId = yield select(selectFocusedObjectId);
+  // When a Pack operation's join parameters change, we need to
+  // recalculate its pack statistics.
+  yield takeEvery(updateOperationsSuccess.type, function* (action) {
+    const rematerializationProperteies = ["columnIds", "childIds"];
+    const joinParameterProperties = [
+      "joinPredicate",
+      "joinKey1",
+      "joinKey2",
+      "childIds",
+    ];
+    const { changedPropertiesById } = action.payload;
+    const operationUpdates = [];
 
-  for (const [id, changedProperties] of Object.entries(changedPropertiesById)) {
-    const hasSchemaChange = changedProperties.some((prop) =>
-      rematerializationProperteies.includes(prop)
-    );
-    if (hasSchemaChange) {
-      const { parentId } = yield select((state) =>
-        isTableId(id)
-          ? selectTablesById(state, id)
-          : selectOperationsById(state, id)
+    for (const [id, changedProperties] of Object.entries(
+      changedPropertiesById
+    )) {
+      const operation = yield select((state) =>
+        selectOperationsById(state, id)
       );
-
-      if (parentId) {
-        operationUpdates.push({
-          id: parentId,
-          ...(parentId === focusedOperationId
-            ? {
-                // If the operation is focused, we can set it to out-of-sync
-                isInSync: false,
-              }
-            : {
-                // If the operation is not focused, we set isMaterialized to null
-                // so that when the user focuses on it, it will re-materialize
-                isMaterialized: null,
-              }),
-        });
+      if (
+        changedProperties.some(
+          (prop) =>
+            joinParameterProperties.includes(prop) &&
+            operation.operationType === OPERATION_TYPE_PACK
+        )
+      ) {
+        const hasValidParams =
+          operation.operationType === OPERATION_TYPE_PACK &&
+          operation.joinKey1 &&
+          operation.joinKey2 &&
+          operation.joinPredicate &&
+          operation.childIds.length === 2;
+        if (hasValidParams) {
+          operationUpdates.push({
+            id,
+            matchStats: {}, // matchStats will be recalculated in the worker
+          });
+        }
+      } else if (
+        changedProperties.some((prop) =>
+          rematerializationProperteies.includes(prop)
+        )
+      ) {
+        const focusedOperationId = yield select(selectFocusedObjectId);
+        const { parentId } = yield select((state) =>
+          selectOperationsById(state, id)
+        );
+        if (parentId) {
+          operationUpdates.push({
+            id: parentId,
+            ...(parentId === focusedOperationId
+              ? {
+                  // If the operation is focused, we can set it to out-of-sync
+                  isInSync: false,
+                }
+              : {
+                  // If the operation is not focused, we set isMaterialized to null
+                  // so that when the user focuses on it, it will re-materialize
+                  isMaterialized: null,
+                }),
+          });
+        }
       }
     }
-  }
 
-  if (operationUpdates.length > 0) {
-    yield put(
-      updateOperationsRequest({
-        operationUpdates,
-      })
-    );
-  }
+    if (operationUpdates.length > 0) {
+      yield put(
+        updateOperationsRequest({
+          operationUpdates,
+        })
+      );
+    }
+  });
 }
