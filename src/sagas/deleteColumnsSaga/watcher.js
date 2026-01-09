@@ -29,6 +29,7 @@ import {
   selectAllColumnIdsByParentId,
   selectOrphanedColumnIds,
 } from "../../slices/columnsSlice/selectors";
+import { deleteOperationsSuccess } from "../deleteOperationsSaga/actions";
 
 export default function* deleteColumnsSaga() {
   // Main watcher for delete columns requests
@@ -136,6 +137,24 @@ export default function* deleteColumnsSaga() {
           columnIds: orphanedColumnIds.flat(),
           recurse: false,
           deleteFromDatabase: false, // Tables are already deleted from DB when table was deleted
+        })
+      );
+    }
+  });
+
+  // If an operation is deleted, we need to delete its columns as well
+  yield takeLatest(deleteOperationsSuccess.type, function* (action) {
+    const { operationIds } = action.payload;
+    // Extract all column IDs from the deleted operations
+    const orphanedColumnIds = yield select((state) =>
+      selectAllColumnIdsByParentId(state, operationIds)
+    );
+    if (orphanedColumnIds.length > 0) {
+      yield put(
+        deleteColumnsRequest({
+          columnIds: orphanedColumnIds.flat(),
+          recurse: false,
+          deleteFromDatabase: false, // Operations are already deleted from DB when operation was deleted
         })
       );
     }

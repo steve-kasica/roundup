@@ -27,6 +27,7 @@ import deleteColumnsWorker from "./worker";
 import { expectSaga } from "redux-saga-test-plan";
 import { initialState } from "../../slices/uiSlice";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
+import { deleteOperationsSuccess } from "../deleteOperationsSaga/actions";
 
 describe("deleteColumnsSaga watcher", () => {
   let state, operations, tables, columns;
@@ -78,7 +79,7 @@ describe("deleteColumnsSaga watcher", () => {
     };
   });
 
-  describe("handling deleteColumnsRequest", () => {
+  describe("handling deleteColumnsRequest actions", () => {
     describe("when the parent is a table", () => {
       it("should call the delete columns worker with the table ID and an array column IDs", async () => {
         const action = deleteColumnsRequest({
@@ -224,7 +225,7 @@ describe("deleteColumnsSaga watcher", () => {
     });
   });
 
-  describe("handling updateOperationsSuccess", () => {
+  describe("handling updateOperationsSuccess actions", () => {
     it("puts a deleteColumnsRequest if there are orphaned columns with the correct columnIds", async () => {
       const localState = JSON.parse(JSON.stringify(state));
       const orphanedColumn = Column();
@@ -272,7 +273,7 @@ describe("deleteColumnsSaga watcher", () => {
     });
   });
 
-  describe("handling deleteTablesSuccessRequest", () => {
+  describe("handling deleteTablesSuccess actions", () => {
     it("should call deleteColumnsWorker with columns belonging to deleted tables", async () => {
       const localState = JSON.parse(JSON.stringify(state));
 
@@ -304,6 +305,34 @@ describe("deleteColumnsSaga watcher", () => {
       );
       expect(putEffect.payload.action.payload.columnIds).toContain(
         columns[1].id
+      );
+    });
+  });
+
+  describe("handling deleteOperationsSuccess actions", () => {
+    it("should call deleteColumnsWorker with columns belonging to deleted operations", async () => {
+      const action = deleteOperationsSuccess({
+        operationIds: [operations[0].id],
+      });
+
+      const result = await expectSaga(deleteColumnsWatcher)
+        .withState(state)
+        .dispatch(action)
+        .silentRun(100);
+
+      const putEffects = result.allEffects.filter(
+        (effect) =>
+          effect.type === "PUT" &&
+          effect.payload.action.type === deleteColumnsRequest.type
+      );
+
+      expect(putEffects.length).toBe(1);
+      const putEffect = putEffects[0];
+      expect(putEffect.payload.action.payload.columnIds).toContain(
+        columns[4].id
+      );
+      expect(putEffect.payload.action.payload.columnIds).toContain(
+        columns[5].id
       );
     });
   });

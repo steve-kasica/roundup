@@ -15,9 +15,11 @@ title: Delete Columns Saga
     deleteCols:Delete columns saga
     updateOps:Update operations saga
     deleteTables:Delete tables saga
+    deleteOps:Delete operations saga
     deleteCols --> deleteCols: columns' parent is an operation
     updateOps --> deleteCols: update orphans columns
-    deleteTables --> deleteCols: deletion orphans columns
+    deleteTables --> deleteCols: delete orphaned columns
+    deleteOps --> deleteCols: delete orphaned columns
 ```
 
 ## Recursive deletion of operation columns
