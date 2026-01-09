@@ -10,8 +10,6 @@ import {
   Operation,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-  JOIN_TYPES,
-  JOIN_PREDICATES,
   selectOperationsById,
   DEFAULT_JOIN_TYPE,
   DEFAULT_JOIN_PREDICATE,
@@ -35,8 +33,8 @@ describe("updateOperationsSaga watcher", () => {
       ui: { focusedOperationId: null },
     };
   });
-  describe("basic watcher functionality", () => {
-    it("should call worker saga when updateOperationsRequest is dispatched", async () => {
+  describe("handling updateOperationsRequest actions", () => {
+    it("should call worker saga", async () => {
       const action = updateOperationsRequest({
         operationUpdates: [{ id: stackOp.id, columnCount: 5 }],
       });
@@ -54,7 +52,7 @@ describe("updateOperationsSaga watcher", () => {
     });
   });
 
-  describe("newly created operations", () => {
+  describe("handling createOperationsSuccess actions", () => {
     it("should dispatch updateOperationsRequest with columnCount null for newly created STACK operation", async () => {
       const action = createOperationsSuccess({
         operationIds: [stackOp.id],
@@ -159,7 +157,7 @@ describe("updateOperationsSaga watcher", () => {
     });
   });
 
-  describe("child table updates triggering rematerialization", () => {
+  describe("handling updateTablesSuccess actions", () => {
     let state, columns, parentOp, table;
     beforeEach(() => {
       columns = Array.from({ length: 4 }, () => Column({ parentId: null }));
@@ -275,7 +273,7 @@ describe("updateOperationsSaga watcher", () => {
     });
   });
 
-  describe("child operation updates triggering rematerialization", () => {
+  describe("handling updateOperationsSuccess actions", () => {
     let state, columns, operations, tables;
     beforeEach(() => {
       operations = Array.from({ length: 2 }, () => Operation());
@@ -357,6 +355,7 @@ describe("updateOperationsSaga watcher", () => {
         )
       ).toBe(true);
     });
+
     it("should dispatch rematerialization request on parent when child operation's childIds is updated", async () => {
       const action = updateOperationsSuccess({
         changedPropertiesById: {
@@ -409,9 +408,5 @@ describe("updateOperationsSaga watcher", () => {
       // Should not trigger rematerialization for orphan tables
       expect(rematerializationRequests).toHaveLength(0);
     });
-
-    // it("should not dispatch rematerialization when operation is root", async () => {
-    //     // TODO
-    // });
   });
 });
