@@ -1,94 +1,57 @@
-### Creating tables
+# Sagas
 
-Trigger chain for `createTablesSaga`, this happens when a user uploads
-a new file to Roundup/
+## Structure of sagas
 
-\*`updateTablesSaga` behaves differently whether or it is called via a `createColumnSuccess` event or a `createTablesSuccess`. The latest only updates the `columnIds` property of the table, which provides the up-to-date mapping between tables and columns.
+Each saga typically consists of three main files:
 
-Sagas also address the added complexity of denormalizing the Redux state, coordinating updates across slices. Roundup frequently needs to inverse lookup, e.g. get all columns from this table. So that these computations are $O(1)$ and not $O(n)$ where $n$ equals the number of columns across all tables and operations. We denormalize the state and derive indexes. Sagas are where we implement logic to maintain consistency across slices since inverse lookups are performance-critical. Thus we pay an additional cost at write-time (more complex updates), but reap the benefits at read time. Thus, while Sagas have other purposes, they also serve as middleware for maintaining consistency across slices.
+- `watcher.js`: Listens for specific Redux actions and triggers the corresponding worker saga.
+- `worker.js`: Contains the logic to perform the side effects, such as database operations and state updates.
+- `actions.js`: Defines Redux action creators used to initiate saga processes.
 
-# Control flows
+We also include a `README.md` file in each saga directory to document its purpose, actions, payload structures, downstream effects, and relationships with other sagas.
 
-## Uploading a source table
+Our `watcher.js` files do more than just watch for actions; they also handle complex orchestration logic. This includes responding to actions from other sagas, managing cascading updates, and ensuring that related data objects remain consistent across the application state. This ensure that the `worker.js` files can focus solely on their core responsibilities of updating the database and state without being burdened by orchestration logic.
 
-When the user uploads a source table from their personal computer. The following happens in the Sagas layer
+## Relationship between sagas
 
-```mermaid
-flowchart LR
-   Start -->|request| B[[Create<br>tables<br>saga]]
-      B -->|success| E[[Create<br>columns<br>saga]]
-         E -->|success| H[[Update<br>columns<br>saga]]
-               H -->|success| Z
-               H -->|failure| Z
-         E -->|failure| Z
-      B -->|failure| Z[[handleAlerts]]
-   Z --> End
-```
-
-## Creating an operation
+Sagas orchestrate complex workflows in Roundup, managing side effects, interacting with databases, and ensuring state consistency across Redux slices. They listen for specific actions and trigger worker sagas to perform three tasks: creation, update, deletion, on three different data objects: tables, columns, and operations such as updating tables, columns, and operations.
 
 ```mermaid
-flowchart LR
-   A(Create<br>operations<br>request) --> B[[Create<br>operations<br>saga]]
-      B --> C(Create<br>operations<br>success)
-         C --> E[[Update<br>operations<br>saga]]
-            E --> F(Update<br>operations<br>success)
-               F --> Z[[handleAlerts]]
-            E --> G(Update<br>operations<br>failure)
-               G --> Z[[handleAlerts]]
-         C --> Z
-      B --> D(Create<br>operations<br>failure)
-         D --> Z[[handleAlerts]]
+   stateDiagram
 
+   alertsSaga:Alerts
+   updateOps:Update operations
+   updateTables:Update tables
+   updateCols:Update columns
+   createOps:Create operations
+   createTables:Create tables
+   createCols:Create columns
+   deleteOps:Delete operations
+   deleteTables:Delete tables
+   deleteCols:Delete columns
+
+   createCols --> createCols: Operation column creation triggers child table/operation column creation
+   createTables --> createCols: Table is created
+   updateOps --> createCols: Operation has been (re)materialized
+
+   updateOps --> alertsSaga: If certain properties are modified
+   createOps --> alertsSaga: Any new operation
+   updateTables --> alertsSaga: Certain properties are modified
+
+   deleteCols --> deleteCols: columns' parent is an operation
+   updateOps --> deleteCols: update orphans columns
+   deleteTables --> deleteCols: delete orphaned columns
+   deleteOps --> deleteCols: delete orphaned columns
+
+   updateOps --> deleteOps: Update creates a childless operation
+   deleteOps --> deleteOps: If operation has operation children
+
+   updateTables-->deleteTables: Deleting all columns
+   deleteOps-->deleteTables: Delete any child tables
+
+   createCols --> updateCols: Update newly created columns
+
+   createOps --> updateOps: Sets defaults for new operations
+   updateTables --> updateOps: Flags operations as out-of-sync
+   updateOps --> updateOps: Handles cascading updates and rematerialization
 ```
-
-## Inserting a column into a child table (of an operation)
-
-```mermaid
-%%{init: {'theme': 'base'}}%%
-graph TB
-   subgraph o1["O<sub>1</sub>"]
-      direction TB
-      C5["C<sub>5</sub>"]
-      C10["C<sub>10</sub>"]
-      C6["C<sub>6</sub>"]
-      C7["C<sub>7</sub>"]
-      C8["C<sub>8</sub>"]
-   end
-   subgraph t1["T<sub>1</sub>"]
-      direction TB
-      C1["C<sub>1</sub>"]
-      C9["C<sub>9</sub>"]
-      C2["C<sub>2</sub>"]
-   end
-   subgraph t2["T<sub>2</sub>"]
-      direction TB
-      C3["C<sub>3</sub>"]
-      C4["C<sub>4</sub>"]
-   end
-   o1 --- t1
-   o1 --- t2
-```
-
-### How schema change proprogate through the AST
-
-#### Inserting columns into an child operation
-
-For example, inserting a new column into O<sub>2</sub>.
-
-```mermaid
-   graph TB
-   O1(("O<sub>1<sub>")) --->|1. Insert| O2(("O<sub>2<sub>"))
-      O2 -->|4. Update| O1
-   O1 --- T3["T<sub>3<sub>"]
-   O2 --->|2. Insert| T1["T<sub>1<sub>"]
-      T1 -->|3. Update| O2
-   O2 --- T2["T<sub>2<sub>"]
-
-   linkStyle 0 stroke: red
-   linkStyle 1 stroke: red
-   linkStyle 3 stroke: red
-   linkStyle 4 stroke: red
-```
-
----
