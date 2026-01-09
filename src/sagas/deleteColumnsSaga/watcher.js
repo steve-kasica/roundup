@@ -19,7 +19,7 @@ import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
 import { deleteColumnsRequest } from "./actions";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
 import {
-  selectActiveColumnIdsByParentId,
+  selectColumnIdsByParentId,
   selectColumnIdsByParentId,
   selectColumnsById,
 } from "../../slices/columnsSlice";
@@ -67,7 +67,7 @@ export default function* deleteColumnsSaga() {
           selectOperationsById(state, parentId)
         );
         const childColumnIds = yield select((state) =>
-          selectActiveColumnIdsByParentId(state, operation.childIds)
+          selectColumnIdsByParentId(state, operation.childIds)
         );
         for (let { id } of columnsToDelete) {
           const columnIndex = operation.columnIds.indexOf(id);
@@ -137,7 +137,13 @@ export default function* deleteColumnsSaga() {
       selectColumnIdsByParentId(state, tableIds)
     );
     if (orphanedColumnIds.length > 0) {
-      yield put(deleteColumnsRequest({ columnIds: orphanedColumnIds.flat() }));
+      yield put(
+        deleteColumnsRequest({
+          columnIds: orphanedColumnIds.flat(),
+          recurse: false,
+          deleteFromDatabase: false, // Tables are already deleted from DB when table was deleted
+        })
+      );
     }
   });
 }

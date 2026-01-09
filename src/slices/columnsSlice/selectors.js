@@ -21,11 +21,12 @@ import { createSelector } from "reselect";
 import { selectSelectedColumnIds } from "../uiSlice";
 import { isTableId, selectTablesById } from "../tablesSlice";
 import { selectOperationsById } from "../operationsSlice";
+import { normalizeInputToArray } from "../utilities";
 
 /**
- * Select ALL column IDs for a specific `parentId`, by iterating over the entire set of columns in Redux.
- * TODO: should table schema and stack schema should have just been using a different selector? Check how
- * this selector is used in the app.
+ * Selects all column IDs for a specific `parentId`, by returning the `columnIds` array from either the table
+ * or operation corresponding to that `parentId`. It will not return orphaned columns that exist in the columns slice but are not
+ * currently associated with the table/operation.
  *
  * @param {Object} state - The Redux state.
  * @param {string|string[]} parentId - The ID(s) of the table/operation to get all columns for.
@@ -47,6 +48,34 @@ export const selectColumnIdsByParentId = createSelector(
 
     if (Array.isArray(parentIds)) {
       return parentIds.map(getColumnIds);
+    }
+    return getColumnIds(parentIds);
+  }
+);
+
+/**
+ * Selects all column IDs fro a specific `parentId`, by iterating over the columns slice
+ * and returning all columns that have a matching `parentId`. This includes both orphaned
+ * columns. The order of the returned column IDs is not guaranteed to match the order
+ * in the parent table/operation's `columnIds` array.
+ *
+ * @param {Object} state - The Redux state.
+ * @param {string|string[]} parentIds - The ID(s) of the table/operation to get all columns for.
+ * @returns {Array<string>|Array<Array<string>>} An array of all column IDs (both active and hided) associated with the table. If parentIds is an array, returns an array of arrays. Returns an empty array if there are no columns with the given parentId(s).
+ * @type {import('@reduxjs/toolkit').Selector<any, string|string[], Array<string>|Array<Array<string>>>}
+ */
+export const selectAllColumnIdsByParentId = createSelector(
+  [(state) => state.columns.byId, (_state, parentIds) => parentIds],
+  (columnsById, parentIds) => {
+    const parentIdArray = normalizeInputToArray(parentIds);
+
+    const getColumnIds = (id) =>
+      Object.values(columnsById)
+        .filter((col) => col.parentId === id)
+        .map((col) => col.id);
+
+    if (Array.isArray(parentIds)) {
+      return parentIdArray.map(getColumnIds);
     }
     return getColumnIds(parentIds);
   }
@@ -129,25 +158,6 @@ export const selectSelectedColumnIdsByParentId = createSelector(
     });
 
     return output.length === 1 ? output[0] : output;
-  }
-);
-
-export const selectActiveColumnIdsByParentId = createSelector(
-  [
-    (state) => state.tables.byId,
-    (state) => state.operations.byId,
-    (state, parentIds) => parentIds,
-  ],
-  (tablesById, operationsById, parentIds) => {
-    if (Array.isArray(parentIds)) {
-      const columnIds = parentIds.map(
-        (id) => (isTableId(id) ? tablesById : operationsById)[id].columnIds
-      );
-      return columnIds;
-    } else {
-      return (isTableId(parentIds) ? tablesById : operationsById)[parentIds]
-        .columnIds;
-    }
   }
 );
 

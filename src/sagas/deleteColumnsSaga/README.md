@@ -12,40 +12,23 @@ The delete columns saga handles the removal of columns from both DuckDB tables a
 title: Delete Columns Saga
 ---
   stateDiagram
-    deleteCols:Delete columns Saga
+    deleteCols:Delete columns saga
     updateOps:Update operations saga
+    deleteTables:Delete tables saga
     deleteCols --> deleteCols: columns' parent is an operation
     updateOps --> deleteCols: update orphans columns
+    deleteTables --> deleteCols: deletion orphans columns
 ```
 
-## Recursive Deletion
+## Recursive deletion of operation columns
 
-When deleting columns from an operation:
+Operation columns are derived from table columns. Deletion of operation column implies the deletion of child table columns. Opeation columns are derived differently depending on whether the operation is a _stack_ or a _pack_ operation:
 
-### PACK Operations
-
-- Column at index `i` maps to left table column if `i < leftTableColumnCount`
-- Otherwise maps to right table column at `i - leftTableColumnCount`
-
-### STACK Operations
-
-- Column at index `i` maps to column at same index in all child tables
-
-## Actions
-
-| Action                 | Type    | Description                 |
-| ---------------------- | ------- | --------------------------- |
-| `deleteColumnsRequest` | Request | Initiates column deletion   |
-| `deleteColumnsSuccess` | Success | Signals successful deletion |
-| `deleteColumnsFailure` | Failure | Signals deletion failure    |
-
-## Payload Structure
-
-```javascript
-{
-  columnIds: ['col_1', 'col_2', ...]
-}
-```
+- _Pack_ operations
+  - Operation column at index `i` maps to left table column if `i < leftTableColumnCount`
+  - Otherwise maps to right table column at `i - leftTableColumnCount`
+- _Stack_ operations
+  - Column at index `i` maps to column at same index in all child tables
 
 ## Files
 

@@ -24,7 +24,7 @@ import {
   MATCH_STATS_DEFAULT,
 } from "../../slices/operationsSlice";
 import {
-  selectActiveColumnIdsByParentId,
+  selectColumnIdsByParentId,
   selectSelectedColumnIdsByParentId,
 } from "../../slices/columnsSlice";
 import {
@@ -293,7 +293,7 @@ export default function withOperationData(WrappedComponent) {
      * @type {Array<Array<string>>}
      */
     const childColumnIds = useSelector((state) =>
-      selectActiveColumnIdsByParentId(state, childIds)
+      selectColumnIdsByParentId(state, childIds)
     );
 
     /**

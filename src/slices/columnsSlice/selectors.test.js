@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import {
-  selectActiveColumnIdsByParentId,
+  selectAllColumnIdsByParentId,
   selectColumnIdsByParentId,
   selectColumnIndexById,
   selectColumnNamesById,
@@ -152,25 +152,27 @@ describe("Column selectors", () => {
       ).toEqual([[column4.id], [column1.id]]);
     });
   });
-  describe("selectActiveColumnIdsByParentId", () => {
+  describe("selectColumnIdsByParentId", () => {
     it("should return active column IDs for a given table ID", () => {
-      expect(
-        selectActiveColumnIdsByParentId(state, [table1.id, table2.id])
-      ).toEqual([[column1.id, column2.id], [column3.id]]);
+      expect(selectColumnIdsByParentId(state, [table1.id, table2.id])).toEqual([
+        [column1.id, column2.id],
+        [column3.id],
+      ]);
     });
     it("should return activeColumn IDs given multiple tableIDs", () => {
-      expect(
-        selectActiveColumnIdsByParentId(state, [table1.id, table2.id])
-      ).toEqual([[column1.id, column2.id], [column3.id]]);
+      expect(selectColumnIdsByParentId(state, [table1.id, table2.id])).toEqual([
+        [column1.id, column2.id],
+        [column3.id],
+      ]);
     });
     it("should return active column IDs for a given operation ID", () => {
-      expect(selectActiveColumnIdsByParentId(state, operation1.id)).toEqual([
+      expect(selectColumnIdsByParentId(state, operation1.id)).toEqual([
         column4.id,
         column5.id,
       ]);
     });
     it("Should return a matrix if given an array of one tableId", () => {
-      expect(selectActiveColumnIdsByParentId(state, [table2.id])).toEqual([
+      expect(selectColumnIdsByParentId(state, [table2.id])).toEqual([
         [column3.id],
       ]);
     });
@@ -202,6 +204,54 @@ describe("Column selectors", () => {
         operation1.id
       );
       expect(orphanedColumnIds).toEqual([column5.id]);
+    });
+  });
+  describe("selectAllColumnIdsByParentId", () => {
+    it("should return all column IDs (including orphaned) for a single parent ID", () => {
+      const result = selectAllColumnIdsByParentId(state, table1.id);
+      expect(result).toHaveLength(2);
+      expect(result).toContain(column1.id);
+      expect(result).toContain(column2.id);
+    });
+    it("should return an empty array for a parent ID with no columns", () => {
+      expect(selectAllColumnIdsByParentId(state, table3.id)).toEqual([]);
+    });
+    it("should return a matrix of all column IDs for multiple parent IDs", () => {
+      const result = selectAllColumnIdsByParentId(state, [
+        table1.id,
+        table2.id,
+      ]);
+      expect(result).toHaveLength(2);
+      expect(result[0]).toHaveLength(2);
+      expect(result[0]).toContain(column1.id);
+      expect(result[0]).toContain(column2.id);
+      expect(result[1]).toHaveLength(1);
+      expect(result[1]).toContain(column3.id);
+    });
+    it("should return all column IDs including orphaned columns for an operation", () => {
+      const localState = {
+        ...state,
+        operations: {
+          byId: {
+            [operation1.id]: {
+              ...operation1,
+              columnIds: [column4.id], // column5 is orphaned but should still be returned
+            },
+          },
+          allIds: [operation1.id],
+        },
+      };
+      const result = selectAllColumnIdsByParentId(localState, operation1.id);
+      expect(result).toHaveLength(2);
+      expect(result).toContain(column4.id);
+      expect(result).toContain(column5.id);
+    });
+    it("should return all column IDs for multiple operation IDs", () => {
+      const result = selectAllColumnIdsByParentId(state, [operation1.id]);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toHaveLength(2);
+      expect(result[0]).toContain(column4.id);
+      expect(result[0]).toContain(column5.id);
     });
   });
 });

@@ -30,7 +30,7 @@ import {
   testPackOperationForFatalErrors,
 } from "../../slices/alertsSlice";
 import {
-  selectActiveColumnIdsByParentId,
+  selectColumnIdsByParentId,
   selectColumnsById,
 } from "../../slices/columnsSlice";
 import { updateTablesSuccess } from "../updateTablesSaga";
@@ -53,7 +53,7 @@ export default function* updateAlertsSagaWatcher() {
       );
       if (operation.operationType === OPERATION_TYPE_STACK) {
         const childColumns = yield select((state) => {
-          const childColumnIdsMatrix = selectActiveColumnIdsByParentId(
+          const childColumnIdsMatrix = selectColumnIdsByParentId(
             state,
             operation.childIds
           );

@@ -12,6 +12,7 @@ import deleteColumnsWatcher from "./watcher";
 import deleteColumnsWorker from "./worker";
 import { expectSaga } from "redux-saga-test-plan";
 import { initialState } from "../../slices/uiSlice";
+import { deleteTablesSuccess } from "../deleteTablesSaga";
 
 describe("deleteColumnsSaga watcher", () => {
   let state, operations, tables, columns;
@@ -255,39 +256,41 @@ describe("deleteColumnsSaga watcher", () => {
 
       expect(putEffects.length).toBe(0);
     });
+  });
 
-    // beforeEach(async () => {
-    //   orphanedColumn = Column();
-    //   orphanedColumn.parentId = operations[0].id;
-    //   state.columns.byId[orphanedColumn.id] = orphanedColumn;
-    //   state.columns.allIds.push(orphanedColumn.id);
+  describe("handling deleteTablesSuccessRequest", () => {
+    it("should call deleteColumnsWorker with columns belonging to deleted tables", async () => {
+      const localState = JSON.parse(JSON.stringify(state));
 
-    //   action = updateOperationsSuccess({
-    //     changedPropertiesById: {
-    //       [operations[0].id]: ["columnIds"],
-    //     },
-    //   });
-    //   result = await expectSaga(deleteColumnsWatcher)
-    //     .withState(state)
-    //     .dispatch(action)
-    //     .silentRun(100);
-    // });
+      // Simulate deleting the first table from state
+      delete localState.tables.byId[tables[0].id];
+      localState.tables.allIds = localState.tables.allIds.filter(
+        (id) => id !== tables[0].id
+      );
 
-    // it("should call handleOrphanedColumns", async () => {
-    //   // Should call the worker to handle orphaned columns
-    //   const handleOrphanedColumnsCalls = result.allEffects.filter(
-    //     (effect) =>
-    //       effect.type === "FORK" && effect.payload.fn == handleOrphanedColumns
-    //   );
+      const action = deleteTablesSuccess({
+        tableIds: [tables[0].id],
+      });
 
-    //   // Expect handleOrphanedColumns to be called once
-    //   expect(handleOrphanedColumnsCalls.length).toEqual(1);
-    // });
+      const result = await expectSaga(deleteColumnsWatcher)
+        .withState(localState)
+        .dispatch(action)
+        .silentRun(100);
 
-    // describe("handleOrphanedColumns", () => {
-    //   it("should call deleteColumnsRequest if there are orphaned columns", async () => {
+      const putEffects = result.allEffects.filter(
+        (effect) =>
+          effect.type === "PUT" &&
+          effect.payload.action.type === deleteColumnsRequest.type
+      );
 
-    //   });
-    // });
+      expect(putEffects.length).toBe(1);
+      const putEffect = putEffects[0];
+      expect(putEffect.payload.action.payload.columnIds).toContain(
+        columns[0].id
+      );
+      expect(putEffect.payload.action.payload.columnIds).toContain(
+        columns[1].id
+      );
+    });
   });
 });

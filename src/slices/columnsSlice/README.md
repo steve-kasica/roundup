@@ -73,7 +73,7 @@ Columns have a _polymorphic association_ with their parent objects—they can be
 | `selectColumnIdsByParentId`         | Returns all column IDs for a parent              |
 | `selectColumnNamesById`             | Returns database name(s) for column ID(s)        |
 | `selectSelectedColumnIdsByParentId` | Returns selected columns for a parent            |
-| `selectActiveColumnIdsByParentId`   | Returns active (non-hidden) columns for a parent |
+| `selectColumnIdsByParentId`         | Returns active (non-hidden) columns for a parent |
 
 ## Input Normalization
 
