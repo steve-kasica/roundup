@@ -1,25 +1,20 @@
 # Create Columns Saga
 
-This saga create a column within Roundup. Its purpose is create new column metadata objects, defined in `Column.js`, and link this object to other data objects, e.g. `Table` metadata, `Operation` metadata, and columns within a table or view in the database. At this stage only these properties are populated by this saga: `id`, `parentId`, `databaseName`. Other properties are later populated in `updateColumnsSaga`.
+This saga creates a column within Roundup. Its purpose is create new column metadata objects, defined in `Column.js`, and link this object to other data objects, e.g. `Table` metadata, `Operation` metadata, and columns within a table or view in the database. At this stage only these properties are populated by this saga: `id`, `parentId`, `databaseName`. Other properties are later populated in `updateColumnsSaga`.
 
 Since Roundup denormalizes global state to optimize column lookups, this saga also updates the inverse mapping between `columns` and `tables`/`operations` specified in the `.columnIds` property of both parent object.
 
-## Process
+## Relationship to other sagas
 
 ```mermaid
----
-title: Creation columns saga
----
-flowchart LR
-    start --> A{which mode?}
-    A -->|Insertion| insertionStart
-    subgraph insertColumnsWorker[Insertion mode]
-    insertionStart
-    end
-    A -->|creation| creationStart
-    subgraph createColumnsWorker[Creation mode]
-    creationStart
-    end
+    stateDiagram
+    createCols:Create columns saga
+    createTables:Create tables saga
+    updateOperations:Update operations saga
+
+    createCols --> createCols: Operation column creation triggers child table/operation column creation
+    createTables --> createCols: Table is created
+    updateOperations --> createCols: Operation has been (re)materialized
 ```
 
 ## Inserting columns

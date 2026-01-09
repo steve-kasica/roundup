@@ -79,6 +79,8 @@ export default function Operation({
   joinKey2 = null,
   joinPredicate = JOIN_PREDICATES.EQUALS,
   joinType = JOIN_TYPES.FULL_OUTER,
+  isMaterialized = false,
+  isInSync = false,
 } = {}) {
   const id = `o${++idCounter}`; // Each operation has a unique ID
 
@@ -92,8 +94,8 @@ export default function Operation({
     columnIds,
     hiddenColumnIds, // TODO: delete
     rowCount,
-    isMaterialized: false, // Initially false, can be updated later
-    isInSync: false, // Initially false, can be updated later
+    isMaterialized,
+    isInSync,
 
     // Properties specific to PACK operations
     ...(operationType === OPERATION_TYPE_PACK

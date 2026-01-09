@@ -121,7 +121,7 @@ export default function* createColumnsWatcher() {
         );
         if (operation.isMaterialized) {
           columnLocations.push(
-            ...Array.from({ length: operation.columnCount }).map(
+            ...Array.from({ length: operation.columnIds.length }).map(
               (_, index) => ({
                 parentId: id,
                 parentDatabaseName: operation.databaseName,
