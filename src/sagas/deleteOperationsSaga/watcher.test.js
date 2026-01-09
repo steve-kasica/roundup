@@ -43,15 +43,16 @@ describe("deleteOperationsWatcher", () => {
   describe("handling deleteOperationsRequest actions", () => {
     it("should invoke worker and delete PACK operation from state", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
+          childIds: ["t1", "t2"],
           databaseName: "pack_view_1",
         },
       });
 
       const action = deleteOperationsRequest({
-        operationIds: ["o_1"],
+        operationIds: ["o1"],
       });
 
       const { effects } = await expectSaga(deleteOperationsWatcher)
@@ -76,15 +77,16 @@ describe("deleteOperationsWatcher", () => {
 
     it("should invoke worker and delete STACK operation from state", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_STACK,
+          childIds: ["t1", "t2"],
           databaseName: "stack_view_1",
         },
       });
 
       const action = deleteOperationsRequest({
-        operationIds: ["o_1"],
+        operationIds: ["o1"],
       });
 
       const { effects } = await expectSaga(deleteOperationsWatcher)
@@ -97,21 +99,20 @@ describe("deleteOperationsWatcher", () => {
         (effect) => effect.payload.action.type === deleteOperationsSuccess.type
       );
       expect(successAction).toBeDefined();
-      expect(successAction.payload.action.payload.operationIds).toContain(
-        "o_1"
-      );
+      expect(successAction.payload.action.payload.operationIds).toContain("o1");
     });
 
     it("should delete NO_OP operation from state without dropping view", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
+          childIds: ["t1", "t2"],
           operationType: OPERATION_TYPE_NO_OP,
         },
       });
 
       const action = deleteOperationsRequest({
-        operationIds: ["o_1"],
+        operationIds: ["o1"],
       });
 
       const { effects } = await expectSaga(deleteOperationsWatcher)
@@ -136,20 +137,22 @@ describe("deleteOperationsWatcher", () => {
 
     it("should delete multiple operations", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
+          childIds: ["t1", "t2"],
           databaseName: "pack_1",
         },
-        o_2: {
-          id: "o_2",
+        o2: {
+          id: "o2",
           operationType: OPERATION_TYPE_STACK,
+          childIds: ["t1", "t2"],
           databaseName: "stack_1",
         },
       });
 
       const action = deleteOperationsRequest({
-        operationIds: ["o_1", "o_2"],
+        operationIds: ["o1", "o2"],
       });
 
       const { effects } = await expectSaga(deleteOperationsWatcher)
@@ -162,34 +165,32 @@ describe("deleteOperationsWatcher", () => {
         (effect) => effect.payload.action.type === deleteOperationsSuccess.type
       );
       expect(successAction).toBeDefined();
-      expect(successAction.payload.action.payload.operationIds).toContain(
-        "o_1"
-      );
-      expect(successAction.payload.action.payload.operationIds).toContain(
-        "o_2"
-      );
+      expect(successAction.payload.action.payload.operationIds).toContain("o1");
+      expect(successAction.payload.action.payload.operationIds).toContain("o2");
     });
 
     it("should handle sequential deleteOperationsRequest actions", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
+          childIds: ["t1", "t2"],
           databaseName: "pack_1",
         },
-        o_2: {
-          id: "o_2",
+        o2: {
+          id: "o2",
           operationType: OPERATION_TYPE_STACK,
+          childIds: ["t3", "t4"],
           databaseName: "stack_1",
         },
       });
 
       const action1 = deleteOperationsRequest({
-        operationIds: ["o_1"],
+        operationIds: ["o1"],
       });
 
       const action2 = deleteOperationsRequest({
-        operationIds: ["o_2"],
+        operationIds: ["o2"],
       });
 
       const { effects } = await expectSaga(deleteOperationsWatcher)
@@ -207,22 +208,22 @@ describe("deleteOperationsWatcher", () => {
     });
     it("should recursively delete child operations", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
           databaseName: "pack_1",
-          childIds: ["o_2"],
+          childIds: ["o2"],
         },
-        o_2: {
-          id: "o_2",
+        o2: {
+          id: "o2",
           operationType: OPERATION_TYPE_STACK,
           databaseName: "stack_1",
-          childIds: [],
+          childIds: ["t1", "t2"],
         },
       });
 
       const action = deleteOperationsRequest({
-        operationIds: ["o_1"],
+        operationIds: ["o1"],
       });
 
       const { effects } = await expectSaga(deleteOperationsWatcher)
@@ -235,20 +236,16 @@ describe("deleteOperationsWatcher", () => {
         (effect) => effect.payload.action.type === deleteOperationsSuccess.type
       );
       expect(successAction).toBeDefined();
-      expect(successAction.payload.action.payload.operationIds).toContain(
-        "o_1"
-      );
-      expect(successAction.payload.action.payload.operationIds).toContain(
-        "o_2"
-      );
+      expect(successAction.payload.action.payload.operationIds).toContain("o1");
+      expect(successAction.payload.action.payload.operationIds).toContain("o2");
     });
   });
 
   describe("handling updateOperationsSuccess actions", () => {
     it("should dispatch deleteOperationsRequest if operation becomes childless", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
           childIds: [], // Now empty
         },
@@ -256,7 +253,7 @@ describe("deleteOperationsWatcher", () => {
 
       const action = updateOperationsSuccess({
         changedPropertiesById: {
-          o_1: ["children"],
+          o1: ["children"],
         },
       });
 
@@ -272,15 +269,13 @@ describe("deleteOperationsWatcher", () => {
           effect.payload?.action?.type === deleteOperationsRequest.type
       );
       expect(deleteRequest).toBeDefined();
-      expect(deleteRequest.payload.action.payload.operationIds).toContain(
-        "o_1"
-      );
+      expect(deleteRequest.payload.action.payload.operationIds).toContain("o1");
     });
 
     it("should not delete operation if it still has children", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
           childIds: ["t_1", "t_2"], // Still has children
         },
@@ -288,7 +283,7 @@ describe("deleteOperationsWatcher", () => {
 
       const action = updateOperationsSuccess({
         changedPropertiesById: {
-          o_1: ["children"],
+          o1: ["children"],
         },
       });
 
@@ -307,8 +302,8 @@ describe("deleteOperationsWatcher", () => {
 
     it("should not trigger deletion when non-children properties change", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
           childIds: [],
         },
@@ -316,7 +311,7 @@ describe("deleteOperationsWatcher", () => {
 
       const action = updateOperationsSuccess({
         changedPropertiesById: {
-          o_1: ["name", "joinType"], // Not "children"
+          o1: ["name", "joinType"], // Not "children"
         },
       });
 
@@ -335,13 +330,13 @@ describe("deleteOperationsWatcher", () => {
 
     it("should handle multiple operations becoming childless", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
           childIds: [],
         },
-        o_2: {
-          id: "o_2",
+        o2: {
+          id: "o2",
           operationType: OPERATION_TYPE_STACK,
           childIds: [],
         },
@@ -349,8 +344,8 @@ describe("deleteOperationsWatcher", () => {
 
       const action = updateOperationsSuccess({
         changedPropertiesById: {
-          o_1: ["children"],
-          o_2: ["children"],
+          o1: ["children"],
+          o2: ["children"],
         },
       });
 
@@ -365,23 +360,19 @@ describe("deleteOperationsWatcher", () => {
           effect.payload?.action?.type === deleteOperationsRequest.type
       );
       expect(deleteRequest).toBeDefined();
-      expect(deleteRequest.payload.action.payload.operationIds).toContain(
-        "o_1"
-      );
-      expect(deleteRequest.payload.action.payload.operationIds).toContain(
-        "o_2"
-      );
+      expect(deleteRequest.payload.action.payload.operationIds).toContain("o1");
+      expect(deleteRequest.payload.action.payload.operationIds).toContain("o2");
     });
 
     it("should only delete childless operations when some have children and some don't", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
           childIds: [], // Empty - should be deleted
         },
-        o_2: {
-          id: "o_2",
+        o2: {
+          id: "o2",
           operationType: OPERATION_TYPE_STACK,
           childIds: ["t_1"], // Has children - should not be deleted
         },
@@ -389,8 +380,8 @@ describe("deleteOperationsWatcher", () => {
 
       const action = updateOperationsSuccess({
         changedPropertiesById: {
-          o_1: ["children"],
-          o_2: ["children"],
+          o1: ["children"],
+          o2: ["children"],
         },
       });
 
@@ -405,11 +396,9 @@ describe("deleteOperationsWatcher", () => {
           effect.payload?.action?.type === deleteOperationsRequest.type
       );
       expect(deleteRequest).toBeDefined();
-      expect(deleteRequest.payload.action.payload.operationIds).toContain(
-        "o_1"
-      );
+      expect(deleteRequest.payload.action.payload.operationIds).toContain("o1");
       expect(deleteRequest.payload.action.payload.operationIds).not.toContain(
-        "o_2"
+        "o2"
       );
     });
   });
@@ -434,7 +423,7 @@ describe("deleteOperationsWatcher", () => {
 
     it("should not respond to deleteOperationsSuccess action for worker triggering", async () => {
       const successAction = deleteOperationsSuccess({
-        operationIds: ["o_1"],
+        operationIds: ["o1"],
       });
 
       const { effects } = await expectSaga(deleteOperationsWatcher)
@@ -473,24 +462,27 @@ describe("deleteOperationsWatcher", () => {
 
     it("should handle mixed operation types in single request", async () => {
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
+          childIds: ["t1", "t2"],
           databaseName: "pack_1",
         },
-        o_2: {
-          id: "o_2",
+        o2: {
+          id: "o2",
+          childIds: ["t3", "t4"],
           operationType: OPERATION_TYPE_NO_OP,
         },
-        o_3: {
-          id: "o_3",
+        o3: {
+          id: "o3",
+          childIds: ["t5", "t6"],
           operationType: OPERATION_TYPE_STACK,
           databaseName: "stack_1",
         },
       });
 
       const action = deleteOperationsRequest({
-        operationIds: ["o_1", "o_2", "o_3"],
+        operationIds: ["o1", "o2", "o3"],
       });
 
       const { effects } = await expectSaga(deleteOperationsWatcher)
