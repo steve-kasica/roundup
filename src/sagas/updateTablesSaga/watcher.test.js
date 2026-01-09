@@ -37,7 +37,7 @@ describe("updateTablesSagaWatcher", () => {
     vi.clearAllMocks();
   });
 
-  describe("updateTablesRequest handling", () => {
+  describe("handle updateTablesRequest actions", () => {
     it("should invoke worker and update table in state", async () => {
       const mockState = createMockState({
         t_1: {

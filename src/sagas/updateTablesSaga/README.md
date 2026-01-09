@@ -11,33 +11,9 @@ This saga:
 - Tracks which properties changed for downstream sagas
 - Handles update failures gracefully
 
-## Process
+## Relationship to other sagas
 
-```mermaid
----
-title: Update Tables Saga Process
----
-flowchart LR
-    A[Start] --> B{More<br>updates?}
-    B -->|yes| C{Contains<br>DB attributes?}
-    C -->|yes| D[Fetch stats<br>from DuckDB]
-    D --> E[Merge with<br>update data]
-    C -->|no| F[Use update<br>as-is]
-    E --> G{Fetch<br>success?}
-    G -->|yes| H[Add to<br>successes]
-    G -->|no| I[Add to<br>failures]
-    F --> H
-    H --> B
-    I --> B
-    B -->|no| J[[Apply updates<br>to Redux]]
-    J --> K{Any<br>failures?}
-    K -->|yes| L(Dispatch<br>failure)
-    K -->|no| M{Any<br>successes?}
-    L --> M
-    M -->|yes| N(Dispatch success<br>with changed properties)
-    M -->|no| End
-    N --> End
-```
+This saga does not listen to other sagas
 
 ## Database Attributes
 
