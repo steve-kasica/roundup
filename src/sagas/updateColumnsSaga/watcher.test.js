@@ -14,11 +14,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
 import * as matchers from "redux-saga-test-plan/matchers";
 import updateColumnsSaga from "./watcher";
-import {
-  updateColumnsRequest,
-  updateColumnsSuccess,
-  updateColumnsFailure,
-} from "./actions";
+import { updateColumnsRequest, updateColumnsSuccess } from "./actions";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
 import {
   updateColumns as updateColumnsSlice,
@@ -58,21 +54,21 @@ describe("updateColumnsSaga", () => {
     vi.clearAllMocks();
   });
 
-  describe("updateColumnsRequest handling", () => {
+  describe("handling updateColumnsRequest actions", () => {
     it("should invoke worker and update column in state", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "Price",
             databaseName: "price_col",
             columnType: "DOUBLE",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Products",
             databaseName: "products_db",
           },
@@ -80,7 +76,7 @@ describe("updateColumnsSaga", () => {
       );
 
       const action = updateColumnsRequest({
-        columnUpdates: [{ id: "c_1", columnType: "INTEGER" }],
+        columnUpdates: [{ id: "c1", columnType: "INTEGER" }],
       });
 
       const { effects } = await expectSaga(updateColumnsSaga)
@@ -111,17 +107,17 @@ describe("updateColumnsSaga", () => {
     it("should fetch column stats when SUMMARY_ATTRIBUTES keys are in update", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "Count",
             databaseName: "count_col",
             columnType: "INTEGER",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Metrics",
             databaseName: "metrics_db",
           },
@@ -129,7 +125,7 @@ describe("updateColumnsSaga", () => {
       );
 
       const action = updateColumnsRequest({
-        columnUpdates: [{ id: "c_1", min: null, max: null }],
+        columnUpdates: [{ id: "c1", min: null, max: null }],
       });
 
       const mockStats = {
@@ -154,17 +150,17 @@ describe("updateColumnsSaga", () => {
     it("should fetch top values when TOP_VALUES_ATTR is in update", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "Category",
             databaseName: "category_col",
             columnType: "VARCHAR",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Products",
             databaseName: "products_db",
           },
@@ -172,7 +168,7 @@ describe("updateColumnsSaga", () => {
       );
 
       const action = updateColumnsRequest({
-        columnUpdates: [{ id: "c_1", [TOP_VALUES_ATTR]: null }],
+        columnUpdates: [{ id: "c1", [TOP_VALUES_ATTR]: null }],
       });
 
       const mockTopValues = [
@@ -195,17 +191,17 @@ describe("updateColumnsSaga", () => {
     it("should update column type in DuckDB when columnType changes", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "Amount",
             databaseName: "amount_col",
             columnType: "VARCHAR",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Transactions",
             databaseName: "transactions_db",
           },
@@ -213,7 +209,7 @@ describe("updateColumnsSaga", () => {
       );
 
       const action = updateColumnsRequest({
-        columnUpdates: [{ id: "c_1", columnType: "DOUBLE" }],
+        columnUpdates: [{ id: "c1", columnType: "DOUBLE" }],
       });
 
       const { effects } = await expectSaga(updateColumnsSaga)
@@ -235,24 +231,24 @@ describe("updateColumnsSaga", () => {
     it("should handle multiple column updates", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "Price",
             databaseName: "price_col",
             columnType: "DOUBLE",
           },
-          c_2: {
-            id: "c_2",
-            parentId: "t_1",
+          c2: {
+            id: "c2",
+            parentId: "t1",
             name: "Quantity",
             databaseName: "quantity_col",
             columnType: "INTEGER",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Orders",
             databaseName: "orders_db",
           },
@@ -261,8 +257,8 @@ describe("updateColumnsSaga", () => {
 
       const action = updateColumnsRequest({
         columnUpdates: [
-          { id: "c_1", min: null },
-          { id: "c_2", max: null },
+          { id: "c1", min: null },
+          { id: "c2", max: null },
         ],
       });
 
@@ -281,9 +277,9 @@ describe("updateColumnsSaga", () => {
     it("should handle columns belonging to operations", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "op_1", // Operation parent
+          c1: {
+            id: "c1",
+            parentId: "o1", // Operation parent
             name: "Result",
             databaseName: "result_col",
             columnType: "INTEGER",
@@ -291,8 +287,8 @@ describe("updateColumnsSaga", () => {
         },
         {},
         {
-          op_1: {
-            id: "op_1",
+          o1: {
+            id: "o1",
             name: "Stack Operation",
             databaseName: "stack_op_db",
           },
@@ -300,7 +296,7 @@ describe("updateColumnsSaga", () => {
       );
 
       const action = updateColumnsRequest({
-        columnUpdates: [{ id: "c_1", min: null }],
+        columnUpdates: [{ id: "c1", min: null }],
       });
 
       const { effects } = await expectSaga(updateColumnsSaga)
@@ -316,21 +312,21 @@ describe("updateColumnsSaga", () => {
     });
   });
 
-  describe("auto-update on createColumnsSuccess", () => {
+  describe("handling createColumnsSuccess actions", () => {
     it("should dispatch updateColumnsRequest when columns are created", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "NewColumn",
             databaseName: "new_col",
             columnType: "VARCHAR",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Table1",
             databaseName: "table1_db",
           },
@@ -338,7 +334,7 @@ describe("updateColumnsSaga", () => {
       );
 
       const action = createColumnsSuccess({
-        columnIds: ["c_1"],
+        columnIds: ["c1"],
       });
 
       const { effects } = await expectSaga(updateColumnsSaga)
@@ -359,31 +355,31 @@ describe("updateColumnsSaga", () => {
       // Verify columnUpdates includes SUMMARY_ATTRIBUTES (except columnType) and TOP_VALUES_ATTR
       const columnUpdates = updateRequest.payload.action.payload.columnUpdates;
       expect(columnUpdates).toHaveLength(1);
-      expect(columnUpdates[0].id).toBe("c_1");
+      expect(columnUpdates[0].id).toBe("c1");
       expect(columnUpdates[0]).toHaveProperty(TOP_VALUES_ATTR);
     });
 
     it("should handle multiple columns in createColumnsSuccess", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "Column1",
             databaseName: "col1",
             columnType: "VARCHAR",
           },
-          c_2: {
-            id: "c_2",
-            parentId: "t_1",
+          c2: {
+            id: "c2",
+            parentId: "t1",
             name: "Column2",
             databaseName: "col2",
             columnType: "INTEGER",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Table1",
             databaseName: "table1_db",
           },
@@ -391,7 +387,7 @@ describe("updateColumnsSaga", () => {
       );
 
       const action = createColumnsSuccess({
-        columnIds: ["c_1", "c_2"],
+        columnIds: ["c1", "c2"],
       });
 
       const { effects } = await expectSaga(updateColumnsSaga)
@@ -410,24 +406,24 @@ describe("updateColumnsSaga", () => {
 
       const columnUpdates = updateRequest.payload.action.payload.columnUpdates;
       expect(columnUpdates).toHaveLength(2);
-      expect(columnUpdates.map((u) => u.id)).toContain("c_1");
-      expect(columnUpdates.map((u) => u.id)).toContain("c_2");
+      expect(columnUpdates.map((u) => u.id)).toContain("c1");
+      expect(columnUpdates.map((u) => u.id)).toContain("c2");
     });
 
     it("should include all SUMMARY_ATTRIBUTES except columnType in updates", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "TestColumn",
             databaseName: "test_col",
             columnType: "INTEGER",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Table1",
             databaseName: "table1_db",
           },
@@ -435,7 +431,7 @@ describe("updateColumnsSaga", () => {
       );
 
       const action = createColumnsSuccess({
-        columnIds: ["c_1"],
+        columnIds: ["c1"],
       });
 
       const { effects } = await expectSaga(updateColumnsSaga)
@@ -469,17 +465,17 @@ describe("updateColumnsSaga", () => {
     it("should respond to updateColumnsRequest action type", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "TestCol",
             databaseName: "test_col",
             columnType: "VARCHAR",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Table1",
             databaseName: "table1_db",
           },
@@ -488,7 +484,7 @@ describe("updateColumnsSaga", () => {
 
       const action = {
         type: updateColumnsRequest.type,
-        payload: { columnUpdates: [{ id: "c_1", min: null }] },
+        payload: { columnUpdates: [{ id: "c1", min: null }] },
       };
 
       const { effects } = await expectSaga(updateColumnsSaga)
@@ -506,17 +502,17 @@ describe("updateColumnsSaga", () => {
     it("should respond to createColumnsSuccess action type", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "TestCol",
             databaseName: "test_col",
             columnType: "VARCHAR",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Table1",
             databaseName: "table1_db",
           },
@@ -525,7 +521,7 @@ describe("updateColumnsSaga", () => {
 
       const action = {
         type: createColumnsSuccess.type,
-        payload: { columnIds: ["c_1"] },
+        payload: { columnIds: ["c1"] },
       };
 
       const { effects } = await expectSaga(updateColumnsSaga)
@@ -581,17 +577,17 @@ describe("updateColumnsSaga", () => {
     it("should handle single columnId in createColumnsSuccess (not array)", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "SingleCol",
             databaseName: "single_col",
             columnType: "VARCHAR",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Table1",
             databaseName: "table1_db",
           },
@@ -600,7 +596,7 @@ describe("updateColumnsSaga", () => {
 
       // Send single string instead of array
       const action = createColumnsSuccess({
-        columnIds: "c_1",
+        columnIds: "c1",
       });
 
       const { effects } = await expectSaga(updateColumnsSaga)
@@ -623,17 +619,17 @@ describe("updateColumnsSaga", () => {
     it("should complete full update flow from request to success", async () => {
       const mockState = createMockState(
         {
-          c_1: {
-            id: "c_1",
-            parentId: "t_1",
+          c1: {
+            id: "c1",
+            parentId: "t1",
             name: "Price",
             databaseName: "price_col",
             columnType: "DOUBLE",
           },
         },
         {
-          t_1: {
-            id: "t_1",
+          t1: {
+            id: "t1",
             name: "Products",
             databaseName: "products_db",
           },
@@ -642,7 +638,7 @@ describe("updateColumnsSaga", () => {
 
       const action = updateColumnsRequest({
         columnUpdates: [
-          { id: "c_1", columnType: "INTEGER", min: null, max: null },
+          { id: "c1", columnType: "INTEGER", min: null, max: null },
         ],
       });
 

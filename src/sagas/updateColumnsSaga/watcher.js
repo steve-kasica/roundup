@@ -13,15 +13,11 @@
  * @example
  * // Watcher is started automatically by rootSaga
  */
-import { put, select, takeEvery } from "redux-saga/effects";
+import { put, takeEvery } from "redux-saga/effects";
 import { updateColumnsRequest } from "./actions";
 import updateColumnsWorker from "./worker";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
-import {
-  SUMMARY_ATTRIBUTES,
-  TOP_VALUES_ATTR,
-  selectColumnsById,
-} from "../../slices/columnsSlice";
+import { SUMMARY_ATTRIBUTES, TOP_VALUES_ATTR } from "../../slices/columnsSlice";
 import { normalizeInputToArray } from "../../slices/utilities";
 
 // Watcher saga
