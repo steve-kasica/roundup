@@ -1,57 +1,20 @@
-# Alerts Saga
+# Alerts saga
 
-The alerts saga manages the lifecycle of validation alerts for operations. It automatically validates operations when changes occur and manages alert state in Redux.
-
-## Purpose
-
-This saga detects and reports structural issues with operations, such as:
-
-- Column misalignment in STACK operations
-- Join configuration problems in PACK operations
-- Missing or incompatible child relationships
+The alerts saga manages the lifecycle of validation alerts. It automatically validates operations when changes occur and manages alert state in Redux. Validation of actual alerts occurs in `watcher.js` file while the `worker.js` file is in charge of creating, deleting, and updating alerts in state. More details on what kinds of alerts Roundup checks for can be found in the `alertsSlice` directory.
 
 ## Process
 
 ```mermaid
----
-title: Alerts Saga Process
----
-flowchart LR
-    A[Start] --> B{Trigger<br>type?}
-    B -->|Explicit request| C[Get operation IDs<br>from payload]
-    B -->|Auto-trigger| D[Extract affected<br>operations]
-    C --> E[Run validation tests]
-    D --> E
-    E --> F{Operation<br>type?}
-    F -->|STACK| G[Test for<br>stack errors]
-    F -->|PACK| H[Test for<br>pack errors]
-    G --> I[Collect<br>raised alerts]
-    H --> I
-    I --> J[[Worker:<br>Process alerts]]
-    J --> K{Compare with<br>existing alerts}
-    K --> L[Add new alerts]
-    K --> M[Remove resolved<br>alerts]
-    L --> End
-    M --> End
+    stateDiagram
+    alertsSaga:Alerts saga
+    updateOps:Update operations saga
+    createOps:Create operations saga
+    updateTables:Update tables saga
+
+    updateOps --> alertsSaga: If certain properties are modified
+    createOps --> alertsSaga: Any new operation
+    updateTables --> alertsSaga: Certain properties are modified
 ```
-
-## Triggers
-
-The watcher responds to multiple action types:
-
-| Action                           | Description                                      |
-| -------------------------------- | ------------------------------------------------ |
-| `checkOperationForAlertsRequest` | Explicit request to validate specific operations |
-| `updateOperationsSuccess`        | Auto-validates after operation updates           |
-| `updateTablesSuccess`            | Auto-validates after table column changes        |
-| `createOperationsSuccess`        | Auto-validates newly created operations          |
-
-## Actions
-
-| Action                           | Type    | Description                           |
-| -------------------------------- | ------- | ------------------------------------- |
-| `updateAlertsRequest`            | Request | Triggers full alert recalculation     |
-| `checkOperationForAlertsRequest` | Request | Checks specific operations for alerts |
 
 ## Files
 
