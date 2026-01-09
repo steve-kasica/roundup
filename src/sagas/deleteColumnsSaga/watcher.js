@@ -2,24 +2,16 @@
  * @fileoverview Delete columns saga watcher.
  * @module sagas/deleteColumnsSaga/watcher
  *
- * Watches for column deletion requests and coordinates the deletion process.
- * Handles recursive deletion for operation columns by propagating to child
- * tables/operations.
+ * Watches for actions that trigger column deletions, including direct requests
+ * for column deletion as well as side-effects from the successful completion of other
+ * sagas (e.g., table deletions, operation updates). The watcher also handles recursive
+ * deletion for operation columns by propagating to child tables/operations.
  *
- * Features:
- * - Handles deleteColumnsRequest actions
- * - Expands operation column deletes to child tables
- * - Groups columns by parent for batch processing
- * - Supports PACK and STACK operation column propagation
- *
- * @example
- * // Watcher is started automatically by rootSaga
  */
 import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
 import { deleteColumnsRequest } from "./actions";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
 import {
-  selectColumnIdsByParentId,
   selectColumnIdsByParentId,
   selectColumnsById,
 } from "../../slices/columnsSlice";
@@ -33,7 +25,10 @@ import { group } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import deleteColumnsWorker from "./worker";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
-import { selectOrphanedColumnIds } from "../../slices/columnsSlice/selectors";
+import {
+  selectAllColumnIdsByParentId,
+  selectOrphanedColumnIds,
+} from "../../slices/columnsSlice/selectors";
 
 export default function* deleteColumnsSaga() {
   // Main watcher for delete columns requests
@@ -129,12 +124,11 @@ export default function* deleteColumnsSaga() {
   });
 
   // If tables are deleted, we need to delete their columns as well
-  // TODO: I don't think I do this anymore do I?
   yield takeLatest(deleteTablesSuccess, function* (action) {
     const { tableIds } = action.payload;
     // Extract all column IDs from the deleted tables
     const orphanedColumnIds = yield select((state) =>
-      selectColumnIdsByParentId(state, tableIds)
+      selectAllColumnIdsByParentId(state, tableIds)
     );
     if (orphanedColumnIds.length > 0) {
       yield put(

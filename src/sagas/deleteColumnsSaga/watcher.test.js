@@ -1,3 +1,17 @@
+/**
+ * @file deleteColumnsSaga watcher tests
+ * @module sagas/deleteColumnsSaga/watcher.test
+ *
+ * Tests for the deleteColumnsSaga watcher, ensuring it correctly
+ * responds to delete column requests and related actions by dispatching
+ * appropriate worker sagas with the correct parameters.
+ *
+ * Scenarios tested:
+ * - Direct deleteColumnsRequest actions for table columns
+ * - Recursive deletion for operation columns (PACK and STACK types)
+ * - Handling of orphaned columns after operation updates
+ * - Deletion of columns when parent tables are deleted
+ */
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   Operation,
