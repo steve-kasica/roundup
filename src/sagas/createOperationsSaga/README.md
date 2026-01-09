@@ -19,26 +19,9 @@ This saga:
 | `STACK` | Stacks rows from multiple child tables vertically (union) |
 | `NO_OP` | Placeholder operation with no database view               |
 
-## Process
+## Relationship to other sagas
 
-```mermaid
----
-title: Create Operations Saga Process
----
-flowchart LR
-    A[Start] --> B[Normalize input<br>to array]
-    B --> C{More<br>operations?}
-    C -->|yes| D[Generate UUID<br>for operation]
-    D --> E[Create Operation<br>object]
-    E --> F[Queue child<br>updates]
-    F --> C
-    C -->|no| G[[Add operations<br>to Redux]]
-    G --> H[[Update table<br>parentIds]]
-    H --> I[[Update operation<br>parentIds]]
-    I --> J[Set focused<br>object]
-    J --> K(Dispatch<br>success)
-    K --> End
-```
+None. This saga does not listen to other sagas
 
 ## Actions
 
