@@ -40,7 +40,7 @@ describe("deleteOperationsWatcher", () => {
     vi.clearAllMocks();
   });
 
-  describe("deleteOperationsRequest handling", () => {
+  describe("handling deleteOperationsRequest actions", () => {
     it("should invoke worker and delete PACK operation from state", async () => {
       const mockState = createMockState({
         o_1: {
@@ -205,10 +205,47 @@ describe("deleteOperationsWatcher", () => {
       );
       expect(successActions).toHaveLength(2);
     });
+    it("should recursively delete child operations", async () => {
+      const mockState = createMockState({
+        o_1: {
+          id: "o_1",
+          operationType: OPERATION_TYPE_PACK,
+          databaseName: "pack_1",
+          childIds: ["o_2"],
+        },
+        o_2: {
+          id: "o_2",
+          operationType: OPERATION_TYPE_STACK,
+          databaseName: "stack_1",
+          childIds: [],
+        },
+      });
+
+      const action = deleteOperationsRequest({
+        operationIds: ["o_1"],
+      });
+
+      const { effects } = await expectSaga(deleteOperationsWatcher)
+        .withState(mockState)
+        .provide([[matchers.call.fn(dropView), undefined]])
+        .dispatch(action)
+        .silentRun(100);
+
+      const successAction = effects.put.find(
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+      );
+      expect(successAction).toBeDefined();
+      expect(successAction.payload.action.payload.operationIds).toContain(
+        "o_1"
+      );
+      expect(successAction.payload.action.payload.operationIds).toContain(
+        "o_2"
+      );
+    });
   });
 
-  describe("auto-deletion of childless operations", () => {
-    it("should dispatch deleteOperationsRequest when operation becomes childless", async () => {
+  describe("handling updateOperationsSuccess actions", () => {
+    it("should dispatch deleteOperationsRequest if operation becomes childless", async () => {
       const mockState = createMockState({
         o_1: {
           id: "o_1",

@@ -13,40 +13,53 @@
  * @example
  * // Watcher is started automatically by rootSaga
  */
-import { deleteOperationsRequest, deleteOperationsSuccess } from "./actions";
-import { put, select, takeEvery, takeLatest } from "redux-saga/effects";
+import { deleteOperationsRequest } from "./actions";
+import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
 import deleteOperationsWorker from "./worker";
 import {
   isOperationId,
   selectOperationsById,
 } from "../../slices/operationsSlice";
-import {
-  updateOperationsRequest,
-  updateOperationsSuccess,
-} from "../updateOperationsSaga";
+import { updateOperationsSuccess } from "../updateOperationsSaga";
 
 export default function* deleteOperationsWatcher() {
-  yield takeEvery(deleteOperationsRequest.type, deleteOperationsWorker);
+  // Watch for delete operation requests, if the operation to be deleted has child operations,
+  // those child operations will be deleted by the worker saga as well.
+  yield takeEvery(deleteOperationsRequest.type, function* (action) {
+    const { operationIds } = action.payload;
 
-  // Whenever operations are deleted, also delete their child operations
-  // yield takeEvery(deleteOperationsSuccess, function* (action) {
-  //   const { operationIds } = action.payload;
-  //   const operations = yield select((state) =>
-  //     operationIds.map((operationId) => selectOperationsById(state, operationId))
-  //   );
-  //   // TODO
-  //   // if (operations.length > 0) {
-  //   //   const operationIdsToDelete = operations
-  //   //     .flatMap((op) => op.childIds)
-  //   //     .filter(isOperationId);
-  //   //   yield put(
-  //   //     deleteOperationsRequest({ operationIds: operationIdsToDelete })
-  //   //   );
-  //   // }
-  // });
+    const operations = yield select((state) =>
+      selectOperationsById(state, operationIds)
+    );
+
+    const operationIdsToDelete = [];
+
+    // Recursively collect all operation IDs including nested child operations
+    function* collectOperationIds(ops) {
+      for (const operation of ops) {
+        operationIdsToDelete.push(operation.id);
+
+        // If the operation has child operations, recursively collect them
+        const childOperationIds = operation.childIds.filter(isOperationId);
+        if (childOperationIds.length > 0) {
+          const childOperations = yield select((state) =>
+            selectOperationsById(state, childOperationIds)
+          );
+          yield* collectOperationIds(childOperations);
+        }
+      }
+    }
+
+    yield* collectOperationIds(operations);
+
+    yield call(deleteOperationsWorker, {
+      payload: { operationIds: operationIdsToDelete },
+    });
+  });
 
   // If an operation successfully updates such that it has no children, then delete it
-  // Note: the `changedPropertiesByOperation` payload object is in the form { operationId: [ keyUpdated, keyUpdated ]}
+  // Note: the `changedPropertiesByOperation` payload object is in the form
+  // { operationId: [ keyUpdated, keyUpdated ]}
   yield takeLatest(updateOperationsSuccess.type, function* (action) {
     const { changedPropertiesById } = action.payload;
     const operationIdsToDelete = [];
