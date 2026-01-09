@@ -19,16 +19,13 @@
  */
 import { createSelector } from "reselect";
 import { selectSelectedColumnIds } from "../uiSlice";
-import {
-  isTableId,
-  selectTableColumnIds,
-  selectTablesById,
-} from "../tablesSlice";
+import { isTableId, selectTablesById } from "../tablesSlice";
 import { selectOperationsById } from "../operationsSlice";
-import { normalizeInputToArray } from "../utilities";
 
 /**
  * Select ALL column IDs for a specific `parentId`, by iterating over the entire set of columns in Redux.
+ * TODO: should table schema and stack schema should have just been using a different selector? Check how
+ * this selector is used in the app.
  *
  * @param {Object} state - The Redux state.
  * @param {string|string[]} parentId - The ID(s) of the table/operation to get all columns for.
@@ -43,10 +40,10 @@ export const selectColumnIdsByParentId = createSelector(
   ],
   (tablesById, operationsById, parentIds) => {
     const getColumnIds = (id) =>
-      isTableId(id)
-        ? selectTablesById({ tables: { byId: tablesById } }, id).columnIds
+      (isTableId(id)
+        ? selectTablesById({ tables: { byId: tablesById } }, id)?.columnIds
         : selectOperationsById({ operations: { byId: operationsById } }, id)
-            .columnIds;
+            ?.columnIds) || [];
 
     if (Array.isArray(parentIds)) {
       return parentIds.map(getColumnIds);
@@ -166,5 +163,27 @@ export const selectColumnIndexById = createSelector(
       ? tablesById[parentId]
       : operationsById[parentId];
     return parent.columnIds.indexOf(columnId);
+  }
+);
+
+export const selectOrphanedColumnIds = createSelector(
+  [
+    (state) => state.columns.byId,
+    (state) => state.tables.byId,
+    (state) => state.operations.byId,
+    (_state, parentId) => parentId,
+  ],
+  (columnsById, tablesById, operationsById, parentId) => {
+    let currentColumnIds = isTableId(parentId)
+      ? selectTablesById({ tables: { byId: tablesById } }, parentId)?.columnIds
+      : selectOperationsById({ operations: { byId: operationsById } }, parentId)
+          ?.columnIds;
+    const allColumnIds = Object.values(columnsById)
+      .filter((col) => col.parentId === parentId)
+      .map((col) => col.id);
+    const orphanedColumnIds = allColumnIds.filter(
+      (id) => !currentColumnIds.includes(id)
+    );
+    return orphanedColumnIds;
   }
 );

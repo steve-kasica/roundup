@@ -5,6 +5,7 @@ import {
   selectColumnIndexById,
   selectColumnNamesById,
   selectColumnsById,
+  selectOrphanedColumnIds,
   selectSelectedColumnIdsByParentId,
 } from "./selectors";
 import { initialState as columnsInitialState } from "./columnsSlice";
@@ -180,6 +181,27 @@ describe("Column selectors", () => {
     });
     it("should return the correct index for a column ID within an operation", () => {
       expect(selectColumnIndexById(state, column5.id)).toBe(1);
+    });
+  });
+  describe("selectOrphanedColumnIds", () => {
+    it("should return orphaned column IDs for a given operation ID", () => {
+      const localState = {
+        ...state,
+        operations: {
+          byId: {
+            [operation1.id]: {
+              ...operation1,
+              columnIds: [column4.id], // column5 is orphaned
+            },
+          },
+          allIds: [operation1.id],
+        },
+      };
+      const orphanedColumnIds = selectOrphanedColumnIds(
+        localState,
+        operation1.id
+      );
+      expect(orphanedColumnIds).toEqual([column5.id]);
     });
   });
 });

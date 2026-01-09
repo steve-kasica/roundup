@@ -32,6 +32,7 @@ import { group } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import deleteColumnsWorker from "./worker";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
+import { selectOrphanedColumnIds } from "../../slices/columnsSlice/selectors";
 
 export default function* deleteColumnsSaga() {
   // Main watcher for delete columns requests
@@ -100,14 +101,8 @@ export default function* deleteColumnsSaga() {
       changedPropertiesById
     )) {
       if (changedProperties.includes("columnIds")) {
-        const currentColumnIds = yield select(
-          (state) => selectOperationsById(state, operationId).columnIds
-        );
-        const allColumnIds = yield select((state) =>
-          selectColumnIdsByParentId(state, operationId)
-        );
-        const orphanedColumnIds = allColumnIds.filter(
-          (id) => !currentColumnIds.includes(id)
+        const orphanedColumnIds = yield select((state) =>
+          selectOrphanedColumnIds(state, operationId)
         );
         if (orphanedColumnIds.length > 0) {
           // Bypass deleteColumnsRequest to avoid recursing into table columns
@@ -119,7 +114,6 @@ export default function* deleteColumnsSaga() {
               deleteFromDatabase: false,
             },
           ]);
-          // yield put(deleteColumnsRequest({ columnIds: orphanedColumnIds }));
         }
       }
     }
