@@ -80,7 +80,6 @@ const theme = createTheme(baseTheme, {
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: "0em",
-      color: baseTheme.palette.text.primary,
     },
 
     // LEVEL 6: Secondary Data Text
@@ -91,7 +90,6 @@ const theme = createTheme(baseTheme, {
       fontWeight: 400,
       lineHeight: 1.43,
       letterSpacing: "0.01em",
-      color: baseTheme.palette.text.secondary,
     },
 
     // LEVEL 7: Tertiary/Small Data
@@ -102,7 +100,6 @@ const theme = createTheme(baseTheme, {
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: "0.02em",
-      color: baseTheme.palette.text.secondary,
     },
 
     // LEVEL 8: Micro Text
@@ -113,7 +110,6 @@ const theme = createTheme(baseTheme, {
       fontWeight: 500,
       lineHeight: 1.4,
       letterSpacing: "0.03em",
-      color: baseTheme.palette.text.secondary,
     },
 
     // SPECIAL: Emphasized Metrics
@@ -124,7 +120,6 @@ const theme = createTheme(baseTheme, {
       fontWeight: 700,
       lineHeight: 1.2,
       letterSpacing: "-0.02em",
-      color: baseTheme.palette.text.primary,
     },
 
     "metric-medium": {

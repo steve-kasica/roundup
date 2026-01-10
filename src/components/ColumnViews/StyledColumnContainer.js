@@ -48,6 +48,18 @@ const StyledColumnContainer = styled(Box, {
       operationIndex !== undefined
         ? theme.palette.operationColors[operationIndex]
         : theme.palette.orphanedTableBackgroundColor,
+    color: theme.palette.getContrastText(
+      operationIndex !== undefined
+        ? theme.palette.operationColors[operationIndex]
+        : theme.palette.orphanedTableBackgroundColor
+    ),
+    borderColor: theme.palette.getContrastText(
+      operationIndex !== undefined
+        ? theme.palette.operationColors[operationIndex]
+        : theme.palette.orphanedTableBackgroundColor
+    ),
+    boxShadow: "none",
+    transform: "scale(1)",
     opacity: 1,
     // Column is hovered state
     ...(isHovered && {

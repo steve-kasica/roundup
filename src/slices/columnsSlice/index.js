@@ -14,7 +14,6 @@ export {
   selectColumnsById,
   selectColumnNamesById,
   selectSelectedColumnIdsByParentId,
-  selectColumnIdsByParentId,
   selectColumnIndexById,
 } from "./selectors.js";
 import Column from "./Column.js";

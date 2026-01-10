@@ -36,7 +36,6 @@ import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import { useCallback, useMemo } from "react";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { selectOperationsById } from "../../slices/operationsSlice";
 
 export default function withColumnData(WrappedComponent) {
   function EnhancedComponent({ id, ...props }) {
@@ -98,6 +97,17 @@ export default function withColumnData(WrappedComponent) {
      * @type {number}
      */
     const approxUnique = useMemo(() => column.approxUnique || null, [column]);
+
+    /**
+     * The percentage of unique values in the column.
+     * Answers the question, "What percentage of the values in this column are unique?"
+     * If all values are unique, this will be 1.0 (100%).
+     * @type {number}
+     */
+    const uniquePercentage = useMemo(
+      () => approxUnique / count,
+      [approxUnique, count]
+    );
 
     /**
      * The approximate number of duplicate values in the column.
@@ -348,6 +358,7 @@ export default function withColumnData(WrappedComponent) {
         count={count}
         approxUnique={approxUnique}
         duplicateCount={duplicateCount}
+        uniquePercentage={uniquePercentage}
         topValues={topValues}
         renameColumn={renameColumn}
         setColumnType={setColumnType}

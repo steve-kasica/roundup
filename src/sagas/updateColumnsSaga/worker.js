@@ -31,8 +31,7 @@ import { updateColumnsFailure, updateColumnsSuccess } from "./actions";
 import { SUMMARY_ATTRIBUTES } from "../../slices/columnsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
-
-const uniqueValueLimit = 10;
+import { COLUMN_UNIQUE_VALUE_LIMIT } from "../../config";
 
 // Worker saga
 export default function* updateColumnsWorker(action) {
@@ -77,7 +76,7 @@ export default function* updateColumnsWorker(action) {
             getValueCounts,
             parent.databaseName,
             column.databaseName,
-            uniqueValueLimit
+            COLUMN_UNIQUE_VALUE_LIMIT
           ),
         };
       }

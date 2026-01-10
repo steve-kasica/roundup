@@ -32,7 +32,7 @@ import StyledColumnContainer from "./StyledColumnContainer";
 import { ColumnContextMenuButton } from "../ui/buttons";
 import { useCallback, useState } from "react";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
-import DescriptionList from "../ui/DescriptionList";
+import { format } from "d3";
 
 /**
  * ColumnSummary Component
@@ -79,9 +79,9 @@ const ColumnSummary = ({
   databaseName,
   columnType,
   id,
-  nullCount,
+  completePercentage,
   approxUnique,
-  nonNullCount,
+  uniquePercentage,
   hoverColumn,
   unhoverColumn,
   onClick,
@@ -98,7 +98,6 @@ const ColumnSummary = ({
   handleInsertColumnLeft,
   handleInsertColumnRight,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
-  alertIds,
   totalCount,
   // Props passed directly from parent
   onContextMenu,
@@ -106,6 +105,7 @@ const ColumnSummary = ({
   sx = {},
 }) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const formatPercentage = format(".2%");
 
   const handleMenuOpen = useCallback((event) => {
     event.stopPropagation();
@@ -153,9 +153,9 @@ const ColumnSummary = ({
           overflow: "hidden",
           containerType: "size",
           display: "flex",
-          justifyContent: "flex-start",
+          justifyContent: "space-between",
           flexDirection: "column",
-          width: "100%",
+          padding: 0.5,
         }}
       >
         {/* Header - Always visible */}
@@ -180,9 +180,9 @@ const ColumnSummary = ({
           >
             <Typography
               variant="data-primary"
-              color="text.secondary"
               sx={{
                 whiteSpace: "nowrap",
+                fontWeight: "bold",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 minWidth: 0,
@@ -202,96 +202,93 @@ const ColumnSummary = ({
               size="small"
               onClick={handleMenuOpen}
               sx={{
-                height: "30px",
+                color: "inherit",
                 opacity: isHovered ? 1 : 0,
                 transition: "opacity 0.2s",
               }}
             />
           </Box>
         </Box>
-
-        <Typography
-          variant="data-primary"
-          sx={{ fontSize: "0.7rem", color: "text.secondary", mr: 0.5 }}
-        >
-          Top values
-        </Typography>
         <Box
           sx={{
-            "@container (min-height: 50px)": {
-              display: "flex",
-            },
-            "@container (max-height: 49px)": {
-              display: "none",
-            },
-            height: "25px",
-            flexWrap: "wrap",
-            alignItems: "flex-start",
-            justifyContent: "flex-start",
-            gap: "1px",
-            overflow: "hidden",
-          }}
-        >
-          {topValues.map(({ value }) => (
-            <Chip
-              key={value}
-              label={`${value}`}
-              title={`${value}`}
-              size="small"
-              sx={{
-                fontSize: "0.6rem",
-                borderRadius: "4px",
-                height: "12.5px",
-                "& .MuiChip-label": { padding: "0 4px" },
-              }}
-            />
-          ))}
-        </Box>
-        <Divider sx={{ my: 0.5 }} />
-        <Box
-          sx={{
-            "@container (min-height: 75px)": {
+            mt: 0.5,
+            "@container (min-height: 100px)": {
               display: "block",
             },
-            "@container (max-height: 74px)": {
+            "@container (max-height: 99px)": {
               display: "none",
             },
           }}
         >
-          <Stack>
-            <Typography
-              variant="data-primary"
-              sx={{ fontSize: "0.7rem", color: "text.secondary", mr: 0.5 }}
-            >
+          <Typography variant="data-primary" sx={{ fontWeight: "bold" }}>
+            Data Quality
+          </Typography>
+          <Stack direction="row" spacing={1} justifyContent={"space-between"}>
+            <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
               Completeness
             </Typography>
             <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
-              0
+              {formatPercentage(completePercentage)}
             </Typography>
           </Stack>
-          <Stack>
-            <Typography
-              variant="data-primary"
-              sx={{ fontSize: "0.7rem", color: "text.secondary", mr: 0.5 }}
-            >
+          <Stack direction="row" spacing={1} justifyContent={"space-between"}>
+            <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
               Uniqueness
             </Typography>
             <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
-              0
+              {formatPercentage(uniquePercentage)}
             </Typography>
           </Stack>
-          {/* <Chip
-            label={`${nullCount || 0} nulls`}
-            size="small"
-            color={nullCount && nullCount > 0 ? "error" : "default"}
-            sx={{ marginTop: 0.5, fontSize: "0.6rem" }}
-          />
-          <Chip
-            label={`${approxUnique || 0} uniq.`}
-            size="small"
-            color={approxUnique && approxUnique < 2 ? "error" : "default"}
-            sx={{ marginTop: 0.5, fontSize: "0.6rem" }}
-          /> */}
+        </Box>
+        <Box
+          sx={{
+            flexGrow: 1,
+            overflow: "hidden",
+            maskImage:
+              "linear-gradient(to bottom, black 95%, transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 95%, transparent 100%)",
+          }}
+        >
+          <Typography
+            variant="data-primary"
+            sx={{ fontWeight: "bold", mt: 0.75, mb: 0.5 }}
+          >
+            Uniq. Values{" "}
+            <small style={{ fontWeight: "normal" }}>
+              ({approxUnique.toLocaleString()})
+            </small>
+          </Typography>
+          <Box
+            sx={{
+              "@container (min-height: 50px)": {
+                display: "flex",
+              },
+              "@container (max-height: 49px)": {
+                display: "none",
+              },
+              flexWrap: "wrap",
+              gap: "2px",
+              overflow: "hidden",
+            }}
+          >
+            {topValues.map(({ value }) => (
+              <Chip
+                key={value}
+                label={`${value}`}
+                title={`${value}`}
+                size="small"
+                sx={{
+                  backgroundColor: "#ddd",
+                  color: "#000",
+                  fontSize: "0.75rem",
+                  borderRadius: "4px",
+                  height: "12.5px",
+                  "& .MuiChip-label": { padding: "0 4px" },
+                }}
+              />
+            ))}
+          </Box>
         </Box>
       </Box>
       <Menu

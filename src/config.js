@@ -21,3 +21,9 @@ export const TEXT_LUMINANCE_THRESHOLD = 186;
  * @type {function}
  */
 export const OPERATION_COLOR_PALETTE = schemeTableau10;
+
+/**
+ * The maximum number of unique values a column object can store in the `topValues` attribute.
+ * @type {number}
+ */
+export const COLUMN_UNIQUE_VALUE_LIMIT = 20;
