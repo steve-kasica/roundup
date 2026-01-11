@@ -2,7 +2,7 @@
  * @file config.js
  * @description Configuration constants for the entire application.
  */
-import { interpolateBlues, schemeTableau10 } from "d3";
+import { schemeTableau10 } from "d3";
 
 /**
  * The maximum depth allowed for the operation tree.

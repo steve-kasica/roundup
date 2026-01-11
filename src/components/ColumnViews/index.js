@@ -1,11 +1,8 @@
 export * from "./ColumnContextMenuItems";
-export * from "./ColumnDetails";
 export * from "./ColumnDragContainer";
 export * from "./ColumnHeader";
 export * from "./ColumnName";
 export * from "./ColumnSummary";
 export * from "../CompositeTableSchema/ColumnTick";
 export * from "./ColumnTypeIcon";
-export * from "./ColumnValueCounts";
-export * from "./ColumnValues";
 export { default as StyledColumnContainer } from "./StyledColumnContainer";

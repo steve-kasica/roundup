@@ -26,9 +26,11 @@
  * unique values within a specified column in a bar chart.
  */
 import { BarChart } from "../visualization";
-import { usePaginatedValueCounts } from "../../hooks/useValueCounts";
+import { usePaginatedValueCounts } from "../../hooks/useValueCounts/useValueCounts";
 import { formatNumber } from "../../lib/utilities";
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
+import { useMemo } from "react";
+import { format } from "d3";
 
 /**
  * ColumnValuesCounts Component
@@ -51,12 +53,19 @@ import { Alert, Box, CircularProgress, Typography } from "@mui/material";
  * - Automatically loads more data when scrolling near bottom
  * - Shows progress text indicating loaded vs total values
  */
-const ColumnValuesCounts = ({ id, approxUnique, limit = 20 }) => {
+const ColumnValuesCounts = ({ id, limit = 20, barColor = "#aaa" }) => {
   const { data, loading, error, total, loadMore } = usePaginatedValueCounts(
     id,
     limit
   );
 
+  // Memoize the data transformation to prevent creating new object references
+  const chartData = useMemo(
+    () => Object.fromEntries(data.map(({ value, count }) => [value, count])),
+    [data]
+  );
+
+  // Only show loading spinner on initial load, not during pagination
   if (loading && data.length === 0) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
@@ -65,10 +74,10 @@ const ColumnValuesCounts = ({ id, approxUnique, limit = 20 }) => {
     );
   }
 
-  if (error) {
+  if (error || data.length === undefined) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Alert severity="error">{error.message || error}</Alert>
+        <Alert severity="error">{error?.message || error}</Alert>
       </Box>
     );
   }
@@ -79,34 +88,32 @@ const ColumnValuesCounts = ({ id, approxUnique, limit = 20 }) => {
         display: "flex",
         flexDirection: "column",
         height: "100%",
+        overflow: "hidden",
       }}
     >
-      <Box sx={{ flexGrow: 1, minHeight: 0, overflow: "hidden" }}>
+      <Typography
+        variant="data-secondary"
+        color="text.secondary"
+        sx={{ mt: 1 }}
+      >
+        Showing {data.length.toLocaleString()} of {total.toLocaleString()}{" "}
+        unique values
+      </Typography>
+      <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
         <BarChart
-          data={Object.fromEntries(
-            data.map(({ value, count }) => [value, count])
-          )}
+          data={chartData}
           xAxisLabel="Count"
           marginLeft={10}
           marginRight={10}
           marginTop={10}
           marginBottom={10}
-          color="#3b82f6"
+          color={barColor}
           formatValue={formatNumber}
           onScrollNearBottom={loadMore}
           scrollThreshold={0.9}
           isLoading={loading && data.length > 0}
         />
       </Box>
-
-      <Typography
-        variant="data-secondary"
-        color="text.secondary"
-        sx={{ mt: 1 }}
-      >
-        Showing {data.length.toLocaleString()} of{" "}
-        {total.toLocaleString() || approxUnique.toLocaleString()} unique values
-      </Typography>
     </Box>
   );
 };

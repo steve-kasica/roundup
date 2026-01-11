@@ -100,6 +100,7 @@ export async function getPaginatedValueCounts(
 
   try {
     // Get total count of unique values that meet the minCount threshold
+    const havingClause = minCount ? `HAVING COUNT(*) >= ${minCount}` : "";
     const totalQuery = `
       SELECT COUNT(*) as total
       FROM (
@@ -107,12 +108,11 @@ export async function getPaginatedValueCounts(
         FROM "${tableName}" 
         WHERE "${columnName}" IS NOT NULL
         GROUP BY "${columnName}"
-        HAVING COUNT(*) >= ${minCount}
+        ${havingClause}
       )
     `;
     const totalResult = await conn.query(totalQuery);
     const total = Number(totalResult.toArray()[0].total);
-    const havingClause = minCount ? `HAVING COUNT(*) >= ${minCount}` : "";
 
     // Get paginated data
     const dataQuery = `

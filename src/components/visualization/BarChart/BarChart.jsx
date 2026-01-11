@@ -53,6 +53,8 @@ const BarChart = ({
   const scrollContainerRef = useRef(null);
   const [hoveredBar, setHoveredBar] = useState(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const previousDataLengthRef = useRef(0);
+  const scrollPositionRef = useRef(0);
 
   const handleScroll = useCallback(
     (event) => {
@@ -80,6 +82,43 @@ const BarChart = ({
       };
     }
   }, [handleScroll, onScrollNearBottom]);
+
+  // Preserve scroll position when data is appended
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const currentDataLength = Object.keys(data).length;
+
+    // If data length increased (pagination loaded more), restore scroll position
+    if (
+      currentDataLength > previousDataLengthRef.current &&
+      previousDataLengthRef.current > 0
+    ) {
+      scrollContainer.scrollTop = scrollPositionRef.current;
+    }
+
+    previousDataLengthRef.current = currentDataLength;
+  }, [data]);
+
+  // Save scroll position before data changes
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const saveScrollPosition = () => {
+      scrollPositionRef.current = scrollContainer.scrollTop;
+    };
+
+    // Save scroll position periodically during scroll
+    scrollContainer.addEventListener("scroll", saveScrollPosition, {
+      passive: true,
+    });
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", saveScrollPosition);
+    };
+  }, []);
 
   if (!data || Object.keys(data).length === 0) {
     return (

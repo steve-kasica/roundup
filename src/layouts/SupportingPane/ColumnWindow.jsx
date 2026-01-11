@@ -16,7 +16,7 @@
  */
 /* eslint-disable react/prop-types */
 import { useDispatch } from "react-redux";
-import { EnhancedColumnDetails } from "../../components/ColumnViews/ColumnDetails";
+import ColumnDetail from "../../components/ColumnDetail";
 import { IconButton, Box } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { setFocusedColumnIds } from "../../slices/uiSlice";
@@ -52,7 +52,7 @@ const RightSidebar = ({ columnIds }) => {
         <CloseIcon fontSize="small" />
       </IconButton>
       {isSingleColumn ? (
-        <EnhancedColumnDetails id={columnIds[0]} />
+        <ColumnDetail id={columnIds[0]} />
       ) : isMultipleColumnsInStack ? (
         <ColumnValuesComparison columnIds={columnIds} />
       ) : null}

@@ -30,11 +30,11 @@ import { useState, useEffect, useCallback } from "react";
 import {
   getValueCounts,
   getPaginatedValueCounts,
-} from "../lib/duckdb/getValueCounts";
+} from "../../lib/duckdb/getValueCounts";
 import { useSelector } from "react-redux";
-import { isTableId, selectTablesById } from "../slices/tablesSlice";
-import { selectColumnsById } from "../slices/columnsSlice";
-import { selectOperationsById } from "../slices/operationsSlice";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectColumnsById } from "../../slices/columnsSlice";
+import { selectOperationsById } from "../../slices/operationsSlice";
 
 /**
  * Custom React Hook for querying value counts for a column
@@ -163,7 +163,9 @@ export function usePaginatedValueCounts(id, pageSize = 100) {
           if (reset || pageNum === 0) {
             return result.data;
           }
-          return { ...prevData, ...result.data };
+
+          const merged = [...prevData, ...result.data];
+          return merged;
         });
 
         setHasMore(result.hasMore);
@@ -191,7 +193,7 @@ export function usePaginatedValueCounts(id, pageSize = 100) {
   }, [fetchPage]);
 
   const reset = useCallback(() => {
-    setData({});
+    setData([]);
     setError(null);
     setLoading(false);
     setCurrentPage(0);
@@ -199,10 +201,13 @@ export function usePaginatedValueCounts(id, pageSize = 100) {
     setTotal(0);
   }, []);
 
-  // Auto-fetch first page on mount or dependency changes
+  // Auto-fetch first page on mount or when table/column changes
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (table && column) {
+      setCurrentPage(0);
+      fetchPage(0, true);
+    }
+  }, [table?.databaseName, column?.databaseName, pageSize]);
 
   return {
     data,

@@ -168,16 +168,18 @@ const ColumnValues = ({
         }}
       >
         {values.map((value, i) => (
-          <Typography
-            variant="data-primary"
-            key={i}
-            component="div"
-          >
+          <Typography variant="data-primary" key={i} component="div">
             {value}
           </Typography>
         ))}
-        {error && <Typography variant="data-secondary" color="error">Error: {error}</Typography>}
-        {loading && <Typography variant="data-secondary">Loading values...</Typography>}
+        {error && (
+          <Typography variant="data-secondary" color="error">
+            Error: {error}
+          </Typography>
+        )}
+        {loading && (
+          <Typography variant="data-secondary">Loading values...</Typography>
+        )}
       </Box>
     </Box>
   );

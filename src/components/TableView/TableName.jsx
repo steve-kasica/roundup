@@ -21,13 +21,9 @@
 import { Typography } from "@mui/material";
 import { withTableData } from "../HOC";
 
-const TableName = ({ name, sx = {} }) => {
+const TableName = ({ name, sx = {}, variant = "data-small" }) => {
   return (
-    <Typography
-      variant="data-small"
-      component="div"
-      sx={sx}
-    >
+    <Typography variant={variant} component="div" sx={sx}>
       {name}
     </Typography>
   );
