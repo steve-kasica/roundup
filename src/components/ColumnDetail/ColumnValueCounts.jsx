@@ -53,7 +53,7 @@ import { format } from "d3";
  * - Automatically loads more data when scrolling near bottom
  * - Shows progress text indicating loaded vs total values
  */
-const ColumnValuesCounts = ({ id, limit = 20, barColor = "#aaa" }) => {
+const ColumnValuesCounts = ({ id, limit = 20, barColor = "#ccc" }) => {
   const { data, loading, error, total, loadMore } = usePaginatedValueCounts(
     id,
     limit
@@ -91,14 +91,6 @@ const ColumnValuesCounts = ({ id, limit = 20, barColor = "#aaa" }) => {
         overflow: "hidden",
       }}
     >
-      <Typography
-        variant="data-secondary"
-        color="text.secondary"
-        sx={{ mt: 1 }}
-      >
-        Showing {data.length.toLocaleString()} of {total.toLocaleString()}{" "}
-        unique values
-      </Typography>
       <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
         <BarChart
           data={chartData}
@@ -114,6 +106,14 @@ const ColumnValuesCounts = ({ id, limit = 20, barColor = "#aaa" }) => {
           isLoading={loading && data.length > 0}
         />
       </Box>
+      <Typography
+        variant="data-secondary"
+        color="text.secondary"
+        sx={{ my: 1 }}
+      >
+        Showing {data.length.toLocaleString()} of {total.toLocaleString()}{" "}
+        unique values
+      </Typography>
     </Box>
   );
 };

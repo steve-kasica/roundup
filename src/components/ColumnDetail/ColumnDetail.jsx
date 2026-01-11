@@ -51,13 +51,16 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Warning } from "@mui/icons-material";
 import { EnhancedColumnValues } from "./ColumnValues";
 import ColumnValueCounts from "./ColumnValueCounts";
 import ColumnValueLengths from "./ColumnValueLengths";
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { useState } from "react";
 import { duckDBToRoundupTypes } from "../../lib/duckdb";
 import ColumnIcon from "../ColumnViews/ColumnIcon";
@@ -66,7 +69,7 @@ import { EnhancedTableName } from "../TableView/TableName";
 import DonutChart from "../visualization/DonutChart";
 import DataListItem from "../ui/DataListItem";
 import Swatch from "../ui/Swatch";
-import { FloatNumber, IntegerNumber, ValueChip } from "../ui/text";
+import { FloatNumber, IntegerNumber, MoreInfo, ValueChip } from "../ui/text";
 
 const VALUE_COUNTS_VIEW = "value_counts";
 const RAW_VALUES_VIEW = "raw_values";
@@ -117,6 +120,8 @@ const ColumnDetail = ({
   count,
   nonNullCount,
   avg,
+  min,
+  max,
   // Props pased from `withAssociatedAlerts` via `withColumnData` HOC
   totalCount,
   nullColor = "#aaa",
@@ -175,7 +180,7 @@ const ColumnDetail = ({
           sx={{ px: 0, minHeight: 36, "&.Mui-expanded": { minHeight: 36 } }}
         >
           <Typography variant="subsection-title" color="text.primary">
-            Column metadata
+            Metadata
           </Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ px: 0, pt: 0 }}>
@@ -190,7 +195,8 @@ const ColumnDetail = ({
                 color="text.secondary"
                 sx={{ fontWeight: "bold" }}
               >
-                Parent Table
+                Parent table
+                <MoreInfo text="The table that this column belongs to." />
               </Typography>
               <EnhancedTableName id={parentId} variant="data-primary" />
             </DataListItem>
@@ -203,6 +209,7 @@ const ColumnDetail = ({
                 }}
               >
                 Column Type
+                <MoreInfo text="The data type of this column." />
               </Typography>
               <Typography variant="data-primary">
                 {duckDBToRoundupTypes(columnType)}
@@ -215,6 +222,7 @@ const ColumnDetail = ({
                 sx={{ fontWeight: "bold" }}
               >
                 Count
+                <MoreInfo text="The total number of values in this column, including nulls." />
               </Typography>
               <Typography variant="data-primary">
                 <IntegerNumber value={count} />
@@ -224,12 +232,20 @@ const ColumnDetail = ({
               <Typography
                 variant="data-primary"
                 color="text.secondary"
-                sx={{ fontWeight: "bold" }}
+                sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
               >
                 Mode
+                <MoreInfo text="The most frequently occurring value in this column." />
               </Typography>
               <Stack direction="row" spacing={1} alignItems="center">
-                <ValueChip label={`${modeValue || 0}`} />
+                <ValueChip
+                  label={`${modeValue || 0}`}
+                  sx={{
+                    maxWidth: "150px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                />
                 <Typography variant="data-primary">
                   (<IntegerNumber value={modeCount} />)
                 </Typography>
@@ -241,22 +257,60 @@ const ColumnDetail = ({
                 color="text.secondary"
                 sx={{ fontWeight: "bold" }}
               >
-                Average
-              </Typography>
-              <Typography variant="data-primary">
-                {<FloatNumber value={avg} /> || "N/A"}
-              </Typography>
-            </DataListItem>
-            <DataListItem>
-              <Typography
-                variant="data-primary"
-                color="text.secondary"
-                sx={{ fontWeight: "bold" }}
-              >
                 Unique Values
+                <MoreInfo text="The approximate number of unique values in this column." />
               </Typography>
               <Typography variant="data-primary">
                 <IntegerNumber value={approxUnique} />
+              </Typography>
+            </DataListItem>
+            <DataListItem disabled={isNaN(min)}>
+              <Typography
+                variant="data-primary"
+                color="text.secondary"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                Min
+                <MoreInfo text="The minimum value in this column." />
+              </Typography>
+              <Typography variant="data-primary">
+                {isNaN(min) ? "N/A" : <FloatNumber value={min} />}
+              </Typography>
+            </DataListItem>
+            <DataListItem disabled={isNaN(max)}>
+              <Typography
+                variant="data-primary"
+                color="text.secondary"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                Max
+                <MoreInfo text="The maximum value in this column." />
+              </Typography>
+              <Typography variant="data-primary">
+                {isNaN(max) ? "N/A" : <FloatNumber value={max} />}
+              </Typography>
+            </DataListItem>
+            <DataListItem disabled={avg === null}>
+              <Typography
+                variant="data-primary"
+                color="text.secondary"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                Average
+                <MoreInfo text="The average (mean) value of this column." />
+              </Typography>
+              <Typography variant="data-primary">
+                {avg !== null && avg !== undefined ? (
+                  <FloatNumber value={avg} />
+                ) : (
+                  "N/A"
+                )}
               </Typography>
             </DataListItem>
           </Box>
@@ -276,7 +330,7 @@ const ColumnDetail = ({
           sx={{ px: 0, minHeight: 36, "&.Mui-expanded": { minHeight: 36 } }}
         >
           <Typography variant="subsection-title" color="text.primary">
-            Data Quality Metrics
+            Quality
             {totalCount ? (
               <InfoIcon
                 sx={{ ml: 1 }}
@@ -297,13 +351,7 @@ const ColumnDetail = ({
               gutterBottom
             >
               Completeness
-              <sup>
-                <InfoIcon
-                  tooltipText={
-                    "The ratio of null to non-null values in a column."
-                  }
-                />
-              </sup>
+              <MoreInfo text="The ratio of null to non-null values in a column." />
             </Typography>
             <Box
               sx={{
@@ -378,13 +426,7 @@ const ColumnDetail = ({
                 gutterBottom
               >
                 Uniqueness
-                <sup>
-                  <InfoIcon
-                    tooltipText={
-                      "The ratio of unique values to duplicate values in a column."
-                    }
-                  />
-                </sup>
+                <MoreInfo text="The ratio of unique values to duplicate values in a column." />
               </Typography>
               <Box
                 sx={{
@@ -446,36 +488,38 @@ const ColumnDetail = ({
         </AccordionDetails>
       </Accordion>
       <Divider />
-      <Typography
-        variant="subsection-title"
-        color="text.primary"
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        justifyContent={"space-between"}
         sx={{ my: 2 }}
       >
-        Values counts
-      </Typography>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
-        <ToggleButtonGroup
-          value={view}
-          exclusive
-          onChange={handleViewChange}
-          size="small"
-          sx={{ flexWrap: "wrap" }}
-        >
-          <ToggleButton value={VALUE_COUNTS_VIEW}>Value</ToggleButton>
-          <ToggleButton value={RAW_VALUES_VIEW}>Index</ToggleButton>
-          <ToggleButton value={STRING_LENGTH_VIEW}>Length</ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
+        <Typography variant="subsection-title" color="text.primary">
+          Values
+        </Typography>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel id="view-select-label">Group by</InputLabel>
+          <Select
+            labelId="view-select-label"
+            id="view-select"
+            value={view}
+            label="Group by"
+            onChange={(e) => setView(e.target.value)}
+          >
+            <MenuItem value={VALUE_COUNTS_VIEW}>Unique values</MenuItem>
+            <MenuItem value={STRING_LENGTH_VIEW}>Value length</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
       <Box
-        className="container"
-        sx={{ mt: "10px", flexGrow: 1, overflow: "hidden" }}
+        className="value-view-container"
+        sx={{ flexGrow: 1, overflow: "hidden" }}
       >
         {view === VALUE_COUNTS_VIEW ? (
-          <ColumnValueCounts id={id} approxUnique={approxUnique} />
-        ) : view === RAW_VALUES_VIEW ? (
-          <EnhancedColumnValues id={id} />
+          <ColumnValueCounts id={id} barColor="#ccc" />
         ) : view === STRING_LENGTH_VIEW ? (
-          <ColumnValueLengths id={id} />
+          <ColumnValueLengths id={id} barColor="#ccc" />
         ) : null}
       </Box>
     </Box>

@@ -31,6 +31,8 @@
 
 import PropTypes from "prop-types";
 import { useEffect, useRef, useCallback, useState } from "react";
+import { Box, Typography, Tooltip, CircularProgress } from "@mui/material";
+import { axisBottom, interpolateNumber, scaleLinear } from "d3";
 
 const BarChart = ({
   data = {},
@@ -45,6 +47,7 @@ const BarChart = ({
   minHeight = 300,
   barHeight = 20,
   barSpacing = 5,
+  xAxisTicks = 5,
   formatValue = (v) => v,
   onScrollNearBottom = null,
   scrollThreshold = 0.9,
@@ -122,26 +125,24 @@ const BarChart = ({
 
   if (!data || Object.keys(data).length === 0) {
     return (
-      <div
+      <Box
         className="bar-chart-container"
-        style={{ minHeight: `${minHeight}px` }}
+        sx={{
+          minHeight: `${minHeight}px`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-            color: "#6b7280",
-          }}
-        >
+        <Typography variant="body2" color="text.secondary">
           No data available
-        </div>
-      </div>
+        </Typography>
+      </Box>
     );
   }
 
   const maxValue = Math.max(...Object.values(data));
+  const xScale = scaleLinear().domain([0, maxValue]).range([0, 100]);
   const xAxisHeight = 30;
   const titleHeight = title ? 60 : 0;
 
@@ -153,11 +154,11 @@ const BarChart = ({
   const shouldScroll = barsContentHeight > availableScrollHeight;
 
   return (
-    <div
+    <Box
       className="bar-chart-container"
-      style={{
+      sx={{
         height: "100%",
-        padding: `${marginTop}px ${marginRight}px ${marginBottom}px ${marginLeft}px`,
+        p: `${marginTop}px ${marginRight}px ${marginBottom}px ${marginLeft}px`,
         display: "flex",
         flexDirection: "column",
         position: "relative",
@@ -165,241 +166,246 @@ const BarChart = ({
     >
       {/* Fixed Title */}
       {title && (
-        <div
-          style={{
-            padding: "16px",
-            borderBottom: "1px solid #e5e7eb",
-            fontSize: "18px",
-            fontWeight: "600",
-            color: "#111827",
+        <Box
+          sx={{
+            p: 2,
+            borderBottom: 1,
+            borderColor: "divider",
             flexShrink: 0,
           }}
         >
-          {title}
-        </div>
+          <Typography variant="h6" color="text.primary">
+            {title}
+          </Typography>
+        </Box>
       )}
 
       {/* Fixed X-axis labels at top */}
-      <div
-        style={{
+      <Box
+        sx={{
           height: `${xAxisHeight}px`,
           display: "flex",
           flexDirection: "column",
-          fontSize: "12px",
-          color: "#6b7280",
-          borderBottom: "1px solid #e5e7eb",
+          paddingBottom: 0.5,
+          marginBottom: 0.75,
           flexShrink: 0,
+          position: "relative",
         }}
       >
         {xAxisLabel && (
-          <span style={{ fontWeight: "500", marginBottom: "2px" }}>
+          <Typography
+            variant="caption"
+            sx={{ fontWeight: 500, mb: 0.25, userSelect: "none" }}
+            color="text.secondary"
+          >
             {xAxisLabel}
-          </span>
+          </Typography>
         )}
-        <div
-          style={{
+        <Box
+          sx={{
             display: "flex",
-            justifyContent: "space-between",
             width: "100%",
+            position: "relative",
           }}
         >
-          <span>0</span>
-          <span style={{ textAlign: "right" }}>{formatValue(maxValue)}</span>
-        </div>
-      </div>
+          {xScale.ticks(xAxisTicks).map((value, i, arr) => {
+            return (
+              <Box
+                key={i}
+                sx={{
+                  display: "flex",
+                  left: `${xScale(value)}%`,
+                  transform: `translateX(-${xScale(0)}%)`,
+                  width: i === 0 ? "0px" : i === arr.length - 1 ? "0px" : "1px",
+                  height: "100%",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  position: "relative",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    userSelect: "none",
+                  }}
+                >
+                  {formatValue(value)}
+                </Typography>
+                <Box
+                  sx={{
+                    width: "1px",
+                    height: "4px",
+                    backgroundColor: "#000",
+                  }}
+                />
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
 
       {/* Scrollable bars container */}
-      <div
+      <Box
         ref={scrollContainerRef}
-        style={{
+        sx={{
           flex: 1,
           overflowY: shouldScroll ? "auto" : "visible",
           position: "relative",
         }}
       >
-        <div
-          style={{
+        <Box
+          sx={{
             position: "relative",
             height: `${barsContentHeight}px`,
           }}
         >
           {Object.entries(data).map(([label, value], index) => {
-            const barWidth = Math.max(
-              20,
-              maxValue > 0 ? (value / maxValue) * 100 : 0
-            );
+            const barWidth = xScale(value);
             const yPosition = index * (barHeight + barSpacing);
             const showValueOutside = barWidth < 75;
-            const tooltipText = tooltipData[label];
+            const isHovered = hoveredBar === label;
+            const shouldDim = hoveredBar !== null && !isHovered;
 
             return (
-              <div
+              <Box
                 key={index}
-                style={{
+                sx={{
                   position: "absolute",
                   top: `${yPosition}px`,
-                  left: "0",
-                  right: "0",
+                  left: 0,
+                  right: 0,
                   height: `${barHeight}px`,
                   display: "flex",
                   alignItems: "center",
+                  opacity: shouldDim ? 0.25 : 1,
+                  transition: "opacity 0.2s ease-in-out",
                 }}
               >
                 {/* Bar container */}
-                <div
-                  style={{
+                <Box
+                  sx={{
                     flex: 1,
                     height: "100%",
                     position: "relative",
                     overflow: "hidden",
+                    cursor: "pointer",
                   }}
                 >
-                  {/* Actual bar */}
-                  <div
-                    style={{
+                  {/* Background bar */}
+                  <Box
+                    sx={{
+                      position: "absolute",
                       width: `${barWidth}%`,
                       height: "100%",
                       backgroundColor: color,
                       transition:
                         "width 0.3s ease-in-out, filter 0.2s ease-in-out, transform 0.2s ease-in-out",
+                      "&:hover": {
+                        filter: "brightness(1.15)",
+                        transform: "scaleY(1.1)",
+                      },
+                    }}
+                  />
+
+                  {/* Content layer */}
+                  <Box
+                    sx={{
                       position: "relative",
+                      width: "100%",
+                      height: "100%",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: showValueOutside
                         ? "flex-start"
                         : "space-between",
-                      cursor: tooltipText ? "pointer" : "default",
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.filter = "brightness(1.15)";
-                      e.currentTarget.style.transform = "scaleY(1.1)";
-                      if (tooltipText) {
+                  >
+                    {/* Label inset on left */}
+                    <Typography
+                      variant="data-primary"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        wordBreak: "keep-all",
+                        pl: 0.5,
+                        userSelect: "none",
+                      }}
+                      onMouseEnter={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         setHoveredBar(label);
                         setTooltipPosition({
                           x: e.clientX,
                           y: rect.top,
                         });
-                      }
-                    }}
-                    onMouseMove={(e) => {
-                      if (tooltipText) {
+                      }}
+                      onMouseMove={(e) => {
                         setTooltipPosition({
                           x: e.clientX,
                           y: e.clientY,
                         });
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.filter = "brightness(1)";
-                      e.currentTarget.style.transform = "scaleY(1)";
-                      setHoveredBar(null);
-                    }}
-                  >
-                    {/* Label inset on left */}
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        color: "#ffffff",
-                        fontWeight: "500",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        maxWidth: showValueOutside ? "90%" : "60%",
-                        paddingLeft: "5px",
-                        userSelect: "none",
                       }}
-                      title={`${label}: ${formatValue(value)}`}
+                      onMouseLeave={() => {
+                        setHoveredBar(null);
+                      }}
                     >
                       {label}
-                    </div>
-
-                    {/* Value inset on right (only when bar is wide enough) */}
-                    {!showValueOutside && (
-                      <div
-                        style={{
-                          fontSize: "12px",
-                          color: "#ffffff",
-                          fontWeight: "500",
-                          flexShrink: 0,
-                          textAlign: "right",
-                          paddingRight: "5px",
-                        }}
-                      >
-                        {formatValue(value)}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Value outside bar (when bar is narrow) */}
-                  {showValueOutside && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: `${barWidth}%`,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        fontSize: "12px",
-                        color: "#374151",
-                        fontWeight: "500",
-                        paddingLeft: "8px",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      {formatValue(value)}
-                    </div>
-                  )}
-                </div>
-              </div>
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
             );
           })}
-        </div>
+        </Box>
 
         {/* Loading indicator at bottom */}
         {isLoading && (
-          <div
-            style={{
+          <Box
+            sx={{
               position: "absolute",
-              bottom: "0",
-              left: "0",
-              right: "0",
+              bottom: 0,
+              left: 0,
+              right: 0,
               height: "30px",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               backgroundColor: "rgba(255, 255, 255, 0.9)",
-              fontSize: "12px",
-              color: "#6b7280",
             }}
           >
-            Loading more...
-          </div>
+            <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
+              Loading more...
+            </Typography>
+            <CircularProgress size={16} />
+          </Box>
         )}
-      </div>
+      </Box>
 
       {/* Tooltip */}
-      {hoveredBar && tooltipData[hoveredBar] && (
-        <div
-          style={{
+      {hoveredBar && (
+        <Box
+          sx={{
             position: "fixed",
             left: `${tooltipPosition.x + 10}px`,
             top: `${tooltipPosition.y - 10}px`,
             backgroundColor: "rgba(0, 0, 0, 0.9)",
             color: "#ffffff",
-            padding: "8px 12px",
-            borderRadius: "6px",
-            fontSize: "12px",
+            p: 1,
+            borderRadius: 1,
             pointerEvents: "none",
             zIndex: 1000,
             maxWidth: "300px",
             wordWrap: "break-word",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            boxShadow: 2,
           }}
         >
-          {tooltipData[hoveredBar]}
-        </div>
+          <Typography variant="caption">
+            {tooltipData[hoveredBar] || `${formatValue(data[hoveredBar])}`}
+          </Typography>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

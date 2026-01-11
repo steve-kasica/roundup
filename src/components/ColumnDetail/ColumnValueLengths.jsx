@@ -31,6 +31,7 @@ import { BarChart } from "../visualization";
 import { usePaginatedValueLength } from "../../hooks/useValueLength";
 import { formatNumber } from "../../lib/utilities";
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
+import { ValueChip } from "../ui/text";
 
 /**
  * ColumnValueLengths Component
@@ -58,7 +59,7 @@ import { Alert, Box, CircularProgress, Typography } from "@mui/material";
  * - Tooltips display example values for each length with their counts
  * - Green color scheme to differentiate from value counts
  */
-const ColumnValueLengths = ({ id, limit = 20 }) => {
+const ColumnValueLengths = ({ id, limit = 20, barColor = "#10b981" }) => {
   const { data, loading, error, total, loadMore } = usePaginatedValueLength(
     id,
     limit
@@ -94,11 +95,18 @@ const ColumnValueLengths = ({ id, limit = 20 }) => {
             data.map(({ length, count }) => [`Length ${length}`, count])
           )}
           tooltipData={Object.fromEntries(
-            data.map(({ length, examples }) => [
+            data.map(({ length, count, examples }) => [
               `Length ${length}`,
-              examples
-                .map((ex) => `${ex.value} (${formatNumber(ex.count)})`)
-                .join(", "),
+              <>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Count: {count.toLocaleString()}
+                </Typography>
+                <Box display={"flex"} gap={0.5} flexWrap="wrap">
+                  {examples.map((ex) => (
+                    <ValueChip key={ex.value} label={ex.value} />
+                  ))}
+                </Box>
+              </>,
             ])
           )}
           xAxisLabel="Count"
@@ -106,7 +114,7 @@ const ColumnValueLengths = ({ id, limit = 20 }) => {
           marginRight={10}
           marginTop={10}
           marginBottom={10}
-          color="#10b981"
+          color={barColor}
           formatValue={formatNumber}
           onScrollNearBottom={loadMore}
           scrollThreshold={0.9}

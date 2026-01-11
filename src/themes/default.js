@@ -47,6 +47,7 @@ const theme = createTheme(baseTheme, {
       lineHeight: 1.3,
       letterSpacing: "-0.01em",
       color: baseTheme.palette.text.primary,
+      userSelect: "none",
     },
 
     // LEVEL 3: Subsection Headers
@@ -58,6 +59,7 @@ const theme = createTheme(baseTheme, {
       lineHeight: 1.4,
       letterSpacing: "0em",
       color: baseTheme.palette.text.primary,
+      userSelect: "none",
     },
 
     // LEVEL 4: Component Labels
@@ -80,6 +82,7 @@ const theme = createTheme(baseTheme, {
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: "0em",
+      userSelect: "none",
     },
 
     // LEVEL 6: Secondary Data Text
@@ -90,6 +93,7 @@ const theme = createTheme(baseTheme, {
       fontWeight: 400,
       lineHeight: 1.43,
       letterSpacing: "0.01em",
+      userSelect: "none",
     },
 
     // LEVEL 7: Tertiary/Small Data
@@ -100,6 +104,7 @@ const theme = createTheme(baseTheme, {
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: "0.02em",
+      userSelect: "none",
     },
 
     // LEVEL 8: Micro Text
@@ -110,6 +115,7 @@ const theme = createTheme(baseTheme, {
       fontWeight: 500,
       lineHeight: 1.4,
       letterSpacing: "0.03em",
+      userSelect: "none",
     },
 
     // SPECIAL: Emphasized Metrics
