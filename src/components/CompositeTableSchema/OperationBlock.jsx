@@ -25,7 +25,7 @@ import {
 } from "../../slices/operationsSlice";
 import { withOperationData } from "../HOC";
 import { EnhancedPackOperationBlock } from "./PackOperationBlock";
-import { EnhancedStackOperationBlock } from "./StackOperationBlock";
+import { EnhancedStackOperationBlock } from "./StackOperationBlock/StackOperationBlock";
 import { EnhancedTableBlock } from "./TableBlock";
 
 /**

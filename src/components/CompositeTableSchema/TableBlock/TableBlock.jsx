@@ -38,14 +38,11 @@ function TableBlock({
   // Props passed directly from parent
   parentOperationType,
   parentColumnCount,
-  // Parent row count will be null if parent operation is a NO_OP (single table)
-  parentRowCount,
   sx = {},
 }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering TableBlock for table:", id);
   }
-  const height = (rowCount / parentRowCount || rowCount) * 100; // height as percentage of parent operation's row count
   const ticks = Array.from(
     {
       length:
@@ -66,8 +63,8 @@ function TableBlock({
         alignItems: "stretch",
         position: "relative",
         containerType: "size",
+        height: "100%", // Default value, will be overridden if in STACK operation
         ...sx,
-        height: `${height}%`,
         // Visual indication of alerts
         ...(totalCount && {
           backgroundColor: "warning.light",

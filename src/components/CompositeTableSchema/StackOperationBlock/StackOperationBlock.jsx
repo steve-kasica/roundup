@@ -33,17 +33,17 @@ import {
   withAssociatedAlerts,
   withOperationData,
   withStackOperationData,
-} from "../HOC/index.js";
+} from "../../HOC/index.js";
 import {
   isOperationId,
   OPERATION_TYPE_STACK,
-} from "../../slices/operationsSlice/index.js";
+} from "../../../slices/operationsSlice/index.js";
 import { Box } from "@mui/material";
-import { EnhancedTableBlock } from "./TableBlock";
-import { EnhancedOperationBlock } from "./OperationBlock";
+import { EnhancedTableBlock } from "../TableBlock/index.js";
+import { EnhancedOperationBlock } from "../OperationBlock.jsx";
 import React from "react";
-import StyledBlock from "../ui/StyledBlock.js";
-import { BLOCK_BREAKPOINTS } from "./settings.js";
+import StyledBlock from "../../ui/StyledBlock.js";
+import { BLOCK_BREAKPOINTS } from "../settings.js";
 
 function StackOperationBlock({
   // Props defined in `withOperationData` HOC
@@ -52,6 +52,7 @@ function StackOperationBlock({
   depth,
   focusedDepth,
   focusOperation,
+  childRowCounts,
   // props via withStackOperationData
   childIds,
   columnCount,
@@ -95,7 +96,7 @@ function StackOperationBlock({
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          gap: "1%",
+          gap: 0.25,
           width: "100%",
           transition: "opacity 0.3s ease",
           [`@container (max-height: ${BLOCK_BREAKPOINTS.HEIGHT.MEDIUM}px)`]: {
@@ -112,14 +113,18 @@ function StackOperationBlock({
                   parentOperationType={OPERATION_TYPE_STACK}
                   parentColumnCount={columnCount}
                   parentRowCount={rowCount}
+                  sx={{
+                    height: `${(childRowCounts.get(id) / rowCount) * 100}%`,
+                  }}
                 />
               ) : (
                 <EnhancedTableBlock
                   id={id}
                   parentOperationType={OPERATION_TYPE_STACK}
                   parentColumnCount={columnCount}
-                  parentRowCount={rowCount}
                   sx={{
+                    height: `${(childRowCounts.get(id) / rowCount) * 100}%`,
+                    borderBottom: "1px solid #fff",
                     color: (theme) =>
                       useLightTextInChildren
                         ? theme.palette.textLight

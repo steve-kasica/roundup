@@ -94,7 +94,7 @@ import {
  *  - `insertColumnIntoChildAtIndex` (function): Inserts a new column into a child table at specified index
  *
  * Row Data:
- *  - `childRowCounts` (array): Array of row counts for child operations, is parallel to `childIds`
+ *  - `childRowCounts` (Map): Map of row counts for child tables/operations, keyed by child ID
  *
  * Interaction State:
  *  - `isFocused` (boolean): Whether this operation is currently focused
