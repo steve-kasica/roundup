@@ -27,7 +27,7 @@ import {
 } from "../../slices/operationsSlice";
 import { EnhancedPackRows } from "../../components/PackOperationView";
 import { isTableId } from "../../slices/tablesSlice";
-import { EnhancedStackRows } from "../../components/StackOperationView/StackRows";
+import EnhancedStackRows from "../../components/StackRows";
 
 const VIEW_TABLE = "TABLE";
 const VIEW_STACK = "STACK";

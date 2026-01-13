@@ -30,10 +30,10 @@
  * **Table Tree**, by design.
  */
 
-import { EnhancedTableBlock } from "../TableView";
+import { EnhancedTableBlock } from "./TableBlock";
 import { OPERATION_TYPE_PACK } from "../../slices/operationsSlice";
 import { isTableId } from "../../slices/tablesSlice";
-import { Typography, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import { EnhancedOperationBlock } from "./OperationBlock";
 import {
   withPackOperationData,

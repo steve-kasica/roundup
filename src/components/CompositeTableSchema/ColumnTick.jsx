@@ -42,6 +42,7 @@ const ColumnTick = ({
   sx = {},
 }) => (
   <StyledColumnContainer
+    className={"ColumnTick"}
     isHovered={isHovered}
     isDragging={isDragging}
     isDropTarget={isDropTarget}

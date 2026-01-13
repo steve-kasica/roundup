@@ -25,10 +25,11 @@ import {
   withAssociatedAlerts,
   withStackOperationData,
 } from "../HOC";
-import { usePaginatedTableRows } from "../../hooks/useTableRowData";
+import { usePaginatedTableRows } from "../../hooks/useTableRowData.js";
 import RoundupTable from "../ui/Table/Table.jsx";
 import { Stack, Typography } from "@mui/material";
-import { NumberIcon } from "../ui/icons";
+import { NumberIcon } from "../ui/icons/index.js";
+import { getSelectedColumnIndices } from "./utilities.js";
 
 const pageSize = 50; // default page size for pagination
 
@@ -63,7 +64,6 @@ const StackRows = ({
     if (selectedChildColumnIds.flat().length === 0) {
       return [0, 0];
     }
-
     const [firstIndex, lastIndex] = selectedChildColumnIds.reduce(
       (acc, colIds, index) => {
         if (colIds.length > 0) {
@@ -85,17 +85,19 @@ const StackRows = ({
   }, [childIds, rowRanges, selectedChildColumnIds]);
 
   const displayColumnIds = useMemo(() => {
-    const selectedChildColumnIdsSet = new Set(selectedChildColumnIds.flat());
-    const selectedIndices = new Set();
-    columnIdMatrix.forEach((columnIds) => {
-      columnIds.forEach((colId, colIndex) => {
-        if (selectedChildColumnIdsSet.has(colId)) {
-          selectedIndices.add(colIndex);
-        }
-      });
-    });
+    const allSelectedChildColumnIds = selectedChildColumnIds.flat();
+    const selectedIndices = getSelectedColumnIndices(
+      columnIdMatrix,
+      allSelectedChildColumnIds
+    );
     return columnIds.filter((_colId, index) => selectedIndices.has(index));
   }, [columnIds, columnIdMatrix, selectedChildColumnIds]);
+
+  console.log("selectedChildColumnIds", {
+    selectedChildColumnIds,
+    columnIds,
+    displayColumnIds,
+  });
 
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
@@ -150,11 +152,7 @@ const StackRows = ({
             number={tableIndex + 1}
             tooltipText={`Table ${tableIndex + 1} of ${childIds.length}`}
           />
-          <Typography
-            variant="data-small"
-          >
-            {globalIndex + 1}.
-          </Typography>
+          <Typography variant="data-small">{globalIndex + 1}.</Typography>
         </Stack>
       );
     },

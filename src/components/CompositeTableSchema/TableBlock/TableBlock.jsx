@@ -18,11 +18,12 @@
  * <EnhancedTableBlock id={tableId} />
  */
 
-import { ColumnTick, EnhancedColumnTick } from "../ColumnViews/index.js";
-import { OPERATION_TYPE_STACK } from "../../slices/operationsSlice/Operation.js";
-import { withTableData, withAssociatedAlerts } from "../HOC/index.js";
+import { ColumnTick, EnhancedColumnTick } from "../ColumnTick";
+import { OPERATION_TYPE_STACK } from "../../../slices/operationsSlice/Operation";
+import { withTableData, withAssociatedAlerts } from "../../HOC";
 import { Box, darken, Typography } from "@mui/material";
-import { BLOCK_BREAKPOINTS } from "./settings.js";
+import { BLOCK_BREAKPOINTS } from "../settings.js";
+import { IntegerNumber } from "../../ui/text";
 
 function TableBlock({
   // Props from withAssociatedAlerts via withTableData
@@ -87,6 +88,7 @@ function TableBlock({
           whiteSpace: "nowrap",
           wordBreak: "keep-all",
           transition: "opacity 0.3s ease",
+          zIndex: 1,
           [`@container (max-height: ${BLOCK_BREAKPOINTS.HEIGHT.SMALL}px)`]: {
             opacity: "0",
           },
@@ -105,6 +107,7 @@ function TableBlock({
           color: "inherit",
           wordBreak: "keep-all",
           transition: "opacity 0.3s ease",
+          zIndex: 1,
           [`@container (max-height: ${BLOCK_BREAKPOINTS.HEIGHT.MEDIUM}px)`]: {
             opacity: "0",
           },
@@ -113,11 +116,13 @@ function TableBlock({
           },
         }}
       >
-        {`${columnCount.toLocaleString()} x ${rowCount.toLocaleString()}`}
+        <IntegerNumber value={columnCount} /> x{" "}
+        <IntegerNumber value={rowCount} />
       </Typography>
       {ticks.map((columnId, index, array) => {
         const sx = {
           borderRight: index < array.length - 1 ? "1px solid" : "none",
+          zIndex: 0,
         };
         return columnId === null ? (
           <ColumnTick

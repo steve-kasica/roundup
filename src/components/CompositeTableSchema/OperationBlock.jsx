@@ -23,10 +23,10 @@ import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice";
-import withOperationData from "../HOC/withOperationData";
+import { withOperationData } from "../HOC";
 import { EnhancedPackOperationBlock } from "./PackOperationBlock";
 import { EnhancedStackOperationBlock } from "./StackOperationBlock";
-import { EnhancedTableBlock } from "../TableView";
+import { EnhancedTableBlock } from "./TableBlock";
 
 /**
  * OperationBlock Component

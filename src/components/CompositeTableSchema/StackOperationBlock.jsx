@@ -38,9 +38,9 @@ import {
   isOperationId,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice/index.js";
-import { Box, Typography } from "@mui/material";
-import { EnhancedTableBlock } from "./TableBlock.jsx";
-import { EnhancedOperationBlock } from "./OperationBlock.jsx";
+import { Box } from "@mui/material";
+import { EnhancedTableBlock } from "./TableBlock";
+import { EnhancedOperationBlock } from "./OperationBlock";
 import React from "react";
 import StyledBlock from "../ui/StyledBlock.js";
 import { BLOCK_BREAKPOINTS } from "./settings.js";
