@@ -12,6 +12,8 @@
  * - Multiple interactive states (hover, drag, select, focus)
  * - Alert/error highlighting
  * - Drag-and-drop support
+ * - Graphically delimits column values in *chips* for readability, since we can't
+ *   assume that a delimiting character will be present in the data itself.
  *
  * @module components/ColumnViews/ColumnSummary
  *

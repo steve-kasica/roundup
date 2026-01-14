@@ -30,17 +30,17 @@
  * **Table Tree**, by design.
  */
 
-import { EnhancedTableBlock } from "./TableBlock";
-import { OPERATION_TYPE_PACK } from "../../slices/operationsSlice";
-import { isTableId } from "../../slices/tablesSlice";
+import { EnhancedTableBlock } from "../TableBlock";
+import { OPERATION_TYPE_PACK } from "../../../slices/operationsSlice";
+import { isTableId } from "../../../slices/tablesSlice";
 import { Box } from "@mui/material";
-import { EnhancedOperationBlock } from "./OperationBlock";
+import { EnhancedOperationBlock } from "../OperationBlock";
 import {
   withPackOperationData,
   withOperationData,
   withAssociatedAlerts,
-} from "../HOC";
-import StyledBlock from "../ui/StyledBlock";
+} from "../../HOC";
+import StyledBlock from "../../ui/StyledBlock";
 
 function PackOperationBlock({
   // props via withOperationData
@@ -65,58 +65,52 @@ function PackOperationBlock({
       isFocused={isFocused}
       hasError={totalCount}
       sx={{
-        flexDirection: "column",
-        justifyContent: "flex-start",
+        display: "flex",
+        flexDirection: "row",
+        boxSizing: "border-box",
+        flexGrow: 1,
         color: (theme) =>
           useLightText ? theme.palette.textLight : theme.palette.textDark,
         ...sx,
       }}
     >
-      <Box
-        display={"flex"}
-        flexDirection={"row"}
-        boxSizing={"border-box"}
-        flexGrow={1}
-      >
-        {childIds.map((childId, index) => {
-          const childSx = {
-            width:
-              ((index === 0 ? leftColumnCount : rightColumnCount) /
-                columnCount) *
-                100 +
-              "%",
-            marginLeft: index === 0 ? "0px" : "2px",
-          };
-          if (isTableId(childId)) {
-            return (
-              <EnhancedTableBlock
-                key={childId}
-                id={childId}
-                isDraggable={false}
-                parentOperationType={OPERATION_TYPE_PACK}
-                parentColumnCount={columnCount}
-                sx={{
-                  ...childSx,
-                  color: (theme) =>
-                    useLightTextInChildren
-                      ? theme.palette.textLight
-                      : theme.palette.textDark,
-                }}
-              />
-            );
-          } else {
-            return (
-              <EnhancedOperationBlock
-                id={childId}
-                key={childId}
-                parentOperationType={OPERATION_TYPE_PACK}
-                parentColumnCount={columnCount}
-                sx={childSx}
-              />
-            );
-          }
-        })}
-      </Box>
+      {childIds.map((childId, index) => {
+        const childSx = {
+          width:
+            ((index === 0 ? leftColumnCount : rightColumnCount) / columnCount) *
+              100 +
+            "%",
+          marginLeft: index === 0 ? "0px" : "2px",
+        };
+        if (isTableId(childId)) {
+          return (
+            <EnhancedTableBlock
+              key={childId}
+              id={childId}
+              isDraggable={false}
+              parentOperationType={OPERATION_TYPE_PACK}
+              parentColumnCount={columnCount}
+              sx={{
+                ...childSx,
+                color: (theme) =>
+                  useLightTextInChildren
+                    ? theme.palette.textLight
+                    : theme.palette.textDark,
+              }}
+            />
+          );
+        } else {
+          return (
+            <EnhancedOperationBlock
+              id={childId}
+              key={childId}
+              parentOperationType={OPERATION_TYPE_PACK}
+              parentColumnCount={columnCount}
+              sx={childSx}
+            />
+          );
+        }
+      })}
     </StyledBlock>
   );
 }
