@@ -120,14 +120,24 @@ export default function* createColumnsWatcher() {
           selectOperationsById(state, id)
         );
         if (operation.isMaterialized) {
+          console.log(
+            "Creating columns for materialized operation:",
+            id,
+            operation.columnIds
+          );
           columnLocations.push(
-            ...Array.from({ length: operation.columnIds.length }).map(
-              (_, index) => ({
-                parentId: id,
-                parentDatabaseName: operation.databaseName,
-                index,
-              })
-            )
+            ...Array.from({
+              length:
+                // TODO: technical debt, newly materialized operations may not have columnIds yet
+                // But this property will be set by updateOperationsWorker at this point.
+                operation.columnIds.length > 0
+                  ? operation.columnIds.length
+                  : operation.columnCount,
+            }).map((_, index) => ({
+              parentId: id,
+              parentDatabaseName: operation.databaseName,
+              index,
+            }))
           );
         }
       }
