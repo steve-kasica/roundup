@@ -34,6 +34,7 @@ import {
   addOperations as addOperationsToSlice,
   updateOperations as updateOperationsSlice,
   Operation,
+  OPERATION_TYPE_NO_OP,
 } from "../../slices/operationsSlice";
 import { createOperationsSuccess } from "./actions";
 import { setFocusedObjectId } from "../../slices/uiSlice";
@@ -89,8 +90,12 @@ export default function* createOperationsWorker(action) {
   yield put(addOperationsToSlice(createdOperations));
   yield put(updateTablesSlice(tableUpdates));
   yield put(updateOperationsSlice(operationUpdates));
-  const focusedObjectId = createdOperations[createdOperations.length - 1].id;
-  yield put(setFocusedObjectId(focusedObjectId)); // focus the last operation created
+  const lastOperation = createdOperations[createdOperations.length - 1];
+  if (lastOperation.operationType === OPERATION_TYPE_NO_OP) {
+    yield put(setFocusedObjectId(lastOperation.childIds[0])); // focus the table of the NO_OP operation
+  } else {
+    yield put(setFocusedObjectId(lastOperation.id)); // focus the last operation created
+  }
 
   yield put(
     createOperationsSuccess({

@@ -31,11 +31,6 @@ const RightSidebar = ({ columnIds }) => {
     dispatch(setFocusedColumnIds([]));
   };
 
-  // TODO: implement
-  // const isMultipleColumnsInPack =
-  //   selectedColumns && selectedColumns.length === 2 && false;
-  // const isMultipleColumnInTable =
-  //   selectedColumns && selectedColumns.length > 2 && false;
   return (
     <Box height="100%" sx={{ position: "relative" }}>
       <IconButton

@@ -392,14 +392,14 @@ const PackSchemaView = ({
 
   return (
     <Box display={"flex"} flexDirection="column" height="100%">
-      <EnhancedPackSchemaToolbar
+      {/* <EnhancedPackSchemaToolbar
         id={id}
         // clickedBlockCells={clickedBlockCells}
         clickedBlockCells={new Set()}
         areAnySelected={areAnySelected}
         onSelectAllClick={handleSelectAll}
         handleHideColumns={handleHideColumns}
-      />
+      /> */}
       <Box
         display={"flex"}
         flexDirection={"column"}

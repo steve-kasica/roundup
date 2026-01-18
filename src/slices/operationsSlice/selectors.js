@@ -20,7 +20,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectColumnsById } from "../columnsSlice";
 import { isTableId, selectTableQueryData } from "../tablesSlice";
-import { OPERATION_TYPE_PACK } from "./Operation";
+import { OPERATION_TYPE_NO_OP, OPERATION_TYPE_PACK } from "./Operation";
 
 /**
  * Selects an operation by its ID from the Redux state.
@@ -45,8 +45,14 @@ export const selectOperationsById = createSelector(
  * @param {Object} state - The Redux state object.
  * @returns {Array<string|number>} An array of operation IDs.
  */
-export function selectAllOperationIds(state) {
-  return state.operations.allIds;
+export function selectAllOperationIds(state, includeNoOp = false) {
+  if (!includeNoOp) {
+    return state.operations.allIds.filter(
+      (id) => state.operations.byId[id].operationType !== OPERATION_TYPE_NO_OP
+    );
+  } else {
+    return state.operations.allIds;
+  }
 }
 
 /**

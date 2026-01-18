@@ -41,18 +41,8 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useCallback, useMemo, useState } from "react";
-import { EnhancedExportDialog } from "../ExportCompositeTable/ExportDialog";
 import { selectAlertsById } from "../../slices/alertsSlice/selectors";
 import { EnhancedAlertDescription } from "../Alerts/AlertDescription";
-import {
-  DeleteColumnsButton,
-  ExportTableButton,
-  FocusIconButton,
-  HideIconButton,
-  RenameObjectButton,
-  SchemaAlertsButton,
-  SelectToggleIconButton,
-} from "./buttons";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
 import { PackOperationIcon, StackOperationIcon, TableIcon } from "./icons";
 
@@ -95,14 +85,6 @@ const SchemaToolbar = ({
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [alertAnchorEl, setAlertAnchorEl] = useState(null);
 
-  const handleExport = useCallback(() => {
-    setIsExportDialogOpen(true);
-  }, []);
-
-  const handleCloseExportDialog = useCallback(() => {
-    setIsExportDialogOpen(false);
-  }, []);
-
   const handleOpenAlerts = useCallback((event) => {
     setAlertAnchorEl(event.currentTarget);
   }, []);
@@ -125,83 +107,8 @@ const SchemaToolbar = ({
         gap: 1,
       }}
     >
-      <Stack direction="row" alignItems="center" spacing={1}>
-        {objectType === OBJECT_TYPE_STACK ? (
-          <StackOperationIcon />
-        ) : objectType === OBJECT_TYPE_PACK ? (
-          <PackOperationIcon />
-        ) : (
-          <TableIcon />
-        )}
-        <Typography
-          variant="subsection-title"
-          component="div"
-        >
-          {title}
-        </Typography>
-        <Chip
-          label={`${columnCount.toLocaleString()} x ${
-            rowCount && rowCount >= 0 ? rowCount.toLocaleString() : "???"
-          }`}
-          sx={{
-            userSelect: "none",
-          }}
-        />
-      </Stack>
-
       <Box display="flex" gap={1}>
         {customMenuItems}
-        <Divider orientation="vertical" flexItem />
-        <RenameObjectButton
-          objectType={objectType}
-          onConfirm={onRenameConfirm}
-          currentName={title}
-        />
-        <Divider orientation="vertical" flexItem />
-        <FocusIconButton
-          onClick={onFocusColumns}
-          disabled={isFocusedDisabled}
-        />
-        <HideIconButton onClick={onHideColumns} disabled={isHideDisabled} />
-        <DeleteColumnsButton
-          onConfirm={onDeleteColumns}
-          disabled={isDeleteDisabled}
-        />
-        <SelectToggleIconButton
-          onClick={onSelectToggleColumns}
-          isSelected={isSelectToggleSelected}
-        />
-
-        <Divider orientation="vertical" flexItem />
-        {/* Alerts */}
-        <SchemaAlertsButton
-          onClick={handleOpenAlerts}
-          disabled={totalCount === 0}
-          badgeContent={displayCount}
-          color={
-            errorCount > 0
-              ? "error"
-              : warningCount - silencedWarningCount > 0
-              ? "warning"
-              : "default"
-          }
-        />
-        {/* Export */}
-        <ExportTableButton onClick={handleExport} disabled={errorCount > 0} />
-
-        {/* Export Dialog */}
-        <Dialog
-          open={isExportDialogOpen}
-          onClose={handleCloseExportDialog}
-          maxWidth="sm"
-          fullWidth
-        >
-          <EnhancedExportDialog
-            id={id}
-            open={isExportDialogOpen}
-            onClose={handleCloseExportDialog}
-          />
-        </Dialog>
       </Box>
 
       {/* Alerts Popover */}

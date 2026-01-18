@@ -105,6 +105,7 @@ const ColumnSummary = ({
   onContextMenu,
   onHideColumn = () => {},
   sx = {},
+  elevation = 1,
 }) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const formatPercentage = format(".2%");

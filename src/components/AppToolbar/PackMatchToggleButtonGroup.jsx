@@ -28,13 +28,18 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from "@mui/material";
-import TooltipIconButton from "./TooltipIconButton";
-import VennDiagram from "../icons/VennDiagram";
+import { TooltipIconButton } from "../ui/buttons";
+import { VennDiagram } from "../ui/icons";
 import {
+  isOperationId,
   MATCH_TYPE_LEFT_UNMATCHED,
   MATCH_TYPE_MATCHES,
   MATCH_TYPE_RIGHT_UNMATCHED,
-} from "../../../slices/operationsSlice";
+  OPERATION_TYPE_PACK,
+} from "../../slices/operationsSlice";
+import { withPackOperationData } from "../HOC";
+import { useSelector } from "react-redux";
+import { selectFocusedObjectId } from "../../slices/uiSlice";
 
 // TODO: these need to go into theme
 const vennFillColor = "#555";
@@ -76,16 +81,46 @@ const MatchToggleButton = ({ text, children, ...props }) => (
   </Tooltip>
 );
 
+/**
+ * 
+ *           value={validMatchGroups}
+          onChange={handleToggleMatchChange}
+          isLeftUnmatchedDisabled={
+            matchStats[MATCH_TYPE_LEFT_UNMATCHED] === 0 || errorCount > 0
+          }
+          isMatchDisabled={
+            matchStats[MATCH_TYPE_MATCHES] === 0 || errorCount > 0
+          }
+          isRightUnmatchedDisabled={
+            matchStats[MATCH_TYPE_RIGHT_UNMATCHED] === 0 || errorCount > 0
+          }
+ * 
+ */
 const PackMatchToggleButtonGroup = ({
-  value,
-  onChange,
-  isLeftUnmatchedDisabled,
-  isMatchDisabled,
-  isRightUnmatchedDisabled,
+  // Props passed via `withPackOperationData.jsx` HOC
+  validMatchGroups,
+  matchStats,
+  // Props passed via `withAssocitedAlerts.jsx` HOC
+  errorCount,
 }) => {
+  const isLeftUnmatchedDisabled =
+    matchStats === undefined ||
+    matchStats[MATCH_TYPE_LEFT_UNMATCHED] === 0 ||
+    errorCount > 0;
+  const isMatchDisabled =
+    matchStats === undefined ||
+    matchStats[MATCH_TYPE_MATCHES] === 0 ||
+    errorCount > 0;
+  const isRightUnmatchedDisabled =
+    matchStats === undefined ||
+    matchStats[MATCH_TYPE_RIGHT_UNMATCHED] === 0 ||
+    errorCount > 0;
+
+  const onChange = (event, newValues) => {};
   return (
     <ToggleButtonGroup
-      value={value}
+      value={validMatchGroups}
+      disabled={validMatchGroups === undefined}
       exclusive={false}
       aria-label="Toggle match categories"
       size="small"
@@ -112,7 +147,9 @@ const PackMatchToggleButtonGroup = ({
       <MatchToggleButton
         value={MATCH_TYPE_LEFT_UNMATCHED}
         text={`${
-          value.includes(MATCH_TYPE_LEFT_UNMATCHED) ? "Unselect" : "Select"
+          validMatchGroups?.includes(MATCH_TYPE_LEFT_UNMATCHED)
+            ? "Unselect"
+            : "Select"
         } unmatched rows from the left-hand table ${
           isLeftUnmatchedDisabled ? "(disabled)" : ""
         }`}
@@ -134,7 +171,7 @@ const PackMatchToggleButtonGroup = ({
       <MatchToggleButton
         value={MATCH_TYPE_MATCHES}
         text={`${
-          value.includes(MATCH_TYPE_MATCHES) ? "Unselect" : "Select"
+          validMatchGroups?.includes(MATCH_TYPE_MATCHES) ? "Unselect" : "Select"
         } matched rows from both tables ${isMatchDisabled ? "(disabled)" : ""}`}
         disabled={isMatchDisabled}
       >
@@ -150,7 +187,9 @@ const PackMatchToggleButtonGroup = ({
       <MatchToggleButton
         value={MATCH_TYPE_RIGHT_UNMATCHED}
         text={`${
-          value.includes(MATCH_TYPE_RIGHT_UNMATCHED) ? "Unselect" : "Select"
+          validMatchGroups?.includes(MATCH_TYPE_RIGHT_UNMATCHED)
+            ? "Unselect"
+            : "Select"
         } unmatched rows from the right-hand table ${
           isRightUnmatchedDisabled ? "(disabled)" : ""
         }`}
@@ -169,21 +208,25 @@ const PackMatchToggleButtonGroup = ({
           }
         />
       </MatchToggleButton>
-
-      {/* {Array.from(matchLabels.keys())
-        .sort((a, b) => a.localeCompare(b)) // Sort alphabetically to put matches in center
-        .map((key) => (
-          <ToggleButton
-            key={key}
-            value={key}
-            aria-label={matchLabels.get(key)}
-            disabled={matchStats[key] === 0 || errorCount > 0}
-          >
-            {matchLabels.get(key).replace("Only", "").trim()}
-          </ToggleButton>
-        ))} */}
     </ToggleButtonGroup>
   );
 };
 
-export default PackMatchToggleButtonGroup;
+const EnhancedPackMatchToggleButtonGroup = () => {
+  const focusedObject = useSelector((state) => {
+    const focusedObjectId = selectFocusedObjectId(state);
+    focusedObjectId ? state.operations.byId[focusedObjectId] : null;
+  });
+  if (
+    isOperationId(focusedObject?.id) &&
+    focusedObject.type === OPERATION_TYPE_PACK
+  ) {
+    return withPackOperationData(PackMatchToggleButtonGroup, {
+      id: focusedObject.id,
+    });
+  } else {
+    return <PackMatchToggleButtonGroup />;
+  }
+};
+
+export default EnhancedPackMatchToggleButtonGroup;

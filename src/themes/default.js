@@ -20,7 +20,7 @@ const theme = createTheme(baseTheme, {
       "#bcbd22",
       "#17becf",
     ],
-    orphanedTableBackgroundColor: "#e0e0e0",
+    orphanedTableBackgroundColor: "#fff",
   },
   typography: {
     // ============================================

@@ -22,7 +22,6 @@ import ColumnDragContainer from "../../ColumnViews/ColumnDragContainer";
 import { isTableId } from "../../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../OperationView/OperationLabel";
 import { HiddenColumnsButton } from "../../ui/buttons";
-import { EnhancedStackSchemaToolbar } from "../StackSchemaToolbar";
 import StyledTableCell from "./StyledTableCell";
 import { NumberIcon } from "../../ui/icons";
 
@@ -202,33 +201,33 @@ const StackSchemaView = ({
     [insertColumnIntoChildAtIndex, childIds]
   );
 
-  const handleHideColumns = useCallback(() => {
-    // Find all column indices where all cells are selected
-    const indicesToHide = [];
-    const columnIdsToDeselect = [];
-    for (let colIndex = 0; colIndex < m; colIndex++) {
-      const columnIds = columnIdMatrix
-        .map((row) => row[colIndex])
-        .filter((id) => id !== null);
+  // const handleHideColumns = useCallback(() => {
+  //   // Find all column indices where all cells are selected
+  //   const indicesToHide = [];
+  //   const columnIdsToDeselect = [];
+  //   for (let colIndex = 0; colIndex < m; colIndex++) {
+  //     const columnIds = columnIdMatrix
+  //       .map((row) => row[colIndex])
+  //       .filter((id) => id !== null);
 
-      const allSelected = columnIds.every((id) =>
-        selectedChildColumnIdsSet.has(id)
-      );
+  //     const allSelected = columnIds.every((id) =>
+  //       selectedChildColumnIdsSet.has(id)
+  //     );
 
-      if (allSelected && columnIds.length > 0) {
-        indicesToHide.push(colIndex);
-        columnIdsToDeselect.push(...columnIds);
-      }
-    }
+  //     if (allSelected && columnIds.length > 0) {
+  //       indicesToHide.push(colIndex);
+  //       columnIdsToDeselect.push(...columnIds);
+  //     }
+  //   }
 
-    setHiddenIndices((prev) =>
-      Array.from(new Set([...prev, ...indicesToHide]))
-    );
-    const nextColumnSelection = [...selectedChildColumnIdsSet].filter(
-      (columnId) => !columnIdsToDeselect.includes(columnId)
-    );
-    selectColumns(nextColumnSelection); // Remove from selection after hiding
-  }, [columnIdMatrix, m, selectedChildColumnIdsSet, selectColumns]);
+  //   setHiddenIndices((prev) =>
+  //     Array.from(new Set([...prev, ...indicesToHide]))
+  //   );
+  //   const nextColumnSelection = [...selectedChildColumnIdsSet].filter(
+  //     (columnId) => !columnIdsToDeselect.includes(columnId)
+  //   );
+  //   selectColumns(nextColumnSelection); // Remove from selection after hiding
+  // }, [columnIdMatrix, m, selectedChildColumnIdsSet, selectColumns]);
 
   // Build header groups to render visible columns and runs of hidden columns
   //
@@ -252,11 +251,6 @@ const StackSchemaView = ({
 
   return (
     <Box display={"flex"} flexDirection="column" height="100%">
-      <EnhancedStackSchemaToolbar
-        id={id}
-        handleHideColumns={handleHideColumns}
-      />
-
       {/* Scroll container for the table */}
       <Box
         className="data-container"

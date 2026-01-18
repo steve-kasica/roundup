@@ -71,7 +71,6 @@ import {
 } from "../ColumnViews";
 import ColumnDragContainer from "../ColumnViews/ColumnDragContainer";
 import { HiddenColumnsButton } from "../ui/buttons";
-import { EnhancedTableSchemaToolbar } from "./TableSchemaToolbar";
 
 /**
  * TableSchema component renders a table's schema as a collection of interactive column cards
@@ -103,58 +102,8 @@ const TableSchema = ({
   const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
   const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
   const columnContainerRef = useRef(null);
-  //  const [visibleColumns, setVisibleColumns] = useState([]);
+
   const [hiddenColumnIds, setHiddenColumnIds] = useState([]);
-
-  /**
-   * Sync local visible columns state to parent/slice whenever it changes
-   */
-  // useEffect(() => {
-  //   setVisibleColumnsInSlice(visibleColumns);
-  // }, [visibleColumns, setVisibleColumnsInSlice]);
-
-  /**
-   * Set up scroll event listener on the column container
-   */
-  // useEffect(() => {
-  //   const container = columnContainerRef.current;
-
-  //   if (!container) return;
-
-  //   const handleScroll = () => {
-  //     // Get all column elements within the container
-  //     const columnElements = container.querySelectorAll("[data-column-id]");
-  //     const containerRect = container.getBoundingClientRect();
-  //     const currentlyVisibleColumnIds = [];
-
-  //     columnElements.forEach((element) => {
-  //       const elementRect = element.getBoundingClientRect();
-
-  //       // Check if element is at least partially visible within the container
-  //       const isVisible =
-  //         elementRect.left > containerRect.left &&
-  //         elementRect.right < containerRect.right;
-
-  //       if (isVisible) {
-  //         const columnId = element.getAttribute("data-column-id");
-  //         currentlyVisibleColumnIds.push(columnId);
-  //       }
-  //     });
-
-  //     if (
-  //       JSON.stringify(currentlyVisibleColumnIds) !==
-  //       JSON.stringify(visibleColumns)
-  //     ) {
-  //       setVisibleColumns(currentlyVisibleColumnIds);
-  //     }
-  //   };
-
-  //   container.addEventListener("scroll", handleScroll);
-
-  //   return () => {
-  //     container.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, [visibleColumns]);
 
   /**
    * Closes the column type dropdown menu
@@ -238,16 +187,8 @@ const TableSchema = ({
     setContextMenuColumnId(null);
   }, []);
 
-  const handleHideColumns = useCallback(() => {
-    setHiddenColumnIds([...hiddenColumnIds, ...selectedColumnIds]);
-  }, [hiddenColumnIds, selectedColumnIds]);
-
   const handleColumnDrop = useCallback(
     (draggedItem, targetItem) => {
-      console.log("Swapping columns:", {
-        draggedItem,
-        targetItem,
-      });
       swapColumns(targetItem.id, draggedItem.id);
     },
     [swapColumns]
@@ -267,9 +208,6 @@ const TableSchema = ({
         }),
       }}
     >
-      {/* Toolbar with table info and action buttons */}
-      <EnhancedTableSchemaToolbar id={id} hideColumns={handleHideColumns} />
-
       {/* Column Type Change Menu */}
       <Menu
         anchorEl={columnTypeMenuAnchor}
@@ -451,6 +389,9 @@ const TableSchema = ({
                         handleInsertColumnRight={(value) =>
                           insertColumn(i + 1, value)
                         }
+                        sx={{
+                          boxShadow: 1, // subtle elevation effect
+                        }}
                       />
                     </ColumnDragContainer>
                   </>

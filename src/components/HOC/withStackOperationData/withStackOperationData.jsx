@@ -17,20 +17,21 @@ import { useCallback, useMemo } from "react";
 import {
   selectOperationsById,
   selectStackOperationRowRanges,
-} from "../../slices/operationsSlice";
-import { updateTablesRequest } from "../../sagas/updateTablesSaga";
-import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
+} from "../../../slices/operationsSlice";
+import { updateTablesRequest } from "../../../sagas/updateTablesSaga";
+import { selectColumnIdsByParentId } from "../../../slices/columnsSlice";
+import { getColumnCount, getColumnIdMatrix, getRowCount } from "./utilities";
 
 /**
  * @typedef {Object} WithStackOperationDataProps
  * @property {string} id - The ID of the stack operation
+ * @property {number} columnCount - Number of columns in the stack operation
  * @property {Array<Array<string|null>>} columnIdMatrix - 2D array of column IDs with nulls
  * @property {number} m - Number of columns in the column ID matrix
  * @property {number} n - Number of rows in the column ID matrix
- * @property {function} swapColumns - Function to swap two columns in child tables
- * @property {number} columnCount - Number of columns in the stack operation
  * @property {Map<string, {start: number, end: number}>} rowRanges - Map of table ID to row range
  * @property {number} rowCount - Number of rows in the stack operation
+ * @property {function} swapColumns - Function to swap two columns in child tables
  */
 
 /**
@@ -70,16 +71,7 @@ export default function withStackOperationData(WrappedComponent) {
      *
      * @returns {Array<Array<string|null>>} 2D array of column IDs with nulls
      */
-    const columnIdMatrix = useMemo(() => {
-      const maxLength = Math.max(...childColumnIds.map((row) => row.length), 0);
-      const backfilledMatrix = childColumnIds.map((row) => {
-        if (row.length < maxLength) {
-          return [...row, ...Array(maxLength - row.length).fill(null)];
-        }
-        return row;
-      });
-      return backfilledMatrix;
-    }, [childColumnIds]);
+    const columnIdMatrix = useMemo(() => getColumnIdMatrix(childColumnIds), [childColumnIds]);
 
     /**
      * Calculate matrix dimensions: m (columns), n (rows)
@@ -136,12 +128,10 @@ export default function withStackOperationData(WrappedComponent) {
      * in the child tables.
      * @returns {number} The number of columns in the stack operation
      */
-    const columnCount = useMemo(() => {
-      return Math.max(
-        ...childColumnIds.map((columnIds) => columnIds.length),
-        0
-      );
-    }, [childColumnIds]);
+    const columnCount = useMemo(
+      () => getColumnCount(operation.columnCount, childColumnIds),
+      [operation.columnCount, childColumnIds]
+    );
 
     /**
      * Get the row ranges for each child table in the stack operation
@@ -158,14 +148,10 @@ export default function withStackOperationData(WrappedComponent) {
      * we may need to estimate the row count from the rowRanges.
      * @returns {number} The number of rows in the stack operation
      */
-    const rowCount = useMemo(() => {
-      return operation.rowCount !== null
-        ? operation.rowCount
-        : [...rowRanges.entries()].reduce(
-            (acc, [, { end }]) => Math.max(acc, end),
-            0
-          );
-    }, [operation.rowCount, rowRanges]);
+    const rowCount = useMemo(
+      () => getRowCount(operation.rowCount, rowRanges),
+      [operation.rowCount, rowRanges]
+    );
 
     return (
       <WrappedComponent

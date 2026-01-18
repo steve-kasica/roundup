@@ -22,13 +22,11 @@
 
 import { Upload, Close } from "@mui/icons-material";
 import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
-import TooltipIconButton from "./TooltipIconButton";
+import { TooltipIconButton } from "../ui/buttons";
 import { useCallback, useState } from "react";
-import FileUpload from "../../FileUpload";
+import FileUpload from "../FileUpload";
 
-const UploadTablesButton = ({
-  tooltipText = "Upload Tables",
-}) => {
+const UploadTablesButton = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const onClick = useCallback(() => {
@@ -39,12 +37,14 @@ const UploadTablesButton = ({
     setDialogOpen(false);
   }, []);
 
+  const tooltipText = "Upload Tables";
+
   return (
     <>
       <TooltipIconButton tooltipText={tooltipText} onClick={onClick}>
         <Upload />
       </TooltipIconButton>
-      <Dialog open={dialogOpen} onClose={handleClose} maxWidth="md" fullWidth>
+      <Dialog open={dialogOpen} onClose={handleClose} fullWidth>
         <DialogTitle sx={{ m: 0, p: 2 }}>
           Upload Tables
           <IconButton

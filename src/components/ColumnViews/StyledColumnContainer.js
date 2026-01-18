@@ -45,16 +45,16 @@ const StyledColumnContainer = styled(Box, {
     // Define column container default styles
     cursor: "pointer",
     backgroundColor:
-      operationIndex !== undefined
+      operationIndex && operationIndex >= 0
         ? theme.palette.operationColors[operationIndex]
         : theme.palette.orphanedTableBackgroundColor,
     color: theme.palette.getContrastText(
-      operationIndex !== undefined
+      operationIndex && operationIndex >= 0
         ? theme.palette.operationColors[operationIndex]
         : theme.palette.orphanedTableBackgroundColor
     ),
     borderColor: theme.palette.getContrastText(
-      operationIndex !== undefined
+      operationIndex && operationIndex >= 0
         ? theme.palette.operationColors[operationIndex]
         : theme.palette.orphanedTableBackgroundColor
     ),
@@ -64,7 +64,7 @@ const StyledColumnContainer = styled(Box, {
     // Column is hovered state
     ...(isHovered && {
       backgroundColor: lighten(
-        operationIndex !== undefined
+        operationIndex && operationIndex >= 0
           ? theme.palette.operationColors[operationIndex]
           : theme.palette.orphanedTableBackgroundColor,
         0.3
@@ -74,7 +74,7 @@ const StyledColumnContainer = styled(Box, {
     // Column is selected state
     ...(isSelected && {
       backgroundColor: lighten(
-        operationIndex !== undefined
+        operationIndex && operationIndex >= 0
           ? theme.palette.operationColors[operationIndex]
           : theme.palette.orphanedTableBackgroundColor,
         0.4
@@ -108,13 +108,13 @@ const StyledColumnContainer = styled(Box, {
       "@keyframes pulse": {
         "0%, 100%": {
           backgroundColor:
-            operationIndex !== undefined
+            operationIndex && operationIndex >= 0
               ? theme.palette.operationColors[operationIndex]
               : theme.palette.orphanedTableBackgroundColor,
         },
         "50%": {
           backgroundColor: lighten(
-            operationIndex !== undefined
+            operationIndex && operationIndex >= 0
               ? theme.palette.operationColors[operationIndex]
               : theme.palette.orphanedTableBackgroundColor,
             0.2

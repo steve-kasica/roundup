@@ -23,7 +23,6 @@
  */
 
 import {
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -33,20 +32,56 @@ import {
   Tooltip,
 } from "@mui/material";
 import { DeleteForever } from "@mui/icons-material";
-import { useCallback, useState } from "react";
-import TooltipIconButton from "./TooltipIconButton";
+import { useCallback, useMemo, useState } from "react";
+import { TooltipIconButton } from "../ui/buttons";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectFocusedObjectId,
+  selectSelectedColumnIds,
+} from "../../slices/uiSlice";
+import { isTableId } from "../../slices/tablesSlice";
+import { deleteColumns } from "../../slices/columnsSlice";
+import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 
-const DeleteColumnsButton = ({
-  onConfirm,
-  tooltipText = "Delete columns",
-  ...props
-}) => {
+const DeleteColumnsButton = () => {
+  const dispatch = useDispatch();
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const focusedObjectId = useSelector(selectFocusedObjectId);
+  const focusedObject = useSelector((state) => {
+    if (focusedObjectId === null) {
+      return null;
+    } else if (isTableId(focusedObjectId)) {
+      return state.tables.byId[focusedObjectId];
+    } else {
+      return state.operations.byId[focusedObjectId];
+    }
+  });
+
+  const selectedColumns = useSelector(selectSelectedColumnIds);
+
+  const selectedObjectColumns = useMemo(() => {
+    if (!focusedObject) return [];
+    return focusedObject.columnIds.filter((colId) =>
+      selectedColumns.includes(colId)
+    );
+  }, [focusedObject, selectedColumns]);
+
+  const tooltipText = useMemo(() => {
+    return `Delete ${selectedObjectColumns.length} column${
+      selectedObjectColumns.length !== 1 ? "s" : ""
+    }`;
+  }, [selectedObjectColumns.length]);
+
   const handleConfirm = () => {
     setDialogOpen(false);
-    if (typeof onConfirm === "function") {
-      onConfirm();
-    }
+    dispatch(
+      deleteColumnsRequest({
+        columnIds: selectedObjectColumns,
+        recurse: true,
+        deleteFromDatabase: true,
+      })
+    );
   };
 
   const handleCancel = () => {
@@ -58,7 +93,7 @@ const DeleteColumnsButton = ({
       <TooltipIconButton
         tooltipText={tooltipText}
         onClick={(event) => setDialogOpen(event.currentTarget)}
-        {...props}
+        disabled={selectedObjectColumns.length === 0}
       >
         <DeleteForever />
       </TooltipIconButton>

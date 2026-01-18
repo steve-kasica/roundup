@@ -28,6 +28,7 @@ export const initialState = {
   selectedColumnIds: [], // array of column ids
   focusedColumnIds: [], // array of column ids
   visibleColumnIds: [], // array of column ids
+  hiddenColumnIds: [], // array of column ids
   draggingColumnIds: [], // array of column ids
   dropTargetColumnIds: [], // array of column ids
   focusedObjectId: null, // either a table id or sucessfully created operation id
@@ -146,6 +147,34 @@ export const uiSlice = createSlice({
     },
 
     /**
+     * Sets the list of hidden column IDs in the UI state.
+     *
+     * @param {Object} state - The current UI slice state.
+     * @param {Object} action - The Redux action object.
+     * @param {string[]|string} action.payload - The column IDs to set as hidden. Can be a single string or an array of strings.
+     */
+    setHiddenColumnIds(state, action) {
+      const columnIds = normalizeInputToArray(action.payload);
+      state.hiddenColumnIds = columnIds;
+    },
+
+    addToHiddenColumnIds(state, action) {
+      const columnIdsToAdd = normalizeInputToArray(action.payload);
+      columnIdsToAdd.forEach((id) => {
+        if (!state.hiddenColumnIds.includes(id)) {
+          state.hiddenColumnIds.push(id);
+        }
+      });
+    },
+
+    removeFromHiddenColumnIds(state, action) {
+      const columnIdsToRemove = normalizeInputToArray(action.payload);
+      state.hiddenColumnIds = state.hiddenColumnIds.filter(
+        (id) => !columnIdsToRemove.includes(id)
+      );
+    },
+
+    /**
      * Sets the list of currently dragging column IDs in the UI state.
      *
      * Normalizes the input payload to an array and updates the `draggingColumnIds` property in the state.
@@ -209,6 +238,9 @@ export const {
   removeFromHoveredColumnIds,
   setFocusedColumnIds,
   setVisibleColumnIds,
+  setHiddenColumnIds,
+  addToHiddenColumnIds,
+  removeFromHiddenColumnIds,
   setDraggingColumnIds,
   setDropTargetColumnIds,
   setFocusedObjectId,

@@ -36,6 +36,7 @@ import {
   selectFocusedObjectId,
 } from "../../slices/uiSlice";
 import FileUpload from "../../components/FileUpload";
+import RoundupToolbar from "../../components/AppToolbar";
 // Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -61,7 +62,6 @@ export default function SupportingPane() {
   });
   const focusedObject = useSelector(selectFocusedObjectId);
   const focusedColumnIds = useSelector(selectFocusedColumnIds);
-  console.log("SupportingPane render: focusedColumnIds=", focusedColumnIds);
   const isOpen = tables.length > 0;
 
   return (
@@ -70,23 +70,16 @@ export default function SupportingPane() {
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: (theme) => theme.palette.background.default, // TODO: apply to whole app?
+        backgroundColor: "background.default",
       }}
     >
-      {/* Header */}
       <Box
         sx={{
-          borderBottom: "1px solid #ddd",
-          padding: "8px 16px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexShrink: 0,
+          borderBottom: "2px solid",
+          borderColor: "#ccc",
         }}
       >
-        <Typography variant="analytics-subsection-title" component="div">
-          {APP_NAME}
-        </Typography>
+        <RoundupToolbar />
       </Box>
 
       {/* Main Content Area */}

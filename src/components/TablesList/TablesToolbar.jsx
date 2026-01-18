@@ -32,11 +32,9 @@
 import { Divider, Toolbar } from "@mui/material";
 import SearchTextBox from "../ui/SearchTextBox";
 import {
-  DeleteColumnsButton,
   AddStackOperationButton,
   AddPackOperationButton,
-  SelectToggleIconButton,
-  UploadTablesButton,
+  // SelectToggleIconButton,
   InsertTableInOperationButton,
 } from "../ui/buttons";
 import withGlobalInterfaceData from "../HOC/withGlobalInterfaceData";
@@ -93,18 +91,10 @@ const TablesToolbar = ({
           // searchString={searchString}
           onChange={setSearchString}
         />
-        <UploadTablesButton />
-        <SelectToggleIconButton
+        {/* <SelectToggleIconButton
           onClick={handleSelectAllClick}
           isSelected={selectedTableIds.length > 0}
-        />
-        <DeleteColumnsButton
-          title={`Delete selected table${
-            selectedTableIds.length !== 1 ? "s" : ""
-          }`}
-          disabled={isSelectionEmpty}
-          onConfirm={handleDeleteClick}
-        />
+        /> */}
         <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
         <InsertTableInOperationButton
           disabled={disableNextOperation}

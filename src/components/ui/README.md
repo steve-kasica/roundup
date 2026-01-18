@@ -15,9 +15,7 @@ ui/
 │   ├── ExportTableButton.jsx
 │   ├── FocusIconButton.jsx
 │   ├── HiddenColumnsButton.jsx
-│   ├── HideIconButton.jsx
 │   ├── InsertTableInOperationButton.jsx
-│   ├── PackMatchToggleButtonGroup.jsx
 │   ├── RenameObjectButton.jsx
 │   ├── SchemaAlertsButton.jsx
 │   ├── SelectToggleIconButton.jsx
@@ -90,9 +88,7 @@ Action buttons with consistent styling and behavior.
 | `ExportTableButton`            | Export table data        | 📥   |
 | `FocusIconButton`              | Focus on object          | 🎯   |
 | `HiddenColumnsButton`          | Toggle hidden columns    | 👁    |
-| `HideIconButton`               | Hide column/object       | 👁‍🗨  |
 | `InsertTableInOperationButton` | Add table to operation   | ➕   |
-| `PackMatchToggleButtonGroup`   | Toggle match type        | ⚙    |
 | `RenameObjectButton`           | Rename table/operation   | ✏    |
 | `SchemaAlertsButton`           | Show schema alerts       | ⚠    |
 | `SelectToggleIconButton`       | Toggle selection         | ☑    |

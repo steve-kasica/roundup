@@ -11,10 +11,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useMemo } from "react";
 
-import {
-  selectColumnIdsByParentId,
-  selectSelectedColumnIdsByParentId,
-} from "../../slices/columnsSlice";
+import { selectSelectedColumnIdsByParentId } from "../../slices/columnsSlice";
 import {
   setSelectedColumnIds,
   setFocusedColumnIds,
@@ -213,8 +210,6 @@ export default function withTableData(WrappedComponent) {
     const selectedColumnIds = useSelector((state) =>
       selectSelectedColumnIdsByParentId(state, id)
     );
-
-    /// ???????
 
     /**
      * @function selectColumns

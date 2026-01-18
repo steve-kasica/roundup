@@ -24,6 +24,7 @@ import {
 } from "../../lib/duckdb";
 import { createTablesFailure, createTablesSuccess } from "./actions";
 import generateUUID from "../../lib/utilities/generateUUID";
+import { setFocusedObjectId } from "../../slices/uiSlice";
 
 export default function* createTablesWorker(action) {
   const successfulCreations = [];

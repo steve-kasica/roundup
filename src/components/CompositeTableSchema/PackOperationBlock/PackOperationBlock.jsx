@@ -82,6 +82,12 @@ function PackOperationBlock({
             "%",
           marginLeft: index === 0 ? "0px" : "2px",
         };
+        console.log("PackOperationBlock childSx:", {
+          leftColumnCount,
+          rightColumnCount,
+          columnCount,
+          childSx,
+        });
         if (isTableId(childId)) {
           return (
             <EnhancedTableBlock

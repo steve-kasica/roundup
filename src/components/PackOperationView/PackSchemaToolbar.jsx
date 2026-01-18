@@ -27,7 +27,7 @@
  */
 
 import { EnhancedSchemaToolbar, OBJECT_TYPE_PACK } from "../ui/SchemaToolbar";
-import { SwapTablesButton, PackMatchToggleButtonGroup } from "../ui/buttons";
+import { SwapTablesButton } from "../ui/buttons";
 import { useCallback, useMemo } from "react";
 import {
   withPackOperationData,
@@ -196,19 +196,6 @@ const PackSchemaToolbar = ({
         <>
           {/* Match category filter buttons */}
           <Divider orientation="vertical" flexItem />
-          <PackMatchToggleButtonGroup
-            value={validMatchGroups}
-            onChange={handleToggleMatchChange}
-            isLeftUnmatchedDisabled={
-              matchStats[MATCH_TYPE_LEFT_UNMATCHED] === 0 || errorCount > 0
-            }
-            isMatchDisabled={
-              matchStats[MATCH_TYPE_MATCHES] === 0 || errorCount > 0
-            }
-            isRightUnmatchedDisabled={
-              matchStats[MATCH_TYPE_RIGHT_UNMATCHED] === 0 || errorCount > 0
-            }
-          />
           <Divider orientation="vertical" flexItem />
           <SwapTablesButton onClick={handleSwapTables} />
         </>

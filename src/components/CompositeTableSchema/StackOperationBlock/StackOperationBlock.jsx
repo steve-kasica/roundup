@@ -33,7 +33,7 @@ import {
   withAssociatedAlerts,
   withOperationData,
   withStackOperationData,
-} from "../../HOC/index.js";
+} from "../../HOC";
 import {
   isOperationId,
   OPERATION_TYPE_STACK,
@@ -68,7 +68,8 @@ function StackOperationBlock({
   parentRowCount,
   sx = {},
 }) {
-  const height = parentRowCount ? (rowCount / parentRowCount) * 100 : 100; // height as percentage of parent operation's row count
+  // TODO: I think we can compute this via sx and using child row counts from operation via the parent
+  // const height = parentRowCount ? (rowCount / parentRowCount) * 100 : 100; // height as percentage of parent operation's row count
   const useLightText = isDarkBackground(depth);
   const useLightTextInChildren = isDarkBackground(depth + 1);
   return (
@@ -87,7 +88,7 @@ function StackOperationBlock({
         color: (theme) =>
           useLightText ? theme.palette.textLight : theme.palette.textDark,
         cursor: focusedDepth > 0 ? "pointer" : "default",
-        height: `${height}%`,
+        height: `100%`, // Set to 100%, actual height controlled by parent via sx
         ...sx,
       }}
     >
@@ -105,6 +106,9 @@ function StackOperationBlock({
         }}
       >
         {childIds.map((id) => {
+          const childSx = {
+            height: `${(childRowCounts.get(id) / rowCount) * 100}%`,
+          };
           return (
             <React.Fragment key={id}>
               {isOperationId(id) ? (
@@ -113,9 +117,7 @@ function StackOperationBlock({
                   parentOperationType={OPERATION_TYPE_STACK}
                   parentColumnCount={columnCount}
                   parentRowCount={rowCount}
-                  sx={{
-                    height: `${(childRowCounts.get(id) / rowCount) * 100}%`,
-                  }}
+                  sx={childSx}
                 />
               ) : (
                 <EnhancedTableBlock
@@ -123,7 +125,7 @@ function StackOperationBlock({
                   parentOperationType={OPERATION_TYPE_STACK}
                   parentColumnCount={columnCount}
                   sx={{
-                    height: `${(childRowCounts.get(id) / rowCount) * 100}%`,
+                    ...childSx,
                     borderBottom: "1px solid #fff",
                     color: (theme) =>
                       useLightTextInChildren

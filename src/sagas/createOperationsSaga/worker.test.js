@@ -9,6 +9,7 @@ import { updateTables as updateTablesSlice } from "../../slices/tablesSlice";
 import { setFocusedObjectId } from "../../slices/uiSlice";
 import { createOperationsSuccess } from "./actions";
 import {
+  OPERATION_TYPE_NO_OP,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
 } from "../../slices/operationsSlice/Operation";
@@ -221,6 +222,28 @@ describe("createOperationsWorker saga", () => {
       );
       expect(setFocusedAction).toBeDefined();
       expect(setFocusedAction.payload.action.payload).toBe(lastOperationId);
+    });
+    it("sets focusedObjectId to table child for NO_OP operation", async () => {
+      const action = {
+        payload: {
+          operationData: {
+            operationType: OPERATION_TYPE_NO_OP,
+            childIds: ["t_42"],
+          },
+        },
+      };
+
+      const { effects } = await expectSaga(
+        createOperationsWorker,
+        action
+      ).run();
+
+      // Verify setFocusedObjectId was called with the table child's ID
+      const setFocusedAction = effects.put.find(
+        (effect) => effect.payload.action.type === setFocusedObjectId.type
+      );
+      expect(setFocusedAction).toBeDefined();
+      expect(setFocusedAction.payload.action.payload).toBe("t_42");
     });
   });
 

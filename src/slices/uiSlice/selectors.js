@@ -208,3 +208,11 @@ export const selectSelectedMatches = (state) => state.ui.selectedMatches;
  * @returns {Array} The array of loading operation IDs.
  */
 export const selectLoadingOperations = (state) => state.ui.loadingOperations;
+
+/**
+ * Selector to retrieve the hidden column IDs from the UI slice of the state.
+ *
+ * @param {Object} state
+ * @returns {Array} The array of hidden column IDs.
+ */
+export const selectHiddenColumnIds = (state) => state.ui.hiddenColumnIds;
