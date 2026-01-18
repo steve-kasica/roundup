@@ -10,6 +10,7 @@ import UploadTablesButton from "./UploadTablesButton";
 import SelectAllColumnsButton from "./SelectAllColumnsButton";
 import HideColumnsButton from "./HideColumnsButton";
 import PackMatchToggleButtonGroup from "./PackMatchToggleButtonGroup";
+import JoinPredicateButton from "./JoinPredicateButton/JoinPredicateButton";
 
 const AppToolbar = () => {
   return (
@@ -37,6 +38,7 @@ const AppToolbar = () => {
         <ExportTableButton />
         <Divider orientation="vertical" flexItem />
         <PackMatchToggleButtonGroup />
+        <JoinPredicateButton />
       </Box>
       <SchemaAlertsButton />
     </Toolbar>
