@@ -11,6 +11,7 @@ import SelectAllColumnsButton from "./SelectAllColumnsButton";
 import HideColumnsButton from "./HideColumnsButton";
 import PackMatchToggleButtonGroup from "./PackMatchToggleButtonGroup";
 import JoinPredicateButton from "./JoinPredicateButton/JoinPredicateButton";
+import JoinKeysButton from "./JoinKeysButton";
 
 const AppToolbar = () => {
   return (
@@ -39,6 +40,8 @@ const AppToolbar = () => {
         <Divider orientation="vertical" flexItem />
         <PackMatchToggleButtonGroup />
         <JoinPredicateButton />
+        <JoinKeysButton />
+        <Divider orientation="vertical" flexItem />
       </Box>
       <SchemaAlertsButton />
     </Toolbar>

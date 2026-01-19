@@ -96,10 +96,10 @@ export default function withPackOperationData(WrappedComponent) {
         dispatch(
           updateOperationsRequest({
             operationUpdates: [{ id, joinPredicate }],
-          })
+          }),
         );
       },
-      [dispatch, id]
+      [dispatch, id],
     );
 
     /**
@@ -119,10 +119,10 @@ export default function withPackOperationData(WrappedComponent) {
                 joinType, // Update join type
               },
             ],
-          })
+          }),
         );
       },
-      [dispatch, id]
+      [dispatch, id],
     );
 
     // Left table props
@@ -133,7 +133,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const leftTableId = useMemo(
       () => (operation.childIds.length > 0 ? operation.childIds[0] : null),
-      [operation.childIds]
+      [operation.childIds],
     );
 
     /**
@@ -146,7 +146,7 @@ export default function withPackOperationData(WrappedComponent) {
      * @returns {Array} leftColumnIds - An array of column IDs for the left child table.
      */
     const leftColumnIds = useSelector((state) =>
-      selectColumnIdsByParentId(state, leftTableId)
+      selectColumnIdsByParentId(state, leftTableId),
     );
 
     /**
@@ -155,7 +155,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const leftColumnCount = useMemo(
       () => leftColumnIds.length,
-      [leftColumnIds]
+      [leftColumnIds],
     );
 
     /**
@@ -163,7 +163,7 @@ export default function withPackOperationData(WrappedComponent) {
      * @returns {Array} leftSelectedColumnsIds - An array of selected column IDs in the left child table.
      */
     const leftSelectedColumnsIds = useSelector((state) =>
-      selectSelectedColumnIdsByParentId(state, leftTableId)
+      selectSelectedColumnIdsByParentId(state, leftTableId),
     );
 
     /**
@@ -183,10 +183,10 @@ export default function withPackOperationData(WrappedComponent) {
                 joinKey1: columnId,
               },
             ],
-          })
+          }),
         );
       },
-      [dispatch, id]
+      [dispatch, id],
     );
 
     // Right table props
@@ -197,7 +197,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const rightTableId = useMemo(
       () => (operation.childIds.length === 2 ? operation.childIds[1] : null),
-      [operation.childIds]
+      [operation.childIds],
     );
 
     /**
@@ -210,8 +210,10 @@ export default function withPackOperationData(WrappedComponent) {
      * @returns {Array} rightColumnIds - An array of column IDs for the right child table.
      */
     const rightColumnIds = useSelector((state) =>
-      selectColumnIdsByParentId(state, rightTableId)
+      selectColumnIdsByParentId(state, rightTableId),
     );
+
+    console.log("rightColumnIds:", rightColumnIds);
 
     /**
      * Right table column count for this pack operation
@@ -219,7 +221,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const rightColumnCount = useMemo(
       () => rightColumnIds.length,
-      [rightColumnIds]
+      [rightColumnIds],
     );
 
     /**
@@ -227,7 +229,9 @@ export default function withPackOperationData(WrappedComponent) {
      * @returns {Array} rightSelectedColumnsIds - An array of selected column IDs in the right child table.
      */
     const rightSelectedColumnsIds = useSelector((state) =>
-      rightTableId ? selectSelectedColumnIdsByParentId(state, rightTableId) : []
+      rightTableId
+        ? selectSelectedColumnIdsByParentId(state, rightTableId)
+        : [],
     );
 
     /**
@@ -247,10 +251,10 @@ export default function withPackOperationData(WrappedComponent) {
                 joinKey2: columnId,
               },
             ],
-          })
+          }),
         );
       },
-      [dispatch, id]
+      [dispatch, id],
     );
 
     // Match statistics for this pack operation
@@ -262,7 +266,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const matchStats = useMemo(
       () => operation.matchStats,
-      [operation.matchStats]
+      [operation.matchStats],
     );
 
     /**
@@ -295,7 +299,7 @@ export default function withPackOperationData(WrappedComponent) {
           }
           return acc;
         }, new Map()),
-      []
+      [],
     );
 
     /**
@@ -387,7 +391,7 @@ export default function withPackOperationData(WrappedComponent) {
         operation.isInSync,
         leftColumnCount,
         rightColumnCount,
-      ]
+      ],
     );
 
     /**
@@ -396,7 +400,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const combinedChildColumnIds = useMemo(
       () => [...leftColumnIds, ...rightColumnIds],
-      [leftColumnIds, rightColumnIds]
+      [leftColumnIds, rightColumnIds],
     );
 
     return (
