@@ -3,7 +3,7 @@ import FocusedObjectSelect from "./FocusedObjectSelect";
 import RenameFocusedObjectButton from "./RenameFocusedObjectButton";
 import ChangeTableOrder from "./ChangeTableOrder";
 import SchemaAlertsButton from "./SchemaAlertsButton";
-import FocusColumnsButton from "./FocusedColumnsButton";
+import FocusColumnsButton from "./FocusColumnsButton";
 import DeleteColumnsButton from "./DeleteColumnsButton";
 import { ExportTableButton } from "./ExportTable";
 import UploadTablesButton from "./UploadTablesButton";

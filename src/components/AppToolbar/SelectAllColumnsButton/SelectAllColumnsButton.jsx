@@ -1,5 +1,5 @@
 /**
- * @fileoverview SelectAllColumnsButtonButton Component
+ * @fileoverview SelectAllColumnsButton Component
  *
  * A button for toggling selection state (select all/deselect all). Displays
  * appropriate icon based on current selection state.
@@ -18,20 +18,18 @@
  *   onClick={handleToggleSelect}
  * />
  */
-
-/* eslint-disable react/prop-types */
 import { Deselect, SelectAll } from "@mui/icons-material";
-import { TooltipIconButton } from "../ui/buttons";
 import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useMemo } from "react";
+import { TooltipIconButton } from "../../ui/buttons";
 import {
   selectFocusedObjectId,
   selectSelectedColumnIds,
   setSelectedColumnIds,
-} from "../../slices/uiSlice";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { selectOperationsById } from "../../slices/operationsSlice";
-import { useCallback, useMemo } from "react";
-import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
+} from "../../../slices/uiSlice";
+import { isTableId, selectTablesById } from "../../../slices/tablesSlice";
+import { selectOperationsById } from "../../../slices/operationsSlice";
+import { selectColumnIdsByParentId } from "../../../slices/columnsSlice";
 
 const SelectAllColumnsButtonButton = () => {
   const dispatch = useDispatch();
@@ -50,16 +48,6 @@ const SelectAllColumnsButtonButton = () => {
     }
   });
 
-  const selectedObjectColumns = useMemo(() => {
-    if (!focusedObject) {
-      return [];
-    } else {
-      return selectedColumnIds.filter((colId) =>
-        focusedObject.columnIds.includes(colId)
-      );
-    }
-  }, [focusedObject, selectedColumnIds]);
-
   const allColumns = useSelector((state) => {
     if (!focusedObject) {
       return [];
@@ -76,8 +64,10 @@ const SelectAllColumnsButtonButton = () => {
 
   const onDeselectAll = useCallback(
     () => dispatch(setSelectedColumnIds([])),
-    [dispatch]
+    [dispatch],
   );
+
+  const isDisabled = focusedObjectId === null;
 
   return (
     <>
@@ -85,6 +75,7 @@ const SelectAllColumnsButtonButton = () => {
         <TooltipIconButton
           tooltipText="Select all columns"
           onClick={onSelectAll}
+          disabled={isDisabled}
         >
           <SelectAll />
         </TooltipIconButton>
@@ -92,6 +83,7 @@ const SelectAllColumnsButtonButton = () => {
         <TooltipIconButton
           tooltipText="Deselect all columns"
           onClick={onDeselectAll}
+          disabled={isDisabled}
         >
           <Deselect />
         </TooltipIconButton>

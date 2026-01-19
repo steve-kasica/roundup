@@ -20,14 +20,14 @@
  */
 
 import { CenterFocusStrong } from "@mui/icons-material";
-import { TooltipIconButton } from "../ui/buttons";
+import { TooltipIconButton } from "../../ui/buttons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectFocusedObjectId,
   selectSelectedColumnIds,
   setFocusedColumnIds,
-} from "../../slices/uiSlice";
-import { isTableId } from "../../slices/tablesSlice";
+} from "../../../slices/uiSlice";
+import { isTableId } from "../../../slices/tablesSlice";
 import { useCallback, useMemo } from "react";
 
 const FocusColumnsButton = () => {
@@ -47,22 +47,39 @@ const FocusColumnsButton = () => {
   const selectedObjectColumns = useMemo(() => {
     if (!focusedObject) return [];
     return focusedObject.columnIds.filter((colId) =>
-      selectedColumnIds.includes(colId)
+      selectedColumnIds.includes(colId),
     );
   }, [focusedObject, selectedColumnIds]);
+
+  const allColumns = useSelector((state) => state.columns.byId);
+
+  const isSameIndex = useMemo(() => {
+    if (selectedObjectColumns.length <= 1) return true;
+    const databaseNames = selectedObjectColumns.map(
+      (colId) => allColumns[colId]?.databaseName,
+    );
+    return new Set(databaseNames).size === 1;
+  }, [selectedObjectColumns, allColumns]);
+
+  const isDisabled = useMemo(
+    () => selectedObjectColumns.length === 0 || !isSameIndex,
+    [selectedObjectColumns, isSameIndex],
+  );
+
+  const tooltipText = useMemo(() => {
+    return `Focus ${selectedObjectColumns.length} column${
+      selectedObjectColumns.length !== 1 ? "s" : ""
+    }`;
+  }, [selectedObjectColumns.length]);
 
   const handleOnClick = useCallback(() => {
     dispatch(setFocusedColumnIds(selectedObjectColumns));
   }, [dispatch, selectedObjectColumns]);
 
-  const tooltipText = `Focus ${selectedObjectColumns.length} column${
-    selectedObjectColumns.length !== 1 ? "s" : ""
-  }`;
-
   return (
     <TooltipIconButton
       tooltipText={tooltipText}
-      disabled={selectedObjectColumns.length === 0}
+      disabled={isDisabled}
       onClick={handleOnClick}
     >
       <CenterFocusStrong fontSize="small" />
