@@ -87,9 +87,11 @@ const TableSchema = ({
   id,
   columnIds,
   selectedColumnIds,
+  hiddenColumnIds,
   swapColumns,
   selectColumns,
   insertColumn,
+  unhideColumns,
 
   // Props from withAssociatedAlerts via withTableData
   totalCount,
@@ -102,8 +104,6 @@ const TableSchema = ({
   const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
   const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
   const columnContainerRef = useRef(null);
-
-  const [hiddenColumnIds, setHiddenColumnIds] = useState([]);
 
   /**
    * Closes the column type dropdown menu
@@ -160,7 +160,7 @@ const TableSchema = ({
         selectColumns([columnId]);
       }
     },
-    [columnIds, selectedColumnIds, selectColumns]
+    [columnIds, selectedColumnIds, selectColumns],
   );
 
   /**
@@ -173,7 +173,7 @@ const TableSchema = ({
       // Double-click: Focus on the column (same as focus button action)
       dispatch(setFocusedColumnIds([columnId]));
     },
-    [dispatch]
+    [dispatch],
   );
 
   const handleContextMenu = useCallback((event, columnId) => {
@@ -191,7 +191,7 @@ const TableSchema = ({
     (draggedItem, targetItem) => {
       swapColumns(targetItem.id, draggedItem.id);
     },
-    [swapColumns]
+    [swapColumns],
   );
 
   return (
@@ -253,19 +253,17 @@ const TableSchema = ({
               insertColumn(
                 columnIds.indexOf(contextMenuColumnId),
                 name,
-                fillValue
+                fillValue,
               )
             }
             onInsertColumnRightClick={({ name, fillValue }) =>
               insertColumn(
                 columnIds.indexOf(contextMenuColumnId) + 1,
                 name,
-                fillValue
+                fillValue,
               )
             }
-            onHideColumn={() =>
-              setHiddenColumnIds([...hiddenColumnIds, contextMenuColumnId])
-            }
+            onHideColumn={() => console.log("TODO: hide column")}
           />
         )}
       </Menu>
@@ -320,14 +318,7 @@ const TableSchema = ({
               >
                 <IconButton
                   size="small"
-                  onClick={() => {
-                    !isVisible
-                      ? // TODO
-                        setHiddenColumnIds((prev) =>
-                          prev.filter((hid) => !columnIds.includes(hid))
-                        )
-                      : null;
-                  }}
+                  onClick={() => unhideColumns(columnIds)}
                   sx={{ borderRadius: 0 }}
                 >
                   <Tooltip
@@ -356,7 +347,7 @@ const TableSchema = ({
                           {indices[0] + 1}
                         </Typography>
                       ) : (
-                        <HiddenColumnsButton />
+                        <HiddenColumnsButton count={indices.length} />
                       )}
                     </Box>
                   </Tooltip>

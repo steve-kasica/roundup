@@ -15,6 +15,7 @@ import { selectSelectedColumnIdsByParentId } from "../../slices/columnsSlice";
 import {
   setSelectedColumnIds,
   setFocusedColumnIds,
+  removeFromHiddenColumnIds,
 } from "../../slices/uiSlice";
 import { selectTablesById } from "../../slices/tablesSlice";
 
@@ -26,6 +27,7 @@ import {
 } from "../../sagas/createColumnsSaga";
 import { setFocusedObjectId } from "../../slices/uiSlice";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
+import { selectHiddenColumnIdsByParentId } from "../../slices/columnsSlice/selectors";
 
 /**
  * @typedef {Object} TableDataProps
@@ -45,6 +47,7 @@ import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
  * @property {function(): void} deleteTable - Function to delete the table
  * @property {Array<string>} columnIds - The IDs of the child columns of the table
  * @property {Array<string>} selectedColumnIds - The IDs of the currently selected columns
+ * @property {Array<string>} hiddenColumnIds - The IDs of the currently hidden columns
  * @property {number} columnCount - The number of columns in the table
  * @property {function(Array<string>): void} selectColumns - Function to select columns
  * @property {function(string, string): void} swapColumns - Function to swap two columns
@@ -71,7 +74,7 @@ export default function withTableData(WrappedComponent) {
     const allOperationIds = useSelector((state) => state.operations.allIds);
 
     const operationIndex = allOperationIds.findIndex((opId) =>
-      table ? opId === table.parentId : false
+      table ? opId === table.parentId : false,
     );
 
     // Table identity and metadata
@@ -101,7 +104,7 @@ export default function withTableData(WrappedComponent) {
      */
     const databaseName = useMemo(
       () => table.databaseName,
-      [table.databaseName]
+      [table.databaseName],
     );
 
     /**
@@ -140,7 +143,7 @@ export default function withTableData(WrappedComponent) {
      */
     const dateLastModified = useMemo(
       () => table.dateLastModified,
-      [table.dateLastModified]
+      [table.dateLastModified],
     );
 
     /**
@@ -160,10 +163,10 @@ export default function withTableData(WrappedComponent) {
         dispatch(
           updateTablesRequest({
             tableUpdates: [{ id, name }],
-          })
+          }),
         );
       },
-      [dispatch, id]
+      [dispatch, id],
     );
 
     /**
@@ -208,7 +211,12 @@ export default function withTableData(WrappedComponent) {
     // Selected columns (only changes when selection changes)
     // TODO: do I still need this?
     const selectedColumnIds = useSelector((state) =>
-      selectSelectedColumnIdsByParentId(state, id)
+      selectSelectedColumnIdsByParentId(state, id),
+    );
+
+    // Hidden columns (only changes when hidden columns change)
+    const hiddenColumnIds = useSelector((state) =>
+      selectHiddenColumnIdsByParentId(state, id),
     );
 
     /**
@@ -221,7 +229,7 @@ export default function withTableData(WrappedComponent) {
       (selectedColumnIds) => {
         dispatch(setSelectedColumnIds(selectedColumnIds));
       },
-      [dispatch]
+      [dispatch],
     );
 
     /**
@@ -237,7 +245,7 @@ export default function withTableData(WrappedComponent) {
         const targetIndex = columnIds.indexOf(target);
         if (sourceIndex === -1 || targetIndex === -1) {
           throw new Error(
-            `Invalid column IDs for swapping: source (${source}) or target (${target}) not found in active columns of table ${id}.`
+            `Invalid column IDs for swapping: source (${source}) or target (${target}) not found in active columns of table ${id}.`,
           );
         }
         const nextColumnIds = [...columnIds];
@@ -252,10 +260,10 @@ export default function withTableData(WrappedComponent) {
                 columnIds: nextColumnIds,
               },
             ],
-          })
+          }),
         );
       },
-      [dispatch, columnIds, id]
+      [dispatch, columnIds, id],
     );
 
     /**
@@ -278,10 +286,10 @@ export default function withTableData(WrappedComponent) {
                 name,
               },
             ],
-          })
+          }),
         );
       },
-      [dispatch, id]
+      [dispatch, id],
     );
 
     /**
@@ -297,9 +305,9 @@ export default function withTableData(WrappedComponent) {
             columnIds: columnIdsToDelete,
             recurse: false,
             deleteFromDatabase: true,
-          })
+          }),
         ),
-      [dispatch]
+      [dispatch],
     );
 
     /**
@@ -310,7 +318,14 @@ export default function withTableData(WrappedComponent) {
      */
     const focusColumns = useCallback(
       (colIds) => dispatch(setFocusedColumnIds(colIds)),
-      [dispatch]
+      [dispatch],
+    );
+
+    const unhideColumns = useCallback(
+      (colIds) => {
+        dispatch(removeFromHiddenColumnIds(colIds));
+      },
+      [dispatch],
     );
 
     return (
@@ -336,12 +351,14 @@ export default function withTableData(WrappedComponent) {
         // Child columns
         columnIds={columnIds}
         selectedColumnIds={selectedColumnIds}
+        hiddenColumnIds={hiddenColumnIds}
         columnCount={columnCount}
         selectColumns={selectColumns}
         swapColumns={swapColumns}
         insertColumn={insertColumn}
         deleteColumns={deleteColumns}
         focusColumns={focusColumns}
+        unhideColumns={unhideColumns}
         {...props}
       />
     );

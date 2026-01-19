@@ -16,7 +16,7 @@
  */
 
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { TooltipIconButton } from "../ui/buttons";
+import { TooltipIconButton } from "../../ui/buttons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToHiddenColumnIds,
@@ -24,14 +24,13 @@ import {
   selectFocusedObjectId,
   selectSelectedColumnIds,
   setSelectedColumnIds,
-} from "../../slices/uiSlice";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
-import { selectOperationsById } from "../../slices/operationsSlice";
-import { useCallback } from "react";
+} from "../../../slices/uiSlice";
+import { isTableId, selectTablesById } from "../../../slices/tablesSlice";
+import { selectOperationsById } from "../../../slices/operationsSlice";
+import { useCallback, useMemo } from "react";
 
 const HideColumnsButton = () => {
   const dispatch = useDispatch();
-  const tooltipText = "Hide columns";
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
 
   const focusedObject = useSelector((state) => {
@@ -46,34 +45,40 @@ const HideColumnsButton = () => {
   });
 
   const selectedObjectColumns = selectedColumnIds.filter((colId) =>
-    focusedObject ? focusedObject.columnIds.includes(colId) : false
+    focusedObject ? focusedObject.columnIds.includes(colId) : false,
   );
 
-  const hiddenObjectColumns = useSelector((state) => {
-    const hiddenColumnIds = state.ui.hiddenColumnIds;
-    return selectedObjectColumns.filter((colId) =>
-      hiddenColumnIds.includes(colId)
-    );
-  });
+  const hiddenColumnIds = useSelector((state) => state.ui.hiddenColumnIds);
+
+  const hiddenObjectColumns = useMemo(
+    () =>
+      focusedObject
+        ? focusedObject.columnIds.filter((colId) =>
+            hiddenColumnIds.includes(colId),
+          )
+        : [],
+    [focusedObject, hiddenColumnIds],
+  );
 
   const hideSelectedColumns = useCallback(() => {
     dispatch(addToHiddenColumnIds(selectedObjectColumns));
     dispatch(setSelectedColumnIds([]));
   }, [dispatch, selectedObjectColumns]);
 
-  const unhideSelectedColumns = useCallback(() => {
-    dispatch(removeFromHiddenColumnIds(selectedObjectColumns));
+  const unhideObjectColumns = useCallback(() => {
+    dispatch(removeFromHiddenColumnIds(hiddenObjectColumns));
     dispatch(setSelectedColumnIds([]));
-  }, [dispatch, selectedObjectColumns]);
+  }, [dispatch, hiddenObjectColumns]);
+
+  const isHideMode = selectedObjectColumns.length > 0;
 
   return (
     <>
-      {hiddenObjectColumns.length === 0 ? (
+      {isHideMode ? (
         <TooltipIconButton
           tooltipText={`Hide ${selectedObjectColumns.length} selected column${
             selectedObjectColumns.length !== 1 ? "s" : ""
           }`}
-          disabled={selectedColumnIds.length === 0}
           onClick={hideSelectedColumns}
         >
           <VisibilityOff />
@@ -83,7 +88,8 @@ const HideColumnsButton = () => {
           tooltipText={`Unhide ${hiddenObjectColumns.length} hidden column${
             hiddenObjectColumns.length !== 1 ? "s" : ""
           }`}
-          onClick={unhideSelectedColumns}
+          disabled={hiddenObjectColumns.length === 0}
+          onClick={unhideObjectColumns}
         >
           <Visibility />
         </TooltipIconButton>

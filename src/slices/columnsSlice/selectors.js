@@ -50,7 +50,7 @@ export const selectColumnIdsByParentId = createSelector(
       return parentIds.map(getColumnIds);
     }
     return getColumnIds(parentIds);
-  }
+  },
 );
 
 /**
@@ -78,7 +78,7 @@ export const selectAllColumnIdsByParentId = createSelector(
       return parentIdArray.map(getColumnIds);
     }
     return getColumnIds(parentIds);
-  }
+  },
 );
 
 /**
@@ -90,7 +90,7 @@ export const selectAllColumnIdsByParentId = createSelector(
  */
 export const selectColumnsById = createSelector(
   [(state) => state.columns.byId, (_, ids) => ids],
-  (byId, ids) => (Array.isArray(ids) ? ids.map((id) => byId[id]) : byId[ids])
+  (byId, ids) => (Array.isArray(ids) ? ids.map((id) => byId[id]) : byId[ids]),
 );
 
 /**
@@ -116,8 +116,8 @@ export const selectColumnNamesById = createSelector(
     !ids
       ? null
       : Array.isArray(ids)
-      ? ids.map((id) => byId[id]?.databaseName)
-      : byId[ids]?.databaseName
+        ? ids.map((id) => byId[id]?.databaseName)
+        : byId[ids]?.databaseName,
 );
 
 /**
@@ -158,7 +158,43 @@ export const selectSelectedColumnIdsByParentId = createSelector(
     });
 
     return output.length === 1 ? output[0] : output;
-  }
+  },
+);
+
+/**
+ * Select hidden column IDs for specific tables.
+ * This selector provides the intersection of all columns (from the table/operation)
+ * and hidden columns (from `state.ui.hiddenColumnIds`). It's useful for operations that should
+ * only apply to columns that are both part of the table AND currently hidden
+ * by the user.
+ *
+ * @function
+ * @param {Object} state - The Redux state.
+ * @param {string|string[]} parentId - The ID(s) of the table/operation to get hidden columns for.
+ * @returns {Array<string>|Array<Array<string>>} An array of column IDs that are both part of the table/operation AND hidden. If parentId is an array, returns an array of arrays. Returns an empty array if no columns match both criteria or if the table/operation doesn't exist.
+ */
+export const selectHiddenColumnIdsByParentId = createSelector(
+  [
+    (state, parentIds) => parentIds,
+    (state) => state.tables.byId,
+    (state) => state.operations.byId,
+    (state) => state.ui.hiddenColumnIds,
+  ],
+  (parentIds, tablesById, operationsById, hiddenColumnIds) => {
+    const hiddenSet = new Set(hiddenColumnIds);
+    const normalizedParentIds = Array.isArray(parentIds)
+      ? parentIds
+      : [parentIds];
+
+    const output = normalizedParentIds.map((parentId) => {
+      const columnIds = isTableId(parentId)
+        ? tablesById[parentId].columnIds
+        : operationsById[parentId].columnIds;
+      return columnIds.filter((colId) => hiddenSet.has(colId));
+    });
+
+    return output.length === 1 ? output[0] : output;
+  },
 );
 
 export const selectColumnIndexById = createSelector(
@@ -173,7 +209,7 @@ export const selectColumnIndexById = createSelector(
       ? tablesById[parentId]
       : operationsById[parentId];
     return parent.columnIds.indexOf(columnId);
-  }
+  },
 );
 
 export const selectOrphanedColumnIds = createSelector(
@@ -192,8 +228,8 @@ export const selectOrphanedColumnIds = createSelector(
       .filter((col) => col.parentId === parentId)
       .map((col) => col.id);
     const orphanedColumnIds = allColumnIds.filter(
-      (id) => !currentColumnIds.includes(id)
+      (id) => !currentColumnIds.includes(id),
     );
     return orphanedColumnIds;
-  }
+  },
 );

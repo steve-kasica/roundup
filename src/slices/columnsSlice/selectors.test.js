@@ -7,6 +7,7 @@ import {
   selectColumnsById,
   selectOrphanedColumnIds,
   selectSelectedColumnIdsByParentId,
+  selectHiddenColumnIdsByParentId,
 } from "./selectors";
 import { initialState as columnsInitialState } from "./columnsSlice";
 import Column from "./Column";
@@ -131,13 +132,13 @@ describe("Column selectors", () => {
             ...state,
             ui: { selectedColumnIds: [column4.id] },
           },
-          operation1.id
-        )
+          operation1.id,
+        ),
       ).toEqual([column4.id]);
     });
     it("returns selected column IDs for multiple table IDs", () => {
       expect(
-        selectSelectedColumnIdsByParentId(state, [table1.id, table2.id])
+        selectSelectedColumnIdsByParentId(state, [table1.id, table2.id]),
       ).toEqual([[column1.id], [column3.id]]);
     });
     it("returns selected column IDs for multiple operation IDs", () => {
@@ -147,8 +148,64 @@ describe("Column selectors", () => {
             ...state,
             ui: { selectedColumnIds: [column4.id, column1.id] },
           },
-          [operation1.id, table1.id]
-        )
+          [operation1.id, table1.id],
+        ),
+      ).toEqual([[column4.id], [column1.id]]);
+    });
+  });
+  describe("selectHiddenColumnIdsByParentId", () => {
+    it("returns hidden column IDs for a single table ID", () => {
+      const stateWithHidden = {
+        ...state,
+        ui: { hiddenColumnIds: [column1.id, column3.id] },
+      };
+      expect(
+        selectHiddenColumnIdsByParentId(stateWithHidden, table1.id),
+      ).toEqual([column1.id]);
+      expect(
+        selectHiddenColumnIdsByParentId(stateWithHidden, table2.id),
+      ).toEqual([column3.id]);
+    });
+    it("returns an empty array if no columns are hidden for a single table ID", () => {
+      const stateWithHidden = {
+        ...state,
+        ui: { hiddenColumnIds: [column1.id, column3.id] },
+      };
+      expect(
+        selectHiddenColumnIdsByParentId(stateWithHidden, table3.id),
+      ).toEqual([]);
+    });
+    it("returns hidden column IDs for a single operation ID", () => {
+      const stateWithHidden = {
+        ...state,
+        ui: { hiddenColumnIds: [column4.id] },
+      };
+      expect(
+        selectHiddenColumnIdsByParentId(stateWithHidden, operation1.id),
+      ).toEqual([column4.id]);
+    });
+    it("returns hidden column IDs for multiple table IDs", () => {
+      const stateWithHidden = {
+        ...state,
+        ui: { hiddenColumnIds: [column1.id, column3.id] },
+      };
+      expect(
+        selectHiddenColumnIdsByParentId(stateWithHidden, [
+          table1.id,
+          table2.id,
+        ]),
+      ).toEqual([[column1.id], [column3.id]]);
+    });
+    it("returns hidden column IDs for multiple operation IDs", () => {
+      const stateWithHidden = {
+        ...state,
+        ui: { hiddenColumnIds: [column4.id, column1.id] },
+      };
+      expect(
+        selectHiddenColumnIdsByParentId(stateWithHidden, [
+          operation1.id,
+          table1.id,
+        ]),
       ).toEqual([[column4.id], [column1.id]]);
     });
   });
@@ -201,7 +258,7 @@ describe("Column selectors", () => {
       };
       const orphanedColumnIds = selectOrphanedColumnIds(
         localState,
-        operation1.id
+        operation1.id,
       );
       expect(orphanedColumnIds).toEqual([column5.id]);
     });

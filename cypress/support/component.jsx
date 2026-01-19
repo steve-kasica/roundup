@@ -66,11 +66,21 @@ function createTestStore(preloadedState = {}) {
  * @param {React.ReactElement} component - The component to mount.
  * @param {Object} options - Mount options.
  * @param {Object} options.preloadedState - Optional Redux state overrides.
+ * @param {Function} options.dispatchSpy - Optional spy function to track dispatched actions.
  * @returns {Cypress.Chainable} Cypress chainable with store attached.
  */
 Cypress.Commands.add("mountWithProviders", (component, options = {}) => {
-  const { preloadedState = {}, ...mountOptions } = options;
+  const { preloadedState = {}, dispatchSpy, ...mountOptions } = options;
   const store = createTestStore(preloadedState);
+
+  // Wrap dispatch with spy if provided
+  if (dispatchSpy) {
+    const originalDispatch = store.dispatch;
+    store.dispatch = (action) => {
+      dispatchSpy(action);
+      return originalDispatch(action);
+    };
+  }
 
   const wrapped = (
     <Provider store={store}>
@@ -81,6 +91,10 @@ Cypress.Commands.add("mountWithProviders", (component, options = {}) => {
   );
 
   return mount(wrapped, mountOptions).then(() => {
+    // Make store available globally for getState command
+    cy.window().then((win) => {
+      win.store = store;
+    });
     // Return the store for assertions
     return cy.wrap({ store });
   });
@@ -88,3 +102,11 @@ Cypress.Commands.add("mountWithProviders", (component, options = {}) => {
 
 // Make the basic mount command available as well
 Cypress.Commands.add("mount", mount);
+
+/**
+ * Custom command to get the current Redux store state.
+ * @returns {Cypress.Chainable} Cypress chainable with the current state.
+ */
+Cypress.Commands.add("getState", () => {
+  return cy.window().its("store").invoke("getState");
+});
