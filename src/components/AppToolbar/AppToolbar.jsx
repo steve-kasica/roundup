@@ -1,4 +1,4 @@
-import { Toolbar, Box, Divider, Typography } from "@mui/material";
+import { Toolbar, Box, Divider } from "@mui/material";
 import FocusedObjectSelect from "./FocusedObjectSelect";
 import RenameFocusedObjectButton from "./RenameFocusedObjectButton";
 import ChangeTableOrder from "./ChangeTableOrder";
@@ -10,7 +10,7 @@ import UploadTablesButton from "./UploadTablesButton";
 import SelectAllColumnsButton from "./SelectAllColumnsButton";
 import HideColumnsButton from "./HideColumnsButton";
 import PackMatchToggleButtonGroup from "./PackMatchToggleButtonGroup";
-import JoinPredicateButton from "./JoinPredicateButton/JoinPredicateButton";
+import JoinPredicateButton from "./JoinPredicateButton";
 import JoinKeysButton from "./JoinKeysButton";
 
 const AppToolbar = () => {
@@ -40,7 +40,7 @@ const AppToolbar = () => {
         <Divider orientation="vertical" flexItem />
         <PackMatchToggleButtonGroup />
         <JoinPredicateButton />
-        <JoinKeysButton />
+        {/* <JoinKeysButton /> */}
         <Divider orientation="vertical" flexItem />
       </Box>
       <SchemaAlertsButton />
