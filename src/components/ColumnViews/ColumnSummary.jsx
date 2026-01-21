@@ -35,6 +35,7 @@ import { ColumnContextMenuButton } from "../ui/buttons";
 import { useCallback, useState } from "react";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
 import { format } from "d3";
+import { IntegerNumber, PercentNumber } from "../ui/text";
 
 /**
  * ColumnSummary Component
@@ -108,7 +109,6 @@ const ColumnSummary = ({
   elevation = 1,
 }) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-  const formatPercentage = format(".2%");
 
   const handleMenuOpen = useCallback((event) => {
     event.stopPropagation();
@@ -231,7 +231,7 @@ const ColumnSummary = ({
               Completeness
             </Typography>
             <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
-              {formatPercentage(completePercentage)}
+              <PercentNumber value={completePercentage} />
             </Typography>
           </Stack>
           <Stack direction="row" spacing={1} justifyContent={"space-between"}>
@@ -239,7 +239,7 @@ const ColumnSummary = ({
               Uniqueness
             </Typography>
             <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
-              {formatPercentage(uniquePercentage)}
+              <PercentNumber value={uniquePercentage} />
             </Typography>
           </Stack>
         </Box>
@@ -259,7 +259,7 @@ const ColumnSummary = ({
           >
             Uniq. Values{" "}
             <small style={{ fontWeight: "normal" }}>
-              ({approxUnique.toLocaleString()})
+              <IntegerNumber value={approxUnique} />
             </small>
           </Typography>
           <Box
@@ -275,7 +275,7 @@ const ColumnSummary = ({
               overflow: "hidden",
             }}
           >
-            {topValues.map(({ value }) => (
+            {topValues?.map(({ value }) => (
               <Chip
                 key={value}
                 label={`${value}`}
@@ -316,7 +316,7 @@ const ColumnSummary = ({
 ColumnSummary.displayName = "Column Summary";
 
 const EnhancedColumnSummary = withAssociatedAlerts(
-  withColumnData(ColumnSummary)
+  withColumnData(ColumnSummary),
 );
 
 EnhancedColumnSummary.displayName = "Enhanced Column Summary";
