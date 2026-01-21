@@ -1,4 +1,4 @@
-import { Toolbar, Box, Divider } from "@mui/material";
+import { Toolbar, Box, Divider, Typography } from "@mui/material";
 import FocusedObjectSelect from "./FocusedObjectSelect";
 import RenameFocusedObjectButton from "./RenameFocusedObjectButton";
 import ChangeTableOrder from "./ChangeTableOrder";
@@ -9,9 +9,9 @@ import { ExportTableButton } from "./ExportTable";
 import UploadTablesButton from "./UploadTablesButton";
 import SelectAllColumnsButton from "./SelectAllColumnsButton";
 import HideColumnsButton from "./HideColumnsButton";
-import PackMatchToggleButtonGroup from "./PackMatchToggleButtonGroup";
 import JoinPredicateButton from "./JoinPredicateButton";
 import JoinKeysButton from "./JoinKeysButton";
+import { EnhancedPackMatchToggleButtonGroup } from "./PackMatchToggleButtonGroup";
 
 const AppToolbar = () => {
   return (
@@ -30,15 +30,20 @@ const AppToolbar = () => {
         <RenameFocusedObjectButton />
         <ChangeTableOrder />
         <Divider orientation="vertical" flexItem />
-        <SelectAllColumnsButton />
-        <FocusColumnsButton />
-        <HideColumnsButton />
-        <DeleteColumnsButton />
+        <Box display={"flex"} flexDirection={"column"}>
+          <Box>
+            <SelectAllColumnsButton />
+            <FocusColumnsButton />
+            <HideColumnsButton />
+            <DeleteColumnsButton />
+          </Box>
+        </Box>
+
         <Divider orientation="vertical" flexItem />
         <UploadTablesButton />
         <ExportTableButton />
         <Divider orientation="vertical" flexItem />
-        <PackMatchToggleButtonGroup />
+        <EnhancedPackMatchToggleButtonGroup />
         <JoinPredicateButton />
         {/* <JoinKeysButton /> */}
         <Divider orientation="vertical" flexItem />

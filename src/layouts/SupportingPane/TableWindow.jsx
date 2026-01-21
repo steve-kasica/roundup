@@ -16,7 +16,7 @@
  * <TableWindow id="t1" />
  */
 /* eslint-disable react/prop-types */
-import { Alert, Box } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { EnhancedTableRows } from "../../components/TableView";
 import {
@@ -38,7 +38,7 @@ const VIEW_UNKNOWN = "UNKNOWN";
 const TableWindow = ({ id }) => {
   const isFocusedTable = isTableId(id);
   const focusedOperation = useSelector((state) =>
-    isFocusedTable ? null : selectOperationsById(state, id)
+    isFocusedTable ? null : selectOperationsById(state, id),
   );
 
   const viewMode = (function (opType) {
@@ -89,7 +89,7 @@ const TableWindow = ({ id }) => {
                   id: id || null,
                 },
                 null,
-                2
+                2,
               )}
             </pre>
           </Alert>

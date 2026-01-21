@@ -22,6 +22,7 @@ import {
   DEFAULT_JOIN_PREDICATE,
   DEFAULT_JOIN_TYPE,
   MATCH_STATS_DEFAULT,
+  selectOperationIndexById,
 } from "../../slices/operationsSlice";
 import {
   selectColumnIdsByParentId,
@@ -117,13 +118,13 @@ export default function withOperationData(WrappedComponent) {
     // The name database table associated with this operation
     const databaseName = useMemo(
       () => operation.databaseName,
-      [operation.databaseName]
+      [operation.databaseName],
     );
 
     // The type of this operation
     const operationType = useMemo(
       () => operation.operationType,
-      [operation.operationType]
+      [operation.operationType],
     );
 
     // The display name of this operation
@@ -145,7 +146,7 @@ export default function withOperationData(WrappedComponent) {
       (name) => {
         dispatch(updateOperationsRequest({ operationUpdates: [{ id, name }] }));
       },
-      [dispatch, id]
+      [dispatch, id],
     );
 
     // Function to change the operation type
@@ -165,7 +166,7 @@ export default function withOperationData(WrappedComponent) {
                       joinPredicate: DEFAULT_JOIN_PREDICATE,
                       joinType: DEFAULT_JOIN_TYPE,
                       matchStats: Object.fromEntries(
-                        MATCH_STATS_DEFAULT.entries()
+                        MATCH_STATS_DEFAULT.entries(),
                       ),
                     }
                   : {
@@ -177,9 +178,13 @@ export default function withOperationData(WrappedComponent) {
                     }),
               },
             ],
-          })
+          }),
         ),
-      [dispatch, id]
+      [dispatch, id],
+    );
+
+    const operationIndex = useSelector((state) =>
+      selectOperationIndexById(state, id),
     );
 
     // Hierarchy & Structure
@@ -188,7 +193,7 @@ export default function withOperationData(WrappedComponent) {
     // The IDs of child tables/operations
     const childIds = useMemo(
       () => operation.childIds || [],
-      [operation.childIds]
+      [operation.childIds],
     );
 
     // The absolute depth of this operation from the root of the tree
@@ -212,7 +217,7 @@ export default function withOperationData(WrappedComponent) {
       } else {
         const focusedOperationDepth = selectOperationDepthById(
           state,
-          focusedOperationId
+          focusedOperationId,
         );
         return depth - focusedOperationDepth;
       }
@@ -244,7 +249,7 @@ export default function withOperationData(WrappedComponent) {
         // return scale(depth);
         return scale(operationId);
       },
-      [allOperationIds]
+      [allOperationIds],
     );
 
     // Simple algorithm to determine if text should be light or dark based on background color
@@ -258,7 +263,7 @@ export default function withOperationData(WrappedComponent) {
         const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
         return luminance < TEXT_LUMINANCE_THRESHOLD;
       },
-      [colorScale]
+      [colorScale],
     );
 
     // Sync & Materialization Status
@@ -267,7 +272,7 @@ export default function withOperationData(WrappedComponent) {
     // is the operation materialized?
     const isMaterialized = useMemo(
       () => operation.isMaterialized,
-      [operation.isMaterialized]
+      [operation.isMaterialized],
     );
 
     // is the materialized operation in sync with the schema?
@@ -285,7 +290,7 @@ export default function withOperationData(WrappedComponent) {
     // All column IDs associated directly with this operation
     const columnIds = useMemo(
       () => operation.columnIds || [],
-      [operation.columnIds]
+      [operation.columnIds],
     );
 
     /**
@@ -293,7 +298,7 @@ export default function withOperationData(WrappedComponent) {
      * @type {Array<Array<string>>}
      */
     const childColumnIds = useSelector((state) =>
-      selectColumnIdsByParentId(state, childIds)
+      selectColumnIdsByParentId(state, childIds),
     );
 
     /**
@@ -302,7 +307,7 @@ export default function withOperationData(WrappedComponent) {
      * @type {Array<Array<string>>}
      */
     const selectedChildColumnIds = useSelector((state) =>
-      selectSelectedColumnIdsByParentId(state, childIds)
+      selectSelectedColumnIdsByParentId(state, childIds),
     );
 
     /**
@@ -317,7 +322,7 @@ export default function withOperationData(WrappedComponent) {
     // TODO: should this be a selector of should the selector draw straight
     // from the ui source, then we memoize a calculation upon it?
     const selectedColumnIds = useSelector((state) =>
-      selectSelectedColumnIdsByParentId(state, id)
+      selectSelectedColumnIdsByParentId(state, id),
     );
 
     /**
@@ -327,7 +332,7 @@ export default function withOperationData(WrappedComponent) {
     const focusedObjectId = useSelector(selectFocusedObjectId);
 
     const childRowCounts = useSelector((state) =>
-      selectOperationChildRowCounts(state, id)
+      selectOperationChildRowCounts(state, id),
     );
 
     const isFocused = focusedObjectId === id;
@@ -338,12 +343,12 @@ export default function withOperationData(WrappedComponent) {
       (columnIds) => {
         dispatch(setVisibleColumnsAction(columnIds));
       },
-      [dispatch]
+      [dispatch],
     );
 
     const selectColumns = useCallback(
       (columnIds) => dispatch(setSelectedColumnIds(columnIds)),
-      [dispatch]
+      [dispatch],
     );
 
     const clearSelectedColumns = useCallback(() => {
@@ -358,15 +363,15 @@ export default function withOperationData(WrappedComponent) {
             columnLocations: [
               { parentId: childId, index: targetIndex, fillValue, name },
             ],
-          })
+          }),
         );
       },
-      [dispatch]
+      [dispatch],
     );
 
     const focusColumns = useCallback(
       (colIds) => dispatch(setFocusedColumnIds(colIds)),
-      [dispatch]
+      [dispatch],
     );
 
     const swapTablePositions = useCallback(
@@ -395,10 +400,10 @@ export default function withOperationData(WrappedComponent) {
                   : {}),
               },
             ],
-          })
+          }),
         );
       },
-      [dispatch, id, childIds, operation.joinKey1, operation.joinKey2]
+      [dispatch, id, childIds, operation.joinKey1, operation.joinKey2],
     );
 
     const deleteColumns = useCallback(
@@ -408,10 +413,10 @@ export default function withOperationData(WrappedComponent) {
             columnIds: columnIdsToDelete,
             recurse: true,
             deleteFromDatabase: true,
-          })
+          }),
         );
       },
-      [dispatch]
+      [dispatch],
     );
 
     const materializeOperation = useCallback(
@@ -419,9 +424,9 @@ export default function withOperationData(WrappedComponent) {
         dispatch(
           updateOperationsRequest({
             operationUpdates: [{ id, isMaterialized: null }],
-          })
+          }),
         ),
-      [dispatch, id]
+      [dispatch, id],
     );
 
     /**
@@ -433,7 +438,7 @@ export default function withOperationData(WrappedComponent) {
      */
     const focusOperation = useCallback(
       () => dispatch(setFocusedObjectId(id)),
-      [dispatch, id]
+      [dispatch, id],
     );
 
     /**
@@ -456,6 +461,7 @@ export default function withOperationData(WrappedComponent) {
         setOperationType={setOperationType}
         setOperationName={setOperationName}
         swapTablePositions={swapTablePositions}
+        operationIndex={operationIndex}
         // Hierarchy & Structure
         childIds={childIds}
         depth={depth}

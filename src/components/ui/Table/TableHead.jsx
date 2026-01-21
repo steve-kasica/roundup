@@ -28,7 +28,7 @@ import {
   Typography,
 } from "@mui/material";
 import StyledTableCell from "./StyledTableCell";
-import { EnhancedColumnHeader } from "../../ColumnViews";
+import { EnhancedColumnHeader } from "./ColumnHeader.jsx";
 import { PLACEHOLDER_COLUMN_COUNT } from "./index.js";
 
 const TableHead = ({ columnIds, sortConfig, onColumnSort }) => {
@@ -60,10 +60,7 @@ const TableHead = ({ columnIds, sortConfig, onColumnSort }) => {
                     p: "1px",
                   }}
                 >
-                  <Typography
-                    variant="label"
-                    color="text.secondary"
-                  >
+                  <Typography variant="label" color="text.secondary">
                     Column {i + 1}
                   </Typography>
                 </TableCell>
@@ -71,7 +68,7 @@ const TableHead = ({ columnIds, sortConfig, onColumnSort }) => {
             })
           : columnIds.map((colId, i) => {
               return (
-                <TableCell key={`${i}-${colId}`} align="center">
+                <TableCell key={`${i}-${colId}`} align="left">
                   <EnhancedColumnHeader
                     id={colId}
                     isActive={sortConfig.columnId === colId}

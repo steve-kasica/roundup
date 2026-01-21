@@ -27,7 +27,7 @@ import { useSelector } from "react-redux";
 import { isTableId, selectAllTableIds } from "../../slices/tablesSlice";
 import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
 import { EnhancedStackSchemaView } from "../../components/StackOperationView/StackSchemaView/StackSchemaView";
-import PackSchemaView from "../../components/PackOperationView/PackSchemaView";
+import PackSchemaView from "../../components/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
 
@@ -36,7 +36,7 @@ export default function SchemaWindow() {
   const focusedObjectId = useSelector(selectFocusedObjectId);
   const isFocusedTable = isTableId(focusedObjectId);
   const focusedOperation = useSelector((state) =>
-    isFocusedTable ? null : selectOperationsById(state, focusedObjectId)
+    isFocusedTable ? null : selectOperationsById(state, focusedObjectId),
   );
   const operations = useSelector(selectAllOperationIds);
 
@@ -94,7 +94,7 @@ export default function SchemaWindow() {
                     allOperations: operations || null,
                   },
                   null,
-                  2
+                  2,
                 )}
               </pre>
             </Alert>

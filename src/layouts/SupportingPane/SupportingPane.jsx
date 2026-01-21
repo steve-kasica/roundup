@@ -123,9 +123,6 @@ export default function SupportingPane() {
                       style={{ padding: "5px" }}
                     >
                       <Box display="flex" flexDirection="column" height="100%">
-                        <Typography variant="analytics-data-secondary">
-                          Composite Table Schema
-                        </Typography>
                         <CompositeTableSchema />
                       </Box>
                     </Panel>

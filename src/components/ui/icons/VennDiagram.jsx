@@ -63,7 +63,7 @@ function VennDiagram(props) {
       sx={{
         width: S,
         height: S,
-        opacity: disabled ? 0.5 : 1,
+        opacity: disabled ? 0.8 : 1,
         ...(otherProps?.sx || {}),
       }}
     >
@@ -74,7 +74,7 @@ function VennDiagram(props) {
         fill={labelFill}
         textAnchor="middle"
         alignmentBaseline="middle"
-        opacity={disabled ? 0.5 : 1}
+        opacity={disabled ? 0.8 : 1}
       >
         {label}
       </text>
@@ -84,10 +84,10 @@ function VennDiagram(props) {
         cy={cy}
         r={r}
         fill={leftFill}
-        fillOpacity={disabled ? leftOpacity * 0.5 : leftOpacity}
+        fillOpacity={disabled ? leftOpacity * 0.8 : leftOpacity}
         stroke={stroke}
         strokeWidth={strokeWidth}
-        opacity={disabled ? 0.5 : 1}
+        opacity={disabled ? 0.8 : 1}
       />
       {/* Right circle */}
       <circle
@@ -95,7 +95,7 @@ function VennDiagram(props) {
         cy={cy}
         r={r}
         fill={rightFill}
-        fillOpacity={disabled ? rightOpacity * 0.5 : rightOpacity}
+        fillOpacity={disabled ? rightOpacity * 0.8 : rightOpacity}
         stroke={stroke}
         strokeWidth={strokeWidth}
         opacity={disabled ? 0.5 : 1}
@@ -106,7 +106,7 @@ function VennDiagram(props) {
           S * (12 / 24)
         } ${yBottom} A ${r} ${r} 0 0 0 ${S * (12 / 24)} ${yTop} Z`}
         fill={overlapFill}
-        fillOpacity={disabled ? overlapOpacity * 0.5 : overlapOpacity}
+        fillOpacity={disabled ? overlapOpacity * 0.8 : overlapOpacity}
         stroke={stroke}
         strokeWidth={strokeWidth}
         opacity={disabled ? 0.5 : 1}

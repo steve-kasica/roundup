@@ -33,7 +33,7 @@ const StyledColumnContainer = styled(Box, {
     operationIndex,
   }) => ({
     flex: "1 1 0",
-    minHeight: "25px",
+    // minHeight: "25px",
     minWidth: "100px",
     display: "flex",
     flexDirection: "column",

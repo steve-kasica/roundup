@@ -39,7 +39,6 @@ import {
   withGlobalInterfaceData,
 } from "../HOC";
 import { useCallback, useState, useMemo } from "react";
-import { EnhancedColumnName } from "../ColumnViews";
 import { Error } from "@mui/icons-material";
 import VennDiagram from "../ui/icons/VennDiagram";
 import { EnhancedTableName } from "../TableView/TableName";
@@ -51,7 +50,7 @@ import {
   MATCH_TYPE_MATCHES,
   MATCH_TYPE_RIGHT_UNMATCHED,
 } from "../../slices/operationsSlice";
-import { EnhancedPackSchemaToolbar } from "./PackSchemaToolbar";
+import { EnhancedColumnLabel } from "./ColumnLabel";
 
 const yAxisLabelWidth = "50px";
 const yAxisLabelPadding = "0px";
@@ -69,6 +68,7 @@ const PackSchemaView = ({
   isLoading,
   colorScale,
   depth,
+  operationIndex,
   // Props defined in `withPackOperationData`
   insertColumnIntoChildAtIndex,
   validMatchGroups,
@@ -146,7 +146,7 @@ const PackSchemaView = ({
         // Collect all column IDs and match labels in the range
         const columnsToSelect = combinedChildColumnIds.slice(
           colStart,
-          colEnd + 1
+          colEnd + 1,
         );
         const matchesToSelect = matchKeys
           .slice(matchStart, matchEnd + 1)
@@ -171,7 +171,7 @@ const PackSchemaView = ({
       selectColumns,
       selectMatches,
       validMatchGroups,
-    ]
+    ],
   );
 
   /**
@@ -218,7 +218,7 @@ const PackSchemaView = ({
       selectColumns,
       selectMatches,
       validMatchGroups,
-    ]
+    ],
   );
 
   const handleColumnContextMenu = useCallback((event, columnId) => {
@@ -269,7 +269,7 @@ const PackSchemaView = ({
       handleCloseContextMenu,
       leftTableId,
       rightTableId,
-    ]
+    ],
   );
 
   /**
@@ -292,7 +292,7 @@ const PackSchemaView = ({
 
         const columnsToSelect = combinedChildColumnIds.slice(
           colStart,
-          colEnd + 1
+          colEnd + 1,
         );
 
         selectColumns(columnsToSelect);
@@ -311,7 +311,7 @@ const PackSchemaView = ({
       selectColumns,
       selectMatches,
       validMatchGroups,
-    ]
+    ],
   );
 
   /**
@@ -352,7 +352,7 @@ const PackSchemaView = ({
       clearSelectedColumns();
       clearSelectedMatches();
     },
-    [clearSelectedColumns, clearSelectedMatches, selectedChildColumnIdsSet]
+    [clearSelectedColumns, clearSelectedMatches, selectedChildColumnIdsSet],
   );
 
   const handleSetAsKeyClick = useCallback(
@@ -364,7 +364,7 @@ const PackSchemaView = ({
         setRightTableJoinKey(columnId);
       }
     },
-    [leftColumnIds, setLeftTableJoinKey, setRightTableJoinKey]
+    [leftColumnIds, setLeftTableJoinKey, setRightTableJoinKey],
   );
 
   // This memoized variable groups columns into contiguous visible/hidden segments
@@ -387,7 +387,7 @@ const PackSchemaView = ({
         }
         return acc;
       }, []),
-    [combinedChildColumnIds, hiddenColumns]
+    [combinedChildColumnIds, hiddenColumns],
   );
 
   return (
@@ -535,57 +535,11 @@ const PackSchemaView = ({
                       }}
                     />
                   ) : (
-                    <EnhancedColumnName
+                    <EnhancedColumnLabel
                       id={columnIds[0]}
-                      containerSx={{
-                        containerType: "inline-size",
-                      }}
-                      sx={{
-                        fontSize: "0.6rem",
-                        userSelect: "none",
-                        // Multiple transform commands should be space-separated in a single string
-                        transform: "rotate(0deg)",
-                        transformOrigin: "left bottom",
-                        textAlign: "center",
-                        ...(columnIds[0] === leftKey ||
-                        columnIds[0] === rightKey
-                          ? {
-                              fontWeight: "bold",
-                            }
-                          : {}),
-                        marginBottom: "2.5px",
-                        marginTop: 0,
-                        "@container (width < 50px)": {
-                          textAlign: "left",
-                          transform: `rotate(-10deg) translateX(20px)`,
-                          marginTop: "2.5px",
-                        },
-                        "@container (width < 45px)": {
-                          transform:
-                            "rotate(-20deg) translateX(20px) translateY(5px)",
-                          textAlign: "left",
-                          marginTop: "5px",
-                        },
-                        "@container (width < 40px)": {
-                          transform:
-                            "rotate(-30deg) translateX(20px) translateY(8px)",
-                          textAlign: "left",
-                          marginTop: "7.5px",
-                        },
-                        "@container (width < 35px)": {
-                          transform:
-                            "rotate(-40deg) translateX(12px) translateY(9px)",
-                          textAlign: "left",
-                          marginTop: "10px",
-                        },
-                        "@container (width < 30px)": {
-                          transform:
-                            "rotate(-50deg) translateX(12px) translateY(10px)",
-                          textAlign: "left",
-                          marginTop: "12.5px",
-                        },
-                      }}
-                      onClick={handleColumnLabelClick}
+                      onClick={(event) =>
+                        handleColumnLabelClick(event, columnIds[0])
+                      }
                     />
                   )}
                 </Box>
@@ -769,6 +723,9 @@ const PackSchemaView = ({
                   return (
                     <StyledBlockCell
                       key={columnId}
+                      operationIndex={
+                        isTableId(tableId) ? operationIndex : operationIndex - 1
+                      }
                       disabled={isMatchDisabled}
                       isEmpty={
                         (key === MATCH_TYPE_LEFT_UNMATCHED &&
@@ -781,7 +738,7 @@ const PackSchemaView = ({
                       highlightBottomBorder={highlightBottomBorder}
                       highlightLeftBorder={highlightLeftBorder}
                       highlightRightBorder={highlightRightBorder}
-                      backgroundColor={colorScale(depth + 1)}
+                      backgroundColor={colorScale(depth)}
                       tableBorderWidth={childTablesSeparatorWidth}
                       defaultBorderColor={cellBorderColor}
                       isSelected={isClicked}
@@ -849,8 +806,8 @@ PackSchemaView.displayName = "Pack Schema View";
 
 const EnhancedPackSchemaView = withOperationData(
   withAssociatedAlerts(
-    withPackOperationData(withGlobalInterfaceData(PackSchemaView))
-  )
+    withPackOperationData(withGlobalInterfaceData(PackSchemaView)),
+  ),
 );
 
 EnhancedPackSchemaView.displayName = "Enhanced Pack Schema View";

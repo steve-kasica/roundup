@@ -36,7 +36,7 @@ export const selectOperationsById = createSelector(
     return Array.isArray(operationId)
       ? operationId.map((id) => byId[id])
       : byId[operationId];
-  }
+  },
 );
 
 /**
@@ -48,7 +48,7 @@ export const selectOperationsById = createSelector(
 export function selectAllOperationIds(state, includeNoOp = false) {
   if (!includeNoOp) {
     return state.operations.allIds.filter(
-      (id) => state.operations.byId[id].operationType !== OPERATION_TYPE_NO_OP
+      (id) => state.operations.byId[id].operationType !== OPERATION_TYPE_NO_OP,
     );
   } else {
     return state.operations.allIds;
@@ -67,9 +67,9 @@ export const selectOperationIdByChildId = createSelector(
   (_, childId) => childId,
   (operationsData, childId) => {
     return Object.entries(operationsData).find(([, { childIds }]) =>
-      childIds.includes(childId)
+      childIds.includes(childId),
     )?.[0];
-  }
+  },
 );
 
 /**
@@ -103,7 +103,7 @@ export const selectOperationDepthById = createSelector(
     }
     // Start from the root (last in ids or explicit root)
     return findDepth(rootOperationId, depth);
-  }
+  },
 );
 
 /**
@@ -140,7 +140,7 @@ export const selectMaxOperationDepth = createSelector(
 
     traverse(rootOperationId, 0);
     return maxDepth;
-  }
+  },
 );
 
 /**
@@ -180,7 +180,7 @@ export const selectOperationQueryData = (state, id) => {
       return {
         tableName: selectOperationsById(state, childId).databaseName,
         columnNames: selectOperationsById(state, childId).columnIds.map(
-          (colId) => selectColumnsById(state, colId).databaseName
+          (colId) => selectColumnsById(state, colId).databaseName,
         ),
       };
     }
@@ -196,7 +196,7 @@ export const selectOperationQueryData = (state, id) => {
       : {};
 
   const columnNames = operation.columnIds.map(
-    (colId) => selectColumnsById(state, colId).databaseName
+    (colId) => selectColumnsById(state, colId).databaseName,
   );
 
   return {
@@ -247,7 +247,7 @@ export const selectStackOperationRowCount = createSelector(
       }
       return total + childRowCount;
     }, 0);
-  }
+  },
 );
 
 /**
@@ -276,11 +276,11 @@ export const selectPackOperationColumnCount = createSelector(
 
     return childIds.reduce((total, tableId) => {
       const activeColumns = Object.values(columnsData).filter(
-        (column) => column.tableId === tableId && column.isActive !== false
+        (column) => column.tableId === tableId && column.isActive !== false,
       );
       return total + activeColumns.length;
     }, 0);
-  }
+  },
 );
 
 /**
@@ -323,7 +323,7 @@ export const selectStackOperationRowRanges = createSelector(
       }
     }
     return rowRanges;
-  }
+  },
 );
 
 export const selectOperationChildRowCounts = createSelector(
@@ -344,5 +344,12 @@ export const selectOperationChildRowCounts = createSelector(
       rowCounts.push([childId, rowCount]);
     }
     return new Map(rowCounts);
-  }
+  },
+);
+
+export const selectOperationIndexById = createSelector(
+  [(state) => state.operations.allIds, (_, operationId) => operationId],
+  (allIds, operationId) => {
+    return allIds.indexOf(operationId);
+  },
 );
