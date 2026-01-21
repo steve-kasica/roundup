@@ -21,7 +21,6 @@
 
 import { withColumnData } from "../HOC";
 import { StyledColumnContainer } from "../ColumnViews";
-import { lighten } from "@mui/material";
 
 const ColumnTick = ({
   isHovered,
@@ -40,29 +39,32 @@ const ColumnTick = ({
   totalCount,
   operationIndex,
   sx = {},
-}) => (
-  <StyledColumnContainer
-    className={"ColumnTick"}
-    isHovered={isHovered}
-    isDragging={isDragging}
-    isDropTarget={isDropTarget}
-    isSelected={isSelected}
-    isOver={isOver}
-    isLoading={isLoading}
-    isFocused={isFocused}
-    isDraggable={isDraggable}
-    isNull={isNull}
-    isError={totalCount}
-    isVisible={isVisible}
-    operationIndex={operationIndex}
-    // onMouseEnter={hoverColumn}
-    // onMouseLeave={unhoverColumn}
-    sx={{
-      minWidth: "1px",
-      ...sx,
-    }}
-  />
-);
+}) => {
+  console.log("Rendering ColumnTick:", { operationIndex, sx });
+  return (
+    <StyledColumnContainer
+      className={"ColumnTick"}
+      isHovered={isHovered}
+      isDragging={isDragging}
+      isDropTarget={isDropTarget}
+      isSelected={isSelected}
+      isOver={isOver}
+      isLoading={isLoading}
+      isFocused={isFocused}
+      isDraggable={isDraggable}
+      isNull={isNull}
+      isError={totalCount}
+      isVisible={isVisible}
+      operationIndex={operationIndex}
+      // onMouseEnter={hoverColumn}
+      // onMouseLeave={unhoverColumn}
+      sx={{
+        minWidth: "1px",
+        ...sx,
+      }}
+    />
+  );
+};
 
 ColumnTick.displayName = "ColumnTick";
 

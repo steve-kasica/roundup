@@ -32,7 +32,6 @@ const StyledColumnContainer = styled(Box, {
     isError,
     operationIndex,
   }) => ({
-    // padding: 4,
     flex: "1 1 0",
     minHeight: "25px",
     minWidth: "100px",
@@ -45,18 +44,18 @@ const StyledColumnContainer = styled(Box, {
     // Define column container default styles
     cursor: "pointer",
     backgroundColor:
-      operationIndex && operationIndex >= 0
+      operationIndex !== null && operationIndex >= 0
         ? theme.palette.operationColors[operationIndex]
         : theme.palette.orphanedTableBackgroundColor,
     color: theme.palette.getContrastText(
-      operationIndex && operationIndex >= 0
+      operationIndex !== null && operationIndex >= 0
         ? theme.palette.operationColors[operationIndex]
-        : theme.palette.orphanedTableBackgroundColor
+        : theme.palette.orphanedTableBackgroundColor,
     ),
     borderColor: theme.palette.getContrastText(
-      operationIndex && operationIndex >= 0
+      operationIndex !== null && operationIndex >= 0
         ? theme.palette.operationColors[operationIndex]
-        : theme.palette.orphanedTableBackgroundColor
+        : theme.palette.orphanedTableBackgroundColor,
     ),
     boxShadow: "none",
     transform: "scale(1)",
@@ -64,20 +63,20 @@ const StyledColumnContainer = styled(Box, {
     // Column is hovered state
     ...(isHovered && {
       backgroundColor: lighten(
-        operationIndex && operationIndex >= 0
+        operationIndex !== null && operationIndex >= 0
           ? theme.palette.operationColors[operationIndex]
           : theme.palette.orphanedTableBackgroundColor,
-        0.3
+        0.3,
       ),
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
     }),
     // Column is selected state
     ...(isSelected && {
       backgroundColor: lighten(
-        operationIndex && operationIndex >= 0
+        operationIndex !== null && operationIndex >= 0
           ? theme.palette.operationColors[operationIndex]
           : theme.palette.orphanedTableBackgroundColor,
-        0.4
+        0.4,
       ),
     }),
     ...(isDraggable && {
@@ -93,7 +92,7 @@ const StyledColumnContainer = styled(Box, {
       outline: `2px solid ${darken(
         theme.palette.operationColors[operationIndex] ||
           theme.palette.orphanedTableBackgroundColor,
-        0.2
+        0.2,
       )}`,
     }),
     ...(isDropTarget === false && {
@@ -108,16 +107,16 @@ const StyledColumnContainer = styled(Box, {
       "@keyframes pulse": {
         "0%, 100%": {
           backgroundColor:
-            operationIndex && operationIndex >= 0
+            operationIndex !== null && operationIndex >= 0
               ? theme.palette.operationColors[operationIndex]
               : theme.palette.orphanedTableBackgroundColor,
         },
         "50%": {
           backgroundColor: lighten(
-            operationIndex && operationIndex >= 0
+            operationIndex !== null && operationIndex >= 0
               ? theme.palette.operationColors[operationIndex]
               : theme.palette.orphanedTableBackgroundColor,
-            0.2
+            0.2,
           ),
         },
       },
@@ -140,7 +139,7 @@ const StyledColumnContainer = styled(Box, {
       fontStyle: "italic",
       color: theme.palette.text.disabled,
     }),
-  })
+  }),
 );
 
 export default StyledColumnContainer;
