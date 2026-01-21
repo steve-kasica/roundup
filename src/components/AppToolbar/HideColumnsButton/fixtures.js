@@ -45,7 +45,7 @@ export const state = {
         size: 607442,
         mimeType: "text/csv",
         dateLastModified: 1730741525092,
-        columnIds: ["c1", "c2", "c3"],
+        columnIds: ["c1", "c2"],
         rowCount: 3653,
         hiddenColumnIds: [],
       },
@@ -67,7 +67,7 @@ export const state = {
     },
   },
   columns: {
-    allIds: ["c1", "c2", "c3", "c46", "c47"],
+    allIds: ["c1", "c2", "c46", "c47"],
     byId: {
       c1: {
         id: "c1",
@@ -106,26 +106,6 @@ export const state = {
           {
             value: "ST LOUIS LAMBERT INTERNATIONAL AIRPORT, MO US",
             count: 3653,
-          },
-        ],
-      },
-      c3: {
-        id: "c3",
-        parentId: "t1",
-        name: null,
-        databaseName: "DATE",
-        columnType: "VARCHAR",
-        approxUnique: 365,
-        avg: null,
-        count: 3653,
-        max: "2017-12-31",
-        min: "2017-01-01",
-        nullPercentage: 0,
-        std: null,
-        topValues: [
-          {
-            value: "2017-01-01",
-            count: 10,
           },
         ],
       },
