@@ -29,11 +29,12 @@ import {
 } from "../../../slices/uiSlice";
 import { isTableId } from "../../../slices/tablesSlice";
 import { useCallback, useMemo } from "react";
+import { selectColumnIdsByParentId } from "../../../slices/columnsSlice";
+import { isOperation, isOperationId } from "../../../slices/operationsSlice";
 
 const FocusColumnsButton = () => {
   const dispatch = useDispatch();
   const focusedObjectId = useSelector(selectFocusedObjectId);
-  const selectedColumnIds = useSelector(selectSelectedColumnIds);
   const focusedObject = useSelector((state) => {
     if (focusedObjectId === null) {
       return null;
@@ -44,37 +45,77 @@ const FocusColumnsButton = () => {
     }
   });
 
-  const selectedObjectColumns = useMemo(() => {
-    if (!focusedObject) return [];
-    return focusedObject.columnIds.filter((colId) =>
-      selectedColumnIds.includes(colId),
-    );
-  }, [focusedObject, selectedColumnIds]);
+  const selectedColumnIds = useSelector(selectSelectedColumnIds);
 
-  const allColumns = useSelector((state) => state.columns.byId);
+  // const selectedObjectColumns = useMemo(() => {
+  //   if (!focusedObject) return [];
+  //   return focusedObject.columnIds.filter((colId) =>
+  //     selectedColumnIds.includes(colId),
+  //   );
+  // }, [focusedObject, selectedColumnIds]);
+  const focusedObjectColumns = useSelector((state) => {
+    if (!focusedObject) {
+      return [];
+    } else if (isTableId(focusedObject?.id)) {
+      return focusedObject.columnIds;
+    } else {
+      return selectColumnIdsByParentId(state, focusedObject.childIds);
+    }
+  });
 
-  const isSameIndex = useMemo(() => {
-    if (selectedObjectColumns.length <= 1) return true;
-    const databaseNames = selectedObjectColumns.map(
-      (colId) => allColumns[colId]?.databaseName,
-    );
-    return new Set(databaseNames).size === 1;
-  }, [selectedObjectColumns, allColumns]);
+  const selectedFocusedColumnIds = useMemo(() => {
+    if (!focusedObject) {
+      return [];
+    } else if (isTableId(focusedObject.id)) {
+      return focusedObjectColumns
+        .map((id, index) => ({ id, index, parentId: focusedObject.id }))
+        .filter(({ id }) => selectedColumnIds.includes(id));
+    } else {
+      // focused object is an operation
+      return focusedObjectColumns
+        .map((columnIds, parentIndex) =>
+          columnIds
+            .map((id, index) => ({
+              id,
+              index,
+              parentId: focusedObject.childIds[parentIndex],
+            }))
+            .filter(({ id }) => selectedColumnIds.includes(id)),
+        )
+        .flat();
+    }
+  }, [focusedObject, focusedObjectColumns, selectedColumnIds]);
+
+  const isSelectionWithinIndex = useMemo(() => {
+    if (selectedFocusedColumnIds.length <= 1) return true;
+    const indices = selectedFocusedColumnIds.map((col) => col.index);
+    return new Set(indices).size === 1;
+  }, [selectedFocusedColumnIds]);
 
   const isDisabled = useMemo(
-    () => selectedObjectColumns.length === 0 || !isSameIndex,
-    [selectedObjectColumns, isSameIndex],
+    () =>
+      !focusedObject || // No focused object
+      selectedFocusedColumnIds.length === 0 || // No selected columnIds in focused object
+      (isTableId(focusedObject.id) && selectedFocusedColumnIds.length > 1) || // multiple indices selected in table
+      (isOperationId(focusedObject.id) &&
+        selectedFocusedColumnIds.length > 2) || // more than 2 columns selected in operation
+      (isOperationId(focusedObject.id) &&
+        selectedFocusedColumnIds.length === 2 &&
+        !isSelectionWithinIndex), // two columns selected but from different tables in operation
+    [focusedObject, isSelectionWithinIndex, selectedFocusedColumnIds.length],
   );
 
   const tooltipText = useMemo(() => {
-    return `Focus ${selectedObjectColumns.length} column${
-      selectedObjectColumns.length !== 1 ? "s" : ""
+    return `Focus ${selectedFocusedColumnIds.length} column${
+      selectedFocusedColumnIds.length !== 1 ? "s" : ""
     }`;
-  }, [selectedObjectColumns.length]);
+  }, [selectedFocusedColumnIds.length]);
 
   const handleOnClick = useCallback(() => {
-    dispatch(setFocusedColumnIds(selectedObjectColumns));
-  }, [dispatch, selectedObjectColumns]);
+    dispatch(
+      setFocusedColumnIds(selectedFocusedColumnIds.map((col) => col.id)),
+    );
+  }, [dispatch, selectedFocusedColumnIds]);
 
   return (
     <TooltipIconButton
