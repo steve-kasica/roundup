@@ -61,7 +61,7 @@ export function useTableRowData(
   offset = 0,
   sortBy = null,
   sortDirection = "asc",
-  autoFetch = true
+  autoFetch = true,
 ) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -82,7 +82,7 @@ export function useTableRowData(
         limit,
         offset,
         sortBy,
-        sortDirection
+        sortDirection,
       );
       setData(rows);
     } catch (err) {
@@ -136,20 +136,21 @@ export function usePaginatedTableRows(
   sortByColumnId = null,
   sortDirection = "asc",
   initialOffset = 0,
-  rowLimit = null
+  rowLimit = null,
+  isMaterialized = true,
 ) {
   const sortBy = useSelector(
-    (state) => selectColumnsById(state, sortByColumnId)?.databaseName || null
+    (state) => selectColumnsById(state, sortByColumnId)?.databaseName || null,
   );
   const table = useSelector((state) =>
     isTableId(tableId)
       ? selectTablesById(state, tableId)
-      : selectOperationsById(state, tableId)
+      : selectOperationsById(state, tableId),
   );
   const columns = useSelector((state) => selectColumnsById(state, columnIds));
   const columnsList = useMemo(
     () => columns.map(({ databaseName }) => databaseName),
-    [columns]
+    [columns],
   );
 
   // Extract stable values from table to avoid object reference changes
@@ -163,7 +164,7 @@ export function usePaginatedTableRows(
 
   const fetchPage = useCallback(
     async (pageNum = 0, reset = false) => {
-      if (!tableId) {
+      if (!tableId || !isMaterialized) {
         return;
       }
 
@@ -185,7 +186,7 @@ export function usePaginatedTableRows(
           effectiveLimit,
           offset,
           sortBy,
-          sortDirection
+          sortDirection,
         );
 
         setData((prevData) => {
@@ -195,7 +196,7 @@ export function usePaginatedTableRows(
           // Calculate hasMore based on actual new data
           if (rowLimit !== null) {
             setHasMore(
-              newData.length < rowLimit && rows.length === effectiveLimit
+              newData.length < rowLimit && rows.length === effectiveLimit,
             );
           } else {
             setHasMore(rows.length === pageSize);
@@ -222,7 +223,7 @@ export function usePaginatedTableRows(
       columnsList,
       sortBy,
       sortDirection,
-    ]
+    ],
   );
 
   const loadMore = useCallback(() => {

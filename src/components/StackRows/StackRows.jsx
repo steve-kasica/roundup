@@ -96,12 +96,6 @@ const StackRows = ({
     return columnIds.filter((_colId, index) => selectedIndices.has(index));
   }, [columnIds, columnIdMatrix, selectedChildColumnIds]);
 
-  console.log("selectedChildColumnIds", {
-    selectedChildColumnIds,
-    columnIds,
-    displayColumnIds,
-  });
-
   const { data, loading, error, hasMore, loadMore, refresh } =
     usePaginatedTableRows(
       id,
@@ -111,6 +105,7 @@ const StackRows = ({
       sortDirection,
       initialOffset,
       rowLimit,
+      isMaterialized,
     );
 
   const handleColumnSort = useCallback(
