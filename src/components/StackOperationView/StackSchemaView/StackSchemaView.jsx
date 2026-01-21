@@ -109,7 +109,7 @@ const StackSchemaView = ({
         const rangeColumnIds = getValuesInRange(
           columnIdMatrix,
           selectionAnchorCell,
-          currentPosition
+          currentPosition,
         ).filter((id) => id !== null);
 
         selectColumns(rangeColumnIds);
@@ -121,14 +121,14 @@ const StackSchemaView = ({
         setSelectionAnchorCell(currentPosition);
       }
     },
-    [columnIdMatrix, selectColumns, selectionAnchorCell]
+    [columnIdMatrix, selectColumns, selectionAnchorCell],
   );
   const onCellDoubleClick = useCallback(
     (event, columnId) => {
       // Double-click: Focus on the column (same as focus button action)
       focusColumns([columnId]);
     },
-    [focusColumns]
+    [focusColumns],
   );
   const onRowLabelClick = useCallback(
     (event, rowIndex) => {
@@ -152,14 +152,14 @@ const StackSchemaView = ({
       } else {
         // Single click: select only this entire row
         const columnIdsToSelect = columnIdMatrix[rowIndex].filter(
-          (id) => id !== null
+          (id) => id !== null,
         );
         selectColumns(columnIdsToSelect);
         // Update anchor for next shift+click operation
         setSelectionAnchorCell([rowIndex, 0]);
       }
     },
-    [columnIdMatrix, selectColumns, selectionAnchorCell]
+    [columnIdMatrix, selectColumns, selectionAnchorCell],
   );
 
   const onColumnLabelClick = useCallback(
@@ -192,13 +192,13 @@ const StackSchemaView = ({
         setSelectionAnchorCell([0, colIndex]);
       }
     },
-    [selectionAnchorCell, columnIdMatrix, selectColumns]
+    [selectionAnchorCell, columnIdMatrix, selectColumns],
   );
   const onInsertColumnIntoChildTable = useCallback(
     (i, j) => {
       insertColumnIntoChildAtIndex(childIds[i], j);
     },
-    [insertColumnIntoChildAtIndex, childIds]
+    [insertColumnIntoChildAtIndex, childIds],
   );
 
   // const handleHideColumns = useCallback(() => {
@@ -246,7 +246,7 @@ const StackSchemaView = ({
       }
       return acc;
     },
-    []
+    [],
   );
 
   return (
@@ -339,7 +339,7 @@ const StackSchemaView = ({
                       <HiddenColumnsButton
                         onClick={() => {
                           setHiddenIndices((prev) =>
-                            prev.filter((x) => !group.indices.includes(x))
+                            prev.filter((x) => !group.indices.includes(x)),
                           );
                           clearSelectedColumns();
                         }}
@@ -368,22 +368,23 @@ const StackSchemaView = ({
                   <Stack direction="column" alignItems="center" spacing={1}>
                     <NumberIcon
                       number={rowIndex + 1}
-                      tooltipText={`Table ${rowIndex + 1}`}
+                      tooltipText={
+                        isTableId(childId) ? (
+                          <EnhancedTableLabel
+                            id={childId}
+                            includeIcon={false}
+                            includeDimensions={false}
+                            sx={{ justifyContent: "flex-end" }}
+                          />
+                        ) : (
+                          <EnhancedOperationLabel
+                            id={childId}
+                            includeIcon={false}
+                            includeDimensions={false}
+                          />
+                        )
+                      }
                     />
-                    {isTableId(childId) ? (
-                      <EnhancedTableLabel
-                        id={childId}
-                        includeIcon={false}
-                        includeDimensions={false}
-                        sx={{ justifyContent: "flex-end" }}
-                      />
-                    ) : (
-                      <EnhancedOperationLabel
-                        id={childId}
-                        includeIcon={false}
-                        includeDimensions={false}
-                      />
-                    )}
                   </Stack>
                 </StyledTableCell>
 
@@ -397,25 +398,25 @@ const StackSchemaView = ({
                         selectedChildColumnIdsSet.has(columnId) &&
                         (colIndex === 0 ||
                           !selectedChildColumnIdsSet.has(
-                            columnIdMatrix[rowIndex][colIndex - 1]
+                            columnIdMatrix[rowIndex][colIndex - 1],
                           ));
                       const highlightRightBorder =
                         selectedChildColumnIdsSet.has(columnId) &&
                         (colIndex === m - 1 ||
                           !selectedChildColumnIdsSet.has(
-                            columnIdMatrix[rowIndex][colIndex + 1]
+                            columnIdMatrix[rowIndex][colIndex + 1],
                           ));
                       const highlightTopBorder =
                         selectedChildColumnIdsSet.has(columnId) &&
                         (rowIndex === 0 ||
                           !selectedChildColumnIdsSet.has(
-                            columnIdMatrix[rowIndex - 1][colIndex]
+                            columnIdMatrix[rowIndex - 1][colIndex],
                           ));
                       const highlightBottomBorder =
                         selectedChildColumnIdsSet.has(columnId) &&
                         (rowIndex === childIds.length - 1 ||
                           !selectedChildColumnIdsSet.has(
-                            columnIdMatrix[rowIndex + 1][colIndex]
+                            columnIdMatrix[rowIndex + 1][colIndex],
                           ));
 
                       return (
@@ -442,20 +443,20 @@ const StackSchemaView = ({
                                 onCellDoubleClick(event, columnId)
                               }
                               isDraggable={selectedChildColumnIdsSet.has(
-                                columnId
+                                columnId,
                               )}
                               handleInsertColumnLeft={(data) =>
                                 onInsertColumnIntoChildTable(
                                   getIndexOfValue(columnIdMatrix, columnId)[0],
                                   colIndex,
-                                  data
+                                  data,
                                 )
                               }
                               handleInsertColumnRight={(data) =>
                                 onInsertColumnIntoChildTable(
                                   getIndexOfValue(columnIdMatrix, columnId)[0],
                                   colIndex + 1,
-                                  data
+                                  data,
                                 )
                               }
                             />
@@ -534,7 +535,7 @@ const StackSchemaView = ({
 StackSchemaView.displayName = "Stack Schema View";
 
 const EnhancedStackSchemaView = withOperationData(
-  withStackOperationData(StackSchemaView)
+  withStackOperationData(StackSchemaView),
 );
 
 EnhancedStackSchemaView.displayName = "Enhanced Stack Schema View";

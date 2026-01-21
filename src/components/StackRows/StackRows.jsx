@@ -30,6 +30,9 @@ import RoundupTable from "../ui/Table/Table.jsx";
 import { Stack, Typography } from "@mui/material";
 import { NumberIcon } from "../ui/icons/index.js";
 import { getSelectedColumnIndices } from "./utilities.js";
+import { isTableId } from "../../slices/tablesSlice/Table.js";
+import { EnhancedTableLabel } from "../TableView/TableLabel.jsx";
+import { EnhancedOperationLabel } from "../OperationView/OperationLabel.jsx";
 
 const pageSize = 50; // default page size for pagination
 
@@ -72,7 +75,7 @@ const StackRows = ({
         }
         return acc;
       },
-      [Number.MAX_SAFE_INTEGER, -1]
+      [Number.MAX_SAFE_INTEGER, -1],
     );
 
     // Lookup row count of the previous child table to use
@@ -88,7 +91,7 @@ const StackRows = ({
     const allSelectedChildColumnIds = selectedChildColumnIds.flat();
     const selectedIndices = getSelectedColumnIndices(
       columnIdMatrix,
-      allSelectedChildColumnIds
+      allSelectedChildColumnIds,
     );
     return columnIds.filter((_colId, index) => selectedIndices.has(index));
   }, [columnIds, columnIdMatrix, selectedChildColumnIds]);
@@ -107,7 +110,7 @@ const StackRows = ({
       sortByColumnId,
       sortDirection,
       initialOffset,
-      rowLimit
+      rowLimit,
     );
 
   const handleColumnSort = useCallback(
@@ -119,7 +122,7 @@ const StackRows = ({
       setSortByColumnId(columnId);
       setSortDirection(newDirection);
     },
-    [sortByColumnId, sortDirection]
+    [sortByColumnId, sortDirection],
   );
 
   const handleMaterializeView = useCallback(() => {
@@ -137,7 +140,7 @@ const StackRows = ({
     (rowData, index) => {
       const globalIndex = index + initialOffset; // Zero-indexed
       const tableIndex = [...rowRanges.entries()].findIndex(
-        ([, { start, end }]) => globalIndex >= start && globalIndex <= end
+        ([, { start, end }]) => globalIndex >= start && globalIndex <= end,
       );
       return (
         <Stack
@@ -150,13 +153,28 @@ const StackRows = ({
         >
           <NumberIcon
             number={tableIndex + 1}
-            tooltipText={`Table ${tableIndex + 1} of ${childIds.length}`}
+            tooltipText={
+              isTableId(childIds[tableIndex]) ? (
+                <EnhancedTableLabel
+                  id={childIds[tableIndex]}
+                  includeIcon={false}
+                  includeDimensions={false}
+                  sx={{ justifyContent: "flex-end" }}
+                />
+              ) : (
+                <EnhancedOperationLabel
+                  id={childIds[tableIndex]}
+                  includeIcon={false}
+                  includeDimensions={false}
+                />
+              )
+            }
           />
           <Typography variant="data-small">{globalIndex + 1}.</Typography>
         </Stack>
       );
     },
-    [childIds.length, initialOffset, rowRanges]
+    [childIds.length, initialOffset, rowRanges],
   );
 
   // Load initial data only when table/columns/sort changes, not when refresh function changes
@@ -189,7 +207,7 @@ const StackRows = ({
 StackRows.displayName = "Stack Rows";
 
 const EnhancedStackRows = withAssociatedAlerts(
-  withOperationData(withStackOperationData(StackRows))
+  withOperationData(withStackOperationData(StackRows)),
 );
 
 EnhancedStackRows.displayName = "Enhanced Stack Rows";
