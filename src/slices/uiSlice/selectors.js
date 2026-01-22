@@ -17,6 +17,7 @@
  * const selected = selectSelectedColumnIds(state);
  */
 import { createSelector } from "@reduxjs/toolkit";
+import { selectColumnIdsByParentId } from "../columnsSlice";
 
 // =============================================================================
 // Interaction-specific Column Selectors
@@ -128,7 +129,7 @@ export const selectVisibleColumnIds = (state) => state.ui.visibleColumnIds;
  */
 export const selectFocusedObjectId = createSelector(
   (state) => state.ui.focusedObjectId,
-  (focusedObjectId) => focusedObjectId
+  (focusedObjectId) => focusedObjectId,
 );
 
 /**
@@ -141,17 +142,17 @@ export const selectFocusedObjectId = createSelector(
  */
 export const isColumnIdHovered = createSelector(
   [(state) => selectHoveredColumnIds(state), (state, columnId) => columnId],
-  (hoveredColumnIds, columnId) => hoveredColumnIds.includes(columnId)
+  (hoveredColumnIds, columnId) => hoveredColumnIds.includes(columnId),
 );
 
 export const isColumnIdSelected = createSelector(
   [(state) => selectSelectedColumnIds(state), (state, columnId) => columnId],
-  (selectedColumnIds, columnId) => selectedColumnIds.includes(columnId)
+  (selectedColumnIds, columnId) => selectedColumnIds.includes(columnId),
 );
 
 export const isColumnIdDragging = createSelector(
   [(state) => selectDraggingColumnIds(state), (state, columnId) => columnId],
-  (draggingColumnIds, columnId) => draggingColumnIds.includes(columnId)
+  (draggingColumnIds, columnId) => draggingColumnIds.includes(columnId),
 );
 
 /**
@@ -168,7 +169,7 @@ export const isColumnIdDropTarget = createSelector(
   (dropTargetColumnIds, columnId) =>
     dropTargetColumnIds.length > 0
       ? dropTargetColumnIds.includes(columnId)
-      : undefined
+      : undefined,
 );
 
 /**
@@ -185,12 +186,12 @@ export const isColumnIdFocused = createSelector(
   (focusedColumnIds, columnId) =>
     focusedColumnIds.length > 0
       ? focusedColumnIds.includes(columnId)
-      : undefined
+      : undefined,
 );
 
 export const isColumnIdVisible = createSelector(
   [(state) => selectVisibleColumnIds(state), (state, columnId) => columnId],
-  (visibleColumnIds, columnId) => visibleColumnIds.includes(columnId)
+  (visibleColumnIds, columnId) => visibleColumnIds.includes(columnId),
 );
 
 /**
@@ -216,3 +217,27 @@ export const selectLoadingOperations = (state) => state.ui.loadingOperations;
  * @returns {Array} The array of hidden column IDs.
  */
 export const selectHiddenColumnIds = (state) => state.ui.hiddenColumnIds;
+
+/**
+ * Selector to retrieve hidden column IDs filtered by parent ID.
+ * @param {Object} state - The Redux state object.
+ * @param {string|Array<string>} parentId - The parent ID or array of parent IDs to filter by.
+ * @returns {Array} An array of hidden column IDs that belong to the specified parent ID(s).
+ */
+export const selectHiddenColumnIdsByParentId = createSelector(
+  [
+    selectHiddenColumnIds,
+    (state, parentId) => selectColumnIdsByParentId(state, parentId),
+  ],
+  (hiddenColumnIds, columnsByParentId) => {
+    if (Array.isArray(columnsByParentId[0])) {
+      return columnsByParentId.map((columnIds) =>
+        columnIds.filter((colId) => hiddenColumnIds.includes(colId)),
+      );
+    } else {
+      return columnsByParentId.filter((colId) =>
+        hiddenColumnIds.includes(colId),
+      );
+    }
+  },
+);
