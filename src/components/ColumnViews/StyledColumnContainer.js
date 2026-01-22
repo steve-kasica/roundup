@@ -43,10 +43,12 @@ const StyledColumnContainer = styled(Box, {
 
     // Define column container default styles
     cursor: "pointer",
-    backgroundColor:
+    backgroundColor: lighten(
       operationIndex !== null && operationIndex >= 0
         ? theme.palette.operationColors[operationIndex]
         : theme.palette.orphanedTableBackgroundColor,
+      theme.effects.defaultLighten,
+    ),
     color: theme.palette.getContrastText(
       operationIndex !== null && operationIndex >= 0
         ? theme.palette.operationColors[operationIndex]
@@ -66,7 +68,7 @@ const StyledColumnContainer = styled(Box, {
         operationIndex !== null && operationIndex >= 0
           ? theme.palette.operationColors[operationIndex]
           : theme.palette.orphanedTableBackgroundColor,
-        0.3,
+        theme.effects.hoveredLighten,
       ),
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
     }),
@@ -76,32 +78,72 @@ const StyledColumnContainer = styled(Box, {
         operationIndex !== null && operationIndex >= 0
           ? theme.palette.operationColors[operationIndex]
           : theme.palette.orphanedTableBackgroundColor,
-        0.4,
+        theme.effects.selectedLighten,
       ),
     }),
     ...(isDraggable && {
       cursor: "grab",
     }),
-    // Column is being dragged state
-    ...(isDragging && {
-      opacity: 0,
-      cursor: "grabbing",
-    }),
     // Column is drop target state
-    ...(isDropTarget === true && {
-      outline: `2px solid ${darken(
-        theme.palette.operationColors[operationIndex] ||
-          theme.palette.orphanedTableBackgroundColor,
-        0.2,
-      )}`,
-    }),
-    ...(isDropTarget === false && {
-      opacity: 0.5,
-    }),
+    ...(isDropTarget === true
+      ? {
+          "@keyframes border-dance": {
+            "0%": {
+              backgroundPosition: "0% 0%, 100% 100%, 0% 100%, 100% 0%",
+            },
+            "100%": {
+              backgroundPosition: "100% 0%, 0% 100%, 0% 0%, 100% 100%",
+            },
+          },
+          background: `
+        linear-gradient(90deg, 
+        ${darken(
+          operationIndex !== null && operationIndex >= 0
+            ? theme.palette.operationColors[operationIndex]
+            : theme.palette.orphanedTableBackgroundColor,
+          theme.effects.dropTargetDarken,
+        )} 50%, transparent 50%), 
+        linear-gradient(90deg, ${darken(
+          operationIndex !== null && operationIndex >= 0
+            ? theme.palette.operationColors[operationIndex]
+            : theme.palette.orphanedTableBackgroundColor,
+          theme.effects.dropTargetDarken,
+        )} 50%, transparent 50%), 
+        linear-gradient(0deg, ${darken(
+          operationIndex !== null && operationIndex >= 0
+            ? theme.palette.operationColors[operationIndex]
+            : theme.palette.orphanedTableBackgroundColor,
+          theme.effects.dropTargetDarken,
+        )} 50%, transparent 50%), 
+        linear-gradient(0deg, ${darken(
+          operationIndex !== null && operationIndex >= 0
+            ? theme.palette.operationColors[operationIndex]
+            : theme.palette.orphanedTableBackgroundColor,
+          theme.effects.dropTargetDarken,
+        )} 50%, transparent 50%),
+        ${lighten(
+          operationIndex !== null && operationIndex >= 0
+            ? theme.palette.operationColors[operationIndex]
+            : theme.palette.orphanedTableBackgroundColor,
+          theme.effects.defaultLighten,
+        )}
+      `,
+          backgroundRepeat: `repeat-x, repeat-x, repeat-y, repeat-y, no-repeat`,
+          backgroundSize: `4px 4px, 4px 4px, 4px 4px, 4px 4px, 100% 100%`,
+          backgroundPosition: `0% 0%, 100% 100%, 0% 100%, 100% 0%`,
+          animation: `border-dance ${theme.effects.dropTargetMarchingSpeed} infinite linear`,
+        }
+      : isDropTarget === false
+        ? {
+            opacity: theme.effects.nonDropTargetOpacity,
+            filter: `blur(${theme.effects.nonDropTargetBlur}px)`,
+          }
+        : {}),
     // Column is over a drop target state
     ...(isOver && {
       transform: "scale(1.03)",
     }),
+    // Define loading styles
     ...(isLoading && {
       animation: "pulse 1.5s ease-in-out infinite",
       "@keyframes pulse": {
@@ -121,23 +163,27 @@ const StyledColumnContainer = styled(Box, {
         },
       },
     }),
+    // Column is being dragged state
+    ...(isDragging && {
+      opacity: theme.effects.isDraggingOpacity,
+      cursor: "grabbing",
+    }),
     ...(isError && {}),
-    ...(isFocused === true && {
-      outlineWidth: "2px",
-      outlineStyle: "solid",
-      outlineColor:
-        theme.palette.operationColors[operationIndex] ||
-        theme.palette.orphanedTableBackgroundColor,
-      zIndex: 1000,
-    }),
-    ...(isFocused === false && {
-      opacity: 0.5,
-    }),
-    ...(isVisible === false && {}),
+    // Define focus vs unfocus styles
+    ...(isFocused === true
+      ? {
+          opacity: theme.effects.focusedOpacity,
+        }
+      : isFocused === false
+        ? {
+            opacity: theme.effects.unfocusedOpacity,
+            filter: `blur(${theme.effects.unfocusedBlur}px)`,
+          }
+        : {}),
     ...(isNull && {
-      backgroundColor: "black",
-      fontStyle: "italic",
-      color: theme.palette.text.disabled,
+      backgroundImage: `
+        repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0, 0, 0, 0.15) 3px, rgba(0, 0, 0, 0.15) 4px),
+        repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(0, 0, 0, 0.15) 3px, rgba(0, 0, 0, 0.15) 4px)`,
     }),
   }),
 );

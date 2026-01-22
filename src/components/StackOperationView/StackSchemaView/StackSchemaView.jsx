@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { withOperationData, withStackOperationData } from "../../HOC";
 import {
   Box,
@@ -21,7 +21,6 @@ import {
 import ColumnDragContainer from "../../ColumnViews/ColumnDragContainer";
 import { isTableId } from "../../../slices/tablesSlice";
 import { EnhancedOperationLabel } from "../../OperationView/OperationLabel";
-import { HiddenColumnsButton } from "../../ui/buttons";
 import StyledTableCell from "./StyledTableCell";
 import { NumberIcon } from "../../ui/icons";
 import HiddenIndicesHeader from "./HiddenIndicesHeader";
@@ -32,10 +31,8 @@ const leftMarginWidth = 25; // Fixed width for the left margin (row headers)
 const StackSchemaView = ({
   // Props passed via withOperationData
   childIds,
-  id,
   selectedChildColumnIdsSet,
   selectColumns, // Sets global set of selected column IDs
-  clearSelectedColumns, // Clears global set of selected column IDs
   focusColumns, // Sets global set of focused column IDs
   hiddenChildColumnIds, // Matrix of hidden column IDs for child tables
   insertColumnIntoChildAtIndex,
@@ -407,11 +404,11 @@ const StackSchemaView = ({
                         </StyledTableCell>
                       );
                     } else if (columnId === null) {
-                      // Column is Null
+                      // Column is Empty
                       return (
                         <StyledTableCell key={`null-${rowIndex}-${colIndex}`}>
                           <StyledColumnContainer
-                            isError={true}
+                            isNull={true}
                             sx={{
                               display: "flex",
                               flexDirection: "column",
@@ -419,30 +416,34 @@ const StackSchemaView = ({
                               justifyContent: "center",
                               textAlign: "center",
                               height: "100%",
-                              background: "red",
+                              "::after": {
+                                content: '"EMPTY"',
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                transform:
+                                  "translate(-50%, -50%) rotate(-15deg)",
+                                fontSize: 30,
+                                fontWeight: "medium",
+                                color: "#555",
+                                opacity: 0.7,
+                                pointerEvents: "none",
+                              },
                             }}
                           >
-                            <Box
+                            {/* <Typography
+                              variant="caption"
                               sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                gap: 1,
+                                fontWeight: "medium",
+                                fontSize: 20,
+                                p: 0,
+                                textTransform: "uppercase",
+                                transform: "rotate(-15deg)",
+                                color: "white",
                               }}
                             >
-                              <Typography
-                                variant="caption"
-                                color="error"
-                                sx={{
-                                  fontWeight: "medium",
-                                  textTransform: "uppercase",
-                                  letterSpacing: "0.5px",
-                                  fontSize: "0.7rem",
-                                }}
-                              >
-                                Schema Mismatch
-                              </Typography>
-                            </Box>
+                              Error
+                            </Typography> */}
                           </StyledColumnContainer>
                         </StyledTableCell>
                       );
