@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { withOperationData, withStackOperationData } from "../../HOC";
 import {
   Box,
@@ -24,6 +24,7 @@ import { EnhancedOperationLabel } from "../../OperationView/OperationLabel";
 import { HiddenColumnsButton } from "../../ui/buttons";
 import StyledTableCell from "./StyledTableCell";
 import { NumberIcon } from "../../ui/icons";
+import HiddenIndicesHeader from "./HiddenIndicesHeader";
 
 const topRowHeight = 5; // Fixed height for the top row (column headers)
 const leftMarginWidth = 25; // Fixed width for the left margin (row headers)
@@ -36,68 +37,35 @@ const StackSchemaView = ({
   selectColumns, // Sets global set of selected column IDs
   clearSelectedColumns, // Clears global set of selected column IDs
   focusColumns, // Sets global set of focused column IDs
+  hiddenChildColumnIds, // Matrix of hidden column IDs for child tables
   insertColumnIntoChildAtIndex,
-  setVisibleColumns: setVisibleColumnsInSlice,
 
   // Props passed via withStackOperationData
   columnIdMatrix, // column IDs of child tables in a matrix
   m, // width of the matrix (# of columns)
   swapColumns,
 }) => {
-  const [hiddenIndices, setHiddenIndices] = useState([]); // This array stores column indices that are hidden
   const [selectionAnchorCell, setSelectionAnchorCell] = useState(null);
   const columnContainerRef = useRef(null);
-  const [visibleColumns, setVisibleColumns] = useState([]);
 
-  // Sync local visible columns state to parent/slice whenver it changes
-  useEffect(() => {
-    setVisibleColumnsInSlice(visibleColumns);
-  }, [visibleColumns, setVisibleColumnsInSlice]);
-
-  /**
-   * Set up scroll event listener on the column container
-   */
-  useEffect(() => {
-    const container = columnContainerRef.current;
-
-    if (!container) return;
-
-    const handleScroll = () => {
-      // Get all column elements within the container
-      const columnElements = container.querySelectorAll("[data-column-id]");
-      const containerRect = container.getBoundingClientRect();
-      const currentlyVisibleColumnIds = [];
-
-      columnElements.forEach((element) => {
-        const elementRect = element.getBoundingClientRect();
-
-        // Check if element is at least partially visible within the container (horizontal and vertical)
-        const isVisible =
-          elementRect.right > containerRect.left &&
-          elementRect.left < containerRect.right &&
-          elementRect.bottom > containerRect.top &&
-          elementRect.top < containerRect.bottom;
-
-        if (isVisible) {
-          const columnId = element.getAttribute("data-column-id");
-          currentlyVisibleColumnIds.push(columnId);
-        }
-      });
-
-      if (
-        JSON.stringify(currentlyVisibleColumnIds) !==
-        JSON.stringify(visibleColumns)
-      ) {
-        setVisibleColumns(currentlyVisibleColumnIds);
-      }
-    };
-
-    container.addEventListener("scroll", handleScroll);
-
-    return () => {
-      container.removeEventListener("scroll", handleScroll);
-    };
-  }, [visibleColumns]);
+  const hiddenIndices = useMemo(() => {
+    // Determine which column indices are hidden based on hiddenChildColumnIds
+    if (!hiddenChildColumnIds || hiddenChildColumnIds.length === 0) {
+      return new Set();
+    } else {
+      const hiddenIndices = columnIdMatrix
+        .map((row, i) =>
+          row.reduce((acc, colId, j) => {
+            if (hiddenChildColumnIds[i].includes(colId)) {
+              acc.push(j);
+            }
+            return acc;
+          }, []),
+        )
+        .flat();
+      return new Set(hiddenIndices);
+    }
+  }, [columnIdMatrix, hiddenChildColumnIds]);
 
   const onCellClick = useCallback(
     (event, columnId) => {
@@ -123,6 +91,7 @@ const StackSchemaView = ({
     },
     [columnIdMatrix, selectColumns, selectionAnchorCell],
   );
+
   const onCellDoubleClick = useCallback(
     (event, columnId) => {
       // Double-click: Focus on the column (same as focus button action)
@@ -130,6 +99,7 @@ const StackSchemaView = ({
     },
     [focusColumns],
   );
+
   const onRowLabelClick = useCallback(
     (event, rowIndex) => {
       if (
@@ -201,39 +171,11 @@ const StackSchemaView = ({
     [insertColumnIntoChildAtIndex, childIds],
   );
 
-  // const handleHideColumns = useCallback(() => {
-  //   // Find all column indices where all cells are selected
-  //   const indicesToHide = [];
-  //   const columnIdsToDeselect = [];
-  //   for (let colIndex = 0; colIndex < m; colIndex++) {
-  //     const columnIds = columnIdMatrix
-  //       .map((row) => row[colIndex])
-  //       .filter((id) => id !== null);
-
-  //     const allSelected = columnIds.every((id) =>
-  //       selectedChildColumnIdsSet.has(id)
-  //     );
-
-  //     if (allSelected && columnIds.length > 0) {
-  //       indicesToHide.push(colIndex);
-  //       columnIdsToDeselect.push(...columnIds);
-  //     }
-  //   }
-
-  //   setHiddenIndices((prev) =>
-  //     Array.from(new Set([...prev, ...indicesToHide]))
-  //   );
-  //   const nextColumnSelection = [...selectedChildColumnIdsSet].filter(
-  //     (columnId) => !columnIdsToDeselect.includes(columnId)
-  //   );
-  //   selectColumns(nextColumnSelection); // Remove from selection after hiding
-  // }, [columnIdMatrix, m, selectedChildColumnIdsSet, selectColumns]);
-
   // Build header groups to render visible columns and runs of hidden columns
   //
   const headerGroups = Array.from({ length: m }, (_, i) => i).reduce(
     (acc, i) => {
-      const isHidden = hiddenIndices.includes(i);
+      const isHidden = hiddenIndices.has(i);
       const prev = acc[acc.length - 1];
       if (isHidden) {
         if (prev && prev.type === "hidden") {
@@ -290,6 +232,7 @@ const StackSchemaView = ({
                 }}
               />
               {headerGroups.map((group, idx) => {
+                console.log("Rendering header group:", group);
                 if (group.type === "visible") {
                   const colIndex = group.colIndex;
                   return (
@@ -331,18 +274,18 @@ const StackSchemaView = ({
                         zIndex: 2,
                         background: "inherit",
                         height: `${topRowHeight}px`,
-                        minWidth: runLen * 30,
-                        width: runLen * 30,
+                        minWidth: "20px",
+                        width: "20px",
                         textAlign: "center",
                       }}
                     >
-                      <HiddenColumnsButton
-                        onClick={() => {
-                          setHiddenIndices((prev) =>
-                            prev.filter((x) => !group.indices.includes(x)),
-                          );
-                          clearSelectedColumns();
-                        }}
+                      <HiddenIndicesHeader
+                        indices={group.indices}
+                        columnIds={group.indices
+                          .map((index) =>
+                            columnIdMatrix.map((row) => row[index]),
+                          )
+                          .flat()}
                       />
                     </StyledTableCell>
                   );
