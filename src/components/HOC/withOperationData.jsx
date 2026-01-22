@@ -30,6 +30,7 @@ import {
 } from "../../slices/columnsSlice";
 import {
   selectFocusedObjectId,
+  selectHiddenColumnIdsByParentId,
   selectLoadingOperations,
   setFocusedColumnIds,
   setFocusedObjectId,
@@ -84,6 +85,7 @@ import {
  *  - `columnIds` (array): All column IDs directly associated with this operation
  *  - `selectedColumnIds` (array): Currently selected column IDs
  *  - `childColumnIds` (array): Column IDs of child tables/operations
+ *  - `hiddenChildColumnIds` (array): Hidden column IDs of child tables/operations
  *  - `selectedChildColumnIds` (array): Matrix of selected column IDs, each row represents a child table
  *  - `selectedChildColumnIdsSet` (Set): Set of all selected column IDs including those from child tables
  *  - `selectColumns` (columnIds): Selects specified columns
@@ -302,6 +304,15 @@ export default function withOperationData(WrappedComponent) {
     );
 
     /**
+     * Matrix of hidden column IDs, each row represents a child table
+     * Is dependent upon `state.ui.hiddenColumnIds`
+     * @type {Array<Array<string>>}
+     */
+    const hiddenChildColumnIds = useSelector((state) =>
+      selectHiddenColumnIdsByParentId(state, childIds),
+    );
+
+    /**
      * Matrix of selected column IDs, each row represents a child table
      * Is dependent upon `state.ui.selectedColumnIds`
      * @type {Array<Array<string>>}
@@ -477,7 +488,8 @@ export default function withOperationData(WrappedComponent) {
         materializeOperation={materializeOperation}
         // Column Data
         columnIds={columnIds} // All column IDs associated with this operation
-        childColumnIds={childColumnIds} // ColumnIDs of operation's child tables (not hidden)
+        childColumnIds={childColumnIds} // ColumnIDs of operation's child tables
+        hiddenChildColumnIds={hiddenChildColumnIds} // Hidden column IDs of operation's child tables
         selectedColumnIds={selectedColumnIds}
         selectedChildColumnIds={selectedChildColumnIds} // A matrix of column IDs, each row is a child table
         selectedChildColumnIdsSet={selectedChildColumnIdsSet} // a Set of all selected column IDs, including those from child tables

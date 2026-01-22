@@ -1,5 +1,5 @@
 /**
- * @fileoverview SchemaAlertsButton Component
+ * @fileoverview AlertsButton Component
  *
  * A button for viewing schema alerts with a badge showing alert count. Displays
  * an error outline icon with a badge indicator for alert notifications.
@@ -11,10 +11,10 @@
  * - Customizable tooltip text
  * - Props forwarding to TooltipIconButton
  *
- * @module components/ui/buttons/SchemaAlertsButton
+ * @module components/ui/buttons/AlertsButton
  *
  * @example
- * <SchemaAlertsButton
+ * <AlertsButton
  *   badgeContent={3}
  *   color="error"
  *   tooltipText="View 3 alerts"
@@ -23,28 +23,22 @@
  */
 
 import { ErrorOutline as Icon } from "@mui/icons-material";
-import TooltipIconButton from "../ui/buttons/TooltipIconButton";
+import TooltipIconButton from "../../ui/buttons/TooltipIconButton";
 import Badge from "@mui/material/Badge";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { selectAlertsById } from "../../slices/alertsSlice";
+// import { selectAlertsById } from "../../slices/alertsSlice";
 import { Divider, Popover, Typography, Box, List } from "@mui/material";
-import { selectFocusedObjectId } from "../../slices/uiSlice";
-import { withAssociatedAlerts } from "../HOC";
-import { EnhancedAlertDescription } from "../Alerts/AlertDescription";
+import { selectFocusedObjectId } from "../../../slices/uiSlice";
+import { withAssociatedAlerts } from "../../HOC";
+import { EnhancedAlertDescription } from "../../Alerts/AlertDescription";
 
-const SchemaAlertsButton = ({
-  alertIds,
-  totalCount,
-  errorCount,
-  warningCount,
-}) => {
+const AlertsButton = ({ alertIds, totalCount, errorCount, warningCount }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const isOpen = Boolean(anchorEl);
   const color =
     errorCount > 0 ? "error" : warningCount > 0 ? "warning" : "default";
   const isDisabled = totalCount === 0;
-  console.log("Rendering SchemaAlertsButton with alerts:", totalCount);
 
   return (
     <>
@@ -99,11 +93,15 @@ const SchemaAlertsButton = ({
   );
 };
 
-const EnhancedSchemaAlertsButton = withAssociatedAlerts(SchemaAlertsButton);
+const EnhancedAlertsButton = withAssociatedAlerts(AlertsButton);
 
-const SchemaAlertsButtonComponent = () => {
+const FocusedEnhancedAlertsButton = () => {
   const focusedObjectId = useSelector(selectFocusedObjectId);
-  return <EnhancedSchemaAlertsButton id={focusedObjectId} />;
+  return <EnhancedAlertsButton id={focusedObjectId} />;
 };
 
-export default SchemaAlertsButtonComponent;
+export {
+  AlertsButton,
+  EnhancedAlertsButton,
+  FocusedEnhancedAlertsButton as default,
+};

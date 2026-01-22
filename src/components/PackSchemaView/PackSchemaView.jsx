@@ -43,7 +43,7 @@ import { Error } from "@mui/icons-material";
 import VennDiagram from "../ui/icons/VennDiagram";
 import { EnhancedTableName } from "../TableView/TableName";
 import { isTableId } from "../../slices/tablesSlice";
-import { HiddenColumnsButton } from "../ui/buttons";
+import HiddenColumnsLabel from "./HiddenColumnsLabel";
 import StyledBlockCell from "./StyledBlockCell";
 import {
   MATCH_TYPE_LEFT_UNMATCHED,
@@ -63,6 +63,7 @@ const PackSchemaView = ({
   id,
   selectedColumnIds,
   selectedChildColumnIdsSet,
+  hiddenChildColumnIds,
   selectColumns,
   clearSelectedColumns,
   isLoading,
@@ -95,8 +96,6 @@ const PackSchemaView = ({
 }) => {
   // Add hover state for coordinating between tables
   const [hoveredMatch, setHoveredMatch] = useState(null);
-
-  const [hiddenColumns, setHiddenColumns] = useState(new Set());
 
   // Track the last clicked cell for range selection
   const [selectionAnchor, setSelectionAnchor] = useState(null);
@@ -337,24 +336,6 @@ const PackSchemaView = ({
     validMatchGroups,
   ]);
 
-  /**
-   * @function handleHideColumns
-   * Handles hiding columns
-   * @param {string} [columnId] - Optional column ID to hide; if not provided, hides all selected columns
-   */
-  const handleHideColumns = useCallback(
-    (columnId) => {
-      if (columnId) {
-        setHiddenColumns((prev) => new Set(prev).add(columnId));
-      } else {
-        setHiddenColumns(selectedChildColumnIdsSet);
-      }
-      clearSelectedColumns();
-      clearSelectedMatches();
-    },
-    [clearSelectedColumns, clearSelectedMatches, selectedChildColumnIdsSet],
-  );
-
   const handleSetAsKeyClick = useCallback(
     (columnId) => {
       // Determine which child table/operation this column belongs to
@@ -368,38 +349,29 @@ const PackSchemaView = ({
   );
 
   // This memoized variable groups columns into contiguous visible/hidden segments
-  const columnIdVisibilityGroups = useMemo(
-    () =>
-      combinedChildColumnIds.reduce((acc, columnId, i) => {
-        const isHidden = hiddenColumns.has(columnId);
-        if (!isHidden) {
-          acc.push({ columnIds: [columnId], isHidden });
+  const columnIdVisibilityGroups = useMemo(() => {
+    const hiddenChildColumnsSet = new Set(hiddenChildColumnIds.flat());
+    return combinedChildColumnIds.reduce((acc, columnId, i) => {
+      const isHidden = hiddenChildColumnsSet.has(columnId);
+      if (!isHidden) {
+        acc.push({ columnIds: [columnId], isHidden });
+      } else {
+        const prev = acc[acc.length - 1];
+        if (prev?.isHidden) {
+          prev.columnIds.push(columnId);
         } else {
-          const prev = acc[acc.length - 1];
-          if (prev?.isHidden) {
-            prev.columnIds.push(columnId);
-          } else {
-            acc.push({
-              isHidden: true,
-              columnIds: [columnId],
-            });
-          }
+          acc.push({
+            isHidden: true,
+            columnIds: [columnId],
+          });
         }
-        return acc;
-      }, []),
-    [combinedChildColumnIds, hiddenColumns],
-  );
+      }
+      return acc;
+    }, []);
+  }, [combinedChildColumnIds, hiddenChildColumnIds]);
 
   return (
     <Box display={"flex"} flexDirection="column" height="100%">
-      {/* <EnhancedPackSchemaToolbar
-        id={id}
-        // clickedBlockCells={clickedBlockCells}
-        clickedBlockCells={new Set()}
-        areAnySelected={areAnySelected}
-        onSelectAllClick={handleSelectAll}
-        handleHideColumns={handleHideColumns}
-      /> */}
       <Box
         display={"flex"}
         flexDirection={"column"}
@@ -431,8 +403,16 @@ const PackSchemaView = ({
               flexShrink={0}
             />
             {[
-              { childId: leftTableId, columnCount: leftColumnIds.length },
-              { childId: rightTableId, columnCount: rightColumnIds.length },
+              {
+                childId: leftTableId,
+                columnCount:
+                  leftColumnIds.length - hiddenChildColumnIds[0]?.length || 0,
+              },
+              {
+                childId: rightTableId,
+                columnCount:
+                  rightColumnIds.length - hiddenChildColumnIds[1]?.length || 0,
+              },
             ].map(({ childId, columnCount }) => (
               <Box
                 key={childId}
@@ -452,10 +432,7 @@ const PackSchemaView = ({
                         fontSize: "0.75rem",
                         userSelect: "none",
                         fontWeight: "none",
-                        // borderRight: `${childTablesSeparatorWidth}px solid ${cellBorderColor}`,
                       }}
-                      // onMouseEnter={() => setHoveredColumn(`${childId}:`)}
-                      // onMouseLeave={() => setHoveredColumn(null)}
                     />
                   ) : (
                     <p>{childId}</p>
@@ -520,20 +497,7 @@ const PackSchemaView = ({
                   }
                 >
                   {isHidden ? (
-                    <HiddenColumnsButton
-                      count={columnIds.length}
-                      onClick={() => {
-                        setHiddenColumns((prev) => {
-                          const nextSet = new Set(prev);
-                          columnIds.forEach((colId) => nextSet.delete(colId));
-                          return nextSet;
-                        });
-                      }}
-                      sx={{
-                        width: "10px",
-                        height: "20px",
-                      }}
-                    />
+                    <HiddenColumnsLabel columnIds={columnIds} />
                   ) : (
                     <EnhancedColumnLabel
                       id={columnIds[0]}
@@ -648,7 +612,11 @@ const PackSchemaView = ({
 
                   // If not hidden, there will only be one columnId
                   const columnId = columnIds[0];
-                  const isLastLeftColumn = j === leftColumnIds.length - 1;
+                  const isLastLeftColumn =
+                    j ===
+                    leftColumnIds.length -
+                      1 -
+                      (hiddenChildColumnIds[0]?.length || 0);
                   const tableId =
                     j < leftColumnIds.length ? leftTableId : rightTableId;
                   // const cellKey = `${columnId}:${key}`;
@@ -774,7 +742,7 @@ const PackSchemaView = ({
         <MenuItem
           onClick={() => {
             // TODO
-            handleDeleteColumns(contextMenuColumnId);
+            // handleDeleteColumns(contextMenuColumnId);
             handleCloseContextMenu();
           }}
         >
@@ -783,7 +751,7 @@ const PackSchemaView = ({
         <MenuItem onClick={handleCloseContextMenu}>Rename Column</MenuItem>
         <MenuItem
           onClick={() => {
-            handleHideColumns(contextMenuColumnId);
+            // handleHideColumns(contextMenuColumnId);
             handleCloseContextMenu();
           }}
         >
