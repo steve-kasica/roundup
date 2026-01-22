@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import SelectAllColumnsButton from ".";
+import HideColumnsButton from ".";
 import { state } from "./fixtures.js";
 
 const hideIconTestId = "VisibilityOffIcon";
@@ -13,7 +13,7 @@ describe("HideColumnsButton Component", () => {
 
   describe("Basic functionality", () => {
     beforeEach(() => {
-      cy.mountWithProviders(<SelectAllColumnsButton />, {
+      cy.mountWithProviders(<HideColumnsButton />, {
         preloadedState: localState,
       });
     });
@@ -53,7 +53,7 @@ describe("HideColumnsButton Component", () => {
               selectedColumnIds: [],
             },
           };
-          cy.mountWithProviders(<SelectAllColumnsButton />, {
+          cy.mountWithProviders(<HideColumnsButton />, {
             preloadedState: localState,
           });
         });
@@ -76,7 +76,7 @@ describe("HideColumnsButton Component", () => {
               selectedColumnIds: ["c1", "c2"],
             },
           };
-          cy.mountWithProviders(<SelectAllColumnsButton />, {
+          cy.mountWithProviders(<HideColumnsButton />, {
             preloadedState: localState,
           });
         });
@@ -117,9 +117,12 @@ describe("HideColumnsButton Component", () => {
               selectedColumnIds: [],
             },
           };
-          cy.mountWithProviders(<SelectAllColumnsButton />, {
+          cy.mountWithProviders(<HideColumnsButton />, {
             preloadedState: localState,
           });
+        });
+        it("enables the button", () => {
+          cy.get("button").should("not.be.disabled");
         });
         it("displays the show icon", () => {
           cy.get("button")
@@ -143,9 +146,12 @@ describe("HideColumnsButton Component", () => {
               selectedColumnIds: ["c2"],
             },
           };
-          cy.mountWithProviders(<SelectAllColumnsButton />, {
+          cy.mountWithProviders(<HideColumnsButton />, {
             preloadedState: localState,
           });
+        });
+        it("enables the button", () => {
+          cy.get("button").should("not.be.disabled");
         });
         it("displays the hide icon", () => {
           cy.get("button")
@@ -184,6 +190,141 @@ describe("HideColumnsButton Component", () => {
           },
         };
       });
+      describe("No child table columns are selected", () => {
+        beforeEach(() => {
+          localState = {
+            ...localState,
+            ui: {
+              ...localState.ui,
+              selectedColumnIds: [],
+            },
+          };
+          cy.mountWithProviders(<HideColumnsButton />, {
+            preloadedState: localState,
+          });
+        });
+        it("disables the button", () => {
+          cy.get("button").should("be.disabled");
+        });
+        // it("displays the show icon", () => {
+        //   cy.get("button")
+        //     .find("svg")
+        //     .should("have.attr", "data-testid", showIconTestId);
+        // });
+      });
+      describe("One child table column is selected", () => {
+        beforeEach(() => {
+          localState = {
+            ...localState,
+            ui: {
+              ...localState.ui,
+              selectedColumnIds: ["c1"],
+            },
+          };
+          cy.mountWithProviders(<HideColumnsButton />, {
+            preloadedState: localState,
+          });
+        });
+        it("disables the button", () => {
+          cy.get("button").should("be.disabled");
+        });
+        // it("displays the hide icon", () => {
+        //   cy.get("button")
+        //     .find("svg")
+        //     .should("have.attr", "data-testid", hideIconTestId);
+        // });
+      });
+      describe("Two child table columns within table are selected", () => {
+        beforeEach(() => {
+          localState = {
+            ...localState,
+            ui: {
+              ...localState.ui,
+              selectedColumnIds: ["c1", "c2"],
+            },
+          };
+          cy.mountWithProviders(<HideColumnsButton />, {
+            preloadedState: localState,
+          });
+        });
+        it("disables the button", () => {
+          cy.get("button").should("be.disabled");
+        });
+        // it("displays the hide icon", () => {
+        //   cy.get("button")
+        //     .find("svg")
+        //     .should("have.attr", "data-testid", hideIconTestId);
+        // });
+      });
+      describe("Two child table columns within index and between tables are selected", () => {
+        beforeEach(() => {
+          localState = {
+            ...localState,
+            ui: {
+              ...localState.ui,
+              selectedColumnIds: ["c1", "c46"],
+            },
+          };
+          cy.mountWithProviders(<HideColumnsButton />, {
+            preloadedState: localState,
+          });
+        });
+        it("enables the button", () => {
+          cy.get("button").should("not.be.disabled");
+        });
+        it("displays the hide icon", () => {
+          cy.get("button")
+            .find("svg")
+            .should("have.attr", "data-testid", hideIconTestId);
+        });
+        it("adds selected columns to hidden columns on click", () => {
+          cy.get("button").click();
+          cy.getState().then((state) => {
+            const hiddenColumnIds = state.ui.hiddenColumnIds;
+            expect(hiddenColumnIds).to.deep.equal(["c1", "c46"]);
+          });
+        });
+      });
+      describe("Four child table columns between tables are selected", () => {
+        beforeEach(() => {
+          localState = {
+            ...localState,
+            ui: {
+              ...localState.ui,
+              selectedColumnIds: ["c1", "c2", "c46", "c47"],
+            },
+          };
+          cy.mountWithProviders(<HideColumnsButton />, {
+            preloadedState: localState,
+          });
+        });
+        it("enables the button", () => {
+          cy.get("button").should("not.be.disabled");
+        });
+        it("displays the hide icon", () => {
+          cy.get("button")
+            .find("svg")
+            .should("have.attr", "data-testid", hideIconTestId);
+        });
+        it("adds selected columns to hidden columns on click", () => {
+          cy.get("button").click();
+          cy.getState().then((state) => {
+            const hiddenColumnIds = state.ui.hiddenColumnIds;
+            expect(hiddenColumnIds).to.deep.equal(["c1", "c2", "c46", "c47"]);
+          });
+        });
+      });
+    });
+    describe("Some child table columns are hidden", () => {
+      beforeEach(() => {
+        localState = {
+          ...localState,
+          ui: {
+            ...localState.ui,
+            hiddenColumnIds: ["c2", "c46"],
+          },
+        };
+      });
       describe("No columns are selected", () => {
         beforeEach(() => {
           localState = {
@@ -193,111 +334,55 @@ describe("HideColumnsButton Component", () => {
               selectedColumnIds: [],
             },
           };
-          cy.mountWithProviders(<SelectAllColumnsButton />, {
+          cy.mountWithProviders(<HideColumnsButton />, {
             preloadedState: localState,
           });
         });
-        it("disables the button", () => {
-          cy.get("button").should("be.disabled");
+        it("enables the button", () => {
+          cy.get("button").should("not.be.disabled");
         });
         it("displays the show icon", () => {
           cy.get("button")
             .find("svg")
             .should("have.attr", "data-testid", showIconTestId);
         });
+        it("remove child table columns from hidden columns on click", () => {
+          cy.get("button").click();
+          cy.getState().then((state) => {
+            const hiddenColumnIds = state.ui.hiddenColumnIds;
+            expect(hiddenColumnIds).to.deep.equal([]);
+          });
+        });
       });
-      // describe("Some columns are selected", () => {
-      //   beforeEach(() => {
-      //     localState = {
-      //       ...localState,
-      //       ui: {
-      //         ...localState.ui,
-      //         selectedColumnIds: ["c1", "c46"],
-      //       },
-      //     };
-      //     cy.mountWithProviders(<SelectAllColumnsButton />, {
-      //       preloadedState: localState,
-      //     });
-      //   });
-      //   it("enables the button", () => {
-      //     cy.get("button").should("not.be.disabled");
-      //   });
-      //   it("displays the hide icon", () => {
-      //     cy.get("button")
-      //       .find("svg")
-      //       .should("have.attr", "data-testid", hideIconTestId);
-      //   });
-      //   it("adds selected columns to hidden columns on click", () => {
-      //     cy.get("button").click();
-      //     cy.getState().then((state) => {
-      //       const hiddenColumnIds = state.ui.hiddenColumnIds;
-      //       expect(hiddenColumnIds).to.deep.equal(["c1", "c46"]);
-      //     });
-      //   });
-      // });
+      describe("Some columns are selected", () => {
+        beforeEach(() => {
+          localState = {
+            ...localState,
+            ui: {
+              ...localState.ui,
+              selectedColumnIds: ["c3", "c47"],
+            },
+          };
+          cy.mountWithProviders(<HideColumnsButton />, {
+            preloadedState: localState,
+          });
+        });
+        it("enables the button", () => {
+          cy.get("button").should("not.be.disabled");
+        });
+        it("displays the hide icon", () => {
+          cy.get("button")
+            .find("svg")
+            .should("have.attr", "data-testid", hideIconTestId);
+        });
+        it("adds selected columns to hidden columns on click", () => {
+          cy.get("button").click();
+          cy.getState().then((state) => {
+            const hiddenColumnIds = state.ui.hiddenColumnIds;
+            expect(hiddenColumnIds).to.deep.equal(["c2", "c46", "c47"]);
+          });
+        });
+      });
     });
-    // describe("Some child table columns are hidden", () => {
-    //   beforeEach(() => {
-    //     localState = {
-    //       ...localState,
-    //       ui: {
-    //         ...localState.ui,
-    //         hiddenColumnIds: ["c3", "c5"],
-    //       },
-    //     };
-    //   });
-    //   describe("No columns are selected", () => {
-    //     beforeEach(() => {
-    //       localState = {
-    //         ...localState,
-    //         ui: {
-    //           ...localState.ui,
-    //           selectedColumnIds: [],
-    //         },
-    //       };
-    //       cy.mountWithProviders(<SelectAllColumnsButton />, {
-    //         preloadedState: localState,
-    //       });
-    //     });
-    //     it("displays the show icon", () => {
-    //       cy.get("button")
-    //         .find("svg")
-    //         .should("have.attr", "data-testid", showIconTestId);
-    //     });
-    //     it("remove child table columns from hidden columns on click", () => {
-    //       cy.get("button").click();
-    //       cy.getState().then((state) => {
-    //         const hiddenColumnIds = state.ui.hiddenColumnIds;
-    //         expect(hiddenColumnIds).to.deep.equal([]);
-    //       });
-    //     });
-    //   });
-    //   describe("Some columns are selected", () => {
-    //     beforeEach(() => {
-    //       localState = {
-    //         ...localState,
-    //         ui: {
-    //           ...localState.ui,
-    //           selectedColumnIds: ["c1", "c2"],
-    //         },
-    //       };
-    //       cy.mountWithProviders(<SelectAllColumnsButton />, {
-    //         preloadedState: localState,
-    //       });
-    //     });
-    //     it("displays the hide icon", () => {
-    //       cy.get("button")
-    //         .find("svg")
-    //         .should("have.attr", "data-testid", hideIconTestId);
-    //     });
-    //     it("adds selected columns to hidden columns on click", () => {
-    //       cy.get("button").click();
-    //       cy.getState().then((state) => {
-    //         const hiddenColumnIds = state.ui.hiddenColumnIds;
-    //         expect(hiddenColumnIds).to.deep.equal(["c3", "c1", "c2"]);
-    //       });
-    //     });
-    //   });
-    // });
   });
 });

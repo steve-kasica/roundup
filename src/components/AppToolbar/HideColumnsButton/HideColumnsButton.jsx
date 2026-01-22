@@ -22,16 +22,24 @@ import {
   addToHiddenColumnIds,
   removeFromHiddenColumnIds,
   selectFocusedObjectId,
+  selectHiddenColumnIds,
   selectSelectedColumnIds,
   setSelectedColumnIds,
 } from "../../../slices/uiSlice";
 import { isTableId, selectTablesById } from "../../../slices/tablesSlice";
-import { selectOperationsById } from "../../../slices/operationsSlice";
+import {
+  isOperationId,
+  OPERATION_TYPE_STACK,
+  selectOperationsById,
+} from "../../../slices/operationsSlice";
 import { useCallback, useMemo } from "react";
+import { selectColumnIdsByParentId } from "../../../slices/columnsSlice";
 
 const HideColumnsButton = () => {
   const dispatch = useDispatch();
+
   const selectedColumnIds = useSelector(selectSelectedColumnIds);
+  const hiddenColumnIds = useSelector(selectHiddenColumnIds);
 
   const focusedObject = useSelector((state) => {
     const focusedObjectId = selectFocusedObjectId(state);
@@ -44,52 +52,106 @@ const HideColumnsButton = () => {
     }
   });
 
-  const selectedObjectColumns = selectedColumnIds.filter((colId) =>
-    focusedObject ? focusedObject.columnIds.includes(colId) : false,
+  // The columns that are relevant to the focused object
+  const relevantColumnIds = useSelector((state) => {
+    if (!focusedObject) {
+      return [];
+    } else if (isTableId(focusedObject.id)) {
+      return focusedObject.columnIds;
+    } else {
+      return selectColumnIdsByParentId(state, focusedObject.childIds);
+    }
+  });
+
+  const relevantColumnData = useMemo(() => {
+    if (!focusedObject) {
+      return [];
+    } else if (isTableId(focusedObject.id)) {
+      return relevantColumnIds.map((id, index) => ({
+        id,
+        index,
+        parentId: focusedObject.id,
+      }));
+    } else {
+      // focused object is an operation
+      return relevantColumnIds
+        .map((columnIds, parentIndex) =>
+          columnIds.map((id, index) => ({
+            id,
+            index,
+            parentId: focusedObject.childIds[parentIndex],
+          })),
+        )
+        .flat();
+    }
+  }, [focusedObject, relevantColumnIds]);
+
+  const selectedColumnData = useMemo(() => {
+    return relevantColumnData.filter(({ id }) =>
+      selectedColumnIds.includes(id),
+    );
+  }, [relevantColumnData, selectedColumnIds]);
+
+  const selectedTables = useMemo(
+    () => new Set(selectedColumnData.map(({ parentId }) => parentId)),
+    [selectedColumnData],
   );
 
-  const hiddenColumnIds = useSelector((state) => state.ui.hiddenColumnIds);
-
-  const hiddenObjectColumns = useMemo(
-    () =>
-      focusedObject
-        ? focusedObject.columnIds.filter((colId) =>
-            hiddenColumnIds.includes(colId),
-          )
-        : [],
-    [focusedObject, hiddenColumnIds],
-  );
+  const hiddenColumnData = useMemo(() => {
+    return relevantColumnData.filter(({ id }) => hiddenColumnIds.includes(id));
+  }, [relevantColumnData, hiddenColumnIds]);
 
   const hideSelectedColumns = useCallback(() => {
-    dispatch(addToHiddenColumnIds(selectedObjectColumns));
+    dispatch(addToHiddenColumnIds(selectedColumnData.map(({ id }) => id)));
     dispatch(setSelectedColumnIds([]));
-  }, [dispatch, selectedObjectColumns]);
+  }, [dispatch, selectedColumnData]);
 
-  const unhideObjectColumns = useCallback(() => {
-    dispatch(removeFromHiddenColumnIds(hiddenObjectColumns));
+  const unhideHiddenColumns = useCallback(() => {
+    dispatch(removeFromHiddenColumnIds(hiddenColumnData.map(({ id }) => id)));
     dispatch(setSelectedColumnIds([]));
-  }, [dispatch, hiddenObjectColumns]);
+  }, [dispatch, hiddenColumnData]);
 
-  const isHideMode = selectedObjectColumns.length > 0;
+  const isHideMode = useMemo(() => {
+    return selectedColumnData.length > 0;
+  }, [selectedColumnData]);
+
+  const isDisabled = useMemo(() => {
+    return (
+      !focusedObject || // no focused object
+      (selectedColumnData.length === 0 && hiddenColumnData.length === 0) || // no selected or hidden columns
+      // Selection is only within one table on a stack operation (and we're in hide mode, not unhide mode)
+      (isOperationId(focusedObject.id) &&
+        focusedObject.operationType === OPERATION_TYPE_STACK &&
+        selectedColumnData.length > 0 &&
+        selectedTables.size === 1 &&
+        hiddenColumnData.length === 0) // Only disable if there are no hidden columns to unhide
+    );
+  }, [
+    focusedObject,
+    selectedColumnData.length,
+    hiddenColumnData.length,
+    selectedTables.size,
+  ]);
 
   return (
     <>
       {isHideMode ? (
         <TooltipIconButton
-          tooltipText={`Hide ${selectedObjectColumns.length} selected column${
-            selectedObjectColumns.length !== 1 ? "s" : ""
+          tooltipText={`Hide ${selectedColumnData.length} selected column${
+            selectedColumnData.length !== 1 ? "s" : ""
           }`}
+          disabled={isDisabled}
           onClick={hideSelectedColumns}
         >
           <VisibilityOff />
         </TooltipIconButton>
       ) : (
         <TooltipIconButton
-          tooltipText={`Unhide ${hiddenObjectColumns.length} hidden column${
-            hiddenObjectColumns.length !== 1 ? "s" : ""
+          tooltipText={`Unhide ${hiddenColumnData.length} hidden column${
+            hiddenColumnData.length !== 1 ? "s" : ""
           }`}
-          disabled={hiddenObjectColumns.length === 0}
-          onClick={unhideObjectColumns}
+          disabled={isDisabled}
+          onClick={unhideHiddenColumns}
         >
           <Visibility />
         </TooltipIconButton>
