@@ -2,23 +2,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useMemo } from "react";
 import { ButtonWithMenu } from "../../../ui/buttons";
 import {
+  clearSelectedTableIds,
   selectFocusedObject,
-  selectFocusedObjectId,
   selectSelectedTableIds,
 } from "../../../../slices/uiSlice";
 
-import {
-  AddPackOperationItem,
-  AddStackOperationItem,
-} from "./AddOperationItem";
-import RemoveTablesItem from "./RemoveTablesItem";
-import { Divider } from "@mui/material";
-import { deleteTablesRequest } from "../../../../sagas/deleteTablesSaga";
+import { Divider, ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import {
   isOperationId,
-  selectRootOperation,
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
   selectRootOperationId,
 } from "../../../../slices/operationsSlice";
+import { PackOperationIcon, StackOperationIcon } from "../../../ui/icons";
+import { createOperationsRequest } from "../../../../sagas/createOperationsSaga/actions";
+import { updateOperationsRequest } from "../../../../sagas/updateOperationsSaga";
 
 const ActionsButton = () => {
   const dispatch = useDispatch();
@@ -49,12 +47,73 @@ const ActionsButton = () => {
     ], // no selected tables
   );
 
+  const handleOnPackClick = useCallback(() => {
+    dispatch(
+      createOperationsRequest({
+        operationData: [
+          {
+            operationType: OPERATION_TYPE_PACK,
+            childIds: (rootOperationId ? [rootOperationId] : []).concat(
+              selectedTableIds,
+            ),
+          },
+        ],
+      }),
+    );
+    dispatch(clearSelectedTableIds());
+  }, [dispatch, rootOperationId, selectedTableIds]);
+
+  const handleOnStackClick = useCallback(() => {
+    dispatch(
+      createOperationsRequest({
+        operationData: [
+          {
+            operationType: OPERATION_TYPE_STACK,
+            childIds: (rootOperationId ? [rootOperationId] : []).concat(
+              selectedTableIds,
+            ),
+          },
+        ],
+      }),
+    );
+    dispatch(clearSelectedTableIds());
+  }, [dispatch, rootOperationId, selectedTableIds]);
+
+  const handleInsertClick = useCallback(() => {
+    dispatch(
+      updateOperationsRequest({
+        operationUpdates: [
+          {
+            id: focusedObject.id,
+            childIds: focusedObject.childIds.concat(selectedTableIds),
+          },
+        ],
+      }),
+    );
+    dispatch(clearSelectedTableIds());
+  }, [dispatch, focusedObject?.childIds, focusedObject?.id, selectedTableIds]);
+
   return (
     <ButtonWithMenu label="Actions" disabled={!isEnabled}>
-      <AddStackOperationItem />
-      <AddPackOperationItem />
+      <MenuItem onClick={handleOnPackClick}>
+        <ListItemIcon>
+          <PackOperationIcon />
+        </ListItemIcon>
+        <ListItemText>Pack tables</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={handleOnStackClick}>
+        <ListItemIcon>
+          <StackOperationIcon />
+        </ListItemIcon>
+        <ListItemText>Stack tables</ListItemText>
+      </MenuItem>
       <Divider orientation="horizontal" />
-      <RemoveTablesItem />
+      <MenuItem onClick={handleInsertClick}>
+        <ListItemIcon>
+          <StackOperationIcon />
+        </ListItemIcon>
+        <ListItemText>Append tables</ListItemText>
+      </MenuItem>
     </ButtonWithMenu>
   );
 };
