@@ -19,7 +19,7 @@
  */
 
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
-import { PackOperationIcon } from "../../../ui/icons";
+import { PackOperationIcon } from "../../../../ui/icons";
 
 const AddPackOperationButton = ({ ...props }) => {
   const onClick = () => console.log("Add Pack Operation button clicked");

@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
-import { SearchTextBox } from "../../ui/input";
-import { setTableSearchString } from "../../../slices/uiSlice";
+import { SearchTextBox } from "../../../ui/input";
+import { setTableSearchString } from "../../../../slices/uiSlice";
 
 const SearchTablesInput = () => {
   const dispatch = useDispatch();

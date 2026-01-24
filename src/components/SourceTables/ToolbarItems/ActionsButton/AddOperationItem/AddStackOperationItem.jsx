@@ -16,7 +16,7 @@
  */
 
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
-import { StackOperationIcon } from "../../../ui/icons";
+import { StackOperationIcon } from "../../../../ui/icons";
 
 const AddStackOperationButton = ({ ...props }) => {
   const onClick = () => console.log("Add Stack Operation button clicked");

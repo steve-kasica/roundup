@@ -1,22 +1,22 @@
 /* eslint-disable no-undef */
-import DeleteTablesItem from "./DeleteTablesItem";
+import DeleteTablesButton from "./DeleteTablesButton";
 
-describe("DeleteTablesItem", () => {
+describe("DeleteTablesButton", () => {
   it("should render the menu item", () => {
-    cy.mountWithProviders(<DeleteTablesItem />);
-    cy.get("li").contains("Delete").should("exist");
+    cy.mountWithProviders(<DeleteTablesButton />);
+    cy.get("button").should("exist");
   });
 
   describe("when clicked", () => {
     beforeEach(() => {
-      cy.mountWithProviders(<DeleteTablesItem />, {
+      cy.mountWithProviders(<DeleteTablesButton />, {
         preloadedState: {
           ui: {
             selectedTableIds: ["t1", "t2"],
           },
         },
       });
-      cy.get("li").contains("Delete").click();
+      cy.get("button").click();
     });
 
     it("should open the confirmation dialog", () => {
@@ -35,14 +35,14 @@ describe("DeleteTablesItem", () => {
   describe("when confirmed", () => {
     it("should call onConfirm and close when the user clicks confirm", () => {
       const onConfirmSpy = cy.spy().as("onConfirmSpy");
-      cy.mountWithProviders(<DeleteTablesItem onConfirm={onConfirmSpy} />, {
+      cy.mountWithProviders(<DeleteTablesButton onConfirm={onConfirmSpy} />, {
         preloadedState: {
           ui: {
             selectedTableIds: ["t1", "t2"],
           },
         },
       });
-      cy.get("li").contains("Delete").click();
+      cy.get("button").click();
       cy.get("[role=dialog]").should("exist");
       cy.get("[role=dialog]").find("button").contains("Delete").click();
       cy.get("[role=dialog]").should("not.exist");

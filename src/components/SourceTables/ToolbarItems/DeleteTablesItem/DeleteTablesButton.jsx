@@ -6,17 +6,20 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
+  IconButton,
 } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectSelectedTableIds } from "../../../../slices/uiSlice";
 
 const DeleteTablesItem = ({ onConfirm, ...props }) => {
   const selectedTables = useSelector(selectSelectedTableIds);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const isDisabled = useMemo(
+    () => selectedTables.length === 0,
+    [selectedTables],
+  );
 
   const onClick = () => {
     setDialogOpen(true);
@@ -35,12 +38,9 @@ const DeleteTablesItem = ({ onConfirm, ...props }) => {
 
   return (
     <>
-      <MenuItem onClick={onClick} {...props}>
-        <ListItemIcon>
-          <DeleteForever />
-        </ListItemIcon>
-        <ListItemText>Delete</ListItemText>
-      </MenuItem>
+      <IconButton onClick={onClick} disabled={isDisabled} {...props}>
+        <DeleteForever />
+      </IconButton>
 
       <Dialog open={dialogOpen} onClose={handleClose}>
         <DialogTitle>Delete Tables?</DialogTitle>

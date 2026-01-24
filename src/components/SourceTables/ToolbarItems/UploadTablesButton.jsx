@@ -22,9 +22,9 @@
 
 import { Upload, Close } from "@mui/icons-material";
 import { Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
-import { TooltipIconButton } from "../ui/buttons";
+import { TooltipIconButton } from "../../ui/buttons";
 import { useCallback, useState } from "react";
-import FileUpload from "../FileUpload";
+import FileUpload from "../../FileUpload";
 
 const UploadTablesButton = () => {
   const [dialogOpen, setDialogOpen] = useState(false);

@@ -75,9 +75,14 @@ import {
   selectSelectedTableIds,
   setSelectedTableIds,
 } from "../../slices/uiSlice";
-import ActionsButton from "./ActionsButton";
-import UploadTablesButton from "./UploadTablesButton";
-import SearchTablesInput from "./SearchTablesInput/SearchTablesInput";
+// import SearchTablesInput from "./SearchTablesInput/SearchTablesInput";
+import {
+  SearchTablesInput,
+  UploadTablesButton,
+  ActionsButton,
+  DeleteTablesButton,
+} from "./ToolbarItems";
+import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 
 const headers = [
   {
@@ -151,6 +156,10 @@ function SourceTables({
       ),
     [tables, sortAttribute, isAscending],
   );
+
+  const handleOnDeleteTables = useCallback(() => {
+    dispatch(deleteTablesRequest(selectedTableIds));
+  }, [dispatch, selectedTableIds]);
 
   // Clear tables for component selection
   // const clearSelectedTableIds = useCallback(() => {
@@ -231,8 +240,9 @@ function SourceTables({
     <>
       <Toolbar disableGutters>
         <SearchTablesInput />
-        <ActionsButton />
         <UploadTablesButton />
+        <DeleteTablesButton onConfirm={handleOnDeleteTables} />
+        <ActionsButton />
       </Toolbar>
       <TableContainer
         sx={{

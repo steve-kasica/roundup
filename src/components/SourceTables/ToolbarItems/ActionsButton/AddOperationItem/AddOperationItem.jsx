@@ -18,26 +18,26 @@
  * />
  */
 
-import StackOperationIcon from "../../../ui/icons/StackOperationIcon";
-import TooltipIconButton from "../../../ui/buttons/TooltipIconButton";
+import StackOperationIcon from "../../../../ui/icons/StackOperationIcon";
+import TooltipIconButton from "../../../../ui/buttons/TooltipIconButton";
 import { useDispatch, useSelector } from "react-redux";
 import {
   isOperationId,
   OPERATION_TYPE_STACK,
   selectOperationsById,
   selectRootOperationId,
-} from "../../../../slices/operationsSlice";
-import { createOperationsRequest } from "../../../../sagas/createOperationsSaga/actions";
+} from "../../../../../slices/operationsSlice";
+import { createOperationsRequest } from "../../../../../sagas/createOperationsSaga/actions";
 import {
   clearSelectedTableIds,
   selectFocusedObjectId,
   selectSelectedTableIds,
-} from "../../../../slices/uiSlice";
+} from "../../../../../slices/uiSlice";
 import {
   isTableId,
   selectAddedTableIds,
   selectTablesById,
-} from "../../../../slices/tablesSlice";
+} from "../../../../../slices/tablesSlice";
 import { useMemo } from "react";
 import { MenuItem } from "@mui/material";
 
