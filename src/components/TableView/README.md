@@ -182,9 +182,9 @@ Toolbar with table-level actions.
 | Action | Icon | Description              |
 | ------ | ---- | ------------------------ |
 | Search | 🔍   | Filter columns by name   |
-| Hidden | 👁    | Show/hide hidden columns |
+| Hidden | 👁   | Show/hide hidden columns |
 | Export | 📥   | Export table data        |
-| Delete | 🗑    | Remove table             |
+| Delete | 🗑   | Remove table             |
 
 ## TableName
 
@@ -261,7 +261,7 @@ function SortableTableView({ tableId, columns }) {
 function TableWithHiddenColumns({ tableId }) {
   const [showHidden, setShowHidden] = useState(false);
   const hiddenColumns = useSelector((state) =>
-    selectHiddenColumns(state, tableId)
+    selectHiddenColumns(state, tableId),
   );
 
   return (
@@ -313,7 +313,7 @@ export const EnhancedTableSchema = withTableData(TableSchema);
 ## Related Components
 
 - **ColumnViews** - Individual column display
-- **TablesList** - List of all source tables
+- **SourceTables** - List of all source tables
 - **PackSchemaView** - Uses tables in PACK operations
 - **StackSchemaView** - Uses tables in STACK operations
 

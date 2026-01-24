@@ -6,10 +6,10 @@ import {
   JOIN_PREDICATES,
   OPERATION_TYPE_PACK,
   selectOperationsById,
-} from "../../../slices/operationsSlice";
+} from "../../../../slices/operationsSlice";
 import { useSelector } from "react-redux";
-import { selectFocusedObjectId } from "../../../slices/uiSlice";
-import { withPackOperationData } from "../../HOC";
+import { selectFocusedObjectId } from "../../../../slices/uiSlice";
+import { withPackOperationData } from "../../../HOC";
 
 const JoinPredicateButton = ({
   // Props passed via withPackOperationData HOC
@@ -84,22 +84,4 @@ const JoinPredicateButton = ({
   );
 };
 
-const EnhancedJoinPredicateButton = withPackOperationData(JoinPredicateButton);
-
-const FocusedEnhancedJoinPredicateButton = () => {
-  const focusedObject = useSelector((state) => {
-    const focusedId = selectFocusedObjectId(state);
-    if (isOperationId(focusedId)) {
-      return selectOperationsById(state, focusedId);
-    }
-    return null;
-  });
-
-  if (!focusedObject || focusedObject.operationType !== OPERATION_TYPE_PACK) {
-    return <JoinPredicateButton disabled={true} />;
-  } else {
-    return <EnhancedJoinPredicateButton id={focusedObject.id} />;
-  }
-};
-
-export default FocusedEnhancedJoinPredicateButton;
+export default JoinPredicateButton;

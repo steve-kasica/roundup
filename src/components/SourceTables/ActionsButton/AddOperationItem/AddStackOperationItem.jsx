@@ -15,19 +15,18 @@
  * <AddStackOperationButton />
  */
 
-import { ListItemIcon, ListItemText } from "@mui/material";
+import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import { StackOperationIcon } from "../../../ui/icons";
-import AddOperationItem from "./AddOperationItem";
 
 const AddStackOperationButton = ({ ...props }) => {
   const onClick = () => console.log("Add Stack Operation button clicked");
   return (
-    <AddOperationItem onClick={onClick} {...props}>
+    <MenuItem onClick={onClick} {...props}>
       <ListItemIcon>
         <StackOperationIcon />
       </ListItemIcon>
       <ListItemText>Add in stack operation</ListItemText>
-    </AddOperationItem>
+    </MenuItem>
   );
 };
 

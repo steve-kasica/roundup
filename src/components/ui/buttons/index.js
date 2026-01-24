@@ -1,5 +1,4 @@
-export { default as AddPackOperationButton } from "./AddPackOperationButton";
-export { default as AddStackOperationButton } from "./AddStackOperationButton";
+export { default as AddStackOperationButton } from "../../SourceTables/ActionsButton/AddOperationItem/AddOperationItem";
 export { default as ClearSearchTextButton } from "./ClearSearchTextButton";
 export { default as ColumnContextMenuButton } from "./ColumnContextMenuButton";
 export { default as HiddenColumnsButton } from "./HiddenColumnsButton";
@@ -7,3 +6,4 @@ export { default as InsertTableInOperationButton } from "./InsertTableInOperatio
 export { default as RenameObjectButton } from "./RenameObjectButton";
 export { default as SwapTablesButton } from "./SwapTablesButton";
 export { default as TooltipIconButton } from "./TooltipIconButton";
+export { default as ButtonWithMenu } from "./ButtonWithMenu";

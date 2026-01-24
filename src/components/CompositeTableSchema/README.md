@@ -6,7 +6,7 @@ This module renders an interactive nested treemap visualization of the complete 
 
 1. **Visual Hierarchy**: Nested blocks show operation structure
 2. **Error Handling**: Data objects rendered in the composite schema include visual indicators showing error state, if any.
-3. **Drop Targets**: Uses can add tables and create new operations via drag-and-drop interactions with the `TablesList` component.
+3. **Drop Targets**: Uses can add tables and create new operations via drag-and-drop interactions with the `SourceTables` component.
 
 ## Layout algorithm
 

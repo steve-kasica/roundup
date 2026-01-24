@@ -36,7 +36,7 @@ export const selectTablesById = createSelector(
       return tableIds.map((id) => tablesData[id]);
     }
     return tablesData[tableIds];
-  }
+  },
 );
 
 /**
@@ -70,7 +70,7 @@ export const selectTableColumnIds = createSelector(
       return tablesById[tableId].columnIds;
     });
     return tableIds.length === 1 ? output[0] : output;
-  }
+  },
 );
 
 /**
@@ -82,7 +82,7 @@ export const selectTableColumnIds = createSelector(
  */
 export const selectAllTablesData = createSelector(
   [(state) => state.tables.byId],
-  (byId) => Object.values(byId)
+  (byId) => Object.values(byId),
 );
 
 export const selectTableQueryData = createSelector(
@@ -96,7 +96,7 @@ export const selectTableQueryData = createSelector(
       tableName: table.databaseName,
       columnNames: columns.map((col) => col.databaseName),
     };
-  }
+  },
 );
 
 /**
@@ -125,5 +125,19 @@ export const selectAllTableIdsByParentId = createSelector(
         .map((table) => table.id);
     });
     return parentIds.length === 1 ? output[0] : output;
-  }
+  },
+);
+
+/**
+ * Selector to retrieve all tables that have a non-null parentId (i.e., added tables).
+ *
+ * @param {Object} state - The Redux state object.
+ * @returns {Array} An array of table objects that have a non-null parentId.
+ */
+export const selectAddedTableIds = createSelector(
+  [(state) => state.tables.byId],
+  (tablesById) =>
+    Object.values(tablesById)
+      .filter((table) => table.parentId !== null)
+      .map(({ id }) => id),
 );

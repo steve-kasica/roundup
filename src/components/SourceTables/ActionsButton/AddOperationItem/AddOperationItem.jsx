@@ -42,32 +42,32 @@ import { useMemo } from "react";
 import { MenuItem } from "@mui/material";
 
 const AddOperationButton = ({ onClick, children, ...props }) => {
-  const selectedTableIds = useSelector(selectSelectedTableIds);
-  const addedTableIds = useSelector(selectAddedTableIds);
-  const focusedObject = useSelector((state) => {
-    const focusedObjectId = selectFocusedObjectId(state);
-    if (!focusedObjectId) {
-      return null;
-    } else if (isTableId(focusedObjectId)) {
-      return selectTablesById(state, focusedObjectId);
-    } else {
-      return selectOperationsById(state, focusedObjectId);
-    }
-  });
+  // const selectedTableIds = useSelector(selectSelectedTableIds);
+  // const addedTableIds = useSelector(selectAddedTableIds);
+  // const focusedObject = useSelector((state) => {
+  //   const focusedObjectId = selectFocusedObjectId(state);
+  //   if (!focusedObjectId) {
+  //     return null;
+  //   } else if (isTableId(focusedObjectId)) {
+  //     return selectTablesById(state, focusedObjectId);
+  //   } else {
+  //     return selectOperationsById(state, focusedObjectId);
+  //   }
+  // });
 
-  const selectedNotAdded = useMemo(() => {
-    const addedSet = new Set(addedTableIds);
-    return selectedTableIds.filter((id) => !addedSet.has(id));
-  }, [selectedTableIds, addedTableIds]);
+  // const selectedNotAdded = useMemo(() => {
+  //   const addedSet = new Set(addedTableIds);
+  //   return selectedTableIds.filter((id) => !addedSet.has(id));
+  // }, [selectedTableIds, addedTableIds]);
 
-  const isDisabled = useMemo(() => {
-    return (
-      selectedTableIds.length === 0 || // No tables selected
-      selectedNotAdded.length === 0 || // Everything selected has been added
-      (isOperationId(focusedObject?.id) && !focusedObject.isMaterialized) || // Focused operation not materialized
-      (isOperationId(focusedObject?.id) && !focusedObject.isInSync) // Focused operation not in sync
-    );
-  }, [selectedTableIds.length, selectedNotAdded.length, focusedObject]);
+  // const isDisabled = useMemo(() => {
+  //   return (
+  //     selectedTableIds.length === 0 || // No tables selected
+  //     selectedNotAdded.length === 0 || // Everything selected has been added
+  //     (isOperationId(focusedObject?.id) && !focusedObject.isMaterialized) || // Focused operation not materialized
+  //     (isOperationId(focusedObject?.id) && !focusedObject.isInSync) // Focused operation not in sync
+  //   );
+  // }, [selectedTableIds.length, selectedNotAdded.length, focusedObject]);
 
   // const handleClick = () => {
   //   const childIds = (rootOperationId ? [rootOperationId] : []).concat(
@@ -83,7 +83,7 @@ const AddOperationButton = ({ onClick, children, ...props }) => {
   // };
 
   return (
-    <MenuItem onClick={onClick} disabled={isDisabled} {...props}>
+    <MenuItem onClick={onClick} {...props}>
       {children}
     </MenuItem>
   );

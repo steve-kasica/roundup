@@ -32,8 +32,10 @@ export const initialState = {
   draggingColumnIds: [], // array of column ids
   dropTargetColumnIds: [], // array of column ids
   focusedObjectId: null, // either a table id or sucessfully created operation id
+  selectedTableIds: [], // array of selected table ids
   loadingOperations: [], // array of operation ids currently loading
   selectedMatches: [], // array of match types
+  tableSearchString: "", // current search string for filtering tables
 };
 
 export const uiSlice = createSlice({
@@ -64,7 +66,7 @@ export const uiSlice = createSlice({
     removeFromLoadingOperations(state, action) {
       const operationIdsToRemove = normalizeInputToArray(action.payload);
       state.loadingOperations = state.loadingOperations.filter(
-        (id) => !operationIdsToRemove.includes(id)
+        (id) => !operationIdsToRemove.includes(id),
       );
     },
 
@@ -118,7 +120,7 @@ export const uiSlice = createSlice({
     removeFromHoveredColumnIds(state, action) {
       const columnIdsToRemove = normalizeInputToArray(action.payload);
       state.hoveredColumnIds = state.hoveredColumnIds.filter(
-        (id) => !columnIdsToRemove.includes(id)
+        (id) => !columnIdsToRemove.includes(id),
       );
     },
 
@@ -170,7 +172,7 @@ export const uiSlice = createSlice({
     removeFromHiddenColumnIds(state, action) {
       const columnIdsToRemove = normalizeInputToArray(action.payload);
       state.hiddenColumnIds = state.hiddenColumnIds.filter(
-        (id) => !columnIdsToRemove.includes(id)
+        (id) => !columnIdsToRemove.includes(id),
       );
     },
 
@@ -225,6 +227,32 @@ export const uiSlice = createSlice({
     setFocusedObjectId(state, action) {
       state.focusedObjectId = action.payload;
     },
+
+    setSelectedTableIds(state, action) {
+      const tableIds = normalizeInputToArray(action.payload);
+      state.selectedTableIds = tableIds;
+    },
+    addToSelectedTableIds(state, action) {
+      const tableIdsToAdd = normalizeInputToArray(action.payload);
+      tableIdsToAdd.forEach((id) => {
+        if (!state.selectedTableIds.includes(id)) {
+          state.selectedTableIds.push(id);
+        }
+      });
+    },
+    removeFromSelectedTableIds(state, action) {
+      const tableIdsToRemove = normalizeInputToArray(action.payload);
+      state.selectedTableIds = state.selectedTableIds.filter(
+        (id) => !tableIdsToRemove.includes(id),
+      );
+    },
+    clearSelectedTableIds(state) {
+      state.selectedTableIds = [];
+    },
+
+    setTableSearchString(state, action) {
+      state.tableSearchString = action.payload;
+    },
   },
 });
 
@@ -245,6 +273,13 @@ export const {
   setDropTargetColumnIds,
   setFocusedObjectId,
   setSelectedMatches,
+
+  setSelectedTableIds,
+  addToSelectedTableIds,
+  removeFromSelectedTableIds,
+  clearSelectedTableIds,
+
+  setTableSearchString,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

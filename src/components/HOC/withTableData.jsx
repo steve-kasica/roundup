@@ -16,6 +16,7 @@ import {
   setSelectedColumnIds,
   setFocusedColumnIds,
   removeFromHiddenColumnIds,
+  selectSelectedTableIds,
 } from "../../slices/uiSlice";
 import { selectTablesById } from "../../slices/tablesSlice";
 
@@ -91,6 +92,12 @@ export default function withTableData(WrappedComponent) {
      * @returns {boolean} True if the table is part of the schema, false otherwise
      */
     const isInSchema = useMemo(() => parentId !== null, [parentId]);
+
+    const selectedTableIds = useSelector(selectSelectedTableIds);
+    const isSelected = useMemo(
+      () => selectedTableIds.includes(id),
+      [selectedTableIds, id],
+    );
 
     /**
      * The source of the table (e.g., file path, database)
@@ -334,6 +341,7 @@ export default function withTableData(WrappedComponent) {
         // Identity and metadata
         parentId={parentId}
         isInSchema={isInSchema}
+        isSelected={isSelected}
         source={source}
         databaseName={databaseName}
         name={name}

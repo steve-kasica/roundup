@@ -18,19 +18,18 @@
  * />
  */
 
-import { ListItemIcon, ListItemText } from "@mui/material";
+import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import { PackOperationIcon } from "../../../ui/icons";
-import AddOperationItem from "./AddOperationItem";
 
 const AddPackOperationButton = ({ ...props }) => {
   const onClick = () => console.log("Add Pack Operation button clicked");
   return (
-    <AddOperationItem onClick={onClick} {...props}>
+    <MenuItem onClick={onClick} {...props}>
       <ListItemIcon>
         <PackOperationIcon />
       </ListItemIcon>
       <ListItemText>Add in pack operation</ListItemText>
-    </AddOperationItem>
+    </MenuItem>
   );
 };
 

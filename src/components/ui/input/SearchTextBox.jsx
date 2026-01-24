@@ -37,10 +37,10 @@ const SearchTextBox = ({
   placeholder = "Search...",
   //   searchString,
   onChange,
+  sx = {},
+  delay = 300,
 }) => {
-  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [localValue, setLocalValue] = useState("");
-  const menuOpen = Boolean(menuAnchorEl);
   const debounceTimerRef = useRef(null);
 
   // Cleanup on unmount
@@ -51,15 +51,6 @@ const SearchTextBox = ({
       }
     };
   }, []);
-
-  const handleMenuOpen = (event) => {
-    event.stopPropagation();
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setMenuAnchorEl(null);
-  };
 
   const handleOnChange = (e) => {
     const value = e.target.value;
@@ -73,10 +64,9 @@ const SearchTextBox = ({
     // Set new timer
     debounceTimerRef.current = setTimeout(() => {
       if (onChange) {
-        const trimmedLowercased = value.trim().toLowerCase();
-        onChange(trimmedLowercased);
+        onChange(value);
       }
-    }, 300);
+    }, delay);
   };
   return (
     <>
@@ -102,6 +92,7 @@ const SearchTextBox = ({
               border: "none",
             },
           },
+          ...sx,
         }}
         slotProps={{
           input: {
@@ -110,71 +101,9 @@ const SearchTextBox = ({
                 <SearchIcon />
               </InputAdornment>
             ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={handleMenuOpen}
-                  aria-haspopup="true"
-                  aria-expanded={menuOpen ? "true" : undefined}
-                >
-                  <MoreVert />
-                </IconButton>
-              </InputAdornment>
-            ),
           },
         }}
       />
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={menuOpen}
-        onClose={handleMenuClose}
-        onClick={handleMenuClose}
-      >
-        <MenuItem
-          disabled={!localValue}
-          onClick={() => {
-            setLocalValue("");
-            if (onChange) onChange("");
-          }}
-        >
-          Clear search
-        </MenuItem>
-        {/* <MenuItem
-          onClick={() => {
-            onSelectAll();
-            handleMenuClose();
-          }}
-        >
-          Select all
-        </MenuItem>
-        <MenuItem
-          disabled={selectedTables.length === 0}
-          onClick={() => {
-            onDeleteAll();
-            handleMenuClose();
-          }}
-        >
-          Delete all
-        </MenuItem>
-        <MenuItem
-          disabled={selectedTables.length === 0}
-          onClick={() => {
-            onClearSelection();
-            handleMenuClose();
-          }}
-        >
-          Clear selection
-        </MenuItem>
-        <Divider /> */}
-        {/* <MenuItem
-          onClick={() => {
-            document.getElementById("file-upload-input")?.click();
-            handleMenuClose();
-          }}
-        >
-          Upload more files
-        </MenuItem> */}
-      </Menu>
     </>
   );
 };

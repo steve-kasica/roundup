@@ -2,7 +2,7 @@
  * @fileoverview Left sidebar with tabbed navigation.
  * @module layouts/SupportingPane/LeftSideBar
  *
- * Tabbed sidebar component containing TablesList and OperationsList
+ * Tabbed sidebar component containing SourceTables and OperationsList
  * with conditional tab disabling based on data availability.
  *
  * Features:
@@ -18,7 +18,7 @@
 import React from "react";
 import { Box, Tabs, Tab, Chip } from "@mui/material";
 import { useSelector } from "react-redux";
-import TablesList from "../../components/TablesList";
+import SourceTables from "../../components/SourceTables";
 import OperationsList from "../../components/OperationsList";
 import { selectAllOperationIds } from "../../slices/operationsSlice";
 import { selectAllTablesData } from "../../slices/tablesSlice";
@@ -125,7 +125,7 @@ const LeftSideBar = () => {
       <Box sx={{ flex: 1, minHeight: 0 }}>
         <Box sx={{ overflow: "auto", height: "100%" }}>
           <CustomTabPanel value={value} index={0}>
-            <TablesList />
+            <SourceTables />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={1}>
             <OperationsList />

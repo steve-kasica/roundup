@@ -6,11 +6,9 @@ import AlertsButton from "./AlertsButton";
 import FocusColumnsButton from "./FocusColumnsButton";
 import DeleteColumnsButton from "./DeleteColumnsButton";
 import { ExportTableButton } from "./ExportTable";
-import UploadTablesButton from "./UploadTablesButton";
 import SelectAllColumnsButton from "./SelectAllColumnsButton";
 import HideColumnsButton from "./HideColumnsButton";
-import JoinPredicateButton from "./JoinPredicateButton";
-// import JoinKeysButton from "./JoinKeysButton";
+import JoinKeysButton from "./JoinKeysButton";
 import { EnhancedPackMatchToggleButtonGroup } from "./PackMatchToggleButtonGroup";
 
 const AppToolbar = () => {
@@ -40,12 +38,10 @@ const AppToolbar = () => {
         </Box>
 
         <Divider orientation="vertical" flexItem />
-        <UploadTablesButton />
         <ExportTableButton />
         <Divider orientation="vertical" flexItem />
+        <JoinKeysButton />
         <EnhancedPackMatchToggleButtonGroup />
-        <JoinPredicateButton />
-        {/* <JoinKeysButton /> */}
         <Divider orientation="vertical" flexItem />
       </Box>
       <AlertsButton />
