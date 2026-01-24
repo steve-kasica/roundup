@@ -8,7 +8,9 @@ import {
   selectVisibleColumnIds,
   selectHoveredColumnIds,
   selectHiddenColumnIdsByParentId,
+  selectFocusedObject,
 } from "./selectors";
+import { OPERATION_TYPE_STACK } from "../operationsSlice";
 
 describe("uiSlice selectors", () => {
   describe("column-related selectors", () => {
@@ -34,6 +36,9 @@ describe("uiSlice selectors", () => {
         c7: { id: "c7", parentId: "t4" },
         c8: { id: "c8", parentId: "t4" },
         c9: { id: "c9", parentId: "t5" },
+      };
+      state.operations.byId = {
+        o1: { id: "o1", operationType: OPERATION_TYPE_STACK },
       };
       state.ui = {
         ...initialState,
@@ -114,6 +119,28 @@ describe("uiSlice selectors", () => {
           parentId,
         );
         expect(hiddenColumnIdsMatrix).toEqual(["c1"]);
+      });
+    });
+    describe("selectFocusedObject", () => {
+      it("should return null if no focusedObjectId", () => {
+        state.ui.focusedObjectId = null;
+        const focusedObject = selectFocusedObject(state);
+        expect(focusedObject).toBeNull();
+      });
+      it("should return the focused table if focusedObjectId is a table ID", () => {
+        state.ui.focusedObjectId = "t2";
+        const focusedObject = selectFocusedObject(state);
+        expect(focusedObject).toEqual(state.tables.byId["t2"]);
+      });
+      it("should return the focused operation if focusedObjectId is an operation ID", () => {
+        state.ui.focusedObjectId = "o1";
+        const focusedObject = selectFocusedObject(state);
+        expect(focusedObject).toEqual(state.operations.byId["o1"]);
+      });
+      it("should return null if focusedObjectId is neither table nor operation ID", () => {
+        state.ui.focusedObjectId = "x999";
+        const focusedObject = selectFocusedObject(state);
+        expect(focusedObject).toBeNull();
       });
     });
   });

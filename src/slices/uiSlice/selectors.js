@@ -18,6 +18,8 @@
  */
 import { createSelector } from "@reduxjs/toolkit";
 import { selectColumnIdsByParentId } from "../columnsSlice";
+import { isTableId, selectTablesById } from "../tablesSlice";
+import { isOperationId, selectOperationsById } from "../operationsSlice";
 
 // =============================================================================
 // Interaction-specific Column Selectors
@@ -127,10 +129,27 @@ export const selectVisibleColumnIds = (state) => state.ui.visibleColumnIds;
  * @param {Object} state - The Redux state object.
  * @returns {string|null} The currently focused object ID, e.g. table or operation
  */
-export const selectFocusedObjectId = createSelector(
-  (state) => state.ui.focusedObjectId,
-  (focusedObjectId) => focusedObjectId,
-);
+export const selectFocusedObjectId = (state) => state.ui.focusedObjectId;
+
+/**
+ * Selector to retrieve the focused object (table or operation) based on the
+ * focusedObjectId in the UI slice of the state.
+ *
+ * @param {Object} state - The Redux state.
+ * @returns {Object|null} The focused table or operation object, or null if none is focused.
+ */
+export const selectFocusedObject = (state) => {
+  const focusedObjectId = selectFocusedObjectId(state);
+  if (!focusedObjectId) {
+    return null;
+  } else if (isTableId(focusedObjectId)) {
+    return selectTablesById(state, focusedObjectId);
+  } else if (isOperationId(focusedObjectId)) {
+    return selectOperationsById(state, focusedObjectId);
+  } else {
+    return null;
+  }
+};
 
 /**
  * Selector to determine if a specific column ID is currently hovered.
@@ -241,3 +260,5 @@ export const selectHiddenColumnIdsByParentId = createSelector(
     }
   },
 );
+
+export const selectSelectedTableIds = (state) => state.ui.selectedTableIds;
