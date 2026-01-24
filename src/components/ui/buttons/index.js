@@ -1,4 +1,3 @@
-export { default as AddStackOperationButton } from "../../SourceTables/ToolbarItems/ActionsButton/AddOperationItem/AddOperationItem";
 export { default as ClearSearchTextButton } from "./ClearSearchTextButton";
 export { default as ColumnContextMenuButton } from "./ColumnContextMenuButton";
 export { default as HiddenColumnsButton } from "./HiddenColumnsButton";

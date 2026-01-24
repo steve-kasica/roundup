@@ -27,7 +27,7 @@ const ButtonWithMenu = ({ label = "button", children, ...props }) => {
         {label}
       </Button>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        {children}
+        <div onClick={handleClose}>{children}</div>
       </Menu>
     </>
   );
