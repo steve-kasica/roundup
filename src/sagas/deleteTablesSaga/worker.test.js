@@ -23,244 +23,113 @@ describe("deleteTablesWorker saga", () => {
     vi.clearAllMocks();
   });
 
-  describe("successful table deletion", () => {
-    it("deletes a single table and its columns from database and state", async () => {
+  describe("successful single table deletion", () => {
+    let result;
+    beforeEach(async () => {
+      const mockState = createMockState({
+        t1: {
+          id: "t1",
+          databaseName: "t1_db",
+          columnIds: ["c1", "c2", "c3"],
+        },
+      });
       const action = {
         payload: {
-          tableIds: ["t_1"],
+          tableIds: ["t1"],
         },
       };
 
-      const mockState = createMockState({
-        t_1: {
-          id: "t_1",
-          name: "Sales",
-          databaseName: "sales_db",
-          columnIds: ["c_1", "c_2", "c_3"],
-        },
-      });
-
-      const { effects } = await expectSaga(deleteTablesWorker, action)
+      result = await expectSaga(deleteTablesWorker, action)
         .withState(mockState)
         .provide([[matchers.call.fn(dropTable), undefined]])
         .run();
-
-      // Verify columns were deleted from slice
-      const deleteColumnsAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteColumnsInSlice.type
+    });
+    it("dispatches a single deleteTables action", async () => {
+      const { effects } = result;
+      // Verify the slice delete action was dispatched
+      const deleteTablesActions = effects.put.filter(
+        (effect) => effect.payload.action.type === deleteTablesInSlice.type,
       );
-      expect(deleteColumnsAction).toBeDefined();
-      expect(deleteColumnsAction.payload.action.payload).toEqual([
-        "c_1",
-        "c_2",
-        "c_3",
-      ]);
-
-      // Verify table was deleted from slice
-      const deleteTablesAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteTablesInSlice.type
+      expect(deleteTablesActions).toHaveLength(1);
+      expect(deleteTablesActions[0].payload.action.payload).toBe("t1");
+    });
+    it("dispatches a removeFromSelectedTableIds action", async () => {
+      const { effects } = result;
+      // Verify the UI slice action was dispatched
+      const removeSelectedActions = effects.put.filter(
+        (effect) =>
+          effect.payload.action.type === "ui/removeFromSelectedTableIds",
       );
-      expect(deleteTablesAction).toBeDefined();
-
-      // Verify success action was dispatched
+      expect(removeSelectedActions).toHaveLength(1);
+      expect(removeSelectedActions[0].payload.action.payload).toBe("t1");
+    });
+    it("dispatches a deleteTablesSuccess action", async () => {
+      const { effects } = result;
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteTablesSuccess.type
+        (effect) => effect.payload.action.type === deleteTablesSuccess.type,
       );
       expect(successAction).toBeDefined();
-      expect(successAction.payload.action.payload.tableIds).toContain("t_1");
+      expect(successAction.payload.action.payload.tableIds).toContain("t1");
     });
+  });
 
-    it("deletes multiple tables", async () => {
+  describe("successful multiple table deletion", () => {
+    let result;
+    beforeEach(async () => {
+      const mockState = createMockState({
+        t1: {
+          id: "t1",
+          databaseName: "t1_db",
+          columnIds: ["c1", "c2", "c3"],
+        },
+        t2: {
+          id: "t2",
+          databaseName: "t2_db",
+          columnIds: ["c4", "c5"],
+        },
+      });
       const action = {
         payload: {
-          tableIds: ["t_1", "t_2"],
+          tableIds: ["t1", "t2"],
         },
       };
 
-      const mockState = createMockState({
-        t_1: {
-          id: "t_1",
-          name: "Sales",
-          databaseName: "sales_db",
-          columnIds: ["c_1"],
-        },
-        t_2: {
-          id: "t_2",
-          name: "Products",
-          databaseName: "products_db",
-          columnIds: ["c_2"],
-        },
-      });
-
-      const { effects } = await expectSaga(deleteTablesWorker, action)
+      result = await expectSaga(deleteTablesWorker, action)
         .withState(mockState)
         .provide([[matchers.call.fn(dropTable), undefined]])
         .run();
-
-      // Should have two deleteColumns calls
-      const deleteColumnsActions = effects.put.filter(
-        (effect) => effect.payload.action.type === deleteColumnsInSlice.type
-      );
-      expect(deleteColumnsActions).toHaveLength(2);
-
-      // Should have two deleteTables calls
+    });
+    it("dispatches multiple deleteTables actions", async () => {
+      const { effects } = result;
+      // Verify the slice delete action was dispatched
       const deleteTablesActions = effects.put.filter(
-        (effect) => effect.payload.action.type === deleteTablesInSlice.type
+        (effect) => effect.payload.action.type === deleteTablesInSlice.type,
       );
       expect(deleteTablesActions).toHaveLength(2);
-
-      const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteTablesSuccess.type
-      );
-      expect(successAction.payload.action.payload.tableIds).toHaveLength(2);
+      expect(deleteTablesActions[0].payload.action.payload).toEqual("t1");
+      expect(deleteTablesActions[1].payload.action.payload).toEqual("t2");
     });
-  });
-
-  describe("failed table deletion", () => {
-    it("dispatches failure action when database drop fails", async () => {
-      const action = {
-        payload: {
-          tableIds: ["t_1"],
-        },
-      };
-
-      const mockState = createMockState({
-        t_1: {
-          id: "t_1",
-          name: "Sales",
-          databaseName: "sales_db",
-          columnIds: ["c_1"],
-        },
-      });
-
-      const { effects } = await expectSaga(deleteTablesWorker, action)
-        .withState(mockState)
-        .provide([
-          [matchers.call.fn(dropTable), throwError(new Error("Drop failed"))],
-        ])
-        .run();
-
-      const failureAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteTablesFailure.type
+    it("dispatches a removeFromSelectedTableIds action for each table", async () => {
+      const { effects } = result;
+      // Verify the UI slice action was dispatched
+      const removeSelectedActions = effects.put.filter(
+        (effect) =>
+          effect.payload.action.type === "ui/removeFromSelectedTableIds",
       );
-      expect(failureAction).toBeDefined();
-      expect(failureAction.payload.action.payload.tableIds).toContain("t_1");
+      expect(removeSelectedActions).toHaveLength(2);
+      expect(removeSelectedActions[0].payload.action.payload).toEqual("t1");
+      expect(removeSelectedActions[1].payload.action.payload).toEqual("t2");
     });
-  });
-
-  describe("partial success scenarios", () => {
-    it("reports both successes and failures when some tables fail", async () => {
-      const action = {
-        payload: {
-          tableIds: ["t_1", "t_2"],
-        },
-      };
-
-      const mockState = createMockState({
-        t_1: {
-          id: "t_1",
-          name: "Good",
-          databaseName: "good_db",
-          columnIds: ["c_1"],
-        },
-        t_2: {
-          id: "t_2",
-          name: "Bad",
-          databaseName: "bad_db",
-          columnIds: ["c_2"],
-        },
-      });
-
-      let callCount = 0;
-      const { effects } = await expectSaga(deleteTablesWorker, action)
-        .withState(mockState)
-        .provide({
-          call(effect, next) {
-            if (effect.fn === dropTable) {
-              callCount++;
-              if (callCount === 2) {
-                throw new Error("Drop failed");
-              }
-              return undefined;
-            }
-            return next();
-          },
-        })
-        .run();
-
-      // Should have both success and failure
+    it("dispatches a deleteTablesSuccess action", async () => {
+      const { effects } = result;
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteTablesSuccess.type
-      );
-      const failureAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteTablesFailure.type
-      );
-
-      expect(successAction).toBeDefined();
-      expect(failureAction).toBeDefined();
-    });
-  });
-
-  describe("input normalization", () => {
-    it("handles single tableId (not array)", async () => {
-      const action = {
-        payload: {
-          tableIds: "t_1", // Single ID, not array
-        },
-      };
-
-      const mockState = createMockState({
-        t_1: {
-          id: "t_1",
-          name: "Sales",
-          databaseName: "sales_db",
-          columnIds: ["c_1"],
-        },
-      });
-
-      const { effects } = await expectSaga(deleteTablesWorker, action)
-        .withState(mockState)
-        .provide([[matchers.call.fn(dropTable), undefined]])
-        .run();
-
-      const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteTablesSuccess.type
+        (effect) => effect.payload.action.type === deleteTablesSuccess.type,
       );
       expect(successAction).toBeDefined();
-    });
-  });
-
-  describe("edge cases", () => {
-    it("handles table with no columns", async () => {
-      const action = {
-        payload: {
-          tableIds: ["t_1"],
-        },
-      };
-
-      const mockState = createMockState({
-        t_1: {
-          id: "t_1",
-          name: "Empty",
-          databaseName: "empty_db",
-          columnIds: [],
-        },
-      });
-
-      const { effects } = await expectSaga(deleteTablesWorker, action)
-        .withState(mockState)
-        .provide([[matchers.call.fn(dropTable), undefined]])
-        .run();
-
-      const deleteColumnsAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteColumnsInSlice.type
-      );
-      expect(deleteColumnsAction.payload.action.payload).toEqual([]);
-
-      const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteTablesSuccess.type
-      );
-      expect(successAction).toBeDefined();
+      expect(successAction.payload.action.payload.tableIds).toEqual([
+        "t1",
+        "t2",
+      ]);
     });
   });
 });

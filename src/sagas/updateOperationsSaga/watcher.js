@@ -28,9 +28,12 @@ import {
   DEFAULT_JOIN_PREDICATE,
   DEFAULT_JOIN_TYPE,
   OPERATION_TYPE_PACK,
+  selectOperationIdByChildId,
   selectOperationsById,
 } from "../../slices/operationsSlice";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
+import { deleteTablesSuccess } from "../deleteTablesSaga";
+import { group } from "d3";
 
 // This it listen for actions by the operations and columns slice
 export default function* updateOperationsWatcher() {
@@ -44,7 +47,7 @@ export default function* updateOperationsWatcher() {
 
     for (const operationId of operationIds) {
       const { operationType } = yield select((state) =>
-        selectOperationsById(state, operationId)
+        selectOperationsById(state, operationId),
       );
       operationUpdates.push({
         id: operationId,
@@ -60,7 +63,7 @@ export default function* updateOperationsWatcher() {
     yield put(
       updateOperationsRequest({
         operationUpdates,
-      })
+      }),
     );
   });
 
@@ -74,16 +77,16 @@ export default function* updateOperationsWatcher() {
     const focusedOperationId = yield select(selectFocusedObjectId);
 
     for (const [id, changedProperties] of Object.entries(
-      changedPropertiesById
+      changedPropertiesById,
     )) {
       const hasSchemaChange = changedProperties.some((prop) =>
-        rematerializationProperteies.includes(prop)
+        rematerializationProperteies.includes(prop),
       );
       if (hasSchemaChange) {
         const { parentId } = yield select((state) =>
           isTableId(id)
             ? selectTablesById(state, id)
-            : selectOperationsById(state, id)
+            : selectOperationsById(state, id),
         );
 
         if (parentId) {
@@ -108,7 +111,7 @@ export default function* updateOperationsWatcher() {
       yield put(
         updateOperationsRequest({
           operationUpdates,
-        })
+        }),
       );
     }
   });
@@ -127,16 +130,16 @@ export default function* updateOperationsWatcher() {
     const operationUpdates = [];
 
     for (const [id, changedProperties] of Object.entries(
-      changedPropertiesById
+      changedPropertiesById,
     )) {
       const operation = yield select((state) =>
-        selectOperationsById(state, id)
+        selectOperationsById(state, id),
       );
       if (
         changedProperties.some(
           (prop) =>
             joinParameterProperties.includes(prop) &&
-            operation.operationType === OPERATION_TYPE_PACK
+            operation.operationType === OPERATION_TYPE_PACK,
         )
       ) {
         const hasValidParams =
@@ -153,12 +156,12 @@ export default function* updateOperationsWatcher() {
         }
       } else if (
         changedProperties.some((prop) =>
-          rematerializationProperteies.includes(prop)
+          rematerializationProperteies.includes(prop),
         )
       ) {
         const focusedOperationId = yield select(selectFocusedObjectId);
         const { parentId } = yield select((state) =>
-          selectOperationsById(state, id)
+          selectOperationsById(state, id),
         );
         if (parentId) {
           operationUpdates.push({
@@ -182,7 +185,45 @@ export default function* updateOperationsWatcher() {
       yield put(
         updateOperationsRequest({
           operationUpdates,
-        })
+        }),
+      );
+    }
+  });
+
+  // When tables are deleted, we need to remove that table ID from the
+  // parent operation's childIds, if any.
+  yield takeEvery(deleteTablesSuccess.type, function* (action) {
+    const { tableIds } = action.payload;
+    const parentOperations = yield select((state) =>
+      tableIds.map((tableId) => ({
+        tableId,
+        operation: selectOperationsById(
+          state,
+          selectOperationIdByChildId(state, tableId),
+        ),
+      })),
+    );
+
+    const operationUpdates = group(parentOperations, (d) => d.operation.id);
+    const updatePayload = [];
+
+    for (const [operationId, entries] of operationUpdates) {
+      const childIdsToRemove = entries.map((e) => e.tableId);
+      const operation = entries[0].operation;
+      const newChildIds = operation.childIds.filter(
+        (id) => !childIdsToRemove.includes(id),
+      );
+      updatePayload.push({
+        id: operationId,
+        childIds: newChildIds,
+      });
+    }
+
+    if (updatePayload.length > 0) {
+      yield put(
+        updateOperationsRequest({
+          operationUpdates: updatePayload,
+        }),
       );
     }
   });

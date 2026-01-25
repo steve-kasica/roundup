@@ -31,7 +31,7 @@ export default function* deleteTablesSagaWatcher() {
       .filter(
         ([, changedProperties]) =>
           changedProperties.columnIds &&
-          changedProperties.columnIds.length === 0
+          changedProperties.columnIds.length === 0,
       )
       .map(([tableId]) => tableId);
     if (tableIdsToDelete.length > 0) {
@@ -44,7 +44,7 @@ export default function* deleteTablesSagaWatcher() {
   yield takeEvery(deleteOperationsSuccess.type, function* (action) {
     const { operationIds } = action.payload;
     const childTablesToDelete = yield select((state) =>
-      selectAllTableIdsByParentId(state, operationIds).flat()
+      selectAllTableIdsByParentId(state, operationIds).flat(),
     );
     if (childTablesToDelete.length > 0) {
       yield put(deleteTablesRequest({ tableIds: childTablesToDelete }));

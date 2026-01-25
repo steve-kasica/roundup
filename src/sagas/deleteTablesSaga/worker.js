@@ -15,7 +15,7 @@ import {
 } from "../../slices/tablesSlice";
 import { dropTable } from "../../lib/duckdb";
 import { deleteTablesFailure, deleteTablesSuccess } from "./actions";
-import { deleteColumns as deleteColumnsInSlice } from "../../slices/columnsSlice";
+import { removeFromSelectedTableIds } from "../../slices/uiSlice";
 
 export default function* deleteTablesWorker(action) {
   const successfulDeletions = [];
@@ -31,16 +31,20 @@ export default function* deleteTablesWorker(action) {
     try {
       // Remove table (and columns) from DuckDB
       yield call(dropTable, table.databaseName);
-      // Remove columns from state (by-pass column deletion saga)
-      yield put(deleteColumnsInSlice(table.columnIds));
 
       // Remove table from state
       yield put(deleteTablesInSlice(table.id));
 
+      // Remove table from selectedTableIds in UI state
+      yield put(removeFromSelectedTableIds(table.id));
+
       successfulDeletions.push(table);
     } catch (error) {
       alert(`Error deleting table ${table?.name}: ${error.message}`);
-      console.error("Failed to drop table", { table, error });
+      console.error("deleteTablesSaga/worker.js: Failed to drop table", {
+        table,
+        error,
+      });
       failedDeletions.push(table);
     }
   }
@@ -50,7 +54,7 @@ export default function* deleteTablesWorker(action) {
       deleteTablesFailure({
         tableIds: failedDeletions.map((t) => t.id),
         error: "One or more tables failed to delete.",
-      })
+      }),
     );
   }
 
@@ -58,19 +62,7 @@ export default function* deleteTablesWorker(action) {
     yield put(
       deleteTablesSuccess({
         tableIds: successfulDeletions.map((t) => t.id),
-      })
+      }),
     );
   }
-  // TODO: address via updateOperation
-  // if (table.operationId) {
-  //   yield put(
-  //     removeChildFromOperation({
-  //       operationId: table.operationId,
-  //       childId: table.id,
-  //     })
-  //   );
-  // }
-
-  // Remove from tables state
-  // Also removes tables from loading state
 }

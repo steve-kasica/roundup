@@ -16,6 +16,7 @@ import {
 } from "../../slices/operationsSlice";
 import { Table, selectTablesById } from "../../slices/tablesSlice";
 import { Column } from "../../slices/columnsSlice";
+import { deleteTablesSuccess } from "../deleteTablesSaga";
 
 describe("updateOperationsSaga watcher", () => {
   let state,
@@ -69,7 +70,7 @@ describe("updateOperationsSaga watcher", () => {
 
       const updateRequests = effects.put.filter(
         (effect) =>
-          effect.payload?.action?.type === updateOperationsRequest.type
+          effect.payload?.action?.type === updateOperationsRequest.type,
       );
 
       expect(updateRequests).toHaveLength(1);
@@ -98,7 +99,7 @@ describe("updateOperationsSaga watcher", () => {
 
       const updateRequests = effects.put.filter(
         (effect) =>
-          effect.payload?.action?.type === updateOperationsRequest.type
+          effect.payload?.action?.type === updateOperationsRequest.type,
       );
 
       expect(updateRequests).toHaveLength(1);
@@ -147,7 +148,7 @@ describe("updateOperationsSaga watcher", () => {
 
       const updateRequests = effects.put.filter(
         (effect) =>
-          effect.payload?.action?.type === updateOperationsRequest.type
+          effect.payload?.action?.type === updateOperationsRequest.type,
       );
 
       expect(updateRequests).toHaveLength(1);
@@ -200,7 +201,7 @@ describe("updateOperationsSaga watcher", () => {
       // Find the updateOperationsRequest dispatched by the watcher's handleRematerializations
       const rematerializationRequests = effects.put.filter(
         (effect) =>
-          effect.payload?.action?.type === updateOperationsRequest.type
+          effect.payload?.action?.type === updateOperationsRequest.type,
       );
 
       // Should have dispatched updateOperationsRequest for the parent
@@ -211,8 +212,8 @@ describe("updateOperationsSaga watcher", () => {
       expect(
         Object.prototype.hasOwnProperty.call(
           firstRequest.operationUpdates[0],
-          "isMaterialized"
-        )
+          "isMaterialized",
+        ),
       ).toBe(true);
     });
 
@@ -232,7 +233,7 @@ describe("updateOperationsSaga watcher", () => {
       const updateRequests =
         effects.put?.filter(
           (effect) =>
-            effect.payload?.action?.type === updateOperationsRequest.type
+            effect.payload?.action?.type === updateOperationsRequest.type,
         ) || [];
 
       // Should not trigger rematerialization
@@ -265,7 +266,7 @@ describe("updateOperationsSaga watcher", () => {
       const updateRequests =
         effects.put?.filter(
           (effect) =>
-            effect.payload?.action?.type === updateOperationsRequest.type
+            effect.payload?.action?.type === updateOperationsRequest.type,
         ) || [];
 
       // Should not trigger rematerialization for orphan tables
@@ -320,7 +321,7 @@ describe("updateOperationsSaga watcher", () => {
         tables: {
           byId: tables.reduce(
             (acc, table) => ({ ...acc, [table.id]: table }),
-            {}
+            {},
           ),
         },
       };
@@ -342,7 +343,7 @@ describe("updateOperationsSaga watcher", () => {
       const rematerializationRequests =
         effects.put?.filter(
           (effect) =>
-            effect.payload?.action?.type === updateOperationsRequest.type
+            effect.payload?.action?.type === updateOperationsRequest.type,
         ) || [];
 
       expect(rematerializationRequests.length).toBeGreaterThanOrEqual(1);
@@ -351,8 +352,8 @@ describe("updateOperationsSaga watcher", () => {
       expect(
         Object.prototype.hasOwnProperty.call(
           firstRequest.operationUpdates[0],
-          "isMaterialized"
-        )
+          "isMaterialized",
+        ),
       ).toBe(true);
     });
 
@@ -372,7 +373,7 @@ describe("updateOperationsSaga watcher", () => {
       const rematerializationRequests =
         effects.put?.filter(
           (effect) =>
-            effect.payload?.action?.type === updateOperationsRequest.type
+            effect.payload?.action?.type === updateOperationsRequest.type,
         ) || [];
 
       expect(rematerializationRequests.length).toBeGreaterThanOrEqual(1);
@@ -381,8 +382,8 @@ describe("updateOperationsSaga watcher", () => {
       expect(
         Object.prototype.hasOwnProperty.call(
           firstRequest.operationUpdates[0],
-          "isMaterialized"
-        )
+          "isMaterialized",
+        ),
       ).toBe(true);
     });
 
@@ -402,11 +403,63 @@ describe("updateOperationsSaga watcher", () => {
       const rematerializationRequests =
         effects.put?.filter(
           (effect) =>
-            effect.payload?.action?.type === updateOperationsRequest.type
+            effect.payload?.action?.type === updateOperationsRequest.type,
         ) || [];
 
       // Should not trigger rematerialization for orphan tables
       expect(rematerializationRequests).toHaveLength(0);
+    });
+  });
+
+  describe("handling deleteTablesSuccess actions", () => {
+    let state, table1, table2, table3, parentOp, result;
+    beforeEach(async () => {
+      table1 = Table();
+      table2 = Table();
+      table3 = Table();
+      parentOp = Operation({
+        childIds: [table1.id, table2.id, table3.id],
+      });
+      table1.parentId = parentOp.id;
+      table2.parentId = parentOp.id;
+      table3.parentId = parentOp.id;
+
+      state = {
+        ui: { focusedOperationId: null },
+        operations: {
+          byId: { [parentOp.id]: parentOp },
+        },
+        tables: {
+          byId: {
+            [table1.id]: table1,
+            [table2.id]: table2,
+            [table3.id]: table3,
+          },
+        },
+      };
+      const action = deleteTablesSuccess({
+        tableIds: [table1.id, table2.id],
+      });
+
+      result = await expectSaga(updateOperationsWatcher)
+        .provide([[matchers.call.fn(updateOperationsWorker), undefined]])
+        .withState(state)
+        .dispatch(action)
+        .silentRun(100);
+    });
+
+    it("should dispatch a updateOperationsRequest", async () => {
+      const { effects } = result;
+      const updateOperationsRequests =
+        effects.put?.filter(
+          (effect) =>
+            effect.payload?.action?.type === updateOperationsRequest.type,
+        ) || [];
+      expect(updateOperationsRequests).toHaveLength(1);
+      const firstRequest = updateOperationsRequests[0].payload.action.payload;
+      expect(firstRequest.operationUpdates).toHaveLength(1);
+      expect(firstRequest.operationUpdates[0].id).toBe(parentOp.id);
+      expect(firstRequest.operationUpdates[0].childIds).toEqual([table3.id]);
     });
   });
 });

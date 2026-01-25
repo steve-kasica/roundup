@@ -19,10 +19,12 @@ stateDiagram
   updateOps:Update operations saga
   createOps:Create operations saga
   updateTables:Update tables saga
+  deleteTables:Delete tables saga
 
   createOps --> updateOps: Sets defaults for new operations
   updateTables --> updateOps: Flags operations as out-of-sync
   updateOps --> updateOps: Handles cascading updates and rematerialization
+  deleteTables --> updateOps: Cleans up operations referencing deleted tables
 ```
 
 ## Files

@@ -114,18 +114,7 @@ const headers = [
   },
 ];
 
-function SourceTables({
-  tables,
-  rowMax,
-  columnMax,
-  bytesMax,
-  deleteTables, // callback for deleting tables from Roundup
-  addNewOperation, // callback for adding a new operation
-  insertTablesInFocusedOperation, // callback for inserting tables into an existing operation
-
-  // Props defined in withAssociatedAlerts (for focused objectId)
-  totalCount: focusedObjectHasAlerts,
-}) {
+function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering SourceTables");
   }
@@ -148,7 +137,7 @@ function SourceTables({
   );
 
   const handleOnDeleteTables = useCallback(() => {
-    dispatch(deleteTablesRequest(selectedTableIds));
+    dispatch(deleteTablesRequest({ tableIds: selectedTableIds }));
   }, [dispatch, selectedTableIds]);
 
   // Clear tables for component selection
