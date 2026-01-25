@@ -18,7 +18,7 @@
  * <SupportingPane />
  */
 import { name as APP_NAME } from "../../../package.json";
-import { Typography, Box, styled } from "@mui/material";
+import { Typography, Box, styled, IconButton } from "@mui/material";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import LeftSideBar from "./LeftSideBar";
 import { useSelector } from "react-redux";
@@ -37,6 +37,9 @@ import {
 } from "../../slices/uiSlice";
 import FileUpload from "../../components/FileUpload";
 import RoundupToolbar from "../../components/AppToolbar";
+import { KeyboardArrowDown } from "@mui/icons-material";
+import { useRef, useState } from "react";
+import { InfoIcon } from "../../components/ui/icons";
 // Add this import for operations
 
 const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
@@ -54,6 +57,11 @@ const StyledPanelResizeHandle = styled(PanelResizeHandle)(() => ({
   },
 }));
 
+const CompositeSchemaContainerSizes = {
+  COLLAPSED: 4,
+  EXPANDED: 30,
+};
+
 export default function SupportingPane() {
   const tables = useSelector(selectAllTablesData);
   const rootOperation = useSelector((state) => {
@@ -63,6 +71,24 @@ export default function SupportingPane() {
   const focusedObject = useSelector(selectFocusedObjectId);
   const focusedColumnIds = useSelector(selectFocusedColumnIds);
   const isOpen = tables.length > 0;
+  const compositeSchemaRef = useRef(null);
+  const [isCompositeSchemaCollapsed, setIsCompositeSchemaCollapsed] =
+    useState(false);
+
+  const handleCollapseCompositeSchema = () => {
+    if (compositeSchemaRef.current) {
+      if (isCompositeSchemaCollapsed) {
+        compositeSchemaRef.current.resize(
+          CompositeSchemaContainerSizes.EXPANDED,
+        );
+      } else {
+        compositeSchemaRef.current.resize(
+          CompositeSchemaContainerSizes.COLLAPSED,
+        );
+      }
+      setIsCompositeSchemaCollapsed(!isCompositeSchemaCollapsed);
+    }
+  };
 
   return (
     <Box
@@ -116,13 +142,40 @@ export default function SupportingPane() {
                     />
                     <Panel
                       id="composite-table-schema-panel"
-                      minSize={10}
-                      defaultSize={30}
+                      ref={compositeSchemaRef}
+                      minSize={CompositeSchemaContainerSizes.COLLAPSED}
+                      defaultSize={CompositeSchemaContainerSizes.EXPANDED}
                       collapsible={false}
                       order={2}
                       style={{ padding: "5px" }}
                     >
                       <Box display="flex" flexDirection="column" height="100%">
+                        <Box
+                          display="flex"
+                          alignItems="center"
+                          justifyContent={"space-between"}
+                          mb={0}
+                        >
+                          <Typography variant="h6" gutterBottom>
+                            Composite Schema
+                            <InfoIcon
+                              sx={{ ml: 1 }}
+                              tooltipText={
+                                "The Composite Schema provides the highest level"
+                              }
+                            />
+                          </Typography>
+                          <IconButton onClick={handleCollapseCompositeSchema}>
+                            <KeyboardArrowDown
+                              sx={{
+                                transform: isCompositeSchemaCollapsed
+                                  ? "rotate(180deg)"
+                                  : "rotate(0deg)",
+                                transition: "transform 0.3s",
+                              }}
+                            />
+                          </IconButton>
+                        </Box>
                         <CompositeTableSchema />
                       </Box>
                     </Panel>

@@ -39,11 +39,13 @@ import {
 } from "../../slices/operationsSlice";
 
 import TableDropTarget from "./TableDropTarget";
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { EnhancedOperationBlock } from "./OperationBlock";
 import { selectAlertErrorCount } from "../../slices/alertsSlice";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
+import { ListCollapseIcon } from "lucide-react";
+import { KeyboardArrowDown } from "@mui/icons-material";
 
 const stackDropTargetHeight = 50;
 
@@ -66,11 +68,6 @@ export default function CompositeTableSchema() {
       : null;
   });
 
-  const isAddingOperationsDisabled =
-    ((!rootOperation.isMaterialized || !rootOperation.isInSync) &&
-      rootOperation.operationType !== OPERATION_TYPE_NO_OP) ||
-    (errorCount && errorCount > 0);
-
   return (
     <Box
       className="CompositeTableSchema"
@@ -87,41 +84,11 @@ export default function CompositeTableSchema() {
             flexDirection={"column"}
           >
             {rootOperation.childIds.length > 0 ? (
-              <>
-                <EnhancedOperationBlock
-                  id={rootOperation.id}
-                  sx={{ height: "100%", flexGrow: 1 }}
-                />
-                <TableDropTarget
-                  disabled={isAddingOperationsDisabled}
-                  operationType={OPERATION_TYPE_STACK}
-                  sx={{
-                    height: `${stackDropTargetHeight}px`,
-                    marginTop: "3px",
-                  }}
-                >
-                  <AddIcon />
-                </TableDropTarget>
-              </>
+              <EnhancedOperationBlock
+                id={rootOperation.id}
+                sx={{ height: "100%", flexGrow: 1 }}
+              />
             ) : null}
-          </Box>
-          <Box
-            height="100%"
-            display="flex"
-            alignItems="top"
-            justifyContent="center"
-            sx={{ marginTop: "0px", marginBottom: "3px", marginLeft: "3px" }}
-          >
-            <TableDropTarget
-              disabled={isAddingOperationsDisabled}
-              operationType={OPERATION_TYPE_PACK}
-              sx={{
-                height: `calc(100% - ${stackDropTargetHeight + 6}px)`,
-                width: `${stackDropTargetHeight}px`,
-              }}
-            >
-              <AddIcon />
-            </TableDropTarget>
           </Box>
         </Box>
       ) : (

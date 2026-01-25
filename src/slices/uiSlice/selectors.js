@@ -262,3 +262,5 @@ export const selectHiddenColumnIdsByParentId = createSelector(
 );
 
 export const selectSelectedTableIds = (state) => state.ui.selectedTableIds;
+
+export const selectTableSearchString = (state) => state.ui.tableSearchString;

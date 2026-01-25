@@ -123,7 +123,7 @@ const LeftSideBar = () => {
       </Box>
 
       <Box sx={{ flex: 1, minHeight: 0 }}>
-        <Box sx={{ overflow: "auto", height: "100%" }}>
+        <Box sx={{ height: "100%" }}>
           <CustomTabPanel value={value} index={0}>
             <SourceTables />
           </CustomTabPanel>

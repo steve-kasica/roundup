@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useDragLayer } from "react-dnd";
 import { Box } from "@mui/material";
-import TableDragPreview from "./SourceTables/TableDragPreview";
 
 export const DRAG_TYPE_SOURCE_TABLE = "SOURCE_TABLE";
 export const DRAG_TYPE_SOURCE_TABLE_ROW = "SOURCE_TABLE_ROW";
@@ -23,22 +22,7 @@ export default function CustomDragLayer() {
 
   // Render different effects based on the item type
   const renderDragPreview = () => {
-    if (itemType === DRAG_TYPE_SOURCE_TABLE_ROW) {
-      return <TableDragPreview tableIds={item.tableIds} />;
-    } else {
-      return null;
-      // return (
-      //   <Box
-      //     sx={{
-      //       border: "1px dashed gray",
-      //       padding: "8px",
-      //       width: "100px",
-      //       height: "100px",
-      //       backgroundColor: "orange",
-      //     }}
-      //   ></Box>
-      // );
-    }
+    return null;
   };
 
   function x() {

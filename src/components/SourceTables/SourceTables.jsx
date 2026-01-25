@@ -57,23 +57,14 @@ import {
 } from "../../slices/columnsSlice";
 import { ascending, descending } from "d3";
 
-import { EnhancedTableDragContainer } from "./TableDragContainer";
 import { EnhancedTableRowSummary } from "./TableRowSummary";
-import { DRAG_TYPE_SOURCE_TABLE_ROW } from "../CustomDragLayer";
-import { EnhancedTablesToolbar } from "./TablesToolbar";
-import {
-  OPERATION_TYPE_PACK,
-  OPERATION_TYPE_STACK,
-} from "../../slices/operationsSlice";
 import withFocusedObjectData from "../HOC/withFocusedObjectData";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
-import SearchTextBox from "../ui/input/SearchTextBox";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToSelectedTableIds,
   removeFromSelectedTableIds,
   selectSelectedTableIds,
-  setSelectedTableIds,
 } from "../../slices/uiSlice";
 // import SearchTablesInput from "./SearchTablesInput/SearchTablesInput";
 import {
@@ -139,7 +130,6 @@ function SourceTables({
     console.debug("Rendering SourceTables");
   }
   const dispatch = useDispatch();
-  const [searchString, setSearchString] = useState("");
   const [sortAttribute, setSortAttribute] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
   const [lastClickedIndex, setLastClickedIndex] = useState(null);
@@ -174,30 +164,6 @@ function SourceTables({
   //     dispatch(setSelectedTableIds(tables.map(({ id }) => id)));
   //   }
   // }, [selectedTableIds.length, dispatch, tables]);
-
-  // Delete tables callback
-  // const handleDeleteClick = useCallback(() => {
-  //   deleteTables(selectedTableIds);
-  //   clearSelectedTableIds();
-  // }, [deleteTables, selectedTableIds, clearSelectedTableIds]);
-
-  // Add Pack operation callback
-  // const handleAddPackOperationClick = useCallback(() => {
-  //   addNewOperation(OPERATION_TYPE_PACK, selectedTableIds);
-  //   clearSelectedTableIds();
-  // }, [addNewOperation, selectedTableIds, clearSelectedTableIds]);
-
-  // Add Stack operation callback
-  // const handleAddStackOperationClick = useCallback(() => {
-  //   addNewOperation(OPERATION_TYPE_STACK, selectedTableIds);
-  //   clearSelectedTableIds();
-  // }, [addNewOperation, selectedTableIds, clearSelectedTableIds]);
-
-  // Insert tables into focused operation callback
-  // const handleInsertTablesInOperationClick = useCallback(() => {
-  //   insertTablesInFocusedOperation(selectedTableIds);
-  //   clearSelectedTableIds();
-  // }, [insertTablesInFocusedOperation, selectedTableIds, clearSelectedTableIds]);
 
   const handleRowClick = useCallback(
     (event, id) => {
@@ -238,23 +204,28 @@ function SourceTables({
 
   return (
     <>
-      <Toolbar disableGutters>
+      <Box display="flex" alignItems="center" gap={1} padding={1}>
         <SearchTablesInput />
         <UploadTablesButton />
         <DeleteTablesButton onConfirm={handleOnDeleteTables} />
         <ActionsButton />
-      </Toolbar>
+      </Box>
       <TableContainer
         sx={{
           width: "100%",
+          height: "100%",
           containerType: "inline-size",
           containerName: "tableLayout",
+          backgroundColor: (theme) => theme.palette.background.paper,
+          border: "1px solid rgba(0, 0, 0, 0.12)",
         }}
       >
         <Table
           style={{
             width: "100%",
-            borderCollapse: "collapse",
+            height: "100%",
+            borderCollapse: "separate",
+            borderSpacing: 0,
           }}
         >
           <TableHead
@@ -270,7 +241,12 @@ function SourceTables({
                 borderBottom: "2px solid rgba(0, 0, 0, 0.12)",
               }}
             >
-              <TableCell></TableCell>
+              <TableCell
+                sx={{
+                  padding: 0,
+                  borderRight: "1px solid rgba(0, 0, 0, 0.12)",
+                }}
+              ></TableCell>
               {headers.map((header) => (
                 <TableCell
                   key={header.attr}
@@ -305,28 +281,29 @@ function SourceTables({
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedTables.map(({ id, name }) => (
-              <EnhancedTableDragContainer
-                key={id}
-                id={id}
-                canDrag={true}
-                dragType={DRAG_TYPE_SOURCE_TABLE_ROW}
-                tableIds={selectedTableIds}
-                onDragEnd={(_item, dropResult) =>
-                  dropResult ? setSelectedTableIds([]) : null
-                }
-              >
+            {sortedTables.map(({ id }, index) => {
+              const isSelected = selectedTableIds.includes(id);
+              const isPrevSelected = selectedTableIds.includes(
+                sortedTables[index - 1]?.id,
+              );
+              const isNextSelected = selectedTableIds.includes(
+                sortedTables[index + 1]?.id,
+              );
+
+              return (
                 <EnhancedTableRowSummary
+                  key={id}
                   id={id}
-                  searchString={searchString}
-                  hasNameMatch={name.toLowerCase().includes(searchString)}
                   rowMax={rowMax}
                   columnMax={columnMax}
                   bytesMax={bytesMax}
                   onTrClick={handleRowClick}
+                  isSelected={isSelected}
+                  isPrevSelected={isPrevSelected}
+                  isNextSelected={isNextSelected}
                 />
-              </EnhancedTableDragContainer>
-            ))}
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

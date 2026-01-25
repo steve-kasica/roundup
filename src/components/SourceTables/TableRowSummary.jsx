@@ -27,16 +27,16 @@
 
 import { DragIndicator } from "@mui/icons-material";
 import HighlightText from "../ui/HighlightText";
-import { Typography, Checkbox, Stack, Box, TableCell } from "@mui/material";
-import { useCallback, useState } from "react";
-import { Menu, MenuItem } from "@mui/material";
-import { formatDate, formatNumber, formatBytes } from "../../lib/utilities";
+import { Typography, Checkbox, Stack, Box } from "@mui/material";
+import { useCallback, useMemo, useState } from "react";
+import { formatDate, formatBytes } from "../../lib/utilities";
 import { withTableData, withAssociatedAlerts } from "../HOC";
 import StyledTableRow from "./StyledTableRow";
 import BarChartCell from "./BarChartCell";
 import { IntegerNumber } from "../ui/text";
-import { addToSelectedTableIds } from "../../slices/uiSlice";
-import { useDispatch } from "react-redux";
+import { selectTableSearchString } from "../../slices/uiSlice";
+import { useSelector } from "react-redux";
+import StyledTableCell from "./StyledTableCell";
 
 export const TABLE_ROW_VIEW_CLASS = "TableRowSummary";
 
@@ -54,82 +54,94 @@ const TableRowSummary = ({
   columnCount,
   isInSchema,
   isSelected,
-
-  setTableName,
-
-  hoverTable,
-  unhoverTable,
-  dropTable,
   focusTable,
   isDisabled = false, // TODO: remove this, I don't think it's being set anywhere above
 
-  // props passed from TableLayout.jsx
+  // props passed from SourceTables.jsx
   onTrClick,
-  searchString,
   rowMax,
   columnMax,
   bytesMax,
-  hasNameMatch, // does the table name match the search string?
+  isPrevSelected,
+  isNextSelected,
 
   // Props from TableDragContainer
   dragDropRef,
 }) => {
-  if (import.meta.env.VITE_DEBUG_RENDER === "true") {
-    console.debug("Rendering TableRowSummary for table:", id);
-  }
+  const [isHovered, setIsHovered] = useState(false);
+  const clickTimeout = useState(null);
 
-  console.log("Table ID:", id, "isSelected:", isSelected);
+  const searchString = useSelector(selectTableSearchString);
+
+  const hasNameMatch = useMemo(() => {
+    if (!searchString) return true;
+    return name.toLowerCase().includes(searchString.toLowerCase());
+  }, [name, searchString]);
+
+  const handleMouseEnter = (event) => {
+    setIsHovered(true);
+    // hoverTable(event);
+  };
+
+  const handleMouseLeave = (event) => {
+    setIsHovered(false);
+    // unhoverTable(event);
+  };
+
+  const handleClick = (event) => {
+    if (clickTimeout[0]) {
+      clearTimeout(clickTimeout[0]);
+      clickTimeout[1](null);
+    }
+    clickTimeout[1](
+      setTimeout(() => {
+        onTrClick(event, id);
+        clickTimeout[1](null);
+      }, 100),
+    );
+  };
+
+  const handleDoubleClick = (e) => {
+    if (clickTimeout[0]) {
+      clearTimeout(clickTimeout[0]);
+      clickTimeout[1](null);
+    }
+    e.stopPropagation();
+    focusTable();
+  };
 
   return (
     <StyledTableRow
       isDragging={false} // TODO
       isDisabled={isDisabled || (searchString.length > 0 && !hasNameMatch)}
       isSelected={isSelected}
-      isHovered={false} // TODO: Implement hover state if needed
+      isHovered={isHovered}
       totalCount={totalCount}
       hasNameMatch={hasNameMatch}
       data-tableid={id}
       data-selected={isSelected}
-      onMouseEnter={hoverTable}
-      onMouseLeave={unhoverTable}
-      onClick={(event) => onTrClick(event, id)}
-      onDoubleClick={focusTable}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
+      ref={dragDropRef}
     >
-      <Typography
-        variant="data-primary"
-        color={isDisabled ? "textDisabled" : "normal"}
-        data-column="checkbox"
+      <StyledTableCell
+        sx={{
+          border: "2px solid transparent",
+        }}
       >
-        <Stack direction="row" alignItems="center" gap="1px">
-          <Box
-            ref={dragDropRef}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              cursor: "grab",
-              "&:hover .drag-icon": {
-                color: "#ff9800",
-                transform: "scale(1.1)",
-                filter: "drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3))",
-              },
-              "&:active .drag-icon": {
-                cursor: "grabbing",
-                transform: "scale(0.95)",
-                color: "#f57c00",
-              },
-            }}
-          >
-            <DragIndicator
-              className="drag-icon"
-              sx={{
-                color: "text.secondary",
-                opacity: 0.1,
-                transition: "all 0.2s ease-in-out",
-              }}
-            />
-          </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "grab",
+          }}
+        >
           <Checkbox
             checked={isInSchema}
+            indeterminate={isSelected}
             size="small"
             disabled
             sx={{
@@ -137,9 +149,24 @@ const TableRowSummary = ({
               pointerEvents: "none",
             }}
           />
-        </Stack>
-      </Typography>
-      <TableCell sx={{ padding: 0 }}>
+        </Box>
+      </StyledTableCell>
+      <StyledTableCell
+        isSelected={isSelected}
+        isPrevSelected={isPrevSelected}
+        isNextSelected={isNextSelected}
+        sx={{
+          ...(isSelected && {
+            borderLeftColor: (theme) => theme.palette.grey[900],
+            ...(!isPrevSelected && {
+              borderTopColor: (theme) => theme.palette.grey[900],
+            }),
+            ...(!isNextSelected && {
+              borderBottomColor: (theme) => theme.palette.grey[900],
+            }),
+          }),
+        }}
+      >
         <Typography
           variant="data-primary"
           color={
@@ -155,8 +182,22 @@ const TableRowSummary = ({
             }}
           />
         </Typography>
-      </TableCell>
-      <TableCell sx={{ padding: 0 }}>
+      </StyledTableCell>
+      <StyledTableCell
+        isSelected={isSelected}
+        isPrevSelected={isPrevSelected}
+        isNextSelected={isNextSelected}
+        sx={{
+          ...(isSelected && {
+            ...(!isPrevSelected && {
+              borderTopColor: (theme) => theme.palette.grey[900],
+            }),
+            ...(!isNextSelected && {
+              borderBottomColor: (theme) => theme.palette.grey[900],
+            }),
+          }),
+        }}
+      >
         <Typography
           variant="data-primary"
           color={isDisabled ? "textDisabled" : "normal"}
@@ -164,8 +205,22 @@ const TableRowSummary = ({
         >
           {mimeType || "N/A"}
         </Typography>
-      </TableCell>
-      <TableCell sx={{ padding: 0 }}>
+      </StyledTableCell>
+      <StyledTableCell
+        isSelected={isSelected}
+        isPrevSelected={isPrevSelected}
+        isNextSelected={isNextSelected}
+        sx={{
+          ...(isSelected && {
+            ...(!isPrevSelected && {
+              borderTopColor: (theme) => theme.palette.grey[900],
+            }),
+            ...(!isNextSelected && {
+              borderBottomColor: (theme) => theme.palette.grey[900],
+            }),
+          }),
+        }}
+      >
         <BarChartCell
           variant="data-primary"
           color={isDisabled ? "textDisabled" : "normal"}
@@ -175,8 +230,22 @@ const TableRowSummary = ({
         >
           {formatBytes(size)}
         </BarChartCell>
-      </TableCell>
-      <TableCell sx={{ padding: 0 }}>
+      </StyledTableCell>
+      <StyledTableCell
+        isSelected={isSelected}
+        isPrevSelected={isPrevSelected}
+        isNextSelected={isNextSelected}
+        sx={{
+          ...(isSelected && {
+            ...(!isPrevSelected && {
+              borderTopColor: (theme) => theme.palette.grey[900],
+            }),
+            ...(!isNextSelected && {
+              borderBottomColor: (theme) => theme.palette.grey[900],
+            }),
+          }),
+        }}
+      >
         <BarChartCell
           variant="data-primary"
           color={isDisabled ? "textDisabled" : "normal"}
@@ -186,8 +255,22 @@ const TableRowSummary = ({
         >
           <IntegerNumber value={rowCount} />
         </BarChartCell>
-      </TableCell>
-      <TableCell sx={{ padding: 0 }}>
+      </StyledTableCell>
+      <StyledTableCell
+        isSelected={isSelected}
+        isPrevSelected={isPrevSelected}
+        isNextSelected={isNextSelected}
+        sx={{
+          ...(isSelected && {
+            ...(!isPrevSelected && {
+              borderTopColor: (theme) => theme.palette.grey[900],
+            }),
+            ...(!isNextSelected && {
+              borderBottomColor: (theme) => theme.palette.grey[900],
+            }),
+          }),
+        }}
+      >
         <BarChartCell
           variant="data-primary"
           color={isDisabled ? "textDisabled" : "normal"}
@@ -197,8 +280,23 @@ const TableRowSummary = ({
         >
           <IntegerNumber value={columnCount} />
         </BarChartCell>
-      </TableCell>
-      <TableCell sx={{ padding: 0 }}>
+      </StyledTableCell>
+      <StyledTableCell
+        isSelected={isSelected}
+        isPrevSelected={isPrevSelected}
+        isNextSelected={isNextSelected}
+        sx={{
+          ...(isSelected && {
+            borderRightColor: (theme) => theme.palette.grey[900],
+            ...(!isPrevSelected && {
+              borderTopColor: (theme) => theme.palette.grey[900],
+            }),
+            ...(!isNextSelected && {
+              borderBottomColor: (theme) => theme.palette.grey[900],
+            }),
+          }),
+        }}
+      >
         <Typography
           variant="data-primary"
           color={isDisabled ? "textDisabled" : "normal"}
@@ -206,7 +304,7 @@ const TableRowSummary = ({
         >
           {formatDate(new Date(dateLastModified))}
         </Typography>
-      </TableCell>
+      </StyledTableCell>
     </StyledTableRow>
   );
 };

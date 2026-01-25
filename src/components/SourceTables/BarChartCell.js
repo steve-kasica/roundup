@@ -4,6 +4,10 @@ const BarChartCell = styled(Typography, {
   shouldForwardProp: (prop) => !["percentage", "isDisabled"].includes(prop),
 })(({ percentage, isDisabled }) => ({
   position: "relative",
+  height: "100%",
+  justifyContent: "left",
+  alignItems: "center",
+  display: "flex",
   backgroundImage: `linear-gradient(to right, ${
     isDisabled ? "rgba(0, 0, 0, 0.05)" : "rgba(25, 118, 210, 0.15)"
   } 0%, ${
@@ -11,9 +15,8 @@ const BarChartCell = styled(Typography, {
   } ${percentage.toFixed(1)}%, transparent ${percentage.toFixed(1)}%)`,
   backgroundRepeat: "no-repeat",
   backgroundSize: "100% 100%",
-  borderRight: "2px solid transparent",
+
   textWrap: "nowrap",
-  borderTop: "2px solid transparent",
   "&::before": {
     content: '""',
     position: "absolute",
