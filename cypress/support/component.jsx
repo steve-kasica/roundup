@@ -13,6 +13,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { ThemeProvider } from "@mui/material/styles";
+import createSagaMiddleware from "redux-saga";
+import rootSaga from "../../src/sagas";
 
 import { themeDefault } from "../../src/themes";
 import uiReducer, {
@@ -43,7 +45,9 @@ import "./commands";
  * @returns {Object} Configured Redux store for testing.
  */
 function createTestStore(preloadedState = {}) {
-  return configureStore({
+  const sagaMiddleware = createSagaMiddleware();
+
+  const store = configureStore({
     reducer: {
       ui: uiReducer,
       operations: operationsReducer,
@@ -58,7 +62,13 @@ function createTestStore(preloadedState = {}) {
       columns: { ...defaultColumnsState, ...preloadedState.columns },
       alerts: { ...defaultAlertsState, ...preloadedState.alerts },
     },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(sagaMiddleware),
   });
+
+  sagaMiddleware.run(rootSaga);
+
+  return store;
 }
 
 /**

@@ -386,7 +386,7 @@ const PackSchemaView = ({
         gap={0.5}
         padding={1}
         sx={{
-          backgroundColor: totalCount ? "error.lighter" : "transparent",
+          backgroundColor: "background.paper",
           overflow: "hidden",
         }}
       >
@@ -582,11 +582,6 @@ const PackSchemaView = ({
                       >
                         <IntegerNumber value={value} />
                       </Typography>
-                      // <Badge
-                      //   color={isMatchDisabled ? "default" : "info"}
-                      //   badgeContent={value.toLocaleString()}
-                      //   max={Number.MAX_SAFE_INTEGER}
-                      // />
                     )}
                   </Box>
                 </Box>
