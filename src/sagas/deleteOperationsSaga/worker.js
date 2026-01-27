@@ -23,6 +23,10 @@ import {
 } from "../../slices/operationsSlice";
 import { dropView } from "../../lib/duckdb";
 import { deleteOperationsFailure, deleteOperationsSuccess } from "./actions";
+import {
+  selectFocusedObjectId,
+  setFocusedObjectId,
+} from "../../slices/uiSlice";
 
 export default function* deleteOperationsWorker(action) {
   const successfulDeletions = [];
@@ -39,18 +43,29 @@ export default function* deleteOperationsWorker(action) {
   }
 
   const operations = yield select((state) =>
-    selectOperationsById(state, operationIds)
+    selectOperationsById(state, operationIds),
   );
 
   for (const operation of operations) {
     // If the operation corresponds to a view in the database, drop that view
     if (operation.operationType !== OPERATION_TYPE_NO_OP) {
       try {
-        yield call(dropView, operation.id);
+        if (operation.isMaterialized) {
+          yield call(dropView, operation.databaseName);
+        }
+
+        const focusedObjectId = yield select(selectFocusedObjectId);
+        // If the deleted operation is currently focused, clear the focus
+        if (focusedObjectId === operation.id) {
+          yield put(setFocusedObjectId(null));
+        }
         yield put(deleteOperationsFromSlice(operation.id));
         successfulDeletions.push(operation.id);
       } catch (error) {
-        console.error("Error deleting operation:", error);
+        console.error(
+          "deleteOperationsSaga/worker.js: Error deleting operation:",
+          error,
+        );
         failedDeletions.push({ id: operation.id, error });
       }
     } else {

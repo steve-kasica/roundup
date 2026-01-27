@@ -29,7 +29,7 @@ export default function* deleteOperationsWatcher() {
     const { operationIds } = action.payload;
 
     const operations = yield select((state) =>
-      selectOperationsById(state, operationIds)
+      selectOperationsById(state, operationIds),
     );
 
     const operationIdsToDelete = [];
@@ -43,7 +43,7 @@ export default function* deleteOperationsWatcher() {
         const childOperationIds = operation.childIds.filter(isOperationId);
         if (childOperationIds.length > 0) {
           const childOperations = yield select((state) =>
-            selectOperationsById(state, childOperationIds)
+            selectOperationsById(state, childOperationIds),
           );
           yield* collectOperationIds(childOperations);
         }
@@ -57,16 +57,17 @@ export default function* deleteOperationsWatcher() {
     });
   });
 
-  // If an operation successfully updates such that it has no children, then delete it
+  // If an operation successfully updates such that it has no children (`childIds` = []),
+  // then delete it.
   // Note: the `changedPropertiesByOperation` payload object is in the form
   // { operationId: [ keyUpdated, keyUpdated ]}
   yield takeLatest(updateOperationsSuccess.type, function* (action) {
     const { changedPropertiesById } = action.payload;
     const operationIdsToDelete = [];
     for (const [id, keys] of Object.entries(changedPropertiesById)) {
-      if (keys.includes("children")) {
+      if (keys.includes("childIds")) {
         const operation = yield select((state) =>
-          selectOperationsById(state, id)
+          selectOperationsById(state, id),
         );
         if (operation.childIds.length === 0) {
           operationIdsToDelete.push(id);
@@ -75,7 +76,7 @@ export default function* deleteOperationsWatcher() {
     }
     if (operationIdsToDelete.length > 0) {
       yield put(
-        deleteOperationsRequest({ operationIds: operationIdsToDelete })
+        deleteOperationsRequest({ operationIds: operationIdsToDelete }),
       );
     }
   });

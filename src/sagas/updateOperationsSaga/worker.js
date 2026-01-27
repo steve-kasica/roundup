@@ -52,7 +52,7 @@ export default function* updateOperationsWorker(action) {
 
   for (let operationUpdate of operationUpdates) {
     const operation = yield select((state) =>
-      selectOperationsById(state, operationUpdate.id)
+      selectOperationsById(state, operationUpdate.id),
     );
 
     // If the operation is updating the `childIds` property,
@@ -64,7 +64,7 @@ export default function* updateOperationsWorker(action) {
         let childObject;
         if (isTableId(childId)) {
           childObject = yield select((state) =>
-            selectTablesById(state, childId)
+            selectTablesById(state, childId),
           );
           if (childObject.parentId !== operationUpdate.id) {
             tableUpdates.push({
@@ -74,7 +74,7 @@ export default function* updateOperationsWorker(action) {
           }
         } else {
           childObject = yield select((state) =>
-            selectOperationsById(state, childId)
+            selectOperationsById(state, childId),
           );
           if (childObject.parentId !== operationUpdate.id) {
             furtherOperationUpdates.push({
@@ -86,7 +86,7 @@ export default function* updateOperationsWorker(action) {
       }
     } else if (Object.hasOwnProperty.call(operationUpdate, "isMaterialized")) {
       const queryData = yield select((state) =>
-        selectOperationQueryData(state, operation.id)
+        selectOperationQueryData(state, operation.id),
       );
       try {
         if (operation.operationType === OPERATION_TYPE_STACK) {
@@ -96,7 +96,7 @@ export default function* updateOperationsWorker(action) {
         }
         const { columnCount, rowCount } = yield call(
           getTableDimensions,
-          operation.databaseName
+          operation.databaseName,
         );
         operationUpdate.columnCount = columnCount;
         operationUpdate.rowCount = rowCount;
@@ -149,14 +149,14 @@ export default function* updateOperationsWorker(action) {
           rightTableName,
           leftColumnName,
           rightColumnName,
-          joinType
+          joinType,
         );
         operationUpdate.matchStats = matchStats;
       } catch (error) {
         console.error(
           "Error calculating match stats for operation:",
           operation.id,
-          error
+          error,
         );
       } finally {
         // Remove operation from loading state
@@ -172,27 +172,21 @@ export default function* updateOperationsWorker(action) {
     yield put(updateTablesSlice(tableUpdates));
   }
   yield put(
-    updateOperationsSlice([...successfulUpdates, ...furtherOperationUpdates])
+    updateOperationsSlice([...successfulUpdates, ...furtherOperationUpdates]),
   );
 
   const formatSagaEndPayload = (updates) => ({
-    // operationIds: updates.map(({ id }) => id),
     changedPropertiesById: Object.fromEntries(
       updates.map(({ id }) => [
         id,
         Object.keys(
-          operationUpdates.find(({ id: updateId }) => updateId === id)
+          operationUpdates.find(({ id: updateId }) => updateId === id),
         ).filter((key) => key !== "id"),
-      ])
+      ]),
     ),
-    // raisedAlerts,
   });
 
   if (successfulUpdates.length > 0) {
     yield put(updateOperationsSuccess(formatSagaEndPayload(successfulUpdates)));
   }
-
-  // if (failedUpdates.length > 0) {
-  //   yield put(updateOperationsFailure(formatSagaEndPayload(failedUpdates)));
-  // }
 }

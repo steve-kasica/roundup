@@ -64,13 +64,13 @@ describe("deleteOperationsWatcher", () => {
       // Verify deleteOperations was called from slice
       const deleteOperationsAction = effects.put.find(
         (effect) =>
-          effect.payload.action.type === deleteOperationsFromSlice.type
+          effect.payload.action.type === deleteOperationsFromSlice.type,
       );
       expect(deleteOperationsAction).toBeDefined();
 
       // Verify success action was dispatched
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeDefined();
     });
@@ -96,7 +96,7 @@ describe("deleteOperationsWatcher", () => {
         .silentRun(100);
 
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeDefined();
       expect(successAction.payload.action.payload.operationIds).toContain("o1");
@@ -123,14 +123,14 @@ describe("deleteOperationsWatcher", () => {
       // Verify deleteOperations was called from slice
       const deleteOperationsAction = effects.put.find(
         (effect) =>
-          effect.payload.action.type === deleteOperationsFromSlice.type
+          effect.payload.action.type === deleteOperationsFromSlice.type,
       );
       expect(deleteOperationsAction).toBeDefined();
 
       // dropView should not be called for NO_OP
       const callEffects = effects.call || [];
       const dropViewCall = callEffects.find(
-        (effect) => effect.payload?.fn === dropView
+        (effect) => effect.payload?.fn === dropView,
       );
       expect(dropViewCall).toBeUndefined();
     });
@@ -162,7 +162,7 @@ describe("deleteOperationsWatcher", () => {
         .silentRun(100);
 
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeDefined();
       expect(successAction.payload.action.payload.operationIds).toContain("o1");
@@ -202,7 +202,7 @@ describe("deleteOperationsWatcher", () => {
 
       // Should have dispatched success twice
       const successActions = effects.put.filter(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successActions).toHaveLength(2);
     });
@@ -233,7 +233,7 @@ describe("deleteOperationsWatcher", () => {
         .silentRun(100);
 
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeDefined();
       expect(successAction.payload.action.payload.operationIds).toContain("o1");
@@ -253,7 +253,7 @@ describe("deleteOperationsWatcher", () => {
 
       const action = updateOperationsSuccess({
         changedPropertiesById: {
-          o1: ["children"],
+          o1: ["childIds"],
         },
       });
 
@@ -266,7 +266,7 @@ describe("deleteOperationsWatcher", () => {
       // Should dispatch deleteOperationsRequest for childless operation
       const deleteRequest = effects.put.find(
         (effect) =>
-          effect.payload?.action?.type === deleteOperationsRequest.type
+          effect.payload?.action?.type === deleteOperationsRequest.type,
       );
       expect(deleteRequest).toBeDefined();
       expect(deleteRequest.payload.action.payload.operationIds).toContain("o1");
@@ -295,7 +295,7 @@ describe("deleteOperationsWatcher", () => {
       // Should not dispatch deleteOperationsRequest
       const deleteRequest = effects.put?.find(
         (effect) =>
-          effect.payload?.action?.type === deleteOperationsRequest.type
+          effect.payload?.action?.type === deleteOperationsRequest.type,
       );
       expect(deleteRequest).toBeUndefined();
     });
@@ -323,7 +323,7 @@ describe("deleteOperationsWatcher", () => {
       // Should not dispatch deleteOperationsRequest since "children" not changed
       const deleteRequest = effects.put?.find(
         (effect) =>
-          effect.payload?.action?.type === deleteOperationsRequest.type
+          effect.payload?.action?.type === deleteOperationsRequest.type,
       );
       expect(deleteRequest).toBeUndefined();
     });
@@ -344,8 +344,8 @@ describe("deleteOperationsWatcher", () => {
 
       const action = updateOperationsSuccess({
         changedPropertiesById: {
-          o1: ["children"],
-          o2: ["children"],
+          o1: ["childIds"],
+          o2: ["childIds"],
         },
       });
 
@@ -357,7 +357,7 @@ describe("deleteOperationsWatcher", () => {
 
       const deleteRequest = effects.put.find(
         (effect) =>
-          effect.payload?.action?.type === deleteOperationsRequest.type
+          effect.payload?.action?.type === deleteOperationsRequest.type,
       );
       expect(deleteRequest).toBeDefined();
       expect(deleteRequest.payload.action.payload.operationIds).toContain("o1");
@@ -380,8 +380,8 @@ describe("deleteOperationsWatcher", () => {
 
       const action = updateOperationsSuccess({
         changedPropertiesById: {
-          o1: ["children"],
-          o2: ["children"],
+          o1: ["childIds"],
+          o2: ["childIds"],
         },
       });
 
@@ -393,12 +393,12 @@ describe("deleteOperationsWatcher", () => {
 
       const deleteRequest = effects.put.find(
         (effect) =>
-          effect.payload?.action?.type === deleteOperationsRequest.type
+          effect.payload?.action?.type === deleteOperationsRequest.type,
       );
       expect(deleteRequest).toBeDefined();
       expect(deleteRequest.payload.action.payload.operationIds).toContain("o1");
       expect(deleteRequest.payload.action.payload.operationIds).not.toContain(
-        "o2"
+        "o2",
       );
     });
   });
@@ -415,7 +415,7 @@ describe("deleteOperationsWatcher", () => {
       // Should not have dispatched any delete-related actions
       const deleteAction = effects.put?.find(
         (effect) =>
-          effect.payload?.action?.type === deleteOperationsFromSlice.type
+          effect.payload?.action?.type === deleteOperationsFromSlice.type,
       );
 
       expect(deleteAction).toBeUndefined();
@@ -434,7 +434,7 @@ describe("deleteOperationsWatcher", () => {
       // Should not have dispatched deleteOperations from slice
       const deleteAction = effects.put?.find(
         (effect) =>
-          effect.payload?.action?.type === deleteOperationsFromSlice.type
+          effect.payload?.action?.type === deleteOperationsFromSlice.type,
       );
 
       expect(deleteAction).toBeUndefined();
@@ -455,7 +455,7 @@ describe("deleteOperationsWatcher", () => {
       // Should not dispatch success for empty array
       const successAction = effects.put?.find(
         (effect) =>
-          effect.payload?.action?.type === deleteOperationsSuccess.type
+          effect.payload?.action?.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeUndefined();
     });
@@ -492,7 +492,7 @@ describe("deleteOperationsWatcher", () => {
         .silentRun(100);
 
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeDefined();
       expect(successAction.payload.action.payload.operationIds).toHaveLength(3);

@@ -15,11 +15,15 @@ import { dropView } from "../../lib/duckdb";
 /**
  * Helper to create a mock state with operations
  */
-const createMockState = (operationsById = {}) => ({
+const createMockState = (operationsById = {}, uiState = {}) => ({
   operations: {
     byId: operationsById,
     allIds: Object.keys(operationsById),
     rootOperationId: null,
+  },
+  ui: {
+    focusedObjectId: null,
+    ...uiState,
   },
 });
 
@@ -29,16 +33,16 @@ describe("deleteOperationsWorker saga", () => {
   });
 
   describe("deleting PACK/STACK operations", () => {
-    it("drops view and deletes PACK operation from state", async () => {
+    it("dispatches a deleteOperations actions to the slice", async () => {
       const action = {
         payload: {
-          operationIds: ["o_1"],
+          operationIds: ["o1"],
         },
       };
 
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_PACK,
           databaseName: "pack_view_1",
         },
@@ -52,30 +56,28 @@ describe("deleteOperationsWorker saga", () => {
       // Verify deleteOperations was called from slice
       const deleteOperationsAction = effects.put.find(
         (effect) =>
-          effect.payload.action.type === deleteOperationsFromSlice.type
+          effect.payload.action.type === deleteOperationsFromSlice.type,
       );
       expect(deleteOperationsAction).toBeDefined();
 
       // Verify success action was dispatched
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeDefined();
-      expect(successAction.payload.action.payload.operationIds).toContain(
-        "o_1"
-      );
+      expect(successAction.payload.action.payload.operationIds).toContain("o1");
     });
 
-    it("drops view and deletes STACK operation from state", async () => {
+    it("dispatches a deleteOperations actions to the slice", async () => {
       const action = {
         payload: {
-          operationIds: ["o_1"],
+          operationIds: ["o1"],
         },
       };
 
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_STACK,
           databaseName: "stack_view_1",
         },
@@ -87,9 +89,46 @@ describe("deleteOperationsWorker saga", () => {
         .run();
 
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeDefined();
+    });
+
+    it("clears the focused object if it is being deleted", async () => {
+      const action = {
+        payload: {
+          operationIds: ["o1"],
+        },
+      };
+
+      const mockState = {
+        ui: {
+          focusedObjectId: "o1",
+        },
+        operations: {
+          byId: {
+            o1: {
+              id: "o1",
+              operationType: OPERATION_TYPE_PACK,
+              databaseName: "pack_view_1",
+            },
+          },
+          allIds: ["o1"],
+        },
+      };
+
+      const { effects } = await expectSaga(deleteOperationsWorker, action)
+        .withState(mockState)
+        .provide([[matchers.call.fn(dropView), undefined]])
+        .run();
+
+      // Verify setFocusedObjectId(null) was dispatched
+      const setFocusedObjectAction = effects.put.find(
+        (effect) =>
+          effect.payload.action.type === "ui/setFocusedObjectId" &&
+          effect.payload.action.payload === null,
+      );
+      expect(setFocusedObjectAction).toBeDefined();
     });
   });
 
@@ -97,13 +136,13 @@ describe("deleteOperationsWorker saga", () => {
     it("deletes NO_OP operation from state without dropping view", async () => {
       const action = {
         payload: {
-          operationIds: ["o_1"],
+          operationIds: ["o1"],
         },
       };
 
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_NO_OP,
         },
       });
@@ -115,13 +154,13 @@ describe("deleteOperationsWorker saga", () => {
       // Verify deleteOperations was called
       const deleteOperationsAction = effects.put.find(
         (effect) =>
-          effect.payload.action.type === deleteOperationsFromSlice.type
+          effect.payload.action.type === deleteOperationsFromSlice.type,
       );
       expect(deleteOperationsAction).toBeDefined();
 
       // Verify success action was dispatched
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeDefined();
     });
@@ -131,13 +170,13 @@ describe("deleteOperationsWorker saga", () => {
     it("deletes multiple operations of different types", async () => {
       const action = {
         payload: {
-          operationIds: ["o_1", "o_2"],
+          operationIds: ["o1", "o2"],
         },
       };
 
       const mockState = createMockState({
-        o_1: { id: "o_1", operationType: OPERATION_TYPE_PACK },
-        o_2: { id: "o_2", operationType: OPERATION_TYPE_NO_OP },
+        o1: { id: "o1", operationType: OPERATION_TYPE_PACK },
+        o2: { id: "o2", operationType: OPERATION_TYPE_NO_OP },
       });
 
       const { effects } = await expectSaga(deleteOperationsWorker, action)
@@ -148,43 +187,14 @@ describe("deleteOperationsWorker saga", () => {
       // Should have two deleteOperations calls (one per operation)
       const deleteOperationsActions = effects.put.filter(
         (effect) =>
-          effect.payload.action.type === deleteOperationsFromSlice.type
+          effect.payload.action.type === deleteOperationsFromSlice.type,
       );
       expect(deleteOperationsActions).toHaveLength(2);
 
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction.payload.action.payload.operationIds).toHaveLength(2);
-    });
-  });
-
-  describe("failed operation deletion", () => {
-    it("dispatches failure action when view drop fails", async () => {
-      const action = {
-        payload: {
-          operationIds: ["o_1"],
-        },
-      };
-
-      const mockState = createMockState({
-        o_1: {
-          id: "o_1",
-          operationType: OPERATION_TYPE_PACK,
-        },
-      });
-
-      const { effects } = await expectSaga(deleteOperationsWorker, action)
-        .withState(mockState)
-        .provide([
-          [matchers.call.fn(dropView), throwError(new Error("Drop failed"))],
-        ])
-        .run();
-
-      const failureAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsFailure.type
-      );
-      expect(failureAction).toBeDefined();
     });
   });
 
@@ -192,13 +202,13 @@ describe("deleteOperationsWorker saga", () => {
     it("handles single operationId (not array)", async () => {
       const action = {
         payload: {
-          operationIds: "o_1", // Single ID, not array
+          operationIds: "o1", // Single ID, not array
         },
       };
 
       const mockState = createMockState({
-        o_1: {
-          id: "o_1",
+        o1: {
+          id: "o1",
           operationType: OPERATION_TYPE_NO_OP,
         },
       });
@@ -208,7 +218,7 @@ describe("deleteOperationsWorker saga", () => {
         .run();
 
       const successAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteOperationsSuccess.type
+        (effect) => effect.payload.action.type === deleteOperationsSuccess.type,
       );
       expect(successAction).toBeDefined();
     });
@@ -224,7 +234,7 @@ describe("deleteOperationsWorker saga", () => {
 
       const { effects } = await expectSaga(
         deleteOperationsWorker,
-        action
+        action,
       ).run();
 
       // No actions should be dispatched

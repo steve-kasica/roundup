@@ -3,12 +3,8 @@ export const getRowCount = (rowCount, rowRanges) => {
     ? rowCount
     : [...rowRanges.entries()].reduce(
         (acc, [, { end }]) => Math.max(acc, end),
-        0
+        0,
       );
-};
-
-export const getColumnCount = (columnCount, childColumnIds) => {
-  return Math.max(...childColumnIds.map((columnIds) => columnIds.length), 0);
 };
 
 export const getColumnIdMatrix = (childColumnIds) => {

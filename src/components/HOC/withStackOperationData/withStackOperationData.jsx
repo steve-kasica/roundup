@@ -21,7 +21,7 @@ import {
 } from "../../../slices/operationsSlice";
 import { updateTablesRequest } from "../../../sagas/updateTablesSaga";
 import { selectColumnIdsByParentId } from "../../../slices/columnsSlice";
-import { getColumnCount, getColumnIdMatrix, getRowCount } from "./utilities";
+import { getColumnIdMatrix, getRowCount } from "./utilities";
 
 /**
  * @typedef {Object} WithStackOperationDataProps
