@@ -23,13 +23,13 @@ describe("operationsSelectors", () => {
   let columns = Array.from({ length: 12 }, (_, i) =>
       Column({
         databaseName: `column_${i}`,
-      })
+      }),
     ),
     tables = Array.from({ length: 4 }, (_, i) =>
       Table({
         databaseName: `table_${i}`,
         rowCount: 10 * (i + 1),
-      })
+      }),
     ),
     operations = Array.from({ length: 2 }, (_, i) =>
       Operation({
@@ -49,7 +49,7 @@ describe("operationsSelectors", () => {
               joinPredicate: undefined,
               joinType: undefined,
             }),
-      })
+      }),
     ),
     state;
 
@@ -104,12 +104,12 @@ describe("operationsSelectors", () => {
   describe("selectOperationsById", () => {
     it("should return the operation for a given ID", () => {
       expect(selectOperationsById(state, operations[0].id)).toEqual(
-        operations[0]
+        operations[0],
       );
     });
     it("should return an array of operations for given IDs", () => {
       expect(
-        selectOperationsById(state, [operations[0].id, operations[1].id])
+        selectOperationsById(state, [operations[0].id, operations[1].id]),
       ).toEqual([operations[0], operations[1]]);
     });
   });
@@ -124,11 +124,27 @@ describe("operationsSelectors", () => {
   describe("selectOperationIdByChildId", () => {
     it("should return the operation ID for a given table ID", () => {
       expect(selectOperationIdByChildId(state, tables[0].id)).toEqual(
-        operations[0].id
+        operations[0].id,
       );
     });
     it("should return undefined if no operation contains the table ID", () => {
       expect(selectOperationIdByChildId(state, "t100")).toBeUndefined();
+    });
+    it("should return the operation ID for a given operation ID", () => {
+      expect(selectOperationIdByChildId(state, operations[0].id)).toEqual(
+        operations[1].id,
+      );
+    });
+    it("should return an array of operation IDs for given child IDs", () => {
+      expect(
+        selectOperationIdByChildId(state, [tables[0].id, operations[0].id]),
+      ).toEqual([operations[0].id, operations[1].id]);
+    });
+    it("should return undefined for child IDs not contained in any operation", () => {
+      expect(selectOperationIdByChildId(state, ["t100", "o100"])).toEqual([
+        undefined,
+        undefined,
+      ]);
     });
   });
   describe("selectOperationDepthByIdById", () => {
@@ -146,11 +162,11 @@ describe("operationsSelectors", () => {
   describe("selectOperationQueryData", () => {
     it("should return the query data for a given composite operation", () => {
       expect(
-        selectOperationQueryData(state, state.operations.rootOperationId)
+        selectOperationQueryData(state, state.operations.rootOperationId),
       ).toEqual({
         viewName: operations[1].databaseName,
         columnNames: operations[1].columnIds.map(
-          (id) => state.columns.byId[id].databaseName
+          (id) => state.columns.byId[id].databaseName,
         ),
         leftKey: columns[6].databaseName,
         rightKey: columns[8].databaseName,
@@ -160,19 +176,19 @@ describe("operationsSelectors", () => {
           {
             tableName: operations[0].databaseName,
             columnNames: operations[0].columnIds.map(
-              (id) => state.columns.byId[id].databaseName
+              (id) => state.columns.byId[id].databaseName,
             ),
           },
           {
             tableName: tables[2].databaseName,
             columnNames: tables[2].columnIds.map(
-              (id) => state.columns.byId[id].databaseName
+              (id) => state.columns.byId[id].databaseName,
             ),
           },
           {
             tableName: tables[3].databaseName,
             columnNames: tables[3].columnIds.map(
-              (id) => state.columns.byId[id].databaseName
+              (id) => state.columns.byId[id].databaseName,
             ),
           },
         ],
@@ -186,7 +202,7 @@ describe("operationsSelectors", () => {
           [operations[0].id, operations[0].rowCount],
           [tables[2].id, tables[2].rowCount],
           [tables[3].id, tables[3].rowCount],
-        ])
+        ]),
       );
     });
   });

@@ -59,13 +59,21 @@ export function selectAllOperationIds(state, includeNoOp = false) {
  * Memoized selector to find the operation that contains the given table ID.
  *
  * @param {Object} state - The Redux state object.
- * @param {string|number} tableId - The unique identifier of the table.
- * @returns {Object|undefined} The operation object containing the table, or undefined if not found.
+ * @param {string|number|Array<string|number>} childId - The unique identifier(s) of the child(ren).
+ * @returns {string|Array<string>|undefined} The operation ID(s) containing the child(ren), or undefined if not found.
  */
 export const selectOperationIdByChildId = createSelector(
   (state) => state.operations.byId,
   (_, childId) => childId,
   (operationsData, childId) => {
+    if (Array.isArray(childId)) {
+      return childId.map(
+        (id) =>
+          Object.entries(operationsData).find(([, { childIds }]) =>
+            childIds.includes(id),
+          )?.[0],
+      );
+    }
     return Object.entries(operationsData).find(([, { childIds }]) =>
       childIds.includes(childId),
     )?.[0];
