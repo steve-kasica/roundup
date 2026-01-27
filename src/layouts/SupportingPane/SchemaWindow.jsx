@@ -15,7 +15,7 @@
  * @example
  * <SchemaWindow />
  */
-import { Alert, Box, Typography } from "@mui/material";
+import { Alert, Box, Divider, Typography } from "@mui/material";
 import {
   OPERATION_TYPE_STACK,
   OPERATION_TYPE_PACK,
@@ -30,6 +30,16 @@ import { EnhancedStackSchemaView } from "../../components/StackOperationView/Sta
 import PackSchemaView from "../../components/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
+import FocusedObjectSelect from "../../components/AppToolbar/FocusedObjectSelect";
+import RenameFocusedObjectButton from "../../components/AppToolbar/RenameFocusedObjectButton";
+import ChangeTableOrder from "../../components/AppToolbar/ChangeTableOrder";
+import SelectAllColumnsButton from "../../components/AppToolbar/SelectAllColumnsButton";
+import FocusColumnsButton from "../../components/AppToolbar/FocusColumnsButton/FocusColumnsButton";
+import HideColumnsButton from "../../components/AppToolbar/HideColumnsButton";
+import DeleteColumnsButton from "../../components/AppToolbar/DeleteColumnsButton";
+import { ExportTableButton } from "../../components/AppToolbar/ExportTable";
+import AlertsButton from "../../components/AppToolbar/AlertsButton";
+import PackMatchToggleButtonGroup from "../../components/AppToolbar/PackMatchToggleButtonGroup";
 
 export default function SchemaWindow() {
   const tablesUploaded = useSelector(selectAllTableIds);
@@ -44,11 +54,49 @@ export default function SchemaWindow() {
 
   return (
     <>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent={"space-between"}
+        height={48}
+        borderBottom={1}
+        borderColor="divider"
+        p={0.5}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            userSelect: "none",
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Schema&nbsp;View
+        </Typography>
+        <Box display="flex" alignItems="center" justifyContent="center">
+          <FocusedObjectSelect />
+          <RenameFocusedObjectButton />
+          <ChangeTableOrder />
+          <Divider orientation="vertical" flexItem />
+          <SelectAllColumnsButton />
+          <FocusColumnsButton />
+          <HideColumnsButton />
+          <DeleteColumnsButton />
+          <Divider orientation="vertical" flexItem />
+          <PackMatchToggleButtonGroup />
+          <Divider orientation="vertical" flexItem />
+          <ExportTableButton />
+          <AlertsButton />
+        </Box>
+      </Box>
+
       {!areTablesUploaded ? (
         <Box
           sx={{
             width: "100%",
-            height: "100%",
+            // height: "100%",
+            flex: 1,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

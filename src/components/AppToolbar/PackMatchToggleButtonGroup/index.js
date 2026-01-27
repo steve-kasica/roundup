@@ -1,1 +1,2 @@
-export * from "./PackMatchToggleButtonGroup";
+import EnhancedPackMatchToggleButtonGroup from "./PackMatchToggleButtonGroup";
+export default EnhancedPackMatchToggleButtonGroup;

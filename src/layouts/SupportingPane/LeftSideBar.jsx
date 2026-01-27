@@ -124,12 +124,16 @@ const LeftSideBar = () => {
 
       <Box sx={{ flex: 1, minHeight: 0 }}>
         <Box sx={{ height: "100%" }}>
-          <CustomTabPanel value={value} index={0}>
+          <CustomTabPanel value={value} index={0} className="SourceTablesPanel">
             <SourceTables />
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}>
-            <OperationsList />
-          </CustomTabPanel>
+          {/* <CustomTabPanel
+            value={value}
+            index={1}
+            className="OperationsListPanel"
+          > */}
+          <OperationsList />
+          {/* </CustomTabPanel> */}
         </Box>
       </Box>
     </Box>

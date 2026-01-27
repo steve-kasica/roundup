@@ -8,8 +8,6 @@ import DeleteColumnsButton from "./DeleteColumnsButton";
 import { ExportTableButton } from "./ExportTable";
 import SelectAllColumnsButton from "./SelectAllColumnsButton";
 import HideColumnsButton from "./HideColumnsButton";
-import JoinKeysButton from "./JoinKeysButton";
-import { EnhancedPackMatchToggleButtonGroup } from "./PackMatchToggleButtonGroup";
 
 const AppToolbar = () => {
   return (
@@ -40,8 +38,6 @@ const AppToolbar = () => {
         <Divider orientation="vertical" flexItem />
         <ExportTableButton />
         <Divider orientation="vertical" flexItem />
-        <JoinKeysButton />
-        <EnhancedPackMatchToggleButtonGroup />
         <Divider orientation="vertical" flexItem />
       </Box>
       <AlertsButton />

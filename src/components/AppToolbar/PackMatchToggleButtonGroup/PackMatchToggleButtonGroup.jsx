@@ -36,11 +36,6 @@ import { selectFocusedObjectId } from "../../../slices/uiSlice";
 import MatchToggleButton from "./MatchToggleButton";
 import { useCallback } from "react";
 
-// TODO: these need to go into theme
-const vennFillColor = "#aaa";
-const vennEmptyColor = "rgb(238, 238, 238)";
-const vennStroke = "#aaa";
-
 const PackMatchToggleButtonGroup = ({
   // Props passed via `withPackOperationData.jsx` HOC
   validMatchGroups,
@@ -105,6 +100,7 @@ const PackMatchToggleButtonGroup = ({
       size="small"
       sx={{
         flexWrap: "nowrap",
+        padding: 1,
         "& .MuiToggleButton-root": {
           fontSize: "0.75rem",
           textTransform: "none",
@@ -136,10 +132,7 @@ const PackMatchToggleButtonGroup = ({
       >
         <VennDiagram
           disabled={isLeftUnmatchedDisabled}
-          stroke={vennStroke}
-          leftFill={vennFillColor}
-          overlapFill={vennEmptyColor}
-          rightFill={vennEmptyColor}
+          joinType={JOIN_TYPES.LEFT_ANTI}
         />
       </MatchToggleButton>
       <MatchToggleButton
@@ -149,13 +142,7 @@ const PackMatchToggleButtonGroup = ({
         } matched rows from both tables ${isMatchDisabled ? "(disabled)" : ""}`}
         disabled={isMatchDisabled}
       >
-        <VennDiagram
-          disabled={isMatchDisabled}
-          stroke={vennStroke}
-          leftFill={vennEmptyColor}
-          overlapFill={vennFillColor}
-          rightFill={vennEmptyColor}
-        />
+        <VennDiagram disabled={isMatchDisabled} joinType={JOIN_TYPES.INNER} />
       </MatchToggleButton>
       <MatchToggleButton
         value={MATCH_TYPE_RIGHT_UNMATCHED}
@@ -170,10 +157,7 @@ const PackMatchToggleButtonGroup = ({
       >
         <VennDiagram
           disabled={isRightUnmatchedDisabled}
-          stroke={vennStroke}
-          leftFill={vennEmptyColor}
-          overlapFill={vennEmptyColor}
-          rightFill={vennFillColor}
+          joinType={JOIN_TYPES.RIGHT_ANTI}
         />
       </MatchToggleButton>
     </ToggleButtonGroup>
@@ -198,4 +182,5 @@ const EnhancedPackMatchToggleButtonGroup = () => {
   }
 };
 
-export { PackMatchToggleButtonGroup, EnhancedPackMatchToggleButtonGroup };
+export { PackMatchToggleButtonGroup, PackMatchToggleButtonGroupWithData };
+export default EnhancedPackMatchToggleButtonGroup;

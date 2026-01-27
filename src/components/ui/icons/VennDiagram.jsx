@@ -24,95 +24,113 @@
  * />
  */
 
-import SvgIcon from "@mui/material/SvgIcon";
+import { JoinFull, JoinLeft, JoinRight } from "@mui/icons-material";
+import { JOIN_TYPES } from "../../../slices/operationsSlice";
+import { SvgIcon } from "@mui/material";
 
-function VennDiagram(props) {
-  const {
-    label = "",
-    labelFill = "#000",
-    leftFill = "#90caf9",
-    leftOpacity = 1,
-    rightFill = "#a5d6a7",
-    rightOpacity = 1,
-    overlapFill = "#fff176",
-    overlapOpacity = 1,
-    stroke = "#000",
-    strokeWidth = "1",
-    size = "24",
-    disabled = false,
-    ...otherProps
-  } = props;
-
-  // Scale geometry relative to the viewBox size (default baseline: 24)
-  const S = Number(size) || 24;
-  const r = (6 / 24) * S; // original r=6 in a 24x24 box
-  const cy = (12 / 24) * S; // vertical center
-  const cxLeft = (9 / 24) * S; // original left cx=9
-  const cxRight = (15 / 24) * S; // original right cx=15
-
-  // Intersection y-coordinates for two circles (dx=6, r=6 in baseline):
-  // cy ± sqrt(r^2 - (dx/2)^2) => 12 ± 5.196152. Scale to S
-  const dy = (5.196152 / 24) * S;
-  const yTop = cy + dy;
-  const yBottom = cy - dy;
-
+const JoinRightAnti = (props) => {
   return (
-    <SvgIcon
-      {...otherProps}
-      viewBox={`0 0 ${S} ${S}`}
-      sx={{
-        width: S,
-        height: S,
-        opacity: disabled ? 0.8 : 1,
-        ...(otherProps?.sx || {}),
-      }}
-    >
-      <text
-        x={S / 2}
-        y="5"
-        fontSize={S * (4 / 24)}
-        fill={labelFill}
-        textAnchor="middle"
-        alignmentBaseline="middle"
-        opacity={disabled ? 0.8 : 1}
-      >
-        {label}
-      </text>
-      {/* Left circle */}
-      <circle
-        cx={cxLeft}
-        cy={cy}
-        r={r}
-        fill={leftFill}
-        fillOpacity={disabled ? leftOpacity * 0.8 : leftOpacity}
-        stroke={stroke}
-        strokeWidth={strokeWidth}
-        opacity={disabled ? 0.8 : 1}
-      />
-      {/* Right circle */}
-      <circle
-        cx={cxRight}
-        cy={cy}
-        r={r}
-        fill={rightFill}
-        fillOpacity={disabled ? rightOpacity * 0.8 : rightOpacity}
-        stroke={stroke}
-        strokeWidth={strokeWidth}
-        opacity={disabled ? 0.5 : 1}
-      />
-      {/* Overlap area */}
+    <SvgIcon {...props}>
       <path
-        d={`M ${S * (12 / 24)} ${yTop} A ${r} ${r} 0 0 0 ${
-          S * (12 / 24)
-        } ${yBottom} A ${r} ${r} 0 0 0 ${S * (12 / 24)} ${yTop} Z`}
-        fill={overlapFill}
-        fillOpacity={disabled ? overlapOpacity * 0.8 : overlapOpacity}
-        stroke={stroke}
-        strokeWidth={strokeWidth}
-        opacity={disabled ? 0.5 : 1}
+        d="M7.5 12c0-.97.23-4.16 3.03-6.5C9.75 5.19 8.9 5 8 5c-3.86 0-7 3.14-7 7s3.14 7 7 7c.9 0 1.75-.19 2.53-.5-2.8-2.34-3.03-5.53-3.03-6.5"
+        fill="transparent"
+        strokeWidth="2"
+        stroke="currentColor"
+      />
+      {/* <ellipse
+        cx="12"
+        cy="12"
+        rx="3"
+        ry="5.74"
+        // fill="transparent"
+        strokeWidth="1"
+      ></ellipse> */}
+      <path
+        d="M15.5 12c0-.97-.23-4.16-3.03-6.5C13.25 5.19 14.1 5 15 5c3.86 0 7 3.14 7 7s-3.14 7-7 7c-.9 0-1.75-.19-2.53-.5 2.8-2.34 3.03-5.53 3.03-6.5"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="2"
       />
     </SvgIcon>
   );
+};
+
+const JoinLeftAnti = (props) => {
+  return (
+    <SvgIcon {...props}>
+      <path
+        d="M7.5 12c0-.97.23-4.16 3.03-6.5C9.75 5.19 8.9 5 8 5c-3.86 0-7 3.14-7 7s3.14 7 7 7c.9 0 1.75-.19 2.53-.5-2.8-2.34-3.03-5.53-3.03-6.5"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      {/* <ellipse
+        cx="12"
+        cy="12"
+        rx="3"
+        ry="5.74"
+        // fill="transparent"
+        strokeWidth="1"
+      ></ellipse> */}
+      <path
+        d="M15.5 12c0-.97-.23-4.16-3.03-6.5C13.25 5.19 14.1 5 15 5c3.86 0 7 3.14 7 7s-3.14 7-7 7c-.9 0-1.75-.19-2.53-.5 2.8-2.34 3.03-5.53 3.03-6.5"
+        fill="transparent"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+    </SvgIcon>
+  );
+};
+
+const JoinInner = (props) => {
+  return (
+    <SvgIcon {...props}>
+      <path
+        d="M7.5 12c0-.97.23-4.16 3.03-6.5C9.75 5.19 8.9 5 8 5c-3.86 0-7 3.14-7 7s3.14 7 7 7c.9 0 1.75-.19 2.53-.5-2.8-2.34-3.03-5.53-3.03-6.5"
+        fill="transparent"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <ellipse cx="11.5" cy="12" rx="3" ry="6" fill="currentColor" />
+      <path
+        d="M15.5 12c0-.97-.23-4.16-3.03-6.5C13.25 5.19 14.1 5 15 5c3.86 0 7 3.14 7 7s-3.14 7-7 7c-.9 0-1.75-.19-2.53-.5 2.8-2.34 3.03-5.53 3.03-6.5"
+        fill="transparent"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+    </SvgIcon>
+  );
+};
+
+/**
+ * 
+ * FULL_OUTER: string;
+    LEFT_OUTER: string;
+    FULL_ANTI: string;
+    LEFT_ANTI: string;
+    RIGHT_OUTER: string;
+    INNER: string;
+    RIGHT_ANTI: string;
+    EMPTY: stri
+ * @param {*} param0 
+ * @returns 
+ */
+function VennDiagram({ joinType, ...props }) {
+  if (joinType === JOIN_TYPES.FULL_OUTER) {
+    return <JoinFull {...props} />;
+  } else if (joinType === JOIN_TYPES.LEFT_OUTER) {
+    return <JoinLeft {...props} />;
+  } else if (joinType === JOIN_TYPES.FULL_ANTI) {
+    return <JoinFullAnti {...props} />;
+  } else if (joinType === JOIN_TYPES.LEFT_ANTI) {
+    return <JoinLeftAnti {...props} />;
+  } else if (joinType === JOIN_TYPES.RIGHT_OUTER) {
+    return <JoinRight {...props} />;
+  } else if (joinType === JOIN_TYPES.INNER) {
+    return <JoinInner {...props} />;
+  } else if (joinType === JOIN_TYPES.RIGHT_ANTI) {
+    return <JoinRightAnti {...props} />;
+  }
 }
 
 export default VennDiagram;

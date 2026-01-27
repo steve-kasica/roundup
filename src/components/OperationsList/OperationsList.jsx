@@ -14,10 +14,27 @@
  * <OperationsList />
  */
 
-import { useSelector } from "react-redux";
-import { selectAllOperationIds } from "../../slices/operationsSlice";
-import OperationView from "./OperationView";
-import { Box } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  isOperationId,
+  selectAllOperationIds,
+} from "../../slices/operationsSlice";
+// import OperationView from "./OperationView";
+import {
+  Box,
+  Divider,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  Select,
+} from "@mui/material";
+import { EnhancedOperationItem } from "./OperationItem";
+import { useCallback, useMemo, useState } from "react";
+import {
+  selectFocusedObjectId,
+  setFocusedObjectId,
+} from "../../slices/uiSlice";
+import { EnhancedOperationParams } from "./OperationParams/OperationParams";
 
 /**
  * OperationsList Component
@@ -32,15 +49,80 @@ import { Box } from "@mui/material";
  * in reverse order to show the most recent operations first.
  */
 export default function OperationsList() {
+  const dispatch = useDispatch();
   const operationIds = useSelector(selectAllOperationIds);
+  const focusedObjectId = useSelector(selectFocusedObjectId);
 
-  const reveredOperationIds = [...operationIds].reverse();
+  const reversedOperationIds = useMemo(
+    () => [...operationIds].reverse(),
+    [operationIds],
+  );
+
+  const handleChange = useCallback(
+    (event) => {
+      const operationId = event.target.value;
+      dispatch(setFocusedObjectId(operationId));
+    },
+    [dispatch],
+  );
+
+  const renderValue = useCallback((value) => {
+    if (!isOperationId(value)) {
+      return "";
+    }
+    return <EnhancedOperationItem id={value} />;
+  }, []);
 
   return (
-    <Box>
-      {reveredOperationIds.map((operationId, i) => (
-        <OperationView key={operationId} id={operationId} index={i} />
-      ))}
+    <Box
+      className="OperationsList"
+      display="flex"
+      flexDirection="column"
+      sx={{
+        minWidth: 120,
+        pt: 2,
+        height: "100%",
+        boxSizing: "border-box",
+      }}
+    >
+      <FormControl fullWidth sx={{ mb: 1 }} size="small">
+        <InputLabel id="operations-list-select">Operations</InputLabel>
+        <Select
+          labelId="operations-list-select"
+          id="operations-select"
+          value={
+            focusedObjectId && isOperationId(focusedObjectId)
+              ? focusedObjectId
+              : ""
+          }
+          label="Operations"
+          onChange={handleChange}
+          renderValue={renderValue}
+        >
+          {reversedOperationIds.map((operationId) => (
+            <div key={operationId}>
+              <EnhancedOperationItem id={operationId} />
+            </div>
+          ))}
+        </Select>
+        <FormHelperText>
+          Select an operation to focus and view details
+        </FormHelperText>
+      </FormControl>
+      <Box
+        flexGrow={1}
+        sx={{
+          padding: 1,
+          border: "1px solid",
+          borderColor: "divider",
+          overflow: "auto",
+          backgroundColor: "background.paper",
+        }}
+      >
+        {focusedObjectId && isOperationId(focusedObjectId) && (
+          <EnhancedOperationParams id={focusedObjectId} />
+        )}
+      </Box>
     </Box>
   );
 }

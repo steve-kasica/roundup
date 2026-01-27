@@ -99,15 +99,6 @@ export default function SupportingPane() {
         backgroundColor: "background.default",
       }}
     >
-      <Box
-        sx={{
-          borderBottom: "2px solid",
-          borderColor: "#ccc",
-        }}
-      >
-        <RoundupToolbar />
-      </Box>
-
       {/* Main Content Area */}
       <Box sx={{ flex: 1, overflow: "hidden" }}>
         {/* If there are no uploaded tables, show the fileUpload component */}
@@ -192,6 +183,10 @@ export default function SupportingPane() {
                   defaultSize={25}
                   maxSize={100}
                   order={1}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
                 >
                   <SchemaWindow />
                 </Panel>

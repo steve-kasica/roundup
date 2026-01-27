@@ -31,6 +31,9 @@ import {
   Skeleton,
   CircularProgress,
   Badge,
+  Stack,
+  IconButton,
+  Typography,
 } from "@mui/material";
 import {
   withOperationData,
@@ -46,11 +49,13 @@ import { isTableId } from "../../slices/tablesSlice";
 import HiddenColumnsLabel from "./HiddenColumnsLabel";
 import StyledBlockCell from "./StyledBlockCell";
 import {
+  JOIN_TYPES,
   MATCH_TYPE_LEFT_UNMATCHED,
   MATCH_TYPE_MATCHES,
   MATCH_TYPE_RIGHT_UNMATCHED,
 } from "../../slices/operationsSlice";
 import { EnhancedColumnLabel } from "./ColumnLabel";
+import { IntegerNumber } from "../ui/text";
 
 const yAxisLabelWidth = "50px";
 const yAxisLabelPadding = "0px";
@@ -538,7 +543,7 @@ const PackSchemaView = ({
                     padding: yAxisLabelPadding,
                     display: "flex",
                     flexDirection: "column",
-                    alignItems: "flex-end",
+                    alignItems: "center",
                     justifyContent: "center",
                     userSelect: "none",
                     cursor: isMatchDisabled ? "not-allowed" : "pointer",
@@ -550,35 +555,38 @@ const PackSchemaView = ({
                     isMatchDisabled ? null : handleMatchLabelClick(event, key)
                   }
                 >
-                  <VennDiagram
-                    label={label}
-                    size={yAxisLabelWidth.replace("px", "")}
-                    disabled={isMatchDisabled}
-                    leftFill={
-                      key === MATCH_TYPE_LEFT_UNMATCHED
-                        ? vennFill
-                        : "transparent"
-                    }
-                    rightFill={
-                      key === MATCH_TYPE_RIGHT_UNMATCHED
-                        ? vennFill
-                        : "transparent"
-                    }
-                    overlapFill={
-                      key === MATCH_TYPE_MATCHES ? vennFill : "white"
-                    }
-                  />
+                  <IconButton disabled={isMatchDisabled} size="small">
+                    <VennDiagram
+                      label={label}
+                      size={yAxisLabelWidth.replace("px", "")}
+                      joinType={
+                        key === MATCH_TYPE_LEFT_UNMATCHED
+                          ? JOIN_TYPES.LEFT_ANTI
+                          : key === MATCH_TYPE_RIGHT_UNMATCHED
+                            ? JOIN_TYPES.RIGHT_ANTI
+                            : JOIN_TYPES.INNER
+                      }
+                    />
+                  </IconButton>
                   <Box display="flex" justifyContent="center" width={"100%"}>
                     {isLoading ? (
                       <CircularProgress size={15} />
                     ) : errorCount > 0 ? (
                       <Error color="error" />
                     ) : (
-                      <Badge
-                        color={isMatchDisabled ? "default" : "info"}
-                        badgeContent={value.toLocaleString()}
-                        max={Number.MAX_SAFE_INTEGER}
-                      />
+                      <Typography
+                        variant="data-small"
+                        sx={{
+                          opacity: isMatchDisabled ? 0.5 : 1,
+                        }}
+                      >
+                        <IntegerNumber value={value} />
+                      </Typography>
+                      // <Badge
+                      //   color={isMatchDisabled ? "default" : "info"}
+                      //   badgeContent={value.toLocaleString()}
+                      //   max={Number.MAX_SAFE_INTEGER}
+                      // />
                     )}
                   </Box>
                 </Box>
