@@ -1,5 +1,10 @@
 import { Stack, Typography } from "@mui/material";
-import { withOperationData, withTableData } from "../../HOC";
+import {
+  withOperationData,
+  withPackOperationData,
+  withStackOperationData,
+  withTableData,
+} from "../../HOC";
 import { IntegerNumber } from "../../ui/text";
 import { PackOperationIcon, StackOperationIcon } from "../../ui/icons";
 import { TableIcon } from "lucide-react";
@@ -27,17 +32,32 @@ const ObjectMenuItemContent = ({
     <Typography variant="data-secondary">
       {name || id}&nbsp;
       <small>
-        <IntegerNumber value={columnCount} /> x{" "}
-        <IntegerNumber value={rowCount} />
+        {isNaN(columnCount) ? "?" : <IntegerNumber value={columnCount} />}
+        &nbsp;x&nbsp;
+        {isNaN(rowCount) ? "?" : <IntegerNumber value={rowCount} />}
       </small>
     </Typography>
   </Stack>
 );
 
 const EnhancedTableMenuItemContent = withTableData(ObjectMenuItemContent);
+const EnhancedPackMenuItemContent = withPackOperationData(
+  ObjectMenuItemContent,
+);
+const EnhancedStackMenuItemContent = withStackOperationData(
+  ObjectMenuItemContent,
+);
 
 const EnhancedOperationMenuItemContent = withOperationData(
-  ObjectMenuItemContent
+  ({ operationType, id }) => {
+    if (operationType === OPERATION_TYPE_STACK) {
+      return <EnhancedStackMenuItemContent id={id} />;
+    } else if (operationType === OPERATION_TYPE_PACK) {
+      return <EnhancedPackMenuItemContent id={id} />;
+    } else {
+      return null;
+    }
+  },
 );
 
 export { EnhancedTableMenuItemContent, EnhancedOperationMenuItemContent };

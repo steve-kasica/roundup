@@ -15,6 +15,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useMemo } from "react";
 import {
+  OPERATION_TYPE_STACK,
   selectOperationsById,
   selectStackOperationRowRanges,
 } from "../../../slices/operationsSlice";
@@ -50,7 +51,7 @@ export default function withStackOperationData(WrappedComponent) {
      * @returns {Array<Array<string>>} 2D array of column IDs per child table
      */
     const childColumnIds = useSelector((state) =>
-      selectColumnIdsByParentId(state, operation.childIds)
+      selectColumnIdsByParentId(state, operation.childIds),
     );
 
     // Child Columns
@@ -71,7 +72,10 @@ export default function withStackOperationData(WrappedComponent) {
      *
      * @returns {Array<Array<string|null>>} 2D array of column IDs with nulls
      */
-    const columnIdMatrix = useMemo(() => getColumnIdMatrix(childColumnIds), [childColumnIds]);
+    const columnIdMatrix = useMemo(
+      () => getColumnIdMatrix(childColumnIds),
+      [childColumnIds],
+    );
 
     /**
      * Calculate matrix dimensions: m (columns), n (rows)
@@ -81,7 +85,7 @@ export default function withStackOperationData(WrappedComponent) {
         Math.max(...columnIdMatrix.map((c) => c.length), 0),
         columnIdMatrix.length,
       ],
-      [columnIdMatrix]
+      [columnIdMatrix],
     );
 
     /**
@@ -113,10 +117,10 @@ export default function withStackOperationData(WrappedComponent) {
                 columnIds,
               },
             ],
-          })
+          }),
         );
       },
-      [childColumnIds, operation.childIds, dispatch]
+      [childColumnIds, operation.childIds, dispatch],
     );
 
     // Table dimensions
@@ -128,17 +132,32 @@ export default function withStackOperationData(WrappedComponent) {
      * in the child tables.
      * @returns {number} The number of columns in the stack operation
      */
-    const columnCount = useMemo(
-      () => getColumnCount(operation.columnCount, childColumnIds),
-      [operation.columnCount, childColumnIds]
-    );
+    const columnCount = useMemo(() => {
+      if (operation?.isInSync && operation?.columnCount >= 0) {
+        return operation.columnCount;
+      } else if (operation?.columnIds?.length > 0) {
+        return operation.columnIds.length;
+      } else if (childColumnIds?.length > 0) {
+        return Math.max(
+          ...childColumnIds.map((columnIds) => columnIds.length),
+          0,
+        );
+      } else {
+        return undefined;
+      }
+    }, [
+      operation?.isInSync,
+      operation?.columnCount,
+      operation?.columnIds,
+      childColumnIds,
+    ]);
 
     /**
      * Get the row ranges for each child table in the stack operation
      * @returns {Map<string, {start: number, end: number}>} Map of table ID to row range
      */
     const rowRanges = useSelector((state) =>
-      selectStackOperationRowRanges(state, id)
+      selectStackOperationRowRanges(state, id),
     );
 
     /**
@@ -150,12 +169,14 @@ export default function withStackOperationData(WrappedComponent) {
      */
     const rowCount = useMemo(
       () => getRowCount(operation.rowCount, rowRanges),
-      [operation.rowCount, rowRanges]
+      [operation.rowCount, rowRanges],
     );
 
     return (
       <WrappedComponent
         id={id}
+        // Metadata
+        operationType={OPERATION_TYPE_STACK}
         // Child columns
         columnIdMatrix={columnIdMatrix}
         m={m}

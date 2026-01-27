@@ -22,6 +22,7 @@ import {
   MATCH_TYPE_LEFT_UNMATCHED,
   MATCH_TYPE_MATCHES,
   MATCH_TYPE_RIGHT_UNMATCHED,
+  OPERATION_TYPE_PACK,
   selectOperationsById,
 } from "../../slices/operationsSlice";
 
@@ -362,10 +363,11 @@ export default function withPackOperationData(WrappedComponent) {
      * @returns {number|null} rowCount - The estimated row count of the pack operation.
      */
     const rowCount = useMemo(() => {
-      if (operation.rowCount && operation.rowCount >= 0) {
+      const matchValues = Object.values(matchStats);
+      if (operation?.rowCount != null) {
         return operation.rowCount;
-      } else {
-        let total = Object.values(matchStats).reduce((acc, val) => {
+      } else if (Math.max(...matchValues) > 0) {
+        let total = matchValues.reduce((acc, val) => {
           acc += val;
           return acc;
         }, 0);
@@ -374,25 +376,10 @@ export default function withPackOperationData(WrappedComponent) {
         } else {
           return null;
         }
+      } else {
+        return undefined;
       }
-    }, [operation.rowCount, matchStats]);
-
-    /**
-     * Total columns directly associated with this pack operation.
-     * @returns {number} columnCount - The total number of columns in both child tables.
-     */
-    const columnCount = useMemo(
-      () =>
-        operation.columnIds && operation.isInSync
-          ? operation.columnIds.length
-          : leftColumnCount + rightColumnCount,
-      [
-        operation.columnIds,
-        operation.isInSync,
-        leftColumnCount,
-        rightColumnCount,
-      ],
-    );
+    }, [operation?.rowCount, matchStats]);
 
     /**
      * Combined child column IDs from both left and right tables
@@ -403,9 +390,31 @@ export default function withPackOperationData(WrappedComponent) {
       [leftColumnIds, rightColumnIds],
     );
 
+    /**
+     * Total columns directly associated with this pack operation.
+     * @returns {number} columnCount - The total number of columns in both child tables.
+     */
+    const columnCount = useMemo(() => {
+      if (operation?.columnCount > 0 && operation.isInSync) {
+        return operation.columnCount;
+      } else if (operation?.columnIds.length > 0) {
+        return operation.columnIds.length;
+      } else if (combinedChildColumnIds?.length > 0) {
+        return combinedChildColumnIds.length;
+      } else {
+        return undefined;
+      }
+    }, [
+      operation.columnCount,
+      operation.isInSync,
+      operation.columnIds.length,
+      combinedChildColumnIds.length,
+    ]);
+
     return (
       <WrappedComponent
         id={id}
+        operationType={OPERATION_TYPE_PACK}
         // Pack-specific props
         joinPredicate={joinPredicate}
         joinType={joinType}
