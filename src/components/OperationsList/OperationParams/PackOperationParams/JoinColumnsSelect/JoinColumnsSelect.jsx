@@ -3,7 +3,7 @@ import { EnhancedColumnMenuItemContent } from "./ColumnMenuItemContent";
 import { useSelector } from "react-redux";
 import { selectColumnsById } from "../../../../../slices/columnsSlice";
 import { cross } from "d3";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { isTableId } from "../../../../../slices/tablesSlice";
 import { EnhancedTableLabel } from "../../../../TableView";
 import { EnhancedOperationLabel } from "../../../../OperationView/OperationLabel";
@@ -22,6 +22,11 @@ const JoinColumnsSelect = ({
   const [value, setValue] = useState(
     leftKeyId && rightKeyId ? `${leftKeyId}|${rightKeyId}` : "",
   );
+
+  // If leftKeyId or rightKeyId change from outside, update value
+  useEffect(() => {
+    setValue(leftKeyId && rightKeyId ? `${leftKeyId}|${rightKeyId}` : "");
+  }, [leftKeyId, rightKeyId]);
 
   const handleChange = useCallback(
     (value) => {

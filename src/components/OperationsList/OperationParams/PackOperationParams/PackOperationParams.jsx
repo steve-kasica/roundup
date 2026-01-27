@@ -47,6 +47,7 @@ const PackOperationParams = ({
   const [nameLocal, setNameLocal] = useState(name || "Op.");
   const [inputValue, setInputValue] = useState(name || "Op.");
   const debounceTimerRef = useRef(null);
+
   const [leftTableIdLocal, setLeftTableIdLocal] = useState(leftTableId);
   const [rightTableIdLocal, setRightTableIdLocal] = useState(rightTableId);
   const [leftColumnKeyIdLocal, setLeftColumnKeyIdLocal] = useState(leftKey);
@@ -136,6 +137,11 @@ const PackOperationParams = ({
     setRightColumnKeyIdLocal(rightKeyId);
   }, []);
 
+  const handleTableOrderChange = useCallback((left, right) => {
+    setLeftTableIdLocal(left);
+    setRightTableIdLocal(right);
+  }, []);
+
   return (
     <Box
       className="PackOperationParams"
@@ -168,10 +174,7 @@ const PackOperationParams = ({
         {/* <JoinSummary joinPredicate={joinPredicate} /> */}
         <TableOrderRadio
           childIds={[leftTableIdLocal, rightTableIdLocal]}
-          onChange={(left, right) => {
-            setLeftTableIdLocal(left);
-            setRightTableIdLocal(right);
-          }}
+          onChange={handleTableOrderChange}
         />
 
         <JoinColumnsSelect
