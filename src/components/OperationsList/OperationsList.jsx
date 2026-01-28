@@ -15,26 +15,15 @@
  */
 
 import { useDispatch, useSelector } from "react-redux";
-import {
-  isOperationId,
-  selectAllOperationIds,
-} from "../../slices/operationsSlice";
-// import OperationView from "./OperationView";
-import {
-  Box,
-  Divider,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  Select,
-} from "@mui/material";
-import { EnhancedOperationItem } from "./OperationItem";
-import { useCallback, useMemo, useState } from "react";
+import { isOperationId } from "../../slices/operationsSlice";
+import { Box } from "@mui/material";
 import {
   selectFocusedObjectId,
   setFocusedObjectId,
 } from "../../slices/uiSlice";
 import { EnhancedOperationParams } from "./OperationParams/OperationParams";
+import OperationSelect from "./OperationSelect";
+import { useCallback } from "react";
 
 /**
  * OperationsList Component
@@ -50,28 +39,14 @@ import { EnhancedOperationParams } from "./OperationParams/OperationParams";
  */
 export default function OperationsList() {
   const dispatch = useDispatch();
-  const operationIds = useSelector(selectAllOperationIds);
   const focusedObjectId = useSelector(selectFocusedObjectId);
 
-  const reversedOperationIds = useMemo(
-    () => [...operationIds].reverse(),
-    [operationIds],
-  );
-
-  const handleChange = useCallback(
-    (event) => {
-      const operationId = event.target.value;
-      dispatch(setFocusedObjectId(operationId));
+  const handleSelectChange = useCallback(
+    (value) => {
+      dispatch(setFocusedObjectId(value));
     },
     [dispatch],
   );
-
-  const renderValue = useCallback((value) => {
-    if (!isOperationId(value)) {
-      return "";
-    }
-    return <EnhancedOperationItem id={value} />;
-  }, []);
 
   return (
     <Box
@@ -85,30 +60,10 @@ export default function OperationsList() {
         boxSizing: "border-box",
       }}
     >
-      <FormControl fullWidth sx={{ mb: 1 }} size="small">
-        <InputLabel id="operations-list-select">Operations</InputLabel>
-        <Select
-          labelId="operations-list-select"
-          id="operations-select"
-          value={
-            focusedObjectId && isOperationId(focusedObjectId)
-              ? focusedObjectId
-              : ""
-          }
-          label="Operations"
-          onChange={handleChange}
-          renderValue={renderValue}
-        >
-          {reversedOperationIds.map((operationId) => (
-            <div key={operationId}>
-              <EnhancedOperationItem id={operationId} />
-            </div>
-          ))}
-        </Select>
-        <FormHelperText>
-          Select an operation to focus and view details
-        </FormHelperText>
-      </FormControl>
+      <OperationSelect
+        focusedObjectId={focusedObjectId}
+        onChange={handleSelectChange}
+      />
       <Box
         flexGrow={1}
         sx={{

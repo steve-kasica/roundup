@@ -40,7 +40,6 @@ const ColumnTick = ({
   operationIndex,
   sx = {},
 }) => {
-  console.log("Rendering ColumnTick:", { operationIndex, sx });
   return (
     <StyledColumnContainer
       className={"ColumnTick"}

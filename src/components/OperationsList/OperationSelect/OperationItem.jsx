@@ -4,18 +4,18 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import { withOperationData } from "../HOC";
+import { withOperationData } from "../../HOC";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
-} from "../../slices/operationsSlice";
-import { PackOperationIcon, StackOperationIcon } from "../ui/icons";
-import { IntegerNumber } from "../ui/text";
+} from "../../../slices/operationsSlice";
+import { PackOperationIcon, StackOperationIcon } from "../../ui/icons";
+import { IntegerNumber } from "../../ui/text";
 
 const OperationItem = ({ id, name, operationType, columnCount, rowCount }) => {
   const displayName = name || `Operation ${id}`;
   return (
-    <MenuItem value={id}>
+    <>
       <ListItemIcon>
         {operationType === OPERATION_TYPE_STACK ? (
           <StackOperationIcon />
@@ -32,7 +32,7 @@ const OperationItem = ({ id, name, operationType, columnCount, rowCount }) => {
           </Typography>
         )}
       </ListItemText>
-    </MenuItem>
+    </>
   );
 };
 
