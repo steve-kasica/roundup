@@ -27,6 +27,7 @@ import { watcher as deleteColumnsWatcher } from "./deleteColumnsSaga";
 import { watcher as deleteTablesWatcher } from "./deleteTablesSaga";
 import { watcher as deleteOperationsWatcher } from "./deleteOperationsSaga";
 import { watcher as alertsSagaWatcher } from "./alertsSaga";
+import { watcher as uiSaga } from "./uiSaga";
 
 export default function* rootSaga() {
   yield all([
@@ -40,5 +41,6 @@ export default function* rootSaga() {
     call(deleteTablesWatcher),
     call(deleteOperationsWatcher),
     call(alertsSagaWatcher),
+    call(uiSaga),
   ]);
 }

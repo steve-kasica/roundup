@@ -22,7 +22,7 @@ import {
   updateTables as updateTablesSlice,
 } from "../../slices/tablesSlice";
 import { getTableStats } from "../../lib/duckdb";
-import { updateTablesFailure, updateTablesSuccess } from "./actions";
+import { updateTablesSuccess } from "./actions";
 import { DATABASE_ATTRIBUTES } from "../../slices/tablesSlice";
 
 /**
@@ -35,54 +35,32 @@ import { DATABASE_ATTRIBUTES } from "../../slices/tablesSlice";
  * @param {Object} action.payload.updateData - The data to update the table(s) with
  * @yields {Effect} Various saga effects for handling the update process
  */
-export default function* updateTablesWorker(action) {
-  const successfulUpdates = [];
-  const failedUpdates = [];
-  let { tableUpdates } = action.payload;
+export default function* updateTablesWorker(tableUpdates) {
+  let isFailure = false;
 
-  for (let tableUpdate of tableUpdates) {
-    const table = yield select((state) =>
-      selectTablesById(state, tableUpdate.id)
-    );
-
-    try {
-      let databaseUpdates = {};
-      if (
-        Object.keys(tableUpdate).some((key) =>
-          DATABASE_ATTRIBUTES.includes(key)
-        )
-      ) {
-        databaseUpdates = yield call(getTableStats, table.databaseName);
+  for (let i = 0; i < tableUpdates.length; i++) {
+    let tableUpdate = tableUpdates[i];
+    if (
+      Object.keys(tableUpdate).some((key) => DATABASE_ATTRIBUTES.includes(key))
+    ) {
+      const { databaseName, name } = yield select((state) =>
+        selectTablesById(state, tableUpdate.id),
+      );
+      try {
+        // TODO: Optimize to only fetch changed attributes
+        let databaseUpdates = yield call(getTableStats, databaseName);
         tableUpdate = { ...tableUpdate, ...databaseUpdates[0] };
+      } catch (error) {
+        isFailure = true;
+        alert(`Failed to update table ${name}: ${error.message}`);
+        console.error("updateTablesSgaga/worker", error);
       }
-      successfulUpdates.push(tableUpdate);
-    } catch (error) {
-      tableUpdate.error = JSON.stringify(error);
-      failedUpdates.push(tableUpdate);
     }
   }
 
-  // Update the Redux state with the results
-  yield put(updateTablesSlice(successfulUpdates));
-
-  if (failedUpdates.length > 0) {
-    yield put(
-      updateTablesFailure({
-        tableIds: failedUpdates.map(({ id }) => id),
-      })
-    );
-  }
-
-  if (successfulUpdates.length > 0) {
-    yield put(
-      updateTablesSuccess({
-        changedPropertiesById: Object.fromEntries(
-          successfulUpdates.map(({ id, ...changedProperties }) => [
-            id,
-            Object.keys(changedProperties),
-          ])
-        ),
-      })
-    );
+  if (!isFailure) {
+    // Update the Redux state with the results
+    yield put(updateTablesSlice(tableUpdates));
+    yield put(updateTablesSuccess(tableUpdates));
   }
 }

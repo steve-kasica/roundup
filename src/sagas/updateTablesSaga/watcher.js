@@ -7,9 +7,12 @@
  * @example
  * // Watcher is started automatically by rootSaga
  */
-import { takeEvery } from "redux-saga/effects";
+import { call, put, select, takeEvery } from "redux-saga/effects";
 import { updateTablesRequest } from "./actions";
 import updateTablesWorker from "./worker";
+import { deleteColumnsSuccess } from "../deleteColumnsSaga";
+import { group } from "d3";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 
 /**
  * Saga watcher that listens for the `updateTablesRequest` action and triggers the corresponding worker saga.
@@ -18,5 +21,30 @@ import updateTablesWorker from "./worker";
  * @yields {ForkEffect} Triggers the `updateTablesSagaWorker` whenever the `updateTablesRequest` action is dispatched.
  */
 export default function* updateTablesSagaWatcher() {
-  yield takeEvery(updateTablesRequest.type, updateTablesWorker);
+  yield takeEvery(updateTablesRequest.type, function* (action) {
+    yield call(updateTablesWorker, action.payload);
+  });
+
+  // If a column is deleted, we need to delete it's ID from the parent table's columnIds array
+  yield takeEvery(deleteColumnsSuccess.type, function* (action) {
+    const deletedColumns = action.payload;
+    const tableUpdates = [];
+
+    const deletedColumnGroups = group(deletedColumns, (col) => col.parentId);
+
+    for (const [parentId, columns] of deletedColumnGroups) {
+      if (isTableId(parentId)) {
+        tableUpdates.push({
+          id: parentId,
+          columnIds: (yield select(
+            (state) => selectTablesById(state, parentId).columnIds,
+          )).filter((id) => !columns.some((col) => col.id === id)),
+        });
+      }
+    }
+    // delete columns may belong to operations
+    if (tableUpdates.length > 0) {
+      yield call(updateTablesWorker, tableUpdates);
+    }
+  });
 }
