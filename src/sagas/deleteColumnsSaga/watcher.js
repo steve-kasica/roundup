@@ -37,126 +37,108 @@ export default function* deleteColumnsSaga() {
   // will recurse into the child tables/operations to delete the appropriate
   // columns as well.
   yield takeEvery(deleteColumnsRequest.type, function* (action) {
-    let { columnIds, recurse, deleteFromDatabase } = action.payload;
-    columnIds = Array.isArray(columnIds) ? columnIds : [columnIds];
+    const deleteFromDatabase = true;
+    const columnsToDelete = [];
 
-    const columns = yield select((state) =>
-      selectColumnsById(state, columnIds)
-    );
+    const processColumnIds = function* (columnIds) {
+      const columns = yield select((state) =>
+        selectColumnsById(state, columnIds),
+      );
+      for (let col of columns) {
+        columnsToDelete.push(col);
+        if (isOperationId(col.parentId)) {
+          const indexInOperation = yield select((state) => {
+            const operation = selectOperationsById(state, col.parentId);
+            return operation.columnIds.indexOf(col.id);
+          });
 
-    const columnsToDeleteByParentId = group(columns, (col) => col.parentId);
-
-    const tablesToAlter = [];
-    for (let [parentId, columnsToDelete] of columnsToDeleteByParentId) {
-      if (isTableId(parentId) || (!isOperationId(parentId) && !recurse)) {
-        tablesToAlter.push({
-          tableId: parentId,
-          columnsToDelete,
-          deleteFromDatabase,
-        });
-      } else if (isOperationId(parentId) && recurse) {
-        // If we're deleting operation columns, then we need to recurse into the children
-        // tables/operations, map the operation columns to the appropriate table columns
-        // and dispatch a delete columns request with those child columns.
-        const childColumnIdsToDelete = [];
-        const operation = yield select((state) =>
-          selectOperationsById(state, parentId)
-        );
-        const childColumnIds = yield select((state) =>
-          selectColumnIdsByParentId(state, operation.childIds)
-        );
-        for (let { id } of columnsToDelete) {
-          const columnIndex = operation.columnIds.indexOf(id);
-          if (operation.operationType === OPERATION_TYPE_PACK) {
-            childColumnIdsToDelete.push(
-              columnIndex > childColumnIds[0].length - 1
-                ? childColumnIds[1][columnIndex - childColumnIds[0].length]
-                : childColumnIds[0][columnIndex]
-            );
-          } else if (operation.operationType === OPERATION_TYPE_STACK) {
-            childColumnIdsToDelete.push(
-              ...childColumnIds
-                // eslint-disable-next-line no-unused-vars
-                .map((tableColumnIds, i) =>
-                  tableColumnIds.filter((_, j) => j === columnIndex)
-                )
-                .flat()
-            );
+          // recursive case, column belong to an operation
+          const { operationType, childIds } = yield select((state) =>
+            selectOperationsById(state, col.parentId),
+          );
+          const childColumnIds = yield select((state) => {
+            return selectColumnIdsByParentId(state, childIds);
+          });
+          if (operationType === OPERATION_TYPE_STACK) {
+            const childColsToDelete = childColumnIds
+              // eslint-disable-next-line no-unused-vars
+              .map((tableColumnIds, i) =>
+                tableColumnIds.filter((_, j) => j === indexInOperation),
+              )
+              .flat();
+            yield* processColumnIds(childColsToDelete);
+          } else {
+            // PACK operation
+            const tableIndex =
+              indexInOperation >= childColumnIds[0].length ? 1 : 0;
+            const childColId =
+              childColumnIds[tableIndex][
+                tableIndex === 0
+                  ? indexInOperation
+                  : indexInOperation - childColumnIds[0].length
+              ];
+            yield* processColumnIds([childColId]);
           }
         }
-        yield put(
-          deleteColumnsRequest({
-            columnIds: childColumnIdsToDelete,
-            recurse: true,
-            deleteFromDatabase,
-          })
-        );
       }
+    };
+
+    yield* processColumnIds(action.payload);
+
+    yield call(deleteColumnsWorker, columnsToDelete, deleteFromDatabase);
+  });
+
+  // If tables are deleted, we need to delete their columns as well
+  yield takeLatest(deleteTablesSuccess, function* (action) {
+    const deleteFromDatabase = false; // Tables are already deleted from DB when table was deleted
+    const tables = action.payload;
+    const tableIds = tables.map(({ id }) => id);
+    // Extract all column IDs from the deleted tables
+    const orphanedColumnIds = yield select((state) =>
+      selectAllColumnIdsByParentId(state, tableIds).flat(),
+    );
+    if (orphanedColumnIds.length > 0) {
+      const orphanedColumns = yield select((state) =>
+        selectColumnsById(state, orphanedColumnIds),
+      );
+      yield call(deleteColumnsWorker, orphanedColumns, deleteFromDatabase);
     }
-    yield call(deleteColumnsWorker, tablesToAlter);
+  });
+
+  // If an operation is deleted, we need to delete its columns as well
+  yield takeLatest(deleteOperationsSuccess.type, function* (action) {
+    const deleteFromDatabase = false; // Operations are already deleted from DB when operation was deleted
+    const deletedOperations = action.payload;
+    // Extract all column IDs from the deleted operations
+    const orphanedColumnIds = yield select((state) =>
+      selectAllColumnIdsByParentId(
+        state,
+        deletedOperations.map((op) => op.id),
+      ).flat(),
+    );
+    if (orphanedColumnIds.length > 0) {
+      yield call(deleteColumnsWorker, orphanedColumnIds, deleteFromDatabase);
+    }
   });
 
   // When schema-related properties of an operation are updated,
   // we need to re-create the operation's columns, so this saga
   // must delete any orphaned columns that belonged to that opeation.
   yield takeLatest(updateOperationsSuccess.type, function* (action) {
+    const deleteFromDatabase = false;
     const { changedPropertiesById } = action.payload;
 
     for (let [operationId, changedProperties] of Object.entries(
-      changedPropertiesById
+      changedPropertiesById,
     )) {
       if (changedProperties.includes("columnIds")) {
         const orphanedColumnIds = yield select((state) =>
-          selectOrphanedColumnIds(state, operationId)
+          selectOrphanedColumnIds(state, operationId),
         );
-        if (orphanedColumnIds.length > 0) {
-          // Bypass deleteColumnsRequest to avoid recursing into table columns
-          // since we're just swapping out operation columns here.
-          yield put(
-            deleteColumnsRequest({
-              columnIds: orphanedColumnIds,
-              recurse: false,
-              deleteFromDatabase: false,
-            })
-          );
-        }
+        // Bypass deleteColumnsRequest to avoid recursing into table columns
+        // since we're just swapping out operation columns here.
+        yield call(deleteColumnsWorker, orphanedColumnIds, deleteFromDatabase);
       }
-    }
-  });
-
-  // If tables are deleted, we need to delete their columns as well
-  yield takeLatest(deleteTablesSuccess, function* (action) {
-    const { tableIds } = action.payload;
-    // Extract all column IDs from the deleted tables
-    const orphanedColumnIds = yield select((state) =>
-      selectAllColumnIdsByParentId(state, tableIds)
-    );
-    if (orphanedColumnIds.length > 0) {
-      yield put(
-        deleteColumnsRequest({
-          columnIds: orphanedColumnIds.flat(),
-          recurse: false,
-          deleteFromDatabase: false, // Tables are already deleted from DB when table was deleted
-        })
-      );
-    }
-  });
-
-  // If an operation is deleted, we need to delete its columns as well
-  yield takeLatest(deleteOperationsSuccess.type, function* (action) {
-    const { operationIds } = action.payload;
-    // Extract all column IDs from the deleted operations
-    const orphanedColumnIds = yield select((state) =>
-      selectAllColumnIdsByParentId(state, operationIds)
-    );
-    if (orphanedColumnIds.length > 0) {
-      yield put(
-        deleteColumnsRequest({
-          columnIds: orphanedColumnIds.flat(),
-          recurse: false,
-          deleteFromDatabase: false, // Operations are already deleted from DB when operation was deleted
-        })
-      );
     }
   });
 }

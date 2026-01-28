@@ -17,10 +17,11 @@
  */
 import { put, select } from "redux-saga/effects";
 import { deleteColumns as deleteColumnsFromSlice } from "../../slices/columnsSlice";
-import { deleteColumnsSuccess, deleteColumnsFailure } from "./actions";
+import { deleteColumnsSuccess } from "./actions";
 import { dropColumns } from "../../lib/duckdb";
-import { selectTablesById } from "../../slices/tablesSlice";
-import { updateTablesRequest } from "../updateTablesSaga";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectOperationsById } from "../../slices/operationsSlice";
+import { group } from "d3";
 
 /**
  * Worker saga for handling column removal.
@@ -29,60 +30,80 @@ import { updateTablesRequest } from "../updateTablesSaga";
  *
  * @yields {void}
  */
-export default function* deleteColumnsWorker(tablesToAlter) {
-  const successfulDeletions = [];
-  const failedDeletions = [];
-  const tableUpdates = [];
+export default function* deleteColumnsWorker(
+  columnsToDelete,
+  deleteFromDatabase = true,
+) {
+  let isFailure = false;
 
-  for (let { tableId, columnsToDelete, deleteFromDatabase } of tablesToAlter) {
-    const columnIdsToDelete = columnsToDelete.map((col) => col.id);
+  const columnIdsToDeleteGroupedByParent = group(
+    columnsToDelete,
+    (col) => col.parentId,
+  );
+
+  for (let [parentId, columns] of columnIdsToDeleteGroupedByParent) {
     if (deleteFromDatabase) {
-      const { databaseName: parentDatabaseName, columnIds: allTableColumnIds } =
-        yield select((state) => selectTablesById(state, tableId));
-      const columnDatabaseNames = columnsToDelete.map(
-        (col) => col.databaseName
+      const { databaseName: parentDatabaseName } = yield select((state) =>
+        isTableId(parentId)
+          ? selectTablesById(state, parentId)
+          : selectOperationsById(state, parentId),
       );
+      const columnDatabaseNames = columns.map((col) => col.databaseName);
       try {
         // Call the database function to drop columns
         yield dropColumns(parentDatabaseName, columnDatabaseNames);
-        successfulDeletions.push(...columnIdsToDelete);
-        tableUpdates.push({
-          id: tableId,
-          columnIds: allTableColumnIds.filter(
-            (id) => !columnIdsToDelete.includes(id)
-          ),
-        });
       } catch (error) {
+        isFailure = true;
         alert(`Error deleting columns: ${error.message}`);
         console.error(
-          `Failed to drop columns [${columnDatabaseNames.join(
-            ", "
-          )}] from table ${tableId}:`,
-          error
+          `deleteColumnsSaga/worker.js: Failed to drop columns [${columnDatabaseNames.join(
+            ", ",
+          )}] from parent object ${parentId}:`,
+          error,
         );
-        failedDeletions.push(...columnIdsToDelete);
       }
-    } else {
-      // Do not delete from database, just from state
-      successfulDeletions.push(...columnIdsToDelete);
+    }
+
+    if (!isFailure) {
+      yield put(deleteColumnsFromSlice(columnsToDelete.map((col) => col.id)));
+      yield put(deleteColumnsSuccess(columnsToDelete));
     }
   }
-
-  if (successfulDeletions.length > 0) {
-    yield put(deleteColumnsFromSlice(successfulDeletions));
-    yield put(deleteColumnsSuccess(successfulDeletions));
-  }
-
-  if (tableUpdates.length > 0) {
-    yield put(updateTablesRequest({ tableUpdates }));
-  }
-
-  if (failedDeletions.length > 0) {
-    yield put(
-      deleteColumnsFailure({
-        columnIds: failedDeletions,
-        error: "One or more columns failed to delete.",
-      })
-    );
-  }
 }
+// for (let {
+//   tableId: parentId,
+//   columnsToDelete,
+//   deleteFromDatabase,
+// } of tablesToAlter) {
+//   const columnIdsToDelete = columnsToDelete.map((col) => col.id);
+//   if (deleteFromDatabase) {
+//     const { databaseName: parentDatabaseName } = yield select((state) =>
+//       isTableId(parentId)
+//         ? selectTablesById(state, parentId)
+//         : selectOperationsById(state, parentId),
+//     );
+//     const columnDatabaseNames = columnsToDelete.map(
+//       (col) => col.databaseName,
+//     );
+//     try {
+//       // Call the database function to drop columns
+//       yield dropColumns(parentDatabaseName, columnDatabaseNames);
+//       successfulDeletions.push(
+//         ...columnsToDelete.map((col) => ({ id: col.id, parentId })),
+//       );
+//     } catch (error) {
+//       alert(`Error deleting columns: ${error.message}`);
+//       console.error(
+//         `deleteColumnsSaga/worker.js: Failed to drop columns [${columnDatabaseNames.join(
+//           ", ",
+//         )}] from parent object ${parentId}:`,
+//         error,
+//       );
+//     }
+//   } else {
+//     // Do not delete from database, just from state
+//     successfulDeletions.push(
+//       ...columnsToDelete.map((col) => ({ id: col.id, parentId })),
+//     );
+//   }
+// }
