@@ -24,11 +24,12 @@ import { usePaginatedTableRows } from "../../hooks/useTableRowData";
 import RoundupTable from "../ui/Table/Table.jsx";
 import VennDiagram from "../ui/icons/VennDiagram";
 import {
+  JOIN_TYPES,
   MATCH_TYPE_LEFT_UNMATCHED,
   MATCH_TYPE_MATCHES,
   MATCH_TYPE_RIGHT_UNMATCHED,
 } from "../../slices/operationsSlice/Operation.js";
-import { Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import {
   withOperationData,
   withPackOperationData,
@@ -78,7 +79,7 @@ const PackRows = ({
       setSortByColumnId(columnId);
       setSortDirection(newDirection);
     },
-    [sortByColumnId, sortDirection]
+    [sortByColumnId, sortDirection],
   );
 
   /**
@@ -102,10 +103,10 @@ const PackRows = ({
           }
           return acc;
         },
-        []
+        [],
       );
       const selectedOperationColumnIds = selectedTableIndices.map(
-        (index) => columnIds[index]
+        (index) => columnIds[index],
       );
       return selectedOperationColumnIds;
     }
@@ -144,7 +145,7 @@ const PackRows = ({
     sortByColumnId,
     sortDirection,
     initialOffset,
-    rowLimit
+    rowLimit,
   );
   const { data, loading, error, hasMore, loadMore, refresh } = results;
 
@@ -166,9 +167,7 @@ const PackRows = ({
       if (globalIndex < matchStats.matches) {
         // Row is in matches range
         vennProps = {
-          leftFill: "#fff",
-          overlapFill: "#000",
-          rightFill: "#fff",
+          joinType: JOIN_TYPES.INNER,
         };
       } else if (
         globalIndex >= matchStats.matches &&
@@ -176,9 +175,7 @@ const PackRows = ({
       ) {
         // Row is in left_unmatched range
         vennProps = {
-          leftFill: "#000",
-          overlapFill: "#fff",
-          rightFill: "#fff",
+          joinType: JOIN_TYPES.LEFT_ANTI,
         };
       } else if (
         globalIndex >=
@@ -186,22 +183,22 @@ const PackRows = ({
       ) {
         // Row is in right_unmatched range
         vennProps = {
-          leftFill: "#fff",
-          overlapFill: "#fff",
-          rightFill: "#000",
+          joinType: JOIN_TYPES.RIGHT_ANTI,
         };
       } else {
         throw new Error("Index out of bounds");
       }
 
       return (
-        <Stack direction="row" alignItems="right">
+        <Stack direction="row" alignItems="right" justifyContent={"flex-end"}>
           <VennDiagram {...vennProps} />
-          <Typography variant="data-small">{globalIndex + 1}.</Typography>
+          <Box ml={1} mt={0.3}>
+            <Typography variant="data-small">{globalIndex + 1}.</Typography>
+          </Box>
         </Stack>
       );
     },
-    [initialOffset, matchStats.left_unmatched, matchStats.matches]
+    [initialOffset, matchStats.left_unmatched, matchStats.matches],
   );
 
   const onScrollThreshold = useCallback(() => {
@@ -241,7 +238,9 @@ const PackRows = ({
 PackRows.displayName = "Pack Rows";
 
 const EnhancedPackRows = withOperationData(
-  withAssociatedAlerts(withPackOperationData(withGlobalInterfaceData(PackRows)))
+  withAssociatedAlerts(
+    withPackOperationData(withGlobalInterfaceData(PackRows)),
+  ),
 );
 
 EnhancedPackRows.displayName = "Enhanced Pack Rows";
