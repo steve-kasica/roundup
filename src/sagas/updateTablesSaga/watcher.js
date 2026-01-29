@@ -13,6 +13,7 @@ import updateTablesWorker from "./worker";
 import { deleteColumnsSuccess } from "../deleteColumnsSaga";
 import { group } from "d3";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { createOperationsSuccess } from "../createOperationsSaga/actions";
 
 /**
  * Saga watcher that listens for the `updateTablesRequest` action and triggers the corresponding worker saga.
@@ -43,6 +44,27 @@ export default function* updateTablesSagaWatcher() {
       }
     }
     // delete columns may belong to operations
+    if (tableUpdates.length > 0) {
+      yield call(updateTablesWorker, tableUpdates);
+    }
+  });
+
+  // If an operation is created that includes tables, we need to update those tables' parentId property
+  yield takeEvery(createOperationsSuccess.type, function* (action) {
+    const createdOperations = action.payload;
+    const tableUpdates = [];
+
+    for (const operation of createdOperations) {
+      for (const childId of operation.childIds) {
+        if (isTableId(childId)) {
+          tableUpdates.push({
+            id: childId,
+            parentId: operation.id,
+          });
+        }
+      }
+    }
+
     if (tableUpdates.length > 0) {
       yield call(updateTablesWorker, tableUpdates);
     }

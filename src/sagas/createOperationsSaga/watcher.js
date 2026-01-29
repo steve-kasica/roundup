@@ -8,7 +8,7 @@
  * @example
  * // Watcher is started automatically by rootSaga
  */
-import { takeEvery } from "redux-saga/effects";
+import { call, takeEvery } from "redux-saga/effects";
 import { createOperationsRequest } from "./actions";
 import createOperationsWorker from "./worker";
 
@@ -27,5 +27,8 @@ import createOperationsWorker from "./worker";
  */
 export default function* createOperationsWatcher() {
   // Listen for manual view creation requests
-  yield takeEvery(createOperationsRequest.type, createOperationsWorker);
+  yield takeEvery(createOperationsRequest.type, function* (action) {
+    const operationData = action.payload;
+    yield call(createOperationsWorker, operationData);
+  });
 }

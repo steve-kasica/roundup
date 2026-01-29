@@ -7,8 +7,10 @@ import {
   removeFromHoveredColumnIds,
   removeFromSelectedColumnIds,
   removeFromSelectedTableIds,
+  setFocusedObjectId,
 } from "../../slices/uiSlice";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
+import { createOperationsSuccess } from "../createOperationsSaga/actions";
 
 describe("UiSaga watcher", () => {
   describe("Handling deleteColumnsSuccess actions", () => {
@@ -41,6 +43,22 @@ describe("UiSaga watcher", () => {
     it("should dispatch action to remove deleted tables from selectedTableIds", () => {
       return expectSaga(uiSaga)
         .put(removeFromSelectedTableIds(["t1", "t2"]))
+        .dispatch(action)
+        .silentRun();
+    });
+  });
+
+  describe("Handling createOperationsSuccess actions", () => {
+    const action = createOperationsSuccess([
+      {
+        id: "o1",
+      },
+      { id: "o2" },
+    ]);
+    it("should clear selected table IDs and set focused object ID", () => {
+      return expectSaga(uiSaga)
+        .put(removeFromSelectedTableIds([]))
+        .put(setFocusedObjectId("o2"))
         .dispatch(action)
         .silentRun();
     });

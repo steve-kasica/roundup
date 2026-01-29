@@ -21,11 +21,12 @@ import { createAction } from "@reduxjs/toolkit";
  * Action creator for requesting operation updates.
  *
  * @param {Object} payload.operationUpdates - The data to update the operation(s) with
+ * e.g. `{ operationUpdates: [ { id: 'operationId1', property1: 'newValue' }, { id: 'operationId2', property2: 'newValue' } ] }`
  * @returns {Object} Redux action with type "sagas/updateOperations/request"
  * @type {import('@reduxjs/toolkit')}
  */
 export const updateOperationsRequest = createAction(
-  "sagas/updateOperations/request"
+  "sagas/updateOperations/request",
 );
 
 /**
@@ -37,9 +38,9 @@ export const updateOperationsRequest = createAction(
  * @type {import('@reduxjs/toolkit').ActionCreatorWithPayload}
  */
 export const updateOperationsSuccess = createAction(
-  "sagas/updateOperations/success"
+  "sagas/updateOperations/success",
 );
 
 export const updateOperationsFailure = createAction(
-  "sagas/updateOperations/failure"
+  "sagas/updateOperations/failure",
 );

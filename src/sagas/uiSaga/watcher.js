@@ -10,8 +10,10 @@ import {
   removeFromHoveredColumnIds,
   removeFromSelectedColumnIds,
   removeFromSelectedTableIds,
+  setFocusedObjectId,
 } from "../../slices/uiSlice";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
+import { createOperationsSuccess } from "../createOperationsSaga/actions";
 
 export default function* uiSaga() {
   yield takeEvery(deleteColumnsSuccess.type, function* (action) {
@@ -25,5 +27,15 @@ export default function* uiSaga() {
     const tables = action.payload;
     const tableIds = tables.map(({ id }) => id);
     yield put(removeFromSelectedTableIds(tableIds));
+  });
+
+  yield takeEvery(createOperationsSuccess.type, function* (action) {
+    const createdOperations = action.payload;
+    // When new operations are created, clear selected table IDs
+    yield put(removeFromSelectedTableIds([]));
+
+    // Set the last operation created to be the focused operation
+    const lastOperation = createdOperations[createdOperations.length - 1];
+    yield put(setFocusedObjectId(lastOperation.id));
   });
 }

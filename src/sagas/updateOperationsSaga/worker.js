@@ -26,67 +26,25 @@ import {
   selectOperationQueryData,
 } from "../../slices/operationsSlice";
 import { updateOperationsSuccess } from "./actions";
-import { updateTables as updateTablesSlice } from "../../slices/tablesSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import {
-  calcPackStats as calcMatchStats, // TODO: rename file
+  calcMatchStats,
   createPackView,
   createStackView,
   getTableDimensions,
 } from "../../lib/duckdb";
 import { selectColumnsById } from "../../slices/columnsSlice";
-import {
-  addToLoadingOperations,
-  removeFromLoadingOperations,
-} from "../../slices/uiSlice";
 
-export default function* updateOperationsWorker(action) {
-  const successfulUpdates = [];
-  // eslint-disable-next-line no-unused-vars
-  const failedUpdates = [];
-  // eslint-disable-next-line no-unused-vars
-  const raisedAlerts = [];
-  const tableUpdates = [];
-  const furtherOperationUpdates = [];
-  const { operationUpdates } = action.payload;
+export default function* updateOperationsWorker(operationUpdates) {
+  let isFailure = false;
 
   for (let operationUpdate of operationUpdates) {
     const operation = yield select((state) =>
       selectOperationsById(state, operationUpdate.id),
     );
-
-    // If the operation is updating the `childIds` property,
-    // we need to ensure that the corresponding children specify this
-    // operation as their `parentId`.
-    if (Object.hasOwnProperty.call(operationUpdate, "childIds")) {
-      operationUpdate.isInSync = false; // Mark as out-of-sync due to child change
-      for (let childId of operationUpdate.childIds) {
-        let childObject;
-        if (isTableId(childId)) {
-          childObject = yield select((state) =>
-            selectTablesById(state, childId),
-          );
-          if (childObject.parentId !== operationUpdate.id) {
-            tableUpdates.push({
-              id: childId,
-              parentId: operationUpdate.id,
-            });
-          }
-        } else {
-          childObject = yield select((state) =>
-            selectOperationsById(state, childId),
-          );
-          if (childObject.parentId !== operationUpdate.id) {
-            furtherOperationUpdates.push({
-              id: childId,
-              parentId: operationUpdate.id,
-            });
-          }
-        }
-      }
-    } else if (Object.hasOwnProperty.call(operationUpdate, "isMaterialized")) {
+    if (Object.hasOwnProperty.call(operationUpdate, "isMaterialized")) {
       const queryData = yield select((state) =>
-        selectOperationQueryData(state, operation.id),
+        selectOperationQueryData(state, operationUpdate.id),
       );
       try {
         if (operation.operationType === OPERATION_TYPE_STACK) {
@@ -103,90 +61,113 @@ export default function* updateOperationsWorker(action) {
         operationUpdate.isMaterialized = true;
         operationUpdate.isInSync = true;
       } catch (error) {
+        isFailure = true;
         console.error("Error materializing operation:", error, queryData);
-        operationUpdate.isMaterialized = false;
       }
-    } else if (
-      Object.hasOwnProperty.call(operationUpdate, "operationType") ||
-      Object.hasOwnProperty.call(operationUpdate, "joinType") ||
-      Object.hasOwnProperty.call(operationUpdate, "joinPredicate")
-    ) {
-      operationUpdate.isInSync = false; // Mark as out-of-sync due to type change
-    } else if (Object.hasOwnProperty.call(operationUpdate, "matchStats")) {
-      // This parameter can be a long-running process, so mark this operation
-      // as loading
-      yield put(addToLoadingOperations(operation.id));
+    }
 
-      const {
-        leftTableName,
-        rightTableName,
-        leftColumnName,
-        rightColumnName,
-        joinType,
-      } = yield select((state) => {
-        const leftTable = isTableId(operation.childIds[0])
-          ? selectTablesById(state, operation.childIds[0])
-          : selectOperationsById(state, operation.childIds[0]);
-        const rightTable = isTableId(operation.childIds[1])
-          ? selectTablesById(state, operation.childIds[1])
-          : selectOperationsById(state, operation.childIds[1]);
-        const [leftKey, rightKey] = selectColumnsById(state, [
-          operation.joinKey1,
-          operation.joinKey2,
-        ]);
-        return {
-          leftTableName: leftTable.databaseName,
-          rightTableName: rightTable.databaseName,
-          leftColumnName: leftKey.databaseName,
-          rightColumnName: rightKey.databaseName,
-          joinType: operation.joinPredicate,
-        };
+    if (Object.hasOwnProperty.call(operationUpdate, "matchStats")) {
+      const [leftTableName, rightTableName] = yield select((state) => {
+        const childIds = Object.hasOwnProperty.call(operationUpdate, "childIds")
+          ? operationUpdate.childIds
+          : operation.childIds;
+        return [
+          (isTableId(childIds[0])
+            ? selectTablesById(state, childIds[0])
+            : selectOperationsById(state, childIds[0])
+          ).databaseName,
+          (isTableId(childIds[1])
+            ? selectTablesById(state, childIds[1])
+            : selectOperationsById(state, childIds[1])
+          ).databaseName,
+        ];
       });
+      const [leftColumnName, rightColumnName] = yield select((state) => {
+        return [
+          selectColumnsById(
+            state,
+            Object.hasOwnProperty.call(operationUpdate, "joinKey1")
+              ? operationUpdate.joinKey1
+              : operation.joinKey1,
+          ).databaseName,
+          selectColumnsById(
+            state,
+            Object.hasOwnProperty.call(operationUpdate, "joinKey2")
+              ? operationUpdate.joinKey2
+              : operation.joinKey2,
+          ).databaseName,
+        ];
+      });
+
+      const joinPredicate = Object.hasOwnProperty.call(
+        operationUpdate,
+        "joinPredicate",
+      )
+        ? operationUpdate.joinPredicate
+        : operation.joinPredicate;
+
       try {
         const matchStats = yield call(
-          calcMatchStats, // TODO: rename to calcMatchStats
+          calcMatchStats,
           leftTableName,
           rightTableName,
           leftColumnName,
           rightColumnName,
-          joinType,
+          joinPredicate,
         );
         operationUpdate.matchStats = matchStats;
       } catch (error) {
+        isFailure = true;
+        alert("Failure updating match statistics for operation.");
         console.error(
+          "updateOperationsSaga/worker.js:",
           "Error calculating match stats for operation:",
           operation.id,
           error,
         );
-      } finally {
-        // Remove operation from loading state
-        yield put(removeFromLoadingOperations(operation.id));
       }
     }
 
-    // TODO: need to update isInSync when table change their column order or are removed
-    successfulUpdates.push(operationUpdate);
+    // If the operation is updating the `childIds` property,
+    // we need to ensure that the corresponding children specify this
+    // operation as their `parentId`.
+    // if (Object.hasOwnProperty.call(operationUpdate, "childIds")) {
+    // operationUpdate.isInSync = false; // Mark as out-of-sync due to child change
+    // for (let childId of operationUpdate.childIds) {
+    //   let childObject;
+    //   if (isTableId(childId)) {
+    //     childObject = yield select((state) =>
+    //       selectTablesById(state, childId),
+    //     );
+    //     if (childObject.parentId !== operationUpdate.id) {
+    //       tableUpdates.push({
+    //         id: childId,
+    //         parentId: operationUpdate.id,
+    //       });
+    //     }
+    //   } else {
+    //     childObject = yield select((state) =>
+    //       selectOperationsById(state, childId),
+    //     );
+    //     if (childObject.parentId !== operationUpdate.id) {
+    //       furtherOperationUpdates.push({
+    //         id: childId,
+    //         parentId: operationUpdate.id,
+    //       });
+    //     }
+    //   }
+    // }
+    // } else if (
+    //   Object.hasOwnProperty.call(operationUpdate, "operationType") ||
+    //   Object.hasOwnProperty.call(operationUpdate, "joinType") ||
+    //   Object.hasOwnProperty.call(operationUpdate, "joinPredicate")
+    // ) {
+    //   operationUpdate.isInSync = false; // Mark as out-of-sync due to type change
+    // }
   }
 
-  if (tableUpdates.length > 0) {
-    yield put(updateTablesSlice(tableUpdates));
-  }
-  yield put(
-    updateOperationsSlice([...successfulUpdates, ...furtherOperationUpdates]),
-  );
-
-  const formatSagaEndPayload = (updates) => ({
-    changedPropertiesById: Object.fromEntries(
-      updates.map(({ id }) => [
-        id,
-        Object.keys(
-          operationUpdates.find(({ id: updateId }) => updateId === id),
-        ).filter((key) => key !== "id"),
-      ]),
-    ),
-  });
-
-  if (successfulUpdates.length > 0) {
-    yield put(updateOperationsSuccess(formatSagaEndPayload(successfulUpdates)));
+  if (!isFailure) {
+    yield put(updateOperationsSlice(operationUpdates));
+    yield put(updateOperationsSuccess(operationUpdates));
   }
 }
