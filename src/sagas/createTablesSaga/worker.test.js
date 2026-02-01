@@ -1,4 +1,4 @@
-import { describe, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
 import createTablesWorker from "./worker";
 import { addTables } from "../../slices/tablesSlice";
@@ -63,13 +63,32 @@ describe("createTablesWorker saga", () => {
       },
     ];
     it("should create tables and dispatch success action on successful creation", async () => {
-      await expectSaga(createTablesWorker, tablesData)
+      return expectSaga(createTablesWorker, tablesData)
         .call(createDBTables, "t-mock-uuid", "data1.csv")
         .call(createDBTables, "t-mock-uuid", "data2.csv")
         .call(getTableDimensions, "t-mock-uuid")
         .call(getTableDimensions, "t-mock-uuid")
         .put.like({ action: { type: addTables.type } })
-        .put.like({ action: { type: createTablesSuccess.type } })
+        .put(
+          createTablesSuccess([
+            {
+              ...tablesData[0],
+              id: "t1",
+              parentId: null,
+              databaseName: "t-mock-uuid",
+              columnIds: new Array(5),
+              rowCount: 100,
+            },
+            {
+              ...tablesData[1],
+              id: "t2",
+              parentId: null,
+              databaseName: "t-mock-uuid",
+              columnIds: new Array(5),
+              rowCount: 100,
+            },
+          ]),
+        )
         .run();
     });
   });

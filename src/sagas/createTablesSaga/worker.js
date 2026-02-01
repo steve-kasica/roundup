@@ -53,9 +53,9 @@ export default function* createTablesWorker(tablesData) {
       mimeType: tableData.mimeType,
       dateLastModified: tableData.dateLastModified,
       rowCount,
-      columnCount,
       columnIds: new Array(columnCount),
     });
+    console.log("Created table:", table);
     createdTables.push(table);
   }
 

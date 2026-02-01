@@ -63,7 +63,7 @@ export function Table({
   dateLastModified = null,
   columnIds = [],
   rowCount = null,
-  hiddenColumnIds = [],
+  // columnCount = null,
 } = {}) {
   const id = `t${++idCounter}`;
   return {
@@ -79,7 +79,7 @@ export function Table({
     dateLastModified,
     columnIds,
     rowCount,
-    hiddenColumnIds,
+    // columnCount,
   };
 }
 

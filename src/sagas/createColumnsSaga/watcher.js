@@ -88,7 +88,7 @@ export default function* createColumnsWatcher() {
     const workerPayload = [];
     for (const table of tables) {
       workerPayload.push(
-        ...Array.from({ length: table.columnCount }).map((_, index) => ({
+        ...Array.from({ length: table.columnIds.length }).map((_, index) => ({
           parentId: table.id, // tables and operations can be parents of columns
           index,
         })),

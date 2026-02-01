@@ -6,13 +6,12 @@ This saga creates a column within Roundup. Its purpose is create new column meta
 
 ```mermaid
     stateDiagram
-    createCols:Create columns saga
+    createColumns:Create columns saga
     createTables:Create tables saga
     updateOperations:Update operations saga
 
-    createCols --> createCols: Operation column creation triggers child table/operation column creation
-    createTables --> createCols: Table is created
-    updateOperations --> createCols: Operation has been (re)materialized
+    createTables --> createColumns: Table is created
+    updateOperations --> createColumns: Operation has been (re)materialized
 ```
 
 ## Inserting columns
