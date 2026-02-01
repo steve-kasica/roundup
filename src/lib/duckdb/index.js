@@ -7,14 +7,14 @@
  * Exported modules include:
  * - Table operations: createTables, dropTable, getTableRows, getTableDimensions
  * - Column operations: getColumnStats, getColumnNames, getValueCounts
- * - Join operations: calcPackStats, createPackView, getMatchValues
+ * - Join operations: calcMatchStats, createPackView, getMatchValues
  * - Stack operations: createStackView, getVirtualStackRows
  * - File operations: registerFiles, exportTableToStreamManual
  *
  * @module lib/duckdb
  *
  * @example
- * import { getTableRows, calcPackStats, createTables } from './lib/duckdb';
+ * import { getTableRows, calcMatchStats, createTables } from './lib/duckdb';
  */
 
 export * from "./getTableRows";
@@ -27,7 +27,7 @@ export * from "./getColumnStats";
 export * from "./createTables";
 export * from "./registerFiles";
 export * from "./renameColumns";
-export * from "./calcPackStats";
+export * from "./calcMatchStats";
 export * from "./getValueCounts";
 export * from "./getValueLength";
 export * from "./getColumnNames";

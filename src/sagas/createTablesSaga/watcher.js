@@ -7,10 +7,13 @@
  * @example
  * // Watcher is started automatically by rootSaga
  */
-import { takeEvery } from "redux-saga/effects";
+import { call, takeEvery } from "redux-saga/effects";
 import { createTablesRequest } from "./actions";
 import addTablesWorker from "./worker";
 
 export default function* createTablesWatcher() {
-  yield takeEvery(createTablesRequest.type, addTablesWorker);
+  yield takeEvery(createTablesRequest.type, function* (action) {
+    const tableData = action.payload;
+    yield call(addTablesWorker, tableData);
+  });
 }

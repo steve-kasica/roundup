@@ -8,7 +8,7 @@
  * deletion for operation columns by propagating to child tables/operations.
  *
  */
-import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
+import { call, select, takeEvery, takeLatest } from "redux-saga/effects";
 import { deleteColumnsRequest } from "./actions";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
 import {
@@ -17,12 +17,9 @@ import {
 } from "../../slices/columnsSlice";
 import {
   isOperationId,
-  OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectOperationsById,
 } from "../../slices/operationsSlice";
-import { group } from "d3";
-import { isTableId } from "../../slices/tablesSlice";
 import deleteColumnsWorker from "./worker";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
 import {
@@ -32,7 +29,6 @@ import {
 import { deleteOperationsSuccess } from "../deleteOperationsSaga/actions";
 
 export default function* deleteColumnsSaga() {
-  // Main watcher for delete columns requests
   // If the column to be deleted is an operation's column, then the watcher
   // will recurse into the child tables/operations to delete the appropriate
   // columns as well.
@@ -122,11 +118,11 @@ export default function* deleteColumnsSaga() {
   });
 
   // When schema-related properties of an operation are updated,
-  // we need to re-create the operation's columns, so this saga
-  // must delete any orphaned columns that belonged to that opeation.
+  // we re-create the operation's columns instead of updating them, so we delete
+  // the operation's old columns, which will be orphaned in columns state.
   yield takeLatest(updateOperationsSuccess.type, function* (action) {
     const deleteFromDatabase = false;
-    const { changedPropertiesById } = action.payload;
+    const changedPropertiesById = action.payload;
 
     for (let [operationId, changedProperties] of Object.entries(
       changedPropertiesById,
@@ -135,8 +131,6 @@ export default function* deleteColumnsSaga() {
         const orphanedColumnIds = yield select((state) =>
           selectOrphanedColumnIds(state, operationId),
         );
-        // Bypass deleteColumnsRequest to avoid recursing into table columns
-        // since we're just swapping out operation columns here.
         yield call(deleteColumnsWorker, orphanedColumnIds, deleteFromDatabase);
       }
     }

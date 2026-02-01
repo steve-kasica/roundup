@@ -87,13 +87,7 @@ const DeleteColumnsButton = () => {
 
   const handleConfirm = () => {
     setDialogOpen(false);
-    dispatch(
-      deleteColumnsRequest({
-        columnIds: selectedObjectColumns,
-        recurse: true,
-        deleteFromDatabase: true,
-      }),
-    );
+    dispatch(deleteColumnsRequest(selectedObjectColumns));
   };
 
   const handleCancel = () => {

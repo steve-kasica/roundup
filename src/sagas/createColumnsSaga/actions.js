@@ -4,14 +4,6 @@
  *
  * Redux action creators for column creation saga operations.
  *
- * Actions:
- * - createColumnsRequest: Initiates column creation process
- * - createColumnsSuccess: Signals successful column creation
- * - createColumnsFailure: Signals column creation failure
- *
- * @example
- * import { createColumnsRequest } from './actions';
- * dispatch(createColumnsRequest({ columnLocations: [...], mode: 'insertion' }));
  */
 import { createAction } from "@reduxjs/toolkit";
 
@@ -20,9 +12,30 @@ import { createAction } from "@reduxjs/toolkit";
  * Dispatch this action to trigger the process of creating columns.
  *
  * @function
+ * @param {Array<Object>} payload - Array of column creation data objects.
+ *
  * @returns {Object} Redux action with type "sagas/createColumns/request"
+ *
  */
 export const createColumnsRequest = createAction("sagas/createColumns/request");
+
+/**
+ * Action creator for initiating the insert columns request saga.
+ * Dispatch this action to trigger the process of inserting columns.
+ *
+ * @function
+ * @param {Array<Object>} payload - Array of column insertion data objects.
+ * @returns {Object} Redux action with type "sagas/createColumns/insertRequest"
+ *
+ *  * @example
+ * dispatch(insertColumnsRequest([
+ *   { parentId: 'table1', index: 0, name: 'New Column', fillValue: null },
+ *   { parentId: 'operation1', index: 2, name: 'Another Column', fillValue: 0 },
+ * ]));
+ */
+export const insertColumnsRequest = createAction(
+  "sagas/createColumns/insertRequest",
+);
 
 /**
  * Action creator for successful creation of columns.
@@ -32,12 +45,3 @@ export const createColumnsRequest = createAction("sagas/createColumns/request");
  * @type {import('@reduxjs/toolkit').ActionCreatorWithPayload<any>}
  */
 export const createColumnsSuccess = createAction("sagas/createColumns/success");
-
-/**
- * Action creator for handling failure in the createColumns saga.
- * Dispatched when the createColumns process encounters an error.
- *
- * @function
- * @returns {Object} Redux action with type "sagas/createColumns/failure"
- */
-export const createColumnsFailure = createAction("sagas/createColumns/failure");

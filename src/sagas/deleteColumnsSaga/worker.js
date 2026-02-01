@@ -15,7 +15,7 @@
  * // Called by watcher saga
  * yield call(deleteColumnsWorker, tablesToAlter);
  */
-import { put, select } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import { deleteColumns as deleteColumnsFromSlice } from "../../slices/columnsSlice";
 import { deleteColumnsSuccess } from "./actions";
 import { dropColumns } from "../../lib/duckdb";
@@ -51,7 +51,7 @@ export default function* deleteColumnsWorker(
       const columnDatabaseNames = columns.map((col) => col.databaseName);
       try {
         // Call the database function to drop columns
-        yield dropColumns(parentDatabaseName, columnDatabaseNames);
+        yield call(dropColumns, parentDatabaseName, columnDatabaseNames);
       } catch (error) {
         isFailure = true;
         alert(`Error deleting columns: ${error.message}`);
@@ -70,40 +70,3 @@ export default function* deleteColumnsWorker(
     }
   }
 }
-// for (let {
-//   tableId: parentId,
-//   columnsToDelete,
-//   deleteFromDatabase,
-// } of tablesToAlter) {
-//   const columnIdsToDelete = columnsToDelete.map((col) => col.id);
-//   if (deleteFromDatabase) {
-//     const { databaseName: parentDatabaseName } = yield select((state) =>
-//       isTableId(parentId)
-//         ? selectTablesById(state, parentId)
-//         : selectOperationsById(state, parentId),
-//     );
-//     const columnDatabaseNames = columnsToDelete.map(
-//       (col) => col.databaseName,
-//     );
-//     try {
-//       // Call the database function to drop columns
-//       yield dropColumns(parentDatabaseName, columnDatabaseNames);
-//       successfulDeletions.push(
-//         ...columnsToDelete.map((col) => ({ id: col.id, parentId })),
-//       );
-//     } catch (error) {
-//       alert(`Error deleting columns: ${error.message}`);
-//       console.error(
-//         `deleteColumnsSaga/worker.js: Failed to drop columns [${columnDatabaseNames.join(
-//           ", ",
-//         )}] from parent object ${parentId}:`,
-//         error,
-//       );
-//     }
-//   } else {
-//     // Do not delete from database, just from state
-//     successfulDeletions.push(
-//       ...columnsToDelete.map((col) => ({ id: col.id, parentId })),
-//     );
-//   }
-// }

@@ -12,11 +12,12 @@
  * - Handling of orphaned columns after operation updates
  * - Deletion of columns when parent tables are deleted
  */
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 import { deleteColumnsRequest } from "./actions";
 import deleteColumnsWatcher from "./watcher";
 import deleteColumnsWorker from "./worker";
 import { expectSaga } from "redux-saga-test-plan";
+import * as matchers from "redux-saga-test-plan/matchers";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
@@ -59,11 +60,12 @@ describe("deleteColumnsSaga watcher", () => {
           allIds: [],
         },
       };
-      it("should pass the appropriate parameters to deleteColumnsWorker", async () => {
+      it("should pass the appropriate parameters to deleteColumnsWorker", () => {
         const action = deleteColumnsRequest(["c1", "c2"]);
 
-        await expectSaga(deleteColumnsWatcher)
+        return expectSaga(deleteColumnsWatcher)
           .withState(state)
+          .provide([[matchers.call.fn(deleteColumnsWorker), undefined]])
           .call(
             deleteColumnsWorker,
             [
@@ -79,7 +81,7 @@ describe("deleteColumnsSaga watcher", () => {
             true,
           )
           .dispatch(action)
-          .silentRun(100);
+          .run();
       });
     });
     describe("ColumnIds belonging to a stack operation", () => {
@@ -153,11 +155,12 @@ describe("deleteColumnsSaga watcher", () => {
           allIds: ["o1"],
         },
       };
-      it("should pass the appropriate parameters to deleteColumnsWorker", async () => {
+      it("should pass the appropriate parameters to deleteColumnsWorker", () => {
         const action = deleteColumnsRequest(["c7"]);
 
-        await expectSaga(deleteColumnsWatcher)
+        return expectSaga(deleteColumnsWatcher)
           .withState(state)
+          .provide([[matchers.call.fn(deleteColumnsWorker), undefined]])
           .call(
             deleteColumnsWorker,
             [
@@ -239,11 +242,12 @@ describe("deleteColumnsSaga watcher", () => {
         },
       };
 
-      it("should pass the appropriate parameters to deleteColumnsWorker", async () => {
+      it("should pass the appropriate parameters to deleteColumnsWorker", () => {
         const action = deleteColumnsRequest(["c6"]);
 
-        await expectSaga(deleteColumnsWatcher)
+        return expectSaga(deleteColumnsWatcher)
           .withState(state)
+          .provide([[matchers.call.fn(deleteColumnsWorker), undefined]])
           .call(
             deleteColumnsWorker,
             [
@@ -295,11 +299,12 @@ describe("deleteColumnsSaga watcher", () => {
         allIds: [],
       },
     };
-    it("should pass the appropriate parameters to deleteColumnsWorker", async () => {
+    it("should pass the appropriate parameters to deleteColumnsWorker", () => {
       const action = deleteTablesSuccess([state.tables.byId.t1]);
 
-      await expectSaga(deleteColumnsWatcher)
+      return expectSaga(deleteColumnsWatcher)
         .withState(state)
+        .provide([[matchers.call.fn(deleteColumnsWorker), undefined]])
         .call(
           deleteColumnsWorker,
           [
@@ -350,11 +355,12 @@ describe("deleteColumnsSaga watcher", () => {
       },
     };
 
-    it("should dispatch deleteColumnsRequest with the appropriate parameters", async () => {
+    it("should dispatch deleteColumnsRequest with the appropriate parameters", () => {
       const action = deleteOperationsSuccess([state.operations.byId.o1]);
 
-      await expectSaga(deleteColumnsWatcher)
+      return expectSaga(deleteColumnsWatcher)
         .withState(state)
+        .provide([[matchers.call.fn(deleteColumnsWorker), undefined]])
         .call(deleteColumnsWorker, ["c1", "c2"], false)
         .dispatch(action)
         .run();
@@ -399,13 +405,12 @@ describe("deleteColumnsSaga watcher", () => {
       },
     };
     describe("when the columnIds property has changed", () => {
-      it("should call deleteColumnsWorker with the appropriate parameters", async () => {
-        const action = updateOperationsSuccess({
-          changedPropertiesById: { o1: ["columnIds"] },
-        });
+      it("should call deleteColumnsWorker with the appropriate parameters", () => {
+        const action = updateOperationsSuccess({ o1: ["columnIds"] });
 
-        await expectSaga(deleteColumnsWatcher)
+        return expectSaga(deleteColumnsWatcher)
           .withState(state)
+          .provide([[matchers.call.fn(deleteColumnsWorker), undefined]])
           .call(deleteColumnsWorker, ["c2"], false)
           .dispatch(action)
           .run();

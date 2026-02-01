@@ -12,11 +12,13 @@
  */
 import { describe, it } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
+import * as matchers from "redux-saga-test-plan/matchers";
 import updateTablesSagaWatcher from "./watcher";
 import { deleteColumnsSuccess } from "../deleteColumnsSaga";
 import updateTablesWorker from "./worker";
 import { updateTablesRequest } from "./actions";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
+import { createColumnsSuccess } from "../createColumnsSaga/actions";
 
 describe("updateTablesSagaWatcher", () => {
   let state = {};
@@ -68,12 +70,25 @@ describe("updateTablesSagaWatcher", () => {
     };
 
     describe("when columns are deleted from a table", () => {
-      const action = deleteColumnsSuccess([
-        { id: "c2", parentId: "t1", name: "Column 2" },
-      ]);
-      it.skip("should call updateTablesWorker with appropriate params", async () => {
-        await expectSaga(updateTablesSagaWatcher)
-          .withState(state)
+      const action = deleteColumnsSuccess([state.columns.byId.c2]);
+      it("should call updateTablesWorker with appropriate params", () => {
+        return expectSaga(updateTablesSagaWatcher)
+          .withState({
+            ...state,
+            tables: {
+              ...state.tables,
+              byId: {
+                ...state.tables.byId,
+                t1: { ...state.tables.byId.t1, columnIds: ["c1", "c3"] },
+              },
+            },
+            columns: {
+              ...state.columns,
+              byId: { ...state.columns.byId, c2: undefined },
+              allIds: state.columns.allIds.filter((id) => id !== "c2"),
+            },
+          })
+          .provide([[matchers.call.fn(updateTablesWorker), undefined]])
           .call(updateTablesWorker, [{ id: "t1", columnIds: ["c1", "c3"] }])
           .dispatch(action)
           .run();
@@ -85,7 +100,7 @@ describe("updateTablesSagaWatcher", () => {
       ]);
       it("should not call updateTablesWorker", async () => {
         await expectSaga(updateTablesSagaWatcher)
-          .withState(state)
+          .withState({ ...state })
           .not.call.fn(updateTablesWorker)
           .dispatch(action)
           .run();
@@ -148,12 +163,44 @@ describe("updateTablesSagaWatcher", () => {
       },
     };
     const action = createOperationsSuccess([state.operations.byId.o2]);
-    it.skip("should call updateTablesWorker with action payload", async () => {
+    it("should call updateTablesWorker with action payload", async () => {
       await expectSaga(updateTablesSagaWatcher)
+        .provide([[matchers.call.fn(updateTablesWorker), undefined]])
         .call(updateTablesWorker, [
           {
             id: "t3",
             parentId: "o2",
+          },
+        ])
+        .dispatch(action)
+        .run();
+    });
+  });
+
+  describe("handling createColumnsSuccess actions", () => {
+    const action = createColumnsSuccess([
+      state.columns.byId.c1,
+      state.columns.byId.c2,
+    ]);
+    it("should call updateTablesWorker with action payload if columns belong to a table", async () => {
+      await expectSaga(updateTablesSagaWatcher)
+        .provide([[matchers.call.fn(updateTablesWorker), undefined]])
+        .call(updateTablesWorker, [
+          {
+            id: "t1",
+            columnIds: ["c1", "c2"],
+          },
+        ])
+        .dispatch(action)
+        .run();
+    });
+    it("should not call updateTablesWorker with action payload if columns belong to an operation", async () => {
+      await expectSaga(updateTablesSagaWatcher)
+        .provide([[matchers.call.fn(updateTablesWorker), undefined]])
+        .not.call(updateTablesWorker, [
+          {
+            id: "o1",
+            columnIds: ["c1", "c2"],
           },
         ])
         .dispatch(action)

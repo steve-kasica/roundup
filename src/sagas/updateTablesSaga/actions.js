@@ -36,11 +36,3 @@ export const updateTablesRequest = createAction("sagas/updateTables/request");
  *
  */
 export const updateTablesSuccess = createAction("sagas/updateTables/success");
-
-/**
- * Action creator for failed table updates.
- *
- * This action is dispatched when table updates fail.
- *
- */
-export const updateTablesFailure = createAction("sagas/updateTables/failure");

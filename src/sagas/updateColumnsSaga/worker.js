@@ -27,97 +27,99 @@ import {
   getValueCounts,
   setColumnType,
 } from "../../lib/duckdb";
-import { updateColumnsFailure, updateColumnsSuccess } from "./actions";
+import { updateColumnsSuccess } from "./actions";
 import { SUMMARY_ATTRIBUTES } from "../../slices/columnsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { selectOperationsById } from "../../slices/operationsSlice";
 import { COLUMN_UNIQUE_VALUE_LIMIT } from "../../config";
 
 // Worker saga
-export default function* updateColumnsWorker(action) {
-  const successfulUpdates = [];
-  const failedUpdates = [];
-  const { columnUpdates } = action.payload;
+export default function* updateColumnsWorker(columnUpdates) {
+  let isFailure = false;
 
   for (let columnUpdate of columnUpdates) {
+    const updatingProperties = Object.keys(columnUpdate);
     const column = yield select((state) =>
-      selectColumnsById(state, columnUpdate.id)
+      selectColumnsById(state, columnUpdate.id),
     );
+
     // TODO: honestly, this should be streamlined into a selector that handles both tables and operations
     const parent = yield select((state) =>
       isTableId(column.parentId)
         ? selectTablesById(state, column.parentId)
-        : selectOperationsById(state, column.parentId)
+        : selectOperationsById(state, column.parentId),
     );
-    const updateKeys = Object.keys(columnUpdate);
-    let databaseUpdates = {};
-    try {
-      if (updateKeys.includes("columnType")) {
+
+    if (updatingProperties.includes("columnType")) {
+      try {
         // We need to update the column type in the database prior to fetching stats
         yield call(
           setColumnType,
           parent.databaseName,
           column.databaseName,
-          columnUpdate.columnType
+          columnUpdate.columnType,
         );
+      } catch (error) {
+        alert(
+          `Failed to update column type for (${
+            column.name || column.databaseName || column.id
+          }): ${error.message}`,
+        );
+        console.error(
+          "updateColumnsSaga/worker.js",
+          `Error updating column type for ${column.id}:`,
+          error,
+          "Column update data:",
+          columnUpdate,
+        );
+        isFailure = true;
       }
-      if (updateKeys.some((key) => SUMMARY_ATTRIBUTES.includes(key))) {
-        databaseUpdates = {
-          ...databaseUpdates,
-          ...(yield call(getColumnStats, parent.databaseName, [
+    }
+
+    if (
+      updatingProperties.some((property) =>
+        SUMMARY_ATTRIBUTES.includes(property),
+      )
+    ) {
+      try {
+        columnUpdate = Object.assign(
+          columnUpdate,
+          (yield call(getColumnStats, parent.databaseName, [
             column.databaseName,
           ]))[0],
-        };
+        );
+      } catch (error) {
+        alert(
+          `Failed to fetch column statistics for (${
+            column.name || column.databaseName || column.id
+          }): ${error.message}`,
+        );
+        console.error(
+          "updateColumnsSaga/worker.js",
+          `Error fetching stats for column ${column.id}:`,
+          error,
+          "Column update data:",
+          columnUpdate,
+        );
+        isFailure = true;
       }
-      if (updateKeys.includes(TOP_VALUES_ATTR)) {
-        databaseUpdates = {
-          ...databaseUpdates,
-          [TOP_VALUES_ATTR]: yield call(
-            getValueCounts,
-            parent.databaseName,
-            column.databaseName,
-            COLUMN_UNIQUE_VALUE_LIMIT
-          ),
-        };
-      }
+    }
 
-      successfulUpdates.push({
-        ...columnUpdate,
-        ...databaseUpdates,
-      });
-    } catch (error) {
-      alert(
-        `Failed to update column (${
-          column.name || column.databaseName || column.id
-        }): ${error.message}`
-      );
-      failedUpdates.push({
-        ...columnUpdate,
+    if (updatingProperties.includes(TOP_VALUES_ATTR)) {
+      columnUpdate = Object.assign(columnUpdate, {
+        topValues: yield call(
+          getValueCounts,
+          parent.databaseName,
+          column.databaseName,
+          COLUMN_UNIQUE_VALUE_LIMIT,
+        ),
       });
     }
   }
 
-  // Update the column objects in the store (both successful and failed)
-  yield put(updateColumnsSlice(successfulUpdates));
-
-  const formatUpdates = (updates) =>
-    Object.fromEntries(
-      updates.map((c) => [c.id, Object.keys(c).filter((key) => key !== "id")])
-    );
-
-  if (successfulUpdates.length > 0) {
-    yield put(
-      updateColumnsSuccess({
-        updates: formatUpdates(successfulUpdates),
-      })
-    );
-  }
-
-  if (failedUpdates.length > 0) {
-    yield put(
-      updateColumnsFailure({
-        updates: formatUpdates(failedUpdates),
-      })
-    );
+  if (!isFailure) {
+    // Update the column objects in the store (both successful and failed)
+    yield put(updateColumnsSlice(columnUpdates));
+    yield put(updateColumnsSuccess(columnUpdates));
   }
 }

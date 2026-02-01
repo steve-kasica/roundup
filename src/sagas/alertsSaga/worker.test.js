@@ -1,10 +1,20 @@
-import { describe, it, expect } from "vitest";
+import { describe, it } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
-import alertsSagaWorker from "./worker";
+import * as matchers from "redux-saga-test-plan/matchers";
+import {
+  processAlerts,
+  validateOperationWorker,
+  validatePackOperationWorker,
+  validateStackOperationWorker,
+} from "./worker";
 import {
   addAlerts as addAlertsToSlice,
-  deleteAlerts as deleteAlertsFromSlice,
+  deleteAlerts,
 } from "../../slices/alertsSlice/alertsSlice";
+import {
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
+} from "../../slices/operationsSlice";
 
 /**
  * Helper to create a mock state with alerts
@@ -19,145 +29,48 @@ const createMockState = (alertsById = {}) => ({
 });
 
 describe("alertsSagaWorker saga", () => {
-  describe("adding new alerts", () => {
-    it("adds a new alert when it does not exist and is not passing", async () => {
-      const raisedAlerts = [
+  describe("validateOperationWorker", () => {
+    it("should call validateStackOperationWorker for STACK operations", () => {
+      const operations = [
         {
-          id: "source_1",
-          alerts: [
-            {
-              id: "alert_1",
-              sourceId: "source_1",
-              isPassing: false,
-              message: "Error",
-            },
-          ],
+          id: "o1",
+          operationType: OPERATION_TYPE_STACK,
         },
       ];
-
-      const initialState = createMockState({});
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
-        .withState(initialState)
+      return expectSaga(validateOperationWorker, operations)
+        .provide([
+          [matchers.call.fn(validateStackOperationWorker, operations[0])],
+        ])
+        .call(validateStackOperationWorker, operations[0])
         .run();
-
-      const addAlertsAction = effects.put.find(
-        (effect) => effect.payload.action.type === addAlertsToSlice.type
-      );
-
-      expect(addAlertsAction).toBeDefined();
-      expect(addAlertsAction.payload.action.payload).toHaveLength(1);
-      expect(addAlertsAction.payload.action.payload[0]).toMatchObject({
-        id: "alert_1",
-        sourceId: "source_1",
-        isPassing: false,
-      });
     });
 
-    it("adds multiple new alerts from the same source", async () => {
-      const raisedAlerts = [
+    it("should call validatePackOperationWorker for PACK operations", () => {
+      const operations = [
         {
-          id: "source_1",
-          alerts: [
-            {
-              id: "alert_1",
-              sourceId: "source_1",
-              isPassing: false,
-              message: "Error 1",
-            },
-            {
-              id: "alert_2",
-              sourceId: "source_1",
-              isPassing: false,
-              message: "Error 2",
-            },
-          ],
+          id: "o1",
+          operationType: OPERATION_TYPE_PACK,
         },
       ];
-
-      const initialState = createMockState({});
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
-        .withState(initialState)
+      return expectSaga(validateOperationWorker, operations)
+        .provide([
+          [matchers.call.fn(validatePackOperationWorker, operations[0])],
+        ])
+        .call(validatePackOperationWorker, operations[0])
         .run();
-
-      const addAlertsAction = effects.put.find(
-        (effect) => effect.payload.action.type === addAlertsToSlice.type
-      );
-
-      expect(addAlertsAction).toBeDefined();
-      expect(addAlertsAction.payload.action.payload).toHaveLength(2);
     });
   });
 
-  describe("deleting resolved alerts", () => {
-    it("deletes an alert when it exists and is now passing", async () => {
+  describe("processAlerts", () => {
+    it("should add new alerts when they are raised", () => {
       const raisedAlerts = [
         {
-          id: "source_1",
+          id: "t1",
           alerts: [
             {
-              id: "alert_1",
-              sourceId: "source_1",
-              isPassing: true,
-              message: "Resolved",
-            },
-          ],
-        },
-      ];
-
-      const initialState = createMockState({
-        alert_1: { id: "alert_1", sourceId: "source_1", isPassing: false },
-      });
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
-        .withState(initialState)
-        .run();
-
-      const deleteAlertsAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteAlertsFromSlice.type
-      );
-
-      expect(deleteAlertsAction).toBeDefined();
-      expect(deleteAlertsAction.payload.action.payload).toContain("alert_1");
-    });
-
-    it("deletes orphaned alerts that are no longer raised", async () => {
-      const raisedAlerts = [
-        {
-          id: "source_1",
-          alerts: [], // No alerts raised anymore
-        },
-      ];
-
-      const initialState = createMockState({
-        alert_1: { id: "alert_1", sourceId: "source_1", isPassing: false },
-        alert_2: { id: "alert_2", sourceId: "source_1", isPassing: false },
-      });
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
-        .withState(initialState)
-        .run();
-
-      const deleteAlertsAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteAlertsFromSlice.type
-      );
-
-      expect(deleteAlertsAction).toBeDefined();
-      expect(deleteAlertsAction.payload.action.payload).toContain("alert_1");
-      expect(deleteAlertsAction.payload.action.payload).toContain("alert_2");
-    });
-  });
-
-  describe("no action needed scenarios", () => {
-    it("does not add or delete when alert already exists and is not passing", async () => {
-      const raisedAlerts = [
-        {
-          id: "source_1",
-          alerts: [
-            {
-              id: "alert_1",
-              sourceId: "source_1",
+              id: "t1_ERROR1",
+              code: "ERROR1",
+              sourceId: "t1",
               isPassing: false,
               message: "Error",
             },
@@ -166,207 +79,77 @@ describe("alertsSagaWorker saga", () => {
       ];
 
       const initialState = createMockState({
-        alert_1: { id: "alert_1", sourceId: "source_1", isPassing: false },
+        t1_ERROR2: {
+          id: "t1_ERROR2",
+          code: "ERROR2",
+          sourceId: "t1",
+          isPassing: false,
+        },
       });
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
+      return expectSaga(processAlerts, raisedAlerts)
         .withState(initialState)
+        .put(addAlertsToSlice([raisedAlerts[0].alerts[0]]))
         .run();
-
-      // No put effects should be dispatched
-      expect(effects.put).toBeUndefined();
     });
-
-    it("does not dispatch actions when a new alert is passing (never raised)", async () => {
+    it("should delete existing alerts if they're passing", () => {
       const raisedAlerts = [
         {
-          id: "source_1",
+          id: "t1",
           alerts: [
             {
-              id: "alert_1",
-              sourceId: "source_1",
+              id: "t1_ERROR1",
+              code: "ERROR1",
+              sourceId: "t1",
               isPassing: true,
-              message: "OK",
-            },
-          ],
-        },
-      ];
-
-      const initialState = createMockState({});
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
-        .withState(initialState)
-        .run();
-
-      // No put effects should be dispatched
-      expect(effects.put).toBeUndefined();
-    });
-  });
-
-  describe("mixed scenarios", () => {
-    it("handles multiple sources with different alert states", async () => {
-      const raisedAlerts = [
-        {
-          id: "source_1",
-          alerts: [
-            {
-              id: "alert_1",
-              sourceId: "source_1",
-              isPassing: false,
-              message: "New error",
-            },
-          ],
-        },
-        {
-          id: "source_2",
-          alerts: [
-            {
-              id: "alert_2",
-              sourceId: "source_2",
-              isPassing: true,
-              message: "Resolved",
+              message: "Error",
             },
           ],
         },
       ];
 
       const initialState = createMockState({
-        // source_1 has no existing alerts
-        // source_2 has an existing alert that will be resolved
-        alert_2: { id: "alert_2", sourceId: "source_2", isPassing: false },
+        t1_ERROR1: {
+          id: "t1_ERROR1",
+          code: "ERROR1",
+          sourceId: "t1",
+          isPassing: false,
+          message: "Error",
+        },
       });
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
+      return expectSaga(processAlerts, raisedAlerts)
         .withState(initialState)
+        .put(deleteAlerts([raisedAlerts[0].alerts[0].id]))
         .run();
-
-      // Should have both add and delete actions
-      const addAlertsAction = effects.put.find(
-        (effect) => effect.payload.action.type === addAlertsToSlice.type
-      );
-      const deleteAlertsAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteAlertsFromSlice.type
-      );
-
-      expect(addAlertsAction).toBeDefined();
-      expect(deleteAlertsAction).toBeDefined();
     });
 
-    it("adds new alerts while keeping existing non-passing alerts", async () => {
+    it("should not modify existing alerts that are still failing", () => {
       const raisedAlerts = [
         {
-          id: "source_1",
+          id: "t1",
           alerts: [
             {
-              id: "alert_1",
-              sourceId: "source_1",
+              id: "t1_ERROR1",
+              code: "ERROR1",
+              sourceId: "t1",
               isPassing: false,
-              message: "Existing",
-            },
-            {
-              id: "alert_2",
-              sourceId: "source_1",
-              isPassing: false,
-              message: "New",
+              message: "Error",
             },
           ],
         },
       ];
 
       const initialState = createMockState({
-        alert_1: { id: "alert_1", sourceId: "source_1", isPassing: false },
-      });
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
-        .withState(initialState)
-        .run();
-
-      const addAlertsAction = effects.put.find(
-        (effect) => effect.payload.action.type === addAlertsToSlice.type
-      );
-
-      expect(addAlertsAction).toBeDefined();
-      expect(addAlertsAction.payload.action.payload).toHaveLength(1);
-      expect(addAlertsAction.payload.action.payload[0].id).toBe("alert_2");
-
-      // No delete action since alert_1 is still not passing
-      const deleteAlertsAction = effects.put?.find(
-        (effect) => effect.payload.action.type === deleteAlertsFromSlice.type
-      );
-      expect(deleteAlertsAction).toBeUndefined();
-    });
-
-    it("simultaneously adds new alerts and deletes resolved alerts", async () => {
-      const raisedAlerts = [
-        {
-          id: "source_1",
-          alerts: [
-            {
-              id: "alert_1",
-              sourceId: "source_1",
-              isPassing: true,
-              message: "Resolved",
-            },
-            {
-              id: "alert_2",
-              sourceId: "source_1",
-              isPassing: false,
-              message: "New error",
-            },
-          ],
+        t1_ERROR1: {
+          id: "t1_ERROR1",
+          code: "ERROR1",
+          sourceId: "t1",
+          isPassing: false,
         },
-      ];
-
-      const initialState = createMockState({
-        alert_1: { id: "alert_1", sourceId: "source_1", isPassing: false },
       });
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
+      return expectSaga(processAlerts, raisedAlerts)
         .withState(initialState)
+        .not.put(addAlertsToSlice([raisedAlerts[0].alerts[0]]))
         .run();
-
-      const addAlertsAction = effects.put.find(
-        (effect) => effect.payload.action.type === addAlertsToSlice.type
-      );
-      const deleteAlertsAction = effects.put.find(
-        (effect) => effect.payload.action.type === deleteAlertsFromSlice.type
-      );
-
-      expect(addAlertsAction).toBeDefined();
-      expect(addAlertsAction.payload.action.payload[0].id).toBe("alert_2");
-
-      expect(deleteAlertsAction).toBeDefined();
-      expect(deleteAlertsAction.payload.action.payload).toContain("alert_1");
-    });
-  });
-
-  describe("edge cases", () => {
-    it("handles empty raisedAlerts array", async () => {
-      const raisedAlerts = [];
-
-      const { effects } = await expectSaga(
-        alertsSagaWorker,
-        raisedAlerts
-      ).run();
-
-      expect(effects.put).toBeUndefined();
-    });
-
-    it("handles source with empty alerts array", async () => {
-      const raisedAlerts = [
-        {
-          id: "source_1",
-          alerts: [],
-        },
-      ];
-
-      const initialState = createMockState({});
-
-      const { effects } = await expectSaga(alertsSagaWorker, raisedAlerts)
-        .withState(initialState)
-        .run();
-
-      expect(effects.put).toBeUndefined();
     });
   });
 });

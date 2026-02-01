@@ -20,13 +20,8 @@
 
 import { CloudUpload } from "@mui/icons-material";
 import { useCallback, useState } from "react";
-import {
-  Typography,
-  Box,
-  LinearProgress,
-  Alert,
-} from "@mui/material";
-import { registerFiles } from '../../lib/duckdb'
+import { Typography, Box, LinearProgress, Alert } from "@mui/material";
+import { registerFiles } from "../../lib/duckdb";
 import { createTablesRequest } from "../../sagas/createTablesSaga";
 import { useDispatch } from "react-redux";
 import FileUploadZone from "./FileUploadZone";
@@ -35,9 +30,9 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
   const dispatch = useDispatch();
   const createTables = useCallback(
     (tablesInfo) => {
-      dispatch(createTablesRequest({ tablesInfo }));
+      dispatch(createTablesRequest(tablesInfo));
     },
-    [dispatch]
+    [dispatch],
   );
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -46,7 +41,7 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
 
   async function handleFileUpload(files) {
     if (!files.length) return;
-    
+
     // Track upload progress for each file
     files.forEach((file) => {
       const fileId = `${file.name}-${Date.now()}`;
@@ -72,7 +67,7 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
         });
       }, 2200);
     });
-  
+
     registerFiles(files)
       .then(() =>
         createTables(
@@ -86,9 +81,10 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
             size: f.size,
             mimeType: f.type,
             dateLastModified: f.lastModified,
-          }))
-        )
-      ).then(() => {
+          })),
+        ),
+      )
+      .then(() => {
         onComplete && onComplete();
       })
       .catch((error) => {
@@ -226,7 +222,8 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
         // accept=".csv,.json,.txt,.xls,.xlsx,.tsv"
       />
 
-      {Object.keys(uploadProgress).length === 0 && uploadedFiles.length === 0 ? (
+      {Object.keys(uploadProgress).length === 0 &&
+      uploadedFiles.length === 0 ? (
         <FileUploadZone
           isDragActive={isDragActive}
           hasError={errors.length > 0}
@@ -244,8 +241,8 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
                 errors.length > 0
                   ? theme.palette.error.main
                   : isDragActive
-                  ? theme.palette.primary.main
-                  : theme.palette.grey[400],
+                    ? theme.palette.primary.main
+                    : theme.palette.grey[400],
               mb: 2,
             }}
           />
@@ -274,12 +271,12 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
         </Box>
       ) : (
         <Box>
-        <Typography variant="data-secondary" color="text.secondary">
-          No files being uploaded.
-        </Typography>
-        <pre>
-          {JSON.stringify({uploadedFiles, uploadProgress}, null, 2)}
-        </pre>
+          <Typography variant="data-secondary" color="text.secondary">
+            No files being uploaded.
+          </Typography>
+          <pre>
+            {JSON.stringify({ uploadedFiles, uploadProgress }, null, 2)}
+          </pre>
         </Box>
       )}
 

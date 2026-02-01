@@ -49,32 +49,28 @@ const ActionsButton = () => {
 
   const handleOnPackClick = useCallback(() => {
     dispatch(
-      createOperationsRequest({
-        operationData: [
-          {
-            operationType: OPERATION_TYPE_PACK,
-            childIds: (rootOperationId ? [rootOperationId] : []).concat(
-              selectedTableIds,
-            ),
-          },
-        ],
-      }),
+      createOperationsRequest([
+        {
+          operationType: OPERATION_TYPE_PACK,
+          childIds: (rootOperationId ? [rootOperationId] : []).concat(
+            selectedTableIds,
+          ),
+        },
+      ]),
     );
     dispatch(clearSelectedTableIds());
   }, [dispatch, rootOperationId, selectedTableIds]);
 
   const handleOnStackClick = useCallback(() => {
     dispatch(
-      createOperationsRequest({
-        operationData: [
-          {
-            operationType: OPERATION_TYPE_STACK,
-            childIds: (rootOperationId ? [rootOperationId] : []).concat(
-              selectedTableIds,
-            ),
-          },
-        ],
-      }),
+      createOperationsRequest([
+        {
+          operationType: OPERATION_TYPE_STACK,
+          childIds: (rootOperationId ? [rootOperationId] : []).concat(
+            selectedTableIds,
+          ),
+        },
+      ]),
     );
     dispatch(clearSelectedTableIds());
   }, [dispatch, rootOperationId, selectedTableIds]);

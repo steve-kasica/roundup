@@ -28,7 +28,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { calcPackStats } from "../lib/duckdb/calcPackStats.js";
+import { calcMatchStats } from "../lib/duckdb/calcMatchStats.js";
 import { useSelector } from "react-redux";
 import { selectColumnsById } from "../slices/columnsSlice/selectors.js";
 import { selectTablesById } from "../slices/tablesSlice/selectors.js";
@@ -63,13 +63,13 @@ export function usePackStats(
   leftColumnId,
   rightColumnId,
   joinType,
-  autoFetch = true
+  autoFetch = true,
 ) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [leftColumn, rightColumn] = useSelector((state) =>
-    selectColumnsById(state, [leftColumnId, rightColumnId])
+    selectColumnsById(state, [leftColumnId, rightColumnId]),
   );
   const [leftTable, rightTable] = useSelector((state) => [
     isTableId(leftColumn?.parentId)
@@ -97,12 +97,12 @@ export function usePackStats(
     setError(null);
 
     try {
-      const stats = await calcPackStats(
+      const stats = await calcMatchStats(
         leftTable?.databaseName,
         rightTable?.databaseName,
         leftColumn?.databaseName,
         rightColumn?.databaseName,
-        joinType
+        joinType,
       );
       setData(stats);
     } catch (err) {
@@ -140,14 +140,14 @@ export function usePackStats(
         [matchKeys[1], "Matches"],
         [matchKeys[2], "Right Only"],
       ]),
-    [matchKeys]
+    [matchKeys],
   );
 
   return {
     data: data
       ? data
       : Object.fromEntries(
-          Array.from(matchLabels.keys()).map((type) => [type, 0])
+          Array.from(matchLabels.keys()).map((type) => [type, 0]),
         ),
     matchLabels,
     matchKeys,

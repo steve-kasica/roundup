@@ -19,9 +19,8 @@ import generateUUID from "../../lib/utilities/generateUUID";
  * @param {string} action.payload - The operation ID to create a view for
  * @yields {Effect} Various saga effects for database operations and state updates
  */
-export default function* createOperationsWorker(action) {
+export default function* createOperationsWorker(operationsData) {
   let isFailure = false;
-  const operationsData = action.payload;
   const createdOperations = [];
 
   for (const { operationType, childIds } of operationsData) {

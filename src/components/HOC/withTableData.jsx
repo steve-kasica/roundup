@@ -22,10 +22,7 @@ import { selectTablesById } from "../../slices/tablesSlice";
 
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 import { updateTablesRequest } from "../../sagas/updateTablesSaga";
-import {
-  createColumnsRequest,
-  CREATION_MODE_INSERTION,
-} from "../../sagas/createColumnsSaga";
+import { insertColumnsRequest } from "../../sagas/createColumnsSaga";
 import { setFocusedObjectId } from "../../slices/uiSlice";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import { selectHiddenColumnIdsByParentId } from "../../slices/columnsSlice/selectors";
@@ -283,17 +280,7 @@ export default function withTableData(WrappedComponent) {
     const insertColumn = useCallback(
       (index, { name, fillValue }) => {
         dispatch(
-          createColumnsRequest({
-            mode: CREATION_MODE_INSERTION,
-            columnLocations: [
-              {
-                parentId: id,
-                index,
-                fillValue,
-                name,
-              },
-            ],
-          }),
+          insertColumnsRequest([{ parentId: id, index, name, fillValue }]),
         );
       },
       [dispatch, id],
@@ -306,14 +293,7 @@ export default function withTableData(WrappedComponent) {
      * @returns {void}
      */
     const deleteColumns = useCallback(
-      (columnIdsToDelete) =>
-        dispatch(
-          deleteColumnsRequest({
-            columnIds: columnIdsToDelete,
-            recurse: false,
-            deleteFromDatabase: true,
-          }),
-        ),
+      (columnIdsToDelete) => dispatch(deleteColumnsRequest(columnIdsToDelete)),
       [dispatch],
     );
 

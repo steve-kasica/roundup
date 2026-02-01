@@ -113,12 +113,7 @@ const PackOperationParams = ({
         joinPredicate: joinPredicateState,
       };
 
-      // Dispatch your action here
-      dispatch(
-        updateOperationsRequest({
-          operationUpdates: [formData],
-        }),
-      );
+      dispatch(updateOperationsRequest([formData]));
     },
     [
       leftTableIdLocal,

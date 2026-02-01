@@ -83,6 +83,19 @@ export const uiSlice = createSlice({
     },
 
     /**
+     * Removes column IDs from the list of currently selected column IDs in the UI state.
+     * @param {Object} state - The current UI slice state.
+     * @param {Object} action - The Redux action object.
+     * @param {string|string[]} action.payload - The column ID or array of column IDs to remove from selected.
+     */
+    removeFromSelectedColumnIds(state, action) {
+      const columnIdsToRemove = normalizeInputToArray(action.payload);
+      state.selectedColumnIds = state.selectedColumnIds.filter(
+        (id) => !columnIdsToRemove.includes(id),
+      );
+    },
+
+    /**
      * Sets the list of currently hovered column IDs in the UI state.
      *
      * @param {Object} state - The current UI slice state.
@@ -260,7 +273,10 @@ export const uiSlice = createSlice({
 export const {
   addToLoadingOperations,
   removeFromLoadingOperations,
+
   setSelectedColumnIds,
+  removeFromSelectedColumnIds,
+
   setHoveredColumnIds,
   addToHoveredColumnIds,
   removeFromHoveredColumnIds,

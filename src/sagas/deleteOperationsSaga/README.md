@@ -6,8 +6,8 @@ The delete operations saga handles the removal of _stack_ and _pack_ operations 
 
 - Drops database views for PACK and STACK operations
 - Removes operation metadata from Redux state
-- Handles NO_OP operations (state-only deletion)
 - Auto-deletes operations that become childless, e.g. if the user deletes the last table in an operation then also delete the operation (edge case).
+- Auto-deletes operations where all columns have been deleted by the user.
 
 ## Relationship to other sagas
 

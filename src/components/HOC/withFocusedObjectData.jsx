@@ -68,19 +68,19 @@ export default function withFocusedObjectData(WrappedComponent) {
     // Check if the current component's ID matches the focused object
     const isFocused = useMemo(
       () => id === focusedObjectId,
-      [id, focusedObjectId]
+      [id, focusedObjectId],
     );
 
     // Action to focus this object
     const focusObject = useCallback(
       () => dispatch(setFocusedObjectId(id)),
-      [dispatch, id]
+      [dispatch, id],
     );
 
     // Action to clear focus
     const clearFocus = useCallback(
       () => dispatch(setFocusedObjectId(null)),
-      [dispatch]
+      [dispatch],
     );
 
     // Action to insert tables into the focused operation (if it's an operation)
@@ -89,28 +89,26 @@ export default function withFocusedObjectData(WrappedComponent) {
         if (!focusedObject || focusedObjectType !== "operation") {
           console.warn(
             "Cannot insert tables: no operation is focused",
-            focusedObjectType
+            focusedObjectType,
           );
           return;
         }
 
         const currentChildIds = focusedObject.childIds || [];
         const updatedChildIds = Array.from(
-          new Set([...currentChildIds, ...tableIds])
+          new Set([...currentChildIds, ...tableIds]),
         );
 
         dispatch(
-          updateOperationsRequest({
-            operationUpdates: [
-              {
-                id: focusedObject.id,
-                childIds: updatedChildIds,
-              },
-            ],
-          })
+          updateOperationsRequest([
+            {
+              id: focusedObject.id,
+              childIds: updatedChildIds,
+            },
+          ]),
         );
       },
-      [dispatch, focusedObject, focusedObjectType]
+      [dispatch, focusedObject, focusedObjectType],
     );
 
     return (

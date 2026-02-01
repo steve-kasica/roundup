@@ -196,6 +196,7 @@ const TableSchema = ({
 
   return (
     <Box
+      className="TableSchema"
       display="flex"
       flexDirection="column"
       height="100%"

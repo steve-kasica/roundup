@@ -92,7 +92,6 @@ export default function Operation({
     parentId,
     childIds,
     columnIds,
-    hiddenColumnIds, // TODO: delete
     rowCount,
     isMaterialized,
     isInSync,

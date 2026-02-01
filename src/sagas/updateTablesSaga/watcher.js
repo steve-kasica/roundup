@@ -11,9 +11,10 @@ import { call, put, select, takeEvery } from "redux-saga/effects";
 import { updateTablesRequest } from "./actions";
 import updateTablesWorker from "./worker";
 import { deleteColumnsSuccess } from "../deleteColumnsSaga";
-import { group } from "d3";
+import { ascending, group } from "d3";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
+import { createColumnsSuccess } from "../createColumnsSaga/actions";
 
 /**
  * Saga watcher that listens for the `updateTablesRequest` action and triggers the corresponding worker saga.
@@ -23,7 +24,8 @@ import { createOperationsSuccess } from "../createOperationsSaga/actions";
  */
 export default function* updateTablesSagaWatcher() {
   yield takeEvery(updateTablesRequest.type, function* (action) {
-    yield call(updateTablesWorker, action.payload);
+    const workerPayload = action.payload;
+    yield call(updateTablesWorker, workerPayload);
   });
 
   // If a column is deleted, we need to delete it's ID from the parent table's columnIds array
@@ -67,6 +69,27 @@ export default function* updateTablesSagaWatcher() {
 
     if (tableUpdates.length > 0) {
       yield call(updateTablesWorker, tableUpdates);
+    }
+  });
+
+  yield takeEvery(createColumnsSuccess.type, function* (action) {
+    const createdColumns = action.payload;
+    const workerPayload = [];
+
+    const columnsByParent = group(createdColumns, (col) => col.parentId);
+
+    for (const [parentId, columns] of columnsByParent) {
+      if (isTableId(parentId)) {
+        workerPayload.push({
+          id: parentId,
+          columnIds: columns
+            .sort((a, b) => ascending(a.index, b.index))
+            .map((col) => col.id),
+        });
+      }
+    }
+    if (workerPayload.length > 0) {
+      yield call(updateTablesWorker, workerPayload);
     }
   });
 }

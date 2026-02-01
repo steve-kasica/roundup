@@ -94,11 +94,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const setJoinPredicate = useCallback(
       (joinPredicate) => {
-        dispatch(
-          updateOperationsRequest({
-            operationUpdates: [{ id, joinPredicate }],
-          }),
-        );
+        dispatch(updateOperationsRequest([{ id, joinPredicate }]));
       },
       [dispatch, id],
     );
@@ -112,16 +108,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const setJoinType = useCallback(
       (joinType) => {
-        dispatch(
-          updateOperationsRequest({
-            operationUpdates: [
-              {
-                id,
-                joinType, // Update join type
-              },
-            ],
-          }),
-        );
+        dispatch(updateOperationsRequest([{ id, joinType }]));
       },
       [dispatch, id],
     );
@@ -176,16 +163,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const setLeftTableJoinKey = useCallback(
       (columnId) => {
-        dispatch(
-          updateOperationsRequest({
-            operationUpdates: [
-              {
-                id,
-                joinKey1: columnId,
-              },
-            ],
-          }),
-        );
+        dispatch(updateOperationsRequest([{ id, joinKey1: columnId }]));
       },
       [dispatch, id],
     );
@@ -244,16 +222,7 @@ export default function withPackOperationData(WrappedComponent) {
      */
     const setRightTableJoinKey = useCallback(
       (columnId) => {
-        dispatch(
-          updateOperationsRequest({
-            operationUpdates: [
-              {
-                id,
-                joinKey2: columnId,
-              },
-            ],
-          }),
-        );
+        dispatch(updateOperationsRequest([{ id, joinKey2: columnId }]));
       },
       [dispatch, id],
     );

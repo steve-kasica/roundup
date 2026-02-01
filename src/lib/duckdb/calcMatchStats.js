@@ -1,5 +1,5 @@
 /**
- * @fileoverview calcPackStats Module
+ * @fileoverview calcMatchStats Module
  *
  * DuckDB utility for calculating PACK (join) statistics between two tables. Performs
  * a full outer join and returns counts of matched and unmatched rows for each table.
@@ -10,10 +10,10 @@
  * - Match count breakdown (matched, left unjoined, right unjoined)
  * - Cardinality analysis (one-to-one vs many relationships)
  *
- * @module lib/duckdb/calcPackStats
+ * @module lib/duckdb/calcMatchStats
  *
  * @example
- * const stats = await calcPackStats(
+ * const stats = await calcMatchStats(
  *   'customers',
  *   'orders',
  *   'customer_id',
@@ -41,18 +41,18 @@ import { escapeColumnName } from "./utilities";
  * @returns {Promise<{matches: number, left_unmatched: number, right_unmatched: number}>}
  *          Object containing match statistics
  */
-export async function calcPackStats(
+export async function calcMatchStats(
   leftTableName,
   rightTableName,
   leftColumnName,
   rightColumnName,
-  joinType
+  joinType,
 ) {
   const leftValue = `CAST(${leftTableName}.${escapeColumnName(
-    leftColumnName
+    leftColumnName,
   )} AS VARCHAR)`;
   const rightValue = `CAST(${rightTableName}.${escapeColumnName(
-    rightColumnName
+    rightColumnName,
   )} AS VARCHAR)`;
   const db = await getDuckDB();
   const conn = await db.connect();

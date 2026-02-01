@@ -75,7 +75,7 @@ export default function withColumnData(WrappedComponent) {
      */
     const name = useMemo(
       () => column.name || databaseName,
-      [column.name, databaseName]
+      [column.name, databaseName],
     );
 
     /**
@@ -106,7 +106,7 @@ export default function withColumnData(WrappedComponent) {
      */
     const uniquePercentage = useMemo(
       () => approxUnique / count,
-      [approxUnique, count]
+      [approxUnique, count],
     );
 
     /**
@@ -117,7 +117,7 @@ export default function withColumnData(WrappedComponent) {
      */
     const duplicateCount = useMemo(
       () => count - approxUnique,
-      [count, approxUnique]
+      [count, approxUnique],
     );
 
     /**
@@ -169,7 +169,7 @@ export default function withColumnData(WrappedComponent) {
      */
     const nullCount = useMemo(
       () => Math.floor(count * nullPercentage),
-      [nullPercentage, count]
+      [nullPercentage, count],
     );
 
     /**
@@ -179,7 +179,7 @@ export default function withColumnData(WrappedComponent) {
      */
     const completePercentage = useMemo(
       () => 1 - nullPercentage,
-      [nullPercentage]
+      [nullPercentage],
     );
 
     /**
@@ -189,7 +189,7 @@ export default function withColumnData(WrappedComponent) {
      */
     const nonNullCount = useMemo(
       () => Math.floor(count * completePercentage),
-      [count, completePercentage]
+      [count, completePercentage],
     );
 
     /**
@@ -224,9 +224,9 @@ export default function withColumnData(WrappedComponent) {
      */
     const renameColumn = useCallback(
       (name) => {
-        dispatch(updateColumnsRequest({ columnUpdates: [{ id, name }] }));
+        dispatch(updateColumnsRequest([{ id, name }]));
       },
-      [dispatch, id]
+      [dispatch, id],
     );
 
     /**
@@ -236,9 +236,8 @@ export default function withColumnData(WrappedComponent) {
      * @param {string} columnType - The new column type.
      */
     const setColumnType = useCallback(
-      (columnType) =>
-        dispatch(updateColumnsRequest({ columnUpdates: [{ id, columnType }] })),
-      [dispatch, id]
+      (columnType) => dispatch(updateColumnsRequest([{ id, columnType }])),
+      [dispatch, id],
     );
 
     /**
@@ -247,15 +246,8 @@ export default function withColumnData(WrappedComponent) {
      * Delete the column.
      */
     const deleteColumn = useCallback(
-      () =>
-        dispatch(
-          deleteColumnsRequest({
-            columnIds: [id],
-            recurse: true,
-            deleteFromDatabase: true,
-          })
-        ),
-      [dispatch, id]
+      () => dispatch(deleteColumnsRequest([id])),
+      [dispatch, id],
     );
 
     // Interaction state
@@ -286,7 +278,7 @@ export default function withColumnData(WrappedComponent) {
      * @type {boolean}
      */
     const isDropTarget = useSelector((state) =>
-      isColumnIdDropTarget(state, id)
+      isColumnIdDropTarget(state, id),
     );
 
     /**
@@ -295,7 +287,7 @@ export default function withColumnData(WrappedComponent) {
      */
     const isOver = useMemo(
       () => isDropTarget && isHovered,
-      [isDropTarget, isHovered]
+      [isDropTarget, isHovered],
     );
 
     /**

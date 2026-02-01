@@ -116,54 +116,48 @@ export default function TableDropTarget({
                 childIds: draggedTableIds,
               },
             ],
-          })
+          }),
         );
       } else if (rootOperation?.operationType === OPERATION_TYPE_NO_OP) {
         // Case: first table added after schema initialized with only one table
         // Update the operation type and add the new table as a child
         // This allows the operation to evolve from a NO_OP to either PACK or STACK
         dispatch(
-          updateOperationsRequest({
-            operationUpdates: [
-              {
-                id: rootOperation.id,
-                operationType,
-                childIds: [...rootOperation.childIds, ...draggedTableIds],
-                ...(operationType === OPERATION_TYPE_PACK && {
-                  joinPredicate: JOIN_PREDICATES["EQUALS"],
-                  joinType: JOIN_TYPES["FULL_OUTER"],
-                  joinKey1: null,
-                  joinKey2: null,
-                  matchStats: Object.fromEntries(MATCH_STATS_DEFAULT.entries()),
-                }),
-              },
-            ],
-          })
+          updateOperationsRequest([
+            {
+              id: rootOperation.id,
+              operationType,
+              childIds: [...rootOperation.childIds, ...draggedTableIds],
+              ...(operationType === OPERATION_TYPE_PACK && {
+                joinPredicate: JOIN_PREDICATES["EQUALS"],
+                joinType: JOIN_TYPES["FULL_OUTER"],
+                joinKey1: null,
+                joinKey2: null,
+                matchStats: Object.fromEntries(MATCH_STATS_DEFAULT.entries()),
+              }),
+            },
+          ]),
         );
       } else if (rootOperation?.operationType === operationType) {
         // Case: tables added to an existing operation of the same type
         dispatch(
-          updateOperationsRequest({
-            operationUpdates: [
-              {
-                id: rootOperation.id,
-                childIds: [...rootOperation.childIds, ...draggedTableIds],
-              },
-            ],
-          })
+          updateOperationsRequest([
+            {
+              id: rootOperation.id,
+              childIds: [...rootOperation.childIds, ...draggedTableIds],
+            },
+          ]),
         );
       } else {
         // Case: tables added to an existing operation of a different type
         // Create a new operation with the existing root and the new table as children
         dispatch(
-          createOperationsRequest({
-            operationData: [
-              {
-                operationType,
-                childIds: [rootOperation.id, ...draggedTableIds],
-              },
-            ],
-          })
+          createOperationsRequest([
+            {
+              operationType,
+              childIds: [rootOperation.id, ...draggedTableIds],
+            },
+          ]),
         );
       }
     },

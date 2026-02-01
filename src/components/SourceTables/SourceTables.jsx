@@ -137,7 +137,7 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
   );
 
   const handleOnDeleteTables = useCallback(() => {
-    dispatch(deleteTablesRequest({ tableIds: selectedTableIds }));
+    dispatch(deleteTablesRequest(selectedTableIds));
   }, [dispatch, selectedTableIds]);
 
   // Clear tables for component selection

@@ -18,22 +18,18 @@
 // Unlike other sagas, this saga is only in charge of
 // syncing database views with operations in the redux store.
 
-import { call, put, select, takeEvery } from "redux-saga/effects";
-import { updateOperationsRequest, updateOperationsSuccess } from "./actions";
+import { call, select, takeEvery } from "redux-saga/effects";
+import { updateOperationsRequest } from "./actions";
 import updateOperationsWorker from "./worker";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { isTableId } from "../../slices/tablesSlice";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
-import { updateTablesSuccess } from "../updateTablesSaga";
 import {
-  DEFAULT_JOIN_PREDICATE,
-  DEFAULT_JOIN_TYPE,
-  OPERATION_TYPE_PACK,
-  selectOperationIdByChildId,
+  isOperationId,
   selectOperationsById,
 } from "../../slices/operationsSlice";
-import { selectFocusedObjectId } from "../../slices/uiSlice";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
-import { group } from "d3";
+import { ascending, group } from "d3";
+import { createColumnsSuccess } from "../createColumnsSaga/actions";
 
 // This it listen for actions by the operations and columns slice
 export default function* updateOperationsWatcher() {
@@ -89,6 +85,31 @@ export default function* updateOperationsWatcher() {
 
     if (operationUpdates.length > 0) {
       yield call(updateOperationsWorker, operationUpdates);
+    }
+  });
+
+  /**
+   * When columns are created, we need to update the parent operation's
+   * columnIds property to include the new columns.
+   */
+  yield takeEvery(createColumnsSuccess.type, function* (action) {
+    const createdColumns = action.payload;
+    const workerPayload = [];
+
+    const columnsByParent = group(createdColumns, (col) => col.parentId);
+
+    for (const [parentId, columns] of columnsByParent) {
+      if (isOperationId(parentId)) {
+        workerPayload.push({
+          id: parentId,
+          columnIds: columns
+            .sort((a, b) => ascending(a.index, b.index))
+            .map((col) => col.id),
+        });
+      }
+    }
+    if (workerPayload.length > 0) {
+      yield call(updateOperationsWorker, workerPayload);
     }
   });
 

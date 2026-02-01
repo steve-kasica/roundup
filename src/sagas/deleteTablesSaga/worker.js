@@ -8,61 +8,31 @@
  *  belong to tables slated for deletion.
  */
 
-import { call, put, select } from "redux-saga/effects";
-import {
-  deleteTables as deleteTablesInSlice,
-  selectTablesById,
-} from "../../slices/tablesSlice";
+import { call, put } from "redux-saga/effects";
+import { deleteTables as deleteTablesInSlice } from "../../slices/tablesSlice";
 import { dropTable } from "../../lib/duckdb";
-import { deleteTablesFailure, deleteTablesSuccess } from "./actions";
-import { removeFromSelectedTableIds } from "../../slices/uiSlice";
+import { deleteTablesSuccess } from "./actions";
 
-export default function* deleteTablesWorker(action) {
-  const successfulDeletions = [];
-  const failedDeletions = [];
-  let { tableIds } = action.payload;
-  if (!Array.isArray(tableIds)) {
-    tableIds = [tableIds];
-  }
-
-  const tables = yield select((state) => selectTablesById(state, tableIds));
+export default function* deleteTablesWorker(tables) {
+  let isFailure = false;
 
   for (const table of tables) {
     try {
       // Remove table (and columns) from DuckDB
       yield call(dropTable, table.databaseName);
-
-      // Remove table from state
-      yield put(deleteTablesInSlice(table.id));
-
-      // Remove table from selectedTableIds in UI state
-      yield put(removeFromSelectedTableIds(table.id));
-
-      successfulDeletions.push(table);
     } catch (error) {
       alert(`Error deleting table ${table?.name}: ${error.message}`);
       console.error("deleteTablesSaga/worker.js: Failed to drop table", {
         table,
         error,
       });
-      failedDeletions.push(table);
+      isFailure = true;
     }
   }
 
-  if (failedDeletions.length > 0) {
-    yield put(
-      deleteTablesFailure({
-        tableIds: failedDeletions.map((t) => t.id),
-        error: "One or more tables failed to delete.",
-      }),
-    );
-  }
-
-  if (successfulDeletions.length > 0) {
-    yield put(
-      deleteTablesSuccess({
-        tableIds: successfulDeletions.map((t) => t.id),
-      }),
-    );
+  if (!isFailure) {
+    // Remove table from state
+    yield put(deleteTablesInSlice(tables.map((table) => table.id)));
+    yield put(deleteTablesSuccess(tables));
   }
 }

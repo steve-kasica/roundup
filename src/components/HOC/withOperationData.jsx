@@ -38,10 +38,7 @@ import {
   setVisibleColumnIds as setVisibleColumnsAction,
 } from "../../slices/uiSlice";
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
-import {
-  createColumnsRequest,
-  CREATION_MODE_INSERTION,
-} from "../../sagas/createColumnsSaga";
+import { insertColumnsRequest } from "../../sagas/createColumnsSaga";
 
 import { scaleOrdinal, scaleSequential } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
@@ -146,7 +143,7 @@ export default function withOperationData(WrappedComponent) {
     // Function to change the operation name (not database name)
     const setOperationName = useCallback(
       (name) => {
-        dispatch(updateOperationsRequest({ operationUpdates: [{ id, name }] }));
+        dispatch(updateOperationsRequest([{ id, name }]));
       },
       [dispatch, id],
     );
@@ -155,32 +152,30 @@ export default function withOperationData(WrappedComponent) {
     const setOperationType = useCallback(
       (nextOperationType) =>
         dispatch(
-          updateOperationsRequest({
-            operationUpdates: [
-              {
-                id,
-                operationType: nextOperationType,
-                // Reset join parameters if changing away from PACK
-                ...(nextOperationType === OPERATION_TYPE_PACK
-                  ? {
-                      joinKey1: null,
-                      joinKey2: null,
-                      joinPredicate: DEFAULT_JOIN_PREDICATE,
-                      joinType: DEFAULT_JOIN_TYPE,
-                      matchStats: Object.fromEntries(
-                        MATCH_STATS_DEFAULT.entries(),
-                      ),
-                    }
-                  : {
-                      joinKey1: undefined,
-                      joinKey2: undefined,
-                      joinPredicate: undefined,
-                      joinType: undefined,
-                      matchStats: undefined,
-                    }),
-              },
-            ],
-          }),
+          updateOperationsRequest([
+            {
+              id,
+              operationType: nextOperationType,
+              // Reset join parameters if changing away from PACK
+              ...(nextOperationType === OPERATION_TYPE_PACK
+                ? {
+                    joinKey1: null,
+                    joinKey2: null,
+                    joinPredicate: DEFAULT_JOIN_PREDICATE,
+                    joinType: DEFAULT_JOIN_TYPE,
+                    matchStats: Object.fromEntries(
+                      MATCH_STATS_DEFAULT.entries(),
+                    ),
+                  }
+                : {
+                    joinKey1: undefined,
+                    joinKey2: undefined,
+                    joinPredicate: undefined,
+                    joinType: undefined,
+                    matchStats: undefined,
+                  }),
+            },
+          ]),
         ),
       [dispatch, id],
     );
@@ -369,12 +364,9 @@ export default function withOperationData(WrappedComponent) {
     const insertColumnIntoChildAtIndex = useCallback(
       (childId, targetIndex, fillValue, name) => {
         dispatch(
-          createColumnsRequest({
-            mode: CREATION_MODE_INSERTION,
-            columnLocations: [
-              { parentId: childId, index: targetIndex, fillValue, name },
-            ],
-          }),
+          insertColumnsRequest([
+            { parentId: childId, index: targetIndex, name, fillValue },
+          ]),
         );
       },
       [dispatch],
@@ -395,23 +387,21 @@ export default function withOperationData(WrappedComponent) {
         ];
 
         dispatch(
-          updateOperationsRequest({
-            operationUpdates: [
-              {
-                id,
-                childIds: updatedChildren,
-                // If join keys are set, we may need to swap them as well
-                ...(operation.operationType === OPERATION_TYPE_PACK &&
-                operation.joinKey1 &&
-                operation.joinKey2
-                  ? {
-                      joinKey1: operation.joinKey2,
-                      joinKey2: operation.joinKey1,
-                    }
-                  : {}),
-              },
-            ],
-          }),
+          updateOperationsRequest([
+            {
+              id,
+              childIds: updatedChildren,
+              // If join keys are set, we may need to swap them as well
+              ...(operation.operationType === OPERATION_TYPE_PACK &&
+              operation.joinKey1 &&
+              operation.joinKey2
+                ? {
+                    joinKey1: operation.joinKey2,
+                    joinKey2: operation.joinKey1,
+                  }
+                : {}),
+            },
+          ]),
         );
       },
       [dispatch, id, childIds, operation.joinKey1, operation.joinKey2],
@@ -419,24 +409,13 @@ export default function withOperationData(WrappedComponent) {
 
     const deleteColumns = useCallback(
       (columnIdsToDelete) => {
-        dispatch(
-          deleteColumnsRequest({
-            columnIds: columnIdsToDelete,
-            recurse: true,
-            deleteFromDatabase: true,
-          }),
-        );
+        dispatch(deleteColumnsRequest(columnIdsToDelete));
       },
       [dispatch],
     );
 
     const materializeOperation = useCallback(
-      () =>
-        dispatch(
-          updateOperationsRequest({
-            operationUpdates: [{ id, isMaterialized: null }],
-          }),
-        ),
+      () => dispatch(updateOperationsRequest([{ id, isMaterialized: null }])),
       [dispatch, id],
     );
 

@@ -21,11 +21,9 @@ import {
   OPERATION_TYPE_PACK,
   selectOperationsById,
   selectAllOperationIds,
-  OPERATION_TYPE_NO_OP,
 } from "../../slices/operationsSlice";
 import { useSelector } from "react-redux";
-import { isTableId, selectAllTableIds } from "../../slices/tablesSlice";
-import TableDropTarget from "../../components/CompositeTableSchema/TableDropTarget";
+import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedStackSchemaView } from "../../components/StackOperationView/StackSchemaView/StackSchemaView";
 import PackSchemaView from "../../components/PackSchemaView";
 import { EnhancedTableSchema } from "../../components/TableView";
@@ -42,15 +40,13 @@ import AlertsButton from "../../components/AppToolbar/AlertsButton";
 import PackMatchToggleButtonGroup from "../../components/AppToolbar/PackMatchToggleButtonGroup";
 
 export default function SchemaWindow() {
-  const tablesUploaded = useSelector(selectAllTableIds);
   const focusedObjectId = useSelector(selectFocusedObjectId);
   const isFocusedTable = isTableId(focusedObjectId);
   const focusedOperation = useSelector((state) =>
     isFocusedTable ? null : selectOperationsById(state, focusedObjectId),
   );
-  const operations = useSelector(selectAllOperationIds);
 
-  const areTablesUploaded = tablesUploaded.length > 0;
+  console.log("Rendering SchemaWindow with focusedObjectId:", focusedObjectId);
 
   return (
     <>
@@ -91,35 +87,14 @@ export default function SchemaWindow() {
         </Box>
       </Box>
 
-      {!areTablesUploaded ? (
-        <Box
-          sx={{
-            width: "100%",
-            // height: "100%",
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <pre>No tables uploaded</pre>
-        </Box>
-      ) : isFocusedTable ? (
+      {isTableId(focusedObjectId) ? (
         <EnhancedTableSchema id={focusedObjectId} />
-      ) : operations.length === 0 || focusedOperation?.childIds.length === 0 ? (
-        <Box sx={{ flex: 1, height: "100%" }}>
-          <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
-            <Typography>Drag to add a source table</Typography>
-          </TableDropTarget>
-        </Box>
       ) : focusedOperation?.operationType === OPERATION_TYPE_STACK ? (
         <EnhancedStackSchemaView id={focusedObjectId} />
       ) : focusedOperation?.operationType === OPERATION_TYPE_PACK ? (
         <Box sx={{ flex: 1, height: "100%", overflow: "hidden" }}>
           <PackSchemaView id={focusedObjectId} />
         </Box>
-      ) : focusedOperation?.operationType === OPERATION_TYPE_NO_OP ? (
-        <EnhancedTableSchema id={focusedOperation.childIds[0]} />
       ) : (
         <Box
           sx={{
@@ -139,7 +114,6 @@ export default function SchemaWindow() {
                   {
                     focusedObjectId: focusedObjectId || null,
                     focusedOperation: focusedOperation || null,
-                    allOperations: operations || null,
                   },
                   null,
                   2,

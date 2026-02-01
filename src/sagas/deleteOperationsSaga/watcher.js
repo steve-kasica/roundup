@@ -24,20 +24,17 @@ import { updateOperationsSuccess } from "../updateOperationsSaga";
 
 export default function* deleteOperationsWatcher() {
   // Watch for delete operation requests, if the operation to be deleted has child operations,
-  // those child operations will be deleted by the worker saga as well.
+  // those child operations should be deleted by the worker saga as well.
   yield takeEvery(deleteOperationsRequest.type, function* (action) {
-    const { operationIds } = action.payload;
-
+    const operationIds = action.payload;
+    const operationsToDelete = [];
     const operations = yield select((state) =>
       selectOperationsById(state, operationIds),
     );
-
-    const operationIdsToDelete = [];
-
     // Recursively collect all operation IDs including nested child operations
     function* collectOperationIds(ops) {
       for (const operation of ops) {
-        operationIdsToDelete.push(operation.id);
+        operationsToDelete.push(operation);
 
         // If the operation has child operations, recursively collect them
         const childOperationIds = operation.childIds.filter(isOperationId);
@@ -52,9 +49,7 @@ export default function* deleteOperationsWatcher() {
 
     yield* collectOperationIds(operations);
 
-    yield call(deleteOperationsWorker, {
-      payload: { operationIds: operationIdsToDelete },
-    });
+    yield call(deleteOperationsWorker, operationsToDelete);
   });
 
   // If an operation successfully updates such that it has no children (`childIds` = []),
@@ -62,22 +57,23 @@ export default function* deleteOperationsWatcher() {
   // Note: the `changedPropertiesByOperation` payload object is in the form
   // { operationId: [ keyUpdated, keyUpdated ]}
   yield takeLatest(updateOperationsSuccess.type, function* (action) {
-    const { changedPropertiesById } = action.payload;
-    const operationIdsToDelete = [];
-    for (const [id, keys] of Object.entries(changedPropertiesById)) {
-      if (keys.includes("childIds")) {
+    const changedPropertiesById = action.payload;
+    const operationsToDelete = [];
+    for (const [id, changedProperties] of Object.entries(
+      changedPropertiesById,
+    )) {
+      if (changedProperties.includes("childIds")) {
         const operation = yield select((state) =>
           selectOperationsById(state, id),
         );
         if (operation.childIds.length === 0) {
-          operationIdsToDelete.push(id);
+          operationsToDelete.push(operation);
         }
       }
     }
-    if (operationIdsToDelete.length > 0) {
-      yield put(
-        deleteOperationsRequest({ operationIds: operationIdsToDelete }),
-      );
+
+    if (operationsToDelete.length > 0) {
+      yield call(deleteOperationsWorker, operationsToDelete);
     }
   });
 }

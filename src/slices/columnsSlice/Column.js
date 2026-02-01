@@ -134,7 +134,6 @@ function Column({
 }
 
 export const SUMMARY_ATTRIBUTES = [
-  "columnType",
   "approxUnique",
   "avg",
   "count",

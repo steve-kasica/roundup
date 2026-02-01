@@ -22,7 +22,7 @@
  * import store from './store';
  * <Provider store={store}><App /></Provider>
  */
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 
 import uiReducer from "./slices/uiSlice";
 import tablesReducer from "./slices/tablesSlice";
@@ -35,14 +35,17 @@ import rootSaga from "./sagas";
 
 const sagaMidddleware = createSagaMiddleware();
 
+// Export root reducer for testing
+export const rootReducer = combineReducers({
+  ui: uiReducer,
+  operations: operationsReducer,
+  tables: tablesReducer,
+  columns: columnsReducer,
+  alerts: alertsReducer,
+});
+
 const store = configureStore({
-  reducer: {
-    ui: uiReducer,
-    operations: operationsReducer,
-    tables: tablesReducer,
-    columns: columnsReducer,
-    alerts: alertsReducer,
-  },
+  reducer: rootReducer,
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
   middleware: (getDefaultMiddleware) =>

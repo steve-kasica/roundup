@@ -19,21 +19,36 @@
  */
 // Worker saga
 
-import { put, select } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import {
   addAlerts as addAlertsToSlice,
   deleteAlerts as deleteAlertsFromSlice,
 } from "../../slices/alertsSlice/alertsSlice";
-import { selectAlertIdsBySourceId } from "../../slices/alertsSlice";
+import {
+  selectAlertIdsBySourceId,
+  validateIncongruentTables,
+  validateMissingJoinPredicate,
+  validateMissingJoinType,
+  validateMissingLeftJoinKey,
+  validateMissingRightJoinKey,
+} from "../../slices/alertsSlice";
+import {
+  OPERATION_TYPE_PACK,
+  OPERATION_TYPE_STACK,
+} from "../../slices/operationsSlice";
+import {
+  selectColumnIdsByParentId,
+  selectColumnsById,
+} from "../../slices/columnsSlice";
+import { validateHeterogeneousColumnTypes } from "../../slices/alertsSlice/Alerts/Warnings/HeterogeneousColumnTypes";
 
-// The raised alerts payload includes an array of source Ids and their associated alerts
-export default function* alertsSagaWorker(raisedAlerts) {
+export function* processAlerts(raisedAlerts) {
   const alertsToAdd = [];
   const alertsToDelete = [];
 
   for (const { id, alerts } of raisedAlerts) {
     const associatedAlerts = yield select((state) =>
-      selectAlertIdsBySourceId(state, id)
+      selectAlertIdsBySourceId(state, id),
     );
     const existingAlerts = new Set(associatedAlerts);
 
@@ -67,4 +82,53 @@ export default function* alertsSagaWorker(raisedAlerts) {
       yield put(deleteAlertsFromSlice(alertsToDelete));
     }
   }
+}
+
+export function* validateOperationWorker(operations) {
+  for (let operation of operations) {
+    if (operation.operationType === OPERATION_TYPE_STACK) {
+      yield call(validateStackOperationWorker, operation);
+    } else if (operation.operationType === OPERATION_TYPE_PACK) {
+      yield call(validatePackOperationWorker, operation);
+    } else {
+      throw new Error(
+        `Unsupported operation type "${operation.operationType}" for alert checking.`,
+      );
+    }
+  }
+}
+
+export function* validateStackOperationWorker(operation) {
+  const childColumns = yield select((state) => {
+    const childColumnIdsMatrix = selectColumnIdsByParentId(
+      state,
+      operation.childIds,
+    );
+    const childColumns = childColumnIdsMatrix.map((columnIds) =>
+      selectColumnsById(state, columnIds),
+    );
+    return childColumns;
+  });
+
+  const childColumnCounts = childColumns.map((columns) => columns.length);
+  const childColumnTypes = childColumns.map((columns) =>
+    columns.map((column) => column.columnType),
+  );
+
+  const results = [
+    validateIncongruentTables(operation, childColumnCounts),
+    validateHeterogeneousColumnTypes(operation, childColumnTypes),
+  ];
+
+  yield call(processAlerts, { id: operation.id, alerts: results });
+}
+
+export function* validatePackOperationWorker(operation) {
+  const results = [
+    validateMissingLeftJoinKey(operation),
+    validateMissingRightJoinKey(operation),
+    validateMissingJoinPredicate(operation),
+    validateMissingJoinType(operation),
+  ];
+  yield call(processAlerts, { id: operation.id, alerts: results });
 }

@@ -22,53 +22,45 @@ import {
   createTables as createDBTables,
   getTableDimensions,
 } from "../../lib/duckdb";
-import { createTablesFailure, createTablesSuccess } from "./actions";
+import { createTablesSuccess } from "./actions";
 import generateUUID from "../../lib/utilities/generateUUID";
-import { setFocusedObjectId } from "../../slices/uiSlice";
 
-export default function* createTablesWorker(action) {
-  const successfulCreations = [];
-  const failedCreations = [];
-  const { tablesInfo } = action.payload;
+export default function* createTablesWorker(tablesData) {
+  let isFailure = false;
+  const createdTables = [];
 
-  for (const info of tablesInfo) {
+  for (let i = 0; i < tablesData.length; i++) {
+    const tableData = tablesData[i];
+    const databaseName = generateUUID("t");
+    let rowCount, columnCount;
     try {
-      const databaseName = generateUUID("t");
-      yield call(createDBTables, databaseName, info.fileName);
-      const { rowCount, columnCount } = yield call(
-        getTableDimensions,
-        databaseName
-      );
-      const table = Table({
-        source: info.source,
-        databaseName,
-        name: info.name,
-        fileName: info.fileName, // fileName is the original name of the file uploaded
-        extension: info.extension,
-        size: info.size,
-        mimeType: info.mimeType,
-        dateLastModified: info.dateLastModified,
-        rowCount,
-        columnIds: new Array(columnCount),
-      });
-      successfulCreations.push(table);
+      yield call(createDBTables, databaseName, tableData.fileName);
+      const dimensions = yield call(getTableDimensions, databaseName);
+      rowCount = dimensions.rowCount;
+      columnCount = dimensions.columnCount;
     } catch (error) {
-      console.error("Error creating tables:", error);
-      failedCreations.push(tablesInfo);
+      alert(`Failed to create table ${tableData.name}: ${error.message}`);
+      console.error("createTablesSaga/worker: Error creating tables:", error);
+      isFailure = true;
     }
+    const table = Table({
+      source: tableData.source,
+      databaseName,
+      name: tableData.name,
+      fileName: tableData.fileName, // fileName is the original name of the file uploaded
+      extension: tableData.extension,
+      size: tableData.size,
+      mimeType: tableData.mimeType,
+      dateLastModified: tableData.dateLastModified,
+      rowCount,
+      columnCount,
+      columnIds: new Array(columnCount),
+    });
+    createdTables.push(table);
   }
 
-  yield put(addTables(successfulCreations));
-
-  if (successfulCreations.length > 0) {
-    yield put(
-      createTablesSuccess({
-        tableIds: successfulCreations.map((t) => t.id),
-      })
-    );
-  }
-
-  if (failedCreations.length > 0) {
-    yield put(createTablesFailure({ tablesInfo }));
+  if (!isFailure) {
+    yield put(addTables(createdTables));
+    yield put(createTablesSuccess(createdTables));
   }
 }

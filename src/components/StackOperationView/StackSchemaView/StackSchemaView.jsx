@@ -229,7 +229,6 @@ const StackSchemaView = ({
                 }}
               />
               {headerGroups.map((group, idx) => {
-                console.log("Rendering header group:", group);
                 if (group.type === "visible") {
                   const colIndex = group.colIndex;
                   return (

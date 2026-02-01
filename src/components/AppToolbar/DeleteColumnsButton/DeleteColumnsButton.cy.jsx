@@ -81,24 +81,3 @@ describe("DeleteColumnsButton Component", () => {
     });
   });
 });
-
-//   describe("Functionality", () => {
-//     describe("")
-//     it("dispatches a deleteColumnsRequest action on confirmation", () => {
-//       const spy = cy.spy();
-//       cy.mountWithProviders(<DeleteColumnsButton />, {
-//         preloadedState: state,
-//         dispatchSpy: spy,
-//       });
-//       cy.get("button").click();
-//       cy.get("[role='dialog']").should("be.visible");
-//       cy.contains("button", "Delete").click();
-//       cy.wrap(spy).should("have.been.calledWithMatch", {
-//         type: "sagas/deleteColumns/request",
-//         payload: {
-//           columnIds: ["c1", "c2"],
-//         },
-//       });
-//     });
-//   });
-// });

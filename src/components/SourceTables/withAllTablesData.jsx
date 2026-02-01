@@ -58,13 +58,13 @@ const withAllTablesData = (WrappedComponent) => {
     );
     const createTables = useCallback(
       (tablesInfo) => {
-        dispatch(createTablesRequest({ tablesInfo }));
+        dispatch(createTablesRequest(tablesInfo));
       },
       [dispatch],
     );
 
     const deleteTables = useCallback(
-      (tableIds) => dispatch(deleteTablesRequest({ tableIds })),
+      (tableIds) => dispatch(deleteTablesRequest(tableIds)),
       [dispatch],
     );
 
@@ -74,9 +74,12 @@ const withAllTablesData = (WrappedComponent) => {
           tableIds,
         );
         dispatch(
-          createOperationsRequest({
-            operationData: { operationType, childIds },
-          }),
+          createOperationsRequest([
+            {
+              operationType,
+              childIds,
+            },
+          ]),
         );
       },
       [dispatch, rootOperationId],
