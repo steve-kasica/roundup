@@ -49,18 +49,22 @@ export default function* updateOperationsWatcher() {
     );
 
     for (const [parentOperationId, tables] of deletedTablesByParentOperation) {
-      const operation = yield select((state) =>
-        selectOperationsById(state, parentOperationId),
-      );
-      operationUpdates.push({
-        id: operation.id,
-        childIds: operation.childIds.filter(
-          (id) => !tables.some((table) => table.id === id),
-        ),
-      });
-    }
+      if (parentOperationId === null) {
+        continue;
+      } else {
+        const operation = yield select((state) =>
+          selectOperationsById(state, parentOperationId),
+        );
+        operationUpdates.push({
+          id: operation.id,
+          childIds: operation.childIds.filter(
+            (id) => !tables.some((table) => table.id === id),
+          ),
+        });
+      }
 
-    yield call(updateOperationsWorker, operationUpdates);
+      yield call(updateOperationsWorker, operationUpdates);
+    }
   });
 
   // When an operation is created, if any of its children are operations,

@@ -13,7 +13,7 @@
  * - Auto-deletes tables with empty columnIds after updates
  * - Coordinates with updateTablesSuccess
  */
-import { call, put, select, takeEvery } from "redux-saga/effects";
+import { call, select, takeEvery } from "redux-saga/effects";
 import { deleteTablesRequest } from "./actions";
 import { updateTablesSuccess } from "../updateTablesSaga";
 import deleteTablesWorker from "./worker";

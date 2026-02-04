@@ -1,4 +1,4 @@
-import { describe, it } from "vitest";
+import { describe, it, beforeEach } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
 import * as matchers from "redux-saga-test-plan/matchers";
 import updateOperationsWatcher from "./watcher";
@@ -11,7 +11,6 @@ import {
 } from "../../slices/operationsSlice";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
-import { before, beforeEach } from "node:test";
 
 describe("updateOperationsSaga watcher", () => {
   let state, action;
@@ -85,8 +84,8 @@ describe("updateOperationsSaga watcher", () => {
       ]);
     });
 
-    it("should call worker saga with correct payload", () => {
-      expectSaga(updateOperationsWatcher)
+    it("should call worker saga with correct payload if tables was an operation child", () => {
+      return expectSaga(updateOperationsWatcher)
         .withState(state)
         .provide([[matchers.call.fn(updateOperationsWorker), null]])
         .call(updateOperationsWorker, [
@@ -95,6 +94,18 @@ describe("updateOperationsSaga watcher", () => {
             childIds: ["t2"],
           },
         ])
+        .dispatch(action)
+        .run();
+    });
+
+    it("should not call worker saga if deleted table was not an operation child", () => {
+      action = deleteTablesSuccess([
+        { id: "t3", name: "Table 3", parentId: null },
+      ]);
+      return expectSaga(updateOperationsWatcher)
+        .withState(state)
+        .provide([[matchers.call.fn(updateOperationsWorker), null]])
+        .not.call(updateOperationsWorker)
         .dispatch(action)
         .run();
     });
@@ -120,7 +131,7 @@ describe("updateOperationsSaga watcher", () => {
       action = createOperationsSuccess([localState.operations.byId.o2]);
     });
     it("should call worker saga with correct payload", () => {
-      expectSaga(updateOperationsWatcher)
+      return expectSaga(updateOperationsWatcher)
         .withState(localState)
         .provide([[matchers.call.fn(updateOperationsWorker), null]])
         .call(updateOperationsWorker, [
