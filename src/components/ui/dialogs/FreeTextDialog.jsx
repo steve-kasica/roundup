@@ -44,6 +44,7 @@ const FreeTextDialog = ({
   contentText = "",
 }) => {
   const [value, setValue] = useState("");
+  console.log("Rendering FreeTextDialog with title:", title);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -64,6 +65,10 @@ const FreeTextDialog = ({
               setTimeout(() => onClose(), 100);
             } else if (e.key === "Escape") {
               onClose();
+            } else {
+              // Prevent keyboard shortcuts from triggering buttons behind the dialog
+              // See https://stackoverflow.com/a/56285545/3734991
+              e.stopPropagation();
             }
           }}
         />
