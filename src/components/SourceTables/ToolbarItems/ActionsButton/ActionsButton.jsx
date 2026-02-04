@@ -77,14 +77,12 @@ const ActionsButton = () => {
 
   const handleInsertClick = useCallback(() => {
     dispatch(
-      updateOperationsRequest({
-        operationUpdates: [
-          {
-            id: focusedObject.id,
-            childIds: focusedObject.childIds.concat(selectedTableIds),
-          },
-        ],
-      }),
+      updateOperationsRequest([
+        {
+          id: focusedObject.id,
+          childIds: focusedObject.childIds.concat(selectedTableIds),
+        },
+      ]),
     );
     dispatch(clearSelectedTableIds());
   }, [dispatch, focusedObject?.childIds, focusedObject?.id, selectedTableIds]);

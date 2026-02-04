@@ -53,6 +53,7 @@ describe("updateAlertsSagaWatcher", () => {
           o1: {
             id: "o1",
             operationType: OPERATION_TYPE_STACK,
+            parentId: "o2",
             childIds: ["t1", "t2"],
             isMaterialized: true,
             columnIds: ["c7", "c8"],
@@ -60,6 +61,7 @@ describe("updateAlertsSagaWatcher", () => {
           o2: {
             id: "o2",
             operationType: OPERATION_TYPE_PACK,
+            parentId: null,
             childIds: ["o1", "t3"],
             joinKey1: "c7",
             joinKey2: "c5",
@@ -132,30 +134,39 @@ describe("updateAlertsSagaWatcher", () => {
   });
 
   describe("handling updateOperationsSuccess action", () => {
-    it.skip("should call validateOperations for operations when relevant property changes", () => {
-      const action = updateOperationsSuccess({
-        o1: ["childIds"],
-      });
+    it("should call validateOperations for operations when relevant property changes", () => {
+      const action = updateOperationsSuccess([
+        {
+          id: "o1",
+          childIds: ["t1", "t2"],
+        },
+      ]);
       return expectSaga(updateAlertsSagaWatcher)
         .withState(state)
         .call(validateOperationWorker, [state.operations.byId["o1"]])
         .dispatch(action)
         .run();
     });
-    it.skip("should not call validateOperations for operations when no relevant property changes", () => {
-      const action = updateOperationsSuccess({
-        o2: ["someOtherProperty"],
-      });
+    it("should not call validateOperations for operations when no relevant property changes", () => {
+      const action = updateOperationsSuccess([
+        {
+          id: "o2",
+          name: "Operation Name",
+        },
+      ]);
       return expectSaga(updateAlertsSagaWatcher)
         .withState(state)
         .not.call.fn(validateOperationWorker)
         .dispatch(action)
         .run();
     });
-    it.skip("should call validateOperations for parent operations when child operation's columnIds change", () => {
-      const action = updateOperationsSuccess({
-        o1: ["columnIds"],
-      });
+    it("should call validateOperations for parent operations when child operation's columnIds change", () => {
+      const action = updateOperationsSuccess([
+        {
+          id: "o1",
+          columnIds: ["c7", "c8"],
+        },
+      ]);
       return expectSaga(updateAlertsSagaWatcher)
         .withState(state)
         .call(validateOperationWorker, [state.operations.byId["o2"]])
@@ -166,19 +177,17 @@ describe("updateAlertsSagaWatcher", () => {
 
   describe("handling updateTablesSuccess action", () => {
     it("should call validateOperationsWorker for parent operations when tables are updated", () => {
-      const action = updateTablesSuccess({
-        t1: ["columnIds"],
-      });
+      const action = updateTablesSuccess([{ id: "t1", columnIds: ["c1"] }]);
       return expectSaga(updateAlertsSagaWatcher)
         .withState(state)
         .call(validateOperationWorker, [state.operations.byId["o1"]])
         .dispatch(action)
         .run();
     });
-    it.skip("should not call validateOperationsWorker if no parent operations affected", () => {
-      const action = updateTablesSuccess({
-        t3: ["someOtherProperty"],
-      });
+    it("should not call validateOperationsWorker if no parent operations affected", () => {
+      const action = updateTablesSuccess([
+        { id: "t1", name: "New Table Name" },
+      ]);
       return expectSaga(updateAlertsSagaWatcher)
         .withState(state)
         .not.call.fn(validateOperationWorker)

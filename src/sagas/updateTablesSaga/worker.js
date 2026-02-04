@@ -23,7 +23,9 @@ import {
 } from "../../slices/tablesSlice";
 import { getTableStats } from "../../lib/duckdb";
 import { updateTablesSuccess } from "./actions";
-import { DATABASE_ATTRIBUTES } from "../../slices/tablesSlice";
+
+// Define which table attributes require database calls to update
+const DATABASE_ATTRIBUTES = ["rowCount"];
 
 /**
  * Saga worker to handle the logic of updating tables.
@@ -49,7 +51,7 @@ export default function* updateTablesWorker(tableUpdates) {
       try {
         // TODO: Optimize to only fetch changed attributes
         let databaseUpdates = yield call(getTableStats, databaseName);
-        tableUpdate = { ...tableUpdate, ...databaseUpdates[0] };
+        Object.assign(tableUpdate, databaseUpdates[0]);
       } catch (error) {
         isFailure = true;
         alert(`Failed to update table ${name}: ${error.message}`);

@@ -21,3 +21,6 @@
 	path = example-workflows/nyc-trips
 	url = https://github.com/steve-kasica/nyc-trips
 	branch = roundup
+[submodule "example-workflows/times-data"]
+	path = example-workflows/times-data
+	url = git@github.com:steve-kasica/data-2.git

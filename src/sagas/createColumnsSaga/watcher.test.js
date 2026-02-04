@@ -1,4 +1,4 @@
-import { describe, it } from "vitest";
+import { describe, it, vi } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
 import * as matchers from "redux-saga-test-plan/matchers";
 import createColumnsWatcher from "./watcher";
@@ -10,6 +10,15 @@ import {
 } from "../../slices/operationsSlice";
 import { createTablesSuccess } from "../createTablesSaga";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
+import { getTableColumnNames } from "../../lib/duckdb/getTableColumnNames";
+
+// vi.mock("./worker", () => ({
+//   default: vi.fn(),
+// }));
+
+// vi.mock("../../lib/duckdb/getTableColumnNames", () => ({
+//   getTableColumnNames: vi.fn(["id", "name", "email"]),
+// }));
 
 describe("createColumnsWatcher", () => {
   describe("handling insertColumnsRequest actions", () => {
@@ -247,7 +256,7 @@ describe("createColumnsWatcher", () => {
               name: "Table 1",
               databaseName: "db_table_1",
               columnCount: 2,
-              columnIds: [],
+              columnIds: new Array(2),
             },
           },
           allIds: ["t1"],
@@ -260,12 +269,16 @@ describe("createColumnsWatcher", () => {
       };
       const action = createTablesSuccess([state.tables.byId["t1"]]);
       const expectedArguments = [
-        { parentId: "t1", index: 0 },
-        { parentId: "t1", index: 1 },
+        { parentId: "t1", index: 0, name: "bar", databaseName: "bar" },
+        { parentId: "t1", index: 1, name: "foo", databaseName: "foo" },
       ];
       await expectSaga(createColumnsWatcher)
         .withState(state)
-        .provide([[matchers.call.fn(createColumnsWorker), undefined]])
+        .provide([
+          [matchers.call.fn(createColumnsWorker), undefined],
+          [matchers.call.fn(getTableColumnNames), ["bar", "foo"]],
+        ])
+        .call(getTableColumnNames, "db_table_1")
         .call(createColumnsWorker, expectedArguments, false)
         .dispatch(action)
         .run();
@@ -305,24 +318,27 @@ describe("createColumnsWatcher", () => {
       },
     };
     it("calls createColumnsWorker with correct arguments if `isMaterialized` is true", async () => {
-      const action = updateOperationsSuccess({
-        o1: ["isMaterialized"],
-      });
+      const action = updateOperationsSuccess([
+        { id: "o1", isMaterialized: true },
+      ]);
       const expectedArguments = [
-        { parentId: "o1", index: 0 },
-        { parentId: "o1", index: 1 },
+        { parentId: "o1", index: 0, name: "foo", databaseName: "foo" },
+        { parentId: "o1", index: 1, name: "bar", databaseName: "bar" },
       ];
       await expectSaga(createColumnsWatcher)
         .withState({ ...state })
-        .provide([[matchers.call.fn(createColumnsWorker), undefined]])
+        .provide([
+          [matchers.call.fn(createColumnsWorker), undefined],
+          [matchers.call.fn(getTableColumnNames), ["foo", "bar"]],
+        ])
         .call(createColumnsWorker, expectedArguments, false)
         .dispatch(action)
         .run();
     });
     it("does not call createColumnsWorker if `isMaterialized` is false", async () => {
-      const action = updateOperationsSuccess({
-        o1: ["isMaterialized"],
-      });
+      const action = updateOperationsSuccess([
+        { id: "o1", isMaterialized: false },
+      ]);
       await expectSaga(createColumnsWatcher)
         .withState({
           ...state,
@@ -343,9 +359,9 @@ describe("createColumnsWatcher", () => {
         .run();
     });
     it("does not call createColumnsWorker if a different property has changed", async () => {
-      const action = updateOperationsSuccess({
-        o1: ["someOtherProperty"],
-      });
+      const action = updateOperationsSuccess([
+        { id: "o1", name: "New Operation Name" },
+      ]);
       await expectSaga(createColumnsWatcher)
         .withState({
           ...state,

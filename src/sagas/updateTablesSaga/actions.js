@@ -20,7 +20,9 @@ import { createAction } from "@reduxjs/toolkit";
 /**
  * Action creator for requesting table updates.
  *
- * @param {Object} payload.tableUpdates - The data to update the table(s) with
+ * @param {Array<Object>} payload - The data to update the table(s) with
+ *  *  e.g. [{ id: 't1', rowCount: null, columnIds: [...] }, ...]
+ *
  * @returns {Object} Redux action with type "sagas/updateTables/request"
  * @type {import('@reduxjs/toolkit')}
  */
@@ -29,7 +31,8 @@ export const updateTablesRequest = createAction("sagas/updateTables/request");
 /**
  * Action creator for successful table updates.
  *
- * @param {Object} payload.changedPropertiesById - The updated properties for each table by ID
+ * @param {Array<Object>} payload - The updated properties for each table by ID
+ *  e.g. [{ id: 't1', rowCount: 100, columnIds: [...] }, ...]
  * @returns {Object} Redux action with type "sagas/updateTables/success"
  * @type {import('@reduxjs/toolkit')}
  *

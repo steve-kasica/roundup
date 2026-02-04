@@ -21,7 +21,11 @@ export const updateOperationsRequest = createAction(
 
 /**
  * Action creator for successful operation updates.
+ *
  * @param {Array<Object>} payload - The updated operation objects
+ *  e.g. `[ { id: 'o1', name: 'operation' }, { id: 'o2', joinKey1: 'c7' } ] }`
+ *
+ * @returns {Object} Redux action with type "sagas/updateOperations/success"
  */
 export const updateOperationsSuccess = createAction(
   "sagas/updateOperations/success",

@@ -86,9 +86,7 @@ describe("deleteOperationsWatcher", () => {
   describe("handling updateOperationsSuccess actions", () => {
     describe("If an update involves columnIDs changes", () => {
       it("call deleteOperationsWorker if operation is childless", () => {
-        const action = updateOperationsSuccess({
-          o1: ["childIds"],
-        });
+        const action = updateOperationsSuccess([{ id: "o1", childIds: [] }]);
 
         return expectSaga(deleteOperationsWatcher)
           .withState({
@@ -109,9 +107,9 @@ describe("deleteOperationsWatcher", () => {
           .run();
       });
       it("doesn't call deleteOperationsWorker if operation still has children", () => {
-        const action = updateOperationsSuccess({
-          o2: ["childIds"],
-        });
+        const action = updateOperationsSuccess([
+          { id: "o2", childIds: ["o1", "t3"] },
+        ]);
 
         return expectSaga(deleteOperationsWatcher)
           .withState({

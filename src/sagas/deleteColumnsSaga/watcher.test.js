@@ -406,7 +406,9 @@ describe("deleteColumnsSaga watcher", () => {
     };
     describe("when the columnIds property has changed", () => {
       it("should call deleteColumnsWorker with the appropriate parameters", () => {
-        const action = updateOperationsSuccess({ o1: ["columnIds"] });
+        const action = updateOperationsSuccess([
+          { id: "o1", columnIds: ["c1"] },
+        ]);
 
         return expectSaga(deleteColumnsWatcher)
           .withState(state)

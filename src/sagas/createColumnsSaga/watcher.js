@@ -27,6 +27,7 @@ import {
 } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
+import { getTableColumnNames } from "../../lib/duckdb/getTableColumnNames";
 
 export default function* createColumnsWatcher() {
   yield takeEvery(insertColumnsRequest.type, function* (action) {
@@ -87,9 +88,12 @@ export default function* createColumnsWatcher() {
     const tables = action.payload;
     const workerPayload = [];
     for (const table of tables) {
+      const columnNames = yield call(getTableColumnNames, table.databaseName);
       workerPayload.push(
-        ...Array.from({ length: table.columnIds.length }).map((_, index) => ({
+        ...columnNames.map((name, index) => ({
           parentId: table.id, // tables and operations can be parents of columns
+          name,
+          databaseName: name,
           index,
         })),
       );
@@ -100,25 +104,32 @@ export default function* createColumnsWatcher() {
   // If an operation has been recently materialized as a view,
   // then we need to create columns that represent columns of that view.
   yield takeEvery(updateOperationsSuccess.type, function* (action) {
-    const changedPropertiesById = action.payload;
+    const operationUpdates = action.payload;
     const workerPayload = [];
-    for (const [id, changedProperties] of Object.entries(
-      changedPropertiesById,
-    )) {
-      if (changedProperties.includes("isMaterialized")) {
+    for (const operationUpdate of operationUpdates) {
+      const operationId = operationUpdate.id;
+      const changedProperties = Object.keys(operationUpdate).filter(
+        (key) => key !== "id",
+      );
+      if (
+        changedProperties.includes("isMaterialized") &&
+        operationUpdate.isMaterialized == true
+      ) {
         const operation = yield select((state) =>
-          selectOperationsById(state, id),
+          selectOperationsById(state, operationId),
         );
-        if (operation.isMaterialized) {
-          workerPayload.push(
-            ...Array.from({
-              length: operation.columnCount, // use columnCount since columnIds may not be set yet
-            }).map((_, index) => ({
-              parentId: id,
-              index,
-            })),
-          );
-        }
+        const columnNames = yield call(
+          getTableColumnNames,
+          operation.databaseName,
+        );
+        workerPayload.push(
+          ...columnNames.map((name, index) => ({
+            parentId: operationId,
+            name,
+            databaseName: name,
+            index,
+          })),
+        );
       }
     }
     if (workerPayload.length > 0) {

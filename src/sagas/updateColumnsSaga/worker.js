@@ -18,6 +18,7 @@
  */
 import { call, put, select } from "redux-saga/effects";
 import {
+  COLUMN_TYPE_CATEGORICAL,
   selectColumnsById,
   TOP_VALUES_ATTR,
   updateColumns as updateColumnsSlice,
@@ -36,12 +37,14 @@ import { COLUMN_UNIQUE_VALUE_LIMIT } from "../../config";
 // Worker saga
 export default function* updateColumnsWorker(columnUpdates) {
   let isFailure = false;
+  const processedColumnUpdates = [];
 
   for (let columnUpdate of columnUpdates) {
     const updatingProperties = Object.keys(columnUpdate);
     const column = yield select((state) =>
       selectColumnsById(state, columnUpdate.id),
     );
+    let processedColumnUpdate = JSON.parse(JSON.stringify(columnUpdate));
 
     // TODO: honestly, this should be streamlined into a selector that handles both tables and operations
     const parent = yield select((state) =>
@@ -50,31 +53,29 @@ export default function* updateColumnsWorker(columnUpdates) {
         : selectOperationsById(state, column.parentId),
     );
 
-    if (updatingProperties.includes("columnType")) {
-      try {
-        // We need to update the column type in the database prior to fetching stats
-        yield call(
-          setColumnType,
-          parent.databaseName,
-          column.databaseName,
-          columnUpdate.columnType,
-        );
-      } catch (error) {
-        alert(
-          `Failed to update column type for (${
-            column.name || column.databaseName || column.id
-          }): ${error.message}`,
-        );
-        console.error(
-          "updateColumnsSaga/worker.js",
-          `Error updating column type for ${column.id}:`,
-          error,
-          "Column update data:",
-          columnUpdate,
-        );
-        isFailure = true;
-      }
-    }
+    // TODO: handling column type updates is currently disabled
+    // if (updatingProperties.includes("columnType")) {
+    //   try {
+    //     // We need to update the column type in the database prior to fetching stats
+    //     columnUpdate = Object.assign({}, columnUpdate, {
+    //       columnType: COLUMN_TYPE_CATEGORICAL,
+    //     });
+    //   } catch (error) {
+    //     alert(
+    //       `Failed to update column type for (${
+    //         column.name || column.databaseName || column.id
+    //       }): ${error.message}`,
+    //     );
+    //     console.error(
+    //       "updateColumnsSaga/worker.js",
+    //       `Error updating column type for ${column.id}:`,
+    //       error,
+    //       "Column update data:",
+    //       columnUpdate,
+    //     );
+    //     isFailure = true;
+    //   }
+    // }
 
     if (
       updatingProperties.some((property) =>
@@ -82,12 +83,10 @@ export default function* updateColumnsWorker(columnUpdates) {
       )
     ) {
       try {
-        columnUpdate = Object.assign(
-          columnUpdate,
-          (yield call(getColumnStats, parent.databaseName, [
-            column.databaseName,
-          ]))[0],
-        );
+        const columnStats = (yield call(getColumnStats, parent.databaseName, [
+          column.databaseName,
+        ]))[0];
+        processedColumnUpdate = { ...processedColumnUpdate, ...columnStats };
       } catch (error) {
         alert(
           `Failed to fetch column statistics for (${
@@ -106,20 +105,23 @@ export default function* updateColumnsWorker(columnUpdates) {
     }
 
     if (updatingProperties.includes(TOP_VALUES_ATTR)) {
-      columnUpdate = Object.assign(columnUpdate, {
-        topValues: yield call(
-          getValueCounts,
-          parent.databaseName,
-          column.databaseName,
-          COLUMN_UNIQUE_VALUE_LIMIT,
-        ),
-      });
+      const topValues = yield call(
+        getValueCounts,
+        parent.databaseName,
+        column.databaseName,
+        COLUMN_UNIQUE_VALUE_LIMIT,
+      );
+      processedColumnUpdate = {
+        ...processedColumnUpdate,
+        topValues,
+      };
     }
+    processedColumnUpdates.push(processedColumnUpdate);
   }
 
   if (!isFailure) {
     // Update the column objects in the store (both successful and failed)
-    yield put(updateColumnsSlice(columnUpdates));
-    yield put(updateColumnsSuccess(columnUpdates));
+    yield put(updateColumnsSlice(processedColumnUpdates));
+    yield put(updateColumnsSuccess(processedColumnUpdates));
   }
 }

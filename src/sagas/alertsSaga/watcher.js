@@ -15,14 +15,10 @@
  * @example
  * // Watcher is started automatically by rootSaga
  */
-import { call, put, select, takeEvery } from "redux-saga/effects";
+import { call, select, takeEvery } from "redux-saga/effects";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
 import { validateOperationWorker } from "./worker";
-import { checkOperationForAlertsRequest } from "./actions";
-import {
-  isOperationId,
-  selectOperationsById,
-} from "../../slices/operationsSlice";
+import { selectOperationsById } from "../../slices/operationsSlice";
 import { updateTablesSuccess } from "../updateTablesSaga";
 import { selectTablesById } from "../../slices/tablesSlice";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
@@ -38,7 +34,7 @@ export default function* updateAlertsSagaWatcher() {
   // we need to re-check that operation for alerts.
   yield takeEvery(updateOperationsSuccess.type, function* (action) {
     const operationsToValidate = [];
-    const changedPropertiesById = action.payload;
+    const operationUpdates = action.payload;
 
     const relevantChangedProperties = [
       "operationType",
@@ -49,17 +45,20 @@ export default function* updateAlertsSagaWatcher() {
       "joinPredicate",
     ];
 
-    for (const [
-      operationId,
-      changedProperties,
-    ] of changedPropertiesById.entries()) {
+    for (const operationUpdate of operationUpdates) {
+      const operationId = operationUpdate.id;
+      const changedProperties = Object.keys(operationUpdate).filter(
+        (key) => key !== "id",
+      );
       const operation = yield select((state) =>
         selectOperationsById(state, operationId),
       );
-      const hasRelevantChange = relevantChangedProperties.some((prop) =>
-        changedProperties.includes(prop),
-      );
-      if (hasRelevantChange) {
+
+      if (
+        relevantChangedProperties.some((prop) =>
+          changedProperties.includes(prop),
+        )
+      ) {
         operationsToValidate.push(operation);
       }
 
@@ -71,7 +70,9 @@ export default function* updateAlertsSagaWatcher() {
       }
     }
 
-    yield call(validateOperationWorker, operationsToValidate);
+    if (operationsToValidate.length > 0) {
+      yield call(validateOperationWorker, operationsToValidate);
+    }
   });
 
   // When tables are updated, we need to check if any operations that depend on
@@ -79,13 +80,14 @@ export default function* updateAlertsSagaWatcher() {
   // a table change, a stack operation using that table may now have mismatched columns.
   yield takeEvery(updateTablesSuccess.type, function* (action) {
     const propertiesToCheck = ["columnIds"];
-    const changedPropertiesById = action.payload;
+    const tableUpdates = action.payload;
     const operationsToValidate = new Set();
-    for (let [tableId, changedProperties] of Object.entries(
-      changedPropertiesById,
-    )) {
+    for (const tableUpdate of tableUpdates) {
+      const changedProperties = Object.keys(tableUpdate).filter(
+        (key) => key !== "id",
+      );
       const { parentId } = yield select((state) =>
-        selectTablesById(state, tableId),
+        selectTablesById(state, tableUpdate.id),
       );
       if (
         parentId &&
@@ -98,6 +100,8 @@ export default function* updateAlertsSagaWatcher() {
         operationsToValidate.add(operation);
       }
     }
-    yield call(validateOperationWorker, Array.from(operationsToValidate));
+    if (operationsToValidate.size > 0) {
+      yield call(validateOperationWorker, Array.from(operationsToValidate));
+    }
   });
 }

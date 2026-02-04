@@ -72,7 +72,7 @@ describe("DeleteColumnsSaga Integration Tests", () => {
         expect(parentTable.columnIds).not.toContain("c4");
       });
 
-      it.skip("should update the parent table's columnCount", () => {
+      it("should update the parent table's columnCount", () => {
         const parentTable = finalState.tables.byId["t1"];
         const originalColumnCount =
           mockState.tables.byId["t1"].columnIds.length;

@@ -54,6 +54,17 @@ const PackOperationParams = ({
   const [rightColumnKeyIdLocal, setRightColumnKeyIdLocal] = useState(rightKey);
   const [joinPredicateState, setJoinPredicateState] = useState(joinPredicate);
 
+  // Sync local state with props when operation changes
+  useEffect(() => {
+    setLeftTableIdLocal(leftTableId);
+    setRightTableIdLocal(rightTableId);
+    setLeftColumnKeyIdLocal(leftKey);
+    setRightColumnKeyIdLocal(rightKey);
+    setJoinPredicateState(joinPredicate);
+    setNameLocal(name || "Op.");
+    setInputValue(name || "Op.");
+  }, [id, leftTableId, rightTableId, leftKey, rightKey, joinPredicate, name]);
+
   const hasChanges = useMemo(() => {
     return (
       nameLocal !== (name || "Op.") ||
@@ -111,6 +122,7 @@ const PackOperationParams = ({
         joinKey1: leftColumnKeyIdLocal,
         joinKey2: rightColumnKeyIdLocal,
         joinPredicate: joinPredicateState,
+        matchStats: {}, // will be set in updateOperationsSaga/worker
       };
 
       dispatch(updateOperationsRequest([formData]));

@@ -153,9 +153,6 @@ export function usePaginatedTableRows(
     [columns],
   );
 
-  // Extract stable values from table to avoid object reference changes
-  const tableDatabaseName = table?.databaseName;
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -181,7 +178,7 @@ export function usePaginatedTableRows(
         }
 
         const rows = await getTableRows(
-          tableDatabaseName,
+          table.databaseName,
           columnsList,
           effectiveLimit,
           offset,
@@ -208,21 +205,24 @@ export function usePaginatedTableRows(
         setCurrentPage(pageNum);
       } catch (err) {
         setError(err);
-        console.error("Failed to fetch paginated table rows:", err);
+        console.error("Failed to fetch paginated table rows:", {
+          err,
+          table,
+        });
       } finally {
         setLoading(false);
       }
     },
     [
       tableId,
-      columnIds,
+      isMaterialized,
       initialOffset,
       pageSize,
       rowLimit,
-      tableDatabaseName,
       columnsList,
       sortBy,
       sortDirection,
+      table,
     ],
   );
 

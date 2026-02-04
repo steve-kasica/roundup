@@ -43,7 +43,7 @@ export default function* createColumnsWorker(
   let isFailure = false;
   const columnsCreated = [];
 
-  for (const { parentId, index, name, fillValue } of columnData) {
+  for (const { parentId, index, name, fillValue, databaseName } of columnData) {
     const parentTable = yield select((state) =>
       isTableId(parentId)
         ? selectTablesById(state, parentId)
@@ -52,7 +52,7 @@ export default function* createColumnsWorker(
     const column = Column({
       parentId,
       name: name || "New column",
-      databaseName: generateUUID("col_"),
+      databaseName,
       index,
     });
     if (addToDatabase) {

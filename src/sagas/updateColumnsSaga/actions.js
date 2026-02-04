@@ -35,7 +35,9 @@ export const updateColumnsRequest = createAction(
  * Action creator for handling column update success.
  *
  * @function
- * @param {Array<Object>} payload - Array of updated column objects.
+ * @param {Array<Object>} payload - Array of updated column objects with the column ID and updated properties only
+ *  [{id: "c1", name: "New Column Name"}, {id: "c2", columnType: "INTEGER"}].
+ *
  * @returns {Object} Redux action.
  */
 

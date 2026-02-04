@@ -55,7 +55,6 @@ export default function* createTablesWorker(tablesData) {
       rowCount,
       columnIds: new Array(columnCount),
     });
-    console.log("Created table:", table);
     createdTables.push(table);
   }
 

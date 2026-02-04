@@ -29,12 +29,8 @@ const ChangeTableOrder = () => {
     if (focusedObject?.operationType === OPERATION_TYPE_PACK) {
       dispatch(
         updateOperationsRequest({
-          operationUpdates: [
-            {
-              id: focusedObject.id,
-              childIds: [...focusedObject.childIds].reverse(),
-            },
-          ],
+          id: focusedObject.id,
+          childIds: [...focusedObject.childIds].reverse(),
         }),
       );
     }

@@ -3,13 +3,14 @@ import { runSaga } from "redux-saga";
 import updateTablesWorker from "./worker";
 import { expectSaga } from "redux-saga-test-plan";
 import { getTableStats } from "../../lib/duckdb";
+import { updateTablesSuccess } from "./actions";
+import { updateTables } from "../../slices/tablesSlice";
 
 vi.mock("../../lib/duckdb", () => ({
-  getTableStats: vi.fn(() =>
-    Promise.resolve({
-      table_1: { rowCount: 150 },
-      table_2: { rowCount: 250 },
-    }),
+  getTableStats: vi.fn((databaseName) =>
+    Promise.resolve(
+      databaseName === "db1" ? [{ rowCount: 150 }] : [{ rowCount: 250 }],
+    ),
   ),
 }));
 
@@ -46,9 +47,15 @@ describe("updateTablesWorker", () => {
         { id: "t1", rowCount: null },
         { id: "t2", rowCount: null },
       ];
+      const expectedPayload = [
+        { id: "t1", rowCount: 150 },
+        { id: "t2", rowCount: 250 },
+      ];
       await expectSaga(updateTablesWorker, tableUpdates)
         .withState(state)
         .call(getTableStats, "db2")
+        .put(updateTables(expectedPayload))
+        .put(updateTablesSuccess(expectedPayload))
         .run();
     });
   });

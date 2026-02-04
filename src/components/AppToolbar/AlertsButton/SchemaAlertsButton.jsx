@@ -25,7 +25,7 @@
 import { ErrorOutline as Icon } from "@mui/icons-material";
 import TooltipIconButton from "../../ui/buttons/TooltipIconButton";
 import Badge from "@mui/material/Badge";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useSelector } from "react-redux";
 // import { selectAlertsById } from "../../slices/alertsSlice";
 import { Divider, Popover, Typography, Box, List } from "@mui/material";
@@ -81,10 +81,10 @@ const AlertsButton = ({ alertIds, totalCount, errorCount, warningCount }) => {
           </Box>
           <List sx={{ maxHeight: 320, overflow: "auto", p: 0 }}>
             {alertIds.map((id, i, arr) => (
-              <>
-                <EnhancedAlertDescription key={id} id={id} />
+              <Fragment key={id}>
+                <EnhancedAlertDescription id={id} />
                 {i < arr.length - 1 && <Divider component="li" />}
-              </>
+              </Fragment>
             ))}
           </List>
         </Box>

@@ -128,6 +128,7 @@ export default function* updateOperationsWorker(operationUpdates) {
       }
     }
 
+    // TODO: is this case tested for?
     // If the operation is updating the `childIds` property,
     // we need to ensure that the corresponding children specify this
     // operation as their `parentId`.

@@ -120,7 +120,7 @@ export function* validateStackOperationWorker(operation) {
     validateHeterogeneousColumnTypes(operation, childColumnTypes),
   ];
 
-  yield call(processAlerts, { id: operation.id, alerts: results });
+  yield call(processAlerts, [{ id: operation.id, alerts: results }]);
 }
 
 export function* validatePackOperationWorker(operation) {
@@ -130,5 +130,5 @@ export function* validatePackOperationWorker(operation) {
     validateMissingJoinPredicate(operation),
     validateMissingJoinType(operation),
   ];
-  yield call(processAlerts, { id: operation.id, alerts: results });
+  yield call(processAlerts, [{ id: operation.id, alerts: results }]);
 }

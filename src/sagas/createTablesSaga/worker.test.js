@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, it, vi } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
 import createTablesWorker from "./worker";
 import { addTables } from "../../slices/tablesSlice";
@@ -19,6 +19,14 @@ vi.mock("../../lib/utilities/generateUUID", () => ({
   default: vi.fn((prefix) => `${prefix}-mock-uuid`),
 }));
 
+vi.mock("../../slices/tablesSlice/Table", () => ({
+  Table: vi.fn((tableData) => ({
+    ...tableData,
+    id: tableData.name === "table1" ? "t1" : "t2",
+    parentId: null,
+  })),
+}));
+
 describe("createTablesWorker saga", () => {
   describe("Creating a single table", () => {
     const tablesData = [
@@ -32,8 +40,8 @@ describe("createTablesWorker saga", () => {
         dateLastModified: 1625155200000,
       },
     ];
-    it("should create tables and dispatch success action on successful creation", async () => {
-      await expectSaga(createTablesWorker, tablesData)
+    it("should create tables and dispatch success action on successful creation", () => {
+      return expectSaga(createTablesWorker, tablesData)
         .call(createDBTables, "t-mock-uuid", "data1.csv")
         .call(getTableDimensions, "t-mock-uuid")
         .put.like({ action: { type: addTables.type } })
@@ -41,6 +49,7 @@ describe("createTablesWorker saga", () => {
         .run();
     });
   });
+
   describe("Creating multiple tables", () => {
     const tablesData = [
       {

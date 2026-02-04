@@ -16,11 +16,11 @@ const theme = createTheme(baseTheme, {
       "#9467bd",
       "#8c564b",
       "#e377c2",
-      "#7f7f7f",
+      // "#7f7f7f",
       "#bcbd22",
       "#17becf",
     ],
-    orphanedTableBackgroundColor: baseTheme.palette.background.paper,
+    orphanedTableBackgroundColor: "#7f7f7f",
   },
   typography: {
     // ============================================

@@ -122,11 +122,13 @@ export default function* deleteColumnsSaga() {
   // the operation's old columns, which will be orphaned in columns state.
   yield takeLatest(updateOperationsSuccess.type, function* (action) {
     const deleteFromDatabase = false;
-    const changedPropertiesById = action.payload;
+    const operationUpdates = action.payload;
 
-    for (let [operationId, changedProperties] of Object.entries(
-      changedPropertiesById,
-    )) {
+    for (const operationUpdate of operationUpdates) {
+      const operationId = operationUpdate.id;
+      const changedProperties = Object.keys(operationUpdate).filter(
+        (key) => key !== "id",
+      );
       if (changedProperties.includes("columnIds")) {
         const orphanedColumnIds = yield select((state) =>
           selectOrphanedColumnIds(state, operationId),

@@ -89,9 +89,7 @@ describe("deleteTablesSagaWatcher", () => {
 
   describe("handling updateTablesSuccess actions", () => {
     it("should trigger deletion when columnIds are empty", () => {
-      const action = updateTablesSuccess({
-        t1: ["columnIds"],
-      });
+      const action = updateTablesSuccess([{ id: "t1", columnIds: [] }]);
       return expectSaga(deleteTablesSagaWatcher)
         .withState({
           ...state,
@@ -113,9 +111,9 @@ describe("deleteTablesSagaWatcher", () => {
     });
 
     it("should not trigger deletion when columnIds is not empty", () => {
-      const action = updateTablesSuccess({
-        t1: ["columnIds"],
-      });
+      const action = updateTablesSuccess([
+        { id: "t1", columnIds: ["c1", "c2"] },
+      ]);
       return expectSaga(deleteTablesSagaWatcher)
         .withState({ ...state })
         .provide([[matchers.call.fn(deleteTablesWorker), undefined]])
@@ -125,9 +123,9 @@ describe("deleteTablesSagaWatcher", () => {
     });
 
     it("should not trigger deletion when other properties have changed", () => {
-      const action = updateTablesSuccess({
-        t1: ["name"],
-      });
+      const action = updateTablesSuccess([
+        { id: "t1", name: "New Table Name" },
+      ]);
       return expectSaga(deleteTablesSagaWatcher)
         .withState({ ...state })
         .provide([[matchers.call.fn(deleteTablesWorker), undefined]])

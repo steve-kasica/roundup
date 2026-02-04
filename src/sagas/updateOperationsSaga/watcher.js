@@ -113,6 +113,7 @@ export default function* updateOperationsWatcher() {
     }
   });
 
+  // TODO: address how state should update when child of materialized operation changes
   // // When a table is updated, if it's columnIds property has changed
   // // and the table is the child of a operation, we need to flag that
   // // the operation is out-of-sync.

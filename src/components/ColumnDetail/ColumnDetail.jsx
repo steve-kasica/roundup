@@ -228,7 +228,7 @@ const ColumnDetail = ({
                 <IntegerNumber value={count} />
               </Typography>
             </DataListItem>
-            <DataListItem>
+            <DataListItem disabled={isNaN(modeCount)}>
               <Typography
                 variant="data-primary"
                 color="text.secondary"
@@ -238,20 +238,29 @@ const ColumnDetail = ({
                 <MoreInfo text="The most frequently occurring value in this column." />
               </Typography>
               <Stack direction="row" spacing={1} alignItems="center">
-                <ValueChip
-                  label={`${modeValue || 0}`}
-                  sx={{
-                    maxWidth: "150px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                />
                 <Typography variant="data-primary">
-                  (<IntegerNumber value={modeCount} />)
+                  {isNaN(modeCount) ? (
+                    "N/A"
+                  ) : (
+                    <>
+                      {" "}
+                      <ValueChip
+                        label={`${modeValue || 0}`}
+                        sx={{
+                          maxWidth: "150px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      />
+                      <IntegerNumber value={modeCount || 0} />
+                    </>
+                  )}
                 </Typography>
               </Stack>
             </DataListItem>
-            <DataListItem>
+            <DataListItem
+              disabled={approxUnique === null || approxUnique === 0}
+            >
               <Typography
                 variant="data-primary"
                 color="text.secondary"
@@ -261,10 +270,14 @@ const ColumnDetail = ({
                 <MoreInfo text="The approximate number of unique values in this column." />
               </Typography>
               <Typography variant="data-primary">
-                <IntegerNumber value={approxUnique} />
+                {approxUnique === null || approxUnique === 0 ? (
+                  "N/A"
+                ) : (
+                  <IntegerNumber value={approxUnique} />
+                )}
               </Typography>
             </DataListItem>
-            <DataListItem disabled={isNaN(min)}>
+            <DataListItem disabled={min === null}>
               <Typography
                 variant="data-primary"
                 color="text.secondary"
@@ -276,10 +289,10 @@ const ColumnDetail = ({
                 <MoreInfo text="The minimum value in this column." />
               </Typography>
               <Typography variant="data-primary">
-                {isNaN(min) ? "N/A" : <FloatNumber value={min} />}
+                {min === null ? "N/A" : <FloatNumber value={min} />}
               </Typography>
             </DataListItem>
-            <DataListItem disabled={isNaN(max)}>
+            <DataListItem disabled={max === null}>
               <Typography
                 variant="data-primary"
                 color="text.secondary"
@@ -291,10 +304,10 @@ const ColumnDetail = ({
                 <MoreInfo text="The maximum value in this column." />
               </Typography>
               <Typography variant="data-primary">
-                {isNaN(max) ? "N/A" : <FloatNumber value={max} />}
+                {max === null ? "N/A" : <FloatNumber value={max} />}
               </Typography>
             </DataListItem>
-            <DataListItem disabled={avg === null}>
+            <DataListItem disabled={avg === null || avg === undefined}>
               <Typography
                 variant="data-primary"
                 color="text.secondary"
@@ -360,8 +373,8 @@ const ColumnDetail = ({
             >
               <DonutChart
                 data={[
-                  { name: "Non-null values", value: nonNullCount },
-                  { name: "Null values", value: nullCount },
+                  { name: "Non-null values", value: nonNullCount || 0 },
+                  { name: "Null values", value: nullCount || 0 },
                 ]}
                 width={50}
                 colors={[nonNullColor, nullColor]}
@@ -387,7 +400,7 @@ const ColumnDetail = ({
                     </Typography>
                   </Stack>
                   <Typography variant="data-primary">
-                    <IntegerNumber value={nonNullCount} />
+                    <IntegerNumber value={nonNullCount || 0} />
                   </Typography>
                 </Stack>
                 <Stack
@@ -409,7 +422,7 @@ const ColumnDetail = ({
                     </Typography>
                   </Stack>
                   <Typography variant="data-primary">
-                    <IntegerNumber value={nullCount} />
+                    <IntegerNumber value={nullCount || 0} />
                   </Typography>
                 </Stack>
               </Box>
@@ -435,8 +448,8 @@ const ColumnDetail = ({
               >
                 <DonutChart
                   data={[
-                    { name: "Unique values", value: approxUnique },
-                    { name: "Duplicate values", value: duplicateCount },
+                    { name: "Unique values", value: approxUnique || 0 },
+                    { name: "Duplicate values", value: duplicateCount || 0 },
                   ]}
                   width={50}
                   colors={[uniqueColor, duplicateColor]}
@@ -462,7 +475,7 @@ const ColumnDetail = ({
                       </Typography>
                     </Stack>
                     <Typography variant="data-primary">
-                      {approxUnique.toLocaleString()}
+                      <IntegerNumber value={approxUnique} />
                     </Typography>
                   </Stack>
                   <Stack
@@ -478,7 +491,7 @@ const ColumnDetail = ({
                       </Typography>
                     </Stack>
                     <Typography variant="data-primary">
-                      {duplicateCount.toLocaleString()}
+                      <IntegerNumber value={duplicateCount} />
                     </Typography>
                   </Stack>
                 </Box>

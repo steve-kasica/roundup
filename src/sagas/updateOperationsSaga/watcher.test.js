@@ -11,61 +11,65 @@ import {
 } from "../../slices/operationsSlice";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
+import { before, beforeEach } from "node:test";
 
 describe("updateOperationsSaga watcher", () => {
   let state, action;
-  state = {
-    operations: {
-      byId: {
-        o1: {
-          id: "o1",
-          operationType: OPERATION_TYPE_STACK,
-          columnIds: ["c1", "c2"],
-          childIds: ["t1", "t2"],
+  beforeEach(() => {
+    state = {
+      operations: {
+        byId: {
+          o1: {
+            id: "o1",
+            operationType: OPERATION_TYPE_STACK,
+            columnIds: ["c1", "c2"],
+            childIds: ["t1", "t2"],
+          },
         },
+        allIds: ["o1"],
       },
-      allIds: ["o1"],
-    },
-    tables: {
-      byId: {
-        t1: {
-          id: "t1",
-          parentId: "o1",
-          name: "Table 1",
+      tables: {
+        byId: {
+          t1: {
+            id: "t1",
+            parentId: "o1",
+            name: "Table 1",
+          },
+          t2: {
+            id: "t2",
+            parentId: "o1",
+            name: "Table 2",
+          },
+          t3: {
+            id: "t3",
+            parentId: null,
+            name: "Table 3",
+          },
         },
-        t2: {
-          id: "t2",
-          parentId: "o1",
-          name: "Table 2",
-        },
-        t3: {
-          id: "t3",
-          parentId: null,
-          name: "Table 3",
-        },
+        allIds: ["t1", "t2", "t3"],
       },
-      allIds: ["t1", "t2", "t3"],
-    },
-    columns: {
-      byId: {
-        c1: {
-          id: "c1",
-          parentId: "o1",
-          name: "Column 1",
+      columns: {
+        byId: {
+          c1: {
+            id: "c1",
+            parentId: "o1",
+            name: "Column 1",
+          },
+          c2: {
+            id: "c2",
+            parentId: "o1",
+            name: "Column 2",
+          },
         },
-        c2: {
-          id: "c2",
-          parentId: "o1",
-          name: "Column 2",
-        },
+        allIds: ["c1", "c2"],
       },
-      allIds: ["c1", "c2"],
-    },
-  };
+    };
+  });
   describe("handling updateOperationsRequest actions", () => {
-    it("should call worker saga with correct payload", () => {
+    beforeEach(() => {
       action = updateOperationsRequest([{ id: "o1", name: "stack" }]);
-
+    });
+    it("should call worker saga with correct payload", () => {
       return expectSaga(updateOperationsWatcher)
         .withState(state)
         .dispatch(action)
@@ -75,9 +79,12 @@ describe("updateOperationsSaga watcher", () => {
   });
 
   describe("handling deleteTablesSuccess actions", () => {
-    action = deleteTablesSuccess([
-      { id: "t1", name: "Table 1", parentId: "o1" },
-    ]);
+    beforeEach(() => {
+      action = deleteTablesSuccess([
+        { id: "t1", name: "Table 1", parentId: "o1" },
+      ]);
+    });
+
     it("should call worker saga with correct payload", () => {
       expectSaga(updateOperationsWatcher)
         .withState(state)
@@ -94,21 +101,24 @@ describe("updateOperationsSaga watcher", () => {
   });
 
   describe("handling createOperationsSuccess actions", () => {
-    const localState = {
-      ...state,
-      operations: {
-        byId: {
-          ...state.operations.byId,
-          o2: {
-            id: "o2",
-            operationType: OPERATION_TYPE_PACK,
-            childIds: ["o1", "t3"],
+    let localState;
+    beforeEach(() => {
+      localState = {
+        ...state,
+        operations: {
+          byId: {
+            ...state.operations.byId,
+            o2: {
+              id: "o2",
+              operationType: OPERATION_TYPE_PACK,
+              childIds: ["o1", "t3"],
+            },
           },
+          allIds: [...state.operations.allIds, "o2"],
         },
-        allIds: [...state.operations.allIds, "o2"],
-      },
-    };
-    action = createOperationsSuccess([localState.operations.byId.o2]);
+      };
+      action = createOperationsSuccess([localState.operations.byId.o2]);
+    });
     it("should call worker saga with correct payload", () => {
       expectSaga(updateOperationsWatcher)
         .withState(localState)
@@ -125,11 +135,14 @@ describe("updateOperationsSaga watcher", () => {
   });
 
   describe("handling createColumnsSuccess actions", () => {
-    const action = createColumnsSuccess([
-      state.columns.byId.c1,
-      state.columns.byId.c2,
-    ]);
-    it.skip("should not call updateOperationsWorker with action payload if columns belong to a table", () => {
+    beforeEach(() => {
+      action = createColumnsSuccess([
+        state.columns.byId.c1,
+        state.columns.byId.c2,
+      ]);
+    });
+
+    it("should not call updateOperationsWorker with action payload if columns belong to a table", () => {
       return expectSaga(updateOperationsWatcher)
         .provide([[matchers.call.fn(updateOperationsWorker), undefined]])
         .not.call(updateOperationsWorker, [
@@ -141,7 +154,7 @@ describe("updateOperationsSaga watcher", () => {
         .dispatch(action)
         .run();
     });
-    it.skip("should call updateOperationsWorker with action payload if columns belong to an operation", () => {
+    it("should call updateOperationsWorker with action payload if columns belong to an operation", () => {
       return expectSaga(updateOperationsWatcher)
         .provide([[matchers.call.fn(updateOperationsWorker), undefined]])
         .call(updateOperationsWorker, [

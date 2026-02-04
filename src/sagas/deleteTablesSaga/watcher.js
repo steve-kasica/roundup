@@ -30,11 +30,15 @@ export default function* deleteTablesSagaWatcher() {
   // If a table has had all its columns deleted, then delete the table
   // itself from the database and state.
   yield takeEvery(updateTablesSuccess.type, function* (action) {
-    const changedProperties = action.payload;
+    const tableUpdates = action.payload;
     const tablesToDelete = [];
-    for (const [tableId, properties] of Object.entries(changedProperties)) {
-      if (properties.includes("columnIds")) {
-        const table = yield select((state) => selectTablesById(state, tableId));
+    for (const tableUpdate of tableUpdates) {
+      const { id } = tableUpdate;
+      const changedAttributes = Object.keys(tableUpdate).filter(
+        (key) => key !== "id",
+      );
+      if (changedAttributes.includes("columnIds")) {
+        const table = yield select((state) => selectTablesById(state, id));
         if (table.columnIds.length === 0) {
           tablesToDelete.push(table);
         }

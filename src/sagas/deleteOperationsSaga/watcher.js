@@ -57,14 +57,16 @@ export default function* deleteOperationsWatcher() {
   // Note: the `changedPropertiesByOperation` payload object is in the form
   // { operationId: [ keyUpdated, keyUpdated ]}
   yield takeLatest(updateOperationsSuccess.type, function* (action) {
-    const changedPropertiesById = action.payload;
+    const operationUpdates = action.payload;
     const operationsToDelete = [];
-    for (const [id, changedProperties] of Object.entries(
-      changedPropertiesById,
-    )) {
+    for (const operationUpdate of operationUpdates) {
+      const operationId = operationUpdate.id;
+      const changedProperties = Object.keys(operationUpdate).filter(
+        (key) => key !== "id",
+      );
       if (changedProperties.includes("childIds")) {
         const operation = yield select((state) =>
-          selectOperationsById(state, id),
+          selectOperationsById(state, operationId),
         );
         if (operation.childIds.length === 0) {
           operationsToDelete.push(operation);
