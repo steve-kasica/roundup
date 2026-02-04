@@ -40,6 +40,7 @@ import {
 import { useSelector } from "react-redux";
 import { isTableId, selectTablesById } from "../../../slices/tablesSlice";
 import { selectOperationsById } from "../../../slices/operationsSlice";
+import { selectColumnsById } from "../../../slices/columnsSlice";
 import exportTableToStreamManual from "../../../lib/duckdb/exportTableToStreamManual";
 
 /**
@@ -51,6 +52,7 @@ import exportTableToStreamManual from "../../../lib/duckdb/exportTableToStreamMa
  * @param {Object} props - Component props
  * @param {string} props.name - Display name of the table/operation being exported
  * @param {string} props.databaseName - Internal database name for the export
+ * @param {Array} props.columns - Array of column objects with name and databaseName properties
  * @param {Function} props.onClose - Callback to close the dialog
  *
  * @returns {React.ReactElement} A dialog with export configuration options
@@ -64,7 +66,7 @@ import exportTableToStreamManual from "../../../lib/duckdb/exportTableToStreamMa
  * The dialog displays a preview of the final filename and provides
  * Cancel and Export buttons.
  */
-function ExportDialog({ name, databaseName, onClose }) {
+function ExportDialog({ name, databaseName, columns, onClose }) {
   const [format, setFormat] = useState("csv");
   const [includeHeaders, setIncludeHeaders] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
@@ -90,6 +92,7 @@ function ExportDialog({ name, databaseName, onClose }) {
         },
         delimiter: format === "tsv" ? "\t" : ",",
         includeHeaders,
+        columns,
       });
     } finally {
       clearTimeout(showProgressTimeout);
@@ -122,7 +125,7 @@ function ExportDialog({ name, databaseName, onClose }) {
             value={exportName.replace(/\.[^/.]+$/, "")} // Remove any existing extension for display
             onChange={(e) =>
               setExportName(
-                `${e.target.value.replace(/\.[^/.]+$/, "").toLowerCase()}` // Append the correct extension
+                `${e.target.value.replace(/\.[^/.]+$/, "").toLowerCase()}`, // Append the correct extension
               )
             }
             sx={{ mb: 1 }}
@@ -218,13 +221,22 @@ function ExportDialog({ name, databaseName, onClose }) {
 
 const EnhancedExportDialog = (props) => {
   const { id } = props;
-  const { name, databaseName } = useSelector((state) =>
+  const { name, databaseName, columnIds } = useSelector((state) =>
     isTableId(id)
       ? selectTablesById(state, id)
-      : selectOperationsById(state, id)
+      : selectOperationsById(state, id),
   );
 
-  return <ExportDialog {...props} name={name} databaseName={databaseName} />;
+  const columns = useSelector((state) => selectColumnsById(state, columnIds));
+
+  return (
+    <ExportDialog
+      {...props}
+      name={name}
+      databaseName={databaseName}
+      columns={columns}
+    />
+  );
 };
 
 export { ExportDialog, EnhancedExportDialog };

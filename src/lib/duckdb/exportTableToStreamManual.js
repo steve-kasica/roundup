@@ -31,13 +31,14 @@ import { getDuckDB } from "./duckdbClient";
 export default async function exportTableToStreamManual(
   tableName,
   filename = "export.csv",
-  options = {}
+  options = {},
 ) {
   const {
     chunkSize = 1000, // Number of rows per chunk
     onProgress = null, // Progress callback function
     delimiter = ",", // Can be "," for CSV or "\t" for TSV
     includeHeaders = true,
+    columns = null, // Array of column objects with name and databaseName properties
   } = options;
 
   const db = await getDuckDB();
@@ -46,13 +47,23 @@ export default async function exportTableToStreamManual(
   try {
     // Get total row count for progress tracking
     const countResult = await conn.query(
-      `SELECT COUNT(*) as count FROM "${tableName}"`
+      `SELECT COUNT(*) as count FROM "${tableName}"`,
     );
     const totalRows = Number(countResult.toArray()[0].count);
 
     // Get column information
     const columnsResult = await conn.query(`DESCRIBE "${tableName}"`);
-    const columns = columnsResult.toArray().map((col) => col.column_name); // TODO: column_names are IDs, not names
+    const columnDatabaseNames = columnsResult
+      .toArray()
+      .map((col) => col.column_name);
+
+    // Create column headers using name property, falling back to databaseName
+    const columnHeaders = columns
+      ? columnDatabaseNames.map((dbName) => {
+          const colInfo = columns.find((c) => c.databaseName === dbName);
+          return colInfo?.name || colInfo?.databaseName || dbName;
+        })
+      : columnDatabaseNames;
 
     const chunks = [];
     let processedRows = 0;
@@ -63,7 +74,7 @@ export default async function exportTableToStreamManual(
 
     // Add headers if requested
     if (includeHeaders) {
-      chunks.push(columns.join(delimiter) + "\n");
+      chunks.push(columnHeaders.join(delimiter) + "\n");
     }
 
     // Process data in chunks
@@ -81,9 +92,9 @@ export default async function exportTableToStreamManual(
       const csvChunk =
         rows
           .map((row) =>
-            columns
+            columnDatabaseNames
               .map((col) => formatValue(row[col], delimiter))
-              .join(delimiter)
+              .join(delimiter),
           )
           .join("\n") + "\n";
 
