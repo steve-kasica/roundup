@@ -42,32 +42,6 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
   async function handleFileUpload(files) {
     if (!files.length) return;
 
-    // Track upload progress for each file
-    files.forEach((file) => {
-      const fileId = `${file.name}-${Date.now()}`;
-      setUploadProgress((prev) => ({ ...prev, [fileId]: 0 }));
-
-      // Simulate upload progress
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          const current = prev[fileId] || 0;
-          if (current >= 100) {
-            clearInterval(interval);
-            return prev;
-          }
-          return { ...prev, [fileId]: current + 10 };
-        });
-      }, 200);
-
-      // Remove from progress tracking after completion
-      setTimeout(() => {
-        setUploadProgress((prev) => {
-          const { [fileId]: _, ...rest } = prev;
-          return rest;
-        });
-      }, 2200);
-    });
-
     registerFiles(files)
       .then(() =>
         createTables(
