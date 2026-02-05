@@ -3,6 +3,7 @@ import { deleteColumnsSuccess } from "../deleteColumnsSaga";
 import { expectSaga } from "redux-saga-test-plan";
 import uiSaga from "./watcher";
 import {
+  clearSelectedTableIds,
   removeFromHiddenColumnIds,
   removeFromHoveredColumnIds,
   removeFromSelectedColumnIds,
@@ -85,7 +86,7 @@ describe("UiSaga watcher", () => {
     ]);
     it("should clear selected table IDs and set focused object ID", () => {
       return expectSaga(uiSaga)
-        .put(removeFromSelectedTableIds([]))
+        .put(clearSelectedTableIds())
         .put(setFocusedObjectId("o2"))
         .dispatch(action)
         .run();
@@ -101,7 +102,7 @@ describe("UiSaga watcher", () => {
     ]);
     it("should clear selected table IDs and set focused object ID", () => {
       return expectSaga(uiSaga)
-        .put(removeFromSelectedTableIds([]))
+        .put(clearSelectedTableIds())
         .put(setFocusedObjectId("t2"))
         .dispatch(action)
         .run();

@@ -6,6 +6,7 @@
 import { put, select, takeEvery } from "redux-saga/effects";
 import { deleteColumnsSuccess } from "../deleteColumnsSaga";
 import {
+  clearSelectedTableIds,
   removeFromHiddenColumnIds,
   removeFromHoveredColumnIds,
   removeFromSelectedColumnIds,
@@ -48,7 +49,7 @@ export default function* uiSaga() {
   yield takeEvery(createTablesSuccess.type, function* (action) {
     const createdTables = action.payload;
 
-    yield put(removeFromSelectedTableIds([]));
+    yield put(clearSelectedTableIds());
 
     const lastCreatedTable = createdTables[createdTables.length - 1];
     yield put(setFocusedObjectId(lastCreatedTable.id));
@@ -58,7 +59,7 @@ export default function* uiSaga() {
   yield takeEvery(createOperationsSuccess.type, function* (action) {
     const createdOperations = action.payload;
 
-    yield put(removeFromSelectedTableIds([]));
+    yield put(clearSelectedTableIds());
 
     const lastOperation = createdOperations[createdOperations.length - 1];
     yield put(setFocusedObjectId(lastOperation.id));
