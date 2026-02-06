@@ -12,7 +12,7 @@ import {
 import { useState } from "react";
 import { TitleCaseText } from "../../../ui/text";
 
-const JoinPredicateSelect = ({ joinPredicate, onChange, sx }) => {
+const JoinPredicateSelect = ({ joinPredicate, onChange, sx, isDisabled }) => {
   const [value, setValue] = useState(joinPredicate || DEFAULT_JOIN_PREDICATE);
   const handleChange = (event) => {
     const newValue = event.target.value;
@@ -31,6 +31,7 @@ const JoinPredicateSelect = ({ joinPredicate, onChange, sx }) => {
         label="Match condition"
         onChange={handleChange}
         renderValue={(selected) => <TitleCaseText text={selected} />}
+        disabled={isDisabled}
       >
         {Object.keys(JOIN_PREDICATES).map((predicateValue) => (
           <MenuItem

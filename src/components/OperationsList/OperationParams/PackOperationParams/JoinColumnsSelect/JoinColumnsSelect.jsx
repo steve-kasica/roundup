@@ -18,6 +18,7 @@ const JoinColumnsSelect = ({
   // Props directly from parent
   onChange,
   sx = {},
+  isDisabled,
 }) => {
   const [value, setValue] = useState(
     leftKeyId && rightKeyId ? `${leftKeyId}|${rightKeyId}` : "",
@@ -74,6 +75,7 @@ const JoinColumnsSelect = ({
             disablePadding: true,
           },
         }}
+        disabled={isDisabled}
       >
         <MenuItem
           disabled

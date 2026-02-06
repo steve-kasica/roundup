@@ -13,7 +13,7 @@ import { EnhancedOperationLabel } from "../../../OperationView/OperationLabel";
 import { isTableId } from "../../../../slices/tablesSlice";
 import { cross, descending } from "d3";
 
-const TableOrderRadio = ({ childIds, onChange }) => {
+const TableOrderRadio = ({ childIds, onChange, isDisabled }) => {
   const [value, setValue] = useState();
 
   const options = cross(childIds, childIds)
@@ -34,16 +34,20 @@ const TableOrderRadio = ({ childIds, onChange }) => {
   }, [value, onChange]);
 
   return (
-    <FormControl fullWidth sx={{ mb: 2 }} size="small">
+    <FormControl fullWidth sx={{ mb: 2 }} size="small" disabled={isDisabled}>
       <InputLabel sx={{ position: "relative", transform: "none", mb: 1 }}>
         Table order
       </InputLabel>
-      <RadioGroup value={value} onChange={(e) => setValue(e.target.value)}>
+      <RadioGroup
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        disabled={isDisabled}
+      >
         {options.map(([leftTableId, rightTableId]) => (
           <FormControlLabel
             key={`${leftTableId}|${rightTableId}`}
             value={`${leftTableId}|${rightTableId}`}
-            control={<Radio />}
+            control={<Radio disabled={isDisabled} />}
             label={
               <Box display="flex" alignItems="center" gap={1} width={"350px"}>
                 {isTableId(leftTableId) ? (

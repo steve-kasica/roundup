@@ -30,13 +30,19 @@ import {
   MATCH_TYPE_RIGHT_UNMATCHED,
   OPERATION_TYPE_PACK,
 } from "../../../slices/operationsSlice";
-import { withAssociatedAlerts, withPackOperationData } from "../../HOC";
+import {
+  withAssociatedAlerts,
+  withPackOperationData,
+  withOperationData,
+} from "../../HOC";
 import { useSelector } from "react-redux";
 import { selectFocusedObjectId } from "../../../slices/uiSlice";
 import MatchToggleButton from "./MatchToggleButton";
 import { useCallback } from "react";
 
 const PackMatchToggleButtonGroup = ({
+  // Props passed via `withOperationData.jsx` HOC
+  isReadOnly,
   // Props passed via `withPackOperationData.jsx` HOC
   validMatchGroups,
   matchStats,
@@ -48,15 +54,18 @@ const PackMatchToggleButtonGroup = ({
   const isLeftUnmatchedDisabled =
     matchStats === undefined ||
     matchStats[MATCH_TYPE_LEFT_UNMATCHED] === 0 ||
-    errorCount > 0;
+    errorCount > 0 ||
+    isReadOnly;
   const isMatchDisabled =
     matchStats === undefined ||
     matchStats[MATCH_TYPE_MATCHES] === 0 ||
-    errorCount > 0;
+    errorCount > 0 ||
+    isReadOnly;
   const isRightUnmatchedDisabled =
     matchStats === undefined ||
     matchStats[MATCH_TYPE_RIGHT_UNMATCHED] === 0 ||
-    errorCount > 0;
+    errorCount > 0 ||
+    isReadOnly;
 
   const onChange = useCallback(
     (_event, currentMatches) => {
@@ -166,7 +175,7 @@ const PackMatchToggleButtonGroup = ({
 
 // Create the wrapped component outside of the render function
 const PackMatchToggleButtonGroupWithData = withAssociatedAlerts(
-  withPackOperationData(PackMatchToggleButtonGroup),
+  withOperationData(withPackOperationData(PackMatchToggleButtonGroup)),
 );
 
 const EnhancedPackMatchToggleButtonGroup = () => {

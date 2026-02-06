@@ -46,6 +46,35 @@ describe("DeleteColumnsButton Component", () => {
       });
       cy.get("button").should("be.disabled");
     });
+    describe("table is read-only", () => {
+      beforeEach(() => {
+        cy.mountWithProviders(<DeleteColumnsButton />, {
+          preloadedState: {
+            ...stateWithFocusedTable,
+            operations: {
+              ...stateWithFocusedTable.operations,
+              rootOperationId: "o0", // Make o1 NOT the root operation (isReadOnly = true)
+              allIds: ["o0", "o1"],
+              byId: {
+                ...stateWithFocusedTable.operations.byId,
+                o0: {
+                  id: "o0",
+                  operationType: "stack",
+                  childIds: ["o1"],
+                },
+                o1: {
+                  ...stateWithFocusedTable.operations.byId.o1,
+                  parentId: "o0",
+                },
+              },
+            },
+          },
+        });
+      });
+      it("disables the button even when columns are selected", () => {
+        cy.get("button").should("be.disabled");
+      });
+    });
   });
 
   describe("Focused object is an operation", () => {
@@ -78,6 +107,40 @@ describe("DeleteColumnsButton Component", () => {
         preloadedState: stateWithNoSelectedColumns,
       });
       cy.get("button").should("be.disabled");
+    });
+
+    describe("focused operation is read-only", () => {
+      beforeEach(() => {
+        cy.mountWithProviders(<DeleteColumnsButton />, {
+          preloadedState: {
+            ...stateWithFocusedOperation,
+            ui: {
+              ...stateWithFocusedOperation.ui,
+              focusedObjectId: "o1", // Focus on operation
+            },
+            operations: {
+              ...stateWithFocusedOperation.operations,
+              rootOperationId: "o0", // Make o1 NOT the root operation (isReadOnly = true)
+              allIds: ["o0", "o1"],
+              byId: {
+                ...stateWithFocusedOperation.operations.byId,
+                o0: {
+                  id: "o0",
+                  operationType: "stack",
+                  childIds: ["o1"],
+                },
+                o1: {
+                  ...stateWithFocusedOperation.operations.byId.o1,
+                  parentId: "o0",
+                },
+              },
+            },
+          },
+        });
+      });
+      it("disables the button", () => {
+        cy.get("button").should("be.disabled");
+      });
     });
   });
 });

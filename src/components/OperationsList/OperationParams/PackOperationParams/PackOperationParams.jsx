@@ -30,7 +30,6 @@ import TableOrderRadio from "./TableOrderRadio";
 
 const PackOperationParams = ({
   // Props passed via withPackOperationData HOC
-  id,
   name,
   leftTableId,
   leftColumnIds = [],
@@ -42,6 +41,9 @@ const PackOperationParams = ({
   joinPredicate,
   setLeftTableJoinKey,
   setRightTableJoinKey,
+  // Props passed directly from parent OperationSelect.jsx
+  id,
+  isReadOnly,
 }) => {
   const dispatch = useDispatch();
   const [nameLocal, setNameLocal] = useState(name || "Op.");
@@ -176,12 +178,35 @@ const PackOperationParams = ({
           />
         </FormControl> */}
         <Typography variant="h5" gutterBottom sx={{ my: 1 }}>
+          Stats
+        </Typography>
+        <Box
+          sx={{
+            userSelect: "none",
+          }}
+        >
+          <Stack
+            direction="row"
+            gap={1}
+            mb={1}
+            justifyContent={"space-between"}
+          >
+            <Typography variant="subtitle2" color="text.secondary">
+              Status
+            </Typography>
+            <Typography variant="subtitle2" color="primary">
+              {isReadOnly ? "Read-only" : "Editable"}
+            </Typography>
+          </Stack>
+        </Box>
+        <Typography variant="h5" gutterBottom sx={{ my: 1 }}>
           Join parameters
         </Typography>
         {/* <JoinSummary joinPredicate={joinPredicate} /> */}
         <TableOrderRadio
           childIds={[leftTableIdLocal, rightTableIdLocal]}
           onChange={handleTableOrderChange}
+          isDisabled={isReadOnly}
         />
 
         <JoinColumnsSelect
@@ -207,6 +232,7 @@ const PackOperationParams = ({
           sx={{
             mb: 1,
           }}
+          isDisabled={isReadOnly}
         />
         <JoinPredicateSelect
           value={joinPredicateState}
@@ -216,6 +242,7 @@ const PackOperationParams = ({
           sx={{
             mb: 1,
           }}
+          isDisabled={isReadOnly}
         />
         {/* <Typography variant="h5" gutterBottom sx={{ my: 2 }}>
           Output options
@@ -261,7 +288,7 @@ const PackOperationParams = ({
           variant="contained"
           color="primary"
           onClick={handleUpdate}
-          disabled={!hasChanges}
+          disabled={!hasChanges || isReadOnly}
         >
           Update
         </Button>

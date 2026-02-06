@@ -38,8 +38,6 @@ import {
   TableContainer,
   Typography,
   Box,
-  LinearProgress,
-  Toolbar,
 } from "@mui/material";
 import {
   ArrowDown01,
@@ -227,7 +225,7 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
           >
             <TableRow
               style={{
-                borderBottom: "2px solid rgba(0, 0, 0, 0.12)",
+                borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
               }}
             >
               <TableCell
@@ -247,6 +245,7 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
                 >
                   <Button
                     color="inherit"
+                    disableRipple
                     fullWidth
                     onClick={() => {
                       if (header.attr === sortAttribute) {
@@ -254,6 +253,12 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
                       } else {
                         setSortAttribute(header.attr);
                       }
+                    }}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
                     <Typography variant="label">{header.label}</Typography>

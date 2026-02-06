@@ -5,7 +5,8 @@ const StyledTableCell = styled(TableCell, {
     !["isSelected", "isPrevSelected", "isNextSelected"].includes(prop),
 })(({ theme, isSelected, isPrevSelected, isNextSelected }) => ({
   padding: 0,
-  border: `2px solid ${theme.palette.grey[300]}`,
+  border: "1px solid",
+  borderColor: theme.palette.grey[300],
 }));
 
 export default StyledTableCell;

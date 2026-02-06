@@ -6,11 +6,11 @@ import { withOperationData } from "../../HOC";
 import { EnhancedPackOperationParams } from "./PackOperationParams";
 import { EnhancedStackOperationParams } from "./StackOperationParams";
 
-const OperationParams = ({ operationType, id }) => {
+const OperationParams = ({ operationType, id, isReadOnly }) => {
   if (operationType === OPERATION_TYPE_PACK) {
-    return <EnhancedPackOperationParams id={id} />;
+    return <EnhancedPackOperationParams id={id} isReadOnly={isReadOnly} />;
   } else if (operationType === OPERATION_TYPE_STACK) {
-    return <EnhancedStackOperationParams id={id} />;
+    return <EnhancedStackOperationParams id={id} isReadOnly={isReadOnly} />;
   } else {
     throw new Error(`Unsupported operation type: ${operationType}`);
   }

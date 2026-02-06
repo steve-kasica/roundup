@@ -7,12 +7,14 @@ import { useCallback, useMemo } from "react";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
+  selectRootOperationId,
 } from "../../../slices/operationsSlice";
 import { updateOperationsRequest } from "../../../sagas/updateOperationsSaga";
 
 const ChangeTableOrder = () => {
   const dispatch = useDispatch();
   const focusedObjectId = useSelector(selectFocusedObjectId);
+  const rootOperationId = useSelector(selectRootOperationId);
   const objectType = useMemo(() => {
     return isTableId(focusedObjectId) ? "table" : "operation";
   }, [focusedObjectId]);
@@ -37,16 +39,22 @@ const ChangeTableOrder = () => {
   }, [dispatch, focusedObject]);
 
   const Icon =
-    objectType === "operation" && focusedObject?.operationType === "stack"
+    objectType === "operation" &&
+    focusedObject?.operationType === OPERATION_TYPE_STACK
       ? SwapVert
       : SwapHoriz;
 
   const isDisabled = useMemo(
     () =>
+      // No focused object
       !focusedObject ||
+      // Focused object is a table
       isTableId(focusedObject.id) ||
-      focusedObject?.operationType === OPERATION_TYPE_STACK,
-    [focusedObject],
+      // Focused object is a stack operation
+      focusedObject?.operationType === OPERATION_TYPE_STACK ||
+      // Focused object is "read-only" (i.e. not a root operation)
+      focusedObject?.id !== rootOperationId,
+    [focusedObject, rootOperationId],
   );
 
   return (

@@ -110,14 +110,12 @@ export default function withStackOperationData(WrappedComponent) {
         });
 
         dispatch(
-          updateTablesRequest({
-            tableUpdates: [
-              {
-                id: target.parentId,
-                columnIds,
-              },
-            ],
-          }),
+          updateTablesRequest([
+            {
+              id: target.parentId,
+              columnIds,
+            },
+          ]),
         );
       },
       [childColumnIds, operation.childIds, dispatch],

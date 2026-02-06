@@ -22,7 +22,6 @@ const ActionsButton = () => {
   const dispatch = useDispatch();
 
   const selectedTableIds = useSelector(selectSelectedTableIds);
-  // const focusedObjectId = useSelector(selectFocusedObjectId);
   const rootOperationId = useSelector(selectRootOperationId);
   const focusedObject = useSelector(selectFocusedObject);
 
@@ -93,20 +92,26 @@ const ActionsButton = () => {
         <ListItemIcon>
           <PackOperationIcon />
         </ListItemIcon>
-        <ListItemText>Pack tables</ListItemText>
+        <ListItemText>
+          Pack table{selectedTableIds.length !== 1 ? "s" : ""}
+        </ListItemText>
       </MenuItem>
       <MenuItem onClick={handleOnStackClick}>
         <ListItemIcon>
           <StackOperationIcon />
         </ListItemIcon>
-        <ListItemText>Stack tables</ListItemText>
+        <ListItemText>
+          Stack table{selectedTableIds.length !== 1 ? "s" : ""}
+        </ListItemText>
       </MenuItem>
       <Divider orientation="horizontal" />
       <MenuItem onClick={handleInsertClick}>
         <ListItemIcon>
           <StackOperationIcon />
         </ListItemIcon>
-        <ListItemText>Append tables</ListItemText>
+        <ListItemText>
+          Append table{selectedTableIds.length !== 1 ? "s" : ""}
+        </ListItemText>
       </MenuItem>
     </ButtonWithMenu>
   );

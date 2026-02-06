@@ -26,12 +26,18 @@ import { insertColumnsRequest } from "../../sagas/createColumnsSaga";
 import { setFocusedObjectId } from "../../slices/uiSlice";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import { selectHiddenColumnIdsByParentId } from "../../slices/columnsSlice/selectors";
+import {
+  selectAllOperationIds,
+  selectRootOperationId,
+} from "../../slices/operationsSlice";
 
 /**
  * @typedef {Object} TableDataProps
  * @property {string} id - The ID of the table
  * @property {string|null} parentId - The parent ID of the table, if any
  * @property {boolean} isInSchema - Whether the table is part of the current schema
+ * @property {boolean} isSelected - Whether the table is currently selected
+ * @property {boolean} isReadOnly - Whether the table is read-only (part of a non-root operation)
  * @property {string} source - The source of the table (e.g., file path, database)
  * @property {string} databaseName - The name of the database table
  * @property {string} name - The name of the table
@@ -69,7 +75,8 @@ export default function withTableData(WrappedComponent) {
 
     // Get table data from the Redux store
     const table = useSelector((state) => selectTablesById(state, id));
-    const allOperationIds = useSelector((state) => state.operations.allIds);
+    const allOperationIds = useSelector(selectAllOperationIds);
+    const rootOperationId = useSelector(selectRootOperationId);
 
     const operationIndex = allOperationIds.findIndex((opId) =>
       table ? opId === table.parentId : false,
@@ -94,6 +101,15 @@ export default function withTableData(WrappedComponent) {
     const isSelected = useMemo(
       () => selectedTableIds.includes(id),
       [selectedTableIds, id],
+    );
+
+    /**
+     * Whether the table is read-only (i.e., part of a non-root operation)
+     * @returns {boolean} True if the table is read-only, false otherwise
+     */
+    const isReadOnly = useMemo(
+      () => parentId !== null && parentId !== rootOperationId,
+      [parentId, rootOperationId],
     );
 
     /**
@@ -164,11 +180,7 @@ export default function withTableData(WrappedComponent) {
      */
     const setTableName = useCallback(
       (name) => {
-        dispatch(
-          updateTablesRequest({
-            tableUpdates: [{ id, name }],
-          }),
-        );
+        dispatch(updateTablesRequest([{ id, name }]));
       },
       [dispatch, id],
     );
@@ -257,14 +269,12 @@ export default function withTableData(WrappedComponent) {
         nextColumnIds[targetIndex] = source;
 
         dispatch(
-          updateTablesRequest({
-            tableUpdates: [
-              {
-                id,
-                columnIds: nextColumnIds,
-              },
-            ],
-          }),
+          updateTablesRequest([
+            {
+              id,
+              columnIds: nextColumnIds,
+            },
+          ]),
         );
       },
       [dispatch, columnIds, id],
@@ -322,6 +332,7 @@ export default function withTableData(WrappedComponent) {
         parentId={parentId}
         isInSchema={isInSchema}
         isSelected={isSelected}
+        isReadOnly={isReadOnly}
         source={source}
         databaseName={databaseName}
         name={name}

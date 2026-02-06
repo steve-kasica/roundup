@@ -40,12 +40,18 @@ import {
 } from "../../../slices/uiSlice";
 import { isTableId, selectTablesById } from "../../../slices/tablesSlice";
 import { deleteColumnsRequest } from "../../../sagas/deleteColumnsSaga/actions";
-import { selectOperationsById } from "../../../slices/operationsSlice";
+import {
+  isOperationId,
+  selectOperationsById,
+  selectRootOperationId,
+} from "../../../slices/operationsSlice";
 import { selectColumnIdsByParentId } from "../../../slices/columnsSlice";
 
 const DeleteColumnsButton = () => {
   const dispatch = useDispatch();
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const rootOperationId = useSelector(selectRootOperationId);
 
   const focusedObject = useSelector((state) => {
     const focusedObjectId = selectFocusedObjectId(state);
@@ -85,6 +91,18 @@ const DeleteColumnsButton = () => {
     }`;
   }, [selectedObjectColumns.length]);
 
+  const isDisabled = useMemo(
+    () =>
+      selectedObjectColumns.length === 0 ||
+      // Disabl is focused object is an non-root operation
+      (isOperationId(focusedObject?.id) &&
+        focusedObject.id !== rootOperationId) ||
+      // Disable is table's parent operation is a non-root operation
+      (isTableId(focusedObject?.id) &&
+        focusedObject.parentId !== rootOperationId),
+    [selectedObjectColumns.length, focusedObject, rootOperationId],
+  );
+
   const handleConfirm = () => {
     setDialogOpen(false);
     dispatch(deleteColumnsRequest(selectedObjectColumns));
@@ -99,7 +117,7 @@ const DeleteColumnsButton = () => {
       <TooltipIconButton
         tooltipText={tooltipText}
         onClick={() => setDialogOpen(true)}
-        disabled={selectedObjectColumns.length === 0}
+        disabled={isDisabled}
       >
         <DeleteForever />
       </TooltipIconButton>

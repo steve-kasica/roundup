@@ -46,6 +46,26 @@ describe("ChangeTableOrder component", () => {
         type: updateOperationsRequest.type,
       });
     });
+    describe("operation is read-only", () => {
+      beforeEach(() => {
+        cy.mountWithProviders(<ChangeTableOrder />, {
+          preloadedState: {
+            ...packState,
+            ui: {
+              ...packState.ui,
+              focusedObjectId: "op1", // Focus on the pack operation
+            },
+            operations: {
+              ...packState.operations,
+              rootOperationId: "op0", // Make op1 NOT the root operation (isReadOnly = true)
+            },
+          },
+        });
+      });
+      it("should be disabled", () => {
+        cy.get("button").should("be.disabled");
+      });
+    });
   });
 
   describe("Focused stack operation", () => {
@@ -57,8 +77,29 @@ describe("ChangeTableOrder component", () => {
     it("should display swap arrows icon vertically", () => {
       cy.get("svg").should("have.attr", "data-testid", "SwapVertIcon");
     });
+    // TODO: need a dialog for swapping stack operation order
     it("should be disabled", () => {
       cy.get("button").should("be.disabled");
+    });
+    describe("operation is read-only", () => {
+      beforeEach(() => {
+        cy.mountWithProviders(<ChangeTableOrder />, {
+          preloadedState: {
+            ...stackState,
+            ui: {
+              ...stackState.ui,
+              focusedObjectId: "op1", // Focus on the stack operation
+            },
+            operations: {
+              ...stackState.operations,
+              rootOperationId: "op0", // Make op1 NOT the root operation (isReadOnly = true)
+            },
+          },
+        });
+      });
+      it("should be disabled", () => {
+        cy.get("button").should("be.disabled");
+      });
     });
   });
 });

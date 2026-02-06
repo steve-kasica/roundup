@@ -76,6 +76,7 @@ import {
  *  - `isMaterialized` (boolean): Whether the operation is materialized
  *  - `isInSync` (boolean): Whether the operation is synchronized
  *  - `isLoading` (boolean): Whether this operation is currently loading
+ * - `isReadOnly` (boolean): Whether this operation is read-only (true if it's the root operation)
  *  - `materializeOperation` (function): Trigger a materialization request for this operation
  *
  * Column Data:
@@ -281,6 +282,11 @@ export default function withOperationData(WrappedComponent) {
       return selectLoadingOperations(state).includes(id);
     });
 
+    // Whether this operation is read-only, which is true if it's the root operation
+    // since we don't want to allow users to change the type of the root or add/remove
+    // columns from it (since it's meant to represent the source table)
+    const isReadOnly = useMemo(() => !isRootOperation, [isRootOperation]);
+
     // Column Data
     // -------------------------------------------------------------
 
@@ -464,6 +470,7 @@ export default function withOperationData(WrappedComponent) {
         isMaterialized={isMaterialized}
         isInSync={isInSync}
         isLoading={isLoading}
+        isReadOnly={isReadOnly}
         materializeOperation={materializeOperation}
         // Column Data
         columnIds={columnIds} // All column IDs associated with this operation

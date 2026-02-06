@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import {
   PackMatchToggleButtonGroup,
-  EnhancedPackMatchToggleButtonGroup,
+  default as EnhancedPackMatchToggleButtonGroup,
 } from "./PackMatchToggleButtonGroup";
 import { state } from "./fixtures";
 
@@ -207,6 +207,50 @@ describe("PackMatchToggleButtonGroup component", () => {
           },
         },
       });
+      cy.get("button").eq(2).should("be.disabled");
+    });
+  });
+  describe("focused operation is read-only", () => {
+    beforeEach(() => {
+      cy.mountWithProviders(<EnhancedPackMatchToggleButtonGroup />, {
+        preloadedState: {
+          ...state,
+          ui: {
+            ...state.ui,
+            focusedObjectId: "o1", // Focus on the pack operation
+          },
+          operations: {
+            ...state.operations,
+            rootOperationId: "o0", // Make o1 NOT the root operation (isReadOnly = true)
+            allIds: ["o0", "o1"],
+            byId: {
+              ...state.operations.byId,
+              o0: {
+                id: "o0",
+                operationType: "pack",
+                childIds: ["o1"],
+              },
+              o1: {
+                ...state.operations.byId["o1"],
+                parentId: "o0",
+                matchStats: {
+                  matches: 10,
+                  left_unmatched: 5,
+                  right_unmatched: 2,
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+    it("should be disable left unmatched button", () => {
+      cy.get("button").eq(0).should("be.disabled");
+    });
+    it("should be disable matches button", () => {
+      cy.get("button").eq(1).should("be.disabled");
+    });
+    it("should be disable right unmatched button", () => {
       cy.get("button").eq(2).should("be.disabled");
     });
   });
