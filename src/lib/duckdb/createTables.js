@@ -24,7 +24,7 @@ import { SUPPORTED_TYPES } from "./columnTypes";
 
 // Remove VARCHAR from auto type candidates b/c its the default
 const AUTO_TYPE_CANDIDATES = SUPPORTED_TYPES.filter(
-  (type) => type !== DUCKDB_TYPE_VARCHAR
+  (type) => type !== DUCKDB_TYPE_VARCHAR,
 );
 
 export async function createTables(tableName, fileName) {
@@ -32,11 +32,11 @@ export async function createTables(tableName, fileName) {
   const conn = await db.connect();
   const results = [];
 
-  // Create the table
+  // Create the table with all columns as VARCHAR
   await conn.query(
     `CREATE TABLE "${tableName}" AS 
     SELECT * FROM read_csv_auto('${fileName}', 
-    AUTO_TYPE_CANDIDATES=${JSON.stringify(AUTO_TYPE_CANDIDATES)});`
+    ALL_VARCHAR=true);`,
   );
 
   await conn.close();

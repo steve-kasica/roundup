@@ -24,3 +24,6 @@
 [submodule "example-workflows/times-data"]
 	path = example-workflows/times-data
 	url = git@github.com:steve-kasica/data-2.git
+[submodule "example-workflows/fivethirtyeight"]
+	path = example-workflows/fivethirtyeight
+	url = git@github.com:steve-kasica/538-data.git

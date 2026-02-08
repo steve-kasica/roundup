@@ -2,7 +2,7 @@
  * @fileoverview FileUpload Component
  *
  * A drag-and-drop file upload zone with progress tracking and validation. Supports
- * uploading CSV files with visual feedback for drag states, upload progress, and errors.
+ * uploading CSV or TSV files with visual feedback for drag states, upload progress, and errors.
  *
  * Features:
  * - Drag-and-drop interface with visual feedback
@@ -105,22 +105,14 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
 
   const validateFile = (file) => {
     const maxSize = 100 * 1024 * 1024; // 100MB
-    const allowedTypes = [
-      "text/csv",
-      // TODO: Enable these types when their parsing is supported
-      // "application/json",
-      // "text/plain",
-      // "application/vnd.ms-excel",
-      // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      // "text/tab-separated-values",
-    ];
+    const allowedTypes = ["text/csv", "text/tab-separated-values"];
 
     if (file.size > maxSize) {
       return `File ${file.name} is too large. Maximum size is 100MB.`;
     }
 
     if (acceptedTypes !== "*" && !allowedTypes.includes(file.type)) {
-      return `File ${file.name} has unsupported type. Supported types: CSV.`;
+      return `File ${file.name} has unsupported type. Supported types: CSV, TSV.`;
     }
 
     return null;
@@ -192,7 +184,7 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
         style={{ display: "none" }}
         id="file-upload-input"
         // TODO: support more types when their parsing is implemented
-        accept=".csv"
+        accept=".csv,.tsv"
         // accept=".csv,.json,.txt,.xls,.xlsx,.tsv"
       />
 
@@ -226,7 +218,7 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
               : "Drag & drop files here, or click to select"}
           </Typography>
           <Typography variant="data-secondary" color="text.secondary">
-            Supports CSV files (max 100MB each)
+            Supports CSV and TSV files (max 100MB each)
           </Typography>
         </FileUploadZone>
       ) : Object.keys(uploadProgress).length > 0 ? (
