@@ -15,13 +15,17 @@
  * @example
  * <LeftSideBar />
  */
-import React from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Box, Tabs, Tab, Chip } from "@mui/material";
 import { useSelector } from "react-redux";
 import SourceTables from "../../components/SourceTables";
 import OperationsList from "../../components/OperationsList";
-import { selectAllOperationIds } from "../../slices/operationsSlice";
-import { selectAllTablesData } from "../../slices/tablesSlice";
+import {
+  isOperationId,
+  selectAllOperationIds,
+} from "../../slices/operationsSlice";
+import { selectAllTableIds } from "../../slices/tablesSlice";
+import { selectFocusedObjectId } from "../../slices/uiSlice";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -55,27 +59,39 @@ function CustomTabPanel(props) {
 }
 
 const LeftSideBar = () => {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
 
   // condition to disable the Operations tab
   const operations = useSelector(selectAllOperationIds);
-  const disableOperations = operations.length === 0; // example condition
+  const focusedObjectId = useSelector(selectFocusedObjectId);
+  const tableIds = useSelector(selectAllTableIds);
 
-  const tables = useSelector(selectAllTablesData);
+  useEffect(() => {
+    // If the focused object is an operation, switch to the Operations tab
+    if (isOperationId(focusedObjectId)) {
+      setValue(1);
+    } else {
+      setValue(0);
+    }
+  }, [focusedObjectId]);
+
+  const isOperationTableDisabled = useMemo(() => {
+    return operations.length === 0;
+  }, [operations]);
 
   // prevent switching to a disabled tab
   const handleChange = (event, newValue) => {
     // block switching to Operations tab when disabled
-    if (newValue === 1 && disableOperations) return;
+    if (newValue === 1 && isOperationTableDisabled) return;
     setValue(newValue);
   };
 
   // if the tab becomes disabled while selected, fallback to the first tab
-  React.useEffect(() => {
-    if (disableOperations && value === 1) {
+  useEffect(() => {
+    if (isOperationTableDisabled && value === 1) {
       setValue(0);
     }
-  }, [disableOperations, value]);
+  }, [isOperationTableDisabled, value]);
 
   function a11yProps(index) {
     return {
@@ -97,8 +113,8 @@ const LeftSideBar = () => {
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 Source Tables
                 <Chip
-                  label={tables.length}
-                  disabled={tables.length === 0}
+                  label={tableIds.length}
+                  disabled={tableIds.length === 0}
                   size="small"
                 />
               </Box>
@@ -111,13 +127,13 @@ const LeftSideBar = () => {
                 Operations
                 <Chip
                   label={operations.length}
-                  disabled={operations.length === 0}
+                  disabled={isOperationTableDisabled}
                   size="small"
                 />
               </Box>
             }
             {...a11yProps(1)}
-            disabled={operations.length === 0}
+            disabled={isOperationTableDisabled}
           />
         </Tabs>
       </Box>
@@ -127,13 +143,13 @@ const LeftSideBar = () => {
           <CustomTabPanel value={value} index={0} className="SourceTablesPanel">
             <SourceTables />
           </CustomTabPanel>
-          {/* <CustomTabPanel
+          <CustomTabPanel
             value={value}
             index={1}
             className="OperationsListPanel"
-          > */}
-          <OperationsList />
-          {/* </CustomTabPanel> */}
+          >
+            <OperationsList />
+          </CustomTabPanel>
         </Box>
       </Box>
     </Box>

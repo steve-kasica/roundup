@@ -48,7 +48,7 @@ export const selectOperationsById = createSelector(
 export function selectAllOperationIds(state, includeNoOp = false) {
   if (!includeNoOp) {
     return state.operations.allIds.filter(
-      (id) => state.operations.byId[id].operationType !== OPERATION_TYPE_NO_OP,
+      (id) => state.operations.byId[id].operationType !== OPERATION_TYPE_NO_OP, // TODO: remove NO_OP type and this filter when all operations have meaningful types
     );
   } else {
     return state.operations.allIds;
