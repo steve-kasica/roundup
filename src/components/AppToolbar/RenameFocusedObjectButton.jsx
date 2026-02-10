@@ -1,11 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
 import { useCallback, useMemo } from "react";
-import { isTableId, updateTables } from "../../slices/tablesSlice";
-import { RenameObjectButton } from "../ui/buttons";
+import { isTableId } from "../../slices/tablesSlice";
+import { updateTablesRequest } from "../../sagas/updateTablesSaga";
+import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import FreeTextDialogButton from "../ui/buttons/FreeTextDialogButton";
+import { isOperationId } from "../../slices/operationsSlice";
 
-const RenameFocusedObjectButton = (props) => {
+const RenameFocusedObjectButton = () => {
   const dispatch = useDispatch();
   const focusedObjectId = useSelector(selectFocusedObjectId);
   // TODO: memoize selector
@@ -21,14 +23,27 @@ const RenameFocusedObjectButton = (props) => {
     (nextName) => {
       if (isTableId(focusedObjectId)) {
         dispatch(
-          updateTables({
-            id: focusedObjectId,
-            name: nextName,
-          })
+          updateTablesRequest([
+            {
+              id: focusedObjectId,
+              name: nextName,
+            },
+          ]),
         );
+      } else if (isOperationId(focusedObjectId)) {
+        dispatch(
+          updateOperationsRequest([
+            {
+              id: focusedObjectId,
+              name: nextName,
+            },
+          ]),
+        );
+      } else {
+        throw new Error(`Unexpected focused object id: ${focusedObjectId}`);
       }
     },
-    [dispatch, focusedObjectId]
+    [dispatch, focusedObjectId],
   );
 
   const objectType = useMemo(() => {

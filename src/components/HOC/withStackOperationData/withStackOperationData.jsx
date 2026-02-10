@@ -170,10 +170,20 @@ export default function withStackOperationData(WrappedComponent) {
       [operation.rowCount, rowRanges],
     );
 
+    // The display name of this operation
+    const name = useMemo(() => {
+      if (operation.name && operation.name.trim().length > 0) {
+        return operation.name;
+      } else {
+        return "Stack op.";
+      }
+    }, [operation.name]);
+
     return (
       <WrappedComponent
         id={id}
         // Metadata
+        name={name}
         operationType={OPERATION_TYPE_STACK}
         // Child columns
         columnIdMatrix={columnIdMatrix}

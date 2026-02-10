@@ -15,30 +15,32 @@ import {
 
 // Content component without MenuItem wrapper
 const ObjectMenuItemContent = ({
-  name,
   id,
+  name,
   rowCount,
   columnCount,
   operationType,
-}) => (
-  <Stack direction="row" alignItems="center" spacing={1}>
-    {operationType === OPERATION_TYPE_STACK ? (
-      <StackOperationIcon />
-    ) : operationType === OPERATION_TYPE_PACK ? (
-      <PackOperationIcon />
-    ) : (
-      <TableIcon />
-    )}
-    <Typography variant="data-secondary">
-      {name || id}&nbsp;
-      <small>
-        {isNaN(columnCount) ? "?" : <IntegerNumber value={columnCount} />}
-        &nbsp;x&nbsp;
-        {isNaN(rowCount) ? "?" : <IntegerNumber value={rowCount} />}
-      </small>
-    </Typography>
-  </Stack>
-);
+}) => {
+  return (
+    <Stack direction="row" alignItems="center" spacing={1}>
+      {operationType === OPERATION_TYPE_STACK ? (
+        <StackOperationIcon />
+      ) : operationType === OPERATION_TYPE_PACK ? (
+        <PackOperationIcon />
+      ) : (
+        <TableIcon />
+      )}
+      <Typography variant="data-secondary">
+        {name || id}&nbsp;
+        <small>
+          {isNaN(columnCount) ? "?" : <IntegerNumber value={columnCount} />}
+          &nbsp;x&nbsp;
+          {isNaN(rowCount) ? "?" : <IntegerNumber value={rowCount} />}
+        </small>
+      </Typography>
+    </Stack>
+  );
+};
 
 const EnhancedTableMenuItemContent = withTableData(ObjectMenuItemContent);
 const EnhancedPackMenuItemContent = withPackOperationData(

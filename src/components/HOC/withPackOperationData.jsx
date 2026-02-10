@@ -380,9 +380,19 @@ export default function withPackOperationData(WrappedComponent) {
       combinedChildColumnIds.length,
     ]);
 
+    // The display name of this operation
+    const name = useMemo(() => {
+      if (operation.name && operation.name.trim().length > 0) {
+        return operation.name;
+      } else {
+        return "Pack op.";
+      }
+    }, [operation.name]);
+
     return (
       <WrappedComponent
         id={id}
+        name={name}
         operationType={OPERATION_TYPE_PACK}
         // Pack-specific props
         joinPredicate={joinPredicate}
