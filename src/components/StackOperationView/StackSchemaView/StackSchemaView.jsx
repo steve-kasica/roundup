@@ -398,6 +398,9 @@ const StackSchemaView = ({
                                   data,
                                 )
                               }
+                              sx={{
+                                minHeight: 30,
+                              }}
                             />
                           </ColumnDragContainer>
                         </StyledTableCell>
