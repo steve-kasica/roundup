@@ -2,6 +2,7 @@ import { Select, ListSubheader, MenuItem } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectFocusedObjectId,
+  setFocusedColumnIds,
   setFocusedObjectId,
 } from "../../../slices/uiSlice";
 import {
@@ -17,12 +18,13 @@ const FocusedObjectSelect = () => {
 
   // Select all operation IDs (excluding NO_OP operations)
   const operationIds = useSelector((state) =>
-    selectAllOperationIds(state, false)
+    selectAllOperationIds(state, false),
   );
 
   const handleOnChange = (event) => {
     const selectedId = event.target.value;
     dispatch(setFocusedObjectId(selectedId));
+    dispatch(setFocusedColumnIds([])); // Clear focused column IDs when changing the focused object
   };
 
   return (
