@@ -94,11 +94,12 @@ const DeleteColumnsButton = () => {
   const isDisabled = useMemo(
     () =>
       selectedObjectColumns.length === 0 ||
-      // Disabl is focused object is an non-root operation
+      // disable if focused object is an non-root operation
       (isOperationId(focusedObject?.id) &&
         focusedObject.id !== rootOperationId) ||
       // Disable is table's parent operation is a non-root operation
       (isTableId(focusedObject?.id) &&
+        focusedObject.parentId &&
         focusedObject.parentId !== rootOperationId),
     [selectedObjectColumns.length, focusedObject, rootOperationId],
   );
