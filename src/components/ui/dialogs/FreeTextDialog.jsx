@@ -30,7 +30,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { DialogContentText, TextField } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const confirmText = "Confirm";
 const cancelText = "Cancel";
@@ -44,10 +44,26 @@ const FreeTextDialog = ({
   contentText = "",
 }) => {
   const [value, setValue] = useState("");
-  console.log("Rendering FreeTextDialog with title:", title);
+
+  const handleClose = useCallback(() => {
+    if (typeof onClose === "function") {
+      onClose();
+    }
+    setValue("");
+  }, [onClose]);
+
+  const handleConfirm = useCallback(
+    (event) => {
+      if (typeof onConfirm === "function") {
+        onConfirm(event, value);
+      }
+      handleClose();
+    },
+    [onConfirm, handleClose, value],
+  );
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{contentText}</DialogContentText>
@@ -61,10 +77,10 @@ const FreeTextDialog = ({
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              onConfirm(e, value);
-              setTimeout(() => onClose(), 100);
+              handleConfirm(e);
+              setTimeout(() => handleClose(), 100);
             } else if (e.key === "Escape") {
-              onClose();
+              handleClose();
             } else {
               // Prevent keyboard shortcuts from triggering buttons behind the dialog
               // See https://stackoverflow.com/a/56285545/3734991
@@ -74,9 +90,9 @@ const FreeTextDialog = ({
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{cancelText}</Button>
+        <Button onClick={handleClose}>{cancelText}</Button>
         <Button
-          onClick={(e) => onConfirm(e, value)}
+          onClick={handleConfirm}
           variant="contained"
           color="primary"
           disabled={!value.trim()}
