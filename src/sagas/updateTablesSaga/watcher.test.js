@@ -106,6 +106,28 @@ describe("updateTablesSagaWatcher", () => {
           .run();
       });
     });
+    describe("when the table has already been deleted", () => {
+      const action = deleteColumnsSuccess([state.columns.byId.c2]);
+      it("should not call updateTablesWorker", async () => {
+        await expectSaga(updateTablesSagaWatcher)
+          .withState({
+            ...state,
+            tables: {
+              ...state.tables,
+              byId: { ...state.tables.byId, t1: undefined },
+              allIds: state.tables.allIds.filter((id) => id !== "t1"),
+            },
+            columns: {
+              ...state.columns,
+              byId: { ...state.columns.byId, c2: undefined },
+              allIds: state.columns.allIds.filter((id) => id !== "c2"),
+            },
+          })
+          .not.call.fn(updateTablesWorker)
+          .dispatch(action)
+          .run();
+      });
+    });
   });
 
   describe("handling createOperationsSuccess actions", () => {

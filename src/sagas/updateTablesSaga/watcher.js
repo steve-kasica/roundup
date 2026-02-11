@@ -29,6 +29,7 @@ export default function* updateTablesSagaWatcher() {
   });
 
   // If a column is deleted, we need to delete it's ID from the parent table's columnIds array
+  // If that table still exists, deleteColumns saga does listen for deleteTablesSuccess actions.
   yield takeEvery(deleteColumnsSuccess.type, function* (action) {
     const deletedColumns = action.payload;
     const tableUpdates = [];
@@ -37,12 +38,17 @@ export default function* updateTablesSagaWatcher() {
 
     for (const [parentId, columns] of deletedColumnGroups) {
       if (isTableId(parentId)) {
-        tableUpdates.push({
-          id: parentId,
-          columnIds: (yield select(
-            (state) => selectTablesById(state, parentId).columnIds,
-          )).filter((id) => !columns.some((col) => col.id === id)),
-        });
+        const table = yield select((state) =>
+          selectTablesById(state, parentId),
+        );
+        if (table) {
+          tableUpdates.push({
+            id: parentId,
+            columnIds: (yield select(
+              (state) => selectTablesById(state, parentId).columnIds,
+            )).filter((id) => !columns.some((col) => col.id === id)),
+          });
+        }
       }
     }
     // delete columns may belong to operations
