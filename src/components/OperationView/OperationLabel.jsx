@@ -36,6 +36,7 @@ import StackOperationIcon from "../ui/icons/StackOperationIcon";
 import PackOperationIcon from "../ui/icons/PackOperationIcon";
 import withOperationData from "../HOC/withOperationData";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
+import { withPackOperationData, withStackOperationData } from "../HOC";
 
 /**
  * OperationLabel Component
@@ -108,8 +109,24 @@ const OperationLabel = ({
 
 OperationLabel.displayName = "Operation Label";
 
+const EnhancedPackOperationLabel = withPackOperationData(OperationLabel);
+
+EnhancedPackOperationLabel.displayName = "Enhanced Pack Operation Label";
+
+const EnhancedStackOperationLabel = withStackOperationData(OperationLabel);
+
+EnhancedStackOperationLabel.displayName = "Enhanced Stack Operation Label";
+
 const EnhancedOperationLabel = withAssociatedAlerts(
-  withOperationData(OperationLabel)
+  withOperationData(({ id, operationType }) => {
+    if (operationType === OPERATION_TYPE_PACK) {
+      return <EnhancedPackOperationLabel id={id} />;
+    } else if (operationType === OPERATION_TYPE_STACK) {
+      return <EnhancedStackOperationLabel id={id} />;
+    } else {
+      throw new Error(`Unsupported operation type: ${operationType}`);
+    }
+  }),
 );
 
 EnhancedOperationLabel.displayName = "Enhanced Operation Label";
