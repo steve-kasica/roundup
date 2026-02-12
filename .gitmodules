@@ -30,3 +30,6 @@
 [submodule "example-workflows/auditData"]
 	path = example-workflows/auditData
 	url = git@github.com:steve-kasica/auditData.git
+[submodule "example-workflows/demolitions"]
+	path = example-workflows/demolitions
+	url = git@github.com:statesman/demolitions.git
