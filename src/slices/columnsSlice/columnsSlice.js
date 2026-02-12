@@ -66,11 +66,12 @@ const columnsSlice = createSlice({
     deleteColumns(state, action) {
       const columnIdsToDelete = normalizeInputToArray(action.payload);
       columnIdsToDelete.forEach((id) => {
-        if (!state.byId[id]) {
-          throw new Error(`Column with id ${id} does not exist`);
+        // Skip columns that have already been deleted to avoid errors
+        // when cascade deletions trigger multiple cleanup attempts
+        if (state.byId[id]) {
+          delete state.byId[id];
+          state.allIds = state.allIds.filter((columnId) => columnId !== id);
         }
-        delete state.byId[id];
-        state.allIds = state.allIds.filter((columnId) => columnId !== id);
       });
     },
   },
