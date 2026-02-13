@@ -34,7 +34,10 @@ import { withTableData, withAssociatedAlerts } from "../HOC";
 import StyledTableRow from "./StyledTableRow";
 import BarChartCell from "./BarChartCell";
 import { IntegerNumber } from "../ui/text";
-import { selectTableSearchString } from "../../slices/uiSlice";
+import {
+  selectTableSearchString,
+  selectFocusedObjectId,
+} from "../../slices/uiSlice";
 import { useSelector } from "react-redux";
 import StyledTableCell from "./StyledTableCell";
 
@@ -72,6 +75,8 @@ const TableRowSummary = ({
   const clickTimeout = useState(null);
 
   const searchString = useSelector(selectTableSearchString);
+  const focusedObjectId = useSelector(selectFocusedObjectId);
+  const isFocused = focusedObjectId === id;
 
   const hasNameMatch = useMemo(() => {
     if (!searchString) return true;
@@ -115,6 +120,7 @@ const TableRowSummary = ({
       isDragging={false} // TODO
       isDisabled={isDisabled || (searchString.length > 0 && !hasNameMatch)}
       isSelected={isSelected}
+      isFocused={isFocused}
       isHovered={isHovered}
       data-tableid={id}
       data-selected={isSelected}
@@ -127,6 +133,7 @@ const TableRowSummary = ({
       <StyledTableCell
         sx={{
           border: "2px solid transparent",
+          backgroundColor: (theme) => theme.palette.background.paper,
         }}
       >
         <Box

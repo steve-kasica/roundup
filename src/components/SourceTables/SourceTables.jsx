@@ -63,6 +63,7 @@ import {
   addToSelectedTableIds,
   removeFromSelectedTableIds,
   selectSelectedTableIds,
+  setSelectedTableIds,
 } from "../../slices/uiSlice";
 // import SearchTablesInput from "./SearchTablesInput/SearchTablesInput";
 import {
@@ -156,7 +157,8 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
     (event, id) => {
       const currentIndex = sortedTables.map(({ id }) => id).indexOf(id);
       const isCurrentlySelected = selectedTableIds.includes(id);
-      // Ctrl/Cmd + click: Toggle individual selection
+
+      // Cmd/Ctrl + click: Toggle individual selection, preserve others
       if (event.ctrlKey || event.metaKey) {
         if (isCurrentlySelected) {
           dispatch(removeFromSelectedTableIds(id));
@@ -165,25 +167,23 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
         }
         setLastClickedIndex(currentIndex);
       }
-      // Shift + click: Select range
+      // Shift + click: Select contiguous range from anchor to current
       else if (event.shiftKey && lastClickedIndex !== null) {
         const start = Math.min(lastClickedIndex, currentIndex);
         const end = Math.max(lastClickedIndex, currentIndex);
         const rangeIds = sortedTables.map(({ id }) => id).slice(start, end + 1);
-        dispatch(
-          addToSelectedTableIds(
-            rangeIds.filter((tableId) => !selectedTableIds.includes(tableId)),
-          ),
-        );
+        dispatch(setSelectedTableIds(rangeIds));
+        // Keep anchor at the original position for subsequent shift-clicks
       }
-      // Simple click: Toggle single item
+      // Simple click: Clear selection if already selected, otherwise select only this item
       else {
         if (isCurrentlySelected) {
-          dispatch(removeFromSelectedTableIds(id));
+          dispatch(setSelectedTableIds([]));
+          setLastClickedIndex(null);
         } else {
-          dispatch(addToSelectedTableIds(id));
+          dispatch(setSelectedTableIds([id]));
+          setLastClickedIndex(currentIndex);
         }
-        setLastClickedIndex(currentIndex);
       }
     },
     [dispatch, lastClickedIndex, selectedTableIds, sortedTables],

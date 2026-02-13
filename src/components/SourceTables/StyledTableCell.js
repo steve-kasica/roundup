@@ -6,7 +6,7 @@ const StyledTableCell = styled(TableCell, {
 })(({ theme, isSelected, isPrevSelected, isNextSelected }) => ({
   padding: 0,
   border: "1px solid",
-  borderColor: theme.palette.grey[300],
+  borderColor: "inherit",
 }));
 
 export default StyledTableCell;
