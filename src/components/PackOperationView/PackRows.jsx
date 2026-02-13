@@ -70,6 +70,12 @@ const PackRows = ({
   const [sortByColumnId, setSortByColumnId] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
 
+  console.log("PackRows render", {
+    id,
+    selectedChildColumnIdsSet,
+    selectedMatches,
+  });
+
   const handleColumnSort = useCallback(
     (_event, columnId) => {
       let newDirection = "asc";
@@ -138,6 +144,13 @@ const PackRows = ({
     return filteredMatchStats;
   }, [matchStats, selectedMatches]);
 
+  console.log("PackRows", {
+    initialOffset,
+    rowLimit,
+    matchStats,
+    selectedMatches,
+  });
+
   const results = usePaginatedTableRows(
     id,
     displayColumnIds,
@@ -147,7 +160,9 @@ const PackRows = ({
     initialOffset,
     rowLimit,
   );
+
   const { data, loading, error, hasMore, loadMore, refresh } = results;
+  console.log("PackRows data", { data, loading, error, hasMore });
 
   const handleMaterializeView = useCallback(() => {
     materializeOperation();

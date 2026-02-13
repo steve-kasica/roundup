@@ -226,6 +226,14 @@ export function usePaginatedTableRows(
     ],
   );
 
+  // Fetch page 0 on mount and whenever fetchPage dependencies change
+  useEffect(() => {
+    setData([]);
+    setCurrentPage(0);
+    setHasMore(true);
+    fetchPage(0, true);
+  }, [fetchPage]);
+
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
       fetchPage(currentPage + 1, false);
