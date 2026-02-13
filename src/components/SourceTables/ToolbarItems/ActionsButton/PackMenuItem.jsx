@@ -6,7 +6,6 @@ import {
   selectSelectedTableIds,
 } from "../../../../slices/uiSlice";
 import { useMemo } from "react";
-import { isTableId } from "../../../../slices/tablesSlice";
 import { selectRootOperationId } from "../../../../slices/operationsSlice";
 
 const PackMenuItem = ({ onClick }) => {

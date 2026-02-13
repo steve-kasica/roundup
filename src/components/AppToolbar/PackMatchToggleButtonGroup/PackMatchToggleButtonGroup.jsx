@@ -35,22 +35,25 @@ import {
   withPackOperationData,
   withOperationData,
 } from "../../HOC";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectFocusedObjectId } from "../../../slices/uiSlice";
 import MatchToggleButton from "./MatchToggleButton";
 import { useCallback } from "react";
+import { updateOperationsRequest } from "../../../sagas/updateOperationsSaga";
 
 const PackMatchToggleButtonGroup = ({
   // Props passed via `withOperationData.jsx` HOC
   isReadOnly,
+  id,
+  isMaterialized,
   // Props passed via `withPackOperationData.jsx` HOC
   validMatchGroups,
   matchStats,
   matchKeys,
-  setJoinType,
   // Props passed via `withAssocitedAlerts.jsx` HOC
   errorCount = 0,
 }) => {
+  const dispatch = useDispatch();
   const isLeftUnmatchedDisabled =
     matchStats === undefined ||
     matchStats[MATCH_TYPE_LEFT_UNMATCHED] === 0 ||
@@ -96,9 +99,17 @@ const PackMatchToggleButtonGroup = ({
         }
       })(signature);
 
-      setJoinType(joinType);
+      dispatch(
+        updateOperationsRequest([
+          {
+            id,
+            joinType,
+            isInSync: isMaterialized ? false : true, // If the view is already materialized, changing the join type would make it out of sync. If it's not materialized, we can keep it in sync so that the new join type is reflected when it's materialized.
+          },
+        ]),
+      );
     },
-    [matchKeys, setJoinType],
+    [dispatch, id, isMaterialized, matchKeys],
   );
 
   return (

@@ -3,7 +3,18 @@ import { Box, lighten, styled } from "@mui/material";
 const StyledBlockCell = styled(Box, {
   shouldForwardProp: (prop) =>
     ![
-      "disabled",
+      // "isHovered",
+      // "isDragging",
+      // "isLoading",
+      // "isFocused",
+      // "isDropTarget",
+      // "isOver",
+      // "isVisible",
+      // "isNull",
+      // "isDraggable",
+      // "isError",
+      // "operationIndex",
+      "isDisabled",
       "isEmpty",
       "isSelected",
       "isLastLeftColumn",
@@ -15,60 +26,89 @@ const StyledBlockCell = styled(Box, {
       "backgroundColor",
       "operationIndex",
     ].includes(prop),
-})(({
-  theme,
-  disabled,
-  isEmpty,
-  isSelected,
-  isLastLeftColumn,
-  highlightTopBorder,
-  highlightBottomBorder,
-  highlightLeftBorder,
-  highlightRightBorder,
-  borderWidth = 1, // in pixels
-  tableBorderWidth = 2, // in pixels
-  defaultBorderColor = "rgba(0, 0, 255, 0.05)",
-  backgroundColor,
-  operationIndex = 0,
-}) => {
-  const selectedBorderColor = theme.palette.primary.main;
-
-  return {
+})(
+  ({
+    theme,
+    // isHovered,
+    // isDragging,
+    // isDropTarget,
+    isSelected,
+    isDisabled,
+    // isOver,
+    // isLoading,
+    // isVisible,
+    isNull,
+    // isFocused,
+    // isDraggable,
+    // isError,
+    // operationIndex,
+    isLoading,
+    operationIndex = 0,
+  }) => ({
     flex: 1,
     minWidth: 0,
     height: "100%",
-    backgroundColor: theme.palette.operationColors[operationIndex],
-    position: "relative",
-    marginRight: isLastLeftColumn ? tableBorderWidth : 0,
-    boxShadow: `
-      inset 0 ${borderWidth}px 0 0 ${
-        highlightTopBorder ? selectedBorderColor : defaultBorderColor
-      },
-      inset 0 -${borderWidth}px 0 0 ${
-        highlightBottomBorder ? selectedBorderColor : defaultBorderColor
-      },
-      inset ${borderWidth}px 0 0 0 ${
-        highlightLeftBorder ? selectedBorderColor : defaultBorderColor
-      },
-      inset -${isLastLeftColumn ? tableBorderWidth : borderWidth}px 0 0 0 ${
-        highlightRightBorder ? selectedBorderColor : defaultBorderColor
-      }
-      `,
-    transition: "box-shadow 0.2s ease, opacity 0.2s ease",
-    ...(isEmpty && {
-      backgroundColor: "transparent",
-    }),
-    ...(disabled && {
-      backgroundColor: theme.palette.grey[200],
-      cursor: "not-allowed",
-    }),
+    transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+    backgroundColor: lighten(
+      operationIndex !== null && operationIndex >= 0
+        ? theme.palette.operationColors[operationIndex]
+        : theme.palette.orphanedTableBackgroundColor,
+      theme.effects.defaultLighten,
+    ),
+    color: theme.palette.getContrastText(
+      operationIndex !== null && operationIndex >= 0
+        ? theme.palette.operationColors[operationIndex]
+        : theme.palette.orphanedTableBackgroundColor,
+    ),
     "&:hover": {
-      opacity: disabled ? 1 : 0.8,
+      backgroundColor: lighten(
+        operationIndex !== null && operationIndex >= 0
+          ? theme.palette.operationColors[operationIndex]
+          : theme.palette.orphanedTableBackgroundColor,
+        theme.effects.hoveredLighten,
+      ),
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
     },
+    // Column is selected state
     ...(isSelected && {
-      backgroundColor: lighten(theme.palette.primary.main, 0.85),
+      backgroundColor: lighten(
+        operationIndex !== null && operationIndex >= 0
+          ? theme.palette.operationColors[operationIndex]
+          : theme.palette.orphanedTableBackgroundColor,
+        theme.effects.selectedLighten,
+      ),
     }),
-  };
-});
+    ...(isLoading && {
+      animation: "pulse 1.5s ease-in-out infinite",
+      "@keyframes pulse": {
+        "0%, 100%": {
+          backgroundColor:
+            operationIndex !== null && operationIndex >= 0
+              ? theme.palette.operationColors[operationIndex]
+              : theme.palette.orphanedTableBackgroundColor,
+        },
+        "50%": {
+          backgroundColor: lighten(
+            operationIndex !== null && operationIndex >= 0
+              ? theme.palette.operationColors[operationIndex]
+              : theme.palette.orphanedTableBackgroundColor,
+            0.2,
+          ),
+        },
+      },
+    }),
+    ...(isNull && {
+      backgroundImage: `
+        repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0, 0, 0, 0.15) 3px, rgba(0, 0, 0, 0.15) 4px),
+        repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(0, 0, 0, 0.15) 3px, rgba(0, 0, 0, 0.15) 4px)`,
+      backgroundColor: theme.palette.grey[100],
+    }),
+    ...(isDisabled && {
+      cursor: "not-allowed",
+      backgroundColor: theme.palette.action.disabledBackground,
+      color: theme.palette.action.disabled,
+    }),
+  }),
+);
 
 export default StyledBlockCell;

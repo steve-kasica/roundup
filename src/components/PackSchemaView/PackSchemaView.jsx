@@ -634,91 +634,102 @@ const PackSchemaView = ({
                   let highlightLeftBorder = false;
                   let highlightRightBorder = false;
 
-                  // if (isClicked) {
-                  //   // Find the match type index for this row
-                  //   const currentMatchIndex = matchKeys.indexOf(key);
-                  //   const currentColIndex =
-                  //     combinedChildColumnIds.indexOf(columnId);
+                  if (isClicked) {
+                    const currentMatchIndex = matchKeys.indexOf(key);
+                    const currentColIndex =
+                      combinedChildColumnIds.indexOf(columnId);
 
-                  //   // Check cell above (previous match type)
-                  //   if (currentMatchIndex > 0) {
-                  //     const matchAbove = matchKeys[currentMatchIndex - 1];
-                  //     const cellKeyAbove = `${columnId}:${matchAbove}`;
-                  //     highlightTopBorder = !clickedBlockCells.has(cellKeyAbove);
-                  //   } else {
-                  //     highlightTopBorder = true; // First row
-                  //   }
+                    // Check cell above
+                    if (currentMatchIndex > 0) {
+                      const matchAbove = matchKeys[currentMatchIndex - 1];
+                      highlightTopBorder =
+                        !selectedMatches.includes(matchAbove);
+                    } else {
+                      highlightTopBorder = true;
+                    }
 
-                  //   // Check cell below (next match type)
-                  //   if (currentMatchIndex < matchKeys.length - 1) {
-                  //     const matchBelow = matchKeys[currentMatchIndex + 1];
-                  //     const cellKeyBelow = `${columnId}:${matchBelow}`;
-                  //     highlightBottomBorder =
-                  //       !clickedBlockCells.has(cellKeyBelow);
-                  //   } else {
-                  //     highlightBottomBorder = true; // Last row
-                  //   }
+                    // Check cell below
+                    if (currentMatchIndex < matchKeys.length - 1) {
+                      const matchBelow = matchKeys[currentMatchIndex + 1];
+                      highlightBottomBorder =
+                        !selectedMatches.includes(matchBelow);
+                    } else {
+                      highlightBottomBorder = true;
+                    }
 
-                  //   // Check cell to the left
-                  //   if (currentColIndex > 0) {
-                  //     const colLeft =
-                  //       combinedChildColumnIds[currentColIndex - 1];
-                  //     const cellKeyLeft = `${colLeft}:${key}`;
-                  //     highlightLeftBorder = !clickedBlockCells.has(cellKeyLeft);
-                  //   } else {
-                  //     highlightLeftBorder = true; // First column
-                  //   }
+                    // Check cell to the left
+                    if (currentColIndex > 0) {
+                      const colLeft =
+                        combinedChildColumnIds[currentColIndex - 1];
+                      highlightLeftBorder =
+                        !selectedChildColumnIdsSet.has(colLeft);
+                    } else {
+                      highlightLeftBorder = true;
+                    }
 
-                  //   // Check cell to the right
-                  //   if (currentColIndex < combinedChildColumnIds.length - 1) {
-                  //     const colRight =
-                  //       combinedChildColumnIds[currentColIndex + 1];
-                  //     const cellKeyRight = `${colRight}:${key}`;
-                  //     highlightRightBorder =
-                  //       !clickedBlockCells.has(cellKeyRight);
-                  //   } else {
-                  //     highlightRightBorder = true; // Last column
-                  //   }
-                  // }
-
-                  // const borderWidth = "2px";
-
-                  // Check if the cell to the right is also selected
-                  // const currentColIndex = combinedChildColumnIds.indexOf(columnId);
-                  // const hasRightNeighbor =
-                  //   currentColIndex < combinedChildColumnIds.length - 1;
-                  // const colRight = hasRightNeighbor
-                  //   ? combinedChildColumnIds[currentColIndex + 1]
-                  //   : null;
+                    // Check cell to the right
+                    if (currentColIndex < combinedChildColumnIds.length - 1) {
+                      const colRight =
+                        combinedChildColumnIds[currentColIndex + 1];
+                      highlightRightBorder =
+                        !selectedChildColumnIdsSet.has(colRight);
+                    } else {
+                      highlightRightBorder = true;
+                    }
+                  }
 
                   return (
-                    <StyledBlockCell
+                    <Box
                       key={columnId}
-                      operationIndex={
-                        isTableId(tableId) ? operationIndex : operationIndex - 1
-                      }
-                      disabled={isMatchDisabled}
-                      isEmpty={
-                        (key === MATCH_TYPE_LEFT_UNMATCHED &&
-                          j >= leftColumnIds.length) ||
-                        (key === MATCH_TYPE_RIGHT_UNMATCHED &&
-                          j < leftColumnIds.length)
-                      }
-                      isLastLeftColumn={isLastLeftColumn}
-                      highlightTopBorder={highlightTopBorder}
-                      highlightBottomBorder={highlightBottomBorder}
-                      highlightLeftBorder={highlightLeftBorder}
-                      highlightRightBorder={highlightRightBorder}
-                      backgroundColor={colorScale(depth)}
-                      tableBorderWidth={childTablesSeparatorWidth}
-                      defaultBorderColor={cellBorderColor}
-                      isSelected={isClicked}
-                      onClick={(event) => {
-                        if (!isMatchDisabled) {
-                          handleCellClick(event, columnId, key);
-                        }
+                      sx={{
+                        flex: 1,
+                        minWidth: 0,
+                        height: "100%",
+                        border: "1px solid white",
+                        marginRight: isLastLeftColumn
+                          ? `${childTablesSeparatorWidth}px`
+                          : 0,
+                        borderTopColor: highlightTopBorder ? "black" : "white",
+                        borderBottomColor: highlightBottomBorder
+                          ? "black"
+                          : "white",
+                        borderLeftColor: highlightLeftBorder
+                          ? "black"
+                          : "white",
+                        borderRightColor: highlightRightBorder
+                          ? "black"
+                          : "white",
                       }}
-                    />
+                    >
+                      <StyledBlockCell
+                        isSelected={isClicked}
+                        isDisabled={isMatchDisabled}
+                        isNull={
+                          (key === MATCH_TYPE_LEFT_UNMATCHED &&
+                            j >= leftColumnIds.length) ||
+                          (key === MATCH_TYPE_RIGHT_UNMATCHED &&
+                            j < leftColumnIds.length)
+                        }
+                        // isLastLeftColumn={isLastLeftColumn}
+                        // highlightTopBorder={highlightTopBorder}
+                        // highlightBottomBorder={highlightBottomBorder}
+                        // highlightLeftBorder={highlightLeftBorder}
+                        // highlightRightBorder={highlightRightBorder}
+                        // backgroundColor={colorScale(depth)}
+                        // tableBorderWidth={childTablesSeparatorWidth}
+                        // defaultBorderColor={cellBorderColor}
+                        onClick={(event) => {
+                          if (!isMatchDisabled) {
+                            handleCellClick(event, columnId, key);
+                          }
+                        }}
+                        operationIndex={
+                          isTableId(tableId)
+                            ? operationIndex
+                            : operationIndex - 1
+                        }
+                      />
+                    </Box>
                   );
                 })}
               </Box>
