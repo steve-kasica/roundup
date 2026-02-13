@@ -39,3 +39,6 @@
 [submodule "example-workflows/2015-11-refugees-in-the-united-states"]
 	path = example-workflows/2015-11-refugees-in-the-united-states
 	url = git@github.com:steve-kasica/2015-11-refugees-in-the-united-states.git
+[submodule "example-workflows/school-choice"]
+	path = example-workflows/school-choice
+	url = git@github.com:steve-kasica/school-choice.git

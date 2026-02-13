@@ -710,14 +710,6 @@ const PackSchemaView = ({
                           (key === MATCH_TYPE_RIGHT_UNMATCHED &&
                             j < leftColumnIds.length)
                         }
-                        // isLastLeftColumn={isLastLeftColumn}
-                        // highlightTopBorder={highlightTopBorder}
-                        // highlightBottomBorder={highlightBottomBorder}
-                        // highlightLeftBorder={highlightLeftBorder}
-                        // highlightRightBorder={highlightRightBorder}
-                        // backgroundColor={colorScale(depth)}
-                        // tableBorderWidth={childTablesSeparatorWidth}
-                        // defaultBorderColor={cellBorderColor}
                         onClick={(event) => {
                           if (!isMatchDisabled) {
                             handleCellClick(event, columnId, key);

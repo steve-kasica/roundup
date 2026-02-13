@@ -28,12 +28,9 @@ const DescriptionList = ({ data }) => {
           key={key}
           direction={"row"}
           spacing={2}
-          sx={{ mb: 1, justifyContent: "space-between", mb: 0.5 }}
+          sx={{ justifyContent: "space-between", mb: 0.5 }}
         >
-          <Typography
-            variant="label"
-            color="text.secondary"
-          >
+          <Typography variant="label" color="text.secondary">
             {key}
           </Typography>
           <Typography

@@ -25,7 +25,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
   },
   build: {
-    outDir: path.resolve(__dirname, "../../module"),
+    outDir: "./build",
     rollupOptions: {
       output: {
         entryFileNames: "open-roundup.js",

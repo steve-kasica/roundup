@@ -36,6 +36,7 @@ export async function createTables(tableName, fileName) {
   await conn.query(
     `CREATE TABLE "${tableName}" AS 
     SELECT * FROM read_csv_auto('${fileName}', 
+    HEADER=true,
     ALL_VARCHAR=true);`,
   );
 

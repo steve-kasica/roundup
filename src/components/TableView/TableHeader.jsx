@@ -67,7 +67,6 @@ const TableHeader = ({
             <EnhancedColumnName
               id={columnId}
               sx={{
-                width: columnWidth,
                 fontSize: "0.75rem",
                 fontWeight: "600",
                 cursor: "pointer",
