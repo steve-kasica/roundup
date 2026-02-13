@@ -11,7 +11,8 @@
     "test": "vitest",
     "test:cy": "cypress run --component",
     "test:cy:open": "cypress open --component",
-    "project-stats": "bash ./bin/project-stats.sh"
+    "project-stats": "bash ./bin/project-stats.sh",
+    "deploy": "bash ./bin/deploy.sh"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.29.1-dev132.0",
