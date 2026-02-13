@@ -16,9 +16,22 @@
 import path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import { createHtmlPlugin } from "vite-plugin-html";
+import pkg from "./package.json";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    createHtmlPlugin({
+      inject: {
+        data: {
+          name: pkg.name,
+          version: pkg.version,
+          title: pkg.name.charAt(0).toUpperCase() + pkg.name.slice(1),
+        },
+      },
+    }),
+  ],
   test: {
     environment: "jsdom",
     globals: true,
