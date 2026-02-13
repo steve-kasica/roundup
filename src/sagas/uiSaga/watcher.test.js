@@ -35,7 +35,7 @@ describe("UiSaga watcher", () => {
     });
   });
 
-  describe("Handling deleteTablesRequest actions", () => {
+  describe("Handling deleteTablesSuccess actions", () => {
     const action = deleteTablesSuccess([
       {
         id: "t1",
@@ -45,6 +45,11 @@ describe("UiSaga watcher", () => {
 
     it("should dispatch action to remove deleted tables from selectedTableIds", () => {
       return expectSaga(uiSaga)
+        .withState({
+          ui: {
+            focusedObjectId: null,
+          },
+        })
         .put(removeFromSelectedTableIds(["t1", "t2"]))
         .dispatch(action)
         .run();

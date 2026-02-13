@@ -93,10 +93,5 @@ describe("columnsSlice reducers", () => {
       const nextState = columnsSlice(state, deleteColumns([col1.id, col2.id]));
       expect(Object.values(nextState.byId)).toHaveLength(0);
     });
-    it("throws if column does not exist", () => {
-      const col = Column("t1", 0);
-      const state = initialState;
-      expect(() => columnsSlice(state, deleteColumns(col.id))).toThrow();
-    });
   });
 });

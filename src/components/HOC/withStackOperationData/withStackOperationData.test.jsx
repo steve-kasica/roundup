@@ -1,7 +1,5 @@
 import withStackOperationData from "./withStackOperationData";
-import babyNamePolitics from "../../../../example-workflows/babyname_politics/initialState";
-import crimeAndHeat from "../../../../example-workflows/2018-05-31-crime-and-heat-analysis/initialState";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
@@ -63,7 +61,7 @@ function renderWithStackOperationData(state, operationId) {
   render(
     <Provider store={store}>
       <WrappedComponent id={operationId} />
-    </Provider>
+    </Provider>,
   );
 
   return capturedProps;
@@ -602,32 +600,6 @@ describe("withStackOperationData HOC", () => {
         // rowCount should be max end value = 249
         expect(props.rowCount).toBe(249);
       });
-    });
-  });
-
-  describe("using imported example workflow data", () => {
-    it("can work with babyNamePolitics state structure", () => {
-      // Use the imported babyNamePolitics data to verify state structure compatibility
-      expect(babyNamePolitics).toHaveProperty("tables");
-      expect(babyNamePolitics).toHaveProperty("columns");
-      expect(babyNamePolitics.tables).toHaveProperty("byId");
-      expect(babyNamePolitics.tables).toHaveProperty("allIds");
-    });
-
-    it("can work with crimeAndHeat state structure", () => {
-      // Use the imported crimeAndHeat data to verify state structure compatibility
-      expect(crimeAndHeat).toHaveProperty("tables");
-      expect(crimeAndHeat).toHaveProperty("columns");
-      expect(crimeAndHeat.tables).toHaveProperty("byId");
-      expect(crimeAndHeat.tables).toHaveProperty("allIds");
-
-      // Verify tables exist with expected properties
-      const tableIds = crimeAndHeat.tables.allIds;
-      expect(tableIds.length).toBeGreaterThan(0);
-
-      const firstTable = crimeAndHeat.tables.byId[tableIds[0]];
-      expect(firstTable).toHaveProperty("columnIds");
-      expect(firstTable).toHaveProperty("rowCount");
     });
   });
 });

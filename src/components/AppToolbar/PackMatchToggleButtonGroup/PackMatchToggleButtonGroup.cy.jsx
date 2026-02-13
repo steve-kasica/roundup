@@ -1,24 +1,13 @@
 /* eslint-disable no-undef */
-import {
-  PackMatchToggleButtonGroup,
-  default as EnhancedPackMatchToggleButtonGroup,
-} from "./PackMatchToggleButtonGroup";
+import { default as EnhancedPackMatchToggleButtonGroup } from "./PackMatchToggleButtonGroup";
 import { state } from "./fixtures";
 
 describe("PackMatchToggleButtonGroup component", () => {
   describe("Basic functionality", () => {
     beforeEach(() => {
-      cy.mount(
-        <PackMatchToggleButtonGroup
-          validMatchGroups={[]}
-          matchStats={{
-            left_unmatched: 5,
-            matched: 10,
-            right_unmatched: 2,
-          }}
-          errorCount={0}
-        />,
-      );
+      cy.mountWithProviders(<EnhancedPackMatchToggleButtonGroup />, {
+        preloadedState: state,
+      });
     });
     it("renders three buttons for match groups", () => {
       cy.get("button").should("have.length", 3);

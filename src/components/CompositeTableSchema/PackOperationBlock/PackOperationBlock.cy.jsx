@@ -16,7 +16,67 @@ import {
   OPERATION_TYPE_STACK,
 } from "../../../slices/operationsSlice";
 import { PackOperationBlock } from "./PackOperationBlock";
-import crimeAndHeat from "../../../../example-workflows/2018-05-31-crime-and-heat-analysis/initialState";
+
+// Mock state data
+const mockTables = {
+  allIds: ["t1", "t2", "t3"],
+  byId: {
+    t1: {
+      id: "t1",
+      name: "Table 1",
+      columnIds: ["c1", "c2", "c3"],
+      rowCount: 100,
+      parentId: null,
+    },
+    t2: {
+      id: "t2",
+      name: "Table 2",
+      columnIds: Array.from({ length: 21 }, (_, i) => `c${i + 100}`), // 21 columns
+      rowCount: 150,
+      parentId: null,
+    },
+    t3: {
+      id: "t3",
+      name: "Table 3",
+      columnIds: ["c200", "c201", "c202", "c203"], // 4 columns
+      rowCount: 200,
+      parentId: null,
+    },
+  },
+};
+
+// Create mock columns for all table columns
+const createMockColumns = (tables) => {
+  const allIds = [];
+  const byId = {};
+
+  Object.values(tables.byId).forEach((table) => {
+    table.columnIds.forEach((columnId, index) => {
+      allIds.push(columnId);
+      byId[columnId] = {
+        id: columnId,
+        name: `Column ${columnId}`,
+        databaseName: `col_${columnId}`,
+        parentId: table.id,
+        type: "TEXT",
+      };
+    });
+  });
+
+  return { allIds, byId };
+};
+
+const mockColumns = createMockColumns(mockTables);
+
+const mockUi = {
+  focusedObjectId: null,
+  hoveredColumnIds: [],
+  selectedColumnIds: [],
+  draggingColumnId: null,
+  dropTargetColumnId: null,
+  focusedColumnIds: [],
+  visibleColumnIds: [],
+};
 
 describe("PackOperationBlock Component", () => {
   let state;
@@ -31,34 +91,54 @@ describe("PackOperationBlock Component", () => {
         columnIds: Array.from(
           {
             length:
-              crimeAndHeat.tables.byId["t2"].columnIds.length +
-              crimeAndHeat.tables.byId["t3"].columnIds.length,
+              mockTables.byId["t2"].columnIds.length +
+              mockTables.byId["t3"].columnIds.length,
           },
-          (_, i) => `c${i + 1000}` // dummy column IDs
+          (_, i) => `c${i + 1000}`, // dummy column IDs
         ),
         rowCount: Math.max(
-          crimeAndHeat.tables.byId["t2"].rowCount,
-          crimeAndHeat.tables.byId["t3"].rowCount
+          mockTables.byId["t2"].rowCount,
+          mockTables.byId["t3"].rowCount,
         ),
       });
 
       // Update tables to have correct parentId
       const tables = {
-        ...crimeAndHeat.tables,
+        ...mockTables,
         byId: {
-          ...crimeAndHeat.tables.byId,
+          ...mockTables.byId,
           t2: {
-            ...crimeAndHeat.tables.byId.t2,
+            ...mockTables.byId.t2,
             parentId: packOperation.id,
           },
           t3: {
-            ...crimeAndHeat.tables.byId.t3,
+            ...mockTables.byId.t3,
             parentId: packOperation.id,
           },
         },
       };
+
+      // Create columns for the pack operation
+      const packColumns = {};
+      packOperation.columnIds.forEach((columnId, index) => {
+        packColumns[columnId] = {
+          id: columnId,
+          name: `Pack Column ${index}`,
+          databaseName: `pack_col_${index}`,
+          parentId: packOperation.id,
+          type: "TEXT",
+        };
+      });
+
       state = {
-        columns: crimeAndHeat.columns,
+        columns: {
+          ...mockColumns,
+          allIds: [...mockColumns.allIds, ...packOperation.columnIds],
+          byId: {
+            ...mockColumns.byId,
+            ...packColumns,
+          },
+        },
         tables,
         operations: {
           byId: {
@@ -67,7 +147,7 @@ describe("PackOperationBlock Component", () => {
           allIds: [packOperation.id],
           rootOperationId: packOperation.id,
         },
-        ui: crimeAndHeat.ui,
+        ui: mockUi,
       };
 
       cy.mountWithProviders(
@@ -95,7 +175,7 @@ describe("PackOperationBlock Component", () => {
         </div>,
         {
           preloadedState: state,
-        }
+        },
       );
     });
     it("should render the PackOperationBlock container", () => {
@@ -179,37 +259,75 @@ describe("PackOperationBlock Component", () => {
         childIds: ["t1", "t2"],
         columnIds: Array.from({ length: 3 }, (_, i) => `c${i + 2000}`), // dummy column IDs
         rowCount:
-          crimeAndHeat.tables.byId["t1"].rowCount +
-          crimeAndHeat.tables.byId["t2"].rowCount,
+          mockTables.byId["t1"].rowCount + mockTables.byId["t2"].rowCount,
       });
       packOperation = Operation({
         operationType: OPERATION_TYPE_PACK,
         childIds: [stackOperation.id, "t3"],
-        columnIds: Array.from({
-          length:
-            stackOperation.columnIds.length +
-            crimeAndHeat.tables.byId["t3"].columnIds.length,
-        }),
+        columnIds: Array.from(
+          {
+            length:
+              stackOperation.columnIds.length +
+              mockTables.byId["t3"].columnIds.length,
+          },
+          (_, i) => `c${i + 3000}`,
+        ),
+      });
+
+      // Create columns for the stack operation
+      const stackColumns = {};
+      stackOperation.columnIds.forEach((columnId, index) => {
+        stackColumns[columnId] = {
+          id: columnId,
+          name: `Stack Column ${index}`,
+          databaseName: `stack_col_${index}`,
+          parentId: stackOperation.id,
+          type: "TEXT",
+        };
+      });
+
+      // Create columns for the pack operation
+      const packColumns = {};
+      packOperation.columnIds.forEach((columnId, index) => {
+        packColumns[columnId] = {
+          id: columnId,
+          name: `Pack Column ${index}`,
+          databaseName: `pack_col_${index}`,
+          parentId: packOperation.id,
+          type: "TEXT",
+        };
       });
 
       // Create state and mount component before each test
       state = {
-        ...crimeAndHeat,
+        columns: {
+          ...mockColumns,
+          allIds: [
+            ...mockColumns.allIds,
+            ...stackOperation.columnIds,
+            ...packOperation.columnIds,
+          ],
+          byId: {
+            ...mockColumns.byId,
+            ...stackColumns,
+            ...packColumns,
+          },
+        },
         tables: {
-          ...crimeAndHeat.tables,
+          ...mockTables,
           byId: {
             t1: {
-              ...crimeAndHeat.tables.byId.t1,
+              ...mockTables.byId.t1,
               parentId: stackOperation.id,
-              columnIds: crimeAndHeat.tables.byId["t1"].columnIds.slice(0, 3),
+              columnIds: mockTables.byId["t1"].columnIds.slice(0, 3),
             },
             t2: {
-              ...crimeAndHeat.tables.byId.t2,
+              ...mockTables.byId.t2,
               parentId: stackOperation.id,
-              columnIds: crimeAndHeat.tables.byId["t2"].columnIds.slice(0, 3),
+              columnIds: mockTables.byId["t2"].columnIds.slice(0, 3),
             },
             t3: {
-              ...crimeAndHeat.tables.byId.t3,
+              ...mockTables.byId.t3,
               parentId: packOperation.id,
             },
           },
@@ -222,6 +340,7 @@ describe("PackOperationBlock Component", () => {
           allIds: [stackOperation.id, packOperation.id],
           rootOperationId: packOperation.id,
         },
+        ui: mockUi,
       };
 
       cy.mountWithProviders(
@@ -249,7 +368,7 @@ describe("PackOperationBlock Component", () => {
         </div>,
         {
           preloadedState: state,
-        }
+        },
       );
     });
 
