@@ -46,8 +46,6 @@ export default function SchemaWindow() {
     isFocusedTable ? null : selectOperationsById(state, focusedObjectId),
   );
 
-  console.log("Rendering SchemaWindow with focusedObjectId:", focusedObjectId);
-
   return (
     <>
       <Box
@@ -106,20 +104,7 @@ export default function SchemaWindow() {
           }}
         >
           <Box display={"flex"} flexDirection={"column"} mt={2}>
-            <Alert severity="error">
-              Unsupported operation type: {focusedOperation?.operationType}
-              <Typography>Debug info:</Typography>
-              <pre>
-                {JSON.stringify(
-                  {
-                    focusedObjectId: focusedObjectId || null,
-                    focusedOperation: focusedOperation || null,
-                  },
-                  null,
-                  2,
-                )}
-              </pre>
-            </Alert>
+            <Alert severity="error">Focus on an object to see details</Alert>
           </Box>
         </Box>
       )}

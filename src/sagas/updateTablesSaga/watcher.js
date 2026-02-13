@@ -86,12 +86,28 @@ export default function* updateTablesSagaWatcher() {
 
     for (const [parentId, columns] of columnsByParent) {
       if (isTableId(parentId)) {
-        workerPayload.push({
-          id: parentId,
-          columnIds: columns
-            .sort((a, b) => ascending(a.index, b.index))
-            .map((col) => col.id),
-        });
+        const table = yield select((state) =>
+          selectTablesById(state, parentId),
+        );
+        if (table.columnIds.every((id) => id === null)) {
+          // We are initializing columns for a table, so we can just set columnIds to the new columns
+          workerPayload.push({
+            id: parentId,
+            columnIds: columns
+              .sort((a, b) => ascending(a.index, b.index))
+              .map((col) => col.id),
+          });
+        } else if (columns.length === 1) {
+          // We are inserting new columns into an existing table, so we need to add the new columns to the existing columnIds array
+          workerPayload.push({
+            id: parentId,
+            columnIds: [...table.columnIds].toSpliced(
+              columns[0].index,
+              0,
+              columns[0].id,
+            ),
+          });
+        }
       }
     }
     if (workerPayload.length > 0) {

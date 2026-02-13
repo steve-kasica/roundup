@@ -19,7 +19,6 @@
  *     one: { label: "one column", count: 20, firstIndex: 80 }
  *   }}
  *   valueCount={100}
- *   scrollToDegree={(index) => console.log(index)}
  *   loading={false}
  * />
  */
@@ -187,7 +186,7 @@ const ParentValueSpread = ({
               </Box>
               {/* <span sx={{ color: "#888" }}>({count})</span> */}
             </Box>
-          )
+          ),
         )}
       </Box>
     </Box>

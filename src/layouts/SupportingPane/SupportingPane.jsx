@@ -220,7 +220,6 @@ export default function SupportingPane() {
                   id="column-window-panel"
                   order={3}
                   collapsible={true}
-                  collapsed={!(focusedColumnIds && focusedColumnIds.length > 0)}
                   maxSize={50}
                   defaultSize={25}
                   style={{ padding: "5px" }}

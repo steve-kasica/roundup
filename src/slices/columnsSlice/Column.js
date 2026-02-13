@@ -107,6 +107,7 @@ function Column({
   p75 = null,
   std = null,
   topValues = null,
+  index = -1,
 } = {}) {
   const id = `c${++idCounter}`;
   const output = {};
@@ -129,6 +130,7 @@ function Column({
     p50,
     p75,
     std,
+    index,
     ...output,
   };
 }

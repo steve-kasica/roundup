@@ -116,15 +116,6 @@ export function useColumnKeyRankData(
         !leftColumnsDatabaseNames.length ||
         !rightColumnsDatabaseNames.length
       ) {
-        console.log(
-          "useColumnKeyRankData: missing dependencies, skipping fetch",
-          {
-            leftTableDatabaseName,
-            rightTableDatabaseName,
-            leftColumnsDatabaseNames,
-            rightColumnsDatabaseNames,
-          },
-        );
         return;
       }
 

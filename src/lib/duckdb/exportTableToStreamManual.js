@@ -17,7 +17,6 @@
  * @example
  * await exportTableToStreamManual('my_table', 'export.csv', {
  *   chunkSize: 1000,
- *   onProgress: (current, total) => console.log(`${current}/${total}`),
  *   delimiter: ',',
  *   includeHeaders: true
  * });

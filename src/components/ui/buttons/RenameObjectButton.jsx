@@ -45,10 +45,10 @@ const RenameObjectButton = ({
     (objectType === OBJECT_TYPE_TABLE
       ? "Table"
       : objectType === OBJECT_TYPE_PACK || objectType === OBJECT_TYPE_STACK
-      ? "Operation"
-      : objectType === OBJECT_TYPE_COLUMN
-      ? "Column"
-      : "Object");
+        ? "Operation"
+        : objectType === OBJECT_TYPE_COLUMN
+          ? "Column"
+          : "Object");
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const openDialog = useCallback(() => {
@@ -56,7 +56,6 @@ const RenameObjectButton = ({
   }, []);
 
   const handleClose = useCallback(() => {
-    console.log("Closing rename dialog");
     setDialogOpen(false);
   }, []);
 
@@ -68,7 +67,7 @@ const RenameObjectButton = ({
       }
       setDialogOpen(false);
     },
-    [onConfirm]
+    [onConfirm],
   );
 
   return (

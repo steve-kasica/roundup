@@ -31,8 +31,12 @@ export default function* uiSaga() {
   // When tables are deleted, make just their IDs no longer selected
   yield takeEvery(deleteTablesSuccess.type, function* (action) {
     const tables = action.payload;
+    const focusedObjectId = yield select(selectFocusedObjectId);
     const tableIds = tables.map(({ id }) => id);
     yield put(removeFromSelectedTableIds(tableIds));
+    if (tableIds.includes(focusedObjectId)) {
+      yield put(setFocusedObjectId(null));
+    }
   });
 
   yield takeEvery(deleteOperationsSuccess.type, function* (action) {

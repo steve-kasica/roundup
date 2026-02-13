@@ -49,6 +49,17 @@ describe("UiSaga watcher", () => {
         .dispatch(action)
         .run();
     });
+    it("should clear focused object ID if it was a deleted table", () => {
+      return expectSaga(uiSaga)
+        .withState({
+          ui: {
+            focusedObjectId: "t1",
+          },
+        })
+        .put(setFocusedObjectId(null))
+        .dispatch(action)
+        .run();
+    });
   });
 
   describe("Handling deleteOperationsSuccess actions", () => {

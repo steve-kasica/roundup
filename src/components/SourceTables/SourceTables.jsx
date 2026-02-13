@@ -360,7 +360,6 @@ function SortIcon({ attr, isSort, attrType, isAscending }) {
       label: "Add to selection",
       isDisabled: isSelected || isDisabled || isInSchema,
       onClick: (event) => {
-        console.log("Adding to selection (TODO)");
         handleMenuClose(event);
       },
     },

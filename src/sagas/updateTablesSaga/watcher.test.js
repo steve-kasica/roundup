@@ -204,8 +204,30 @@ describe("updateTablesSagaWatcher", () => {
       state.columns.byId.c1,
       state.columns.byId.c2,
     ]);
-    it("should call updateTablesWorker with action payload if columns belong to a table", async () => {
+    it("should not call updateTablesWorker with action payload if columns belong to an operation", async () => {
       await expectSaga(updateTablesSagaWatcher)
+        .withState({ ...state })
+        .provide([[matchers.call.fn(updateTablesWorker), undefined]])
+        .not.call(updateTablesWorker, [
+          {
+            id: "o1",
+            columnIds: ["c1", "c2"],
+          },
+        ])
+        .dispatch(action)
+        .run();
+    });
+    it("should call updateTablesWork with the entire action payload if `table.columnIds` is empty", async () => {
+      await expectSaga(updateTablesSagaWatcher)
+        .withState({
+          ...state,
+          tables: {
+            byId: {
+              ...state.tables.byId,
+              t1: { ...state.tables.byId.t1, columnIds: [null, null] },
+            },
+          },
+        })
         .provide([[matchers.call.fn(updateTablesWorker), undefined]])
         .call(updateTablesWorker, [
           {
@@ -216,13 +238,32 @@ describe("updateTablesSagaWatcher", () => {
         .dispatch(action)
         .run();
     });
-    it("should not call updateTablesWorker with action payload if columns belong to an operation", async () => {
+    it("should call updateTablesWorker with a modified columnIds array when a new column is inserted into an existing table", async () => {
+      const action = createColumnsSuccess([
+        { id: "c7", parentId: "t1", index: 2, name: "Column 7" },
+      ]);
       await expectSaga(updateTablesSagaWatcher)
+        .withState({
+          tables: {
+            byId: {
+              t1: { id: "t1", name: "Table 1", columnIds: ["c1", "c2", "c3"] },
+            },
+            allIds: ["t1"],
+          },
+          columns: {
+            byId: {
+              c1: { id: "c1", parentId: "t1", index: 0, name: "Column 1" },
+              c2: { id: "c2", parentId: "t1", index: 1, name: "Column 2" },
+              c3: { id: "c3", parentId: "t1", index: 2, name: "Column 3" },
+            },
+            allIds: ["c1", "c2", "c3"],
+          },
+        })
         .provide([[matchers.call.fn(updateTablesWorker), undefined]])
-        .not.call(updateTablesWorker, [
+        .call(updateTablesWorker, [
           {
-            id: "o1",
-            columnIds: ["c1", "c2"],
+            id: "t1",
+            columnIds: ["c1", "c2", "c7", "c3"],
           },
         ])
         .dispatch(action)

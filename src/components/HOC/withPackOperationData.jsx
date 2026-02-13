@@ -192,8 +192,6 @@ export default function withPackOperationData(WrappedComponent) {
       selectColumnIdsByParentId(state, rightTableId),
     );
 
-    console.log("rightColumnIds:", rightColumnIds);
-
     /**
      * Right table column count for this pack operation
      * @returns {number} rightColumnCount - The number of columns in the right child table.

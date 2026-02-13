@@ -69,7 +69,7 @@ const StackSchemaToolbar = ({
 }) => {
   const isSelectionEmpty = useMemo(
     () => selectedChildColumnIdsSet.size === 0,
-    [selectedChildColumnIdsSet]
+    [selectedChildColumnIdsSet],
   );
 
   const isCompleteColumnSelected = useCallback(() => {
@@ -80,7 +80,7 @@ const StackSchemaToolbar = ({
         .filter((id) => id !== null);
 
       const allSelected = columnIds.every((id) =>
-        selectedChildColumnIdsSet.has(id)
+        selectedChildColumnIdsSet.has(id),
       );
 
       if (allSelected && columnIds.length > 0) {
@@ -91,7 +91,6 @@ const StackSchemaToolbar = ({
   }, [columnIdMatrix, m, selectedChildColumnIdsSet]);
 
   const handleFocusColumns = useCallback(() => {
-    console.log("Focusing columns:", selectedChildColumnIdsSet);
     focusColumns(Array.from(selectedChildColumnIdsSet));
   }, [focusColumns, selectedChildColumnIdsSet]);
 
@@ -110,7 +109,7 @@ const StackSchemaToolbar = ({
 
   const handleRenameConfirm = useCallback(
     (newName) => setOperationName(newName),
-    [setOperationName]
+    [setOperationName],
   );
 
   return (
@@ -137,7 +136,7 @@ const StackSchemaToolbar = ({
 StackSchemaToolbar.displayName = "Stack Schema Toolbar";
 
 const EnhancedStackSchemaToolbar = withOperationData(
-  withStackOperationData(StackSchemaToolbar)
+  withStackOperationData(StackSchemaToolbar),
 );
 
 EnhancedStackSchemaToolbar.displayName = "Enhanced Stack Schema Toolbar";

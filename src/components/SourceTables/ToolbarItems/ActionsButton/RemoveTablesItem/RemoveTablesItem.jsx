@@ -2,7 +2,9 @@ import { Remove } from "@mui/icons-material";
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 
 const RemoveTablesItem = () => {
-  const handleClick = () => console.log("Remove Tables button clicked");
+  const handleClick = () => {
+    // todo: implement remove tables from operation logic
+  };
   return (
     <MenuItem onClick={handleClick}>
       <ListItemIcon>

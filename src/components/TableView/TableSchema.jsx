@@ -264,7 +264,9 @@ const TableSchema = ({
                 fillValue,
               )
             }
-            onHideColumn={() => console.log("TODO: hide column")}
+            onHideColumn={() => {
+              // TODO
+            }}
           />
         )}
       </Menu>

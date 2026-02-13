@@ -7,16 +7,18 @@ import {
   selectSelectedTableIds,
 } from "../../../../slices/uiSlice";
 
-import { Divider, ListItemIcon, ListItemText, MenuItem } from "@mui/material";
+import { Divider } from "@mui/material";
 import {
   isOperationId,
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
   selectRootOperationId,
 } from "../../../../slices/operationsSlice";
-import { PackOperationIcon, StackOperationIcon } from "../../../ui/icons";
 import { createOperationsRequest } from "../../../../sagas/createOperationsSaga/actions";
 import { updateOperationsRequest } from "../../../../sagas/updateOperationsSaga";
+import PackMenuItem from "./PackMenuItem";
+import StackMenuItem from "./StackMenuItem";
+import AppendMenuItem from "./AppendMenuItem";
 
 const ActionsButton = () => {
   const dispatch = useDispatch();
@@ -88,31 +90,19 @@ const ActionsButton = () => {
 
   return (
     <ButtonWithMenu label="Actions" disabled={!isEnabled}>
-      <MenuItem onClick={handleOnPackClick}>
-        <ListItemIcon>
-          <PackOperationIcon />
-        </ListItemIcon>
-        <ListItemText>
-          Pack table{selectedTableIds.length !== 1 ? "s" : ""}
-        </ListItemText>
-      </MenuItem>
-      <MenuItem onClick={handleOnStackClick}>
-        <ListItemIcon>
-          <StackOperationIcon />
-        </ListItemIcon>
-        <ListItemText>
-          Stack table{selectedTableIds.length !== 1 ? "s" : ""}
-        </ListItemText>
-      </MenuItem>
+      <PackMenuItem
+        onClick={handleOnPackClick}
+        selectedCount={selectedTableIds.length}
+      />
+      <StackMenuItem
+        onClick={handleOnStackClick}
+        selectedCount={selectedTableIds.length}
+      />
       <Divider orientation="horizontal" />
-      <MenuItem onClick={handleInsertClick}>
-        <ListItemIcon>
-          <StackOperationIcon />
-        </ListItemIcon>
-        <ListItemText>
-          Append table{selectedTableIds.length !== 1 ? "s" : ""}
-        </ListItemText>
-      </MenuItem>
+      <AppendMenuItem
+        onClick={handleInsertClick}
+        selectedCount={selectedTableIds.length}
+      />
     </ButtonWithMenu>
   );
 };

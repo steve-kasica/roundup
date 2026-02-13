@@ -25,7 +25,7 @@ export async function rankColumnKeys(
   rightTableDatabaseName,
   rightColumnsDatabaseNames,
   offset = 0,
-  limit = 100
+  limit = 100,
 ) {
   const db = await getDuckDB();
   const conn = await db.connect();
@@ -64,7 +64,6 @@ export async function rankColumnKeys(
     ` ORDER BY jaccard_index DESC OFFSET ${offset} LIMIT ${limit}`;
 
   const result = await conn.query(query);
-  console.log("rankColumnKeys query:", query);
   await conn.close();
 
   return result.toArray().map((proxyStructRow) => {

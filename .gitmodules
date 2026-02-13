@@ -33,3 +33,9 @@
 [submodule "example-workflows/demolitions"]
 	path = example-workflows/demolitions
 	url = git@github.com:statesman/demolitions.git
+[submodule "example-workflows/Power_of_Irma"]
+	path = example-workflows/Power_of_Irma
+	url = https://github.com/steve-kasica/Power_of_Irma
+[submodule "example-workflows/2015-11-refugees-in-the-united-states"]
+	path = example-workflows/2015-11-refugees-in-the-united-states
+	url = git@github.com:steve-kasica/2015-11-refugees-in-the-united-states.git

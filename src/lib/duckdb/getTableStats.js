@@ -59,8 +59,6 @@ import { getDuckDB } from "./duckdbClient";
  * tableStatistics.forEach(stat => {
  *   if (stat.error) {
  *     console.warn(`Failed to get stats for ${stat.tableId}: ${stat.error}`);
- *   } else {
- *     console.log(`Table ${stat.tableId} has ${stat.rowCount} rows and ${stat.databaseNames.length} columns`);
  *   }
  * });
  */
@@ -123,7 +121,7 @@ export async function getTableStats(tableIds) {
         // Individual table error - log warning but continue processing other tables
         console.warn(
           `Error getting stats for table ${tableId}:`,
-          tableError.message
+          tableError.message,
         );
         // Add a record with error information so the caller knows what failed
         results.push({
@@ -170,8 +168,6 @@ export async function getTableStats(tableIds) {
  * const totalRows = allStats.reduce((sum, stat) => sum + stat.rowCount, 0);
  * const avgColumnsPerTable = allStats.reduce((sum, stat) => sum + stat.databaseNames.length, 0) / allStats.length;
  *
- * console.log(`Total rows across all tables: ${totalRows}`);
- * console.log(`Average columns per table: ${avgColumnsPerTable.toFixed(1)}`);
  *
  * @example
  * // Note: Less error resilient - if any table fails, the whole operation may fail
@@ -214,7 +210,7 @@ export async function getTableStatsBatch(tableIds) {
     // This is more efficient than executing separate COUNT queries
     const rowCountQueries = normalizedTableIds.map(
       (tableId) =>
-        `SELECT '${tableId}' as table_id, COUNT(*) as row_count FROM "${tableId}"`
+        `SELECT '${tableId}' as table_id, COUNT(*) as row_count FROM "${tableId}"`,
     );
 
     const combinedRowCountQuery = rowCountQueries.join(" UNION ALL ");
@@ -225,7 +221,7 @@ export async function getTableStatsBatch(tableIds) {
     // Match each table's column info with its row count
     const results = columnData.map((colInfo) => {
       const rowInfo = rowCountData.find(
-        (row) => row.table_id === colInfo.table_id
+        (row) => row.table_id === colInfo.table_id,
       );
       return {
         tableId: colInfo.table_id,
@@ -251,14 +247,11 @@ export async function getTableStatsBatch(tableIds) {
  *   try {
  *     // Assuming you have tables named 'customers' and 'orders'
  *     const stats = await getTableStats(['customers', 'orders']);
- *     console.log('Individual processing:', stats);
  *
  *     const batchStats = await getTableStatsBatch(['customers', 'orders']);
- *     console.log('Batch processing:', batchStats);
  *
  *     // Test error handling
  *     const mixedStats = await getTableStats(['customers', 'nonexistent_table']);
- *     console.log('Mixed results:', mixedStats);
  *   } catch (error) {
  *     console.error('Test failed:', error);
  *   }

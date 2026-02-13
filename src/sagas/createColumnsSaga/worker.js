@@ -52,7 +52,7 @@ export default function* createColumnsWorker(
     const column = Column({
       parentId,
       name: name || "New column",
-      databaseName,
+      databaseName: databaseName || generateUUID("column"),
       index,
     });
     if (addToDatabase) {

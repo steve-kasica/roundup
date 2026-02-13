@@ -68,7 +68,6 @@ const ProportionBar = ({
     >
       {Object.entries(data).map(([label, value], index) => {
         const widthPercent = (value / total) * 100;
-        console.log(label, value, widthPercent);
         return (
           <Box
             key={index}
@@ -85,7 +84,7 @@ const ProportionBar = ({
               userSelect: "none",
             }}
             title={`${label}: ${value.toLocaleString()} (${widthPercent.toFixed(
-              1
+              1,
             )}%)`}
           >
             <span style={{ padding: "0 4px" }}>{widthPercent.toFixed(1)}%</span>
