@@ -16,3 +16,4 @@ src/main/resources/
 src/test/resources/
 src/sandbox
 cypress/screenshots/
+build
