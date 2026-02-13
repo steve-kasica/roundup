@@ -1,30 +1,34 @@
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import { PackOperationIcon } from "../../../ui/icons";
 import { useSelector } from "react-redux";
-import { selectFocusedObject } from "../../../../slices/uiSlice";
+import {
+  selectFocusedObject,
+  selectSelectedTableIds,
+} from "../../../../slices/uiSlice";
 import { useMemo } from "react";
 import { isTableId } from "../../../../slices/tablesSlice";
 import { selectRootOperationId } from "../../../../slices/operationsSlice";
 
-const PackMenuItem = ({ onClick, selectedCount }) => {
+const PackMenuItem = ({ onClick }) => {
   const focusedObject = useSelector(selectFocusedObject);
   const rootOperationId = useSelector(selectRootOperationId);
+  const selectedTableIds = useSelector(selectSelectedTableIds);
 
-  const isDisabled = useMemo(
+  const isEnabled = useMemo(
     () =>
-      selectedCount !== 1 ||
-      !focusedObject ||
-      isTableId(focusedObject?.id) ||
-      focusedObject?.id !== rootOperationId,
-    [focusedObject, selectedCount, rootOperationId],
+      (rootOperationId === null && selectedTableIds.length === 2) ||
+      (rootOperationId === focusedObject?.id && selectedTableIds.length === 1),
+    [focusedObject?.id, rootOperationId, selectedTableIds.length],
   );
 
   return (
-    <MenuItem onClick={onClick} disabled={isDisabled}>
+    <MenuItem onClick={onClick} disabled={!isEnabled}>
       <ListItemIcon>
         <PackOperationIcon />
       </ListItemIcon>
-      <ListItemText>Pack table{selectedCount !== 1 ? "s" : ""}</ListItemText>
+      <ListItemText>
+        Pack table{selectedTableIds.length !== 1 ? "s" : ""}
+      </ListItemText>
     </MenuItem>
   );
 };

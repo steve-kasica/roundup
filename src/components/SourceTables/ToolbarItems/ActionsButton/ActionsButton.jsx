@@ -90,10 +90,7 @@ const ActionsButton = () => {
 
   return (
     <ButtonWithMenu label="Actions" disabled={!isEnabled}>
-      <PackMenuItem
-        onClick={handleOnPackClick}
-        selectedCount={selectedTableIds.length}
-      />
+      <PackMenuItem onClick={handleOnPackClick} />
       <StackMenuItem
         onClick={handleOnStackClick}
         selectedCount={selectedTableIds.length}
