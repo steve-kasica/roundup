@@ -42,3 +42,6 @@
 [submodule "example-workflows/school-choice"]
 	path = example-workflows/school-choice
 	url = git@github.com:steve-kasica/school-choice.git
+[submodule "example-workflows/employment-discrimination"]
+	path = example-workflows/employment-discrimination
+	url = git@github.com:steve-kasica/employment-discrimination.git
