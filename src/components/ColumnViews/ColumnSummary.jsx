@@ -28,7 +28,15 @@
 
 /* eslint-disable react/prop-types */
 import { withColumnData, withAssociatedAlerts } from "../HOC";
-import { Box, Typography, Menu, Chip, Divider, Stack } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Menu,
+  Chip,
+  Divider,
+  Stack,
+  Tooltip,
+} from "@mui/material";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 import StyledColumnContainer from "./StyledColumnContainer";
 import { ColumnContextMenuButton } from "../ui/buttons";
@@ -181,18 +189,20 @@ const ColumnSummary = ({
               overflow: "hidden",
             }}
           >
-            <Typography
-              variant="data-primary"
-              sx={{
-                whiteSpace: "nowrap",
-                fontWeight: "bold",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                minWidth: 0,
-              }}
-            >
-              {name || databaseName || id}
-            </Typography>
+            <Tooltip title={name || databaseName || id} placement="top">
+              <Typography
+                variant="data-primary"
+                sx={{
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  minWidth: 0,
+                }}
+              >
+                {name || databaseName || id}
+              </Typography>
+            </Tooltip>
             <ColumnTypeIcon columnType={columnType} />
           </Box>
           <Box
