@@ -353,6 +353,71 @@ const PackSchemaView = ({
     [leftColumnIds, setLeftTableJoinKey, setRightTableJoinKey],
   );
 
+  // Calculate adjusted heights so small rows get minimum height and remaining space is redistributed
+  const adjustedHeights = useMemo(() => {
+    const MIN_HEIGHT_PERCENT = 10; // Minimum height for any match category
+
+    // Calculate row count from only enabled matches
+    const enabledRowCount = matchKeys
+      .filter((k) => validMatchGroups.includes(k))
+      .map((k) => matchStats[k])
+      .reduce((a, b) => a + b, 0);
+
+    // Calculate raw percentages based on enabled matches only
+    const rawPercentages = matchKeys.map((key) => {
+      const isDisabled = !validMatchGroups.includes(key);
+      return {
+        key,
+        percentage: isDisabled ? 0 : (matchStats[key] / enabledRowCount) * 100,
+        isDisabled,
+      };
+    });
+
+    // Identify which enabled rows are below minimum
+    const enabledBelowMin = rawPercentages.filter(
+      (r) => !r.isDisabled && r.percentage < MIN_HEIGHT_PERCENT,
+    );
+    const enabledAboveMin = rawPercentages.filter(
+      (r) => !r.isDisabled && r.percentage >= MIN_HEIGHT_PERCENT,
+    );
+    const disabled = rawPercentages.filter((r) => r.isDisabled);
+
+    // Calculate space used by minimum and disabled rows
+    const minSpaceUsed =
+      (enabledBelowMin.length + disabled.length) * MIN_HEIGHT_PERCENT;
+
+    // Calculate remaining space to distribute
+    const remainingSpace = 100 - minSpaceUsed;
+
+    // Calculate total percentage of above-min rows for proportional redistribution
+    const totalAboveMinPercentage = enabledAboveMin.reduce(
+      (sum, r) => sum + r.percentage,
+      0,
+    );
+
+    // Build final height map
+    const heights = new Map();
+
+    // Set minimum heights for small enabled rows
+    enabledBelowMin.forEach((r) => {
+      heights.set(r.key, MIN_HEIGHT_PERCENT);
+    });
+
+    // Set minimum heights for disabled rows
+    disabled.forEach((r) => {
+      heights.set(r.key, MIN_HEIGHT_PERCENT);
+    });
+
+    // Redistribute remaining space proportionally among enabled above-min rows
+    enabledAboveMin.forEach((r) => {
+      const redistributedHeight =
+        (r.percentage / totalAboveMinPercentage) * remainingSpace;
+      heights.set(r.key, redistributedHeight);
+    });
+
+    return heights;
+  }, [matchKeys, matchStats, validMatchGroups]);
+
   // This memoized variable groups columns into contiguous visible/hidden segments
   const columnIdVisibilityGroups = useMemo(() => {
     const hiddenChildColumnsSet = new Set(hiddenChildColumnIds.flat());
@@ -397,6 +462,9 @@ const PackSchemaView = ({
             flexDirection="row"
             alignItems="center"
             justifyContent="flex-start"
+            sx={{
+              marginBottom: 1,
+            }}
           >
             <Box
               className="blank-cell"
@@ -515,218 +583,233 @@ const PackSchemaView = ({
               );
             })}
           </Box>
-          {matchKeys.map((key) => {
-            const value = matchStats[key];
-            // Check if any cells in this match category are selected
-            const label = matchLabels.get(key) || key;
-            const isMatchDisabled = !validMatchGroups.includes(key);
+          <Box height={"100%"}>
+            {matchKeys.map((key) => {
+              const value = matchStats[key];
+              // Check if any cells in this match category are selected
+              const label = matchLabels.get(key) || key;
+              const isMatchDisabled = !validMatchGroups.includes(key);
+              const heightPercent = adjustedHeights.get(key);
 
-            return (
-              <Box
-                key={key}
-                flex={1}
-                minHeight={"60px"}
-                height={"100%"}
-                display={"flex"}
-                flexDirection="row"
-                alignItems="center"
-                justifyContent="flex-start"
-                textAlign={"right"}
-              >
+              return (
                 <Box
+                  key={key}
+                  height={heightPercent + "%"}
+                  display={"flex"}
+                  flexDirection="row"
+                  alignItems="center"
+                  justifyContent="flex-start"
+                  textAlign={"right"}
                   sx={{
-                    height: "100%",
-                    width: yAxisLabelWidth,
-                    minWidth: yAxisLabelWidth,
-                    maxWidth: yAxisLabelWidth,
-                    flexShrink: 0,
-                    padding: yAxisLabelPadding,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    userSelect: "none",
-                    cursor: isMatchDisabled ? "not-allowed" : "pointer",
-                    opacity: hoveredMatch === key ? 1 : 0.8,
+                    transition: "height 0.3s ease-in-out",
                   }}
-                  onMouseEnter={() => setHoveredMatch(key)}
-                  onMouseLeave={() => setHoveredMatch(null)}
-                  onClick={(event) =>
-                    isMatchDisabled ? null : handleMatchLabelClick(event, key)
-                  }
                 >
-                  <IconButton disabled={isMatchDisabled} size="small">
-                    <VennDiagram
-                      label={label}
-                      size={yAxisLabelWidth.replace("px", "")}
-                      joinType={
-                        key === MATCH_TYPE_LEFT_UNMATCHED
-                          ? JOIN_TYPES.LEFT_ANTI
-                          : key === MATCH_TYPE_RIGHT_UNMATCHED
-                            ? JOIN_TYPES.RIGHT_ANTI
-                            : JOIN_TYPES.INNER
-                      }
-                    />
-                  </IconButton>
-                  <Box display="flex" justifyContent="center" width={"100%"}>
-                    {isLoading ? (
-                      <CircularProgress size={15} />
-                    ) : errorCount > 0 ? (
-                      <Error color="error" />
-                    ) : (
-                      <Typography
-                        variant="data-small"
-                        sx={{
-                          opacity: isMatchDisabled ? 0.5 : 1,
-                        }}
-                      >
-                        <IntegerNumber value={value} />
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
-                {columnIdVisibilityGroups.map(({ columnIds, isHidden }, j) => {
-                  if (isHidden) {
-                    return (
-                      <Box
-                        key={columnIds.join("-")}
-                        flex={"0 0 auto"}
-                        minWidth={"10px"}
-                        display={"flex"}
-                        justifyContent={"center"}
-                        height="100%"
-                      >
-                        <Divider orientation="vertical" flexItem />
-                      </Box>
-                    );
-                  } else if (isLoading) {
-                    return (
-                      <Skeleton
-                        variant="rectangular"
-                        key={j}
-                        flex={1}
-                        height={"100%"}
-                        animation="pulse"
-                        width={"100%"}
-                        sx={{ outline: "1px solid white" }}
-                      />
-                    );
-                  }
-
-                  // If not hidden, there will only be one columnId
-                  const columnId = columnIds[0];
-                  const isLastLeftColumn =
-                    j ===
-                    leftColumnIds.length -
-                      1 -
-                      (hiddenChildColumnIds[0]?.length || 0);
-                  const tableId =
-                    j < leftColumnIds.length ? leftTableId : rightTableId;
-                  // const cellKey = `${columnId}:${key}`;
-                  // const isClicked = clickedBlockCells.has(cellKey);
-                  const isClicked =
-                    selectedChildColumnIdsSet.has(columnId) &&
-                    selectedMatches.includes(key);
-
-                  // Calculate which borders to show for contiguous selection
-                  let highlightTopBorder = false;
-                  let highlightBottomBorder = false;
-                  let highlightLeftBorder = false;
-                  let highlightRightBorder = false;
-
-                  if (isClicked) {
-                    const currentMatchIndex = matchKeys.indexOf(key);
-                    const currentColIndex =
-                      combinedChildColumnIds.indexOf(columnId);
-
-                    // Check cell above
-                    if (currentMatchIndex > 0) {
-                      const matchAbove = matchKeys[currentMatchIndex - 1];
-                      highlightTopBorder =
-                        !selectedMatches.includes(matchAbove);
-                    } else {
-                      highlightTopBorder = true;
+                  <Box
+                    sx={{
+                      height: "100%",
+                      width: yAxisLabelWidth,
+                      minWidth: yAxisLabelWidth,
+                      maxWidth: yAxisLabelWidth,
+                      flexShrink: 0,
+                      padding: yAxisLabelPadding,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      userSelect: "none",
+                      cursor: isMatchDisabled ? "not-allowed" : "pointer",
+                      opacity: hoveredMatch === key ? 1 : 0.8,
+                    }}
+                    onMouseEnter={() => setHoveredMatch(key)}
+                    onMouseLeave={() => setHoveredMatch(null)}
+                    onClick={(event) =>
+                      isMatchDisabled ? null : handleMatchLabelClick(event, key)
                     }
-
-                    // Check cell below
-                    if (currentMatchIndex < matchKeys.length - 1) {
-                      const matchBelow = matchKeys[currentMatchIndex + 1];
-                      highlightBottomBorder =
-                        !selectedMatches.includes(matchBelow);
-                    } else {
-                      highlightBottomBorder = true;
-                    }
-
-                    // Check cell to the left
-                    if (currentColIndex > 0) {
-                      const colLeft =
-                        combinedChildColumnIds[currentColIndex - 1];
-                      highlightLeftBorder =
-                        !selectedChildColumnIdsSet.has(colLeft);
-                    } else {
-                      highlightLeftBorder = true;
-                    }
-
-                    // Check cell to the right
-                    if (currentColIndex < combinedChildColumnIds.length - 1) {
-                      const colRight =
-                        combinedChildColumnIds[currentColIndex + 1];
-                      highlightRightBorder =
-                        !selectedChildColumnIdsSet.has(colRight);
-                    } else {
-                      highlightRightBorder = true;
-                    }
-                  }
-
-                  return (
-                    <Box
-                      key={columnId}
-                      sx={{
-                        flex: 1,
-                        minWidth: 0,
-                        height: "100%",
-                        border: "1px solid white",
-                        marginRight: isLastLeftColumn
-                          ? `${childTablesSeparatorWidth}px`
-                          : 0,
-                        borderTopColor: highlightTopBorder ? "black" : "white",
-                        borderBottomColor: highlightBottomBorder
-                          ? "black"
-                          : "white",
-                        borderLeftColor: highlightLeftBorder
-                          ? "black"
-                          : "white",
-                        borderRightColor: highlightRightBorder
-                          ? "black"
-                          : "white",
-                      }}
+                  >
+                    <IconButton
+                      disabled={isMatchDisabled}
+                      size="small"
+                      sx={{ padding: 0, marginBottom: 0 }}
                     >
-                      <StyledBlockCell
-                        isSelected={isClicked}
-                        isDisabled={isMatchDisabled}
-                        isNull={
-                          (key === MATCH_TYPE_LEFT_UNMATCHED &&
-                            j >= leftColumnIds.length) ||
-                          (key === MATCH_TYPE_RIGHT_UNMATCHED &&
-                            j < leftColumnIds.length)
-                        }
-                        onClick={(event) => {
-                          if (!isMatchDisabled) {
-                            handleCellClick(event, columnId, key);
-                          }
-                        }}
-                        operationIndex={
-                          isTableId(tableId)
-                            ? operationIndex
-                            : operationIndex - 1
+                      <VennDiagram
+                        label={label}
+                        size={yAxisLabelWidth.replace("px", "")}
+                        joinType={
+                          key === MATCH_TYPE_LEFT_UNMATCHED
+                            ? JOIN_TYPES.LEFT_ANTI
+                            : key === MATCH_TYPE_RIGHT_UNMATCHED
+                              ? JOIN_TYPES.RIGHT_ANTI
+                              : JOIN_TYPES.INNER
                         }
                       />
+                    </IconButton>
+                    <Box display="flex" justifyContent="center" width={"100%"}>
+                      {isLoading ? (
+                        <CircularProgress size={15} />
+                      ) : errorCount > 0 ? (
+                        <Error color="error" />
+                      ) : (
+                        <Typography
+                          variant="data-small"
+                          sx={{
+                            opacity: isMatchDisabled ? 0.5 : 1,
+                          }}
+                        >
+                          <IntegerNumber value={value} />
+                        </Typography>
+                      )}
                     </Box>
-                  );
-                })}
-              </Box>
-            );
-          })}
+                  </Box>
+                  {columnIdVisibilityGroups.map(
+                    ({ columnIds, isHidden }, j) => {
+                      if (isHidden) {
+                        return (
+                          <Box
+                            key={columnIds.join("-")}
+                            flex={"0 0 auto"}
+                            minWidth={"10px"}
+                            display={"flex"}
+                            justifyContent={"center"}
+                            height="100%"
+                          >
+                            <Divider orientation="vertical" flexItem />
+                          </Box>
+                        );
+                      } else if (isLoading) {
+                        return (
+                          <Skeleton
+                            variant="rectangular"
+                            key={j}
+                            flex={1}
+                            height={"100%"}
+                            animation="pulse"
+                            width={"100%"}
+                            sx={{ outline: "1px solid white" }}
+                          />
+                        );
+                      }
+
+                      // If not hidden, there will only be one columnId
+                      const columnId = columnIds[0];
+                      const isLastLeftColumn =
+                        j ===
+                        leftColumnIds.length -
+                          1 -
+                          (hiddenChildColumnIds[0]?.length || 0);
+                      const tableId =
+                        j < leftColumnIds.length ? leftTableId : rightTableId;
+                      // const cellKey = `${columnId}:${key}`;
+                      // const isClicked = clickedBlockCells.has(cellKey);
+                      const isClicked =
+                        selectedChildColumnIdsSet.has(columnId) &&
+                        selectedMatches.includes(key);
+
+                      // Calculate which borders to show for contiguous selection
+                      let highlightTopBorder = false;
+                      let highlightBottomBorder = false;
+                      let highlightLeftBorder = false;
+                      let highlightRightBorder = false;
+
+                      if (isClicked) {
+                        const currentMatchIndex = matchKeys.indexOf(key);
+                        const currentColIndex =
+                          combinedChildColumnIds.indexOf(columnId);
+
+                        // Check cell above
+                        if (currentMatchIndex > 0) {
+                          const matchAbove = matchKeys[currentMatchIndex - 1];
+                          highlightTopBorder =
+                            !selectedMatches.includes(matchAbove);
+                        } else {
+                          highlightTopBorder = true;
+                        }
+
+                        // Check cell below
+                        if (currentMatchIndex < matchKeys.length - 1) {
+                          const matchBelow = matchKeys[currentMatchIndex + 1];
+                          highlightBottomBorder =
+                            !selectedMatches.includes(matchBelow);
+                        } else {
+                          highlightBottomBorder = true;
+                        }
+
+                        // Check cell to the left
+                        if (currentColIndex > 0) {
+                          const colLeft =
+                            combinedChildColumnIds[currentColIndex - 1];
+                          highlightLeftBorder =
+                            !selectedChildColumnIdsSet.has(colLeft);
+                        } else {
+                          highlightLeftBorder = true;
+                        }
+
+                        // Check cell to the right
+                        if (
+                          currentColIndex <
+                          combinedChildColumnIds.length - 1
+                        ) {
+                          const colRight =
+                            combinedChildColumnIds[currentColIndex + 1];
+                          highlightRightBorder =
+                            !selectedChildColumnIdsSet.has(colRight);
+                        } else {
+                          highlightRightBorder = true;
+                        }
+                      }
+
+                      return (
+                        <Box
+                          key={columnId}
+                          sx={{
+                            flex: 1,
+                            minWidth: 0,
+                            height: "100%",
+                            border: "1px solid white",
+                            marginRight: isLastLeftColumn
+                              ? `${childTablesSeparatorWidth}px`
+                              : 0,
+                            borderTopColor: highlightTopBorder
+                              ? "black"
+                              : "white",
+                            borderBottomColor: highlightBottomBorder
+                              ? "black"
+                              : "white",
+                            borderLeftColor: highlightLeftBorder
+                              ? "black"
+                              : "white",
+                            borderRightColor: highlightRightBorder
+                              ? "black"
+                              : "white",
+                          }}
+                        >
+                          <StyledBlockCell
+                            isSelected={isClicked}
+                            isDisabled={isMatchDisabled}
+                            isNull={
+                              (key === MATCH_TYPE_LEFT_UNMATCHED &&
+                                j >= leftColumnIds.length) ||
+                              (key === MATCH_TYPE_RIGHT_UNMATCHED &&
+                                j < leftColumnIds.length)
+                            }
+                            onClick={(event) => {
+                              if (!isMatchDisabled) {
+                                handleCellClick(event, columnId, key);
+                              }
+                            }}
+                            operationIndex={
+                              isTableId(tableId)
+                                ? operationIndex
+                                : operationIndex - 1
+                            }
+                          />
+                        </Box>
+                      );
+                    },
+                  )}
+                </Box>
+              );
+            })}
+          </Box>
         </Box>
       </Box>
       <Menu
