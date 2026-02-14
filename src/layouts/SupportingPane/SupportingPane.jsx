@@ -61,6 +61,11 @@ const CompositeSchemaContainerSizes = {
   EXPANDED: 30,
 };
 
+const LeftSidebarSizes = {
+  COLLAPSED: 5,
+  EXPANDED: 25,
+};
+
 export default function SupportingPane() {
   const tables = useSelector(selectAllTablesData);
   const rootOperation = useSelector((state) => {
@@ -70,9 +75,22 @@ export default function SupportingPane() {
   const focusedObject = useSelector(selectFocusedObjectId);
   const focusedColumnIds = useSelector(selectFocusedColumnIds);
   const isOpen = tables.length > 0;
+  const leftSidebarRef = useRef(null);
   const compositeSchemaRef = useRef(null);
+  const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
   const [isCompositeSchemaCollapsed, setIsCompositeSchemaCollapsed] =
     useState(false);
+
+  const handleCollapseLeftSidebar = () => {
+    if (leftSidebarRef.current) {
+      if (isLeftSidebarCollapsed) {
+        leftSidebarRef.current.resize(LeftSidebarSizes.EXPANDED);
+      } else {
+        leftSidebarRef.current.resize(LeftSidebarSizes.COLLAPSED);
+      }
+      setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed);
+    }
+  };
 
   const handleCollapseCompositeSchema = () => {
     if (compositeSchemaRef.current) {
@@ -107,9 +125,10 @@ export default function SupportingPane() {
           <PanelGroup autoSaveId="SupportingPane" direction="horizontal">
             <Panel
               id="left-sidebar-panel"
-              collapsible={true}
-              minSize={10}
-              defaultSize={25}
+              ref={leftSidebarRef}
+              collapsible={false}
+              minSize={LeftSidebarSizes.COLLAPSED}
+              defaultSize={LeftSidebarSizes.EXPANDED}
               maxSize={100}
               order={1}
             >
@@ -123,7 +142,38 @@ export default function SupportingPane() {
                   order={1}
                   style={{ padding: "5px" }}
                 >
-                  <LeftSideBar />
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    height="100%"
+                    position="relative"
+                  >
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        zIndex: 10,
+                      }}
+                    >
+                      <IconButton
+                        size="small"
+                        onClick={handleCollapseLeftSidebar}
+                      >
+                        <KeyboardArrowDown
+                          sx={{
+                            transform: isLeftSidebarCollapsed
+                              ? "rotate(-90deg)"
+                              : "rotate(90deg)",
+                            transition: "transform 0.3s",
+                          }}
+                        />
+                      </IconButton>
+                    </Box>
+                    <Box height="100%" overflow="auto">
+                      <LeftSideBar />
+                    </Box>
+                  </Box>
                 </Panel>
                 {rootOperation && (
                   <>
