@@ -185,6 +185,9 @@ export default function withStackOperationData(WrappedComponent) {
         // Metadata
         name={name}
         operationType={OPERATION_TYPE_STACK}
+        childIds={operation.childIds}
+        isMaterialized={operation.isMaterialized}
+        isInSync={operation.isInSync}
         // Child columns
         columnIdMatrix={columnIdMatrix}
         m={m}
