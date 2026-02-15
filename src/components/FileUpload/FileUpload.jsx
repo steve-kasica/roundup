@@ -104,11 +104,11 @@ const FileUpload = ({ acceptedTypes = "*", onComplete }) => {
   };
 
   const validateFile = (file) => {
-    const maxSize = 110 * 1024 * 1024; // 110MB
+    const maxSize = 100 * 1024 * 1024; // 100MB
     const allowedTypes = ["text/csv", "text/tab-separated-values"];
 
     if (file.size > maxSize) {
-      return `File ${file.name} is too large. Maximum size is 110MB.`;
+      return `File ${file.name} is too large. Maximum size is 100MB.`;
     }
 
     if (acceptedTypes !== "*" && !allowedTypes.includes(file.type)) {
