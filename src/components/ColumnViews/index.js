@@ -1,4 +1,4 @@
-export * from "./ColumnContextMenuItems";
+export * from "./ColumnContextMenuItems/ColumnContextMenuItems";
 export * from "./ColumnDragContainer";
 export * from "./ColumnName";
 export * from "./ColumnSummary";

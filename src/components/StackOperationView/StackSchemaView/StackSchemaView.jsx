@@ -432,21 +432,7 @@ const StackSchemaView = ({
                                 pointerEvents: "none",
                               },
                             }}
-                          >
-                            {/* <Typography
-                              variant="caption"
-                              sx={{
-                                fontWeight: "medium",
-                                fontSize: 20,
-                                p: 0,
-                                textTransform: "uppercase",
-                                transform: "rotate(-15deg)",
-                                color: "white",
-                              }}
-                            >
-                              Error
-                            </Typography> */}
-                          </StyledColumnContainer>
+                          ></StyledColumnContainer>
                         </StyledTableCell>
                       );
                     } else {
@@ -457,12 +443,6 @@ const StackSchemaView = ({
                       <StyledTableCell
                         key={`empty-${rowIndex}-${idx}`}
                         colSpan={indices.length}
-                        sx={
-                          {
-                            // width: 30,
-                            // minWidth: 30,
-                          }
-                        }
                       />
                     );
                   } else {

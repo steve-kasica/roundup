@@ -41,7 +41,7 @@ import ColumnTypeIcon from "./ColumnTypeIcon";
 import StyledColumnContainer from "./StyledColumnContainer";
 import { ColumnContextMenuButton } from "../ui/buttons";
 import { useCallback, useState } from "react";
-import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
+import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems/ColumnContextMenuItems";
 import { format } from "d3";
 import { IntegerNumber, PercentNumber } from "../ui/text";
 

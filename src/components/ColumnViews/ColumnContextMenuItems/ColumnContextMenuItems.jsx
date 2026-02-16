@@ -54,13 +54,18 @@ import {
   DeleteForever,
 } from "@mui/icons-material";
 import { useCallback, useState } from "react";
-import { withColumnData } from "../HOC";
+import { withColumnData } from "../../HOC";
 import {
   COLUMN_TYPE_CATEGORICAL,
   COLUMN_TYPE_NUMERICAL,
-} from "../../slices/columnsSlice";
-import { RoundupToDuckDBTypes } from "../../lib/duckdb";
-import { FreeTextDialog, InsertColumnDialog } from "../ui/dialogs";
+} from "../../../slices/columnsSlice";
+import { RoundupToDuckDBTypes } from "../../../lib/duckdb";
+import { FreeTextDialog, InsertColumnDialog } from "../../ui/dialogs";
+import RenameColumnItem from "./RenameColumnItem";
+import DeleteColumnItem from "./DeleteColumnItem";
+import FocusColumnItem from "./FocusColumnItem";
+import TypeColumnItem from "./TypeColumnItem";
+import InsertColumnItem from "./InsertColumnItem";
 
 /**
  * ColumnContextMenu Component
@@ -86,6 +91,7 @@ import { FreeTextDialog, InsertColumnDialog } from "../ui/dialogs";
  */
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
+  id,
   columnType,
   setColumnType,
   focusColumn,
@@ -107,7 +113,7 @@ const ColumnContextMenu = ({
   const [columnTypeDialogOpen, setColumnTypeDialogOpen] = useState(false);
 
   const [selectedColumnType, setSelectedColumnType] = useState(
-    columnType || ""
+    columnType || "",
   );
 
   // Callback for handling column rename
@@ -123,7 +129,7 @@ const ColumnContextMenu = ({
       setRenameDialogOpen(false);
       handleCloseMenu(event);
     },
-    [handleCloseMenu, renameColumn]
+    [handleCloseMenu, renameColumn],
   );
 
   const handleRenameCancel = useCallback(
@@ -131,7 +137,7 @@ const ColumnContextMenu = ({
       setRenameDialogOpen(false);
       handleCloseMenu(event);
     },
-    [handleCloseMenu]
+    [handleCloseMenu],
   );
 
   // Callback for handling column type change
@@ -141,7 +147,7 @@ const ColumnContextMenu = ({
       setSelectedColumnType("");
       handleCloseMenu(event);
     },
-    [handleCloseMenu]
+    [handleCloseMenu],
   );
 
   const handleColumnTypeConfirm = useCallback(
@@ -157,7 +163,7 @@ const ColumnContextMenu = ({
       setColumnType,
       handleColumnTypeDialogClose,
       handleCloseMenu,
-    ]
+    ],
   );
 
   const handleColumnTypeCancel = useCallback(
@@ -165,7 +171,7 @@ const ColumnContextMenu = ({
       handleColumnTypeDialogClose();
       handleCloseMenu(event);
     },
-    [handleColumnTypeDialogClose, handleCloseMenu]
+    [handleColumnTypeDialogClose, handleCloseMenu],
   );
 
   const handleHideColumn = useCallback(
@@ -173,7 +179,7 @@ const ColumnContextMenu = ({
       onHideColumn();
       handleCloseMenu(event);
     },
-    [handleCloseMenu, onHideColumn]
+    [handleCloseMenu, onHideColumn],
   );
 
   const handleDeleteColumn = useCallback(
@@ -181,7 +187,7 @@ const ColumnContextMenu = ({
       deleteColumn();
       handleCloseMenu(event);
     },
-    [handleCloseMenu, deleteColumn]
+    [handleCloseMenu, deleteColumn],
   );
 
   const handleSetColumnType = useCallback(() => {
@@ -194,7 +200,7 @@ const ColumnContextMenu = ({
       focusColumn();
       handleCloseMenu(event);
     },
-    [handleCloseMenu, focusColumn]
+    [handleCloseMenu, focusColumn],
   );
 
   const handleInsertColumnLeft = useCallback(() => {
@@ -223,7 +229,7 @@ const ColumnContextMenu = ({
       insertDirection,
       onInsertColumnLeftClick,
       onInsertColumnRightClick,
-    ]
+    ],
   );
 
   const handleInsertCancel = useCallback(
@@ -232,7 +238,7 @@ const ColumnContextMenu = ({
       setInsertDirection(null);
       handleCloseMenu(event);
     },
-    [handleCloseMenu]
+    [handleCloseMenu],
   );
 
   const menuItemSx = isError
@@ -253,116 +259,13 @@ const ColumnContextMenu = ({
 
   return (
     <>
-      <MenuItem onClick={handleRenameColumnClick} sx={menuItemSx}>
-        <ListItemIcon sx={iconSx}>
-          <Edit fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Rename Column</ListItemText>
-      </MenuItem>
-      <MenuItem onClick={handleSetColumnType} sx={menuItemSx}>
-        <ListItemIcon sx={iconSx}>
-          <SwapHoriz fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Change Column Type</ListItemText>
-      </MenuItem>
+      <RenameColumnItem id={id} handleCloseMenu={handleCloseMenu} />
+      <DeleteColumnItem id={id} handleCloseMenu={handleCloseMenu} />
+      <FocusColumnItem id={id} handleCloseMenu={handleCloseMenu} />
+      <TypeColumnItem id={id} handleCloseMenu={handleCloseMenu} />
       <Divider orientation="horizontal" />
-      <MenuItem onClick={handleHideColumn} sx={menuItemSx}>
-        <ListItemIcon sx={iconSx}>
-          <VisibilityOff fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Hide Column</ListItemText>
-      </MenuItem>
-      <MenuItem onClick={handleDeleteColumn} sx={menuItemSx}>
-        <ListItemIcon sx={iconSx}>
-          <DeleteForever fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Delete Column</ListItemText>
-      </MenuItem>
-      <Divider orientation="horizontal" />
-      <MenuItem onClick={handleFocusColumn} sx={menuItemSx}>
-        <ListItemIcon sx={iconSx}>
-          <CenterFocusStrong fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Focus Column</ListItemText>
-      </MenuItem>
-      {onInsertColumnLeftClick && onInsertColumnRightClick && (
-        <Divider orientation="horizontal" />
-      )}
-      {onInsertColumnLeftClick && (
-        <MenuItem onClick={handleInsertColumnLeft} sx={menuItemSx}>
-          <ListItemIcon sx={iconSx}>
-            <KeyboardArrowLeft fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Insert Column To The Left</ListItemText>
-        </MenuItem>
-      )}
-      {onInsertColumnRightClick && (
-        <MenuItem onClick={handleInsertColumnRight} sx={menuItemSx}>
-          <ListItemIcon sx={iconSx}>
-            <KeyboardArrowRight fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Insert Column To The Right</ListItemText>
-        </MenuItem>
-      )}
-
-      {/* Rename Column Dialog */}
-      <FreeTextDialog
-        title="Rename Column"
-        open={renameDialogOpen}
-        onClose={handleRenameCancel}
-        onConfirm={handleRenameConfirm}
-        label="Column Name"
-      />
-
-      {/* Change Column Type Dialog */}
-      <Dialog
-        open={columnTypeDialogOpen}
-        onClose={handleColumnTypeCancel}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Change Column Type</DialogTitle>
-        <DialogContent>
-          <RadioGroup
-            value={selectedColumnType}
-            onChange={(e) => setSelectedColumnType(e.target.value)}
-          >
-            <FormControlLabel
-              value={RoundupToDuckDBTypes(COLUMN_TYPE_CATEGORICAL)}
-              control={<Radio />}
-              label={
-                COLUMN_TYPE_CATEGORICAL.charAt(0).toUpperCase() +
-                COLUMN_TYPE_CATEGORICAL.slice(1).toLocaleLowerCase()
-              }
-            />
-            <FormControlLabel
-              value={RoundupToDuckDBTypes(COLUMN_TYPE_NUMERICAL)}
-              control={<Radio />}
-              label={
-                COLUMN_TYPE_NUMERICAL.charAt(0).toUpperCase() +
-                COLUMN_TYPE_NUMERICAL.slice(1).toLocaleLowerCase()
-              }
-            />
-          </RadioGroup>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleColumnTypeCancel}>Cancel</Button>
-          <Button
-            onClick={handleColumnTypeConfirm}
-            variant="contained"
-            disabled={!selectedColumnType}
-          >
-            Change Type
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <InsertColumnDialog
-        direction={insertDirection}
-        open={insertDialogOpen}
-        onClose={handleInsertCancel}
-        onSubmit={handleInsertConfirm}
-      />
+      <InsertColumnItem direction="left" handleCloseMenu={handleCloseMenu} />
+      <InsertColumnItem direction="right" handleCloseMenu={handleCloseMenu} />
     </>
   );
 };

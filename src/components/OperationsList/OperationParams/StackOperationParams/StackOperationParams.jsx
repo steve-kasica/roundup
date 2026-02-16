@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Chip,
   Divider,
   Dialog,
   DialogActions,
@@ -46,6 +47,9 @@ const moveInList = (list, fromId, toId) => {
   return next;
 };
 
+const formatCount = (value) =>
+  Number.isFinite(value) ? value.toLocaleString() : "Unknown";
+
 const StackTableOrderItem = ({
   childId,
   index,
@@ -59,7 +63,6 @@ const StackTableOrderItem = ({
     getDragItem: () => ({ id: childId, index }),
     canDrag: () => !isReadOnly,
     canDrop: (item) => !isReadOnly && item?.id !== childId,
-    hideDefaultPreview: true,
     onDrop: (item) => {
       if (!item || item.id === childId) return;
       onMove(item.id, childId);
