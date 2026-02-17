@@ -36,6 +36,7 @@ import { updateColumnsRequest } from "../../sagas/updateColumnsSaga/actions";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import { useCallback, useMemo } from "react";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { insertColumnsRequest } from "../../sagas/createColumnsSaga";
 
 export default function withColumnData(WrappedComponent) {
   function EnhancedComponent({ id, ...props }) {
@@ -77,6 +78,12 @@ export default function withColumnData(WrappedComponent) {
       () => column.name || databaseName,
       [column.name, databaseName],
     );
+
+    /**
+     * The index of the column within its parent table/operation, used for ordering.
+     * @type {number}
+     */
+    const index = useMemo(() => column.index, [column]);
 
     /**
      * The data type of the column, defined in `Column.js`, e.g.
@@ -338,12 +345,29 @@ export default function withColumnData(WrappedComponent) {
       dispatch(setFocusedColumnIds([id]));
     }, [dispatch, id]);
 
+    /**
+     * @function
+     * Callback to insert a new column into this column's table
+     * @param {number} index - The index to insert the new column at
+     * @param {string} name - The name of the new column
+     * @param {string} columnType - The type of the new column
+     * @param {any} fillValue - The value to fill the new column with (null for blank)
+     * @returns {void}
+     */
+    const insertColumn = useCallback(
+      (index, name, fillValue) => {
+        dispatch(insertColumnsRequest([{ parentId, index, name, fillValue }]));
+      },
+      [dispatch, parentId],
+    );
+
     return (
       <WrappedComponent
         id={id}
         // Identity and metadata
         operationIndex={operationIndex}
         parentId={parentId}
+        index={index}
         databaseName={databaseName}
         name={name}
         columnType={columnType}
@@ -381,6 +405,7 @@ export default function withColumnData(WrappedComponent) {
         unhoverColumn={unhoverColumn}
         focusColumn={focusColumn}
         unfocusColumn={unfocusColumn}
+        insertColumn={insertColumn}
         {...props}
       />
     );

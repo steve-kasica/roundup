@@ -30,37 +30,9 @@
  * />
  */
 
-import {
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Divider,
-} from "@mui/material";
-import {
-  Edit,
-  SwapHoriz,
-  CenterFocusStrong,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  VisibilityOff,
-  DeleteForever,
-} from "@mui/icons-material";
-import { useCallback, useState } from "react";
+import { Divider } from "@mui/material";
+import { useCallback } from "react";
 import { withColumnData } from "../../HOC";
-import {
-  COLUMN_TYPE_CATEGORICAL,
-  COLUMN_TYPE_NUMERICAL,
-} from "../../../slices/columnsSlice";
-import { RoundupToDuckDBTypes } from "../../../lib/duckdb";
-import { FreeTextDialog, InsertColumnDialog } from "../../ui/dialogs";
 import RenameColumnItem from "./RenameColumnItem";
 import DeleteColumnItem from "./DeleteColumnItem";
 import FocusColumnItem from "./FocusColumnItem";
@@ -92,170 +64,49 @@ import InsertColumnItem from "./InsertColumnItem";
 const ColumnContextMenu = ({
   // Props passed via `withColumnData` HOC
   id,
-  columnType,
-  setColumnType,
+  index,
   focusColumn,
 
   deleteColumn,
   renameColumn,
+  insertColumn,
   // Props passed directly from parent component
   // eslint-disable-next-line no-unused-vars
   includeInsert = true,
   isError = false,
   onHideColumn,
-  onInsertColumnLeftClick,
-  onInsertColumnRightClick,
   handleCloseMenu,
 }) => {
-  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-  const [insertDialogOpen, setInsertDialogOpen] = useState(false);
-  const [insertDirection, setInsertDirection] = useState(null);
-  const [columnTypeDialogOpen, setColumnTypeDialogOpen] = useState(false);
-
-  const [selectedColumnType, setSelectedColumnType] = useState(
-    columnType || "",
-  );
-
-  // Callback for handling column rename
-  const handleRenameColumnClick = useCallback(() => {
-    setRenameDialogOpen(true);
-  }, []);
-
-  const handleRenameConfirm = useCallback(
-    (event, newColumnName) => {
-      if (newColumnName.trim() && renameColumn) {
-        renameColumn(newColumnName.trim());
-      }
-      setRenameDialogOpen(false);
-      handleCloseMenu(event);
-    },
-    [handleCloseMenu, renameColumn],
-  );
-
-  const handleRenameCancel = useCallback(
-    (event) => {
-      setRenameDialogOpen(false);
-      handleCloseMenu(event);
-    },
-    [handleCloseMenu],
-  );
-
-  // Callback for handling column type change
-  const handleColumnTypeDialogClose = useCallback(
-    (event) => {
-      setColumnTypeDialogOpen(false);
-      setSelectedColumnType("");
-      handleCloseMenu(event);
-    },
-    [handleCloseMenu],
-  );
-
-  const handleColumnTypeConfirm = useCallback(
-    (event) => {
-      if (selectedColumnType && setColumnType) {
-        setColumnType(selectedColumnType);
-      }
-      handleColumnTypeDialogClose();
-      handleCloseMenu(event);
-    },
-    [
-      selectedColumnType,
-      setColumnType,
-      handleColumnTypeDialogClose,
-      handleCloseMenu,
-    ],
-  );
-
-  const handleColumnTypeCancel = useCallback(
-    (event) => {
-      handleColumnTypeDialogClose();
-      handleCloseMenu(event);
-    },
-    [handleColumnTypeDialogClose, handleCloseMenu],
-  );
-
-  const handleHideColumn = useCallback(
-    (event) => {
-      onHideColumn();
-      handleCloseMenu(event);
-    },
-    [handleCloseMenu, onHideColumn],
-  );
-
-  const handleDeleteColumn = useCallback(
-    (event) => {
-      deleteColumn();
-      handleCloseMenu(event);
-    },
-    [handleCloseMenu, deleteColumn],
-  );
-
-  const handleSetColumnType = useCallback(() => {
-    setSelectedColumnType(columnType || "");
-    setColumnTypeDialogOpen(true);
-  }, [columnType]);
-
-  const handleFocusColumn = useCallback(
-    (event) => {
-      focusColumn();
-      handleCloseMenu(event);
-    },
-    [handleCloseMenu, focusColumn],
-  );
-
-  const handleInsertColumnLeft = useCallback(() => {
-    setInsertDirection("left");
-    setInsertDialogOpen(true);
-  }, []);
-
-  const handleInsertColumnRight = useCallback(() => {
-    setInsertDirection("right");
-    setInsertDialogOpen(true);
-  }, []);
-
-  const handleInsertConfirm = useCallback(
-    (event, data) => {
-      if (insertDirection === "left" && onInsertColumnLeftClick) {
-        onInsertColumnLeftClick(data);
-      } else if (insertDirection === "right" && onInsertColumnRightClick) {
-        onInsertColumnRightClick(data);
-      }
-      setInsertDialogOpen(false);
-      setInsertDirection(null);
-      handleCloseMenu(event);
-    },
-    [
-      handleCloseMenu,
-      insertDirection,
-      onInsertColumnLeftClick,
-      onInsertColumnRightClick,
-    ],
-  );
-
   const handleInsertCancel = useCallback(
     (event) => {
-      setInsertDialogOpen(false);
-      setInsertDirection(null);
       handleCloseMenu(event);
     },
     [handleCloseMenu],
   );
 
-  const menuItemSx = isError
-    ? {
-        color: "error.main",
-        backgroundColor: "error.lighter",
-        "&:hover": {
-          backgroundColor: "error.light",
-        },
-      }
-    : {};
+  const handleInsertLeftSubmit = useCallback(
+    (e, formValues) => {
+      insertColumn(
+        index,
+        formValues.name,
+        formValues.fillValue.length === 0 ? null : formValues.fillValue,
+      );
+      handleCloseMenu(e);
+    },
+    [handleCloseMenu, index, insertColumn],
+  );
 
-  const iconSx = isError
-    ? {
-        color: "error.main",
-      }
-    : {};
+  const handleInsertRightSubmit = useCallback(
+    (e, formValues) => {
+      insertColumn(
+        index + 1,
+        formValues.name,
+        formValues.fillValue.length === 0 ? null : formValues.fillValue,
+      );
+      handleCloseMenu(e);
+    },
+    [handleCloseMenu, index, insertColumn],
+  );
 
   return (
     <>
@@ -264,8 +115,16 @@ const ColumnContextMenu = ({
       <FocusColumnItem id={id} handleCloseMenu={handleCloseMenu} />
       <TypeColumnItem id={id} handleCloseMenu={handleCloseMenu} />
       <Divider orientation="horizontal" />
-      <InsertColumnItem direction="left" handleCloseMenu={handleCloseMenu} />
-      <InsertColumnItem direction="right" handleCloseMenu={handleCloseMenu} />
+      <InsertColumnItem
+        direction="left"
+        onCancel={handleInsertCancel}
+        onSubmit={handleInsertLeftSubmit}
+      />
+      <InsertColumnItem
+        direction="right"
+        onCancel={handleInsertCancel}
+        onSubmit={handleInsertRightSubmit}
+      />
     </>
   );
 };

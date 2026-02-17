@@ -13,22 +13,16 @@ import {
 } from "@mui/material";
 import { useCallback, useState } from "react";
 
-const InsertColumnItem = ({ direction, index, handleCloseMenu }) => {
+const InsertColumnItem = ({ direction, index, onSubmit, onCancel }) => {
   const [insertDialogOpen, setInsertDialogOpen] = useState(false);
 
-  const handleInsertClick = useCallback(() => {
-    setInsertDialogOpen(true);
-  }, []);
-
-  const handleInsertCancel = useCallback(() => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const formValues = Object.fromEntries(formData.entries());
     setInsertDialogOpen(false);
-    handleCloseMenu();
-  }, [handleCloseMenu]);
-
-  const handleSubmit = useCallback(() => {
-    setInsertDialogOpen(false);
-    handleCloseMenu();
-  }, [handleCloseMenu]);
+    onSubmit(e, formValues);
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -36,21 +30,21 @@ const InsertColumnItem = ({ direction, index, handleCloseMenu }) => {
       handleSubmit(e);
     } else if (e.key === "Escape") {
       setInsertDialogOpen(false);
-      handleCloseMenu();
+      onCancel();
     } else {
       // See https://stackoverflow.com/a/56285545/3734991
       e.stopPropagation();
     }
   };
 
-  const handleOnCancel = useCallback(() => {
+  const handleOnCancel = () => {
     setInsertDialogOpen(false);
-    handleCloseMenu();
-  }, [handleCloseMenu]);
+    onCancel();
+  };
 
   return (
     <>
-      <MenuItem onClick={handleInsertClick}>
+      <MenuItem onClick={() => setInsertDialogOpen(true)}>
         <ListItemIcon>
           {direction === "left" ? (
             <KeyboardArrowRight
