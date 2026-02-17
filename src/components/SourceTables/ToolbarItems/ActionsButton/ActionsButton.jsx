@@ -86,7 +86,7 @@ const ActionsButton = () => {
       ]),
     );
     dispatch(clearSelectedTableIds());
-  }, [dispatch, focusedObject?.childIds, focusedObject?.id, selectedTableIds]);
+  }, [dispatch, focusedObject.childIds, focusedObject.id, selectedTableIds]);
 
   return (
     <ButtonWithMenu label="Actions" disabled={!isEnabled}>

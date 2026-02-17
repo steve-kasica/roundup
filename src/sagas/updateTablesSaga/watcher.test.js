@@ -19,6 +19,7 @@ import updateTablesWorker from "./worker";
 import { updateTablesRequest } from "./actions";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
+import { updateOperationsSuccess } from "../updateOperationsSaga";
 
 describe("updateTablesSagaWatcher", () => {
   let state = {};
@@ -264,6 +265,46 @@ describe("updateTablesSagaWatcher", () => {
           {
             id: "t1",
             columnIds: ["c1", "c2", "c7", "c3"],
+          },
+        ])
+        .dispatch(action)
+        .run();
+    });
+  });
+
+  describe("handling updateOperationsSuccess actions", () => {
+    const action = updateOperationsSuccess([
+      {
+        id: "o1",
+        name: "Updated Operation 1",
+        childIds: ["t1", "t2", "t3"],
+      },
+    ]);
+    it("should call updateTablesWorker with action payload", async () => {
+      await expectSaga(updateTablesSagaWatcher)
+        .withState({
+          operations: {
+            byId: {
+              o1: {
+                id: "o1",
+                childIds: ["t1", "t2", "t3"],
+              },
+            },
+          },
+          tables: {
+            byId: {
+              t1: { id: "t1", name: "Table 1", parentId: "o1" },
+              t2: { id: "t2", name: "Table 2", parentId: "o1" },
+              t3: { id: "t3", name: "Table 3", parentId: null },
+            },
+            allIds: ["t1", "t2", "t3"],
+          },
+        })
+        .provide([[matchers.call.fn(updateTablesWorker), undefined]])
+        .call(updateTablesWorker, [
+          {
+            id: "t3",
+            parentId: "o1",
           },
         ])
         .dispatch(action)

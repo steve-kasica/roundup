@@ -15,6 +15,7 @@ import { ascending, group } from "d3";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
+import { updateOperationsSuccess } from "../updateOperationsSaga";
 
 /**
  * Saga watcher that listens for the `updateTablesRequest` action and triggers the corresponding worker saga.
@@ -112,6 +113,32 @@ export default function* updateTablesSagaWatcher() {
     }
     if (workerPayload.length > 0) {
       yield call(updateTablesWorker, workerPayload);
+    }
+  });
+
+  // If an operation is updated and has tables as children, we need to update those tables' parentId property
+  yield takeEvery(updateOperationsSuccess.type, function* (action) {
+    const updatedOperations = action.payload;
+    const tableUpdates = [];
+    for (const operation of updatedOperations) {
+      if (Object.hasOwn(operation, "childIds")) {
+        for (const childId of operation.childIds) {
+          if (isTableId(childId)) {
+            const table = yield select((state) =>
+              selectTablesById(state, childId),
+            );
+            if (table.parentId !== operation.id) {
+              tableUpdates.push({
+                id: childId,
+                parentId: operation.id,
+              });
+            }
+          }
+        }
+      }
+    }
+    if (tableUpdates.length > 0) {
+      yield call(updateTablesWorker, tableUpdates);
     }
   });
 }
