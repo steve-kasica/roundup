@@ -21,7 +21,7 @@
 import { call, select, takeEvery } from "redux-saga/effects";
 import { updateOperationsRequest } from "./actions";
 import updateOperationsWorker from "./worker";
-import { isTableId } from "../../slices/tablesSlice";
+import { isTableId, selectTablesById } from "../../slices/tablesSlice";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import {
   isOperationId,
@@ -30,12 +30,39 @@ import {
 import { deleteTablesSuccess } from "../deleteTablesSaga";
 import { ascending, group } from "d3";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
+import { updateTablesSuccess } from "../updateTablesSaga";
 
 // This it listen for actions by the operations and columns slice
 export default function* updateOperationsWatcher() {
+  // Pass along any update operations requests to the worker saga, but if
+  // the operation is materialized and the update includes schema changes, set isInSync to false.
   yield takeEvery(updateOperationsRequest.type, function* (action) {
     const operationUpdates = action.payload;
-    yield call(updateOperationsWorker, operationUpdates);
+    const payload = [];
+    const outOfSyncProps = [
+      "childIds",
+      "joinKey1",
+      "joinKey2",
+      "joinType",
+      "joinPredicate",
+    ];
+    for (const operationUpdate of operationUpdates) {
+      const operation = yield select((state) =>
+        selectOperationsById(state, operationUpdate.id),
+      );
+      if (
+        operation.isMaterialized &&
+        Object.keys(operationUpdate).some((key) => outOfSyncProps.includes(key))
+      ) {
+        payload.push({
+          ...operationUpdate,
+          isInSync: false,
+        });
+      } else {
+        payload.push(operationUpdate);
+      }
+    }
+    yield call(updateOperationsWorker, payload);
   });
 
   // When tables are deleted, we need to remove that table ID from the
@@ -60,6 +87,7 @@ export default function* updateOperationsWatcher() {
           childIds: operation.childIds.filter(
             (id) => !tables.some((table) => table.id === id),
           ),
+          isInSync: operation.isMaterialized ? false : true,
         });
       }
 
@@ -117,53 +145,30 @@ export default function* updateOperationsWatcher() {
     }
   });
 
-  // TODO: address how state should update when child of materialized operation changes
-  // // When a table is updated, if it's columnIds property has changed
-  // // and the table is the child of a operation, we need to flag that
-  // // the operation is out-of-sync.
-  // yield takeEvery(updateTablesSuccess.type, function* (action) {
-  //   const rematerializationProperteies = ["columnIds", "childIds"];
-  //   const { changedPropertiesById } = action.payload;
-  //   const operationUpdates = [];
-  //   const focusedOperationId = yield select(selectFocusedObjectId);
-
-  //   for (const [id, changedProperties] of Object.entries(
-  //     changedPropertiesById,
-  //   )) {
-  //     const hasSchemaChange = changedProperties.some((prop) =>
-  //       rematerializationProperteies.includes(prop),
-  //     );
-  //     if (hasSchemaChange) {
-  //       const { parentId } = yield select((state) =>
-  //         isTableId(id)
-  //           ? selectTablesById(state, id)
-  //           : selectOperationsById(state, id),
-  //       );
-
-  //       if (parentId) {
-  //         operationUpdates.push({
-  //           id: parentId,
-  //           ...(parentId === focusedOperationId
-  //             ? {
-  //                 // If the operation is focused, we can set it to out-of-sync
-  //                 isInSync: false,
-  //               }
-  //             : {
-  //                 // If the operation is not focused, we set isMaterialized to null
-  //                 // so that when the user focuses on it, it will re-materialize
-  //                 isMaterialized: null,
-  //               }),
-  //         });
-  //       }
-  //     }
-  //   }
-
-  //   if (operationUpdates.length > 0) {
-  //     yield put(
-  //       updateOperationsRequest({
-  //         operationUpdates,
-  //       }),
-  //     );
-  //   }
-  // });
+  // If a table re-orders its columns and the table
+  // is the child of a materialized operation, then the operation needs to
+  // be flagged as out of sync.
+  yield takeEvery(updateTablesSuccess.type, function* (action) {
+    const updatedTables = action.payload;
+    const payload = [];
+    for (const updatedTable of updatedTables) {
+      const table = yield select((state) =>
+        selectTablesById(state, updatedTable.id),
+      );
+      if (Object.hasOwn(updatedTable, "columnIds") && table?.parentId) {
+        const operation = yield select((state) =>
+          selectOperationsById(state, table.parentId),
+        );
+        if (operation.isMaterialized) {
+          payload.push({
+            id: operation.id,
+            isInSync: false,
+          });
+        }
+      }
+    }
+    if (payload.length > 0) {
+      yield call(updateOperationsWorker, payload);
+    }
+  });
 }

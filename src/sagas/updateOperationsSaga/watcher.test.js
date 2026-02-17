@@ -8,9 +8,11 @@ import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,
+  selectOperationsById,
 } from "../../slices/operationsSlice";
 import { deleteTablesSuccess } from "../deleteTablesSaga";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
+import { updateTablesSuccess } from "../updateTablesSaga";
 
 describe("updateOperationsSaga watcher", () => {
   let state, action;
@@ -23,6 +25,8 @@ describe("updateOperationsSaga watcher", () => {
             operationType: OPERATION_TYPE_STACK,
             columnIds: ["c1", "c2"],
             childIds: ["t1", "t2"],
+            isMaterialized: true,
+            isInSync: true,
           },
         },
         allIds: ["o1"],
@@ -75,6 +79,26 @@ describe("updateOperationsSaga watcher", () => {
         .call(updateOperationsWorker, action.payload)
         .run();
     });
+    it("should set isInSync to false if operation is materialized and update includes schema changes", () => {
+      action = updateOperationsRequest([{ id: "o1", childIds: ["t1"] }]);
+      return expectSaga(updateOperationsWatcher)
+        .withState(state)
+        .provide([
+          [
+            matchers.select.selector(selectOperationsById),
+            state.operations.byId.o1,
+          ],
+        ])
+        .call(updateOperationsWorker, [
+          {
+            id: "o1",
+            childIds: ["t1"],
+            isInSync: false,
+          },
+        ])
+        .dispatch(action)
+        .run();
+    });
   });
 
   describe("handling deleteTablesSuccess actions", () => {
@@ -92,6 +116,34 @@ describe("updateOperationsSaga watcher", () => {
           {
             id: "o1",
             childIds: ["t2"],
+            isInSync: false,
+          },
+        ])
+        .dispatch(action)
+        .run();
+    });
+
+    it("should call worker saga with correct payload if tables was an unmaterialized operation child", () => {
+      return expectSaga(updateOperationsWatcher)
+        .withState({
+          ...state,
+          operations: {
+            byId: {
+              o1: {
+                ...state.operations.byId.o1,
+                isMaterialized: false,
+                isInSync: true,
+              },
+            },
+            allIds: state.operations.allIds,
+          },
+        })
+        .provide([[matchers.call.fn(updateOperationsWorker), null]])
+        .call(updateOperationsWorker, [
+          {
+            id: "o1",
+            childIds: ["t2"],
+            isInSync: true,
           },
         ])
         .dispatch(action)
@@ -176,6 +228,86 @@ describe("updateOperationsSaga watcher", () => {
         ])
         .dispatch(action)
         .run();
+    });
+  });
+
+  describe("handling updateTablesSuccess actions", () => {
+    const action = updateTablesSuccess([
+      {
+        id: "t1",
+        parentId: "o1",
+        columnIds: ["c1", "c2", "c3"],
+      },
+    ]);
+
+    describe("columnId updates", () => {
+      it("calls updateOperationsWorker if table is the child of a materialized operation", () => {
+        return expectSaga(updateOperationsWatcher)
+          .withState({
+            operations: {
+              byId: {
+                o1: {
+                  id: "o1",
+                  childIds: ["t1", "t2"],
+                  isMaterialized: true,
+                },
+              },
+            },
+            tables: {
+              byId: {
+                t1: {
+                  id: "t1",
+                  parentId: "o1",
+                },
+                t2: {
+                  id: "t2",
+                  parentId: "o1",
+                },
+              },
+            },
+          })
+          .provide([[matchers.call.fn(updateOperationsWorker), undefined]])
+          .call(updateOperationsWorker, [
+            {
+              id: "o1",
+              isInSync: false,
+            },
+          ])
+          .dispatch(action)
+          .run();
+      });
+
+      it("does not call updateOperationsWorker if table is the child of an unmaterialized operation", () => {
+        return expectSaga(updateOperationsWatcher)
+          .withState({
+            operations: {
+              byId: {
+                o1: {
+                  id: "o1",
+                  childIds: ["t1", "t2"],
+                  isMaterialized: false,
+                  isInSync: true,
+                },
+              },
+            },
+            tables: {
+              byId: {
+                t1: {
+                  id: "t1",
+                  parentId: "o1",
+                },
+                t2: {
+                  id: "t2",
+                  parentId: "o1",
+                },
+              },
+            },
+          })
+          .provide([[matchers.call.fn(updateOperationsWorker), undefined]])
+          .not.call(updateOperationsWorker)
+          .dispatch(action)
+          .run();
+      });
     });
   });
 });
