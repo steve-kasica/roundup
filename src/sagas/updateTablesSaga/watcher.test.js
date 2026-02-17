@@ -20,6 +20,7 @@ import { updateTablesRequest } from "./actions";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";
 import { createColumnsSuccess } from "../createColumnsSaga/actions";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
+import { deleteOperationsSuccess } from "../deleteOperationsSaga/actions";
 
 describe("updateTablesSagaWatcher", () => {
   let state = {};
@@ -305,6 +306,40 @@ describe("updateTablesSagaWatcher", () => {
           {
             id: "t3",
             parentId: "o1",
+          },
+        ])
+        .dispatch(action)
+        .run();
+    });
+  });
+
+  describe("handling deleteOperationsSuccess actions", () => {
+    const action = deleteOperationsSuccess([
+      { id: "o1", childIds: ["t1", "t2"] },
+    ]);
+    it("should call updateTablesWorker with action payload", async () => {
+      await expectSaga(updateTablesSagaWatcher)
+        .withState({
+          operations: {
+            byId: {},
+          },
+          tables: {
+            byId: {
+              t1: { id: "t1", name: "Table 1", parentId: "o1" },
+              t2: { id: "t2", name: "Table 2", parentId: "o1" },
+            },
+            allIds: ["t1", "t2"],
+          },
+        })
+        .provide([[matchers.call.fn(updateTablesWorker), undefined]])
+        .call(updateTablesWorker, [
+          {
+            id: "t1",
+            parentId: null,
+          },
+          {
+            id: "t2",
+            parentId: null,
           },
         ])
         .dispatch(action)

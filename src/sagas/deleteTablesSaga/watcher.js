@@ -49,20 +49,21 @@ export default function* deleteTablesSagaWatcher() {
     }
   });
 
+  // TODO: remove, deleted operations should update table
   // If an operation is successfully deleted, Roundup also deletes any
   // associated tables.
-  yield takeEvery(deleteOperationsSuccess.type, function* (action) {
-    const deletedOperations = action.payload;
-    const tableIdsToDelete = deletedOperations
-      .map(({ childIds }) => childIds)
-      .flat()
-      .filter(isTableId);
+  // yield takeEvery(deleteOperationsSuccess.type, function* (action) {
+  //   const deletedOperations = action.payload;
+  //   const tableIdsToDelete = deletedOperations
+  //     .map(({ childIds }) => childIds)
+  //     .flat()
+  //     .filter(isTableId);
 
-    if (tableIdsToDelete.length > 0) {
-      const tablesToDelete = yield select((state) =>
-        selectTablesById(state, tableIdsToDelete),
-      );
-      yield call(deleteTablesWorker, tablesToDelete);
-    }
-  });
+  //   if (tableIdsToDelete.length > 0) {
+  //     const tablesToDelete = yield select((state) =>
+  //       selectTablesById(state, tableIdsToDelete),
+  //     );
+  //     yield call(deleteTablesWorker, tablesToDelete);
+  //   }
+  // });
 }

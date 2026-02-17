@@ -80,13 +80,13 @@ const ActionsButton = () => {
     dispatch(
       updateOperationsRequest([
         {
-          id: focusedObject.id,
-          childIds: focusedObject.childIds.concat(selectedTableIds),
+          id: focusedObject?.id,
+          childIds: focusedObject?.childIds.concat(selectedTableIds),
         },
       ]),
     );
     dispatch(clearSelectedTableIds());
-  }, [dispatch, focusedObject.childIds, focusedObject.id, selectedTableIds]);
+  }, [dispatch, focusedObject?.childIds, focusedObject?.id, selectedTableIds]);
 
   return (
     <ButtonWithMenu label="Actions" disabled={!isEnabled}>
