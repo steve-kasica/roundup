@@ -45,3 +45,6 @@
 [submodule "example-workflows/employment-discrimination"]
 	path = example-workflows/employment-discrimination
 	url = git@github.com:steve-kasica/employment-discrimination.git
+[submodule "example-workflows/2018-voter-registration"]
+	path = example-workflows/2018-voter-registration
+	url = git@github.com:steve-kasica/2018-voter-registration.git
