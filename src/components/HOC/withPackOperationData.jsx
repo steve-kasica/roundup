@@ -392,6 +392,8 @@ export default function withPackOperationData(WrappedComponent) {
         id={id}
         name={name}
         operationType={OPERATION_TYPE_PACK}
+        isMaterialized={operation.isMaterialized}
+        isInSync={operation.isInSync}
         // Pack-specific props
         joinPredicate={joinPredicate}
         joinType={joinType}

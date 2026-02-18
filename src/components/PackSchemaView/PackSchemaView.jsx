@@ -363,6 +363,17 @@ const PackSchemaView = ({
       .map((k) => matchStats[k])
       .reduce((a, b) => a + b, 0);
 
+    // If all values are zero (unspecified join), distribute equally among enabled matches
+    if (Object.values(matchStats).reduce((a, b) => a + b, 0) === 0) {
+      const heights = new Map();
+
+      matchKeys.forEach((key) => {
+        heights.set(key, 33.33333); // Equal distribution
+      });
+
+      return heights;
+    }
+
     // Calculate raw percentages based on enabled matches only
     const rawPercentages = matchKeys.map((key) => {
       const isDisabled = !validMatchGroups.includes(key);

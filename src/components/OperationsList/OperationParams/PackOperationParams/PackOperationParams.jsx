@@ -1,32 +1,24 @@
 import {
   Box,
   Button,
-  MenuItem,
-  Typography,
-  TextField,
-  FormControl,
-  Select,
-  InputLabel,
-  FormControlLabel,
-  ToggleButton,
-  ToggleButtonGroup,
-  Radio,
-  RadioGroup,
+  Divider,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Stack,
+  Typography,
 } from "@mui/material";
+import { CheckCircle, HourglassEmpty, WarningAmber } from "@mui/icons-material";
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { withPackOperationData } from "../../../HOC";
-import { EnhancedTableLabel } from "../../../TableView";
-import { isTableId } from "../../../../slices/tablesSlice";
-import { EnhancedOperationLabel } from "../../../OperationView/OperationLabel";
+import { withAssociatedAlerts, withPackOperationData } from "../../../HOC";
 import JoinColumnsSelect from "./JoinColumnsSelect";
-import { JoinInner, JoinLeft, JoinRight } from "@mui/icons-material";
 import JoinPredicateSelect from "./JoinPredicateSelect";
-import JoinSummary from "./JoinSummary";
 import { updateOperationsRequest } from "../../../../sagas/updateOperationsSaga";
 import TableOrderRadio from "./TableOrderRadio";
-// import PackOutputDetails from "./PackOutputDetails";
+import { IntegerNumber } from "../../../ui/text";
+import { deleteOperationsRequest } from "../../../../sagas/deleteOperationsSaga/actions";
 
 const PackOperationParams = ({
   // Props passed via withPackOperationData HOC
@@ -37,18 +29,22 @@ const PackOperationParams = ({
   rightTableId,
   leftKey,
   rightKey,
-  setJoinPredicate,
   joinPredicate,
-  setLeftTableJoinKey,
-  setRightTableJoinKey,
+  columnCount,
+  rowCount,
+  isMaterialized,
+  isInSync,
   // Props passed directly from parent OperationSelect.jsx
   id,
   isReadOnly,
+  // Props passed via withAssociatedAlerts HOC
+  totalCount = 0,
 }) => {
   const dispatch = useDispatch();
   const [nameLocal, setNameLocal] = useState(name || "Op.");
   const [inputValue, setInputValue] = useState(name || "Op.");
   const debounceTimerRef = useRef(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const [leftTableIdLocal, setLeftTableIdLocal] = useState(leftTableId);
   const [rightTableIdLocal, setRightTableIdLocal] = useState(rightTableId);
@@ -141,6 +137,23 @@ const PackOperationParams = ({
     ],
   );
 
+  const handleDelete = useCallback(() => {
+    dispatch(deleteOperationsRequest([id]));
+  }, [dispatch, id]);
+
+  const handleDeleteClick = useCallback(() => {
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  const handleDeleteCancel = useCallback(() => {
+    setIsDeleteDialogOpen(false);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(() => {
+    handleDelete();
+    setIsDeleteDialogOpen(false);
+  }, [handleDelete]);
+
   const handleJoinColumnsSelectChange = useCallback((leftKeyId, rightKeyId) => {
     setLeftColumnKeyIdLocal(leftKeyId);
     setRightColumnKeyIdLocal(rightKeyId);
@@ -150,6 +163,28 @@ const PackOperationParams = ({
     setLeftTableIdLocal(left);
     setRightTableIdLocal(right);
   }, []);
+
+  const attachedTableCount = useMemo(
+    () => [leftTableIdLocal, rightTableIdLocal].filter(Boolean).length,
+    [leftTableIdLocal, rightTableIdLocal],
+  );
+
+  const status = useMemo(() => {
+    if (isMaterialized) {
+      return isInSync ? "Materialized" : "Out of sync";
+    }
+    return "Not materialized";
+  }, [isMaterialized, isInSync]);
+
+  const statusIcon = useMemo(() => {
+    if (isMaterialized && isInSync) {
+      return <CheckCircle fontSize="small" color="success" />;
+    }
+    if (isMaterialized && !isInSync) {
+      return <WarningAmber fontSize="small" color="warning" />;
+    }
+    return <HourglassEmpty fontSize="small" color="disabled" />;
+  }, [isMaterialized, isInSync]);
 
   return (
     <Box
@@ -164,41 +199,56 @@ const PackOperationParams = ({
       }}
     >
       <Box flexGrow={1} overflow={"auto"}>
-        {/* <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
-          Metadata
-        </Typography>
-        <FormControl fullWidth sx={{ mb: 2 }} size="small">
-          <TextField
-            id="operation-name"
-            label="Name"
-            variant="outlined"
-            size="small"
-            value={inputValue}
-            onChange={handleNameChange}
-          />
-        </FormControl> */}
         <Typography variant="h5" gutterBottom sx={{ my: 1 }}>
           Stats
         </Typography>
-        <Box
-          sx={{
-            userSelect: "none",
-          }}
-        >
-          <Stack
-            direction="row"
-            gap={1}
-            mb={1}
-            justifyContent={"space-between"}
-          >
+        <Stack spacing={1} sx={{ mb: 2 }}>
+          <Stack direction="row" justifyContent="space-between" gap={2}>
+            <Typography variant="subtitle2" color="text.secondary">
+              Number of tables
+            </Typography>
+            <Typography variant="subtitle2" color="text.secondary">
+              <IntegerNumber value={attachedTableCount} />
+            </Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" gap={2}>
+            <Typography variant="subtitle2" color="text.secondary">
+              Expected columns
+            </Typography>
+            <Typography variant="subtitle2" color="text.secondary">
+              <IntegerNumber value={columnCount} />
+            </Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" gap={2}>
+            <Typography variant="subtitle2" color="text.secondary">
+              Expected rows
+            </Typography>
+            <Typography variant="subtitle2" color="text.secondary">
+              <IntegerNumber value={rowCount} />
+            </Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" gap={2}>
+            <Typography variant="subtitle2" color="text.secondary">
+              Alerts
+            </Typography>
+            <Typography variant="subtitle2" color="text.secondary">
+              <IntegerNumber value={totalCount} />
+            </Typography>
+          </Stack>
+          <Stack direction="row" justifyContent={"space-between"} gap={1}>
             <Typography variant="subtitle2" color="text.secondary">
               Status
             </Typography>
-            <Typography variant="subtitle2" color="primary">
-              {isReadOnly ? "Read-only" : "Editable"}
-            </Typography>
+            <Stack direction="row" alignItems="center" gap={0.5}>
+              {statusIcon}
+              <Typography variant="subtitle2" color="text.secondary">
+                {status}
+              </Typography>
+            </Stack>
           </Stack>
-        </Box>
+        </Stack>
+
+        <Divider sx={{ my: 2 }} />
         <Typography variant="h5" gutterBottom sx={{ my: 1 }}>
           Join parameters
         </Typography>
@@ -244,46 +294,26 @@ const PackOperationParams = ({
           }}
           isDisabled={isReadOnly}
         />
-        {/* <Typography variant="h5" gutterBottom sx={{ my: 2 }}>
-          Output options
-        </Typography>
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel
-            shrink
-            sx={{ position: "relative", transform: "none", mb: 1 }}
-          >
-            Include rows from:
-          </InputLabel>
-          <ToggleButtonGroup size="small">
-            <ToggleButton value="left">
-              <JoinLeft sx={{ mr: 1 }} />
-              Left table
-            </ToggleButton>
-            <ToggleButton value="inner">
-              <JoinInner sx={{ mr: 1 }} />
-              Both tables
-            </ToggleButton>
-            <ToggleButton value="right">
-              <JoinRight sx={{ mr: 1 }} />
-              Right table
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </FormControl> */}
       </Box>
 
       <Box
         sx={{
           display: "flex",
           justifyContent: "flex-end",
-          mt: 3,
           pt: 2,
           borderTop: "1px solid",
           borderColor: "divider",
         }}
       >
-        {/* <Button variant="outlined" color="error">
-          Delete operation
-        </Button> */}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleDeleteClick}
+          disabled={isReadOnly}
+          sx={{ mr: 2 }}
+        >
+          Delete
+        </Button>
         <Button
           variant="contained"
           color="primary"
@@ -293,11 +323,39 @@ const PackOperationParams = ({
           Update
         </Button>
       </Box>
+      <Dialog
+        open={isDeleteDialogOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="pack-operation-delete-title"
+        aria-describedby="pack-operation-delete-description"
+      >
+        <DialogTitle id="pack-operation-delete-title">
+          Delete pack operation?
+        </DialogTitle>
+        <DialogContent id="pack-operation-delete-description">
+          <Typography variant="body2" color="text.secondary">
+            This will remove the operation and disconnect its tables. This
+            action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="inherit">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
 
-const EnhancedPackOperationParams = withPackOperationData(
+const EnhancedPackOperationParams = withAssociatedAlerts(
   withPackOperationData(PackOperationParams),
 );
 export { EnhancedPackOperationParams, PackOperationParams };
