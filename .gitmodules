@@ -48,3 +48,6 @@
 [submodule "example-workflows/2018-voter-registration"]
 	path = example-workflows/2018-voter-registration
 	url = git@github.com:steve-kasica/2018-voter-registration.git
+[submodule "example-workflows/california-h2a-visas-analysis"]
+	path = example-workflows/california-h2a-visas-analysis
+	url = git@github.com:steve-kasica/california-h2a-visas-analysis.git
