@@ -33,7 +33,6 @@
 import { EnhancedTableBlock } from "../TableBlock";
 import { OPERATION_TYPE_PACK } from "../../../slices/operationsSlice";
 import { isTableId } from "../../../slices/tablesSlice";
-import { Box } from "@mui/material";
 import { EnhancedOperationBlock } from "../OperationBlock";
 import {
   withPackOperationData,
@@ -41,6 +40,7 @@ import {
   withAssociatedAlerts,
 } from "../../HOC";
 import StyledBlock from "../../ui/StyledBlock";
+import { ColumnTick } from "../ColumnTick";
 
 function PackOperationBlock({
   // props via withOperationData
@@ -54,8 +54,14 @@ function PackOperationBlock({
   columnCount,
   // Props via withAssociatedAlerts HOC
   totalCount,
+  // Props passed directly from parent
+  parentColumnCount,
   sx = {},
 }) {
+  console.log("Rendering PackOperationBlock with props:", {
+    parentColumnCount,
+    columnCount,
+  });
   const useLightText = isDarkBackground(depth);
   const useLightTextInChildren = isDarkBackground(depth + 1);
 
@@ -77,7 +83,8 @@ function PackOperationBlock({
       {childIds.map((childId, index) => {
         const childSx = {
           width:
-            ((index === 0 ? leftColumnCount : rightColumnCount) / columnCount) *
+            ((index === 0 ? leftColumnCount : rightColumnCount) /
+              (parentColumnCount || columnCount)) *
               100 +
             "%",
           marginLeft: index === 0 ? "0px" : "2px",
@@ -111,6 +118,43 @@ function PackOperationBlock({
           );
         }
       })}
+      {/* Render a transparent block to take up remaining space if child columns don't sum to parent */}
+      {parentColumnCount > columnCount && (
+        <div
+          className="difference"
+          data-columncount={parentColumnCount - columnCount}
+          style={{
+            width:
+              ((parentColumnCount - columnCount) / parentColumnCount) * 100 +
+              "%",
+            minHeight: "1px", // Ensure it's visible for testing
+          }}
+        >
+          {Array.from({ length: parentColumnCount - columnCount }).map(
+            (_, i) => (
+              <ColumnTick
+                key={i}
+                isHovered={false}
+                isDraggable={false}
+                isDropTarget={false}
+                isSelected={false}
+                isOver={false}
+                isLoading={false}
+                isFocused={false}
+                isNull={true} // Show as null to indicate missing columns
+                isVisible={true}
+                operationIndex={0} // Not used for difference ticks
+                sx={{
+                  // width: `${100 / (parentColumnCount - columnCount)}%`,
+                  height: "100%",
+                  backgroundColor: (theme) => theme.palette.grey[300],
+                  // border: "1px dashed red", // Visualize the difference area
+                }}
+              />
+            ),
+          )}
+        </div>
+      )}
     </StyledBlock>
   );
 }
