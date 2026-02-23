@@ -8,6 +8,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 REMOTE_USER="kasica"
+JUMPHOST="jumphost.cs.ubc.ca"
 REMOTE_HOST="remote.cs.ubc.ca"
 REMOTE_PATH="~/public_html/roundup"
 LOCAL_BUILD_DIR="build/"
@@ -16,6 +17,7 @@ echo -e "${YELLOW}Syncing build directory to ${REMOTE_USER}@${REMOTE_HOST}:${REM
 
 rsync -avz --delete \
   --exclude '.DS_Store' \
+  -e "ssh -J ${REMOTE_USER}@${JUMPHOST}" \
   "$LOCAL_BUILD_DIR" \
   "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}"
 
