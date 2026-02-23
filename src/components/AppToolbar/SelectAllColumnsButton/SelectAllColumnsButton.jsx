@@ -26,9 +26,16 @@ import {
   selectFocusedObjectId,
   selectSelectedColumnIds,
   setSelectedColumnIds,
+  setSelectedMatches,
 } from "../../../slices/uiSlice";
 import { isTableId, selectTablesById } from "../../../slices/tablesSlice";
-import { selectOperationsById } from "../../../slices/operationsSlice";
+import {
+  MATCH_TYPE_LEFT_UNMATCHED,
+  MATCH_TYPE_MATCHES,
+  MATCH_TYPE_RIGHT_UNMATCHED,
+  OPERATION_TYPE_PACK,
+  selectOperationsById,
+} from "../../../slices/operationsSlice";
 import { selectColumnIdsByParentId } from "../../../slices/columnsSlice";
 
 const SelectAllColumnsButtonButton = () => {
@@ -48,6 +55,11 @@ const SelectAllColumnsButtonButton = () => {
     }
   });
 
+  const isPackOperation = useMemo(
+    () => focusedObject?.operationType === OPERATION_TYPE_PACK,
+    [focusedObject],
+  );
+
   const allColumns = useSelector((state) => {
     if (!focusedObject) {
       return [];
@@ -60,12 +72,23 @@ const SelectAllColumnsButtonButton = () => {
 
   const onSelectAll = useCallback(() => {
     dispatch(setSelectedColumnIds(allColumns.flat()));
-  }, [allColumns, dispatch]);
+    if (isPackOperation) {
+      dispatch(
+        setSelectedMatches([
+          MATCH_TYPE_LEFT_UNMATCHED,
+          MATCH_TYPE_MATCHES,
+          MATCH_TYPE_RIGHT_UNMATCHED,
+        ]),
+      );
+    }
+  }, [allColumns, dispatch, isPackOperation]);
 
-  const onDeselectAll = useCallback(
-    () => dispatch(setSelectedColumnIds([])),
-    [dispatch],
-  );
+  const onDeselectAll = useCallback(() => {
+    dispatch(setSelectedColumnIds([]));
+    if (isPackOperation) {
+      dispatch(setSelectedMatches([]));
+    }
+  }, [dispatch, isPackOperation]);
 
   const isDisabled = focusedObjectId === null;
 

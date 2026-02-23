@@ -1,4 +1,10 @@
 /* eslint-disable no-undef */
+import {
+  MATCH_TYPE_LEFT_UNMATCHED,
+  MATCH_TYPE_MATCHES,
+  MATCH_TYPE_RIGHT_UNMATCHED,
+  OPERATION_TYPE_PACK,
+} from "../../../slices/operationsSlice/Operation.js";
 import SelectAllColumnsButton from "./SelectAllColumnsButton";
 import { state } from "./fixtures.js";
 
@@ -92,12 +98,22 @@ describe("SelectAllColumnsButton Component", () => {
     });
   });
 
-  describe("Focused object is an operation", () => {
+  describe("Focused object is a stack operation", () => {
     const stateWithFocusedOperation = {
       ...state,
       ui: {
         ...state.ui,
-        focusedObjectId: "o1", // Focus on operation
+        focusedObjectId: "o1", // Focus on stack operation
+      },
+      operations: {
+        byId: {
+          o1: {
+            id: "o1",
+            type: "stack",
+            childIds: ["t1", "t2"],
+            columnIds: ["c1", "c2", "c3", "c46", "c47"],
+          },
+        },
       },
     };
     beforeEach(() => {
@@ -129,6 +145,90 @@ describe("SelectAllColumnsButton Component", () => {
       });
       cy.get("button").click();
       cy.getState().its("ui.selectedColumnIds").should("deep.equal", []);
+    });
+  });
+  describe("Focused object is a pack operation", () => {
+    describe("selection is empty", () => {
+      beforeEach(() => {
+        cy.mountWithProviders(<SelectAllColumnsButton />, {
+          preloadedState: {
+            ui: {
+              selectedColumnIds: [],
+              selectedMatches: [],
+              focusedObjectId: "o1", // Focus on pack operation
+            },
+            operations: {
+              byId: {
+                o1: {
+                  id: "o1",
+                  operationType: OPERATION_TYPE_PACK,
+                  childIds: ["t1", "t2"],
+                  columnIds: ["c48", "c49", "c50", "c51", "c52"],
+                },
+              },
+            },
+            tables: {
+              byId: {
+                t1: { id: "t1", columnIds: ["c1", "c2", "c3"] },
+                t2: { id: "t2", columnIds: ["c46", "c47"] },
+              },
+            },
+          },
+        });
+      });
+      it("enables the button", () => {
+        cy.get("button").should("not.be.disabled");
+      });
+      it("on click selects all child columnIds", () => {
+        cy.get("button").click();
+        cy.getState()
+          .its("ui.selectedColumnIds")
+          .should("deep.equal", ["c1", "c2", "c3", "c46", "c47"]);
+      });
+      it("on click selects all match types", () => {
+        cy.get("button").click();
+        cy.getState()
+          .its("ui.selectedMatches")
+          .should("deep.equal", [
+            MATCH_TYPE_LEFT_UNMATCHED,
+            MATCH_TYPE_MATCHES,
+            MATCH_TYPE_RIGHT_UNMATCHED,
+          ]);
+      });
+    });
+    describe("selection is not empty", () => {
+      beforeEach(() => {
+        cy.mountWithProviders(<SelectAllColumnsButton />, {
+          preloadedState: {
+            ui: {
+              selectedColumnIds: ["c1", "c2"],
+              selectedMatches: [MATCH_TYPE_MATCHES],
+              focusedObjectId: "o1", // Focus on pack operation
+            },
+            operations: {
+              byId: {
+                o1: {
+                  id: "o1",
+                  operationType: OPERATION_TYPE_PACK,
+                  childIds: ["t1", "t2"],
+                  columnIds: ["c1", "c2", "c3", "c46", "c47"],
+                },
+              },
+            },
+          },
+        });
+      });
+      it("enables the button", () => {
+        cy.get("button").should("not.be.disabled");
+      });
+      it("on click deselects all child columnIds", () => {
+        cy.get("button").click();
+        cy.getState().its("ui.selectedColumnIds").should("deep.equal", []);
+      });
+      it("on click deselects all match types", () => {
+        cy.get("button").click();
+        cy.getState().its("ui.selectedMatches").should("deep.equal", []);
+      });
     });
   });
 });
