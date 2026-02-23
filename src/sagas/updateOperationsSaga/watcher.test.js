@@ -198,15 +198,31 @@ describe("updateOperationsSaga watcher", () => {
   });
 
   describe("handling createColumnsSuccess actions", () => {
-    beforeEach(() => {
-      action = createColumnsSuccess([
-        state.columns.byId.c1,
-        state.columns.byId.c2,
-      ]);
-    });
-
     it("should not call updateOperationsWorker with action payload if columns belong to a table", () => {
+      action = createColumnsSuccess([
+        { id: "c3", index: 1, parentId: "t1", name: "Column 2" },
+      ]);
       return expectSaga(updateOperationsWatcher)
+        .withState({
+          operations: {
+            byId: {
+              o1: {
+                id: "o1",
+                columnIds: [],
+              },
+            },
+          },
+          tables: {
+            byId: {
+              t1: {
+                id: "t1",
+                parentId: "o1",
+                name: "Table 1",
+                columnIds: ["c1", "c2"],
+              },
+            },
+          },
+        })
         .provide([[matchers.call.fn(updateOperationsWorker), undefined]])
         .not.call(updateOperationsWorker, [
           {
@@ -217,22 +233,74 @@ describe("updateOperationsSaga watcher", () => {
         .dispatch(action)
         .run();
     });
-    it("should call updateOperationsWorker with action payload if columns belong to an operation", () => {
-      return expectSaga(updateOperationsWatcher)
-        .provide([[matchers.call.fn(updateOperationsWorker), undefined]])
-        .call(updateOperationsWorker, [
-          {
-            id: "o1",
-            columnIds: ["c1", "c2"],
-          },
-        ])
-        .dispatch(action)
-        .run();
+
+    describe("when operation columns are initialized", () => {
+      it("should call updateOperationsWorker with action payload if columns belong to an operation", () => {
+        action = createColumnsSuccess([
+          { id: "c1", index: 0, parentId: "o1", name: "Column 1" },
+          { id: "c2", index: 1, parentId: "o1", name: "Column 2" },
+        ]);
+        return expectSaga(updateOperationsWatcher)
+          .withState({
+            operations: {
+              byId: {
+                o1: {
+                  id: "o1",
+                  columnIds: [],
+                },
+              },
+            },
+            columns: {
+              byId: {
+                c1: { id: "c1", index: 0, parentId: "o1", name: "Column 1" },
+                c2: { id: "c2", index: 1, parentId: "o1", name: "Column 2" },
+              },
+            },
+          })
+          .provide([[matchers.call.fn(updateOperationsWorker), undefined]])
+          .call(updateOperationsWorker, [
+            {
+              id: "o1",
+              columnIds: ["c1", "c2"],
+            },
+          ])
+          .dispatch(action)
+          .run();
+      });
+    });
+    describe("when a column is being inserted into an operation", () => {
+      it("should call updateOperationsWork with all columnIds", () => {
+        action = createColumnsSuccess([
+          { id: "c3", index: 1, parentId: "o1", name: "Column 3" },
+        ]);
+        return expectSaga(updateOperationsWatcher)
+          .withState({
+            operations: {
+              byId: { o1: { id: "o1", columnIds: ["c1", "c2"] } },
+            },
+            columns: {
+              byId: {
+                c1: { id: "c1", index: 0, parentId: "o1", name: "Column 1" },
+                c2: { id: "c2", index: 1, parentId: "o1", name: "Column 2" },
+                c3: { id: "c3", index: 1, parentId: "o1", name: "Column 3" },
+              },
+            },
+          })
+          .provide([[matchers.call.fn(updateOperationsWorker), undefined]])
+          .call(updateOperationsWorker, [
+            {
+              id: "o1",
+              columnIds: ["c1", "c3", "c2"],
+            },
+          ])
+          .dispatch(action)
+          .run();
+      });
     });
   });
 
   describe("handling updateTablesSuccess actions", () => {
-    const action = updateTablesSuccess([
+    action = updateTablesSuccess([
       {
         id: "t1",
         parentId: "o1",
@@ -242,6 +310,15 @@ describe("updateOperationsSaga watcher", () => {
 
     describe("columnId updates", () => {
       it("calls updateOperationsWorker if table is the child of a materialized operation", () => {
+        // Image we're swapping columns within a table that is the child of a materialized operation.
+        // The operation needs to be flagged as out of sync.
+        action = updateTablesSuccess([
+          {
+            id: "t1",
+            parentId: "o1",
+            columnIds: ["c2", "c1"],
+          },
+        ]);
         return expectSaga(updateOperationsWatcher)
           .withState({
             operations: {
@@ -249,6 +326,7 @@ describe("updateOperationsSaga watcher", () => {
                 o1: {
                   id: "o1",
                   childIds: ["t1", "t2"],
+                  columnIds: ["c5", "c6"],
                   isMaterialized: true,
                 },
               },
@@ -257,12 +335,24 @@ describe("updateOperationsSaga watcher", () => {
               byId: {
                 t1: {
                   id: "t1",
+                  columnIds: ["c1", "c2"],
                   parentId: "o1",
                 },
                 t2: {
                   id: "t2",
+                  columnIds: ["c3", "c4"],
                   parentId: "o1",
                 },
+              },
+            },
+            columnIds: {
+              byId: {
+                c1: { id: "c1", parentId: "t1", name: "Column 1" },
+                c2: { id: "c2", parentId: "t1", name: "Column 2" },
+                c3: { id: "c3", parentId: "t2", name: "Column 3" },
+                c4: { id: "c4", parentId: "t2", name: "Column 4" },
+                c5: { id: "c5", parentId: "o1", name: "Column 5" },
+                c6: { id: "c6", parentId: "o1", name: "Column 6" },
               },
             },
           })
@@ -285,6 +375,7 @@ describe("updateOperationsSaga watcher", () => {
                 o1: {
                   id: "o1",
                   childIds: ["t1", "t2"],
+                  columnIds: ["c1", "c2", "c3"],
                   isMaterialized: false,
                   isInSync: true,
                 },
@@ -300,6 +391,13 @@ describe("updateOperationsSaga watcher", () => {
                   id: "t2",
                   parentId: "o1",
                 },
+              },
+            },
+            columns: {
+              byId: {
+                c1: { id: "c1", parentId: "o1", name: "Column 1" },
+                c2: { id: "c2", parentId: "o1", name: "Column 2" },
+                c3: { id: "c3", parentId: "o1", name: "Column 3" },
               },
             },
           })

@@ -122,7 +122,17 @@ export default function* updateOperationsWatcher() {
 
   /**
    * When columns are created, we need to update the parent operation's
-   * columnIds property to include the new columns.
+   * columnIds property to include the new columns. We need to handle two cases:
+   * 1) The operation has no columns yet, in which case we can just set columnIds to the new columns
+   * 2) The operation already has columns, in which case we need to splice the new column into the correct index
+   *
+   * We can differentiate between these two cases by checking the current state, we're in case 1 if
+   * all of the operation's current columnIds are null. So instead of using flags passed between watcher
+   * and worker, we just check state. In hindsight, while this pattern works, I think it would be cleaner
+   * to have a separate saga for inserting columns to explicit signal when were in either case,
+   * rather than having the watcher check state again. But this works for now and avoids some
+   * unnecessary complexity in the worker, which is the most important part to keep simple.
+   *
    */
   yield takeEvery(createColumnsSuccess.type, function* (action) {
     const createdColumns = action.payload;
@@ -132,12 +142,28 @@ export default function* updateOperationsWatcher() {
 
     for (const [parentId, columns] of columnsByParent) {
       if (isOperationId(parentId)) {
-        workerPayload.push({
-          id: parentId,
-          columnIds: columns
-            .sort((a, b) => ascending(a.index, b.index))
-            .map((col) => col.id),
-        });
+        const operation = yield select((state) =>
+          selectOperationsById(state, parentId),
+        );
+        if (operation.columnIds.every((id) => id === null)) {
+          // We are instantiating columns for an operation
+          workerPayload.push({
+            id: parentId,
+            columnIds: columns
+              .sort((a, b) => ascending(a.index, b.index))
+              .map((col) => col.id),
+          });
+        } else if (columns.length === 1) {
+          // We are inserting columns into an existing operation
+          workerPayload.push({
+            id: parentId,
+            columnIds: [...operation.columnIds].toSpliced(
+              columns[0].index,
+              0,
+              columns[0].id,
+            ),
+          });
+        }
       }
     }
     if (workerPayload.length > 0) {
