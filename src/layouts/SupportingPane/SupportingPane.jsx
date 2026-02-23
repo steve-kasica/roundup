@@ -17,7 +17,6 @@
  * import SupportingPane from './SupportingPane';
  * <SupportingPane />
  */
-import { name as APP_NAME } from "../../../package.json";
 import { Typography, Box, styled, IconButton } from "@mui/material";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import LeftSideBar from "./LeftSideBar";
@@ -64,6 +63,12 @@ const CompositeSchemaContainerSizes = {
 const LeftSidebarSizes = {
   COLLAPSED: 5,
   EXPANDED: 25,
+  MAXIMUM: 33.3333333,
+};
+const RightSidebarSizes = {
+  COLLAPSED: 0,
+  EXPANDED: 25,
+  MAXIMUM: 25,
 };
 
 export default function SupportingPane() {
@@ -129,7 +134,7 @@ export default function SupportingPane() {
               collapsible={false}
               minSize={LeftSidebarSizes.COLLAPSED}
               defaultSize={LeftSidebarSizes.EXPANDED}
-              maxSize={100}
+              maxSize={LeftSidebarSizes.MAXIMUM}
               order={1}
             >
               <PanelGroup autoSaveId="LeftSidebarPane" direction="vertical">
@@ -270,8 +275,8 @@ export default function SupportingPane() {
                   id="column-window-panel"
                   order={3}
                   collapsible={true}
-                  maxSize={50}
-                  defaultSize={25}
+                  maxSize={RightSidebarSizes.MAXIMUM}
+                  defaultSize={RightSidebarSizes.EXPANDED}
                   style={{ padding: "5px" }}
                 >
                   <ColumnWindow columnIds={focusedColumnIds} />
