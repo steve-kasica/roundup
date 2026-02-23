@@ -136,7 +136,7 @@ describe("deleteTablesSagaWatcher", () => {
   });
 
   describe("handling deleteOperationsSuccess actions", () => {
-    it("should pass child tables to worker", () => {
+    it("should not pass child tables to worker", () => {
       const action = deleteOperationsSuccess([{ ...state.operations.byId.o2 }]);
       const postActionState = {
         ...state,
@@ -148,7 +148,7 @@ describe("deleteTablesSagaWatcher", () => {
       return expectSaga(deleteTablesSagaWatcher)
         .withState(postActionState)
         .provide([[matchers.call.fn(deleteTablesWorker), undefined]])
-        .call(deleteTablesWorker, [state.tables.byId.t3])
+        .not.call(deleteTablesWorker, [state.tables.byId.t3])
         .dispatch(action)
         .run();
     });
