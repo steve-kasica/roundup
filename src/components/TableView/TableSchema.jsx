@@ -55,6 +55,7 @@ import {
   IconButton,
   Divider,
   Tooltip,
+  useTheme,
 } from "@mui/material";
 import { withTableData, withAssociatedAlerts } from "../HOC";
 import { useCallback, useRef, useState } from "react";
@@ -99,10 +100,12 @@ const TableSchema = ({
   if (import.meta.env.VITE_DEBUG_RENDER === "true") {
     console.debug("Rendering TableSchema for table:", id);
   }
+  const theme = useTheme();
   const dispatch = useDispatch();
   const [columnTypeMenuAnchor, setColumnTypeMenuAnchor] = useState(null);
   const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
   const [contextMenuColumnId, setContextMenuColumnId] = useState(null);
+  const [selectedAnchorColumnId, setSelectedAnchorColumnId] = useState(null);
   const columnContainerRef = useRef(null);
 
   /**
@@ -129,7 +132,7 @@ const TableSchema = ({
   /**
    * Handles column selection with support for contiguous selection only:
    * - Regular click: Replace current selection with clicked column
-   * - Shift+click: Select range from last selected column to clicked column
+   * - Shift+click: Select range from anchor column to clicked column
    *
    * @param {Event} event - Click event containing modifier key information
    * @param {string} columnId - ID of the clicked column
@@ -139,28 +142,28 @@ const TableSchema = ({
       const isShift = event.shiftKey;
       const currentColumnIndex = columnIds.indexOf(columnId);
 
-      if (isShift && selectedColumnIds.length > 0) {
-        // Shift+click: Select range from last selected column to clicked column
-        const lastSelectedColumnId = selectedColumnIds[0];
-        const lastSelectedIndex = columnIds.indexOf(lastSelectedColumnId);
+      if (isShift && selectedAnchorColumnId) {
+        // Shift+click: Select range from anchor column to clicked column
+        const anchorIndex = columnIds.indexOf(selectedAnchorColumnId);
 
-        if (lastSelectedIndex !== -1) {
-          const startIndex = Math.min(currentColumnIndex, lastSelectedIndex);
-          const endIndex = Math.max(currentColumnIndex, lastSelectedIndex);
+        if (anchorIndex !== -1) {
+          const startIndex = Math.min(currentColumnIndex, anchorIndex);
+          const endIndex = Math.max(currentColumnIndex, anchorIndex);
           const rangeColumnIds = columnIds.slice(startIndex, endIndex + 1);
 
-          // Add the range to selection (keeping existing selection)
           selectColumns(rangeColumnIds);
         } else {
-          // Fallback to single selection if last selected column not found
+          // Fallback to single selection if anchor not found
           selectColumns([columnId]);
+          setSelectedAnchorColumnId(columnId);
         }
       } else {
-        // Regular click: Replace selection
+        // Regular click: Replace selection and set anchor
         selectColumns([columnId]);
+        setSelectedAnchorColumnId(columnId);
       }
     },
-    [columnIds, selectedColumnIds, selectColumns],
+    [columnIds, selectedAnchorColumnId, selectColumns],
   );
 
   /**
@@ -279,7 +282,6 @@ const TableSchema = ({
         flexDirection="row"
         alignContent={"flex-start"}
         flex="1 1 auto"
-        gap={1}
         sx={{
           overflowX: "auto",
           overflowY: "hidden",
@@ -301,106 +303,161 @@ const TableSchema = ({
             }
             return acc;
           }, [])
-          .map(({ columnIds, indices, isVisible }, i) => {
-            return (
-              <Box
-                key={columnIds.join("-")}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  userSelect: "none",
-                  ...(isVisible
-                    ? {
-                        flex: "1",
-                      }
-                    : {
-                        flex: "0 0 auto",
-                        width: "20px",
-                      }),
-                }}
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => unhideColumns(columnIds)}
-                  sx={{ borderRadius: 0 }}
+          .map(
+            (
+              {
+                columnIds: groupedColumnIds,
+                indices: groupedIndices,
+                isVisible,
+              },
+              i,
+            ) => {
+              // Calculate border styling based on selection state
+              const currentColumnId = groupedColumnIds[0];
+              const isSelected = selectedColumnIds.includes(currentColumnId);
+              const currentColumnIndex = groupedIndices[0];
+
+              // Check if adjacent columns in the full array are also selected
+              const prevColumnId =
+                currentColumnIndex > 0
+                  ? columnIds[currentColumnIndex - 1]
+                  : null;
+              const nextColumnId =
+                currentColumnIndex < columnIds.length - 1
+                  ? columnIds[currentColumnIndex + 1]
+                  : null;
+
+              const prevColumnSelected =
+                prevColumnId && selectedColumnIds.includes(prevColumnId);
+              const nextColumnSelected =
+                nextColumnId && selectedColumnIds.includes(nextColumnId);
+
+              // Build border styling: remove left/right borders between contiguous selections
+              const borderSx = isSelected
+                ? {
+                    borderRadius: 1,
+                    borderLeft: prevColumnSelected
+                      ? "none"
+                      : `5px solid ${theme.palette.selectedBorder}`,
+                    borderRight: nextColumnSelected
+                      ? "none"
+                      : `5px solid ${theme.palette.selectedBorder}`,
+                    borderTop: `5px solid ${theme.palette.selectedBorder}`,
+                    borderBottom: `5px solid ${theme.palette.selectedBorder}`,
+                  }
+                : {};
+
+              return (
+                <Box
+                  key={groupedColumnIds.join("-")}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    userSelect: "none",
+                    ...(isVisible
+                      ? {
+                          flex: "1",
+                        }
+                      : {
+                          flex: "0 0 auto",
+                          width: "20px",
+                        }),
+                  }}
                 >
-                  <Tooltip
-                    title={
-                      isVisible
-                        ? `Column #${indices[0] + 1}`
-                        : `Hidden columns at ${
-                            indices[0] + 1
-                          }. Click to unhide.`
-                    }
-                    arrow
+                  <IconButton
+                    size="small"
+                    onClick={() => unhideColumns(groupedColumnIds)}
+                    sx={{ borderRadius: 0 }}
                   >
+                    <Tooltip
+                      title={
+                        isVisible
+                          ? `Column #${groupedIndices[0] + 1}`
+                          : `Hidden columns at ${
+                              groupedIndices[0] + 1
+                            }. Click to unhide.`
+                      }
+                      arrow
+                    >
+                      <Box
+                        width="100%"
+                        display="flex"
+                        justifyContent="center"
+                        alignItems="center"
+                      >
+                        {isVisible ? (
+                          <Typography
+                            variant="data-small"
+                            textAlign="center"
+                            width="100%"
+                            gutterBottom
+                          >
+                            {groupedIndices[0] + 1}
+                          </Typography>
+                        ) : (
+                          <HiddenColumnsButton count={groupedIndices.length} />
+                        )}
+                      </Box>
+                    </Tooltip>
+                  </IconButton>
+                  {isVisible ? (
                     <Box
-                      width="100%"
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
+                      sx={{
+                        ...borderSx,
+                        height: "100%",
+                        marginTop: isSelected ? "0" : "5px", // add margin around unselected columns for visual separation
+                        marginBottom: isSelected ? "0" : "5px", // add margin around unselected columns for visual separation
+                      }}
                     >
-                      {isVisible ? (
-                        <Typography
-                          variant="data-small"
-                          textAlign="center"
-                          width="100%"
-                          gutterBottom
-                        >
-                          {indices[0] + 1}
-                        </Typography>
-                      ) : (
-                        <HiddenColumnsButton count={indices.length} />
-                      )}
+                      <ColumnDragContainer
+                        id={currentColumnId}
+                        parentId={id}
+                        columnIndex={i}
+                        canDrag={selectedColumnIds.includes(currentColumnId)}
+                        onDrop={handleColumnDrop}
+                      >
+                        {/* Interactive Column Summary Card that includes [data-column-id] */}
+                        <EnhancedColumnSummary
+                          id={currentColumnId}
+                          onClick={(event) =>
+                            handleColumnClick(event, currentColumnId)
+                          }
+                          onDoubleClick={(event) =>
+                            handleColumnDoubleClick(event, currentColumnId)
+                          }
+                          onContextMenu={(event) =>
+                            handleContextMenu(event, currentColumnId)
+                          }
+                          isDraggable={selectedColumnIds.includes(
+                            currentColumnId,
+                          )}
+                          handleInsertColumnLeft={(value) =>
+                            insertColumn(i, value)
+                          }
+                          handleInsertColumnRight={(value) =>
+                            insertColumn(i + 1, value)
+                          }
+                          sx={{
+                            boxShadow: 1, // subtle elevation effect
+                            marginRight:
+                              !isSelected || nextColumnSelected ? "5px" : "0", // add margin around unselected columns for visual separation
+                          }}
+                        />
+                      </ColumnDragContainer>
                     </Box>
-                  </Tooltip>
-                </IconButton>
-                {isVisible ? (
-                  <>
-                    <ColumnDragContainer
-                      id={columnIds[0]}
-                      parentId={id}
-                      columnIndex={i}
-                      canDrag={selectedColumnIds.includes(columnIds[0])}
-                      onDrop={handleColumnDrop}
-                    >
-                      {/* Interactive Column Summary Card that includes [data-column-id] */}
-                      <EnhancedColumnSummary
-                        id={columnIds[0]}
-                        onClick={(event) =>
-                          handleColumnClick(event, columnIds[0])
-                        }
-                        onDoubleClick={(event) =>
-                          handleColumnDoubleClick(event, columnIds[0])
-                        }
-                        onContextMenu={(event) =>
-                          handleContextMenu(event, columnIds[0])
-                        }
-                        isDraggable={selectedColumnIds.includes(columnIds[0])}
-                        handleInsertColumnLeft={(value) =>
-                          insertColumn(i, value)
-                        }
-                        handleInsertColumnRight={(value) =>
-                          insertColumn(i + 1, value)
-                        }
-                        sx={{
-                          boxShadow: 1, // subtle elevation effect
-                        }}
-                      />
-                    </ColumnDragContainer>
-                  </>
-                ) : (
-                  <Divider
-                    orientation="vertical"
-                    sx={{
-                      marginLeft: "auto",
-                      marginRight: "auto",
-                    }}
-                  />
-                )}
-              </Box>
-            );
-          })}
+                  ) : (
+                    <Divider
+                      orientation="vertical"
+                      sx={{
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                      }}
+                    />
+                  )}
+                </Box>
+              );
+            },
+          )}
       </Box>
     </Box>
   );

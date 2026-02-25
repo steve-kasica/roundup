@@ -9,6 +9,7 @@ const baseTheme = createTheme({
       default: "#eeeeee",
       paper: "#ffffff",
     },
+    selectedBorder: "black",
   },
   effects: {
     defaultLighten: 0.4,
