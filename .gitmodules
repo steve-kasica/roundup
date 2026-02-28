@@ -54,3 +54,6 @@
 [submodule "example-workflows/awb-notebook"]
 	path = example-workflows/awb-notebook
 	url = git@github.com:steve-kasica/awb-notebook.git
+[submodule "example-workflows/long-term-care-db"]
+	path = example-workflows/long-term-care-db
+	url = git@github.com:steve-kasica/long-term-care-db.git
