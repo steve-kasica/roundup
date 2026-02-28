@@ -10,11 +10,11 @@
  * Note: Since takeEvery directly invokes the worker (not via call effect),
  * we test by verifying the worker's output effects are produced.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
 import * as matchers from "redux-saga-test-plan/matchers";
 import deleteOperationsWatcher from "./watcher";
-import { deleteOperationsRequest, deleteOperationsSuccess } from "./actions";
+import { deleteOperationsRequest } from "./actions";
 import {
   OPERATION_TYPE_PACK,
   OPERATION_TYPE_STACK,

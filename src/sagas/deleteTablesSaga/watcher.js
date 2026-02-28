@@ -17,8 +17,7 @@ import { call, select, takeEvery } from "redux-saga/effects";
 import { deleteTablesRequest } from "./actions";
 import { updateTablesSuccess } from "../updateTablesSaga";
 import deleteTablesWorker from "./worker";
-import { deleteOperationsSuccess } from "../deleteOperationsSaga/actions";
-import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectTablesById } from "../../slices/tablesSlice";
 
 export default function* deleteTablesSagaWatcher() {
   yield takeEvery(deleteTablesRequest.type, function* (action) {

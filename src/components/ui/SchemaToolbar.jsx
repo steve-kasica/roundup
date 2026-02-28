@@ -32,19 +32,15 @@ import {
   Toolbar,
   Box,
   Divider,
-  Dialog,
   Popover,
   List,
   Typography,
-  Stack,
-  Chip,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useCallback, useMemo, useState } from "react";
 import { selectAlertsById } from "../../slices/alertsSlice/selectors";
 import { EnhancedAlertDescription } from "../Alerts/AlertDescription";
 import withAssociatedAlerts from "../HOC/withAssociatedAlerts";
-import { PackOperationIcon, StackOperationIcon, TableIcon } from "./icons";
 
 export const OBJECT_TYPE_TABLE = "table";
 export const OBJECT_TYPE_STACK = "stack";

@@ -18,16 +18,11 @@
  */
 import { call, put, select } from "redux-saga/effects";
 import {
-  COLUMN_TYPE_CATEGORICAL,
   selectColumnsById,
   TOP_VALUES_ATTR,
   updateColumns as updateColumnsSlice,
 } from "../../slices/columnsSlice";
-import {
-  getColumnStats,
-  getValueCounts,
-  setColumnType,
-} from "../../lib/duckdb";
+import { getColumnStats, getValueCounts } from "../../lib/duckdb";
 import { updateColumnsSuccess } from "./actions";
 import { SUMMARY_ATTRIBUTES } from "../../slices/columnsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";

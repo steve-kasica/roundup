@@ -24,16 +24,10 @@
  */
 
 /* eslint-disable react/prop-types */
-import { IconButton, Menu, TableSortLabel } from "@mui/material";
-// import EditableText from "../ui/EditableText";
-import { useCallback, useState } from "react";
-import { MoreVert } from "@mui/icons-material";
+import { TableSortLabel } from "@mui/material";
+import { useCallback } from "react";
 import { withColumnData, withAssociatedAlerts } from "../../HOC";
-// import { EnhancedColumnName } from "./ColumnName";
-// import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems";
-// import StyledColumnContainer from "./StyledColumnContainer";
 import { ColumnTypeIcon } from "../../ColumnViews";
-import { StyledColumnContainer } from "../../ColumnViews";
 
 /**
  * ColumnHeader Component

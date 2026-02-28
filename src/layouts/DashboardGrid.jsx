@@ -16,7 +16,6 @@
  * import { DashboardGrid } from './layouts';
  * <DashboardGrid components={[<Chart />, <Table />]} titles={['Sales', 'Data']} />
  */
-import { lazy, Suspense } from "react";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -126,7 +125,11 @@ const DashboardGrid = ({
             >
               <CardContent>
                 {gridTitles[index] && (
-                  <Typography variant="analytics-subsection-title" component="div" gutterBottom>
+                  <Typography
+                    variant="analytics-subsection-title"
+                    component="div"
+                    gutterBottom
+                  >
                     {gridTitles[index]}
                   </Typography>
                 )}

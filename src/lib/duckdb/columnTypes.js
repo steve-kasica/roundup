@@ -19,9 +19,7 @@
 
 // https://duckdb.org/docs/stable/sql/data_types/typecasting#:~:text=Implicit%20Casting,passed%20to%20the%20sin%20function.
 import {
-  COLUMN_TYPE_BOOLEAN,
   COLUMN_TYPE_CATEGORICAL,
-  COLUMN_TYPE_DATE,
   COLUMN_TYPE_NUMERICAL,
 } from "../../slices/columnsSlice";
 

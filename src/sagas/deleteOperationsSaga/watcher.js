@@ -14,7 +14,7 @@
  * // Watcher is started automatically by rootSaga
  */
 import { deleteOperationsRequest } from "./actions";
-import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
+import { call, select, takeEvery, takeLatest } from "redux-saga/effects";
 import deleteOperationsWorker from "./worker";
 import {
   isOperationId,

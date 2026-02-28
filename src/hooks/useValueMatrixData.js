@@ -27,13 +27,9 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { getDuckDB } from "../lib/duckdb/duckdbClient";
-import { escapeColumnName } from "../lib/duckdb/utilities";
-import { getValueCounts, getValuesCountMatrix } from "../lib/duckdb";
+import { getValuesCountMatrix } from "../lib/duckdb";
 import { useSelector } from "react-redux";
 import { selectColumnsById } from "../slices/columnsSlice";
-import { group } from "d3";
-import { use } from "react";
 import { isTableId, selectTablesById } from "../slices/tablesSlice";
 import { selectOperationsById } from "../slices/operationsSlice";
 
@@ -72,7 +68,7 @@ export function useValueMatrixData(columnIds = [], autoFetch = true) {
     const tableIds = [];
     const operationIds = [];
     const uniqParentIds = Array.from(
-      new Set(columns.map((col) => col.parentId))
+      new Set(columns.map((col) => col.parentId)),
     );
     setParentIds(uniqParentIds);
     uniqParentIds.forEach((parentId) => {
@@ -87,7 +83,7 @@ export function useValueMatrixData(columnIds = [], autoFetch = true) {
 
   const tables = useSelector((state) => selectTablesById(state, tableIds));
   const operations = useSelector((state) =>
-    selectOperationsById(state, operationIds)
+    selectOperationsById(state, operationIds),
   );
 
   const databaseNames = useMemo(() => {
@@ -98,7 +94,7 @@ export function useValueMatrixData(columnIds = [], autoFetch = true) {
           ? tables.find((tbl) => tbl.id === col.parentId)?.databaseName
           : operations.find((op) => op.id === col.parentId)
               ?.outputTableDatabaseName,
-      ])
+      ]),
     );
     return columns.map((column) => ({
       table: id2DatabaseName.get(column.id),
@@ -117,7 +113,7 @@ export function useValueMatrixData(columnIds = [], autoFetch = true) {
     try {
       const valueCountMatrix = await getValuesCountMatrix(
         databaseNames.map((col) => col.column),
-        databaseNames.map((col) => col.table)
+        databaseNames.map((col) => col.table),
       );
       setUniqueValues(valueCountMatrix.map((row) => row[0]));
       setValueDegrees(valueCountMatrix.map((row) => row[row.length - 2])); // Store the degrees of each value

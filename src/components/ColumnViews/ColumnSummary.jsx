@@ -28,21 +28,12 @@
 
 /* eslint-disable react/prop-types */
 import { withColumnData, withAssociatedAlerts } from "../HOC";
-import {
-  Box,
-  Typography,
-  Menu,
-  Chip,
-  Divider,
-  Stack,
-  Tooltip,
-} from "@mui/material";
+import { Box, Typography, Menu, Chip, Stack, Tooltip } from "@mui/material";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 import StyledColumnContainer from "./StyledColumnContainer";
 import { ColumnContextMenuButton } from "../ui/buttons";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems/ColumnContextMenuItems";
-import { format } from "d3";
 import { IntegerNumber, PercentNumber } from "../ui/text";
 
 /**

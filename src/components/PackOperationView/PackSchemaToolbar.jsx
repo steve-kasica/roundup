@@ -35,12 +35,7 @@ import {
   withGlobalInterfaceData,
 } from "../HOC";
 import { Divider } from "@mui/material";
-import {
-  JOIN_TYPES,
-  MATCH_TYPE_LEFT_UNMATCHED,
-  MATCH_TYPE_MATCHES,
-  MATCH_TYPE_RIGHT_UNMATCHED,
-} from "../../slices/operationsSlice";
+import { JOIN_TYPES } from "../../slices/operationsSlice";
 
 const PackSchemaToolbar = ({
   // Props defined in `withGlobalInterfaceData.jsx` HOC
@@ -78,7 +73,7 @@ const PackSchemaToolbar = ({
     () =>
       selectedMatches.length > 0 &&
       selectedMatches.length === validMatchGroups.length,
-    [selectedMatches, validMatchGroups]
+    [selectedMatches, validMatchGroups],
   );
 
   /**
@@ -121,7 +116,7 @@ const PackSchemaToolbar = ({
       clearSelectedColumns();
       clearSelectedMatches();
     },
-    [matchKeys, setJoinType, clearSelectedColumns, clearSelectedMatches]
+    [matchKeys, setJoinType, clearSelectedColumns, clearSelectedMatches],
   );
 
   /**
@@ -131,7 +126,7 @@ const PackSchemaToolbar = ({
    */
   const handleFocusColumns = useCallback(
     () => focusColumns([...selectedChildColumnIdsSet]),
-    [focusColumns, selectedChildColumnIdsSet]
+    [focusColumns, selectedChildColumnIdsSet],
   );
 
   /**
@@ -169,7 +164,7 @@ const PackSchemaToolbar = ({
    */
   const handleRenameConfirm = useCallback(
     (newName) => setOperationName(newName),
-    [setOperationName]
+    [setOperationName],
   );
 
   return (
@@ -205,7 +200,7 @@ const PackSchemaToolbar = ({
 };
 
 const EnhancedPackSchemaToolbar = withOperationData(
-  withPackOperationData(withGlobalInterfaceData(PackSchemaToolbar))
+  withPackOperationData(withGlobalInterfaceData(PackSchemaToolbar)),
 );
 
 EnhancedPackSchemaToolbar.displayName = "Enhanced Pack Schema Toolbar";

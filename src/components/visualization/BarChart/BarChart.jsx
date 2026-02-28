@@ -31,8 +31,8 @@
 
 import PropTypes from "prop-types";
 import { useEffect, useRef, useCallback, useState } from "react";
-import { Box, Typography, Tooltip, CircularProgress } from "@mui/material";
-import { axisBottom, interpolateNumber, scaleLinear } from "d3";
+import { Box, Typography, CircularProgress } from "@mui/material";
+import { scaleLinear } from "d3";
 
 const BarChart = ({
   data = {},
@@ -71,7 +71,7 @@ const BarChart = ({
         onScrollNearBottom();
       }
     },
-    [onScrollNearBottom, scrollThreshold, isLoading]
+    [onScrollNearBottom, scrollThreshold, isLoading],
   );
 
   useEffect(() => {

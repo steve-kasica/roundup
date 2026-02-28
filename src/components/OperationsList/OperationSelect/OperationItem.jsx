@@ -1,9 +1,4 @@
-import {
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Typography,
-} from "@mui/material";
+import { ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { withOperationData } from "../../HOC";
 import {
   OPERATION_TYPE_PACK,

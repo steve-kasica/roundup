@@ -30,7 +30,6 @@ import { usePaginatedValueCounts } from "../../hooks/useValueCounts/useValueCoun
 import { formatNumber } from "../../lib/utilities";
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
 import { useMemo } from "react";
-import { format } from "d3";
 
 /**
  * ColumnValuesCounts Component
@@ -56,13 +55,13 @@ import { format } from "d3";
 const ColumnValuesCounts = ({ id, limit = 20, barColor = "#ccc" }) => {
   const { data, loading, error, total, loadMore } = usePaginatedValueCounts(
     id,
-    limit
+    limit,
   );
 
   // Memoize the data transformation to prevent creating new object references
   const chartData = useMemo(
     () => Object.fromEntries(data.map(({ value, count }) => [value, count])),
-    [data]
+    [data],
   );
 
   // Only show loading spinner on initial load, not during pagination

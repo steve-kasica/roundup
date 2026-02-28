@@ -63,7 +63,6 @@ import {
   CalendarMonth as DateIcon,
   Key as KeyIcon,
   QuestionMark as UndefinedIcon,
-  DoNotDisturb as NullIcon,
 } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 

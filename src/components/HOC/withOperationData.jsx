@@ -40,11 +40,10 @@ import {
 import { updateOperationsRequest } from "../../sagas/updateOperationsSaga";
 import { insertColumnsRequest } from "../../sagas/createColumnsSaga";
 
-import { scaleOrdinal, scaleSequential } from "d3";
+import { scaleOrdinal } from "d3";
 import { isTableId } from "../../slices/tablesSlice";
 import { deleteColumnsRequest } from "../../sagas/deleteColumnsSaga/actions";
 import {
-  TREE_MAX_DEPTH,
   OPERATION_COLOR_PALETTE,
   TEXT_LUMINANCE_THRESHOLD,
 } from "../../config";

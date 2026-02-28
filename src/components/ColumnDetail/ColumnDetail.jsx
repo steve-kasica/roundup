@@ -46,7 +46,6 @@ import {
   Box,
   Divider,
   Typography,
-  Chip,
   Stack,
   Accordion,
   AccordionSummary,
@@ -58,7 +57,6 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Warning } from "@mui/icons-material";
-import { EnhancedColumnValues } from "./ColumnValues";
 import ColumnValueCounts from "./ColumnValueCounts";
 import ColumnValueLengths from "./ColumnValueLengths";
 import { useState } from "react";
@@ -72,7 +70,6 @@ import Swatch from "../ui/Swatch";
 import { FloatNumber, IntegerNumber, MoreInfo, ValueChip } from "../ui/text";
 
 const VALUE_COUNTS_VIEW = "value_counts";
-const RAW_VALUES_VIEW = "raw_values";
 const STRING_LENGTH_VIEW = "string_length";
 
 /**

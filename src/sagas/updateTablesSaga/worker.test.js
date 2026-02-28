@@ -1,5 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
-import { runSaga } from "redux-saga";
+import { describe, it, vi } from "vitest";
 import updateTablesWorker from "./worker";
 import { expectSaga } from "redux-saga-test-plan";
 import { getTableStats } from "../../lib/duckdb";

@@ -16,7 +16,6 @@
  * <AlertErrorIcon tooltip="Invalid column type" />
  */
 
-import React from "react";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import Tooltip from "@mui/material/Tooltip";
 

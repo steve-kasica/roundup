@@ -36,20 +36,15 @@
  */
 
 import {
-  Avatar,
   IconButton,
   ListItem,
-  ListItemAvatar,
   ListItemIcon,
   ListItemText,
   Typography,
 } from "@mui/material";
-import { Error, VolumeOff, VolumeUp, Warning } from "@mui/icons-material";
+import { VolumeOff, VolumeUp } from "@mui/icons-material";
 import withAlertData from "../HOC/withAlertData";
-import {
-  SEVERITY_ERROR,
-  SEVERITY_WARNING,
-} from "../../slices/alertsSlice/Alerts";
+import { SEVERITY_WARNING } from "../../slices/alertsSlice/Alerts";
 import AlertErrorIcon from "../ui/icons/AlertErrorIcon";
 import AlertWarningIcon from "../ui/icons/AlertWarningIcon";
 

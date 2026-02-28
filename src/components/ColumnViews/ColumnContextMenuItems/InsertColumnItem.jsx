@@ -11,7 +11,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 const InsertColumnItem = ({ direction, index, onSubmit, onCancel }) => {
   const [insertDialogOpen, setInsertDialogOpen] = useState(false);

@@ -20,7 +20,6 @@ import {
   OPERATION_TYPE_STACK,
   OPERATION_TYPE_PACK,
   selectOperationsById,
-  selectAllOperationIds,
 } from "../../slices/operationsSlice";
 import { useSelector } from "react-redux";
 import { isTableId } from "../../slices/tablesSlice";

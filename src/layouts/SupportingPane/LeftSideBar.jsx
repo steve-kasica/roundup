@@ -26,6 +26,8 @@ import {
 } from "../../slices/operationsSlice";
 import { selectAllTableIds } from "../../slices/tablesSlice";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
+import ColumnsList from "../../components/ColumnsList";
+import { selectAllColumnIds } from "../../slices/columnsSlice/selectors";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -63,6 +65,7 @@ const LeftSideBar = () => {
 
   // condition to disable the Operations tab
   const operations = useSelector(selectAllOperationIds);
+  const columns = useSelector(selectAllColumnIds);
   const focusedObjectId = useSelector(selectFocusedObjectId);
   const tableIds = useSelector(selectAllTableIds);
 
@@ -79,10 +82,15 @@ const LeftSideBar = () => {
     return operations.length === 0;
   }, [operations]);
 
+  const isColumnsTabDisabled = useMemo(() => {
+    return columns.length === 0;
+  }, [columns]);
+
   // prevent switching to a disabled tab
   const handleChange = (event, newValue) => {
     // block switching to Operations tab when disabled
     if (newValue === 1 && isOperationTableDisabled) return;
+    if (newValue === 2 && isColumnsTabDisabled) return;
     setValue(newValue);
   };
 
@@ -91,7 +99,10 @@ const LeftSideBar = () => {
     if (isOperationTableDisabled && value === 1) {
       setValue(0);
     }
-  }, [isOperationTableDisabled, value]);
+    if (isColumnsTabDisabled && value === 2) {
+      setValue(0);
+    }
+  }, [isOperationTableDisabled, isColumnsTabDisabled, value]);
 
   function a11yProps(index) {
     return {
@@ -135,6 +146,20 @@ const LeftSideBar = () => {
             {...a11yProps(1)}
             disabled={isOperationTableDisabled}
           />
+          <Tab
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                Columns
+                <Chip
+                  label={columns.length}
+                  disabled={isColumnsTabDisabled}
+                  size="small"
+                />
+              </Box>
+            }
+            {...a11yProps(2)}
+            disabled={isColumnsTabDisabled}
+          />
         </Tabs>
       </Box>
 
@@ -149,6 +174,9 @@ const LeftSideBar = () => {
             className="OperationsListPanel"
           >
             <OperationsList />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={2} className="ColumnsPanel">
+            <ColumnsList />
           </CustomTabPanel>
         </Box>
       </Box>

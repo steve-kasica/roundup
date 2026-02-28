@@ -16,7 +16,7 @@
  * <TableWindow id="t1" />
  */
 /* eslint-disable react/prop-types */
-import { Alert, Box, Typography } from "@mui/material";
+import { Alert, Box } from "@mui/material";
 import { useSelector } from "react-redux";
 import { EnhancedTableRows } from "../../components/TableView";
 import {
