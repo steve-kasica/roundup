@@ -42,6 +42,7 @@ const TableOrderRadio = ({ childIds, onChange, isDisabled }) => {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         disabled={isDisabled}
+        aria-label="Table order"
       >
         {options.map(([leftTableId, rightTableId]) => (
           <FormControlLabel

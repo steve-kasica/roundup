@@ -148,6 +148,7 @@ const TableRowSummary = ({
             indeterminate={isSelected}
             size="small"
             disabled
+            aria-label={`Select table ${name}`}
             sx={{
               padding: 0,
               pointerEvents: "none",

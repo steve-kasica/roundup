@@ -63,8 +63,14 @@ const FreeTextDialog = ({
   );
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{title}</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby="free-text-dialog-title"
+    >
+      <DialogTitle id="free-text-dialog-title">{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{contentText}</DialogContentText>
         <TextField

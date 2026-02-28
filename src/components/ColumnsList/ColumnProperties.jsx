@@ -49,12 +49,20 @@ const ColumnProperties = ({ visibleProperties, onVisiblePropertiesChange }) => {
   return (
     <>
       <Tooltip title="Choose visible columns">
-        <IconButton onClick={handleOpen}>
+        <IconButton onClick={handleOpen} aria-label="Choose visible columns">
           <Settings2 size={20} strokeWidth={1.5} />
         </IconButton>
       </Tooltip>
-      <Dialog open={open} onClose={handleCancel} maxWidth="xs" fullWidth>
-        <DialogTitle>Column Properties</DialogTitle>
+      <Dialog
+        open={open}
+        onClose={handleCancel}
+        maxWidth="xs"
+        fullWidth
+        aria-labelledby="column-properties-dialog-title"
+      >
+        <DialogTitle id="column-properties-dialog-title">
+          Column Properties
+        </DialogTitle>
         <DialogContent dividers>
           {groups.map((group) => (
             <div key={group}>

@@ -29,6 +29,7 @@ const HiddenColumnsButton = ({ count, ...props }) => {
     <IconButton
       size="small"
       tabIndex={-1}
+      aria-label={`Show ${count} hidden columns`}
       {...props}
       sx={{
         position: "relative",

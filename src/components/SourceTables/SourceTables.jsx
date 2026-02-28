@@ -208,6 +208,7 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
         }}
       >
         <Table
+          aria-label="Source tables"
           style={{
             width: "100%",
             height: "100%",

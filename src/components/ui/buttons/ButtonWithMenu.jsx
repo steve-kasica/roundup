@@ -26,7 +26,12 @@ const ButtonWithMenu = ({ label = "button", children, ...props }) => {
       >
         {label}
       </Button>
-      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        aria-label={`${label} menu`}
+      >
         <div onClick={handleClose}>{children}</div>
       </Menu>
     </>

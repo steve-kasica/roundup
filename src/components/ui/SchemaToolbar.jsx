@@ -112,6 +112,7 @@ const SchemaToolbar = ({
         open={isAlertPopoverOpen}
         anchorEl={alertAnchorEl}
         onClose={handleCloseAlerts}
+        aria-label="Schema alerts"
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "right",

@@ -6,6 +6,7 @@ const MatchToggleButton = ({ text, children, ...props }) => (
       <ToggleButton
         disableRipple
         size="small"
+        aria-label={text}
         sx={{
           px: "5px !important",
           border: "none !important",

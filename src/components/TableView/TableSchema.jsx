@@ -217,6 +217,7 @@ const TableSchema = ({
         anchorEl={columnTypeMenuAnchor}
         open={Boolean(columnTypeMenuAnchor)}
         onClose={handleColumnTypeMenuClose}
+        aria-label="Change column type"
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "left",
@@ -248,6 +249,7 @@ const TableSchema = ({
         onClose={handleContextMenuClose}
         anchorReference="anchorPosition"
         anchorPosition={contextMenuAnchor}
+        aria-label="Column actions"
       >
         {contextMenuColumnId && (
           <EnhancedColumnContextMenuItems

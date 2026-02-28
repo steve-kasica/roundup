@@ -26,6 +26,7 @@ const MaterializeViewIconButton = (props) => (
     size="small"
     {...props}
     title="Materialize view for better performance"
+    aria-label="Materialize view for better performance"
     color="secondary"
   >
     <MaterializeViewIcon fontSize="small" />

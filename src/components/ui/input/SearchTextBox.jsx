@@ -68,6 +68,7 @@ const SearchTextBox = ({
         fullWidth
         value={localValue}
         onChange={handleOnChange}
+        aria-label={placeholder}
         sx={{
           "& .MuiOutlinedInput-root": {
             backgroundColor: "#f5f5f5",

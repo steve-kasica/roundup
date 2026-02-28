@@ -226,6 +226,7 @@ const ColumnsList = () => {
       >
         <Table
           size="small"
+          aria-label="Columns list"
           style={{
             width: "100%",
             height: "100%",

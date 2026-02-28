@@ -40,8 +40,14 @@ const DeleteItem = () => {
       <MenuItem disabled={selectedColumnIds.length === 0} onClick={handleClick}>
         Delete
       </MenuItem>
-      <Dialog open={dialogOpen} onClose={handleCancel}>
-        <DialogTitle>Delete Columns?</DialogTitle>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCancel}
+        aria-labelledby="delete-columns-dialog-title"
+      >
+        <DialogTitle id="delete-columns-dialog-title">
+          Delete Columns?
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             Are you sure you want to delete {selectedColumnIds.length} column

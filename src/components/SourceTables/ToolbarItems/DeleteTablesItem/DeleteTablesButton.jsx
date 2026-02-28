@@ -38,12 +38,23 @@ const DeleteTablesItem = ({ onConfirm, ...props }) => {
 
   return (
     <>
-      <IconButton onClick={onClick} disabled={isDisabled} {...props}>
+      <IconButton
+        onClick={onClick}
+        disabled={isDisabled}
+        aria-label="Delete selected tables"
+        {...props}
+      >
         <DeleteForever />
       </IconButton>
 
-      <Dialog open={dialogOpen} onClose={handleClose}>
-        <DialogTitle>Delete Tables?</DialogTitle>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleClose}
+        aria-labelledby="delete-tables-dialog-title"
+      >
+        <DialogTitle id="delete-tables-dialog-title">
+          Delete Tables?
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             Are you sure you want to delete {selectedTables.length} table

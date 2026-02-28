@@ -44,8 +44,13 @@ const UploadTablesButton = () => {
       <TooltipIconButton tooltipText={tooltipText} onClick={onClick}>
         <Upload />
       </TooltipIconButton>
-      <Dialog open={dialogOpen} onClose={handleClose} fullWidth>
-        <DialogTitle sx={{ m: 0, p: 2 }}>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleClose}
+        fullWidth
+        aria-labelledby="upload-tables-dialog-title"
+      >
+        <DialogTitle id="upload-tables-dialog-title" sx={{ m: 0, p: 2 }}>
           Upload Tables
           <IconButton
             aria-label="close"

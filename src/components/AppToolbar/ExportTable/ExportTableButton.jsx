@@ -68,6 +68,7 @@ const ExportTableButton = ({ totalCount, warningCount, errorCount }) => {
         onClose={handleCloseExportDialog}
         maxWidth="sm"
         fullWidth
+        aria-labelledby="export-dialog-title"
       >
         <EnhancedExportDialog
           id={focusedObjectId}
