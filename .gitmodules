@@ -51,3 +51,6 @@
 [submodule "example-workflows/california-h2a-visas-analysis"]
 	path = example-workflows/california-h2a-visas-analysis
 	url = git@github.com:steve-kasica/california-h2a-visas-analysis.git
+[submodule "example-workflows/awb-notebook"]
+	path = example-workflows/awb-notebook
+	url = git@github.com:steve-kasica/awb-notebook.git
