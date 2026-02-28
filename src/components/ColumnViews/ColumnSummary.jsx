@@ -28,13 +28,33 @@
 
 /* eslint-disable react/prop-types */
 import { withColumnData, withAssociatedAlerts } from "../HOC";
-import { Box, Typography, Menu, Chip, Stack, Tooltip } from "@mui/material";
+import { Box, Typography, Menu, Chip, Tooltip, Divider } from "@mui/material";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 import StyledColumnContainer from "./StyledColumnContainer";
 import { ColumnContextMenuButton } from "../ui/buttons";
 import { useCallback, useState } from "react";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems/ColumnContextMenuItems";
-import { IntegerNumber, PercentNumber } from "../ui/text";
+import { IntegerNumber } from "../ui/text";
+
+const breakpoints = {
+  small: 55,
+  medium: 120,
+  large: 220,
+};
+
+/**
+ * Returns the operation color for the given index, falling back to the
+ * orphaned-table background color defined in the theme.
+ */
+const getOperationColor = (theme, operationIndex) =>
+  theme.palette.operationColors[operationIndex] ||
+  theme.palette.orphanedTableBackgroundColor;
+
+/**
+ * Returns the contrast text color for the operation color.
+ */
+const getOperationContrastColor = (theme, operationIndex) =>
+  theme.palette.getContrastText(getOperationColor(theme, operationIndex));
 
 /**
  * ColumnSummary Component
@@ -138,7 +158,6 @@ const ColumnSummary = ({
       operationIndex={operationIndex}
       sx={{
         cursor: isSelected ? "grab" : "pointer",
-        boxShadow: 0,
         height: "100%",
         ...(totalCount && {
           borderColor: "warning.main",
@@ -181,20 +200,40 @@ const ColumnSummary = ({
             }}
           >
             <Tooltip title={name || databaseName || id} placement="top">
-              <Typography
-                variant="data-primary"
+              <Box
                 sx={{
-                  whiteSpace: "nowrap",
-                  fontWeight: "bold",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 0.5,
                   minWidth: 0,
+                  overflow: "hidden",
                 }}
               >
-                {name || databaseName || id}
-              </Typography>
+                <Typography
+                  variant="data-primary"
+                  sx={{
+                    whiteSpace: "nowrap",
+                    fontWeight: "bold",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    minWidth: 0,
+                  }}
+                >
+                  {name || databaseName || id}
+                </Typography>
+                <Typography
+                  component={"small"}
+                  variant="data-secondary"
+                  sx={{
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
+                    fontWeight: "100",
+                  }}
+                >
+                  <IntegerNumber value={approxUnique} />
+                </Typography>
+              </Box>
             </Tooltip>
-            <ColumnTypeIcon columnType={columnType} />
           </Box>
           <Box
             sx={{
@@ -213,67 +252,39 @@ const ColumnSummary = ({
             />
           </Box>
         </Box>
-        <Box
-          sx={{
-            mt: 0.5,
-            "@container (min-height: 100px)": {
-              display: "block",
-            },
-            "@container (max-height: 99px)": {
-              display: "none",
-            },
-          }}
-        >
-          <Typography variant="data-primary" sx={{ fontWeight: "bold" }}>
-            Data Quality
-          </Typography>
-          <Stack direction="row" spacing={1} justifyContent={"space-between"}>
-            <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
-              Completeness
-            </Typography>
-            <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
-              <PercentNumber value={completePercentage} />
-            </Typography>
-          </Stack>
-          <Stack direction="row" spacing={1} justifyContent={"space-between"}>
-            <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
-              Uniqueness
-            </Typography>
-            <Typography variant="data-primary" sx={{ fontSize: "0.9rem" }}>
-              <PercentNumber value={uniquePercentage} />
-            </Typography>
-          </Stack>
-        </Box>
+        <ColumnTypeIcon columnType={columnType} />
+        <Divider sx={{ my: 0.5 }} />
         <Box
           sx={{
             flexGrow: 1,
             overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
             maskImage:
               "linear-gradient(to bottom, black 95%, transparent 100%)",
             WebkitMaskImage:
               "linear-gradient(to bottom, black 95%, transparent 100%)",
           }}
         >
-          <Typography
-            variant="data-primary"
-            sx={{ fontWeight: "bold", mt: 0.75, mb: 0.5 }}
-          >
-            Uniq. Values{" "}
-            <small style={{ fontWeight: "normal" }}>
-              <IntegerNumber value={approxUnique} />
-            </small>
-          </Typography>
           <Box
+            className="top-values-chips"
             sx={{
-              "@container (min-height: 50px)": {
-                display: "flex",
+              opacity: 0,
+              maxHeight: 0,
+              overflow: "hidden",
+              transition: "opacity 0.3s ease, max-height 0.3s ease",
+              [`@container (min-height: ${breakpoints.small}px)`]: {
+                opacity: 1,
+                maxHeight: "500px",
               },
-              "@container (max-height: 49px)": {
-                display: "none",
+              [`@container (min-height: ${breakpoints.large}px)`]: {
+                opacity: 0,
+                maxHeight: 0,
               },
+              display: "flex",
               flexWrap: "wrap",
               gap: "2px",
-              overflow: "hidden",
             }}
           >
             {topValues?.map(({ value }) => (
@@ -283,15 +294,119 @@ const ColumnSummary = ({
                 title={`${value}`}
                 size="small"
                 sx={{
-                  backgroundColor: "#ddd",
-                  color: "#000",
+                  backgroundColor: (theme) =>
+                    getOperationColor(theme, operationIndex),
+                  color: (theme) =>
+                    getOperationContrastColor(theme, operationIndex),
                   fontSize: "0.75rem",
                   borderRadius: "4px",
-                  height: "12.5px",
+                  height: "16px",
                   "& .MuiChip-label": { padding: "0 4px" },
                 }}
               />
             ))}
+          </Box>
+          <Box
+            className="top-values-bars"
+            sx={{
+              mt: 0.5,
+              opacity: 0,
+              maxHeight: 0,
+              overflow: "hidden",
+              transition: "opacity 0.3s ease, max-height 0.3s ease",
+              [`@container (min-height: ${breakpoints.large}px)`]: {
+                opacity: 1,
+                maxHeight: "500px",
+              },
+            }}
+          >
+            {(() => {
+              const maxCount =
+                topValues?.reduce((max, tv) => Math.max(max, tv.count), 0) || 1;
+              return topValues?.map(({ value, count }) => {
+                const pct = (count / maxCount) * 100;
+                return (
+                  <Box
+                    key={value}
+                    sx={{
+                      position: "relative",
+                      mb: "2px",
+                      height: 18,
+                      width: "100%",
+                      borderRadius: "2px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: `${pct}%`,
+                        minWidth: "2px",
+                        height: "100%",
+                        backgroundColor: (theme) =>
+                          getOperationColor(theme, operationIndex),
+                        borderRadius: "2px",
+                        opacity: 0.7,
+                        transition: "width 0.3s ease",
+                      }}
+                    />
+                    <Box
+                      component="span"
+                      sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "2px",
+                        transform: "translateY(-50%)",
+                        maxWidth: `calc(${pct}% - 6px)`,
+                        fontSize: "0.65rem",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        lineHeight: 1,
+                        px: "1px",
+                        py: "1px",
+                        zIndex: 1,
+                        borderRadius: "3px",
+                        color: (theme) =>
+                          getOperationContrastColor(theme, operationIndex),
+                        fontFamily: "inherit",
+                        fontWeight: "800",
+                      }}
+                      title={`${value}`}
+                    >
+                      {value}
+                    </Box>
+                    <Typography
+                      variant="data-primary"
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: `${pct}%`,
+                        height: "100%",
+                        fontSize: "0.65rem",
+                        whiteSpace: "nowrap",
+                        lineHeight: "18px",
+                        zIndex: 1,
+                        color: (theme) =>
+                          getOperationContrastColor(theme, operationIndex),
+                        transform: "translateX(-100%)",
+                        pr: "3px",
+                        ...(pct < 30 && {
+                          transform: "none",
+                          pl: "3px",
+                          pr: 0,
+                          color: "text.primary",
+                        }),
+                      }}
+                    >
+                      {count}
+                    </Typography>
+                  </Box>
+                );
+              });
+            })()}
           </Box>
         </Box>
       </Box>
