@@ -233,3 +233,8 @@ export const selectOrphanedColumnIds = createSelector(
     return orphanedColumnIds;
   },
 );
+
+export const selectAllColumnIds = createSelector(
+  [(state) => state.columns.allIds],
+  (allIds) => allIds,
+);

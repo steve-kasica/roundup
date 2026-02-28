@@ -32,7 +32,7 @@ import { Box, Typography, Menu, Chip, Stack, Tooltip } from "@mui/material";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 import StyledColumnContainer from "./StyledColumnContainer";
 import { ColumnContextMenuButton } from "../ui/buttons";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { EnhancedColumnContextMenuItems } from "./ColumnContextMenuItems/ColumnContextMenuItems";
 import { IntegerNumber, PercentNumber } from "../ui/text";
 

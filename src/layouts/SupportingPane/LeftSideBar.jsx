@@ -118,6 +118,8 @@ const LeftSideBar = () => {
           value={value}
           onChange={handleChange}
           aria-label="basic tabs example"
+          variant="scrollable"
+          scrollButtons="auto"
         >
           <Tab
             label={
