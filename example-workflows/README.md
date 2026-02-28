@@ -45,3 +45,5 @@ I've had to exclude some Table Scraps workflows from this reproduction evaluatio
 ### Workflows with raw data that is too big
 
 - [California Crop Production Wages Analysis](https://github.com/datadesk/california-crop-production-wages-analysis): The 26 files downloaded from BLS when uncompressed are between 127MB and 486MB large, which is even too large to trim this data in Excel. So this workflow is an example of when the raw data is just too large, which is a same because that keeps lots of journalists without access to a developer from being able to use this data.
+
+- [Federal Employees Trump 2017](https://github.com/wpinvestigative/federal_employees_trump_2017): Much of the raw data was unobtainable due to 403 Forbidden errors when trying to download directly from Office of Personnel Management (OPM). Those files were available via Internet Archive; however, when downloaded the uncompressed files exceeded 100MB or were in formats that could not easily be parsed, e.g. varible, fixed-width text files.
