@@ -160,17 +160,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{
-          ...(isSelected && {
-            borderLeftColor: (theme) => theme.palette.grey[900],
-            ...(!isPrevSelected && {
-              borderTopColor: (theme) => theme.palette.grey[900],
-            }),
-            ...(!isNextSelected && {
-              borderBottomColor: (theme) => theme.palette.grey[900],
-            }),
-          }),
-        }}
+        sx={{}}
       >
         <Typography
           variant="data-primary"
@@ -192,16 +182,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{
-          ...(isSelected && {
-            ...(!isPrevSelected && {
-              borderTopColor: (theme) => theme.palette.grey[900],
-            }),
-            ...(!isNextSelected && {
-              borderBottomColor: (theme) => theme.palette.grey[900],
-            }),
-          }),
-        }}
+        sx={{}}
       >
         <Typography
           variant="data-primary"
@@ -215,16 +196,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{
-          ...(isSelected && {
-            ...(!isPrevSelected && {
-              borderTopColor: (theme) => theme.palette.grey[900],
-            }),
-            ...(!isNextSelected && {
-              borderBottomColor: (theme) => theme.palette.grey[900],
-            }),
-          }),
-        }}
+        sx={{}}
       >
         <BarChartCell
           variant="data-primary"
@@ -240,16 +212,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{
-          ...(isSelected && {
-            ...(!isPrevSelected && {
-              borderTopColor: (theme) => theme.palette.grey[900],
-            }),
-            ...(!isNextSelected && {
-              borderBottomColor: (theme) => theme.palette.grey[900],
-            }),
-          }),
-        }}
+        sx={{}}
       >
         <BarChartCell
           variant="data-primary"
@@ -265,16 +228,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{
-          ...(isSelected && {
-            ...(!isPrevSelected && {
-              borderTopColor: (theme) => theme.palette.grey[900],
-            }),
-            ...(!isNextSelected && {
-              borderBottomColor: (theme) => theme.palette.grey[900],
-            }),
-          }),
-        }}
+        sx={{}}
       >
         <BarChartCell
           variant="data-primary"
@@ -290,17 +244,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{
-          ...(isSelected && {
-            borderRightColor: (theme) => theme.palette.grey[900],
-            ...(!isPrevSelected && {
-              borderTopColor: (theme) => theme.palette.grey[900],
-            }),
-            ...(!isNextSelected && {
-              borderBottomColor: (theme) => theme.palette.grey[900],
-            }),
-          }),
-        }}
+        sx={{}}
       >
         <Typography
           variant="data-primary"

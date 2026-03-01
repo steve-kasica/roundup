@@ -15,12 +15,12 @@ const StyledTableRow = styled("tr", {
     transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
     cursor: "pointer",
     userSelect: "none",
-    borderColor: theme.palette.grey[300],
+    // borderBottom: `1px solid ${theme.palette.divider}`,
+    backgroundColor: isSelected
+      ? theme.palette.action.selected
+      : theme.palette.background.paper,
     "&:hover": {
-      backgroundColor: isFocused
-        ? theme.palette.action.hover
-        : theme.palette.grey[50],
-      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+      backgroundColor: theme.palette.action.hover,
     },
   };
 
@@ -28,8 +28,8 @@ const StyledTableRow = styled("tr", {
   if (isFocused) {
     styles = {
       ...styles,
-      backgroundColor: theme.palette.action.focus,
-      borderColor: theme.palette.grey[500],
+      // backgroundColor: theme.palette.action.focus,
+      // borderColor: theme.palette.grey[500],
     };
   }
 
