@@ -21,11 +21,6 @@ export default function CustomDragLayer() {
     return null;
   }
 
-  const previewWidth =
-    typeof itemType === "string" && itemType.startsWith("STACK_TABLE_ORDER_") && item?.width
-      ? item.width
-      : undefined;
-
   // Render different effects based on the item type
   const renderDragPreview = () => {
     if (
@@ -47,7 +42,6 @@ export default function CustomDragLayer() {
             boxShadow: 3,
             minWidth: 180,
             maxWidth: 320,
-            width: previewWidth,
           }}
         >
           <DragIndicator fontSize="small" color="action" />

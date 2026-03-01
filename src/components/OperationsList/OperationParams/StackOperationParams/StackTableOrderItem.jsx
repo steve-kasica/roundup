@@ -6,7 +6,6 @@ import { isTableId, selectTablesById } from "../../../../slices/tablesSlice";
 import { selectOperationsById } from "../../../../slices/operationsSlice";
 import { DragIndicator } from "@mui/icons-material";
 import { useSelector } from "react-redux";
-import { useRef } from "react";
 
 const StackTableOrderItem = ({
   childId,
@@ -21,27 +20,15 @@ const StackTableOrderItem = ({
       : selectOperationsById(state, childId),
   );
 
-  const itemRef = useRef(null);
-
-  // Helper to measure width on drag start
-  function getDragItem() {
-    let width = 0;
-    if (itemRef.current) {
-      width = itemRef.current.offsetWidth;
-    }
-    return {
+  const { dragRef, dropRef, isDragging, isOver, canDropHere } = useDragAndDrop({
+    dragType,
+    dropType: dragType,
+    getDragItem: () => ({
       id: childId,
       index,
       name,
       isTable: isTableId(childId),
-      width,
-    };
-  }
-
-  const { dragRef, dropRef, isDragging, isOver, canDropHere } = useDragAndDrop({
-    dragType,
-    dropType: dragType,
-    getDragItem,
+    }),
     canDrag: () => !isReadOnly,
     canDrop: (item) => !isReadOnly && item?.id !== childId,
     onDrop: (item) => {
@@ -56,10 +43,7 @@ const StackTableOrderItem = ({
 
   return (
     <ListItemButton
-      ref={(node) => {
-        itemRef.current = node;
-        dropRef(node);
-      }}
+      ref={dropRef}
       disabled={isReadOnly}
       sx={{
         opacity: isDragging ? 0.4 : 1,
