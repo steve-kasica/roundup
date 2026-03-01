@@ -6,7 +6,6 @@ import Operation, {
 } from "../operationsSlice/Operation";
 import MissingLeftJoinKeyAlert from "./Alerts/Errors/MissingLeftJoinKey";
 import MissingRightJoinKeyAlert from "./Alerts/Errors/MissingRightJoinKey";
-import { initialState } from "./alertsSlice";
 import {
   selectAlertErrorCount,
   selectAlertIdsBySourceId,

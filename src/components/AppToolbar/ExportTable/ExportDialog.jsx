@@ -87,6 +87,7 @@ function ExportDialog({ name, databaseName, columns, onClose }) {
     try {
       await exportTableToStreamManual(databaseName, `${exportName}.${format}`, {
         chunkSize: 1000,
+        format,
         onProgress: (progressInfo) => {
           setProgress(progressInfo.percentage);
         },
@@ -141,18 +142,23 @@ function ExportDialog({ name, databaseName, columns, onClose }) {
           >
             <MenuItem value="csv">CSV</MenuItem>
             <MenuItem value="tsv">TSV</MenuItem>
+            <MenuItem value="json">JSON</MenuItem>
+            <MenuItem value="parquet">Parquet</MenuItem>
+            <MenuItem value="sql">SQL</MenuItem>
           </TextField>
 
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={includeHeaders}
-                onChange={(e) => setIncludeHeaders(e.target.checked)}
-                color="primary"
-              />
-            }
-            label="Include column headers"
-          />
+          {(format === "csv" || format === "tsv") && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={includeHeaders}
+                  onChange={(e) => setIncludeHeaders(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Include column headers"
+            />
+          )}
         </Box>
       </DialogContent>
       <DialogActions

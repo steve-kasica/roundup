@@ -44,8 +44,14 @@ const DeleteColumnItem = ({ id, handleCloseMenu }) => {
         </ListItemIcon>
         <ListItemText>Delete Column</ListItemText>
       </MenuItem>
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>Delete Column?</DialogTitle>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        aria-labelledby="delete-column-dialog-title"
+      >
+        <DialogTitle id="delete-column-dialog-title">
+          Delete Column?
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             Are you sure you want to delete this column? This action cannot be

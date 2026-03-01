@@ -11,7 +11,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 const InsertColumnItem = ({ direction, index, onSubmit, onCancel }) => {
   const [insertDialogOpen, setInsertDialogOpen] = useState(false);
@@ -60,8 +60,14 @@ const InsertColumnItem = ({ direction, index, onSubmit, onCancel }) => {
         </ListItemText>
       </MenuItem>
 
-      <Dialog open={insertDialogOpen} onClose={handleOnCancel}>
-        <DialogTitle>Insert New Column ({direction})</DialogTitle>
+      <Dialog
+        open={insertDialogOpen}
+        onClose={handleOnCancel}
+        aria-labelledby="insert-column-item-dialog-title"
+      >
+        <DialogTitle id="insert-column-item-dialog-title">
+          Insert New Column ({direction})
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             Specify a value to fill the inserting column. Blank values will be

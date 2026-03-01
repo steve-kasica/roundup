@@ -5,11 +5,7 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  selectFocusedObjectId,
-  setFocusedObjectId,
-} from "../../../slices/uiSlice";
+import { useSelector } from "react-redux";
 import {
   isOperationId,
   selectAllOperationIds,

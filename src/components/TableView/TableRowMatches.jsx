@@ -26,9 +26,6 @@
 /* eslint-disable react/prop-types */
 import { Box, styled } from "@mui/material";
 import { withTableData, withAssociatedAlerts } from "../HOC";
-import { EnhancedTableLabel } from "./TableLabel";
-import { EnhancedColumnName } from "../ColumnViews";
-import { useCallback } from "react";
 
 const RowBlock = styled(Box)(({ height, isHovered, isToggled, isNull }) => ({
   display: "flex",
@@ -155,7 +152,7 @@ const TableRowMatches = ({
 };
 
 const EnhancedTableRowMatches = withAssociatedAlerts(
-  withTableData(TableRowMatches)
+  withTableData(TableRowMatches),
 );
 
 export { EnhancedTableRowMatches, TableRowMatches };

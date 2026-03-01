@@ -16,8 +16,6 @@
  * <AlertWarningIcon tooltip="Missing values detected" />
  */
 
-import React from "react";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import Tooltip from "@mui/material/Tooltip";
 import { WarningAmberOutlined } from "@mui/icons-material";
 

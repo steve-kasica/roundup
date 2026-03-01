@@ -27,3 +27,5 @@ export const OPERATION_COLOR_PALETTE = schemeTableau10;
  * @type {number}
  */
 export const COLUMN_UNIQUE_VALUE_LIMIT = 20;
+
+export const COLUMN_COMPARE_MAX = 2;

@@ -55,7 +55,12 @@ const TooltipIconButton = ({
       onClose={() => setOpen(false)}
     >
       <span>
-        <IconButton onClick={handleClick} disabled={disabled} {...props}>
+        <IconButton
+          onClick={handleClick}
+          disabled={disabled}
+          aria-label={tooltipText}
+          {...props}
+        >
           {children}
         </IconButton>
       </span>

@@ -23,7 +23,7 @@
  */
 
 /* eslint-disable react/prop-types */
-import { Box, Tooltip } from "@mui/material";
+import { Box } from "@mui/material";
 import { withTableData } from "../HOC";
 import { EnhancedColumnName } from "../ColumnViews";
 

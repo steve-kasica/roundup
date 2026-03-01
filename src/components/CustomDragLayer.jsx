@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useDragLayer } from "react-dnd";
-import { Box } from "@mui/material";
+import { Box, ListItemIcon, Typography } from "@mui/material";
+import { DragIndicator, TableChart, AccountTree } from "@mui/icons-material";
 
 export const DRAG_TYPE_SOURCE_TABLE = "SOURCE_TABLE";
 export const DRAG_TYPE_SOURCE_TABLE_ROW = "SOURCE_TABLE_ROW";
@@ -22,10 +23,53 @@ export default function CustomDragLayer() {
 
   // Render different effects based on the item type
   const renderDragPreview = () => {
+    if (
+      typeof itemType === "string" &&
+      itemType.startsWith("STACK_TABLE_ORDER_")
+    ) {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            px: 2,
+            py: 1,
+            borderRadius: 1,
+            border: "1px solid",
+            borderColor: "divider",
+            backgroundColor: "background.paper",
+            boxShadow: 3,
+            minWidth: 180,
+            maxWidth: 320,
+          }}
+        >
+          <DragIndicator fontSize="small" color="action" />
+          {item.isTable ? (
+            <TableChart fontSize="small" />
+          ) : (
+            <AccountTree fontSize="small" />
+          )}
+          <Typography variant="body2" noWrap sx={{ flexGrow: 1 }}>
+            {item.name || "Untitled"}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {item.index + 1}
+          </Typography>
+        </Box>
+      );
+    }
     return null;
   };
 
   function x() {
+    // Lock horizontal position for stack table reorder drags
+    if (
+      typeof itemType === "string" &&
+      itemType.startsWith("STACK_TABLE_ORDER_")
+    ) {
+      return initialOffset ? initialOffset.x : 0;
+    }
     return currentOffset ? currentOffset.x : 0;
   }
 

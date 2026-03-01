@@ -1,34 +1,23 @@
 import {
   Box,
   Button,
-  Chip,
   Divider,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   List,
-  ListItemButton,
-  ListItemIcon,
   Stack,
   Typography,
 } from "@mui/material";
-import {
-  CheckCircle,
-  DragIndicator,
-  HourglassEmpty,
-  WarningAmber,
-} from "@mui/icons-material";
+import { CheckCircle, HourglassEmpty, WarningAmber } from "@mui/icons-material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { withAssociatedAlerts, withStackOperationData } from "../../../HOC";
 import { updateOperationsRequest } from "../../../../sagas/updateOperationsSaga";
-import useDragAndDrop from "../../../../hooks/useDragAndDrop";
-import { EnhancedTableLabel } from "../../../TableView";
-import { EnhancedOperationLabel } from "../../../OperationView/OperationLabel";
-import { isTableId } from "../../../../slices/tablesSlice";
 import { IntegerNumber } from "../../../ui/text";
 import { deleteOperationsRequest } from "../../../../sagas/deleteOperationsSaga/actions";
+import StackTableOrderItem from "./StackTableOrderItem";
 
 const arrayEquals = (left = [], right = []) => {
   if (left.length !== right.length) return false;
@@ -45,60 +34,6 @@ const moveInList = (list, fromId, toId) => {
   next.splice(fromIndex, 1);
   next.splice(toIndex, 0, fromId);
   return next;
-};
-
-const formatCount = (value) =>
-  Number.isFinite(value) ? value.toLocaleString() : "Unknown";
-
-const StackTableOrderItem = ({
-  childId,
-  index,
-  dragType,
-  isReadOnly,
-  onMove,
-}) => {
-  const { combinedRef, isDragging, isOver, canDropHere } = useDragAndDrop({
-    dragType,
-    dropType: dragType,
-    getDragItem: () => ({ id: childId, index }),
-    canDrag: () => !isReadOnly,
-    canDrop: (item) => !isReadOnly && item?.id !== childId,
-    onDrop: (item) => {
-      if (!item || item.id === childId) return;
-      onMove(item.id, childId);
-    },
-  });
-
-  const isDropTarget = canDropHere && isOver && !isReadOnly;
-
-  return (
-    <ListItemButton
-      ref={combinedRef}
-      disabled={isReadOnly}
-      sx={{
-        opacity: isDragging ? 0.5 : 1,
-        borderRadius: 1,
-        border: "1px solid",
-        borderColor: isDropTarget ? "primary.main" : "divider",
-        backgroundColor: isDropTarget ? "action.hover" : "transparent",
-        mb: 1,
-      }}
-    >
-      <ListItemIcon sx={{ minWidth: 32 }}>
-        <DragIndicator fontSize="small" color="action" />
-      </ListItemIcon>
-      <Box sx={{ flexGrow: 1 }}>
-        {isTableId(childId) ? (
-          <EnhancedTableLabel id={childId} includeDimensions={false} />
-        ) : (
-          <EnhancedOperationLabel id={childId} includeDimensions={false} />
-        )}
-      </Box>
-      <Typography variant="caption" color="text.secondary">
-        {index + 1}
-      </Typography>
-    </ListItemButton>
-  );
 };
 
 const StackOperationParams = ({

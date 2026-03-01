@@ -160,6 +160,7 @@ function ColumnContainer({
           }
           closePopover(event);
         }}
+        aria-label="Column options"
         anchorOrigin={{
           vertical: "center",
           horizontal: "right",

@@ -57,6 +57,7 @@ const AlertsButton = ({ alertIds, totalCount, errorCount, warningCount }) => {
         open={isOpen}
         anchorEl={anchorEl}
         onClose={() => setAnchorEl(null)}
+        aria-label="Schema alerts"
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "right",

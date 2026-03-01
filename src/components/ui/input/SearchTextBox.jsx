@@ -21,15 +21,7 @@
  * />
  */
 
-import { MoreVert } from "@mui/icons-material";
-import {
-  Divider,
-  IconButton,
-  InputAdornment,
-  Menu,
-  MenuItem,
-  TextField,
-} from "@mui/material";
+import { InputAdornment, TextField } from "@mui/material";
 import { SearchIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
@@ -76,6 +68,7 @@ const SearchTextBox = ({
         fullWidth
         value={localValue}
         onChange={handleOnChange}
+        aria-label={placeholder}
         sx={{
           "& .MuiOutlinedInput-root": {
             backgroundColor: "#f5f5f5",

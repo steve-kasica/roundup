@@ -13,8 +13,6 @@
  * @todo Implement metadata content display
  */
 
-import React from "react";
-
 /**
  * MetadataView Component
  *

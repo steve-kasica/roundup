@@ -35,6 +35,7 @@ const FocusedObjectSelect = () => {
       disabled={tableIds.length === 0 && operationIds.length === 0}
       onChange={handleOnChange}
       sx={{ minWidth: 175 }}
+      aria-label="Select focused table or operation"
     >
       {tableIds.length > 0 && [
         <ListSubheader key="tables-header">Tables</ListSubheader>,

@@ -33,10 +33,7 @@
  *    only operationTypes are defined in this component
  */
 import PropTypes from "prop-types";
-import { forwardRef } from "react";
 import { useDrop } from "react-dnd";
-import { styled } from "@mui/material/styles";
-import { Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   JOIN_PREDICATES,

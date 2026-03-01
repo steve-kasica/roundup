@@ -30,7 +30,7 @@ import {
 import { isTableId } from "../../../slices/tablesSlice";
 import { useCallback, useMemo } from "react";
 import { selectColumnIdsByParentId } from "../../../slices/columnsSlice";
-import { isOperation, isOperationId } from "../../../slices/operationsSlice";
+import { isOperationId } from "../../../slices/operationsSlice";
 
 const FocusColumnsButton = () => {
   const dispatch = useDispatch();

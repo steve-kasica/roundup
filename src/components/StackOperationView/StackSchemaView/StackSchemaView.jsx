@@ -206,14 +206,15 @@ const StackSchemaView = ({
           className="stack-schema-table"
           sx={{
             borderCollapse: "separate",
-            borderSpacing: 0,
+            borderSpacing: "8px",
             width: "100%",
             height: "100%",
             tableLayout: "fixed",
+            backgroundColor: "#fafafa",
           }}
         >
           <TableHead className="x-axis-container">
-            <TableRow sx={{ background: "white" }}>
+            <TableRow sx={{ background: "#fafafa" }}>
               {/* Sticky top-left corner cell for the row labels column */}
               <StyledTableCell
                 sx={{
@@ -224,8 +225,8 @@ const StackSchemaView = ({
                   height: `${topRowHeight}px`,
                   width: `${leftMarginWidth}px`,
                   minWidth: `${leftMarginWidth}px`,
-                  boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.1)",
                   background: "inherit",
+                  borderColor: "transparent",
                 }}
               />
               {headerGroups.map((group, idx) => {
@@ -246,7 +247,7 @@ const StackSchemaView = ({
                         cursor: "pointer",
                         minWidth: 125,
                         width: 125,
-                        boxShadow: "inset -1px -1px 0 rgba(0,0,0,0.08)",
+                        borderColor: "transparent",
                       }}
                     >
                       <Typography
@@ -299,7 +300,8 @@ const StackSchemaView = ({
                     position: "sticky",
                     left: 0,
                     zIndex: 1,
-                    background: "white",
+                    background: "#fafafa",
+                    borderColor: "transparent",
                     cursor: "pointer",
                   }}
                   onClick={(event) => onRowLabelClick(event, rowIndex)}
@@ -332,40 +334,10 @@ const StackSchemaView = ({
                   if (type === "visible") {
                     const columnId = columnIdMatrix[rowIndex][colIndex];
                     if (columnId) {
-                      // Calculate which borders to highlight based on selected columns
-                      const highlightLeftBorder =
-                        selectedChildColumnIdsSet.has(columnId) &&
-                        (colIndex === 0 ||
-                          !selectedChildColumnIdsSet.has(
-                            columnIdMatrix[rowIndex][colIndex - 1],
-                          ));
-                      const highlightRightBorder =
-                        selectedChildColumnIdsSet.has(columnId) &&
-                        (colIndex === m - 1 ||
-                          !selectedChildColumnIdsSet.has(
-                            columnIdMatrix[rowIndex][colIndex + 1],
-                          ));
-                      const highlightTopBorder =
-                        selectedChildColumnIdsSet.has(columnId) &&
-                        (rowIndex === 0 ||
-                          !selectedChildColumnIdsSet.has(
-                            columnIdMatrix[rowIndex - 1][colIndex],
-                          ));
-                      const highlightBottomBorder =
-                        selectedChildColumnIdsSet.has(columnId) &&
-                        (rowIndex === childIds.length - 1 ||
-                          !selectedChildColumnIdsSet.has(
-                            columnIdMatrix[rowIndex + 1][colIndex],
-                          ));
-
                       return (
                         <StyledTableCell
                           key={columnId}
                           isSelected={selectedChildColumnIdsSet.has(columnId)}
-                          highlightLeftBorder={highlightLeftBorder}
-                          highlightRightBorder={highlightRightBorder}
-                          highlightTopBorder={highlightTopBorder}
-                          highlightBottomBorder={highlightBottomBorder}
                         >
                           <ColumnDragContainer
                             id={columnId}
@@ -400,6 +372,21 @@ const StackSchemaView = ({
                               }
                               sx={{
                                 minHeight: 30,
+                                backgroundColor: (theme) =>
+                                  theme.palette.background.paper,
+                                color: (theme) =>
+                                  theme.palette.getContrastText(
+                                    theme.palette.background.paper,
+                                  ),
+                                borderRadius: 1,
+                                backgroundImage:
+                                  "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
+                                transition:
+                                  "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1)",
+                                boxShadow: 1,
+                                "&:hover": {
+                                  boxShadow: 3,
+                                },
                               }}
                             />
                           </ColumnDragContainer>

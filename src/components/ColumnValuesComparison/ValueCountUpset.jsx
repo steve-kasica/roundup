@@ -27,7 +27,7 @@
  */
 
 import { Box } from "@mui/material";
-import { extent, scaleLinear } from "d3";
+import { extent } from "d3";
 import { useMemo } from "react";
 import { isTableId } from "../../slices/tablesSlice";
 import { EnhancedTableName } from "../TableView/TableName";
@@ -73,7 +73,7 @@ const ValueCountUpset = ({
 }) => {
   const colWidth = useMemo(
     () => (1 / parentIds.length) * 100 + "%",
-    [parentIds.length]
+    [parentIds.length],
   );
   const signatureExtent = useMemo(
     () =>
@@ -83,10 +83,10 @@ const ValueCountUpset = ({
             .split("")
             .map((v, i) => [Number(v), i])
             .filter(([b]) => b)
-            .map(([, i]) => i)
-        )
+            .map(([, i]) => i),
+        ),
       ),
-    [signatures]
+    [signatures],
   );
   const colorScale = (value) => {
     if (value === 0) return "#aaa";
@@ -132,7 +132,7 @@ const ValueCountUpset = ({
               //   key={parentId}
               //   operationId={parentId}
               // />
-            )
+            ),
           )}
         </Box>
       </Box>

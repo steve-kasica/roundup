@@ -1,4 +1,4 @@
-import { darken, lighten, styled } from "@mui/material";
+import { styled } from "@mui/material";
 
 // Styled table row component that handles all drag and drop states
 const StyledTableRow = styled("tr", {

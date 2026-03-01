@@ -63,7 +63,7 @@ const CompositeSchemaContainerSizes = {
 const LeftSidebarSizes = {
   COLLAPSED: 5,
   EXPANDED: 25,
-  MAXIMUM: 33.3333333,
+  MAXIMUM: 50,
 };
 const RightSidebarSizes = {
   COLLAPSED: 0,
@@ -153,28 +153,6 @@ export default function SupportingPane() {
                     height="100%"
                     position="relative"
                   >
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: 8,
-                        right: 8,
-                        zIndex: 10,
-                      }}
-                    >
-                      <IconButton
-                        size="small"
-                        onClick={handleCollapseLeftSidebar}
-                      >
-                        <KeyboardArrowDown
-                          sx={{
-                            transform: isLeftSidebarCollapsed
-                              ? "rotate(-90deg)"
-                              : "rotate(90deg)",
-                            transition: "transform 0.3s",
-                          }}
-                        />
-                      </IconButton>
-                    </Box>
                     <Box height="100%" overflow="auto">
                       <LeftSideBar />
                     </Box>
@@ -228,7 +206,10 @@ export default function SupportingPane() {
                 )}
               </PanelGroup>
             </Panel>
-            <StyledPanelResizeHandle sx={{ width: "2px", height: "100%" }} />
+            <StyledPanelResizeHandle
+              sx={{ width: "2px", height: "100%" }}
+              onDoubleClick={handleCollapseLeftSidebar}
+            />
             <Panel id="main-content-panel" order={2}>
               <PanelGroup autoSaveId="MainContentPane" direction="vertical">
                 <Panel

@@ -15,7 +15,6 @@
  * const uniqueValues = await getColumnUniqueValues(db, 'my_table', 'category');
  */
 
-import duckdb from "@duckdb/duckdb-wasm";
 import { escapeColumnName } from "./utilities";
 
 /**
@@ -28,7 +27,7 @@ import { escapeColumnName } from "./utilities";
 async function getColumnUniqueValues(db, tableId, databaseName) {
   const conn = await db.connect();
   const result = await conn.query(
-    `select distinct ${escapeColumnName(databaseName)} from ${tableId}`
+    `select distinct ${escapeColumnName(databaseName)} from ${tableId}`,
   );
 
   await conn.close();

@@ -7,7 +7,7 @@
  * @example
  * // Watcher is started automatically by rootSaga
  */
-import { call, put, select, takeEvery } from "redux-saga/effects";
+import { call, select, takeEvery } from "redux-saga/effects";
 import { updateTablesRequest } from "./actions";
 import updateTablesWorker from "./worker";
 import { deleteColumnsSuccess } from "../deleteColumnsSaga";

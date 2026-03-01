@@ -25,10 +25,9 @@
  * />
  */
 
-import { DragIndicator } from "@mui/icons-material";
 import HighlightText from "../ui/HighlightText";
-import { Typography, Checkbox, Stack, Box } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
+import { Typography, Checkbox, Box } from "@mui/material";
+import { useMemo, useState } from "react";
 import { formatDate, formatBytes } from "../../lib/utilities";
 import { withTableData, withAssociatedAlerts } from "../HOC";
 import StyledTableRow from "./StyledTableRow";
@@ -149,6 +148,7 @@ const TableRowSummary = ({
             indeterminate={isSelected}
             size="small"
             disabled
+            aria-label={`Select table ${name}`}
             sx={{
               padding: 0,
               pointerEvents: "none",

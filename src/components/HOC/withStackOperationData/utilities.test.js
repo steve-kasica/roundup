@@ -1,5 +1,6 @@
-import { getColumnCount, getRowCount, getColumnIdMatrix } from "./utilities";
-import { describe, it, expect } from "vitest";
+// TODO: uncomment when tests are implemented
+// import { getColumnCount, getRowCount, getColumnIdMatrix } from "./utilities";
+import { describe, it } from "vitest";
 
 describe("withStackOperationData utility functions", () => {
   describe("columnIdMatrix", () => {

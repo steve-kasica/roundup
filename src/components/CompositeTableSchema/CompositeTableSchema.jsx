@@ -33,19 +33,14 @@ import { useSelector } from "react-redux";
 import {
   isOperationId,
   OPERATION_TYPE_NO_OP,
-  OPERATION_TYPE_PACK,
-  OPERATION_TYPE_STACK,
   selectRootOperation,
 } from "../../slices/operationsSlice";
 
 import TableDropTarget from "./TableDropTarget";
-import { Box, IconButton, Typography } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { Box, Typography } from "@mui/material";
 import { EnhancedOperationBlock } from "./OperationBlock";
 import { selectAlertErrorCount } from "../../slices/alertsSlice";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
-import { ListCollapseIcon } from "lucide-react";
-import { KeyboardArrowDown } from "@mui/icons-material";
 
 const stackDropTargetHeight = 50;
 

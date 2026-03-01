@@ -1,12 +1,10 @@
-import { Typography, Box } from "@mui/material";
+import { Typography } from "@mui/material";
 
 const HEIGHT_BREAKPOINTS = {
   SMALL: 15,
   MEDIUM: 30,
   LARGE: 45,
 };
-
-const SECONDARY_TEXT_BREAKPOINT_HEIGHT = 30; // in pixels
 
 const BlockLabel = ({ primaryText, secondaryText }) => {
   return (

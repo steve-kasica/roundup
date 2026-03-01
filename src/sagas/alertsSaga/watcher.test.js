@@ -5,7 +5,6 @@
  */
 import { describe, it, beforeEach, vi } from "vitest";
 import { expectSaga } from "redux-saga-test-plan";
-import * as matchers from "redux-saga-test-plan/matchers";
 import updateAlertsSagaWatcher from "./watcher";
 import { validateOperationWorker } from "./worker";
 import { createOperationsSuccess } from "../createOperationsSaga/actions";

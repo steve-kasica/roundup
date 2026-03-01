@@ -53,8 +53,14 @@ const InsertColumnDialog = ({ direction, onSubmit, onClose, ...props }) => {
   };
 
   return (
-    <Dialog onClose={onClose} {...props}>
-      <DialogTitle>Insert New Column ({direction})</DialogTitle>
+    <Dialog
+      onClose={onClose}
+      aria-labelledby="insert-column-dialog-title"
+      {...props}
+    >
+      <DialogTitle id="insert-column-dialog-title">
+        Insert New Column ({direction})
+      </DialogTitle>
       <DialogContent>
         <DialogContentText>
           Specify a value to fill the inserting column. Blank values will be
