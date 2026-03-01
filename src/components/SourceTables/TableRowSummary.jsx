@@ -26,11 +26,10 @@
  */
 
 import HighlightText from "../ui/HighlightText";
-import { Typography, Checkbox, Box, TableRow } from "@mui/material";
+import { Typography, Checkbox, Box, TableRow, TableCell } from "@mui/material";
 import { useMemo, useState } from "react";
 import { formatDate, formatBytes } from "../../lib/utilities";
 import { withTableData, withAssociatedAlerts } from "../HOC";
-import StyledTableRow from "./StyledTableRow";
 import BarChartCell from "./BarChartCell";
 import { IntegerNumber } from "../ui/text";
 import {
@@ -38,7 +37,7 @@ import {
   selectFocusedObjectId,
 } from "../../slices/uiSlice";
 import { useSelector } from "react-redux";
-import StyledTableCell from "./StyledTableCell";
+// import TableCell from "./TableCell";
 import { RemoveRedEye } from "@mui/icons-material";
 
 export const TABLE_ROW_VIEW_CLASS = "TableRowSummary";
@@ -120,12 +119,9 @@ const TableRowSummary = ({
       hover={!isDisabled || searchString.length === 0 || hasNameMatch}
       selected={isSelected}
       onClick={handleClick}
-      isDragging={false} // TODO
       onDoubleClick={handleDoubleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      // isDisabled={isDisabled || (searchString.length > 0 && !hasNameMatch)}
-      // isFocused={isFocused}
       data-tableid={id}
       data-selected={isSelected}
       ref={dragDropRef}
@@ -140,10 +136,11 @@ const TableRowSummary = ({
             : "pointer",
       }}
     >
-      <StyledTableCell
+      <TableCell
         sx={{
           border: "2px solid transparent",
           backgroundColor: (theme) => theme.palette.background.paper,
+          padding: 0,
         }}
       >
         <Box
@@ -175,12 +172,12 @@ const TableRowSummary = ({
             ></RemoveRedEye>
           )}
         </Box>
-      </StyledTableCell>
-      <StyledTableCell
+      </TableCell>
+      <TableCell
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{}}
+        sx={{ padding: 0 }}
       >
         <Typography
           variant="data-primary"
@@ -197,12 +194,12 @@ const TableRowSummary = ({
             }}
           />
         </Typography>
-      </StyledTableCell>
-      <StyledTableCell
+      </TableCell>
+      <TableCell
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{}}
+        sx={{ padding: 0 }}
       >
         <Typography
           variant="data-primary"
@@ -211,12 +208,12 @@ const TableRowSummary = ({
         >
           {mimeType || "N/A"}
         </Typography>
-      </StyledTableCell>
-      <StyledTableCell
+      </TableCell>
+      <TableCell
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{}}
+        sx={{ padding: 0 }}
       >
         <BarChartCell
           variant="data-primary"
@@ -227,12 +224,12 @@ const TableRowSummary = ({
         >
           {formatBytes(size)}
         </BarChartCell>
-      </StyledTableCell>
-      <StyledTableCell
+      </TableCell>
+      <TableCell
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{}}
+        sx={{ padding: 0 }}
       >
         <BarChartCell
           variant="data-primary"
@@ -243,12 +240,12 @@ const TableRowSummary = ({
         >
           <IntegerNumber value={rowCount} />
         </BarChartCell>
-      </StyledTableCell>
-      <StyledTableCell
+      </TableCell>
+      <TableCell
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{}}
+        sx={{ padding: 0 }}
       >
         <BarChartCell
           variant="data-primary"
@@ -259,12 +256,12 @@ const TableRowSummary = ({
         >
           <IntegerNumber value={columnCount} />
         </BarChartCell>
-      </StyledTableCell>
-      <StyledTableCell
+      </TableCell>
+      <TableCell
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{}}
+        sx={{ padding: 0 }}
       >
         <Typography
           variant="data-primary"
@@ -273,7 +270,7 @@ const TableRowSummary = ({
         >
           {formatDate(new Date(dateLastModified))}
         </Typography>
-      </StyledTableCell>
+      </TableCell>
     </TableRow>
   );
 };

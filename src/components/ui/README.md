@@ -67,7 +67,6 @@ ui/
 ├── SearchTextBox.jsx           # Search input
 ├── SidebarDropZone.jsx         # Sidebar drop target
 ├── StyledBlock.js              # Styled block wrapper
-├── StyledDraggableRow.jsx      # Styled draggable row
 ├── StyledDropZone.jsx          # Styled drop zone
 └── card.tsx                    # Card component
 ```
@@ -84,10 +83,10 @@ Action buttons with consistent styling and behavior.
 | `AddStackOperationButton`      | Create STACK operation   | ➕   |
 | `ClearSearchTextButton`        | Clear search input       | ✕    |
 | `ColumnContextMenuButton`      | Column actions menu      | ⋯    |
-| `DeleteColumnsButton`          | Delete selected columns  | 🗑    |
+| `DeleteColumnsButton`          | Delete selected columns  | 🗑   |
 | `ExportTableButton`            | Export table data        | 📥   |
 | `FocusIconButton`              | Focus on object          | 🎯   |
-| `HiddenColumnsButton`          | Toggle hidden columns    | 👁    |
+| `HiddenColumnsButton`          | Toggle hidden columns    | 👁   |
 | `InsertTableInOperationButton` | Add table to operation   | ➕   |
 | `RenameObjectButton`           | Rename table/operation   | ✏    |
 | `SchemaAlertsButton`           | Show schema alerts       | ⚠    |

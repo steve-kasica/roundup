@@ -7,7 +7,6 @@ This directory contains components for displaying individual source tables, incl
 ```
 TableView/
 ├── BarChartCell.js           # Value distribution cell
-├── StyledTableRow.js         # Styled row component
 ├── TableBlock.jsx            # Draggable table block
 ├── TableDragContainer.jsx    # Drag source container
 ├── TableDragPreview.jsx      # Custom drag preview

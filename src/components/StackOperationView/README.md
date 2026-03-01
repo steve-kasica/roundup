@@ -13,7 +13,6 @@ StackOperationView/
 ├── StackSchemaView/          # Main schema view (542 lines)
 │   ├── StackSchemaView.jsx   # Primary schema component
 │   ├── StyledColumnsContainer.js
-│   ├── StyledTableCell.js
 │   └── index.js              # Exports
 ├── selectionUtils/           # Range selection utilities
 ├── MetadataView.jsx          # Table metadata display
