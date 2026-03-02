@@ -177,7 +177,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{ padding: 0 }}
+        sx={{ padding: 0, maxWidth: 0 }}
       >
         <Typography
           variant="data-primary"
@@ -185,6 +185,7 @@ const TableRowSummary = ({
             isDisabled ? "textDisabled" : totalCount ? "warning.dark" : "normal"
           }
           data-column="name"
+          noWrap
         >
           <HighlightText
             pattern={searchString}

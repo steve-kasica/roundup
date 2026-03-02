@@ -214,6 +214,7 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
             height: "100%",
             borderCollapse: "separate",
             borderSpacing: 0,
+            tableLayout: "fixed",
           }}
         >
           <TableHead
@@ -232,6 +233,7 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
               <TableCell
                 sx={{
                   padding: 0,
+                  width: "40px",
                   borderRight: "1px solid rgba(0, 0, 0, 0.12)",
                 }}
               ></TableCell>
