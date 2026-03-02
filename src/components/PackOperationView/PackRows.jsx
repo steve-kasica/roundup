@@ -63,18 +63,13 @@ const PackRows = ({
   rightKey,
   rightColumnIds,
   validMatchGroups,
+  joinType,
   // Props passed directly from withGlobalInterfaceData HOC
   selectedMatches,
   selectMatches,
 }) => {
   const [sortByColumnId, setSortByColumnId] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
-
-  console.log("PackRows render", {
-    id,
-    selectedChildColumnIdsSet,
-    selectedMatches,
-  });
 
   const handleColumnSort = useCallback(
     (_event, columnId) => {
@@ -101,7 +96,12 @@ const PackRows = ({
     ) {
       return [];
     } else {
-      const allChildColumns = [...leftColumnIds, ...rightColumnIds];
+      const allChildColumns =
+        joinType === JOIN_TYPES.LEFT_ANTI
+          ? leftColumnIds
+          : joinType === JOIN_TYPES.RIGHT_ANTI
+            ? rightColumnIds
+            : [...leftColumnIds, ...rightColumnIds];
       const selectedTableIndices = allChildColumns.reduce(
         (acc, colId, index) => {
           if (selectedChildColumnIdsSet.has(colId)) {
@@ -124,6 +124,7 @@ const PackRows = ({
     rightColumnIds,
     rightKey,
     selectedChildColumnIdsSet,
+    joinType,
   ]);
 
   const initialOffset = useMemo(() => {
@@ -144,13 +145,6 @@ const PackRows = ({
     return filteredMatchStats;
   }, [matchStats, selectedMatches]);
 
-  console.log("PackRows", {
-    initialOffset,
-    rowLimit,
-    matchStats,
-    selectedMatches,
-  });
-
   const results = usePaginatedTableRows(
     id,
     displayColumnIds,
@@ -162,7 +156,6 @@ const PackRows = ({
   );
 
   const { data, loading, error, hasMore, loadMore, refresh } = results;
-  console.log("PackRows data", { data, loading, error, hasMore });
 
   const handleMaterializeView = useCallback(() => {
     materializeOperation();

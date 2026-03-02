@@ -46,11 +46,11 @@ export default function withColumnData(WrappedComponent) {
 
     // TODO: memoize
     const operationIndex = useSelector((state) => {
-      if (isTableId(column.parentId)) {
-        const parent = selectTablesById(state, column.parentId);
-        return state.operations.allIds.indexOf(parent.parentId);
+      if (isTableId(column?.parentId)) {
+        const parent = selectTablesById(state, column?.parentId);
+        return state.operations.allIds.indexOf(parent?.parentId);
       } else {
-        return state.operations.allIds.indexOf(column.parentId);
+        return state.operations.allIds.indexOf(column?.parentId);
       }
     });
 
@@ -61,13 +61,13 @@ export default function withColumnData(WrappedComponent) {
      * The ID of the parent table/operation that this column belongs to.
      * @type {string}
      */
-    const parentId = useMemo(() => column.parentId, [column]);
+    const parentId = useMemo(() => column?.parentId, [column]);
 
     /**
      * The name of the corresponding column in the database.
      * @type {string}
      */
-    const databaseName = useMemo(() => column.databaseName, [column]);
+    const databaseName = useMemo(() => column?.databaseName, [column]);
 
     /**
      * The display name of the column, specified by the user or defaulting
@@ -75,15 +75,15 @@ export default function withColumnData(WrappedComponent) {
      * @type {string|null}
      */
     const name = useMemo(
-      () => column.name || databaseName,
-      [column.name, databaseName],
+      () => column?.name || databaseName,
+      [column?.name, databaseName],
     );
 
     /**
      * The index of the column within its parent table/operation, used for ordering.
      * @type {number}
      */
-    const index = useMemo(() => column.index, [column]);
+    const index = useMemo(() => column?.index, [column]);
 
     /**
      * The data type of the column, defined in `Column.js`, e.g.
@@ -91,19 +91,19 @@ export default function withColumnData(WrappedComponent) {
      * - `COLUMN_TYPE_NUMERICAL`
      * @type {string}
      */
-    const columnType = useMemo(() => column.columnType, [column]);
+    const columnType = useMemo(() => column?.columnType, [column]);
 
     /**
      * The count of non-null values in the column.
      * @type {number|null}
      */
-    const count = useMemo(() => column.count || null, [column]);
+    const count = useMemo(() => column?.count || null, [column]);
 
     /**
      * The approximate number of unique values in the column.
      * @type {number}
      */
-    const approxUnique = useMemo(() => column.approxUnique || null, [column]);
+    const approxUnique = useMemo(() => column?.approxUnique || null, [column]);
 
     /**
      * The percentage of unique values in the column.
@@ -136,7 +136,7 @@ export default function withColumnData(WrappedComponent) {
      * TODO: how many top values are stored? Is this configurable?
      * @type {Array|null}
      */
-    const topValues = useMemo(() => column.topValues || null, [column]);
+    const topValues = useMemo(() => column?.topValues || null, [column]);
 
     // Statistical metadata
     // --------------------------------------------------------------------

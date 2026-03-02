@@ -131,7 +131,7 @@ export function useTableRowData(
  */
 export function usePaginatedTableRows(
   tableId,
-  columnIds = null,
+  columnIds = [],
   pageSize = 50,
   sortByColumnId = null,
   sortDirection = "asc",
@@ -149,7 +149,7 @@ export function usePaginatedTableRows(
   );
   const columns = useSelector((state) => selectColumnsById(state, columnIds));
   const columnsList = useMemo(
-    () => columns.map(({ databaseName }) => databaseName),
+    () => columns.map((column) => column?.databaseName),
     [columns],
   );
 
