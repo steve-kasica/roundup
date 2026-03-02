@@ -140,7 +140,7 @@ const TableRowSummary = ({
         sx={{
           border: "2px solid transparent",
           backgroundColor: (theme) => theme.palette.background.paper,
-          padding: 0,
+          padding: 0.25,
         }}
       >
         <Box
@@ -160,7 +160,7 @@ const TableRowSummary = ({
             disabled
             aria-label={`Select table ${name}`}
             sx={{
-              padding: 0,
+              padding: 0.25,
               pointerEvents: "none",
             }}
           />
@@ -177,7 +177,8 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{ padding: 0 }}
+        padding={"none"}
+        sx={{ maxWidth: 0, paddingRight: 0.5 }}
       >
         <Typography
           variant="data-primary"
@@ -185,6 +186,7 @@ const TableRowSummary = ({
             isDisabled ? "textDisabled" : totalCount ? "warning.dark" : "normal"
           }
           data-column="name"
+          noWrap
         >
           <HighlightText
             pattern={searchString}
@@ -199,7 +201,8 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{ padding: 0 }}
+        padding={"none"}
+        // sx={{ padding: 0.25 }}
       >
         <Typography
           variant="data-primary"
@@ -213,7 +216,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{ padding: 0 }}
+        padding={"none"}
       >
         <BarChartCell
           variant="data-primary"
@@ -229,7 +232,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{ padding: 0 }}
+        padding={"none"}
       >
         <BarChartCell
           variant="data-primary"
@@ -245,7 +248,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{ padding: 0 }}
+        padding={"none"}
       >
         <BarChartCell
           variant="data-primary"
@@ -261,7 +264,7 @@ const TableRowSummary = ({
         isSelected={isSelected}
         isPrevSelected={isPrevSelected}
         isNextSelected={isNextSelected}
-        sx={{ padding: 0 }}
+        padding={"none"}
       >
         <Typography
           variant="data-primary"
