@@ -129,7 +129,18 @@ describe("updateOperationsWorker saga", () => {
         .call(createPackView, queryData)
         .call(getTableDimensions, "pack_view")
         .put(updateOperations(operationUpdates))
-        .put(updateOperationsSuccess(operationUpdates))
+        .put(
+          updateOperationsSuccess([
+            {
+              id: "o1",
+              isMaterialized: true,
+              isInSync: true,
+              columnCount: 5,
+              rowCount: 100,
+              columnIds: [],
+            },
+          ]),
+        )
         .run();
     });
 
@@ -240,7 +251,18 @@ describe("updateOperationsWorker saga", () => {
         .call(createStackView, queryData)
         .call(getTableDimensions, "stack_view")
         .put(updateOperations(operationUpdates))
-        .put(updateOperationsSuccess(operationUpdates))
+        .put(
+          updateOperationsSuccess([
+            {
+              id: "o1",
+              isMaterialized: true,
+              isInSync: true,
+              columnCount: 5,
+              rowCount: 100,
+              columnIds: [],
+            },
+          ]),
+        )
         .run();
     });
   });

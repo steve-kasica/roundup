@@ -60,6 +60,7 @@ export default function* updateOperationsWorker(operationUpdates) {
         operationUpdate.rowCount = rowCount;
         operationUpdate.isMaterialized = true;
         operationUpdate.isInSync = true;
+        operationUpdate.columnIds = []; // Clear column IDs to be re-populated on next sync
       } catch (error) {
         isFailure = true;
         console.error("Error materializing operation:", error, queryData);
