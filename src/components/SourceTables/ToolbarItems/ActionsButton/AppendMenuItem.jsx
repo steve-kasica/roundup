@@ -1,5 +1,5 @@
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
-import { StackOperationIcon } from "../../../ui/icons";
+import { PlaylistAdd } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { selectFocusedObject } from "../../../../slices/uiSlice";
 import { useMemo } from "react";
@@ -27,9 +27,9 @@ const AppendMenuItem = ({ onClick, selectedCount }) => {
   return (
     <MenuItem onClick={onClick} disabled={isDisabled}>
       <ListItemIcon>
-        <StackOperationIcon />
+        <PlaylistAdd />
       </ListItemIcon>
-      <ListItemText>Append table{selectedCount !== 1 ? "s" : ""}</ListItemText>
+      <ListItemText>Insert table in focused operation</ListItemText>
     </MenuItem>
   );
 };

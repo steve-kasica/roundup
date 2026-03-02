@@ -37,7 +37,7 @@ describe("AppendMenuItem", () => {
           preloadedState: defaultState,
         },
       );
-      cy.get("li").should("contain.text", "Append table");
+      cy.get("li").should("contain.text", "Insert table in focused operation");
     });
     it("should render the correct text when multiple tables are selected", () => {
       cy.mountWithProviders(
@@ -46,7 +46,7 @@ describe("AppendMenuItem", () => {
           preloadedState: defaultState,
         },
       );
-      cy.get("li").should("contain.text", "Append tables");
+      cy.get("li").should("contain.text", "Insert table in focused operation");
     });
   });
 
