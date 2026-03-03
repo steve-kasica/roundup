@@ -4,6 +4,16 @@ This is a list of example workflows from the Table Scraps project. The Table Scr
 
 ## Reproducible workflows (17)
 
+### Stack only Workflows (1)
+
+- Zhang, Christine. (2018, October 15). Maryland voter registration analysis. Baltimore Sun. Retrieved from https://github.com/baltimore-sun-data/2018-voter-registration
+
+### Pack only workflows
+
+### Hybrid workflows (stack and pack)
+
+### Uncharacterized
+
 - Ceccon, Stefano. (2016, January 16). Analysis: How the Conservatives won. The Times and Sunday Times. Retrieved from https://github.com/times/data/tree/master/general-election-2015-classification-tree
 - Flowers, Andrew. (2014, June 3). Infrastructure jobs. FiveThirtyEight. Retrieved from https://github.com/fivethirtyeight/data/tree/master/infrastructure-jobs
 - Fresques, Hannah. (2019, April 1). IRS Audit Rates by County. ProPublica. Retrieved from https://github.com/propublica/auditData
@@ -19,8 +29,13 @@ This is a list of example workflows from the Table Scraps project. The Table Scr
 - Wilson, Chris. (2016, December 20). Baby Name Politics. Time. Retrieved from https://github.com/TimeMagazine/babyname_politics
 - Yerardi, Joe. (2019, February 28). Injustice at Work. Center for Public Integrity. Retrieved from https://github.com/PublicI/employment-discrimination
 - Zarkhin, Fedor. (2017, April 21). Long-term care complaints data and analysis. The Oregonian. Retrieved from https://github.com/TheOregonian/long-term-care-db
-- Zhang, Christine. (2018, October 15). Maryland voter registration analysis. Baltimore Sun. Retrieved from https://github.com/baltimore-sun-data/2018-voter-registration
 - Zhang, Christine. (2018, December 4). Maryland schools star ratings analysis. Baltimore Sun. Retrieved from https://github.com/baltimore-sun-data/school-star-ratings-2018
+
+### Workflow categorization
+
+| Workflow                                                                                 | Category   | Difficulty |
+| ---------------------------------------------------------------------------------------- | ---------- | ---------- |
+| [2018-voter-registration](https://github.com/baltimore-sun-data/2018-voter-registration) | Stack only | Simple     |
 
 ## Excluded workflows (33)
 
