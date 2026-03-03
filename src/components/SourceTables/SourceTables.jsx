@@ -125,15 +125,17 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
   const selectedTableIds = useSelector(selectSelectedTableIds);
 
   // Sort tables based on selected attribute and order
-  const sortedTables = useMemo(
-    () =>
-      tables.toSorted((a, b) =>
-        isAscending
-          ? ascending(a[sortAttribute], b[sortAttribute])
-          : descending(a[sortAttribute], b[sortAttribute]),
-      ),
-    [tables, sortAttribute, isAscending],
-  );
+  const sortedTables = useMemo(() => {
+    const getValue = (table) =>
+      sortAttribute === "columnCount"
+        ? table.columnIds?.length ?? 0
+        : table[sortAttribute];
+    return tables.toSorted((a, b) =>
+      isAscending
+        ? ascending(getValue(a), getValue(b))
+        : descending(getValue(a), getValue(b)),
+    );
+  }, [tables, sortAttribute, isAscending]);
 
   const handleOnDeleteTables = useCallback(() => {
     dispatch(deleteTablesRequest(selectedTableIds));
