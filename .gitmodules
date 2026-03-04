@@ -24,36 +24,46 @@
 [submodule "example-workflows/times-data"]
 	path = example-workflows/times-data
 	url = git@github.com:steve-kasica/data-2.git
+	branch = roundup
 [submodule "example-workflows/fivethirtyeight"]
 	path = example-workflows/fivethirtyeight
 	url = git@github.com:steve-kasica/538-data.git
+	branch = roundup
 [submodule "example-workflows/auditData"]
 	path = example-workflows/auditData
 	url = git@github.com:steve-kasica/auditData.git
 [submodule "example-workflows/demolitions"]
 	path = example-workflows/demolitions
-	url = git@github.com:statesman/demolitions.git
+	url = git@github.com:steve-kasica/demolitions.git
 [submodule "example-workflows/Power_of_Irma"]
 	path = example-workflows/Power_of_Irma
 	url = https://github.com/steve-kasica/Power_of_Irma
+	branch = roundup
 [submodule "example-workflows/2015-11-refugees-in-the-united-states"]
 	path = example-workflows/2015-11-refugees-in-the-united-states
 	url = git@github.com:steve-kasica/2015-11-refugees-in-the-united-states.git
+	branch = roundup
 [submodule "example-workflows/school-choice"]
 	path = example-workflows/school-choice
 	url = git@github.com:steve-kasica/school-choice.git
+	branch = roundup
 [submodule "example-workflows/employment-discrimination"]
 	path = example-workflows/employment-discrimination
 	url = git@github.com:steve-kasica/employment-discrimination.git
+	branch = roundup
 [submodule "example-workflows/2018-voter-registration"]
 	path = example-workflows/2018-voter-registration
 	url = git@github.com:steve-kasica/2018-voter-registration.git
+	branch = roundup
 [submodule "example-workflows/california-h2a-visas-analysis"]
 	path = example-workflows/california-h2a-visas-analysis
 	url = git@github.com:steve-kasica/california-h2a-visas-analysis.git
+	branch = roundup
 [submodule "example-workflows/awb-notebook"]
 	path = example-workflows/awb-notebook
 	url = git@github.com:steve-kasica/awb-notebook.git
+	branch = roundup
 [submodule "example-workflows/long-term-care-db"]
 	path = example-workflows/long-term-care-db
 	url = git@github.com:steve-kasica/long-term-care-db.git
+	branch = roundup
