@@ -1,6 +1,6 @@
 # Documentation Directory
 
-This directory contains all documentation for the Open Roundup project, published via **GitHub Pages** using **Jekyll**.
+This directory contains all documentation for the Roundup project, published via **GitHub Pages** using **Jekyll**.
 
 ## Structure
 

@@ -1,6 +1,6 @@
-title: "Open Roundup"
-description: "End-user documentation for the Open Roundup application"
-baseurl: "/open-roundup"
+title: "Roundup"
+description: "End-user documentation for the Roundup application"
+baseurl: "/roundup"
 url: "https://steve-kasica.github.io"
 
 theme: jekyll-theme-minimal

@@ -1,6 +1,6 @@
-# Open Roundup
+# Roundup
 
-Open Roundup is a web-based data wrangling tool that enables users to combine tabular data through visual operations. The system leverages **DuckDB-WASM** for client-side SQL execution, **Redux Saga** for complex async workflows, and **React** with **Material-UI** for the user interface. It provides the following key features:
+Roundup is a web-based data wrangling tool that enables users to combine tabular data through visual operations. The system leverages **DuckDB-WASM** for client-side SQL execution, **Redux Saga** for complex async workflows, and **React** with **Material-UI** for the user interface. It provides the following key features:
 
 - **Client-Side SQL Execution**: Using DuckDB-WASM for privacy-preserving data wrangling
 - **Visual Operation Tree**: Novel visualization of data lineage and transformations
@@ -149,7 +149,7 @@ This enables:
 ```javascript
 // Usage pattern
 export const EnhancedColumnSummary = withAssociatedAlerts(
-  withColumnData(ColumnSummary)
+  withColumnData(ColumnSummary),
 );
 ```
 
@@ -176,7 +176,7 @@ export const selectOperationQueryData = createSelector(
   [selectOperationsById, selectColumnsById, selectTableQueryData],
   (operation, columns, tableData) => {
     /* derived computation */
-  }
+  },
 );
 ```
 

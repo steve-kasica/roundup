@@ -31,7 +31,7 @@ const slice = createSlice({
   reducers: {
     /**
      * Adds one or more new tables to the state. Mapping byId from remote
-     * sources to Open Roundup's table structure is handled upstream.
+     * sources to Roundup's table structure is handled upstream.
      *
      * @param {Object} state - The current Redux slice state, containing `allIds` (array of table IDs) and `byId` (object mapping IDs to table objects).
      * @param {Object} action - The Redux action object.

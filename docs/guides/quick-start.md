@@ -6,22 +6,22 @@ permalink: /guides/quick-start/
 
 # Quick Start Guide
 
-Get up and running with Open Roundup in just 5 minutes!
+Get up and running with Roundup in just 5 minutes!
 
 ## What You'll Learn
 
 By the end of this guide, you'll be able to:
 
-- Access the Open Roundup application
+- Access the Roundup application
 - Browse example workflows
 - Explore a workflow in detail
 
-## Part 1: Accessing Open Roundup
+## Part 1: Accessing Roundup
 
 ### Option A: Online (Recommended for First-Time Users)
 
 1. Open your browser to: `https://steve-kasica.github.io/open-roundup/`
-2. You're now on the Open Roundup documentation site
+2. You're now on the Roundup documentation site
 3. Look for the "Application" link in the navigation to access the web app
 
 ### Option B: Running Locally (For Developers)
