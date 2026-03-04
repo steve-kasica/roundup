@@ -1,0 +1,37 @@
+title: "Open Roundup"
+description: "End-user documentation for the Open Roundup application"
+baseurl: "/open-roundup"
+url: "https://steve-kasica.github.io"
+
+theme: jekyll-theme-minimal
+markdown: kramdown
+
+collections:
+  workflows:
+    output: true
+    permalink: /workflows/:path/
+  guides:
+    output: true
+    permalink: /guides/:path/
+
+defaults:
+  - scope:
+      path: ""
+      type: "workflows"
+    values:
+      layout: workflow
+  - scope:
+      path: ""
+      type: "guides"
+    values:
+      layout: default
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+exclude:
+  - README.md
+  - outline.md
+  - data-model.md

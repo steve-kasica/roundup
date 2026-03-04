@@ -17,3 +17,9 @@ src/test/resources/
 src/sandbox
 cypress/screenshots/
 build
+# Jekyll and documentation build
+_site/
+.jekyll-cache/
+.jekyll-metadata
+Gemfile.lock
+vendor/
