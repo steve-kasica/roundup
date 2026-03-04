@@ -29,7 +29,7 @@ const AppendMenuItem = ({ onClick, selectedCount }) => {
       <ListItemIcon>
         <PlaylistAdd />
       </ListItemIcon>
-      <ListItemText>Insert table in focused operation</ListItemText>
+      <ListItemText>Insert table</ListItemText>
     </MenuItem>
   );
 };
