@@ -26,6 +26,7 @@ import {
   selectOperationsById,
 } from "../../slices/operationsSlice";
 import { isTableId, selectTablesById } from "../../slices/tablesSlice";
+import { selectColumnsById } from "../../slices/columnsSlice";
 import { updateOperationsSuccess } from "../updateOperationsSaga";
 import { getTableColumnNames } from "../../lib/duckdb/getTableColumnNames";
 
@@ -122,11 +123,28 @@ export default function* createColumnsWatcher() {
           getTableColumnNames,
           operation.databaseName,
         );
+        // Get the first child's columns to use user-specified names
+        // instead of database column names (which for UNION ALL views
+        // inherit auto-generated databaseNames from the first child table)
+        const firstChildId = operation.childIds[0];
+        let firstChildColumns = [];
+        if (firstChildId) {
+          const firstChild = yield select((state) =>
+            isTableId(firstChildId)
+              ? selectTablesById(state, firstChildId)
+              : selectOperationsById(state, firstChildId),
+          );
+          if (firstChild?.columnIds?.length > 0) {
+            firstChildColumns = yield select((state) =>
+              selectColumnsById(state, firstChild.columnIds),
+            );
+          }
+        }
         workerPayload.push(
-          ...columnNames.map((name, index) => ({
+          ...columnNames.map((dbName, index) => ({
             parentId: operationId,
-            name,
-            databaseName: name,
+            name: firstChildColumns[index]?.name || dbName,
+            databaseName: dbName,
             index,
           })),
         );

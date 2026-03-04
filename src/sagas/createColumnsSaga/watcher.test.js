@@ -371,5 +371,48 @@ describe("createColumnsWatcher", () => {
         .dispatch(action)
         .run();
     });
+    it("uses user-specified column names from first child instead of database column names", async () => {
+      const stateWithNames = {
+        ...state,
+        columns: {
+          byId: {
+            c1: { id: "c1", name: "foo" },
+            c2: { id: "c2", name: "bar" },
+            c3: { id: "c3" },
+            c4: { id: "c4" },
+          },
+          allIds: ["c1", "c2", "c3", "c4"],
+        },
+      };
+      const action = updateOperationsSuccess([
+        { id: "o1", isMaterialized: true },
+      ]);
+      const expectedArguments = [
+        {
+          parentId: "o1",
+          index: 0,
+          name: "foo",
+          databaseName: "column_abc123",
+        },
+        {
+          parentId: "o1",
+          index: 1,
+          name: "bar",
+          databaseName: "column_def456",
+        },
+      ];
+      await expectSaga(createColumnsWatcher)
+        .withState(stateWithNames)
+        .provide([
+          [matchers.call.fn(createColumnsWorker), undefined],
+          [
+            matchers.call.fn(getTableColumnNames),
+            ["column_abc123", "column_def456"],
+          ],
+        ])
+        .call(createColumnsWorker, expectedArguments, false)
+        .dispatch(action)
+        .run();
+    });
   });
 });
