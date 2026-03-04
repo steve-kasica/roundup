@@ -78,12 +78,14 @@ export default async function exportTableToStreamManual(
       .map((col) => col.column_name);
 
     // Create column headers using name property, falling back to databaseName
+    // Strip newline characters to prevent corrupted CSV/TSV output
     const columnHeaders = columns
       ? columnDatabaseNames.map((dbName) => {
           const colInfo = columns.find((c) => c.databaseName === dbName);
-          return colInfo?.name || colInfo?.databaseName || dbName;
+          const header = colInfo?.name || colInfo?.databaseName || dbName;
+          return header.replace(/\r?\n|\r/g, " ");
         })
-      : columnDatabaseNames;
+      : columnDatabaseNames.map((name) => name.replace(/\r?\n|\r/g, " "));
 
     const chunks = [];
     let processedRows = 0;
