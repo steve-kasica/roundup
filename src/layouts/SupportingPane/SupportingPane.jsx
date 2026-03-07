@@ -158,52 +158,48 @@ export default function SupportingPane() {
                     </Box>
                   </Box>
                 </Panel>
-                {rootOperation && (
-                  <>
-                    <StyledPanelResizeHandle
-                      sx={{ height: "2px", width: "100%" }}
-                    />
-                    <Panel
-                      id="composite-table-schema-panel"
-                      ref={compositeSchemaRef}
-                      minSize={CompositeSchemaContainerSizes.COLLAPSED}
-                      defaultSize={CompositeSchemaContainerSizes.EXPANDED}
-                      collapsible={false}
-                      order={2}
-                      style={{ padding: "5px" }}
+                <StyledPanelResizeHandle
+                  sx={{ height: "2px", width: "100%" }}
+                />
+                <Panel
+                  id="composite-table-schema-panel"
+                  ref={compositeSchemaRef}
+                  minSize={CompositeSchemaContainerSizes.COLLAPSED}
+                  defaultSize={CompositeSchemaContainerSizes.EXPANDED}
+                  collapsible={false}
+                  order={2}
+                  style={{ padding: "5px" }}
+                >
+                  <Box display="flex" flexDirection="column" height="100%">
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent={"space-between"}
+                      mb={0}
                     >
-                      <Box display="flex" flexDirection="column" height="100%">
-                        <Box
-                          display="flex"
-                          alignItems="center"
-                          justifyContent={"space-between"}
-                          mb={0}
-                        >
-                          <Typography variant="h6" gutterBottom>
-                            Composite Schema
-                            <InfoIcon
-                              sx={{ ml: 1 }}
-                              tooltipText={
-                                "The Composite Schema provides the highest level"
-                              }
-                            />
-                          </Typography>
-                          <IconButton onClick={handleCollapseCompositeSchema}>
-                            <KeyboardArrowDown
-                              sx={{
-                                transform: isCompositeSchemaCollapsed
-                                  ? "rotate(180deg)"
-                                  : "rotate(0deg)",
-                                transition: "transform 0.3s",
-                              }}
-                            />
-                          </IconButton>
-                        </Box>
-                        <CompositeTableSchema />
-                      </Box>
-                    </Panel>
-                  </>
-                )}
+                      <Typography variant="h6" gutterBottom>
+                        Composite Schema
+                        <InfoIcon
+                          sx={{ ml: 1 }}
+                          tooltipText={
+                            "The Composite Schema provides the highest level"
+                          }
+                        />
+                      </Typography>
+                      <IconButton onClick={handleCollapseCompositeSchema}>
+                        <KeyboardArrowDown
+                          sx={{
+                            transform: isCompositeSchemaCollapsed
+                              ? "rotate(180deg)"
+                              : "rotate(0deg)",
+                            transition: "transform 0.3s",
+                          }}
+                        />
+                      </IconButton>
+                    </Box>
+                    <CompositeTableSchema />
+                  </Box>
+                </Panel>
               </PanelGroup>
             </Panel>
             <StyledPanelResizeHandle

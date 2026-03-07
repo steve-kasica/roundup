@@ -32,17 +32,100 @@
 import { useSelector } from "react-redux";
 import {
   isOperationId,
-  OPERATION_TYPE_NO_OP,
   selectRootOperation,
 } from "../../slices/operationsSlice";
 
-import TableDropTarget from "./TableDropTarget";
 import { Box, Typography } from "@mui/material";
 import { EnhancedOperationBlock } from "./OperationBlock";
 import { selectAlertErrorCount } from "../../slices/alertsSlice";
 import { selectFocusedObjectId } from "../../slices/uiSlice";
 
-const stackDropTargetHeight = 50;
+/**
+ * SchemaPlaceholder Component
+ *
+ * Renders a muted tree-map illustration of what the schema visualization looks
+ * like when it has content, giving the user a visual hint before any tables are
+ * loaded.
+ *
+ * @component
+ * @returns {React.ReactElement}
+ */
+function SchemaPlaceholder() {
+  const cellSx = {
+    borderRadius: 0.5,
+    bgcolor: "grey.300",
+  };
+  const outerSx = {
+    border: "2px solid",
+    borderColor: "grey.300",
+    borderRadius: 1,
+    p: 0.75,
+    display: "flex",
+    flexDirection: "column",
+    gap: 0.75,
+  };
+
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      sx={{ height: "100%", width: "100%", position: "relative" }}
+    >
+      {/* Muted placeholder illustration */}
+      <Box
+        display="flex"
+        flexDirection="column"
+        sx={{
+          position: "absolute",
+          inset: 0,
+          opacity: 0.25,
+          userSelect: "none",
+          p: 1,
+        }}
+      >
+        {/* Outer container — root operation */}
+        <Box sx={{ ...outerSx, flex: 1 }}>
+          {/* Header row */}
+          <Box sx={{ ...cellSx, height: 12, width: "60%" }} />
+
+          {/* Nested grid: two child tables side by side */}
+          <Box display="flex" flexDirection="row" gap={0.75} flex={1}>
+            {/* Left child table */}
+            <Box sx={{ ...outerSx, flex: 1 }}>
+              <Box sx={{ ...cellSx, flex: 5, width: "100%", minHeight: 6 }} />
+              <Box sx={{ ...cellSx, flex: 4, width: "100%", minHeight: 6 }} />
+              <Box sx={{ ...cellSx, flex: 4, width: "100%", minHeight: 6 }} />
+            </Box>
+
+            {/* Right child table */}
+            <Box sx={{ ...outerSx, flex: 1 }}>
+              <Box sx={{ ...cellSx, flex: 5, width: "100%", minHeight: 6 }} />
+              <Box sx={{ ...cellSx, flex: 4, minHeight: 6 }} />
+              <Box sx={{ ...cellSx, flex: 4, width: "100%", minHeight: 6 }} />
+            </Box>
+
+            {/* Third child table */}
+            <Box sx={{ ...outerSx, flex: 1 }}>
+              <Box sx={{ ...cellSx, flex: 5, width: "100%", minHeight: 6 }} />
+              <Box sx={{ ...cellSx, flex: 4, width: "100%", minHeight: 6 }} />
+              <Box sx={{ ...cellSx, flex: 4, width: "100%", minHeight: 6 }} />
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Centered call-to-action text */}
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: 600, color: "text.secondary", zIndex: 1 }}
+      >
+        Add a table to begin
+      </Typography>
+    </Box>
+  );
+}
 
 /**
  * CompositeTableSchema Component
@@ -56,12 +139,6 @@ const stackDropTargetHeight = 50;
  */
 export default function CompositeTableSchema() {
   const rootOperation = useSelector(selectRootOperation);
-  const errorCount = useSelector((state) => {
-    const focusedObjectId = selectFocusedObjectId(state);
-    return isOperationId(focusedObjectId)
-      ? selectAlertErrorCount(state, focusedObjectId)
-      : null;
-  });
 
   return (
     <Box
@@ -87,9 +164,7 @@ export default function CompositeTableSchema() {
           </Box>
         </Box>
       ) : (
-        <TableDropTarget operationType={OPERATION_TYPE_NO_OP}>
-          <Typography>Drag to add a source table</Typography>
-        </TableDropTarget>
+        <SchemaPlaceholder />
       )}
     </Box>
   );
