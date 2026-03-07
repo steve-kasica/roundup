@@ -23,3 +23,19 @@ _site/
 .jekyll-metadata
 Gemfile.lock
 vendor/
+
+# TODO
+docs/workflows/Power_of_Irma/
+docs/workflows/auditData/
+docs/workflows/awb-notebook/
+docs/workflows/babyname_politics/
+docs/workflows/california-h2a-visas-analysis/
+docs/workflows/demolitions/
+docs/workflows/employment-discrimination/
+docs/workflows/fivethirtyeight/
+docs/workflows/join-demo/
+docs/workflows/long-term-care-db/
+docs/workflows/nyc-trips/
+docs/workflows/school-choice/
+docs/workflows/school-star-ratings-2018/
+docs/workflows/times-data/
