@@ -9,21 +9,21 @@ github_url: "https://github.com/baltimore-sun-data/2018-voter-registration"
 category: "stack"
 difficulty: "simple"
 permalink: /workflows/2018-voter-registration/
-data-link: /workflows/2018-voter-registration.zip
+data-link: /workflows/2018-voter-registration/2018-voter-registration.zip
 ---
 
 # Maryland Voter Registration Analysis
 
 ## Overview
 
-This workflow analyzes Maryland voter registration data across multiple elections to identify registration trends, patterns of voter movement between counties, and demographic shifts in voter registration over time. The analysis provided information for the October 15, 2018 Baltimore Sun story titled ["Maryland nears record high voter registration — and independents make up the fastest-growing group"](http://www.baltimoresun.com/news/maryland/politics/bs-md-2018-voter-registration-20181011-story.html) (print headline: "Parties losing Md. voters").
+This workflow analyzes Maryland voter registration data across multiple elections to identify registration trends, patterns of voter movement between counties, and demographic shifts in voter registration over time. The analysis provided information for the October 15, 2018, _Baltimore Sun_ story titled ["Maryland nears record high voter registration — and independents make up the fastest-growing group"](http://www.baltimoresun.com/news/maryland/politics/bs-md-2018-voter-registration-20181011-story.html) (print headline: "Parties losing Md. voters").
 
 ## Author & Source
 
 - **Author:** Christine Zhang
 - **Publication:** Baltimore Sun
 - **Published:** October 15, 2018
-- **Original Article URL:** https://github.com/baltimore-sun-data/2018-voter-registration
+- **Original Article URL:** http://www.baltimoresun.com/news/maryland/politics/bs-md-2018-voter-registration-20181011-story.html
 - **GitHub Repository:** https://github.com/baltimore-sun-data/2018-voter-registration
 
 ## Data Sources
