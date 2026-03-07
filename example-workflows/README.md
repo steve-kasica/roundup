@@ -8,9 +8,15 @@ This is a list of example workflows from the Table Scraps project. The Table Scr
 
 - Zhang, Christine. (2018, October 15). Maryland voter registration analysis. Baltimore Sun. Retrieved from https://github.com/baltimore-sun-data/2018-voter-registration
 
-### Pack only workflows
+### Pack only workflows (1)
 
-### Hybrid workflows (stack and pack)
+- Singer-Vine, Jeremy. (2019, April 16). Analysis of early 2020 Democratic campaign co-donors. BuzzFeed News. Retrieved from https://github.com/BuzzFeedNews/2019-04-democratic-candidate-codonors
+
+### Hybrid workflows (1)
+
+Hybrid workflow is a workflow that includes both stack and pack operations.
+
+- Jones, Brent. (2018, May 31). Crime and heat analysis. St Louis Public Radio. Retrieved from https://github.com/stlpublicradio/2018-05-31-crime-and-heat-analysis
 
 ### Uncharacterized
 
@@ -18,11 +24,9 @@ This is a list of example workflows from the Table Scraps project. The Table Scr
 - Flowers, Andrew. (2014, June 3). Infrastructure jobs. FiveThirtyEight. Retrieved from https://github.com/fivethirtyeight/data/tree/master/infrastructure-jobs
 - Fresques, Hannah. (2019, April 1). IRS Audit Rates by County. ProPublica. Retrieved from https://github.com/propublica/auditData
 - Groskopf, Christopher. (2017, June 27). Analysis of rideshare trips taken in New York City. Quartz. Retrieved from https://github.com/Quartz/nyc-trips
-- Jones, Brent. (2018, May 31). Crime and heat analysis. St Louis Public Radio. Retrieved from https://github.com/stlpublicradio/2018-05-31-crime-and-heat-analysis
 - McDonald, Christian. (2018, April 15). Residential demolitions in Austin. Austin American-Statesman. Retrieved from https://github.com/statesman/demolitions
 - Mayes, Brittany Renee. (2017, April 17). Data analysis for education's school choice in Indiana project. National Public Radio. Retrieved from https://github.com/nprapps/school-choice
 - Meiners, Joan. (2017, November 30). Power of Irma. WUFT. Retrieved from https://github.com/beecycles/Power_of_Irma
-- Singer-Vine, Jeremy. (2019, April 16). Analysis of early 2020 Democratic campaign co-donors. BuzzFeed News. Retrieved from https://github.com/BuzzFeedNews/2019-04-democratic-candidate-codonors
 - Singer-Vine, Jeremy. (2015, November 18). US Refugee Data and Analysis. BuzzFeed News. Retrieved from https://github.com/BuzzFeedNews/2015-11-refugees-in-the-united-states
 - Wehrmeyer, Stefan. (2016, March 21). Euros für Ärzte Data Analysis. CORRECTIV. Retrieved from https://github.com/correctiv/awb-notebook
 - Welsh, Ben. (2017, May 25). California H-2A visas analysis. Los Angeles Times. Retrieved from https://github.com/datadesk/california-h2a-visas-analysis
