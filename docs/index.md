@@ -31,6 +31,7 @@ Our collection of example workflows reproduces 17 real-world computational and d
 ### Hybrid workflows
 
 - **[2018 Crime and Heat Analysis](/workflows/2018-05-31-crime-and-heat-analysis/)**: This workflow analyzes the relationship between crime and heat in St. Louis, Missouri, by joining a table of violent crime incidents with a table of daily maximum temperatures.
+- **[Democratic Candidate Co-Donors](/workflows/2019-04-democratic-candidate-codonors/)**: This workflow analyzes donors who gave more than $200 to multiple Democratic presidential candidates in the first quarter of the 2020 election cycle, using data from Federal Election Commission (FEC) campaign filings.
 
 ## Support & Community
 
