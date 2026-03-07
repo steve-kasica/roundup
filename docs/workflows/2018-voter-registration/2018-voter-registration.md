@@ -8,8 +8,8 @@ original_url: "https://github.com/baltimore-sun-data/2018-voter-registration"
 github_url: "https://github.com/baltimore-sun-data/2018-voter-registration"
 category: "stack"
 difficulty: "simple"
-permalink: /workflows/2018-voter-registration/
-data-link: /workflows/2018-voter-registration/2018-voter-registration.zip
+permalink: /roundup/workflows/2018-voter-registration/
+data-link: /roundup/workflows/2018-voter-registration/2018-voter-registration.zip
 ---
 
 # Maryland Voter Registration Analysis

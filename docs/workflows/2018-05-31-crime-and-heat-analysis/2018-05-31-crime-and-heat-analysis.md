@@ -8,8 +8,8 @@ original_url: "http://news.stlpublicradio.org/post/warm-weather-worries-st-louis
 github_url: "github.com/stlpublicradio/2018-05-31-crime-and-heat-analysis"
 category: "hybrid"
 difficulty: "simple"
-permalink: /workflows/2018-05-31-crime-and-heat-analysis/
-data-link: /workflows/2018-05-31-crime-and-heat-analysis/2018-05-31-crime-and-heat-analysis.zip
+permalink: /roundup/workflows/2018-05-31-crime-and-heat-analysis/
+data-link: /roundup/workflows/2018-05-31-crime-and-heat-analysis/2018-05-31-crime-and-heat-analysis.zip
 ---
 
 # Crime and Heat Analysis

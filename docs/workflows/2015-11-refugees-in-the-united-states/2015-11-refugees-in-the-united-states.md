@@ -8,8 +8,8 @@ original_url: "http://www.buzzfeed.com/jsvine/where-us-refugees-come-from-and-go
 github_url: "https://github.com/BuzzFeedNews/2015-11-refugees-in-the-united-states"
 category: "pack"
 difficulty: "simple"
-permalink: /workflows/2015-11-refugees-in-the-united-states/
-data-link: /workflows/2015-11-refugees-in-the-united-states/2015-11-refugees-in-the-united-states.zip
+permalink: /roundup/workflows/2015-11-refugees-in-the-united-states/
+data-link: /roundup/workflows/2015-11-refugees-in-the-united-states/2015-11-refugees-in-the-united-states.zip
 ---
 
 # Analysis of U.S. Refugee Data
