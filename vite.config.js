@@ -38,7 +38,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
   },
   build: {
-    outDir: "./build",
+    outDir: "./build/demo",
     rollupOptions: {
       output: {
         entryFileNames: "open-roundup.js",

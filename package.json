@@ -5,14 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "dev:docs": "bundle exec jekyll serve -s docs -d build",
+    "build": "npm run build:docs && vite build",
+    "build:docs": "bundle exec jekyll build -s docs -d build",
+    "build:preview": "python3 -m http.server --directory build",
+    "clean": "rm -rf build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
     "test:cy": "cypress run --component",
     "test:cy:open": "cypress open --component",
     "project-stats": "bash ./bin/project-stats.sh",
-    "deploy": "bash ./bin/deploy.sh"
+    "deploy": "npm run build && bash ./bin/deploy.sh"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.29.1-dev132.0",
