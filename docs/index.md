@@ -10,7 +10,9 @@ Welcome to Roundup - a click-based data integration system for journalists. This
 
 ## Quick Links
 
-- **[Quick Start Guide](guides/quick-start/)** - New to Roundup? Start here for a beginner-friendly introduction to using the application.
+<!-- - **[Quick Start Guide](guides/quick-start/)** - New to Roundup? Start here for a beginner-friendly introduction to using the application. -->
+
+- **[User Guide](guides/usage/)** - In-depth instructions on using Roundup's features, including working with columns, tables, and operations.
 - **[Explore example workflows](#explore-example-workflows)** - Browse our collection of **reproducible computational and data journalism workflows** published by leading news organizations.
 - **[GitHub Repository](https://github.com/steve-kasica/open-roundup)** - Source code
 - **[Issue Tracker](https://github.com/steve-kasica/open-roundup/issues)** - Report bugs or request features
