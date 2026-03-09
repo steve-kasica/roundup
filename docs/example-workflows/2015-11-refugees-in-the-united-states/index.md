@@ -8,7 +8,7 @@ original_url: "http://www.buzzfeed.com/jsvine/where-us-refugees-come-from-and-go
 github_url: "https://github.com/BuzzFeedNews/2015-11-refugees-in-the-united-states"
 category: "pack"
 difficulty: "simple"
-data-link: /roundup/workflows/2015-11-refugees-in-the-united-states/2015-11-refugees-in-the-united-states.zip
+data-link: ./2015-11-refugees-in-the-united-states.zip
 nav_exclude: true
 ---
 
@@ -17,14 +17,6 @@ nav_exclude: true
 ## Overview
 
 This workflow analyzes U.S. refugee resettlement data by state, joining a table of refugee arrivals by destination to a table of U.S. Census state population estimates to calculate per-capita refugee resettlement rates by state. The analysis supported the November 19, 2015 BuzzFeed News article ["Where U.S. Refugees Come From — And Go — In Charts"](http://www.buzzfeed.com/jsvine/where-us-refugees-come-from-and-go-in-charts).
-
-## Author & Sources
-
-- **Author:** Jeremy Singer-Vine
-- **Publication:** BuzzFeed News
-- **Published:** November 19, 2015
-- **Original Article URL:** http://www.buzzfeed.com/jsvine/where-us-refugees-come-from-and-go-in-charts
-- **GitHub Repository:** https://github.com/BuzzFeedNews/2015-11-refugees-in-the-united-states
 
 ## Data Sources
 

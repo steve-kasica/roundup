@@ -8,7 +8,7 @@ original_url: "http://www.baltimoresun.com/news/maryland/politics/bs-md-2018-vot
 github_url: "https://github.com/baltimore-sun-data/2018-voter-registration"
 category: "stack"
 difficulty: "simple"
-data-link: /roundup/workflows/2018-voter-registration/2018-voter-registration.zip
+data-link: ./2018-voter-registration.zip
 nav_exclude: true
 ---
 

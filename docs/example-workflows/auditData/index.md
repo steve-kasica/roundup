@@ -8,7 +8,7 @@ original_url: "https://projects.propublica.org/graphics/eitc-audit"
 github_url: "https://github.com/propublica/auditData"
 category: "hybrid"
 difficulty: "moderate"
-data-link: /roundup/workflows/auditData/auditData.zip
+data-link: ./auditData.zip
 nav_exclude: true
 ---
 

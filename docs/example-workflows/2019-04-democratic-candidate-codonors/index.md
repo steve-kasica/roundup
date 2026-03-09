@@ -8,7 +8,7 @@ original_url: "https://www.buzzfeednews.com/article/tariniparti/democratic-donor
 github_url: "https://github.com/BuzzFeedNews/2019-04-democratic-candidate-codonors"
 category: "hybrid"
 difficulty: "simple"
-data-link: /roundup/workflows/2019-04-democratic-candidate-codonors/2019-04-democratic-candidate-codonors.zip
+data-link: ./2019-04-democratic-candidate-codonors.zip
 nav_exclude: true
 ---
 
