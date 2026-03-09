@@ -1,3 +1,18 @@
+/**
+ * StackSchemaView React component
+ *
+ * Displays a matrix view of columns from multiple child tables/operations, allowing users to select, focus, and manipulate child table columns.
+ *
+ * Features:
+ * - This component supports the direct manipulation of integrated data tables by following
+ *   the select + action paradigm with contiguous selection of child table columns. With a
+ *   selection, the user is able to perform the following actions:
+ *    - Summarizing selected columns
+ *    - Comparing selected columns
+ *    - Hiding selected columns from view (but not deleting from the underlying table)
+ *    - Deleting selected columns from the underlying table
+ *    - Rearranging column position within the table via drag-and-drop
+ */
 import { useCallback, useMemo, useRef, useState } from "react";
 import { withOperationData, withStackOperationData } from "../../HOC";
 import {
