@@ -1,4 +1,4 @@
-title: "Roundup"
+title: "OpenRoundup"
 description: "A click-based data integration system for data journalists"
 baseurl: "/docs"
 url: "../"
@@ -18,7 +18,7 @@ nav_external_links:
   - title: "Demo"
     url: "../demo"
     opens_in_new_tab: false
-  - title: "GitHub Repository"
+  - title: "GitHub Repo"
     url: "https://github.com/steve-kasica/roundup"
     opens_in_new_tab: false
   # - title: "Issue Tracker"

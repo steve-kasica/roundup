@@ -35,15 +35,9 @@ Hybrid workflow is a workflow that includes both stack and pack operations.
 - Zarkhin, Fedor. (2017, April 21). Long-term care complaints data and analysis. The Oregonian. Retrieved from https://github.com/TheOregonian/long-term-care-db
 - Zhang, Christine. (2018, December 4). Maryland schools star ratings analysis. Baltimore Sun. Retrieved from https://github.com/baltimore-sun-data/school-star-ratings-2018
 
-### Workflow categorization
+## Unreproducible workflows (33)
 
-| Workflow                                                                                 | Category   | Difficulty |
-| ---------------------------------------------------------------------------------------- | ---------- | ---------- |
-| [2018-voter-registration](https://github.com/baltimore-sun-data/2018-voter-registration) | Stack only | Simple     |
-
-## Excluded workflows (33)
-
-I've had to exclude some Table Scraps workflows from this reproduction evaluation.
+I've had to exclude some Table Scraps workflows from this reproduction evaluation for the following reasons:
 
 ### Workflows that did not include merging tables (18)
 
@@ -86,6 +80,8 @@ I've had to exclude some Table Scraps workflows from this reproduction evaluatio
 - Wilson, Chris. (2014, May 27). Wikipedia rankings. Time. Retrieved from https://github.com/TimeMagazine/wikipedia-rankings
 
 ### Workflows with raw data that is too big (2)
+
+OpenRoundup does not scale to certain datasets that are too large to be processed in memory, which is a common issue for data journalists working with large datasets. These workflows are not reproducible because the raw data is not available or is too large to be processed in memory. Many GUI-based data wrangling tools, such as Excel, also struggle with files that exceed 100MB, which is a common threshold for large datasets. These workflows are included here as examples of the limitations of Roundup and other GUI-based data wrangling tools when working with large datasets.
 
 - Welsh, Ben. (2017, March 17). California crop production wages analysis. Los Angeles Times. Retrieved from https://github.com/datadesk/california-crop-production-wages-analysis
   - The 26 files downloaded from BLS when uncompressed are between 127MB and 486MB large, which is even too large to trim this data in Excel. So this workflow is an example of when the raw data is just too large, which is a same because that keeps lots of journalists without access to a developer from being able to use this data.

@@ -9,6 +9,7 @@
     "build": "npm run build:docs && vite build",
     "build:docs": "bundle exec jekyll build -s docs -d build/docs",
     "preview": "python3 -m http.server --directory build",
+    "preview:docs": "bundle exec jekyll serve -s docs -d build/docs --livereload --incremental",
     "clean": "rm -rf build",
     "lint": "eslint .",
     "test": "vitest",
