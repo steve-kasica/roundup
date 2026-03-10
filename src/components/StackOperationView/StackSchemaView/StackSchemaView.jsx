@@ -289,6 +289,7 @@ const StackSchemaView = ({
                         minWidth: "20px",
                         width: "20px",
                         textAlign: "center",
+                        borderColor: "transparent",
                       }}
                     >
                       <HiddenIndicesHeader
@@ -445,6 +446,7 @@ const StackSchemaView = ({
                       <StyledTableCell
                         key={`empty-${rowIndex}-${idx}`}
                         colSpan={indices.length}
+                        sx={{ borderColor: "transparent" }}
                       />
                     );
                   } else {
