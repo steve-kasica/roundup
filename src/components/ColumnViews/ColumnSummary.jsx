@@ -42,6 +42,11 @@ const breakpoints = {
   large: 220,
 };
 
+/** Approximate pixel width per character at the bar label font size (0.65rem). */
+const PIXELS_PER_CHAR = 7;
+/** Extra horizontal padding (in pixels) added to the minimum bar width. */
+const BAR_LABEL_PADDING = 10;
+
 /**
  * Returns the operation color for the given index, falling back to the
  * orphaned-table background color defined in the theme.
@@ -325,6 +330,7 @@ const ColumnSummary = ({
                 topValues?.reduce((max, tv) => Math.max(max, tv.count), 0) || 1;
               return topValues?.map(({ value, count }) => {
                 const pct = (count / maxCount) * 100;
+                const minBarWidth = `${String(value).length * PIXELS_PER_CHAR + BAR_LABEL_PADDING}px`;
                 return (
                   <Box
                     key={value}
@@ -342,8 +348,7 @@ const ColumnSummary = ({
                         position: "absolute",
                         top: 0,
                         left: 0,
-                        width: `${pct}%`,
-                        minWidth: "2px",
+                        width: `max(${pct}%, ${minBarWidth})`,
                         height: "100%",
                         backgroundColor: (theme) =>
                           getOperationColor(theme, operationIndex),
@@ -359,7 +364,7 @@ const ColumnSummary = ({
                         top: "50%",
                         left: "2px",
                         transform: "translateY(-50%)",
-                        maxWidth: `calc(${pct}% - 6px)`,
+                        maxWidth: `max(calc(${pct}% - 6px), calc(${minBarWidth} - 6px))`,
                         fontSize: "0.65rem",
                         whiteSpace: "nowrap",
                         overflow: "hidden",
@@ -383,7 +388,7 @@ const ColumnSummary = ({
                       sx={{
                         position: "absolute",
                         top: 0,
-                        left: `${pct}%`,
+                        left: `max(${pct}%, ${minBarWidth})`,
                         height: "100%",
                         fontSize: "0.65rem",
                         whiteSpace: "nowrap",
