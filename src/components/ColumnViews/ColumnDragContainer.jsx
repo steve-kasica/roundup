@@ -38,6 +38,7 @@ import {
   useMemo,
 } from "react";
 import { useDrag, useDrop } from "react-dnd";
+import { getEmptyImage } from "react-dnd-html5-backend";
 import { withColumnData } from "../HOC";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -97,16 +98,20 @@ const ColumnDragContainer = withColumnData(
         (isTableId(parentId)
           ? selectTablesById(state, parentId)
           : selectOperationsById(state, parentId)
-        ).columnIds
+        ).columnIds,
     );
     const siblingColumnIds = useMemo(() => {
       return parentColumnIds.filter((cid) => cid !== id);
     }, [parentColumnIds, id]);
 
     // Drag functionality
-    const [, drag] = useDrag({
+    const [, drag, preview] = useDrag({
       type: dragType,
       item: () => {
+        const dragBounds = ref.current
+          ? ref.current.getBoundingClientRect()
+          : null;
+
         // Dispatch action to add column to dragging state when item is created
         if (id) {
           dispatch(setDraggingColumnIds(id));
@@ -121,6 +126,18 @@ const ColumnDragContainer = withColumnData(
           id,
           parentId,
           type: dragType,
+          dragBounds: dragBounds
+            ? {
+                width: dragBounds.width,
+                height: dragBounds.height,
+                containerLeft: (() => {
+                  let el = ref.current.parentElement;
+                  while (el && el.tagName !== "TBODY") el = el.parentElement;
+                  return el ? el.getBoundingClientRect().left : 0;
+                })(),
+              }
+            : null,
+          dragPreviewSx: isValidElement(children) ? children.props?.sx : {},
         };
       },
       canDrag,
@@ -144,6 +161,10 @@ const ColumnDragContainer = withColumnData(
         }
       },
     });
+
+    useEffect(() => {
+      preview(getEmptyImage(), { captureDraggingState: true });
+    }, [preview]);
 
     // Drop functionality
     const [{ isOver }, drop] = useDrop({
@@ -196,7 +217,7 @@ const ColumnDragContainer = withColumnData(
 
     // Fallback for multiple children or non-element children
     return children;
-  }
+  },
 );
 
 export default ColumnDragContainer;

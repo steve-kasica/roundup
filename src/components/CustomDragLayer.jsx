@@ -1,7 +1,28 @@
-/* eslint-disable no-unused-vars */
+/**
+ * @module CustomDragLayer
+ * @description
+ * Custom drag layer component for react-dnd, providing custom drag previews for different draggable item types
+ * such as columns and stack table orders. Integrates with Material-UI for styled previews and icons.
+ *
+ * OpenRoundup utilize drag-n-drop functionality to specify the order of child objects, e.g. tables within an operation or columns within a table,
+ * in multiple places throughout the app. Using a CustomDragLayer allows OpenRoundup to specify drag previews, a.k.a drag ghosts,
+ * styled differently than the dragging rendered object. It also allows us to control the position of
+ * the drag preview, e.g. locking the horizontal position for column drags so the preview stays
+ * within its container, only moves vertically or horizontally (depending on context),
+ * and doesn't jump around relative to the cursor.
+
+ */
+
+/**
+ * Drag type for source table.
+ * @constant
+ * @type {string}
+ */
+
 import { useDragLayer } from "react-dnd";
-import { Box, ListItemIcon, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { DragIndicator, TableChart, AccountTree } from "@mui/icons-material";
+import { EnhancedColumnSummary } from "./ColumnViews/ColumnSummary";
 
 export const DRAG_TYPE_SOURCE_TABLE = "SOURCE_TABLE";
 export const DRAG_TYPE_SOURCE_TABLE_ROW = "SOURCE_TABLE_ROW";
@@ -23,6 +44,35 @@ export default function CustomDragLayer() {
 
   // Render different effects based on the item type
   const renderDragPreview = () => {
+    if (typeof itemType === "string" && itemType.endsWith("-column")) {
+      const width = item?.dragBounds?.width;
+      const height = item?.dragBounds?.height;
+      const previewSx = item?.dragPreviewSx || {};
+
+      return (
+        <EnhancedColumnSummary
+          id={item?.id}
+          sx={{
+            ...(previewSx || {}),
+            width: width || 160,
+            height: height || 40,
+          }}
+          isDragging={true}
+          isHovered={false}
+          isOver={false}
+          isDropTarget={false}
+          isSelected={false}
+          isDraggable={false}
+          isFocused={true}
+          onClick={undefined}
+          onDoubleClick={undefined}
+          onContextMenu={undefined}
+          hoverColumn={undefined}
+          unhoverColumn={undefined}
+        />
+      );
+    }
+
     if (
       typeof itemType === "string" &&
       itemType.startsWith("STACK_TABLE_ORDER_")
@@ -70,10 +120,22 @@ export default function CustomDragLayer() {
     ) {
       return initialOffset ? initialOffset.x : 0;
     }
+
+    // Clamp left boundary for column drags so the preview stays within its container
+    if (typeof itemType === "string" && itemType.endsWith("-column")) {
+      const containerLeft = item?.dragBounds?.containerLeft ?? 0;
+      return currentOffset ? Math.max(containerLeft, currentOffset.x) : 0;
+    }
+
     return currentOffset ? currentOffset.x : 0;
   }
 
   function y() {
+    // Lock vertical position for column drags
+    if (typeof itemType === "string" && itemType.endsWith("-column")) {
+      return initialOffset ? initialOffset.y : 0;
+    }
+
     return currentOffset ? currentOffset.y : 0;
   }
 

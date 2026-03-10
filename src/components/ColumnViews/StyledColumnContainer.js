@@ -87,51 +87,14 @@ const StyledColumnContainer = styled(Box, {
     // Column is drop target state
     ...(isDropTarget === true
       ? {
-          "@keyframes border-dance": {
-            "0%": {
-              backgroundPosition: "0% 0%, 100% 100%, 0% 100%, 100% 0%",
-            },
-            "100%": {
-              backgroundPosition: "100% 0%, 0% 100%, 0% 0%, 100% 100%",
-            },
-          },
-          background: `
-        linear-gradient(90deg, 
-        ${darken(
-          operationIndex !== null && operationIndex >= 0
-            ? theme.palette.operationColors[operationIndex]
-            : theme.palette.orphanedTableBackgroundColor,
-          theme.effects.dropTargetDarken,
-        )} 50%, transparent 50%), 
-        linear-gradient(90deg, ${darken(
-          operationIndex !== null && operationIndex >= 0
-            ? theme.palette.operationColors[operationIndex]
-            : theme.palette.orphanedTableBackgroundColor,
-          theme.effects.dropTargetDarken,
-        )} 50%, transparent 50%), 
-        linear-gradient(0deg, ${darken(
-          operationIndex !== null && operationIndex >= 0
-            ? theme.palette.operationColors[operationIndex]
-            : theme.palette.orphanedTableBackgroundColor,
-          theme.effects.dropTargetDarken,
-        )} 50%, transparent 50%), 
-        linear-gradient(0deg, ${darken(
-          operationIndex !== null && operationIndex >= 0
-            ? theme.palette.operationColors[operationIndex]
-            : theme.palette.orphanedTableBackgroundColor,
-          theme.effects.dropTargetDarken,
-        )} 50%, transparent 50%),
-        ${lighten(
-          operationIndex !== null && operationIndex >= 0
-            ? theme.palette.operationColors[operationIndex]
-            : theme.palette.orphanedTableBackgroundColor,
-          theme.effects.defaultLighten,
-        )}
-      `,
-          backgroundRepeat: `repeat-x, repeat-x, repeat-y, repeat-y, no-repeat`,
-          backgroundSize: `4px 4px, 4px 4px, 4px 4px, 4px 4px, 100% 100%`,
-          backgroundPosition: `0% 0%, 100% 100%, 0% 100%, 100% 0%`,
-          animation: `border-dance ${theme.effects.dropTargetMarchingSpeed} infinite linear`,
+          outline: `2px dashed ${darken(
+            operationIndex !== null && operationIndex >= 0
+              ? theme.palette.operationColors[operationIndex]
+              : theme.palette.orphanedTableBackgroundColor,
+            theme.effects.dropTargetDarken,
+          )}`,
+          outlineOffset: "-2px",
+          opacity: 1,
         }
       : isDropTarget === false
         ? {
