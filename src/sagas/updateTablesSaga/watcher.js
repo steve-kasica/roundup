@@ -117,7 +117,11 @@ export default function* updateTablesSagaWatcher() {
     }
   });
 
-  // If an operation is updated and has tables as children, we need to update those tables' parentId property
+  // If an operation is updated, we sometimes need to update its child tables to reflect changes to the operation-table relationship. Specifically:
+  //
+  // 1) If an operation's childIds property has changed, we need to either:
+  //  a) Set the table's parentId to the operation's id if a table is added to an operation
+  //  b) Set the table's parentId to null if a table is removed from an operation
   yield takeEvery(updateOperationsSuccess.type, function* (action) {
     const updatedOperations = action.payload;
     const tableUpdates = [];

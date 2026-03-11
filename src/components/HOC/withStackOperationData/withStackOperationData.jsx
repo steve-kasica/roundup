@@ -22,6 +22,8 @@ import {
 import { updateTablesRequest } from "../../../sagas/updateTablesSaga";
 import { selectColumnIdsByParentId } from "../../../slices/columnsSlice";
 import { getColumnIdMatrix, getRowCount } from "./utilities";
+import { isTableId } from "../../../slices/tablesSlice";
+import { updateOperationsRequest } from "../../../sagas/updateOperationsSaga";
 
 /**
  * @typedef {Object} WithStackOperationDataProps
@@ -109,14 +111,21 @@ export default function withStackOperationData(WrappedComponent) {
           return colId;
         });
 
-        dispatch(
-          updateTablesRequest([
-            {
-              id: target.parentId,
-              columnIds,
-            },
-          ]),
-        );
+        if (isTableId(target.parentId)) {
+          dispatch(
+            updateTablesRequest([
+              {
+                id: target.parentId,
+                columnIds,
+              },
+            ]),
+          );
+        } else {
+          // parentId is an operation.
+          dispatch(
+            updateOperationsRequest([{ id: target.parentId, columnIds }]),
+          );
+        }
       },
       [childColumnIds, operation.childIds, dispatch],
     );
