@@ -28,7 +28,15 @@
 
 /* eslint-disable react/prop-types */
 import { withColumnData, withAssociatedAlerts } from "../HOC";
-import { Box, Typography, Menu, Chip, Tooltip, Divider } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Menu,
+  Chip,
+  Tooltip,
+  Divider,
+  Stack,
+} from "@mui/material";
 import ColumnTypeIcon from "./ColumnTypeIcon";
 import StyledColumnContainer from "./StyledColumnContainer";
 import { ColumnContextMenuButton } from "../ui/buttons";
@@ -330,7 +338,7 @@ const ColumnSummary = ({
                 topValues?.reduce((max, tv) => Math.max(max, tv.count), 0) || 1;
               return topValues?.map(({ value, count }) => {
                 const pct = (count / maxCount) * 100;
-                const minBarWidth = `${String(value).length * PIXELS_PER_CHAR + BAR_LABEL_PADDING}px`;
+                const minBarWidth = `${String(value).length + BAR_LABEL_PADDING}px`;
                 return (
                   <Box
                     key={value}
@@ -339,7 +347,6 @@ const ColumnSummary = ({
                       mb: "2px",
                       height: 18,
                       width: "100%",
-                      borderRadius: "2px",
                       overflow: "hidden",
                     }}
                   >
@@ -352,58 +359,39 @@ const ColumnSummary = ({
                         height: "100%",
                         backgroundColor: (theme) =>
                           getOperationColor(theme, operationIndex),
-                        borderRadius: "2px",
-                        opacity: 0.7,
+                        opacity: 0.2,
                         transition: "width 0.3s ease",
                       }}
                     />
-                    <Box
-                      component="span"
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "2px",
-                        transform: "translateY(-50%)",
-                        maxWidth: `max(calc(${pct}% - 6px), calc(${minBarWidth} - 6px))`,
-                        fontSize: "0.65rem",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        lineHeight: 1,
-                        px: "1px",
-                        py: "1px",
-                        zIndex: 1,
-                        borderRadius: "3px",
-                        color: (theme) =>
-                          getOperationContrastColor(theme, operationIndex),
-                        fontFamily: "inherit",
-                        fontWeight: "800",
-                      }}
-                      title={`${value}`}
-                    >
-                      {value}
-                    </Box>
                     <Typography
                       variant="data-primary"
                       sx={{
                         position: "absolute",
                         top: 0,
-                        left: `max(${pct}%, ${minBarWidth})`,
+                        // left: `max(${pct}%, ${minBarWidth})`,
+                        left: "2px",
                         height: "100%",
                         fontSize: "0.65rem",
+                        fontWeight: "600",
                         whiteSpace: "nowrap",
                         lineHeight: "18px",
                         zIndex: 1,
-                        color: (theme) =>
-                          getOperationContrastColor(theme, operationIndex),
-                        transform: "translateX(-100%)",
-                        pr: "3px",
-                        ...(pct < 30 && {
-                          transform: "none",
-                          pl: "3px",
-                          pr: 0,
-                          color: "text.primary",
-                        }),
+                      }}
+                    >
+                      {value}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        // left: `max(${pct}%, ${minBarWidth})`,
+                        right: "2px",
+                        height: "100%",
+                        fontSize: "0.65rem",
+                        fontWeight: "200",
+                        whiteSpace: "nowrap",
+                        lineHeight: "18px",
+                        zIndex: 1,
                       }}
                     >
                       {count}
