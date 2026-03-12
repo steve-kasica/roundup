@@ -5,7 +5,7 @@ author: "Brent Jones"
 publication: "St. Louis Public Radio"
 date: "2018-05-31"
 original_url: "http://news.stlpublicradio.org/post/warm-weather-worries-st-louis-when-temperatures-rise-crime-often-follows"
-github_url: "github.com/stlpublicradio/2018-05-31-crime-and-heat-analysis"
+github_url: "https://github.com/stlpublicradio/2018-05-31-crime-and-heat-analysis"
 category: "hybrid"
 difficulty: "simple"
 data-link: ./2018-05-31-crime-and-heat-analysis.zip
@@ -16,7 +16,7 @@ nav_exclude: true
 
 ## Overview
 
-This workflow analyzes the relationship between crime and heat in St. Louis, Missouri, by joining a table of violent crime incidents with tables of daily maximum temperatures. The analysis supported the May 31, 2018, St. Louis Public Radio story [Warm weather worries in St. Louis: When temperatures rise, crime often follows](http://news.stlpublicradio.org/post/warm-weather-worries-st-louis-when-temperatures-rise-crime-often-follows).
+This workflow analyzes the relationship between violent crime and daily temperature in St. Louis, Missouri, by combining data from NOAA and the metropolitan police department. The analysis supported the May 31, 2018, St. Louis Public Radio story [Warm weather worries in St. Louis: When temperatures rise, crime often follows](http://news.stlpublicradio.org/post/warm-weather-worries-st-louis-when-temperatures-rise-crime-often-follows).
 
 ## Data Sources
 
@@ -28,29 +28,28 @@ Violent crime incident data is provided in `violent_crimes.csv`, sourced from th
 
 ### Pre-processing
 
-There are no pre-processing steps in this workflow. The source tables can be directly imported into Roundup.
+There are no pre-processing steps in this workflow. The source tables can be directly imported into OpenRoundup.
 
-### Roundup steps
+### OpenRoundup steps
 
 These steps outline just one of many possible ways to wrangle the source tables into the final form.
 
 1. Load the following source tables: `lambert_1.csv`, `lambert_2.csv`, and `violent_crimes.csv`.
-2. Create a _stack_ operation from `lambert_1.csv` and `lambert_2.csv`.
-   ![Lambert stack](img/stack-lambert.png.png)
-3. Rename Stack operation to `lambert`.
-4. Re-arrange columns in `lambert` so that `DATE` and `TMAX` are the first two columns.
-5. Trim extra columns to align tables, leaving only `DATE` and `TMAX`.
+2. Create a _stack_ operation from `lambert_1.csv` and `lambert_2.csv`. ![Lambert stack](img/stack-lambert.png)
+3. Rename Stack operation to `lambert` by clicking the rename button in Schema View. ![Rename stack operation](img/rename.png)
+4. Re-arrange columns in `lambert` so that `DATE` and `TMAX` are the first two columns. <video controls  muted style="width:100%;"><source src="../../assets/rearrange-columns.webm" type="video/webm"><source src="../../assets/rearrange-columns.mp4" type="video/mp4">Your browser doesn't support video.</video>
+5. Trim extra columns to align tables, leaving only `DATE` and `TMAX`. <video controls muted   style="width:100%;"><source src="../../assets/trim-columns.webm" type="video/webm"><source src="../../assets/trim-columns.mp4" type="video/mp4">Your browser doesn't support video.</video>
 6. Materialize `lambert` and inspect results
    ![Final lambert](img/final-lambert.png)
 7. Create a _pack_ operation from the previous stack operation, and `violent_crimes.csv`.
    ![start pack](img/start-pack.png)
 8. Update _pack_ parameters so that `DATE` to match `Date` and set the join predicate to `CONTAINS`, and swap table order so `violent_crimes` is the left-hand table and `lambert` is the right-hand table.
    ![pack params](img/pack-params.png)
-9. Materialize pack operation and inspect results
+9. Materialize pack operation and inspect results. ![materialized pack](../../assets/materialize-table.png)
 10. Remove any rows that don't match in both tables, which will remove any crime incidents that don't have a corresponding temperature reading and any temperature readings that don't have a corresponding crime incident. Materialize again and inspect results.
     ![final-pack](img/final-pack.png)
 11. Export pack operation results as a CSV and save it in the `output` directory. This table can be used to analyze the relationship between crime and heat, which was the main analysis for the original story.
 
-### Post Roundup steps
+### Post OpenRoundup steps
 
-After exporting the final table from Roundup, the user can aggregate these rows, which represent individual instances of violent crime, by date, to get the number of violent crimes per date with the maximum temperature on that date.
+After exporting the final table from OpenRoundup, the user can aggregate these rows, which represent individual instances of violent crime, by date, to get the number of violent crimes per date with the maximum temperature on that date.

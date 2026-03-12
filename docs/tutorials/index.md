@@ -43,15 +43,15 @@ Once you've got the basics down, these tutorials will help you learn how to use 
 
 This workflow analyzes Maryland voter registration data across multiple elections to identify registration trends, patterns of voter movement between counties, and demographic shifts in voter registration over time. In this workflow, we compose multiple stack operations together to incrementally assemble 11 tables of annually published voter registration data.
 
-<!-- ## Advanced workflows
-
-### Hybrid workflows
-
-## [2018 Crime and Heat Analysis](./2018-05-31-crime-and-heat-analysis/)
+### [Crime and Heat](./2018-05-31-crime-and-heat-analysis/)
 
 **workflow type**: _Hybrid_
 
-This workflow analyzes the relationship between crime and heat in St. Louis, Missouri, by joining a table of violent crime incidents with a table of daily maximum temperatures.
+**difficulty**: _Moderate_
+
+This workflow analyzes the relationship between violent crime and daily temperature in St. Louis, Missouri, by combining data from NOAA and the metropolitan police department. It uses both _stack_ and _pack_ operations to combine multiple 2 tables of weather and 1 table of crime incident data.
+
+<!-- ## Advanced workflows
 
 #### [Democratic Candidate Co-Donors](./2019-04-democratic-candidate-codonors/)
 
