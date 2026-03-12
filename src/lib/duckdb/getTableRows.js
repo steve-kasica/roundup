@@ -58,7 +58,7 @@ export async function getTableRows(
       FROM ${tableName} 
       LIMIT ${limit} 
       OFFSET ${offset}
-    ) ORDER BY ${sortBy} ${sortDirection}
+    ) ORDER BY "${sortBy}" ${sortDirection}
   `
     : `
     SELECT ${columnsClause} 
