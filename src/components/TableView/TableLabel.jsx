@@ -71,6 +71,9 @@ const TableLabel = ({
         variant="data-secondary"
         component="div"
         sx={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
           ...(totalCount && {
             color: "warning.dark",
             fontWeight: "bold",

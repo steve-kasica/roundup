@@ -50,23 +50,27 @@ const TableOrderRadio = ({ childIds, onChange, isDisabled }) => {
             value={`${leftTableId}|${rightTableId}`}
             control={<Radio disabled={isDisabled} />}
             label={
-              <Box display="flex" alignItems="center" gap={1} width={"350px"}>
+              <Box display="flex" alignItems="center" gap={1} overflow="hidden" minWidth={0}>
                 {isTableId(leftTableId) ? (
                   <EnhancedTableLabel
                     id={leftTableId}
                     sx={{
-                      width: "50%",
+                      minWidth: 0,
+                      flex: "1 1 50%",
+                      overflow: "hidden",
                     }}
                   />
                 ) : (
                   <EnhancedOperationLabel id={leftTableId} />
                 )}
-                <Typography>|</Typography>
+                <Typography sx={{ flexShrink: 0 }}>|</Typography>
                 {isTableId(rightTableId) ? (
                   <EnhancedTableLabel
                     id={rightTableId}
                     sx={{
-                      width: "50%",
+                      minWidth: 0,
+                      flex: "1 1 50%",
+                      overflow: "hidden",
                     }}
                   />
                 ) : (
