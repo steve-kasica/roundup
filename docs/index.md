@@ -7,7 +7,7 @@ nav_exclude: true
 
 # OpenRoundup
 
-OpenRoundup is a click-based data integration system for journalists. It allows users to upload multiple data tables and combine these tables together, and export the resulting consolidated table for further work in downstream analysis and visualization software.
+OpenRoundup is click-based data integration system for data journalists. It enables users to combine multiple data tables together for further analysis and visualization, without needing to write code. It is designed to be flexible and powerful enough to handle a wide range of data wrangling tasks, while also being easy to use for journalists who do not have the extensive technical expertise to perform this task in code-based tools, such as Python, R, or SQL.
 
 ## Getting started
 

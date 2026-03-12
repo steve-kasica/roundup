@@ -10,10 +10,6 @@ nav_exclude: true
 
 A table that is created by combining data from multiple source tables through operations such as stacking and packing. A composite table is the result of a table consolidation process and serves as a unified table schema for analysis.
 
-### Eager data integration
-
-A data integration approach where all data is consolidated into a single composite table prior to other data wrangling tasks. This approach emphasizes having a complete, unified dataset available for analysis. This approach is one fundamental way that OpenRoundup differ from other research, open-source, and commercial data integration and ETL tools.
-
 ### Pack Operation
 
 A data merging operation that combines tables based on shared columns, similar to a SQL `join`. Also referred to as packing tables together.
@@ -37,3 +33,27 @@ The process of combining data from multiple static sources into a single, unifie
 - **Wrangling is exploratory in nature**: You are not trying to build a repeatable data pipeline, but rather trying to understand the data and perform ad-hoc analysis. Roundup is not designed for building repeatable data pipelines, but rather for supporting the exploratory data wrangling process.
 
 Table consolidation workflows can exist on a spectrum between two extremes: _eager table consolidation_ workflows, where tables are consolidated into a single composite table early in the data wrangling process, and _delayed table consolidation_ workflows, where tables are consolidated at the end of the data wrangling process. Roundup is designed to support _eager table consolidation_ workflows.
+
+#### Eager table consolidation
+
+A table consolidation approach where all data is consolidated into a single composite table prior to other data wrangling tasks. This approach emphasizes having a complete, unified dataset available for analysis. This approach is one fundamental way that OpenRoundup differ from other research, open-source, and commercial data integration and ETL tools.
+
+<video autoplay loop muted playsinline style="width: 100%; height: auto; display: block;">
+  <source src="./eager-integration.webm" type="video/webm">
+  <source src="./eager-integration.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+#### Delayed table consolidation
+
+A table consolidation approach where tables are consolidated at the end of the data wrangling process, after all data cleaning and transformation steps have been performed on individual tables. This approach emphasizes performing data cleaning and transformation tasks on individual tables before combining them together into a single table. This is the most common approach to data integration in programming languages, such as Python and R.
+
+<video autoplay loop muted playsinline style="width: 100%; height: auto; display: block;">
+  <source src="./delayed-integration.webm" type="video/webm">
+  <source src="./delayed-integration.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+### Trimming
+
+Data trimming is the process of removing irrelevant rows and columns from a table. Trimming is an important step in the data wrangling process, as it helps to reduce noise and improve the quality of the data for analysis. OpenRoundup supports limited deletion of rows and columns, but it is often advantageous to perform bulk trimming using external tools before importing data into OpenRoundup.
