@@ -43,7 +43,7 @@ export async function getTableRows(
   limit = 50,
   offset = 0,
   sortBy = null,
-  sortDirection = "asc"
+  sortDirection = "asc",
 ) {
   const db = await getDuckDB();
   const conn = await db.connect();
@@ -51,10 +51,18 @@ export async function getTableRows(
     columnsList !== null && columnsList.length > 0
       ? columnsList.map((databaseName) => `"${databaseName}"`).join(", ")
       : "*";
-  const query = `
+  const query = sortBy
+    ? `
+    SELECT * FROM (
+      SELECT ${columnsClause} 
+      FROM ${tableName} 
+      LIMIT ${limit} 
+      OFFSET ${offset}
+    ) ORDER BY ${sortBy} ${sortDirection}
+  `
+    : `
     SELECT ${columnsClause} 
     FROM ${tableName} 
-    ${sortBy ? `ORDER BY ${sortBy} ${sortDirection}` : ""}
     LIMIT ${limit} 
     OFFSET ${offset}
   `;
@@ -72,7 +80,7 @@ export async function getTableRows(
         : result.schema?.fields?.map((f) => f.name)) || [];
     const objects = result.toArray();
     rows = objects.map((obj) =>
-      columnNames.map((name) => parseValue(obj[name]))
+      columnNames.map((name) => parseValue(obj[name])),
     );
   }
 
