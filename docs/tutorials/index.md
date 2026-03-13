@@ -39,31 +39,27 @@ Once you've got the basics down, these tutorials will help you learn how to use 
 
 **workflow type**: _Stack-only_
 
-**difficulty**: _Moderate_
-
 This workflow analyzes Maryland voter registration data across multiple elections to identify registration trends, patterns of voter movement between counties, and demographic shifts in voter registration over time. In this workflow, we compose multiple stack operations together to incrementally assemble 11 tables of annually published voter registration data.
 
 ### [Crime and Heat](./2018-05-31-crime-and-heat-analysis/)
 
 **workflow type**: _Hybrid_
 
-**difficulty**: _Moderate_
-
 This workflow analyzes the relationship between violent crime and daily temperature in St. Louis, Missouri, by combining data from NOAA and the metropolitan police department. It uses both _stack_ and _pack_ operations to combine multiple 2 tables of weather and 1 table of crime incident data.
+
+### [IRS Audit Rates by County](./auditData/) (in progress)
+
+**workflow type** : _Hybrid_
+
+This workflow maps the distribution of IRS audits across U.S. counties, revealing that the audit rate in each county largely reflects how many taxpayers claimed the Earned Income Tax Credit (EITC). It involves stacking four tables together and then _packing_ the results with a fifth table. It is illustrative of instances where we use pre-processing in an external tool to address common data issues that are not yet supported or not planned on being supported in OpenRoundup.
 
 <!-- ## Advanced workflows
 
 #### [Democratic Candidate Co-Donors](./2019-04-democratic-candidate-codonors/)
 
-**workflow type** : _Hybrid workflow_
+**workflow type** : _Hybrid_
 
 This workflow analyzes donors who gave more than $200 to multiple Democratic presidential candidates in the first quarter of the 2020 election cycle, using data from Federal Election Commission (FEC) campaign filings.
-
-#### [IRS Audit Rates by County](./auditData/)
-
-**workflow type** : _Hybrid workflow_
-
-This workflow maps the distribution of IRS audits across U.S. counties, revealing that the audit rate in each county largely reflects how many taxpayers claimed the Earned Income Tax Credit (EITC).
 
 #### Long-Term Care Complaints Database
 

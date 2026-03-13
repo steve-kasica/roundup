@@ -1,0 +1,5 @@
+<video autoplay loop muted playsinline style="width: 100%; height: auto; display: block;">
+    <source src="{{ include.base | default: '.' }}/{{ include.src }}.webm" type="video/webm">
+    <source src="{{ include.base | default: '.' }}/{{ include.src }}.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>

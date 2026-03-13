@@ -38,21 +38,13 @@ Table consolidation workflows can exist on a spectrum between two extremes: _eag
 
 A table consolidation approach where all data is consolidated into a single composite table prior to other data wrangling tasks. This approach emphasizes having a complete, unified dataset available for analysis. This approach is one fundamental way that OpenRoundup differ from other research, open-source, and commercial data integration and ETL tools.
 
-<video autoplay loop muted playsinline style="width: 100%; height: auto; display: block;">
-  <source src="./eager-integration.webm" type="video/webm">
-  <source src="./eager-integration.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+{% include video-autoplay.html src="eager-integration" %}
 
 #### Delayed table consolidation
 
 A table consolidation approach where tables are consolidated at the end of the data wrangling process, after all data cleaning and transformation steps have been performed on individual tables. This approach emphasizes performing data cleaning and transformation tasks on individual tables before combining them together into a single table. This is the most common approach to data integration in programming languages, such as Python and R.
 
-<video autoplay loop muted playsinline style="width: 100%; height: auto; display: block;">
-  <source src="./delayed-integration.webm" type="video/webm">
-  <source src="./delayed-integration.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+{% include video-autoplay.html src="delayed-integration" %}
 
 ### Trimming
 

@@ -37,8 +37,8 @@ These steps outline just one of many possible ways to wrangle the source tables 
 1. Load the following source tables: `lambert_1.csv`, `lambert_2.csv`, and `violent_crimes.csv`.
 2. Create a _stack_ operation from `lambert_1.csv` and `lambert_2.csv`. ![Lambert stack](img/stack-lambert.png)
 3. Rename Stack operation to `lambert` by clicking the rename button in Schema View. ![Rename stack operation](img/rename.png)
-4. Re-arrange columns in `lambert` so that `DATE` and `TMAX` are the first two columns. <video controls  muted style="width:100%;"><source src="../../assets/rearrange-columns.webm" type="video/webm"><source src="../../assets/rearrange-columns.mp4" type="video/mp4">Your browser doesn't support video.</video>
-5. Trim extra columns to align tables, leaving only `DATE` and `TMAX`. <video controls muted   style="width:100%;"><source src="../../assets/trim-columns.webm" type="video/webm"><source src="../../assets/trim-columns.mp4" type="video/mp4">Your browser doesn't support video.</video>
+4. Re-arrange columns in `lambert` so that `DATE` and `TMAX` are the first two columns. {% include video.html src="rearrange-columns" %}
+5. Trim extra columns to align tables, leaving only `DATE` and `TMAX`. {% include video.html src="trim-columns" %}
 6. Materialize `lambert` and inspect results
    ![Final lambert](img/final-lambert.png)
 7. Create a _pack_ operation from the previous stack operation, and `violent_crimes.csv`.
