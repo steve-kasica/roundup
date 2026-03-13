@@ -160,6 +160,10 @@ const ColumnDetail = ({
 
   useEffect(() => {
     const handleKeyDown = (event) => {
+      const tag = event.target.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
+        return;
+      }
       if (event.key === "ArrowLeft") {
         event.preventDefault();
         navigateToPrevColumn();
