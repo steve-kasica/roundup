@@ -135,11 +135,11 @@ const ParentValueSpread = ({
                   <Skeleton
                     component="div"
                     width="100%"
-                    minWidth="1px"
                     animation="wave"
                     sx={{
                       borderRadius: 0,
                       textAlign: "right",
+                      minWidth: "1px",
                     }}
                   >
                     <Typography
