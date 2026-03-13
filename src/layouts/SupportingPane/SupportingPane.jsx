@@ -219,7 +219,10 @@ export default function SupportingPane() {
                     flexDirection: "column",
                   }}
                 >
-                  <SchemaWindow />
+                  <SchemaWindow
+                    onToggleSidebar={handleCollapseLeftSidebar}
+                    isSidebarCollapsed={isLeftSidebarCollapsed}
+                  />
                 </Panel>
                 {focusedObject && (
                   <>
