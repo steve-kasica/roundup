@@ -54,12 +54,15 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  IconButton,
+  ButtonGroup,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Warning } from "@mui/icons-material";
+import { Warning, ChevronLeft, ChevronRight } from "@mui/icons-material";
 import ColumnValueCounts from "./ColumnValueCounts";
 import ColumnValueLengths from "./ColumnValueLengths";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { duckDBToRoundupTypes } from "../../lib/duckdb";
 import ColumnIcon from "../ColumnViews/ColumnIcon";
 import { InfoIcon } from "../ui/icons";
@@ -68,6 +71,8 @@ import DonutChart from "../visualization/DonutChart";
 import DataListItem from "../ui/DataListItem";
 import Swatch from "../ui/Swatch";
 import { FloatNumber, IntegerNumber, MoreInfo, ValueChip } from "../ui/text";
+import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
+import { setFocusedColumnIds } from "../../slices/uiSlice";
 
 const VALUE_COUNTS_VIEW = "value_counts";
 const STRING_LENGTH_VIEW = "string_length";
@@ -127,12 +132,46 @@ const ColumnDetail = ({
   duplicateColor = "#555",
 }) => {
   const [view, setView] = useState(VALUE_COUNTS_VIEW);
+  const dispatch = useDispatch();
+  const siblingColumnIds = useSelector((state) =>
+    selectColumnIdsByParentId(state, parentId),
+  );
+  const currentIndex = siblingColumnIds.indexOf(id);
+  const isFirstColumn = currentIndex <= 0;
+  const isLastColumn = currentIndex >= siblingColumnIds.length - 1;
 
   const handleViewChange = (event, newView) => {
     if (newView !== null) {
       setView(newView);
     }
   };
+
+  const navigateToPrevColumn = useCallback(() => {
+    if (!isFirstColumn) {
+      dispatch(setFocusedColumnIds([siblingColumnIds[currentIndex - 1]]));
+    }
+  }, [dispatch, siblingColumnIds, currentIndex, isFirstColumn]);
+
+  const navigateToNextColumn = useCallback(() => {
+    if (!isLastColumn) {
+      dispatch(setFocusedColumnIds([siblingColumnIds[currentIndex + 1]]));
+    }
+  }, [dispatch, siblingColumnIds, currentIndex, isLastColumn]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        navigateToPrevColumn();
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        navigateToNextColumn();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigateToPrevColumn, navigateToNextColumn]);
+
   return (
     <Box
       className="ColumnDetail"
@@ -149,19 +188,40 @@ const ColumnDetail = ({
         }),
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Stack direction="row" spacing={1} alignItems="center">
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
           <ColumnIcon />
           <Typography
             variant="h5"
             sx={{
               userSelect: "none",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
               ...(totalCount && { color: "warning.dark" }),
             }}
           >
             {name || databaseName || id}
           </Typography>
         </Stack>
+        <ButtonGroup size="small" aria-label="column navigation">
+          <IconButton
+            size="small"
+            onClick={navigateToPrevColumn}
+            disabled={isFirstColumn}
+            aria-label="previous column"
+          >
+            <ChevronLeft fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={navigateToNextColumn}
+            disabled={isLastColumn}
+            aria-label="next column"
+          >
+            <ChevronRight fontSize="small" />
+          </IconButton>
+        </ButtonGroup>
       </Box>
       <Divider sx={{ my: 1 }} />
       <Accordion
