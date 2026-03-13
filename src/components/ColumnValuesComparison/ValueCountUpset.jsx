@@ -165,6 +165,7 @@ const ValueCountUpset = ({
                 boxSizing: "border-box",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
                 userSelect: "none",
               }}
             >
