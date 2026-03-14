@@ -41,6 +41,12 @@ Once you've got the basics down, these tutorials will help you learn how to use 
 
 This workflow analyzes Maryland voter registration data across multiple elections to identify registration trends, patterns of voter movement between counties, and demographic shifts in voter registration over time. In this workflow, we compose multiple stack operations together to incrementally assemble 11 tables of annually published voter registration data.
 
+### [California H-2A Temporary Agricultural Worker Visas Analysis](./california-h2a-visas-analysis/)
+
+**workflow type**: _Stack-only_
+
+This workflow analyzes data on temporary H-2A agricultural worker visas granted by the U.S. Department of Labor. It involves stacking multiple tables of visa data across different years to create a consolidated dataset for analysis. It showcases how OpenRoundup handles [schema drift](../references/glossery/#schema-drift) across tables, and how to use stack operations to align columns and combine tables together.
+
 ### [Crime and Heat](./2018-05-31-crime-and-heat-analysis/)
 
 **workflow type**: _Hybrid_
