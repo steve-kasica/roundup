@@ -71,6 +71,7 @@ import {
   UploadTablesButton,
   ActionsButton,
   DeleteTablesButton,
+  SelectAllTablesButton,
 } from "./ToolbarItems";
 import { deleteTablesRequest } from "../../sagas/deleteTablesSaga";
 
@@ -195,6 +196,7 @@ function SourceTables({ tables, rowMax, columnMax, bytesMax }) {
     <>
       <Box display="flex" alignItems="center" gap={1} padding={1}>
         <SearchTablesInput />
+        <SelectAllTablesButton />
         <UploadTablesButton />
         <DeleteTablesButton onConfirm={handleOnDeleteTables} />
         <ActionsButton />
