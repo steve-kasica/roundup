@@ -45,6 +45,7 @@ import { useCallback, useState, useMemo } from "react";
 import { Error } from "@mui/icons-material";
 import VennDiagram from "../ui/icons/VennDiagram";
 import { EnhancedTableName } from "../TableView/TableName";
+import { EnhancedOperationName } from "../OperationView";
 import { isTableId } from "../../slices/tablesSlice";
 import HiddenColumnsLabel from "./HiddenColumnsLabel";
 import StyledBlockCell from "./StyledBlockCell";
@@ -519,18 +520,14 @@ const PackSchemaView = ({
                       }}
                     />
                   ) : (
-                    <p>{childId}</p>
-                    // TODO
-                    // <EnhancedOperationName
-                    //   id={childId}
-                    //   sx={{
-                    //     fontSize: "0.75rem",
-                    //     userSelect: "none",
-                    //     fontWeight: "none",
-                    //   }}
-                    //   onMouseEnter={() => setHoveredColumn(`${childId}:`)}
-                    //   onMouseLeave={() => setHoveredColumn(null)}
-                    // />
+                    <EnhancedOperationName
+                      id={childId}
+                      sx={{
+                        fontSize: "0.75rem",
+                        userSelect: "none",
+                        fontWeight: "none",
+                      }}
+                    />
                   )}
                 </Box>
               </Box>
