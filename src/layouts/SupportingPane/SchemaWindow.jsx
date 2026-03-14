@@ -13,9 +13,12 @@
  * - Drop target for adding source tables
  *
  * @example
- * <SchemaWindow />
+ * <SchemaWindow
+ *   onToggleSidebar={handleCollapseLeftSidebar}
+ *   isSidebarCollapsed={isLeftSidebarCollapsed}
+ * />
  */
-import { Alert, Box, Divider, Typography } from "@mui/material";
+import { Alert, Box, Divider, IconButton, Tooltip, Typography } from "@mui/material";
 import {
   OPERATION_TYPE_STACK,
   OPERATION_TYPE_PACK,
@@ -37,8 +40,17 @@ import DeleteColumnsButton from "../../components/AppToolbar/DeleteColumnsButton
 import { ExportTableButton } from "../../components/AppToolbar/ExportTable";
 import AlertsButton from "../../components/AppToolbar/AlertsButton";
 import PackMatchToggleButtonGroup from "../../components/AppToolbar/PackMatchToggleButtonGroup";
+import { ViewSidebar } from "@mui/icons-material";
 
-export default function SchemaWindow() {
+/**
+ * @param {object} props
+ * @param {Function} [props.onToggleSidebar] - Callback to collapse or expand the left sidebar.
+ * @param {boolean} [props.isSidebarCollapsed] - Whether the left sidebar is currently collapsed.
+ */
+export default function SchemaWindow({
+  onToggleSidebar,
+  isSidebarCollapsed,
+}) {
   const focusedObjectId = useSelector(selectFocusedObjectId);
   const isFocusedTable = isTableId(focusedObjectId);
   const focusedOperation = useSelector((state) =>
@@ -56,17 +68,33 @@ export default function SchemaWindow() {
         borderColor="divider"
         p={0.5}
       >
-        <Typography
-          variant="h6"
-          sx={{
-            userSelect: "none",
-            textOverflow: "ellipsis",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Schema&nbsp;View
-        </Typography>
+        <Box display="flex" alignItems="center" gap={0.5}>
+          {onToggleSidebar && (
+            <Tooltip
+              title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              <IconButton size="small" onClick={onToggleSidebar}>
+                <ViewSidebar
+                  sx={{
+                    transform: isSidebarCollapsed ? "scaleX(-1)" : "none",
+                    transition: "transform 0.2s",
+                  }}
+                />
+              </IconButton>
+            </Tooltip>
+          )}
+          <Typography
+            variant="h6"
+            sx={{
+              userSelect: "none",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Schema&nbsp;View
+          </Typography>
+        </Box>
         <Box display="flex" alignItems="center" justifyContent="center">
           <FocusedObjectSelect />
           <RenameFocusedObjectButton />
