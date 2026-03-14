@@ -61,7 +61,7 @@ const CompositeSchemaContainerSizes = {
 };
 
 const LeftSidebarSizes = {
-  COLLAPSED: 5,
+  COLLAPSED: 0,
   EXPANDED: 25,
   MAXIMUM: 50,
 };
@@ -219,7 +219,10 @@ export default function SupportingPane() {
                     flexDirection: "column",
                   }}
                 >
-                  <SchemaWindow />
+                  <SchemaWindow
+                    onToggleSidebar={handleCollapseLeftSidebar}
+                    isSidebarCollapsed={isLeftSidebarCollapsed}
+                  />
                 </Panel>
                 {focusedObject && (
                   <>
