@@ -61,7 +61,7 @@ const CompositeSchemaContainerSizes = {
 };
 
 const LeftSidebarSizes = {
-  COLLAPSED: 5,
+  COLLAPSED: 0,
   EXPANDED: 25,
   MAXIMUM: 50,
 };
