@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { EnhancedTableLabel } from "../../../TableView";
 import { EnhancedOperationLabel } from "../../../OperationView/OperationLabel";
 import { isTableId } from "../../../../slices/tablesSlice";
-import { cross, descending } from "d3";
+import { cross, descending, min } from "d3";
 
 const TableOrderRadio = ({ childIds, onChange, isDisabled }) => {
   const [value, setValue] = useState();
@@ -50,27 +50,55 @@ const TableOrderRadio = ({ childIds, onChange, isDisabled }) => {
             value={`${leftTableId}|${rightTableId}`}
             control={<Radio disabled={isDisabled} />}
             label={
-              <Box display="flex" alignItems="center" gap={1} width={"350px"}>
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={1}
+                overflow="hidden"
+                minWidth={0}
+              >
                 {isTableId(leftTableId) ? (
                   <EnhancedTableLabel
                     id={leftTableId}
                     sx={{
-                      width: "50%",
+                      minWidth: 0,
+                      flex: "1 1 50%",
+                      overflow: "hidden",
+                      width: "100%",
                     }}
                   />
                 ) : (
-                  <EnhancedOperationLabel id={leftTableId} />
+                  <EnhancedOperationLabel
+                    id={leftTableId}
+                    sx={{
+                      minWidth: 0,
+                      flex: "1 1 50%",
+                      overflow: "hidden",
+                      width: "100%",
+                    }}
+                  />
                 )}
-                <Typography>|</Typography>
+                <Typography sx={{ flexShrink: 0 }}>|</Typography>
                 {isTableId(rightTableId) ? (
                   <EnhancedTableLabel
                     id={rightTableId}
                     sx={{
-                      width: "50%",
+                      minWidth: 0,
+                      flex: "1 1 50%",
+                      overflow: "hidden",
+                      width: "100%",
                     }}
                   />
                 ) : (
-                  <EnhancedOperationLabel id={rightTableId} />
+                  <EnhancedOperationLabel
+                    id={rightTableId}
+                    sx={{
+                      minWidth: 0,
+                      flex: "1 1 50%",
+                      overflow: "hidden",
+                      width: "100%",
+                    }}
+                  />
                 )}
               </Box>
             }

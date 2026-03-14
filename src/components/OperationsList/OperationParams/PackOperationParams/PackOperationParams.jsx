@@ -224,7 +224,7 @@ const PackOperationParams = ({
               Expected rows
             </Typography>
             <Typography variant="subtitle2" color="text.secondary">
-              <IntegerNumber value={rowCount} />
+              {isNaN(rowCount) ? "Unknown" : <IntegerNumber value={rowCount} />}
             </Typography>
           </Stack>
           <Stack direction="row" justifyContent="space-between" gap={2}>
