@@ -47,7 +47,7 @@ This workflow analyzes Maryland voter registration data across multiple election
 
 This workflow analyzes the relationship between violent crime and daily temperature in St. Louis, Missouri, by combining data from NOAA and the metropolitan police department. It uses both _stack_ and _pack_ operations to combine multiple 2 tables of weather and 1 table of crime incident data.
 
-### [IRS Audit Rates by County](./auditData/) (in progress)
+### [IRS Audit Rates by County](./auditData/)
 
 **workflow type** : _Hybrid_
 
