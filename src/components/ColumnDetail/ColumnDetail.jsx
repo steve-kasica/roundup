@@ -72,7 +72,10 @@ import DataListItem from "../ui/DataListItem";
 import Swatch from "../ui/Swatch";
 import { FloatNumber, IntegerNumber, MoreInfo, ValueChip } from "../ui/text";
 import { selectColumnIdsByParentId } from "../../slices/columnsSlice";
-import { setFocusedColumnIds } from "../../slices/uiSlice";
+import {
+  setFocusedColumnIds,
+  setSelectedColumnIds,
+} from "../../slices/uiSlice";
 
 const VALUE_COUNTS_VIEW = "value_counts";
 const STRING_LENGTH_VIEW = "string_length";
@@ -140,21 +143,19 @@ const ColumnDetail = ({
   const isFirstColumn = currentIndex <= 0;
   const isLastColumn = currentIndex >= siblingColumnIds.length - 1;
 
-  const handleViewChange = (event, newView) => {
-    if (newView !== null) {
-      setView(newView);
-    }
-  };
-
   const navigateToPrevColumn = useCallback(() => {
     if (!isFirstColumn) {
-      dispatch(setFocusedColumnIds([siblingColumnIds[currentIndex - 1]]));
+      const nextColumnId = siblingColumnIds[currentIndex - 1];
+      dispatch(setFocusedColumnIds([nextColumnId]));
+      dispatch(setSelectedColumnIds([nextColumnId]));
     }
   }, [dispatch, siblingColumnIds, currentIndex, isFirstColumn]);
 
   const navigateToNextColumn = useCallback(() => {
     if (!isLastColumn) {
-      dispatch(setFocusedColumnIds([siblingColumnIds[currentIndex + 1]]));
+      const nextColumnId = siblingColumnIds[currentIndex + 1];
+      dispatch(setFocusedColumnIds([nextColumnId]));
+      dispatch(setSelectedColumnIds([nextColumnId]));
     }
   }, [dispatch, siblingColumnIds, currentIndex, isLastColumn]);
 
@@ -192,8 +193,20 @@ const ColumnDetail = ({
         }),
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1,
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          sx={{ minWidth: 0 }}
+        >
           <ColumnIcon />
           <Typography
             variant="h5"
@@ -208,7 +221,13 @@ const ColumnDetail = ({
             {name || databaseName || id}
           </Typography>
         </Stack>
-        <ButtonGroup size="small" aria-label="column navigation">
+        <ButtonGroup
+          size="small"
+          aria-label="column navigation"
+          sx={{
+            marginRight: "25px",
+          }}
+        >
           <IconButton
             size="small"
             onClick={navigateToPrevColumn}
